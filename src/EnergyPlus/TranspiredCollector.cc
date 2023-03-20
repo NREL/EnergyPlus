@@ -183,9 +183,9 @@ namespace TranspiredCollector {
         InitTranspiredCollector(state, CompIndex);
 
         // Control point of deciding if transpired collector is active or not.
-        auto &UTSC_CI(state.dataTranspiredCollector->UTSC(CompIndex));
-        auto &InletNode(UTSC_CI.InletNode);
-        auto &ControlNode(UTSC_CI.ControlNode);
+        auto &UTSC_CI = state.dataTranspiredCollector->UTSC(CompIndex);
+        auto &InletNode = UTSC_CI.InletNode;
+        auto &ControlNode = UTSC_CI.ControlNode;
         UTSC_CI.IsOn = false;
         if ((GetCurrentScheduleValue(state, UTSC_CI.SchedPtr) > 0.0) &&
             (UTSC_CI.InletMDot > 0.0)) { // availability Schedule | OA system is setting mass flow
@@ -538,20 +538,20 @@ namespace TranspiredCollector {
             Roughness = Alphas(11);
             // Select the correct Number for the associated ascii name for the roughness type
             if (UtilityRoutines::SameString(Roughness, "VeryRough"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::VeryRough;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::VeryRough;
             if (UtilityRoutines::SameString(Roughness, "Rough"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::Rough;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::Rough;
             if (UtilityRoutines::SameString(Roughness, "MediumRough"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::MediumRough;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::MediumRough;
             if (UtilityRoutines::SameString(Roughness, "MediumSmooth"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::MediumSmooth;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::MediumSmooth;
             if (UtilityRoutines::SameString(Roughness, "Smooth"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::Smooth;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::Smooth;
             if (UtilityRoutines::SameString(Roughness, "VerySmooth"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::VerySmooth;
 
             // Was it set?
-            if (state.dataTranspiredCollector->UTSC(Item).CollRoughness == DataSurfaces::SurfaceRoughness::Invalid) {
+            if (state.dataTranspiredCollector->UTSC(Item).CollRoughness == Material::SurfaceRoughness::Invalid) {
                 ShowSevereError(state,
                                 format("{} has incorrect entry of {} in {} ={}",
                                        state.dataIPShortCut->cAlphaFieldNames(11),
@@ -875,8 +875,7 @@ namespace TranspiredCollector {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
-        auto &SetPointErrorFlag = state.dataHVACGlobal->SetPointErrorFlag;
+        bool DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
         using namespace DataLoopNode;
         using DataSurfaces::SurfaceData;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
@@ -931,12 +930,12 @@ namespace TranspiredCollector {
                                 ShowSevereError(
                                     state, format("Missing temperature setpoint for UTSC {}", state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name));
                                 ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
-                                SetPointErrorFlag = true;
+                                state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
                                 // need call to EMS to check node
                                 CheckIfNodeSetPointManagedByEMS(
-                                    state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, SetPointErrorFlag);
-                                if (SetPointErrorFlag) {
+                                    state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(
                                         state,
                                         format("Missing temperature setpoint for UTSC {}", state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name));
@@ -1010,7 +1009,7 @@ namespace TranspiredCollector {
 
         // Using/Aliasing
         using ConvectionCoefficients::InitExteriorConvectionCoeff;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using DataSurfaces::SurfaceData;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -1032,56 +1031,56 @@ namespace TranspiredCollector {
         Array1D<Real64> LocalWindArr;
 
         // working variables
-        Real64 RhoAir;                            // density of air
-        Real64 CpAir;                             // specific heat of air
-        Real64 holeArea;                          // area of perforations, includes corrugation of surface
-        Real64 Tamb;                              // outdoor drybulb
-        Real64 A;                                 // projected area of collector, from sum of underlying surfaces
-        Real64 Vholes;                            // mean velocity of air as it passes through collector holes
-        Real64 Vsuction;                          // mean velocity of air as is approaches the collector
-        Real64 Vplen;                             // mean velocity of air inside plenum
-        Real64 HcPlen;                            // surface convection heat transfer coefficient for plenum surfaces
-        Real64 D;                                 // hole diameter
-        Real64 ReD;                               // Reynolds number for holes
-        Real64 P;                                 // pitch, distance betweeen holes
-        Real64 Por;                               // porosity, area fraction of collector that is open because of holes
-        Real64 Mdot;                              // mass flow rate of suction air
-        Real64 QdotSource;                        // energy flux for source/sink inside collector surface (for hybrid PV UTSC)
-        int ThisSurf;                             // do loop counter
-        int NumSurfs;                             // number of underlying HT surfaces associated with UTSC
-        DataSurfaces::SurfaceRoughness Roughness; // parameters for surface roughness, defined in DataHeatBalance
-        Real64 SolAbs;                            // solar absorptivity of collector
-        Real64 AbsExt;                            // thermal emmittance of collector
-        Real64 TempExt;                           // collector temperature
-        int SurfPtr;                              // index of surface in main surface structure
-        Real64 HMovInsul;                         // dummy for call to InitExteriorConvectionCoeff
-        Real64 HExt;                              // dummy for call to InitExteriorConvectionCoeff
-        int ConstrNum;                            // index of construction in main construction structure
-        Real64 AbsThermSurf;                      // thermal emmittance of underlying wall.
-        Real64 TsoK;                              // underlying surface temperature in Kelvin
-        Real64 TscollK;                           // collector temperature in Kelvin  (lagged)
-        Real64 AreaSum;                           // sum of contributing surfaces for area-weighted averages.
-        Real64 Vwind;                             // localized, and area-weighted average for wind speed
-        Real64 HrSky;                             // radiation coeff for sky, area-weighted average
-        Real64 HrGround;                          // radiation coeff for ground, area-weighted average
-        Real64 HrAtm;                             // radiation coeff for air (bulk atmosphere), area-weighted average
-        Real64 Isc;                               // Incoming combined solar radiation, area-weighted average
-        Real64 HrPlen;                            // radiation coeff for plenum surfaces, area-weighted average
-        Real64 Tso;                               // temperature of underlying surface, area-weighted average
-        Real64 HcWind;                            // convection coeff for high speed wind situations
-        Real64 NuD;                               // nusselt number for Reynolds based on hole
-        Real64 U;                                 // overall heat exchanger coefficient
-        Real64 HXeff;                             // effectiveness for heat exchanger
-        Real64 t;                                 // collector thickness
-        Real64 ReS;                               // Reynolds number based on suction velocity and pitch
-        Real64 ReW;                               // Reynolds number based on Wind and pitch
-        Real64 ReB;                               // Reynolds number based on hole velocity and pitch
-        Real64 ReH;                               // Reynolds number based on hole velocity and diameter
-        Real64 Tscoll;                            // temperature of collector
-        Real64 TaHX;                              // leaving air temperature from heat exchanger (entering plenum)
-        Real64 Taplen;                            // Air temperature in plen and outlet node.
-        Real64 SensHeatingRate;                   // Rate at which the system is heating outdoor air
-        Real64 AlessHoles;                        // Area for Kutscher's relation
+        Real64 RhoAir;                        // density of air
+        Real64 CpAir;                         // specific heat of air
+        Real64 holeArea;                      // area of perforations, includes corrugation of surface
+        Real64 Tamb;                          // outdoor drybulb
+        Real64 A;                             // projected area of collector, from sum of underlying surfaces
+        Real64 Vholes;                        // mean velocity of air as it passes through collector holes
+        Real64 Vsuction;                      // mean velocity of air as is approaches the collector
+        Real64 Vplen;                         // mean velocity of air inside plenum
+        Real64 HcPlen;                        // surface convection heat transfer coefficient for plenum surfaces
+        Real64 D;                             // hole diameter
+        Real64 ReD;                           // Reynolds number for holes
+        Real64 P;                             // pitch, distance betweeen holes
+        Real64 Por;                           // porosity, area fraction of collector that is open because of holes
+        Real64 Mdot;                          // mass flow rate of suction air
+        Real64 QdotSource;                    // energy flux for source/sink inside collector surface (for hybrid PV UTSC)
+        int ThisSurf;                         // do loop counter
+        int NumSurfs;                         // number of underlying HT surfaces associated with UTSC
+        Material::SurfaceRoughness Roughness; // parameters for surface roughness, defined in DataHeatBalance
+        Real64 SolAbs;                        // solar absorptivity of collector
+        Real64 AbsExt;                        // thermal emmittance of collector
+        Real64 TempExt;                       // collector temperature
+        int SurfPtr;                          // index of surface in main surface structure
+        Real64 HMovInsul;                     // dummy for call to InitExteriorConvectionCoeff
+        Real64 HExt;                          // dummy for call to InitExteriorConvectionCoeff
+        int ConstrNum;                        // index of construction in main construction structure
+        Real64 AbsThermSurf;                  // thermal emmittance of underlying wall.
+        Real64 TsoK;                          // underlying surface temperature in Kelvin
+        Real64 TscollK;                       // collector temperature in Kelvin  (lagged)
+        Real64 AreaSum;                       // sum of contributing surfaces for area-weighted averages.
+        Real64 Vwind;                         // localized, and area-weighted average for wind speed
+        Real64 HrSky;                         // radiation coeff for sky, area-weighted average
+        Real64 HrGround;                      // radiation coeff for ground, area-weighted average
+        Real64 HrAtm;                         // radiation coeff for air (bulk atmosphere), area-weighted average
+        Real64 Isc;                           // Incoming combined solar radiation, area-weighted average
+        Real64 HrPlen;                        // radiation coeff for plenum surfaces, area-weighted average
+        Real64 Tso;                           // temperature of underlying surface, area-weighted average
+        Real64 HcWind;                        // convection coeff for high speed wind situations
+        Real64 NuD;                           // nusselt number for Reynolds based on hole
+        Real64 U;                             // overall heat exchanger coefficient
+        Real64 HXeff;                         // effectiveness for heat exchanger
+        Real64 t;                             // collector thickness
+        Real64 ReS;                           // Reynolds number based on suction velocity and pitch
+        Real64 ReW;                           // Reynolds number based on Wind and pitch
+        Real64 ReB;                           // Reynolds number based on hole velocity and pitch
+        Real64 ReH;                           // Reynolds number based on hole velocity and diameter
+        Real64 Tscoll;                        // temperature of collector
+        Real64 TaHX;                          // leaving air temperature from heat exchanger (entering plenum)
+        Real64 Taplen;                        // Air temperature in plen and outlet node.
+        Real64 SensHeatingRate;               // Rate at which the system is heating outdoor air
+        Real64 AlessHoles;                    // Area for Kutscher's relation
 
         // Active UTSC calculation
         // first do common things for both correlations
@@ -1182,17 +1181,19 @@ namespace TranspiredCollector {
             InitExteriorConvectionCoeff(
                 state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
-            AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->AbsorpThermal;
+            AbsThermSurf =
+                dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
+                    ->AbsorpThermal;
             TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + DataGlobalConstants::KelvinConv;
             TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + DataGlobalConstants::KelvinConv;
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
         }
         //        AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-        auto Area(
+        auto Area = // (AUTO_OK_OBJ)
             array_sub(state.dataSurface->Surface,
                       &SurfaceData::Area,
                       state.dataTranspiredCollector->UTSC(UTSCNum)
-                          .SurfPtrs)); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
+                          .SurfPtrs); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
         AreaSum = sum(Area);
         // now figure area-weighted averages from underlying surfaces.
         //        Vwind = sum( LocalWindArr * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage:
@@ -1309,7 +1310,7 @@ namespace TranspiredCollector {
             PsyHFnTdbW(state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp, state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat);
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutMassFlow = Mdot;
         state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingRate = SensHeatingRate;
-        state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingEnergy = SensHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingEnergy = SensHeatingRate * TimeStepSysSec;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveACH = 0.0;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotVent = 0.0;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotWind = 0.0;
@@ -1487,12 +1488,12 @@ namespace TranspiredCollector {
             //            Node( UTSC( UTSCNum ).OutletNode ).Temp = Node( UTSC( UTSCNum ).InletNode ).Temp;
             //            Node( UTSC( UTSCNum ).OutletNode ).HumRat = Node( UTSC( UTSCNum ).InletNode ).HumRat;
             //            Node( UTSC( UTSCNum ).OutletNode ).Enthalpy = Node( UTSC( UTSCNum ).InletNode ).Enthalpy;
-            auto const &OutletNode(state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode);
-            auto const &InletNode(state.dataTranspiredCollector->UTSC(UTSCNum).InletNode);
+            auto const &OutletNode = state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode;
+            auto const &InletNode = state.dataTranspiredCollector->UTSC(UTSCNum).InletNode;
             assert(OutletNode.size() == InletNode.size());
             for (int io = OutletNode.l(), ii = InletNode.l(), eo = OutletNode.u(); io <= eo; ++io, ++ii) {
-                auto &outNode(state.dataLoopNodes->Node(OutletNode(io)));
-                auto const &inNode(state.dataLoopNodes->Node(InletNode(ii)));
+                auto &outNode = state.dataLoopNodes->Node(OutletNode(io));
+                auto const &inNode = state.dataLoopNodes->Node(InletNode(ii));
                 outNode.MassFlowRate = inNode.MassFlowRate;
                 outNode.Temp = inNode.Temp;
                 outNode.HumRat = inNode.HumRat;

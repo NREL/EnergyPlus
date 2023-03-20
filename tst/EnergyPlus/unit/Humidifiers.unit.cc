@@ -150,6 +150,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     HumidifierData thisHum;
 
     state->dataHVACGlobal->TimeStepSys = 0.25;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
 
@@ -240,6 +242,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     HumidifierData thisHum;
 
     state->dataHVACGlobal->TimeStepSys = 0.25;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurSysNum = 1;
 

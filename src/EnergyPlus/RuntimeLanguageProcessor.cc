@@ -101,8 +101,8 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
     // One time run.  Must be run BEFORE anything gets parsed.
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     Real64 tmpCurrentTime(0.0);
     Real64 tmpMinutes(0.0);
@@ -799,7 +799,8 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
     while (InstructionNum <= state.dataRuntimeLang->ErlStack(StackNum).NumInstructions) {
 
         {
-            auto const SELECT_CASE_var(state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword);
+            DataRuntimeLanguage::ErlKeywordParam const SELECT_CASE_var =
+                state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword;
 
             if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::None) {
                 // There probably shouldn't be any of these
@@ -1239,8 +1240,8 @@ void ParseExpression(EnergyPlusData &state,
             // parse an operator if found,
             // returns true and increments position, other wise returns false and leaves state untouched
             const auto parse = [&](const char *string, ErlFunc op, bool case_insensitive) {
-                const auto len = strlen(string);
-                const auto potential_match = String.substr(Pos, len);
+                const size_t len = strlen(string);
+                const std::string potential_match = String.substr(Pos, len);
 
                 if ((case_insensitive && UtilityRoutines::SameString(potential_match, string)) || (!case_insensitive && potential_match == string)) {
                     if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "OPERATOR \"{}\"\n", potential_match);
@@ -1733,7 +1734,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
     // Object Data
     Array1D<ErlValueType> Operand;
 
-    auto constexpr EMSBuiltInFunction("EMS Built-In Function");
+    constexpr std::string_view EMSBuiltInFunction = "EMS Built-In Function";
 
     ReturnValue.Type = Value::Number;
     ReturnValue.Number = 0.0;
@@ -2811,7 +2812,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
     // Locals
     // SUBROUTINE PARAMETER DEFINITIONS:
-    auto constexpr RoutineName("GetRuntimeLanguageUserInput: ");
+    constexpr std::string_view RoutineName = "GetRuntimeLanguageUserInput: ";
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int GlobalNum;
@@ -3469,7 +3470,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 }
 
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(3));
+                    std::string const &SELECT_CASE_var = cAlphaArgs(3);
 
                     if (SELECT_CASE_var == "AVERAGED") {
                         VarTypeString = OutputProcessor::SOVStoreType::Average;
@@ -3484,7 +3485,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 }
 
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(4));
+                    std::string const &SELECT_CASE_var = cAlphaArgs(4);
 
                     if (SELECT_CASE_var == "ZONETIMESTEP") {
                         FreqString = OutputProcessor::SOVTimeStepType::Zone;
@@ -3651,7 +3652,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 VarTypeString = OutputProcessor::SOVStoreType::Summed; // all metered vars are sum type
 
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(3));
+                    std::string const &SELECT_CASE_var = cAlphaArgs(3);
 
                     if (SELECT_CASE_var == "ZONETIMESTEP") {
                         FreqString = OutputProcessor::SOVTimeStepType::Zone;
@@ -3667,7 +3668,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 // Resource Type
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(5));
+                    std::string const &SELECT_CASE_var = cAlphaArgs(5);
 
                     if (SELECT_CASE_var == "ELECTRICITY") {
                         ResourceTypeString = "Electricity";
@@ -3724,7 +3725,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 // Group Type
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(6));
+                    std::string const &SELECT_CASE_var = cAlphaArgs(6);
 
                     if (SELECT_CASE_var == "BUILDING") {
                         GroupTypeString = "Building";
@@ -3743,7 +3744,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 // End Use Type
                 {
-                    auto const SELECT_CASE_var(cAlphaArgs(7));
+                    std::string const &SELECT_CASE_var = cAlphaArgs(7);
 
                     if (SELECT_CASE_var == "HEATING") {
                         EndUseTypeString = "Heating";

@@ -104,7 +104,8 @@ checker = licensetext.Checker(licensetext.current_python(), offset=2,
 python_file_license_success = True
 patterns = [r'.*third_party.*', r'^\.(\\|/)build.*',
             r'^\.(\\|/)bin.*', r'.*readthedocs.*',
-            r'.*venv.*', r'.*cmake-build-.*']
+            r'.*venv.*', r'.*cmake-build-.*',
+            r'.*colorize_cppcheck_results.py.*']
 for base in python_dirs:
     file_success = checker.visit(base, exclude_patterns=patterns)
     if not file_success:

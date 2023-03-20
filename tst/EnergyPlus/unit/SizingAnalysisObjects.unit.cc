@@ -435,6 +435,7 @@ TEST_F(SizingAnalysisObjectsTest, DISABLED_LoggingSubStep4stepPerHour)
     state->dataGlobal->DayOfSim = 1;
     int HourofDay(0);
     state->dataHVACGlobal->TimeStepSys = 1.0 / (4.0 * 5.0); // fractional hours, duration
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     Real64 zoneTimeStepDuration(0.25);
     int numTimeStepsInHour(4);
 

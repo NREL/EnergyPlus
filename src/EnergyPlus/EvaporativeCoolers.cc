@@ -1045,7 +1045,7 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     // Uses the status flags to trigger events.
 
     // Using/Aliasing
-    auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
+    bool DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool localSetPointCheck(false);
@@ -1458,13 +1458,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 HardSizeNoDesRun = true;
                 if (thisEvapCond.PadArea > 0.0) {
                     // report for the indirect evap cooler types only
-                    if (thisEvapCond.PadArea > 0.0) {
-                        BaseSizer::reportSizerOutput(state,
-                                                     "EvaporativeCooler:Direct:CelDekPad",
-                                                     thisEvapCond.Name,
-                                                     "User-Specified Celdek Pad Area [m2]",
-                                                     thisEvapCond.PadArea);
-                    }
+                    BaseSizer::reportSizerOutput(
+                        state, "EvaporativeCooler:Direct:CelDekPad", thisEvapCond.Name, "User-Specified Celdek Pad Area [m2]", thisEvapCond.PadArea);
                 }
             } else { // Autosize or hardsize with design data
                 // zone equip evap coolers
@@ -3334,16 +3329,16 @@ void ReportEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     auto &thisEvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
 
     // report the Evap Cooler energy from this component
     thisEvapCond.EvapCoolerPower = thisEvapCond.EvapCoolerPower;
-    thisEvapCond.EvapCoolerEnergy = thisEvapCond.EvapCoolerPower * TimeStepSys * DataGlobalConstants::SecInHour;
+    thisEvapCond.EvapCoolerEnergy = thisEvapCond.EvapCoolerPower * TimeStepSysSec;
 
     // Report Water comsumption in cubic meters per timestep
-    thisEvapCond.EvapWaterConsump = thisEvapCond.EvapWaterConsumpRate * TimeStepSys * DataGlobalConstants::SecInHour;
-    thisEvapCond.EvapWaterStarvMakup = thisEvapCond.EvapWaterStarvMakupRate * TimeStepSys * DataGlobalConstants::SecInHour;
+    thisEvapCond.EvapWaterConsump = thisEvapCond.EvapWaterConsumpRate * TimeStepSysSec;
+    thisEvapCond.EvapWaterStarvMakup = thisEvapCond.EvapWaterStarvMakupRate * TimeStepSysSec;
 }
 
 void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state,
@@ -3829,7 +3824,7 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4554,7 +4549,7 @@ void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) /
     // update output variables for the zone evap unit
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ZoneNodeNum;
@@ -4575,13 +4570,13 @@ void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) /
                                   Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNodeNum).Temp, MinHumRat));
 
     ZoneEvapUnit(UnitNum).UnitTotalCoolingRate = std::abs(min(0.0, QTotUnitOut));
-    ZoneEvapUnit(UnitNum).UnitTotalCoolingEnergy = ZoneEvapUnit(UnitNum).UnitTotalCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
+    ZoneEvapUnit(UnitNum).UnitTotalCoolingEnergy = ZoneEvapUnit(UnitNum).UnitTotalCoolingRate * TimeStepSysSec;
     ZoneEvapUnit(UnitNum).UnitSensibleCoolingRate = std::abs(min(0.0, QSensUnitOut));
-    ZoneEvapUnit(UnitNum).UnitSensibleCoolingEnergy = ZoneEvapUnit(UnitNum).UnitSensibleCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
+    ZoneEvapUnit(UnitNum).UnitSensibleCoolingEnergy = ZoneEvapUnit(UnitNum).UnitSensibleCoolingRate * TimeStepSysSec;
     ZoneEvapUnit(UnitNum).UnitLatentHeatingRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
-    ZoneEvapUnit(UnitNum).UnitLatentHeatingEnergy = ZoneEvapUnit(UnitNum).UnitLatentHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour;
+    ZoneEvapUnit(UnitNum).UnitLatentHeatingEnergy = ZoneEvapUnit(UnitNum).UnitLatentHeatingRate * TimeStepSysSec;
     ZoneEvapUnit(UnitNum).UnitLatentCoolingRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
-    ZoneEvapUnit(UnitNum).UnitLatentCoolingEnergy = ZoneEvapUnit(UnitNum).UnitLatentCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
+    ZoneEvapUnit(UnitNum).UnitLatentCoolingEnergy = ZoneEvapUnit(UnitNum).UnitLatentCoolingRate * TimeStepSysSec;
     ZoneEvapUnit(UnitNum).UnitFanSpeedRatio = ZoneEvapUnit(UnitNum).FanSpeedRatio;
 }
 

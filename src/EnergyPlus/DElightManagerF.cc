@@ -214,7 +214,7 @@ namespace DElightManagerF {
         int iNumWndoConsts = 0;
 
         // Open a file for writing DElight input from EnergyPlus data
-        auto delightInFile = state.files.delightIn.open(state, "DElightInputGenerator", state.files.outputControl.delightin);
+        auto delightInFile = state.files.delightIn.open(state, "DElightInputGenerator", state.files.outputControl.delightin); // (THIS_AUTO_OK)
 
         // Start of DElight input file
         print(delightInFile, Format_901, state.dataStrGlobals->CurrentDateTime);
@@ -345,7 +345,10 @@ namespace DElightManagerF {
                                     iMatlLayer = state.dataConstruction->Construct(iconstruct).LayerPoint(1);
                                     // Get the outside visible reflectance of this material layer
                                     // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
-                                    rExtVisRefl = 1.0 - state.dataMaterial->Material(iMatlLayer)->AbsorpVisible;
+                                    auto const *thisMaterial =
+                                        dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(iMatlLayer));
+                                    assert(thisMaterial != nullptr);
+                                    rExtVisRefl = 1.0 - thisMaterial->AbsorpVisible;
                                 } else {
                                     rExtVisRefl = 0.0;
                                 }
@@ -720,7 +723,7 @@ namespace DElightManagerF {
         int IOStat;
         int CFSNum = 0;
 
-        constexpr auto cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
+        constexpr std::string_view cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
 
         int TotDElightCFS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataDaylightingData->DElightComplexFene.allocate(TotDElightCFS);
@@ -784,7 +787,7 @@ namespace DElightManagerF {
         // ratio for the entire building based on user input.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto CurrentModuleObject("GeometryTransform");
+        constexpr std::string_view CurrentModuleObject("GeometryTransform");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string cAlphas(1);
@@ -851,7 +854,7 @@ namespace DElightManagerF {
     }
 
     void DElightElecLtgCtrl(int iNameLength,
-                            std::string cZoneName,
+                            std::string const &cZoneName,
                             Real64 dBldgLat,
                             Real64 dHISKF,
                             Real64 dHISUNF,
@@ -862,7 +865,7 @@ namespace DElightManagerF {
                             Real64 &pdPowerReducFac,
                             int piErrorFlag)
     {
-        auto zoneNameArr(getCharArrayFromString(cZoneName));
+        std::vector<char> zoneNameArr(getCharArrayFromString(cZoneName));
         delightelecltgctrl(
             iNameLength, &zoneNameArr[0], dBldgLat, dHISKF, dHISUNF, dCloudFraction, dSOLCOSX, dSOLCOSY, dSOLCOSZ, &pdPowerReducFac, &piErrorFlag);
     }

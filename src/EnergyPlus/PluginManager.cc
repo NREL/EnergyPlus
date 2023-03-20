@@ -143,12 +143,12 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
             std::string const &thisObjectName = instance.key();
-            auto const objNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(thisObjectName);
+            std::string const objNameUC = UtilityRoutines::MakeUPPERCase(thisObjectName);
             // no need to validate name, the JSON will validate that.
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sOutputVariable, thisObjectName);
             std::string varName = fields.at("python_plugin_variable_name").get<std::string>();
-            std::string avgOrSum = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("type_of_data_in_variable").get<std::string>());
-            std::string updateFreq = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("update_frequency").get<std::string>());
+            std::string avgOrSum = UtilityRoutines::MakeUPPERCase(fields.at("type_of_data_in_variable").get<std::string>());
+            std::string updateFreq = UtilityRoutines::MakeUPPERCase(fields.at("update_frequency").get<std::string>());
             std::string units;
             if (fields.find("units") != fields.end()) {
                 units = fields.at("units").get<std::string>();
@@ -404,6 +404,14 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
 
 PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(state.dataPluginManager->eplusRunningViaPythonAPI)
 {
+    // Now read all the actual plugins and interpret them
+    // IMPORTANT -- DO NOT CALL setup() UNTIL ALL INSTANCES ARE DONE
+    std::string const sPlugins = "PythonPlugin:Instance";
+    int pluginInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sPlugins);
+    if (pluginInstances == 0) {
+        return;
+    }
+
 #if LINK_WITH_PYTHON
     // this frozen flag tells Python that the package and library have been frozen for embedding, so it shouldn't warn about missing prefixes
     Py_FrozenFlag = 1;
@@ -516,7 +524,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
                         state,
                         "PluginManager: Search path inputs requested adding epin variable to Python path, but epin variable was empty, skipping.");
                 } else {
-                    auto epinRootDir = FileSystem::getParentDirectoryPath(fs::path(epinPathObject));
+                    fs::path epinRootDir = FileSystem::getParentDirectoryPath(fs::path(epinPathObject));
                     if (FileSystem::pathExists(epinRootDir)) {
                         fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epinRootDir);
                         PluginManager::addToPythonPath(state, sanitizedEnvInputDir, true);
@@ -529,10 +537,10 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
             }
 
             try {
-                auto const vars = fields.at("py_search_paths");
+                auto const &vars = fields.at("py_search_paths");
                 for (const auto &var : vars) {
                     try {
-                        PluginManager::addToPythonPath(state, PluginManager::sanitizedPath(fs::path{var.at("search_path").get<std::string>()}), true);
+                        PluginManager::addToPythonPath(state, PluginManager::sanitizedPath(fs::path(var.at("search_path").get<std::string>())), true);
                     } catch (nlohmann::json::out_of_range &e) {
                         // empty entry
                     }
@@ -551,7 +559,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
         get_environment_variable("epin", epin_path);
         fs::path epinPathObject = fs::path(epin_path);
         if (!epinPathObject.empty()) {
-            auto epinRootDir = FileSystem::getParentDirectoryPath(fs::path(epinPathObject));
+            fs::path epinRootDir = FileSystem::getParentDirectoryPath(fs::path(epinPathObject));
             if (FileSystem::pathExists(epinRootDir)) {
                 fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epinRootDir);
                 PluginManager::addToPythonPath(state, sanitizedEnvInputDir, true);
@@ -561,9 +569,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
 
     // Now read all the actual plugins and interpret them
     // IMPORTANT -- DO NOT CALL setup() UNTIL ALL INSTANCES ARE DONE
-    std::string const sPlugins = "PythonPlugin:Instance";
-    int pluginInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sPlugins);
-    if (pluginInstances > 0) {
+    {
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(sPlugins);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
             ShowSevereError(state,                                                                                // LCOV_EXCL_LINE
@@ -603,7 +609,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
             auto const &fields = instance.value();
             std::string const &thisObjectName = instance.key();
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
-            auto const vars = fields.at("global_py_vars");
+            auto const &vars = fields.at("global_py_vars");
             for (const auto &var : vars) {
                 std::string const varNameToAdd = var.at("variable_name").get<std::string>();
                 if (uniqueNames.find(varNameToAdd) == uniqueNames.end()) {
@@ -656,11 +662,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
     // setting up output variables deferred until later in the simulation setup process
 #else
     // need to alert only if a plugin instance is found
-    std::string const sPlugins = "PythonPlugin:Instance";
-    int pluginInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sPlugins);
-    if (pluginInstances > 0) {
-        EnergyPlus::ShowFatalError(state, "Python Plugin instance found, but this build of EnergyPlus is not compiled with Python.");
-    }
+    EnergyPlus::ShowFatalError(state, "Python Plugin instance found, but this build of EnergyPlus is not compiled with Python.");
 #endif
 }
 
@@ -1122,7 +1124,7 @@ bool PluginInstance::run(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledF
                                    format("Program terminates after call to {}() on {} failed!", functionNameAsString, this->stringIdentifier));
     }
     if (PyLong_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
-        auto exitCode = PyLong_AsLong(pFunctionResponse);
+        int exitCode = PyLong_AsLong(pFunctionResponse);
         if (exitCode == 0) {
             // success
         } else if (exitCode == 1) {
@@ -1419,8 +1421,8 @@ void PluginManager::setGlobalVariableValue([[maybe_unused]] EnergyPlusData &stat
 int PluginManager::getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &_programName)
 {
     for (size_t handle = 0; handle < state.dataPluginManager->plugins.size(); handle++) {
-        auto const thisPlugin = state.dataPluginManager->plugins[handle];
-        if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(_programName)) {
+        auto const &thisPlugin = state.dataPluginManager->plugins[handle];
+        if (UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == UtilityRoutines::MakeUPPERCase(_programName)) {
             return handle;
         }
     }
@@ -1448,7 +1450,7 @@ void PluginManager::runSingleUserDefinedPlugin([[maybe_unused]] EnergyPlusData &
 bool PluginManager::anyUnexpectedPluginObjects(EnergyPlusData &state)
 {
     int numTotalThings = 0;
-    for (auto const &objToFind : state.dataPluginManager->objectsToFind) {
+    for (std::string const &objToFind : state.dataPluginManager->objectsToFind) {
         int instances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, objToFind);
         numTotalThings += instances;
         if (numTotalThings == 1) {

@@ -326,7 +326,6 @@ namespace CTElectricGenerator {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), AlphArray(11)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
-                FuelTypeError = false;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecMaxTemp = NumArray(12);
@@ -532,8 +531,6 @@ namespace CTElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // simulate a vapor compression Generator using the CT model
@@ -561,14 +558,13 @@ namespace CTElectricGenerator {
         // design turbine inlet temperature (C)
         Real64 designAirInletTemp = this->DesignAirInletTemp;
 
-        int heatRecInNode;    // Heat Recovery Fluid Inlet Node Num
         Real64 heatRecInTemp; // Heat Recovery Fluid Inlet Temperature (C)
 
         Real64 heatRecMdot; // Heat Recovery Fluid Mass FlowRate (kg/s)
         Real64 heatRecCp;   // Specific Heat of the Heat Recovery Fluid (J/kg-K)
 
         if (this->HeatRecActive) {
-            heatRecInNode = this->HeatRecInletNodeNum;
+            int heatRecInNode = this->HeatRecInletNodeNum;
             heatRecInTemp = state.dataLoopNodes->Node(heatRecInNode).Temp;
 
             heatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -802,12 +798,11 @@ namespace CTElectricGenerator {
 
     void CTGeneratorData::oneTimeInit(EnergyPlusData &state)
     {
-        auto constexpr RoutineName("InitICEngineGenerators");
-        bool errFlag;
+        std::string_view constexpr RoutineName("InitICEngineGenerators");
 
         if (this->MyPlantScanFlag) { // this flag to be removed
             if (allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
-                errFlag = false;
+                bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(
                     state, this->Name, DataPlant::PlantEquipmentType::Generator_CTurbine, this->HRPlantLoc, errFlag, _, _, _, _, _);
                 if (errFlag) {

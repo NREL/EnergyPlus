@@ -231,9 +231,8 @@ namespace BaseboardRadiator {
         int constexpr iHeatCapacityPerFloorAreaNumericNum(
             2); // get input index to water baseboard Radiator system electric heating capacity per floor area sizing
         int constexpr iHeatFracOfAutosizedCapacityNumericNum(
-            3); //  get input index to water baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
+            3); //  get input index to water baseboard Radiator system electric heating capacity sizing as fraction of autosized heating capacity
 
-        bool ErrorsFound(false); // If errors detected in input
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         cCurrentModuleObject = cCMO_BBRadiator_Water;
@@ -245,6 +244,7 @@ namespace BaseboardRadiator {
         state.dataBaseboardRadiator->baseboards.allocate(NumConvHWBaseboards);
 
         if (NumConvHWBaseboards > 0) { // Get the data for cooling schemes
+            bool ErrorsFound(false);   // If errors detected in input
             for (int ConvHWBaseboardNum = 1; ConvHWBaseboardNum <= NumConvHWBaseboards; ++ConvHWBaseboardNum) {
                 int NumAlphas = 0;
                 int NumNums = 0;
@@ -265,7 +265,6 @@ namespace BaseboardRadiator {
 
                 auto &thisBaseboard = state.dataBaseboardRadiator->baseboards(ConvHWBaseboardNum);
                 thisBaseboard.FieldNames.allocate(NumNums);
-                thisBaseboard.FieldNames = "";
                 thisBaseboard.FieldNames = state.dataIPShortCut->cNumericFieldNames;
 
                 if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
@@ -598,7 +597,6 @@ namespace BaseboardRadiator {
         //       DATE WRITTEN   February 2002
         //       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
         //                      July 2014, B.Nigusse, added scalable sizing
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for sizing hot water baseboard components for which flow rates and UAs have not been
@@ -608,58 +606,38 @@ namespace BaseboardRadiator {
         // Obtains flow rates from the zone sizing arrays and plant sizing data. UAs are
         // calculated by numerically inverting the baseboard calculation routine.
 
-        // Using/Aliasing
-        using namespace DataSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
-
-        using PlantUtilities::RegisterPlantCompDesignFlow;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr Acc(0.0001); // Accuracy of result
         int constexpr MaxIte(500);    // Maximum number of iterations
         static std::string const RoutineName(cCMO_BBRadiator_Water + ":SizeBaseboard");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int WaterInletNode;
-        int PltSizHeatNum(0); // index of plant sizing object for 1st heating loop
         Real64 DesCoilLoad(0.0);
-        int SolFla; // Flag of solver
         Real64 UA0; // lower bound for UA
         Real64 UA1; // upper bound for UA
         Real64 UA;
         bool ErrorsFound(false);             // If errors detected in input
         Real64 rho;                          // local fluid density
         Real64 Cp;                           // local fluid specific heat
-        bool FlowAutoSize(false);            // Indicator to autosizing water volume flow
-        bool UAAutoSize(false);              // Indicator to autosizing UA
         Real64 WaterVolFlowRateMaxDes(0.0);  // Design water volume flow for reproting
         Real64 WaterVolFlowRateMaxUser(0.0); // User hard-sized volume flow for reporting
         Real64 UADes(0.0);                   // Design UA value for reproting
         Real64 UAUser(0.0);                  // User hard-sized value for reporting
-        std::string CompName;                // component name
-        std::string CompType;                // component type
-        std::string SizingString;            // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;                     // autosized value of coil input field
-        int FieldNum = 1;                    // IDD numeric field number where input field description is found
-        int SizingMethod;                    // Integer representation of sizing method name (HeatingCapacitySizing)
-        bool PrintFlag;                      // TRUE when sizing information is reported in the eio file
-        int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, and FractionOfAutosizedHeatingCapacity )
-
-        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
-        auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
-        auto &FinalZoneSizing(state.dataSize->FinalZoneSizing);
-        auto &DataScalableCapSizingON(state.dataSize->DataScalableCapSizingON);
 
         // find the appropriate heating Plant Sizing object
-        PltSizHeatNum = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PlantSizNum;
+        int PltSizHeatNum = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PlantSizNum;
 
         if (PltSizHeatNum > 0) {
 
-            DataScalableCapSizingON = false;
+            state.dataSize->DataScalableCapSizingON = false;
 
-            if (CurZoneEqNum > 0) {
+            if (state.dataSize->CurZoneEqNum > 0) {
+                auto &zoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
+                auto const &finalZoneSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum);
+                bool FlowAutoSize = false; // Indicator to autosizing water volume flow
 
-                if (this->WaterVolFlowRateMax == AutoSize) {
+                if (this->WaterVolFlowRateMax == DataSizing::AutoSize) {
                     FlowAutoSize = true;
                 }
                 if (!FlowAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation should continue
@@ -669,50 +647,50 @@ namespace BaseboardRadiator {
                     }
                 } else {
                     CheckZoneSizing(state, cCMO_BBRadiator_Water, this->EquipID);
-                    CompType = cCMO_BBRadiator_Water;
-                    CompName = this->EquipID;
+                    std::string CompType = cCMO_BBRadiator_Water;
+                    std::string CompName = this->EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = this->ZonePtr;
-                    SizingMethod = HeatingCapacitySizing;
-                    FieldNum = 1;
-                    PrintFlag = false;
-                    SizingString = this->FieldNames(FieldNum) + " [W]";
-                    CapSizingMethod = this->HeatingCapMethod;
-                    ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-                    if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-                        CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                    int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+                    int FieldNum = 1;
+                    std::string SizingString = this->FieldNames(FieldNum) + " [W]";
+                    int CapSizingMethod = this->HeatingCapMethod;
+                    zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
+                    if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
+                        CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
 
-                        if (CapSizingMethod == HeatingDesignCapacity) {
-                            if (this->ScaledHeatingCapacity == AutoSize) {
+                        if (CapSizingMethod == DataSizing::HeatingDesignCapacity) {
+                            if (this->ScaledHeatingCapacity == DataSizing::AutoSize) {
                                 CheckZoneSizing(state, CompType, CompName);
-                                ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
+                                zoneEqSizing.DesHeatingLoad = finalZoneSizing.NonAirSysDesHeatLoad;
                             } else {
-                                ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = this->ScaledHeatingCapacity;
+                                zoneEqSizing.DesHeatingLoad = this->ScaledHeatingCapacity;
                             }
-                            ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                            TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
-                        } else if (CapSizingMethod == CapacityPerFloorArea) {
-                            ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                            ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
+                            zoneEqSizing.HeatingCapacity = true;
+                            TempSize = zoneEqSizing.DesHeatingLoad;
+                        } else if (CapSizingMethod == DataSizing::CapacityPerFloorArea) {
+                            zoneEqSizing.HeatingCapacity = true;
+                            zoneEqSizing.DesHeatingLoad =
                                 this->ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
-                            TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
-                            DataScalableCapSizingON = true;
-                        } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                            TempSize = zoneEqSizing.DesHeatingLoad;
+                            state.dataSize->DataScalableCapSizingON = true;
+                        } else if (CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
                             CheckZoneSizing(state, CompType, CompName);
-                            ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
+                            zoneEqSizing.HeatingCapacity = true;
                             state.dataSize->DataFracOfAutosizedHeatingCapacity = this->ScaledHeatingCapacity;
-                            ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
-                            TempSize = AutoSize;
-                            DataScalableCapSizingON = true;
+                            zoneEqSizing.DesHeatingLoad = finalZoneSizing.NonAirSysDesHeatLoad;
+                            TempSize = DataSizing::AutoSize;
+                            state.dataSize->DataScalableCapSizingON = true;
                         } else {
                             TempSize = this->ScaledHeatingCapacity;
                         }
+                        bool PrintFlag = false; // TRUE when sizing information is reported in the eio file
                         bool errorsFound = false;
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                        DataScalableCapSizingON = false;
+                        state.dataSize->DataScalableCapSizingON = false;
                     } else {
                         DesCoilLoad = 0.0;
                     }
@@ -768,8 +746,9 @@ namespace BaseboardRadiator {
                 }
 
                 // UA sizing
+                bool UAAutoSize = false; // Indicator to autosizing UA
                 // Set hard-sized values to the local variable to correct a false indication aftet SolFla function calculation
-                if (this->UA == AutoSize) {
+                if (this->UA == DataSizing::AutoSize) {
                     UAAutoSize = true;
                 } else {
                     UAUser = this->UA;
@@ -781,59 +760,58 @@ namespace BaseboardRadiator {
                     }
                 } else {
                     this->WaterInletTemp = state.dataSize->PlantSizData(PltSizHeatNum).ExitTemp;
-                    this->AirInletTemp = FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak;
-                    this->AirInletHumRat = FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtHeatPeak;
-                    WaterInletNode = this->WaterInletNode;
+                    this->AirInletTemp = finalZoneSizing.ZoneTempAtHeatPeak;
+                    this->AirInletHumRat = finalZoneSizing.ZoneHumRatAtHeatPeak;
                     rho = GetDensityGlycol(state,
                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                            RoutineName);
-                    state.dataLoopNodes->Node(WaterInletNode).MassFlowRate = rho * this->WaterVolFlowRateMax;
+                    state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = rho * this->WaterVolFlowRateMax;
 
-                    CompType = cCMO_BBRadiator_Water;
-                    CompName = this->EquipID;
+                    std::string CompType = cCMO_BBRadiator_Water;
+                    std::string CompName = this->EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = this->ZonePtr;
-                    SizingMethod = HeatingCapacitySizing;
-                    FieldNum = 1;
-                    PrintFlag = false;
-                    SizingString = this->FieldNames(FieldNum) + " [W]";
-                    CapSizingMethod = this->HeatingCapMethod;
-                    ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-                    if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-                        CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                        if (CapSizingMethod == HeatingDesignCapacity) {
-                            if (this->ScaledHeatingCapacity == AutoSize) {
+                    int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+                    int FieldNum = 1;
+                    std::string SizingString = this->FieldNames(FieldNum) + " [W]";
+                    int CapSizingMethod = this->HeatingCapMethod;
+                    zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
+                    if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
+                        CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
+                        if (CapSizingMethod == DataSizing::HeatingDesignCapacity) {
+                            if (this->ScaledHeatingCapacity == DataSizing::AutoSize) {
                                 CheckZoneSizing(state, CompType, CompName);
-                                ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
+                                zoneEqSizing.DesHeatingLoad = finalZoneSizing.NonAirSysDesHeatLoad;
                             } else {
-                                ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = this->ScaledHeatingCapacity;
+                                zoneEqSizing.DesHeatingLoad = this->ScaledHeatingCapacity;
                             }
-                            ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                            TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
-                        } else if (CapSizingMethod == CapacityPerFloorArea) {
-                            ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                            ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
+                            zoneEqSizing.HeatingCapacity = true;
+                            TempSize = zoneEqSizing.DesHeatingLoad;
+                        } else if (CapSizingMethod == DataSizing::CapacityPerFloorArea) {
+                            zoneEqSizing.HeatingCapacity = true;
+                            zoneEqSizing.DesHeatingLoad =
                                 this->ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
-                            TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
-                            DataScalableCapSizingON = true;
-                        } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                            TempSize = zoneEqSizing.DesHeatingLoad;
+                            state.dataSize->DataScalableCapSizingON = true;
+                        } else if (CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
                             CheckZoneSizing(state, CompType, CompName);
-                            ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
+                            zoneEqSizing.HeatingCapacity = true;
                             state.dataSize->DataFracOfAutosizedHeatingCapacity = this->ScaledHeatingCapacity;
-                            ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
-                            TempSize = AutoSize;
-                            DataScalableCapSizingON = true;
+                            zoneEqSizing.DesHeatingLoad = finalZoneSizing.NonAirSysDesHeatLoad;
+                            TempSize = DataSizing::AutoSize;
+                            state.dataSize->DataScalableCapSizingON = true;
                         } else {
                             TempSize = this->ScaledHeatingCapacity;
                         }
+                        bool PrintFlag = false;
                         bool errorsFound = false;
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                        DataScalableCapSizingON = false;
+                        state.dataSize->DataScalableCapSizingON = false;
                     } else {
                         DesCoilLoad = 0.0; // FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
@@ -862,6 +840,7 @@ namespace BaseboardRadiator {
                                     SimHWConvective(state, localBaseBoardNum, LoadMet);
                                     return (DesCoilLoad - LoadMet) / DesCoilLoad;
                                 };
+                                int SolFla = 0;
                                 General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1);
                                 // if the numerical inversion failed, issue error messages.
                                 if (SolFla == -1) {
@@ -957,7 +936,7 @@ namespace BaseboardRadiator {
             }
         } else {
             // if there is no heating Sizing:Plant object and autosizng was requested, issue an error message
-            if (FlowAutoSize || UAAutoSize) {
+            if (this->WaterVolFlowRateMax == DataSizing::AutoSize || this->UA == DataSizing::AutoSize) {
                 ShowSevereError(state, format("SizeBaseboard: {}=\"{}\"", cCMO_BBRadiator_Water, this->EquipID));
                 ShowContinueError(state, "...Autosizing of hot water baseboard requires a heating loop Sizing:Plant object");
                 ErrorsFound = true;
@@ -965,7 +944,7 @@ namespace BaseboardRadiator {
         }
 
         // save the design water flow rate for use by the water loop sizing algorithms
-        RegisterPlantCompDesignFlow(state, this->WaterInletNode, this->WaterVolFlowRateMax);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInletNode, this->WaterVolFlowRateMax);
 
         if (ErrorsFound) {
             ShowFatalError(state, "SizeBaseboard: Preceding sizing errors cause program termination");

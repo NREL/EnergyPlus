@@ -422,7 +422,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     int NumTUInList = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).NumTUInList;
     int NumTUInCoolingMode = 0;            // number of terminal units actually cooling
     int NumTUInHeatingMode = 0;            // number of terminal units actually heating
-    Real64 TUCoolingLoad = 0.0;            // sum of TU's cooling coil load {W}
+    Real64 TUCoolingLoad = 0.0;            // sum of TU's cooling coil load (W)
     Real64 TUHeatingLoad = 0.0;            // sum of TU's heating coil load (W)
     Real64 TUParasiticPower = 0.0;         // total terminal unit parasitic power (W)
     Real64 TUFanPower = 0.0;               // total terminal unit fan power (W)
@@ -1397,12 +1397,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     using Fans::GetFanOutletNode;
     using Fans::GetFanType;
 
-    using MixedAir::GetOAMixerNodeNumbers;
-    using NodeInputManager::GetOnlySingleNode;
-    using ScheduleManager::CheckScheduleValueMinMax;
-    using ScheduleManager::GetScheduleIndex;
-    auto &GetDXCoilInletNode(DXCoils::GetCoilInletNode);
-    auto &GetDXCoilOutletNode(DXCoils::GetCoilOutletNode);
     using DataSizing::AutoSize;
     using DXCoils::GetCoilCondenserInletNode;
     using DXCoils::GetCoilTypeNum;
@@ -1415,7 +1409,11 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     using DXCoils::RatedOutdoorAirTempHeat;
     using DXCoils::RatedOutdoorWetBulbTempHeat;
     using DXCoils::SetDXCoolingCoilData;
+    using MixedAir::GetOAMixerNodeNumbers;
+    using NodeInputManager::GetOnlySingleNode;
     using OutAirNodeManager::CheckOutAirNodeNumber;
+    using ScheduleManager::CheckScheduleValueMinMax;
+    using ScheduleManager::GetScheduleIndex;
     using SingleDuct::GetATMixer;
     using WaterManager::SetupTankDemandComponent;
     using WaterManager::SetupTankSupplyComponent;
@@ -3610,9 +3608,9 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                        thisVrfTU.CoolCoilIndex,
                                        errFlag,
                                        DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling));
-                        CCoilInletNodeNum = GetDXCoilInletNode(
+                        CCoilInletNodeNum = DXCoils::GetCoilInletNode(
                             state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling), cAlphaArgs(12), errFlag);
-                        CCoilOutletNodeNum = GetDXCoilOutletNode(
+                        CCoilOutletNodeNum = DXCoils::GetCoilOutletNode(
                             state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling), cAlphaArgs(12), errFlag);
                         thisVrfTU.coolCoilAirInNode = CCoilInletNodeNum;
                         thisVrfTU.coolCoilAirOutNode = CCoilOutletNodeNum;
@@ -3707,10 +3705,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                        thisVrfTU.CoolCoilIndex,
                                        errFlag,
                                        DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling));
-                        CCoilInletNodeNum =
-                            GetDXCoilInletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
-                        CCoilOutletNodeNum =
-                            GetDXCoilOutletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
+                        CCoilInletNodeNum = DXCoils::GetCoilInletNode(
+                            state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
+                        CCoilOutletNodeNum = DXCoils::GetCoilOutletNode(
+                            state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
                         thisVrfTU.coolCoilAirInNode = CCoilInletNodeNum;
                         thisVrfTU.coolCoilAirOutNode = CCoilOutletNodeNum;
 
@@ -3790,9 +3788,9 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                        thisVrfTU.HeatCoilIndex,
                                        errFlag,
                                        DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating));
-                        HCoilInletNodeNum = GetDXCoilInletNode(
+                        HCoilInletNodeNum = DXCoils::GetCoilInletNode(
                             state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating), cAlphaArgs(14), errFlag);
-                        HCoilOutletNodeNum = GetDXCoilOutletNode(
+                        HCoilOutletNodeNum = DXCoils::GetCoilOutletNode(
                             state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating), cAlphaArgs(14), errFlag);
                         thisVrfTU.heatCoilAirInNode = HCoilInletNodeNum;
                         thisVrfTU.heatCoilAirOutNode = HCoilOutletNodeNum;
@@ -4046,10 +4044,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                        thisVrfTU.HeatCoilIndex,
                                        errFlag,
                                        DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating));
-                        HCoilInletNodeNum =
-                            GetDXCoilInletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
-                        HCoilOutletNodeNum =
-                            GetDXCoilOutletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
+                        HCoilInletNodeNum = DXCoils::GetCoilInletNode(
+                            state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
+                        HCoilOutletNodeNum = DXCoils::GetCoilOutletNode(
+                            state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
                         thisVrfTU.heatCoilAirInNode = HCoilInletNodeNum;
                         thisVrfTU.heatCoilAirOutNode = HCoilOutletNodeNum;
 
@@ -7581,7 +7579,6 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
 
     using namespace DataSizing;
     using Curve::CurveValue;
-    auto &GetDXCoilCap(DXCoils::GetCoilCapacityByIndexType);
     using DataHVACGlobals::CoolingAirflowSizing;
     using DataHVACGlobals::CoolingCapacitySizing;
     using DataHVACGlobals::HeatingAirflowSizing;
@@ -7592,42 +7589,41 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     static constexpr std::string_view RoutineName("SizeVRF: "); // include trailing blank space
 
     auto &CheckVRFCombinationRatio = state.dataHVACVarRefFlow->CheckVRFCombinationRatio;
-    bool FoundAll;                                                       // temporary variable used to check all terminal units
-    bool errFlag;                                                        // temporary variable used for error checking
-    Real64 TUCoolingCapacity;                                            // total terminal unit cooling capacity
-    Real64 TUHeatingCapacity;                                            // total terminal unit heating capacity
-    int VRFCond;                                                         // index to VRF condenser
-    int TUListNum;                                                       // index to terminal unit list
-    int TUIndex;                                                         // index to terminal unit
-    int NumTU;                                                           // DO Loop index counter
-    auto &MyOneTimeEIOFlag = state.dataHVACVarRefFlow->MyOneTimeEIOFlag; // eio header flag reporting
-    Real64 OnOffAirFlowRat;                                              // temporary variable used when sizing coils
-    Real64 DXCoilCap;                                                    // capacity of DX cooling coil (W)
-    bool IsAutoSize;                                                     // Indicator to autosize
-    Real64 MaxCoolAirVolFlowDes;                                         // Autosized supply air during cooling for reporting
-    Real64 MaxCoolAirVolFlowUser;                                        // Hardsized supply air during cooling for reporting
-    Real64 MaxHeatAirVolFlowDes;                                         // Autosized supply air during heating for reporting
-    Real64 MaxHeatAirVolFlowUser;                                        // Hardsized supply air during heating for reporting
-    Real64 MaxNoCoolAirVolFlowDes;                                       // Autosized supply air flow when no cooling is needed for reporting
-    Real64 MaxNoCoolAirVolFlowUser;                                      // Hardsized supply air flow when no cooling is needed for reporting
-    Real64 MaxNoHeatAirVolFlowDes;                                       // Autosized supply air flow when no heating is needed for reporting
-    Real64 MaxNoHeatAirVolFlowUser;                                      // Hardsized supply air flow when no heating is needed for reporting
-    Real64 CoolOutAirVolFlowDes;                                         // Autosized outdoor air flow during cooling for reporting
-    Real64 CoolOutAirVolFlowUser;                                        // Hardsized outdoor air flow during cooling for reporting
-    Real64 HeatOutAirVolFlowDes;                                         // Autosized outdoor air flow during heating for reporting
-    Real64 HeatOutAirVolFlowUser;                                        // Hardsized outdoor air flow during heating for reporting
-    Real64 NoCoolHeatOutAirVolFlowDes;                                   // Autosized outdoor air when unconditioned for reporting
-    Real64 NoCoolHeatOutAirVolFlowUser;                                  // Hardsized outdoor air when unconditioned for reporting
-    Real64 CoolingCapacityDes;                                           // Autosized cooling capacity for reporting
-    Real64 CoolingCapacityUser;                                          // Hardsized cooling capacity for reporting
-    Real64 HeatingCapacityDes;                                           // Autosized heating capacity for reporting
-    Real64 HeatingCapacityUser;                                          // Hardsized heating capacity for reporting
-    Real64 DefrostCapacityDes;                                           // Autosized defrost heater capacity for reporting
-    Real64 DefrostCapacityUser;                                          // Hardsized defrost heater capacity for reporting
-    Real64 EvapCondAirVolFlowRateDes;                                    // Autosized evaporative condenser flow for reporting
-    Real64 EvapCondAirVolFlowRateUser;                                   // Hardsized evaporative condenser flow for reporting
-    Real64 EvapCondPumpPowerDes;                                         // Autosized evaporative condenser pump power for reporting
-    Real64 EvapCondPumpPowerUser;                                        // Hardsized evaporative condenser pump power for reporting
+    bool FoundAll;                      // temporary variable used to check all terminal units
+    bool errFlag;                       // temporary variable used for error checking
+    Real64 TUCoolingCapacity;           // total terminal unit cooling capacity
+    Real64 TUHeatingCapacity;           // total terminal unit heating capacity
+    int VRFCond;                        // index to VRF condenser
+    int TUListNum;                      // index to terminal unit list
+    int TUIndex;                        // index to terminal unit
+    int NumTU;                          // DO Loop index counter
+    Real64 OnOffAirFlowRat;             // temporary variable used when sizing coils
+    Real64 DXCoilCap;                   // capacity of DX cooling coil (W)
+    bool IsAutoSize;                    // Indicator to autosize
+    Real64 MaxCoolAirVolFlowDes;        // Autosized supply air during cooling for reporting
+    Real64 MaxCoolAirVolFlowUser;       // Hardsized supply air during cooling for reporting
+    Real64 MaxHeatAirVolFlowDes;        // Autosized supply air during heating for reporting
+    Real64 MaxHeatAirVolFlowUser;       // Hardsized supply air during heating for reporting
+    Real64 MaxNoCoolAirVolFlowDes;      // Autosized supply air flow when no cooling is needed for reporting
+    Real64 MaxNoCoolAirVolFlowUser;     // Hardsized supply air flow when no cooling is needed for reporting
+    Real64 MaxNoHeatAirVolFlowDes;      // Autosized supply air flow when no heating is needed for reporting
+    Real64 MaxNoHeatAirVolFlowUser;     // Hardsized supply air flow when no heating is needed for reporting
+    Real64 CoolOutAirVolFlowDes;        // Autosized outdoor air flow during cooling for reporting
+    Real64 CoolOutAirVolFlowUser;       // Hardsized outdoor air flow during cooling for reporting
+    Real64 HeatOutAirVolFlowDes;        // Autosized outdoor air flow during heating for reporting
+    Real64 HeatOutAirVolFlowUser;       // Hardsized outdoor air flow during heating for reporting
+    Real64 NoCoolHeatOutAirVolFlowDes;  // Autosized outdoor air when unconditioned for reporting
+    Real64 NoCoolHeatOutAirVolFlowUser; // Hardsized outdoor air when unconditioned for reporting
+    Real64 CoolingCapacityDes;          // Autosized cooling capacity for reporting
+    Real64 CoolingCapacityUser;         // Hardsized cooling capacity for reporting
+    Real64 HeatingCapacityDes;          // Autosized heating capacity for reporting
+    Real64 HeatingCapacityUser;         // Hardsized heating capacity for reporting
+    Real64 DefrostCapacityDes;          // Autosized defrost heater capacity for reporting
+    Real64 DefrostCapacityUser;         // Hardsized defrost heater capacity for reporting
+    Real64 EvapCondAirVolFlowRateDes;   // Autosized evaporative condenser flow for reporting
+    Real64 EvapCondAirVolFlowRateUser;  // Hardsized evaporative condenser flow for reporting
+    Real64 EvapCondPumpPowerDes;        // Autosized evaporative condenser pump power for reporting
+    Real64 EvapCondPumpPowerUser;       // Hardsized evaporative condenser pump power for reporting
 
     std::string CompName;     // component name
     std::string CompType;     // component type
@@ -7643,7 +7639,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                             // FractionOfAutosizedHeatingCapacity )
 
-    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+    auto &ZoneEqSizing = state.dataSize->ZoneEqSizing;
 
     DataSizing::ZoneEqSizingData *select_EqSizing(nullptr);
 
@@ -8402,10 +8398,10 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         for (NumTU = 1; NumTU <= state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).NumTUInList; ++NumTU) {
             TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
             if (state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex > 0) {
-                DXCoilCap = GetDXCoilCap(state,
-                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex,
-                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).DXCoolCoilType_Num,
-                                         errFlag);
+                DXCoilCap = DXCoils::GetCoilCapacityByIndexType(state,
+                                                                state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex,
+                                                                state.dataHVACVarRefFlow->VRFTU(TUIndex).DXCoolCoilType_Num,
+                                                                errFlag);
                 TUCoolingCapacity += DXCoilCap;
                 if (DXCoilCap == AutoSize) {
                     FoundAll = false;
@@ -8413,10 +8409,10 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 }
             }
             if (state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatCoilIndex > 0) {
-                DXCoilCap = GetDXCoilCap(state,
-                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatCoilIndex,
-                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).DXHeatCoilType_Num,
-                                         errFlag);
+                DXCoilCap = DXCoils::GetCoilCapacityByIndexType(state,
+                                                                state.dataHVACVarRefFlow->VRFTU(TUIndex).HeatCoilIndex,
+                                                                state.dataHVACVarRefFlow->VRFTU(TUIndex).DXHeatCoilType_Num,
+                                                                errFlag);
                 TUHeatingCapacity += DXCoilCap;
                 if (DXCoilCap == AutoSize) {
                     FoundAll = false;
@@ -8702,7 +8698,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 BaseSizer::reportSizerOutput(state,
                                              std::string(cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum)),
                                              state.dataHVACVarRefFlow->VRF(VRFCond).Name,
-                                             "Design Size Resistive Defrost Heater Capacity",
+                                             "Design Size Resistive Defrost Heater Capacity [W]",
                                              DefrostCapacityDes);
             } else {
                 if (state.dataHVACVarRefFlow->VRF(VRFCond).DefrostCapacity > 0.0 && DefrostCapacityDes > 0.0) {
@@ -8710,7 +8706,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                     BaseSizer::reportSizerOutput(state,
                                                  std::string(cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum)),
                                                  state.dataHVACVarRefFlow->VRF(VRFCond).Name,
-                                                 "Design Size Resistive Defrost Heater Capacity",
+                                                 "Design Size Resistive Defrost Heater Capacity [W]",
                                                  DefrostCapacityDes,
                                                  "User-Specified Resistive Defrost Heater Capacity",
                                                  DefrostCapacityUser);
@@ -8734,7 +8730,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             if (state.dataHVACVarRefFlow->VRF(VRFCond).EvapCondAirVolFlowRate == AutoSize) {
                 IsAutoSize = true;
             }
-            // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+            // Auto-size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
             EvapCondAirVolFlowRateDes = state.dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * 0.000114;
             if (IsAutoSize) {
                 state.dataHVACVarRefFlow->VRF(VRFCond).EvapCondAirVolFlowRate = EvapCondAirVolFlowRateDes;
@@ -8776,7 +8772,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             if (state.dataHVACVarRefFlow->VRF(VRFCond).EvapCondPumpPower == AutoSize) {
                 IsAutoSize = true;
             }
-            // Auto size evap condenser pump power to Total Capacity * 0.004266 w/w (15 w/ton)
+            // Auto-size evap condenser pump power to Total Capacity * 0.004266 w/w (15 w/ton)
             EvapCondPumpPowerDes = state.dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity * 0.004266;
             if (IsAutoSize) {
                 state.dataHVACVarRefFlow->VRF(VRFCond).EvapCondPumpPower = EvapCondPumpPowerDes;
@@ -8817,13 +8813,13 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             }
 
             // Report to eio other information not related to autosizing
-            if (MyOneTimeEIOFlag) {
+            if (state.dataHVACVarRefFlow->MyOneTimeEIOFlag) {
                 static constexpr std::string_view Format_990(
                     "! <VRF System Information>, VRF System Type, VRF System Name, VRF System Cooling Combination Ratio, VRF "
                     "System Heating Combination Ratio, VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
                     "Correction Factor\n");
                 print(state.files.eio, Format_990);
-                MyOneTimeEIOFlag = false;
+                state.dataHVACVarRefFlow->MyOneTimeEIOFlag = false;
             }
             static constexpr std::string_view Format_991(" VRF System Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
             print(state.files.eio,
@@ -9302,7 +9298,6 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                         ShowContinueError(state, "Terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                         ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                         ShowContinueErrorTimeStamp(state, "");
-                        if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
                         ShowRecurringWarningErrorAtEnd(state,
                                                        DataHVACGlobals::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
                                                            "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
@@ -9324,7 +9319,6 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                     ShowContinueError(state, "Terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                     ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                     ShowContinueErrorTimeStamp(state, "");
-                    if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
                     ShowRecurringWarningErrorAtEnd(state,
                                                    DataHVACGlobals::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
                                                        "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
@@ -9383,8 +9377,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     Real64 SpecHumIn(0.0);  // specific humidity ratio at inlet node
     int TUListIndex;        // index to TU list for this VRF system
     int IndexToTUInTUList;  // index to TU in specific list for the VRF system
-    auto &ATMixOutNode = state.dataHVACVarRefFlow->ATMixOutNode;
-    int ZoneNode; // Zone node of VRFTU is serving
+    int ZoneNode;           // Zone node of VRFTU is serving
 
     VRFCond = this->VRFSysNum;
     TUListIndex = state.dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr;
@@ -9400,7 +9393,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     AirMassFlow = state.dataLoopNodes->Node(VRFTUInletNodeNum).MassFlowRate;
     if (this->ATMixerExists) {
         // There is an air terminal mixer
-        ATMixOutNode = this->ATMixerOutNode;
+        state.dataHVACVarRefFlow->ATMixOutNode = this->ATMixerOutNode;
         if (this->ATMixerType == DataHVACGlobals::ATMixer_InletSide) { // if there is an inlet side air terminal mixer
             // set the primary air inlet mass flow rate
             state.dataLoopNodes->Node(this->ATMixerPriNode).MassFlowRate =
@@ -9530,9 +9523,9 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
         if (this->ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
             // Air terminal supply side mixer, calculate supply side mixer output
             SimATMixer(state, this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
-            TempOut = state.dataLoopNodes->Node(ATMixOutNode).Temp;
-            SpecHumOut = state.dataLoopNodes->Node(ATMixOutNode).HumRat;
-            AirMassFlow = state.dataLoopNodes->Node(ATMixOutNode).MassFlowRate;
+            TempOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->ATMixOutNode).Temp;
+            SpecHumOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->ATMixOutNode).HumRat;
+            AirMassFlow = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->ATMixOutNode).MassFlowRate;
         } else {
             // Air terminal inlet side mixer
             TempOut = state.dataLoopNodes->Node(VRFTUOutletNodeNum).Temp;
@@ -10564,7 +10557,7 @@ int GetVRFTUZoneInletAirNode(EnergyPlusData &state, int const VRFTUNum)
     }
 }
 
-int GetVRFTUOutAirNodeFromName(EnergyPlusData &state, std::string const VRFTUName, bool &errorsFound)
+int GetVRFTUOutAirNodeFromName(EnergyPlusData &state, std::string const &VRFTUName, bool &errorsFound)
 {
     int NodeNum; // return value of node number
 
@@ -10586,7 +10579,7 @@ int GetVRFTUOutAirNodeFromName(EnergyPlusData &state, std::string const VRFTUNam
     return NodeNum;
 }
 
-int GetVRFTUInAirNodeFromName(EnergyPlusData &state, std::string const VRFTUName, bool &errorsFound)
+int GetVRFTUInAirNodeFromName(EnergyPlusData &state, std::string const &VRFTUName, bool &errorsFound)
 {
     int NodeNum; // return value of node number
 
@@ -12240,7 +12233,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                this->EvapCondPumpElecPower + this->DefrostPower;
     if (TotPower > 0.0) {
         this->OperatingCOP = (this->TUCoolingLoad + this->TUHeatingLoad) / TotPower;
-        this->SCHE = this->OperatingCOP * 3.412;
+        this->SCHE = this->OperatingCOP * 3.412141633; // see StandardRatings::ConvFromSIToIP
     }
 
     // limit the TU capacity when the condenser is maxed out on capacity
@@ -12626,8 +12619,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     int IndexToTUInTUList;  // index to TU in specific list for the VRF system
     Real64 EvapTemp;        // evaporating temperature
     Real64 CondTemp;        // condensing temperature
-    auto &ATMixOutNode2 = state.dataHVACVarRefFlow->ATMixOutNode2; // outlet node of ATM Mixer
-    int ZoneNode;                                                  // Zone node of VRFTU is serving
+    int ZoneNode;           // Zone node of VRFTU is serving
 
     VRFCond = this->VRFSysNum;
     TUListIndex = state.dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr;
@@ -12653,7 +12645,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
 
     if (this->ATMixerExists) {
         // There is an air terminal mixer
-        ATMixOutNode2 = this->ATMixerOutNode;
+        state.dataHVACVarRefFlow->ATMixOutNode2 = this->ATMixerOutNode;
         if (this->ATMixerType == DataHVACGlobals::ATMixer_InletSide) { // if there is an inlet side air terminal mixer
             // set the primary air inlet mass flow rate
             state.dataLoopNodes->Node(this->ATMixerPriNode).MassFlowRate =
@@ -12663,7 +12655,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
             SimATMixer(state, this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
         }
     } else {
-        ATMixOutNode2 = 0;
+        state.dataHVACVarRefFlow->ATMixOutNode2 = 0;
         // simulate OA Mixer
         if (this->OAMixerUsed) MixedAir::SimOAMixer(state, this->OAMixerName, this->OAMixerIndex);
     }
@@ -12782,9 +12774,9 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         if (this->ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
             // Air terminal supply side mixer, calculate supply side mixer output
             SimATMixer(state, this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
-            TempOut = state.dataLoopNodes->Node(ATMixOutNode2).Temp;
-            SpecHumOut = state.dataLoopNodes->Node(ATMixOutNode2).HumRat;
-            AirMassFlow = state.dataLoopNodes->Node(ATMixOutNode2).MassFlowRate;
+            TempOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->ATMixOutNode2).Temp;
+            SpecHumOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->ATMixOutNode2).HumRat;
+            AirMassFlow = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->ATMixOutNode2).MassFlowRate;
         } else {
             // Air terminal inlet side mixer
             TempOut = state.dataLoopNodes->Node(VRFTUOutletNodeNum).Temp;

@@ -431,7 +431,7 @@ void DetermineDateTokens(EnergyPlusData &state,
     // Take out separator characters, other extraneous stuff
 
     for (Loop = 0; Loop < NumSingleChars; ++Loop) {
-        auto Pos = index(CurrentString, SingleChars[Loop]);
+        size_t Pos = index(CurrentString, SingleChars[Loop]);
         while (Pos != std::string::npos) {
             CurrentString[Pos] = ' ';
             Pos = index(CurrentString, SingleChars[Loop]);
@@ -439,7 +439,7 @@ void DetermineDateTokens(EnergyPlusData &state,
     }
 
     for (Loop = 0; Loop < NumDoubleChars; ++Loop) {
-        auto Pos = index(CurrentString, DoubleChars[Loop]);
+        size_t Pos = index(CurrentString, DoubleChars[Loop]);
         while (Pos != std::string::npos) {
             CurrentString.replace(Pos, 2, "  ");
             Pos = index(CurrentString, DoubleChars[Loop]);
@@ -455,7 +455,7 @@ void DetermineDateTokens(EnergyPlusData &state,
         Loop = 0;
         while (Loop < 3) { // Max of 3 fields
             if (CurrentString == BlankString) break;
-            auto Pos = index(CurrentString, ' ');
+            size_t Pos = index(CurrentString, ' ');
             ++Loop;
             if (Pos == std::string::npos) Pos = CurrentString.length();
             Fields(Loop) = CurrentString.substr(0, Pos);
@@ -761,8 +761,8 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
     // time step.
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // Return value
     std::string OutputString;
@@ -789,10 +789,10 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
         ++ActualTimeHrS;
         ActualTimeMinS = 0;
     }
-    const auto TimeStmpS = format("{:02}:{:02}", ActualTimeHrS, ActualTimeMinS);
+    const std::string TimeStmpS = format("{:02}:{:02}", ActualTimeHrS, ActualTimeMinS);
     Real64 minutes = ((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin);
 
-    auto TimeStmpE = format("{:02}:{:2.0F}", static_cast<int>(ActualTimeE), minutes);
+    std::string TimeStmpE = format("{:02}:{:2.0F}", static_cast<int>(ActualTimeE), minutes);
 
     if (TimeStmpE[3] == ' ') {
         TimeStmpE[3] = '0';

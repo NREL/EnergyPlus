@@ -200,6 +200,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 60.0;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->BeginSimFlag = true;
@@ -3043,6 +3044,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     Real64 NominalConductanceSummer;
 
     MaterNum = state->dataConstruction->Construct(ConstrNum).LayerPoint(1);
+    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(MaterNum));
     // summer, adj ratio should stay the same, only change for winter
     state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.5;
     CalcNominalWindowCond(*state, ConstrNum, 2, NominalConductanceSummer, SHGC, TransSolNorm, TransVisNorm, errFlag);
@@ -3052,10 +3054,9 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     // for legal input U values, the adjusted NominalConductance should be close to input U
     std::array<Real64, 3> legalInputUs = {3.0, 5.0, 7.0};
     for (auto varyInputU : legalInputUs) {
-        state->dataMaterial->Material(MaterNum)->SimpleWindowUfactor = varyInputU;
+        thisMaterial->SimpleWindowUfactor = varyInputU;
         HeatBalanceManager::SetupSimpleWindowGlazingSystem(*state, MaterNum);
-        state->dataWindowManager->scon[0] =
-            state->dataMaterial->Material(MaterNum)->Conductivity / state->dataMaterial->Material(MaterNum)->Thickness;
+        state->dataWindowManager->scon[0] = thisMaterial->Conductivity / thisMaterial->Thickness;
         CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
         EXPECT_NEAR(NominalConductanceWinter, varyInputU, 0.01);
     }
@@ -3065,7 +3066,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     std::array<Real64, 2> illegalInputUs = {0.0, -2.0};
     for (auto varyInputU : illegalInputUs) {
         state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.0;
-        state->dataMaterial->Material(MaterNum)->SimpleWindowUfactor = varyInputU;
+        thisMaterial->SimpleWindowUfactor = varyInputU;
         CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
         // expect adjustment ratio equal to 1
         EXPECT_EQ(state->dataHeatBal->CoeffAdjRatio(ConstrNum), 1.0);
@@ -3099,24 +3100,24 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     bool errors_found = false;
     Material::GetMaterialData(*state, errors_found);
     EXPECT_FALSE(errors_found);
-    EXPECT_EQ(state->dataHeatBal->ComplexShade(1).Name, "SHADE_14_LAYER");
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->ComplexShade(1).LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ));
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).Thickness, 1.016000e-003, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).Conductivity, 1.592276e+002, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).IRTransmittance, 0, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).FrontEmissivity, 0.9, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).BackEmissivity, 0.9, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).TopOpeningMultiplier, 0, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).BottomOpeningMultiplier, 0, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).LeftOpeningMultiplier, 0, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).RightOpeningMultiplier, 0, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).FrontOpeningMultiplier, 5.000000e-002, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).SlatWidth, 0.0254, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).SlatSpacing, 0.0201, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).SlatThickness, 0.0010, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).SlatAngle, 45.0, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).SlatConductivity, 159.2276, 1e-5);
-    EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).SlatCurve, 0, 1e-5);
+    EXPECT_EQ(state->dataMaterial->ComplexShade(1).Name, "SHADE_14_LAYER");
+    EXPECT_TRUE(compare_enums(state->dataMaterial->ComplexShade(1).LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ));
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).Thickness, 1.016000e-003, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).Conductivity, 1.592276e+002, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).IRTransmittance, 0, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).FrontEmissivity, 0.9, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).BackEmissivity, 0.9, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).TopOpeningMultiplier, 0, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).BottomOpeningMultiplier, 0, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).LeftOpeningMultiplier, 0, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).RightOpeningMultiplier, 0, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).FrontOpeningMultiplier, 5.000000e-002, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).SlatWidth, 0.0254, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).SlatSpacing, 0.0201, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).SlatThickness, 0.0010, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).SlatAngle, 45.0, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).SlatConductivity, 159.2276, 1e-5);
+    EXPECT_NEAR(state->dataMaterial->ComplexShade(1).SlatCurve, 0, 1e-5);
 }
 
 TEST_F(EnergyPlusFixture, SetupComplexWindowStateGeometry_Test)
@@ -7668,6 +7669,7 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 60.0;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->BeginSimFlag = true;
@@ -7707,6 +7709,9 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.01;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = T_in;
 
+    state->dataEnvrn->SOLCOS(1) = 0.84471127222777276;
+    state->dataEnvrn->SOLCOS(2) = -0.53484539135440257;
+    state->dataEnvrn->SOLCOS(3) = 0.020081681162033127;
     state->dataEnvrn->BeamSolarRad = I_s;
     if (I_s > 0.0) {
         state->dataEnvrn->SunIsUp = true;

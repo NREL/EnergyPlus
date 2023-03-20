@@ -759,10 +759,10 @@ void CheckThisZoneForSizing(EnergyPlusData &state,
 }
 
 void ValidateComponent(EnergyPlusData &state,
-                       std::string_view CompType,    // Component Type (e.g. Chiller:Electric)
-                       std::string const &CompName,  // Component Name (e.g. Big Chiller)
-                       bool &IsNotOK,                // .TRUE. if this component pair is invalid
-                       std::string const &CallString // Context of this pair -- for error message
+                       std::string_view CompType,   // Component Type (e.g. Chiller:Electric)
+                       std::string const &CompName, // Component Name (e.g. Big Chiller)
+                       bool &IsNotOK,               // .TRUE. if this component pair is invalid
+                       std::string_view CallString  // Context of this pair -- for error message
 )
 {
 
@@ -803,11 +803,11 @@ void ValidateComponent(EnergyPlusData &state,
 }
 
 void ValidateComponent(EnergyPlusData &state,
-                       std::string const &CompType,    // Component Type (e.g. Chiller:Electric)
+                       std::string_view CompType,      // Component Type (e.g. Chiller:Electric)
                        std::string const &CompValType, // Component "name" field type
                        std::string const &CompName,    // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                  // .TRUE. if this component pair is invalid
-                       std::string const &CallString   // Context of this pair -- for error message
+                       std::string_view CallString     // Context of this pair -- for error message
 )
 {
 
@@ -858,10 +858,10 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Real64 const Tilt,             // Tilt of gap [Degrees]
                                   Real64 const AspRat,           // aspect ratio of gap  Height/gap [--]
                                   Real64 const GapThick,         // Thickness of air space between baffle and underlying heat transfer surface
-                                  DataSurfaces::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
-                                  Real64 const QdotSource,                        // Source/sink term, e.g. electricity exported from solar cell [W]
-                                  Real64 &TsBaffle,                               // Temperature of baffle (both sides) use lagged value on input [C]
-                                  Real64 &TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
+                                  Material::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                                  Real64 const QdotSource,                    // Source/sink term, e.g. electricity exported from solar cell [W]
+                                  Real64 &TsBaffle,                           // Temperature of baffle (both sides) use lagged value on input [C]
+                                  Real64 &TaGap,                              // Temperature of air gap (assumed mixed) use lagged value on input [C]
                                   ObjexxFCL::Optional<Real64> HcGapRpt,
                                   ObjexxFCL::Optional<Real64> HrGapRpt,
                                   ObjexxFCL::Optional<Real64> IscRpt,
@@ -994,7 +994,9 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         InitExteriorConvectionCoeff(
             state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
-        AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->AbsorpThermal;
+        AbsThermSurf =
+            dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
+                ->AbsorpThermal;
         TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + DataGlobalConstants::KelvinConv;
         TsBaffK = TmpTsBaf + DataGlobalConstants::KelvinConv;
         if (TsBaffK == TsoK) {        // avoid divide by zero
@@ -1029,9 +1031,10 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     }
     if (A == 0.0) { // should have been caught earlier
     }
-    auto Area(array_sub(state.dataSurface->Surface,
-                        &SurfaceData::Area,
-                        SurfPtrARR)); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
+    Array1D<Real64> Area(
+        array_sub(state.dataSurface->Surface,
+                  &SurfaceData::Area,
+                  SurfPtrARR)); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
     // now figure area-weighted averages from underlying surfaces.
     //    Vwind = sum( LocalWindArr * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     Vwind = sum(LocalWindArr * Area) / A;
@@ -1290,7 +1293,6 @@ void TestAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1317,10 +1319,10 @@ void TestAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     Array2D_int ValSupAPaths;
     Array2D_int NumSAPNodes;
 
-    NumSAPNodes.allocate(state.dataLoopNodes->NumOfNodes, NumPrimaryAirSys);
-    NumRAPNodes.allocate(state.dataLoopNodes->NumOfNodes, NumPrimaryAirSys);
-    ValRetAPaths.allocate(state.dataLoopNodes->NumOfNodes, NumPrimaryAirSys);
-    ValSupAPaths.allocate(state.dataLoopNodes->NumOfNodes, NumPrimaryAirSys);
+    NumSAPNodes.allocate(state.dataLoopNodes->NumOfNodes, state.dataHVACGlobal->NumPrimaryAirSys);
+    NumRAPNodes.allocate(state.dataLoopNodes->NumOfNodes, state.dataHVACGlobal->NumPrimaryAirSys);
+    ValRetAPaths.allocate(state.dataLoopNodes->NumOfNodes, state.dataHVACGlobal->NumPrimaryAirSys);
+    ValSupAPaths.allocate(state.dataLoopNodes->NumOfNodes, state.dataHVACGlobal->NumPrimaryAirSys);
     NumSAPNodes = 0;
     NumRAPNodes = 0;
     ValRetAPaths = 0;
@@ -1332,17 +1334,17 @@ void TestAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     if (errFlag) ErrFound = true;
 
     // Final tests, look for duplicate nodes
-    for (Loop = 1; Loop <= NumPrimaryAirSys; ++Loop) {
+    for (Loop = 1; Loop <= state.dataHVACGlobal->NumPrimaryAirSys; ++Loop) {
         if (ValRetAPaths(1, Loop) != 0) continue;
         if (state.dataAirLoop->AirToZoneNodeInfo(Loop).NumReturnNodes <= 0) continue;
         ValRetAPaths(1, Loop) = state.dataAirLoop->AirToZoneNodeInfo(Loop).ZoneEquipReturnNodeNum(1);
     }
 
-    for (Loop = 1; Loop <= NumPrimaryAirSys; ++Loop) {
+    for (Loop = 1; Loop <= state.dataHVACGlobal->NumPrimaryAirSys; ++Loop) {
         for (Loop1 = 1; Loop1 <= state.dataLoopNodes->NumOfNodes; ++Loop1) {
             TestNode = ValRetAPaths(Loop1, Loop);
             Count = 0;
-            for (Loop2 = 1; Loop2 <= NumPrimaryAirSys; ++Loop2) {
+            for (Loop2 = 1; Loop2 <= state.dataHVACGlobal->NumPrimaryAirSys; ++Loop2) {
                 for (Loop3 = 1; Loop3 <= state.dataLoopNodes->NumOfNodes; ++Loop3) {
                     if (Loop2 == Loop && Loop1 == Loop3) continue; // Don't count test node
                     if (ValRetAPaths(Loop3, Loop2) == 0) break;
@@ -1379,9 +1381,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    auto &GetZoneSplitterInput(SplitterComponent::GetSplitterInput);
     using namespace DataZoneEquipment;
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Count;
@@ -1422,7 +1422,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 
         // Determine which air loop this supply air path is connected to
         Found = 0;
-        for (Count1 = 1; Count1 <= NumPrimaryAirSys; ++Count1) {
+        for (Count1 = 1; Count1 <= state.dataHVACGlobal->NumPrimaryAirSys; ++Count1) {
             PrimaryAirLoopName = state.dataAirLoop->AirToZoneNodeInfo(Count1).AirLoopName;
             Found = 0;
             for (Count2 = 1; Count2 <= state.dataAirLoop->AirToZoneNodeInfo(Count1).NumSupplyNodes; ++Count2) {
@@ -1555,7 +1555,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 
     if (state.dataSplitterComponent->NumSplitters == 0) {
         if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ZoneSplitter") > 0) {
-            GetZoneSplitterInput(state);
+            SplitterComponent::GetSplitterInput(state);
         }
     }
     if (state.dataZonePlenum->NumZoneSupplyPlenums == 0 && state.dataZonePlenum->NumZoneReturnPlenums == 0) {
@@ -1681,8 +1681,6 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     using namespace DataLoopNode;
     using namespace DataZoneEquipment;
     using namespace ZonePlenum;
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-    auto &GetZoneMixerInput(MixerComponent::GetMixerInput);
     using HVACSingleDuctInduc::FourPipeInductionUnitHasMixer;
     using PoweredInductionUnits::PIUnitHasMixer;
     using PurchasedAirManager::CheckPurchasedAirForReturnPlenum;
@@ -1736,7 +1734,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     for (BCount = 1; BCount <= state.dataZoneEquip->NumReturnAirPaths; ++BCount) {
         //             Determine which air loop this supply air path is connected to
         Found = 0;
-        for (Count1 = 1; Count1 <= NumPrimaryAirSys; ++Count1) {
+        for (Count1 = 1; Count1 <= state.dataHVACGlobal->NumPrimaryAirSys; ++Count1) {
             PrimaryAirLoopName = state.dataAirLoop->AirToZoneNodeInfo(Count1).AirLoopName;
             Found = 0;
             for (Count2 = 1; Count2 <= state.dataAirLoop->AirToZoneNodeInfo(Count1).NumReturnNodes; ++Count2) {
@@ -1921,10 +1919,10 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
             }
         }
         // Determine Air Loop this Return Air Path is on
-        for (Count2 = 1; Count2 <= NumPrimaryAirSys; ++Count2) {
+        for (Count2 = 1; Count2 <= state.dataHVACGlobal->NumPrimaryAirSys; ++Count2) {
             if (state.dataAirLoop->AirToZoneNodeInfo(Count2).NumReturnNodes > 0) {
                 if (AllNodes(1) == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipReturnNodeNum(1)) {
-                    const auto WAirLoop = Count2;
+                    const int WAirLoop = Count2;
                     ValRetAPaths(_, WAirLoop) = 0;
                     ValRetAPaths({1, CountNodes}, WAirLoop) = AllNodes({1, CountNodes});
                     break;
@@ -1941,7 +1939,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
 
     if (state.dataMixerComponent->NumMixers == 0) {
         if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ZoneMixer") > 0) {
-            GetZoneMixerInput(state);
+            MixerComponent::GetMixerInput(state);
         }
     }
     if (state.dataZonePlenum->NumZoneSupplyPlenums == 0 && state.dataZonePlenum->NumZoneReturnPlenums == 0) {

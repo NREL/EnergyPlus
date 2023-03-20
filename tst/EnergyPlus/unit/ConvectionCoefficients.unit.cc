@@ -602,10 +602,11 @@ TEST_F(ConvectionCoefficientsFixture, initExtConvCoeffAdjRatio)
     state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
-    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound); // this calls GetSurfaceData(), but will also calculate the zone volume which we need
+    EXPECT_FALSE(ErrorsFound);
 
     Real64 HMovInsul = 1.0;
-    DataSurfaces::SurfaceRoughness RoughSurf = DataSurfaces::SurfaceRoughness::VerySmooth;
+    Material::SurfaceRoughness RoughSurf = Material::SurfaceRoughness::VerySmooth;
     Real64 AbsThermSurf = 0.84;
     Real64 TempExt = -20.0;
     Real64 HExt;
@@ -820,7 +821,8 @@ TEST_F(ConvectionCoefficientsFixture, initIntConvCoeffAdjRatio)
     state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
-    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound); // this calls GetSurfaceData(), but will also calculate the zone volume which we need
+    EXPECT_FALSE(ErrorsFound);
 
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(7, 1.0);
 

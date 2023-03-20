@@ -224,6 +224,7 @@ set(test_src
     StringUtilities.unit.cc
     SurfaceGeometry.unit.cc
     SurfaceOctree.unit.cc
+    SurfaceGroundHeatExchanger.unit.cc
     SwimmingPool.unit.cc
     SystemAvailabilityManager.unit.cc
     SystemReports.unit.cc

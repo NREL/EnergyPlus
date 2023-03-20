@@ -152,7 +152,7 @@ namespace Curve {
         // Reset curve outputs prior to simulating air loops, plant loops, etc.
         // This allows the report variable for curve/table objects to show an inactive state.
 
-        for (auto c : state.dataCurveManager->PerfCurve) {
+        for (auto &c : state.dataCurveManager->PerfCurve) {
             c->output = DataLoopNode::SensedNodeFlagValue;
             for (auto &i : c->inputs) {
                 i = DataLoopNode::SensedNodeFlagValue;
@@ -239,10 +239,10 @@ namespace Curve {
                    this->coeff[5] * V1 * V2 + this->coeff[6] * V1 * V1 * V1 + this->coeff[7] * V2 * V2 * V2 + this->coeff[8] * V1 * V1 * V2 +
                    this->coeff[9] * V1 * V2 * V2 + this->coeff[10] * V1 * V1 * V2 * V2 + this->coeff[11] * V3 * V2 * V2 * V2;
         case CurveType::TriQuadratic: {
-            auto const &c(this->coeff);
-            Real64 const V1s(V1 * V1);
-            Real64 const V2s(V2 * V2);
-            Real64 const V3s(V3 * V3);
+            auto const &c = this->coeff;
+            Real64 const V1s = V1 * V1;
+            Real64 const V2s = V2 * V2;
+            Real64 const V3s = V3 * V3;
             return c[0] + c[1] * V1s + c[2] * V1 + c[3] * V2s + c[4] * V2 + c[5] * V3s + c[6] * V3 + c[7] * V1s * V2s + c[8] * V1 * V2 +
                    c[9] * V1 * V2s + c[10] * V1s * V2 + c[11] * V1s * V3s + c[12] * V1 * V3 + c[13] * V1 * V3s + c[14] * V1s * V3 +
                    c[15] * V2s * V3s + c[16] * V2 * V3 + c[17] * V2 * V3s + c[18] * V2s * V3 + c[19] * V1s * V2s * V3s + c[20] * V1s * V2s * V3 +
@@ -531,10 +531,10 @@ namespace Curve {
                    this->coeff[9] * V1 * V2 * V2 + this->coeff[10] * V1 * V1 * V2 * V2 + this->coeff[11] * V3 * V2 * V2 * V2;
         } break;
         case CurveType::TriQuadratic: {
-            auto const &c(this->coeff);
-            Real64 const V1s(V1 * V1);
-            Real64 const V2s(V2 * V2);
-            Real64 const V3s(V3 * V3);
+            auto const &c = this->coeff;
+            Real64 const V1s = V1 * V1;
+            Real64 const V2s = V2 * V2;
+            Real64 const V3s = V3 * V3;
             return c[0] + c[1] * V1s + c[2] * V1 + c[3] * V2s + c[4] * V2 + c[5] * V3s + c[6] * V3 + c[7] * V1s * V2s + c[8] * V1 * V2 +
                    c[9] * V1 * V2s + c[10] * V1s * V2 + c[11] * V1s * V3s + c[12] * V1 * V3 + c[13] * V1 * V3s + c[14] * V1s * V3 +
                    c[15] * V2s * V3s + c[16] * V2 * V3 + c[17] * V2 * V3s + c[18] * V2s * V3 + c[19] * V1s * V2s * V3s + c[20] * V1s * V2s * V3 +
@@ -2255,7 +2255,8 @@ namespace Curve {
                         std::vector<Btwxt::GridAxis> gridAxes;
                         gridAxes.emplace_back(axis, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
 
-                        auto gridIndex = state.dataCurveManager->btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes));
+                        auto gridIndex = // (AUTO_OK_OBJ)
+                            state.dataCurveManager->btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes));
                         thisCurve->TableIndex = gridIndex;
                         thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
                     }
@@ -2282,7 +2283,7 @@ namespace Curve {
             varListLimits; // ugly, but this is needed for legacy behavior (otherwise limits are reset by Btwxt if they are within bounds).
         std::map<std::string, std::vector<double>> varListNormalizeTargets;
         if (numIndVarLists > 0) {
-            auto const indVarListInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:IndependentVariableList");
+            auto const &indVarListInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:IndependentVariableList");
             for (auto &instance : indVarListInstances.items()) {
 
                 auto const &fields = instance.value();
@@ -2293,7 +2294,7 @@ namespace Curve {
                 std::vector<Btwxt::GridAxis> gridAxes;
 
                 // Loop through independent variables in list and add them to the grid
-                for (auto indVar : fields.at("independent_variables")) {
+                for (auto &indVar : fields.at("independent_variables")) {
                     std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
                     std::string contextString = format("Table:IndependentVariable \"{}\"", indVarName);
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
@@ -2413,7 +2414,7 @@ namespace Curve {
 
         int numTblLookups = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Table:Lookup");
         if (numTblLookups > 0) {
-            auto const lookupInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:Lookup");
+            auto const &lookupInstances = state.dataInputProcessing->inputProcessor->getObjectInstances("Table:Lookup");
             for (auto &instance : lookupInstances.items()) {
 
                 auto const &fields = instance.value();
@@ -2538,7 +2539,7 @@ namespace Curve {
                                        lookupValues.end());
 
                 } else if (fields.count("values")) {
-                    for (auto value : fields.at("values")) {
+                    for (auto &value : fields.at("values")) {
                         lookupValues.push_back(value.at("output_value").get<Real64>() / normalizationDivisor);
                     }
                 } else {
@@ -2549,11 +2550,11 @@ namespace Curve {
                 thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
 
                 if (normalizeMethod == NM_AUTO_WITH_DIVISOR) {
-                    auto const normalizeTarget = varListNormalizeTargets.at(indVarListName);
+                    auto const &normalizeTarget = varListNormalizeTargets.at(indVarListName);
 
                     bool pointsSpecified = false;
                     bool pointsUnspecified = false;
-                    for (auto value : normalizeTarget) {
+                    for (double value : normalizeTarget) {
                         if (std::isnan(value)) {
                             pointsUnspecified = true;
                         } else {
@@ -2695,12 +2696,12 @@ namespace Curve {
             std::vector<double> array(numRows - row);
             std::transform(content.begin() + row, content.end(), array.begin(), [](std::string_view str) {
                 // Convert strings to double
-                auto first_char = str.find_first_not_of(' ');
+                size_t first_char = str.find_first_not_of(' ');
                 if (first_char != std::string_view::npos) {
                     str.remove_prefix(first_char);
                 }
                 double result = 0;
-                auto answer = fast_float::from_chars(str.data(), str.data() + str.size(), result);
+                auto answer = fast_float::from_chars(str.data(), str.data() + str.size(), result); // (AUTO_OK_OBJ)
                 if (answer.ec != std::errc()) {
                     return std::numeric_limits<double>::quiet_NaN();
                 }

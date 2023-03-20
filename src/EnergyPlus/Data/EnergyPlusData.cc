@@ -296,6 +296,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataWindowEquivLayer = std::make_unique<WindowEquivLayerData>();
     this->dataWindowEquivalentLayer = std::make_unique<WindowEquivalentLayerData>();
     this->dataWindowManager = std::make_unique<WindowManagerData>();
+    this->dataWindowManagerExterior = std::make_unique<WindowManagerExteriorData>();
     this->dataZoneAirLoopEquipmentManager = std::make_unique<ZoneAirLoopEquipmentManagerData>();
     this->dataZoneContaminantPredictorCorrector = std::make_unique<ZoneContaminantPredictorCorrectorData>();
     this->dataZoneCtrls = std::make_unique<DataZoneControlsData>();
@@ -554,6 +555,7 @@ void EnergyPlusData::clear_state()
     this->dataWindowEquivLayer->clear_state();
     this->dataWindowEquivalentLayer->clear_state();
     this->dataWindowManager->clear_state();
+    this->dataWindowManagerExterior->clear_state();
     this->dataZoneAirLoopEquipmentManager->clear_state();
     this->dataZoneContaminantPredictorCorrector->clear_state();
     this->dataZoneCtrls->clear_state();

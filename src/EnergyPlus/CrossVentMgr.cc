@@ -78,8 +78,6 @@ namespace CrossVentMgr {
     // MODULE INFORMATION:
     //       AUTHOR         G. Carrilho da Graca
     //       DATE WRITTEN   October 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // Routines that implement the UCSD Cross Ventilation
@@ -107,8 +105,6 @@ namespace CrossVentMgr {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   October 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         //   manage the UCSD Cross Ventilation model
@@ -125,16 +121,12 @@ namespace CrossVentMgr {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         G. Carrilho da Graca
         //       DATE WRITTEN   October 2004
-        //       MODIFIED       -
-        //       RE-ENGINEERED  -
 
         // PURPOSE OF THIS SUBROUTINE:
         // Low Energy Cooling by Ventilation initialization subroutine.
         // All the data preparation needed to run the LECV models.
         // The subroutines sets up arrays with the locations in the main EnergyPlus surface array of
         // ceiling, windows, doors and walls. The zone maximum and minimum height is calculated.
-
-        using namespace DataRoomAirModel;
 
         // Do the one time initializations
         if (state.dataCrossVentMgr->InitUCSDCV_MyOneTimeFlag) {
@@ -160,23 +152,12 @@ namespace CrossVentMgr {
         //       DATE WRITTEN   October 2004
         //       MODIFIED       8/2013 - Sam Brunswick
         //                      To improve convection coefficient calculation
-        //       RE-ENGINEERED  -
 
         // PURPOSE OF THIS SUBROUTINE:
         // Main subroutine for convection calculation in the UCSD Cross Ventilation model.
         // It calls CalcDetailedHcInForDVModel for convection coefficient
         // initial calculations and averages the final result comparing the position of the surface with
         // the interface subzone height.
-
-        using namespace DataEnvironment;
-        using namespace DataHeatBalance;
-        using ScheduleManager::GetScheduleIndex; // , GetDayScheduleValues
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Ctd;     // DO loop counter for surfaces
-        int SurfNum; // Surface number
-        Real64 Hjet;
-        Real64 Hrec;
 
         // Initialize HAT and HA
         state.dataCrossVentMgr->HAT_J = 0.0;
@@ -187,8 +168,9 @@ namespace CrossVentMgr {
         // Is the air flow model for this zone set to UCSDCV Cross Ventilation?
         if (state.dataRoomAirMod->IsZoneCV(ZoneNum)) {
             // WALL Hc, HA and HAT calculation
-            for (Ctd = state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 2); ++Ctd) {
-                SurfNum = state.dataUCSDShared->APos_Wall(Ctd);
+            for (int Ctd = state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 2);
+                 ++Ctd) {
+                int SurfNum = state.dataUCSDShared->APos_Wall(Ctd);
                 state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
                 state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
                 if (SurfNum == 0) continue;
@@ -201,9 +183,9 @@ namespace CrossVentMgr {
                 state.dataCrossVentMgr->HA_R += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWall(Ctd);
             } // END WALL
             // WINDOW Hc, HA and HAT CALCULATION
-            for (Ctd = state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 2);
+            for (int Ctd = state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 2);
                  ++Ctd) {
-                SurfNum = state.dataUCSDShared->APos_Window(Ctd);
+                int SurfNum = state.dataUCSDShared->APos_Window(Ctd);
                 state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
                 state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
                 if (SurfNum == 0) continue;
@@ -220,11 +202,11 @@ namespace CrossVentMgr {
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
                     CalcDetailedHcInForDVModel(
                         state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Ujet);
-                    Hjet = state.dataRoomAirMod->CVHcIn(SurfNum);
+                    Real64 Hjet = state.dataRoomAirMod->CVHcIn(SurfNum);
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTREC(ZoneNum);
                     CalcDetailedHcInForDVModel(
                         state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Urec);
-                    Hrec = state.dataRoomAirMod->CVHcIn(SurfNum);
+                    Real64 Hrec = state.dataRoomAirMod->CVHcIn(SurfNum);
                     state.dataUCSDShared->HWindow(Ctd) =
                         state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) * Hjet + (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) * Hrec;
                     state.dataCrossVentMgr->HAT_R += state.dataSurface->Surface(SurfNum).Area *
@@ -243,11 +225,11 @@ namespace CrossVentMgr {
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
                     CalcDetailedHcInForDVModel(
                         state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Ujet);
-                    Hjet = state.dataRoomAirMod->CVHcIn(SurfNum);
+                    Real64 Hjet = state.dataRoomAirMod->CVHcIn(SurfNum);
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTREC(ZoneNum);
                     CalcDetailedHcInForDVModel(
                         state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Urec);
-                    Hrec = state.dataRoomAirMod->CVHcIn(SurfNum);
+                    Real64 Hrec = state.dataRoomAirMod->CVHcIn(SurfNum);
                     state.dataUCSDShared->HWindow(Ctd) =
                         state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) * Hjet + (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) * Hrec;
                     state.dataCrossVentMgr->HAT_R += state.dataSurface->Surface(SurfNum).Area *
@@ -265,9 +247,9 @@ namespace CrossVentMgr {
                 state.dataRoomAirMod->CVHcIn(SurfNum) = state.dataUCSDShared->HWindow(Ctd);
             } // END WINDOW
             // DOOR Hc, HA and HAT CALCULATION
-            for (Ctd = state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 2);
+            for (int Ctd = state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 2);
                  ++Ctd) { // DOOR
-                SurfNum = state.dataUCSDShared->APos_Door(Ctd);
+                int SurfNum = state.dataUCSDShared->APos_Door(Ctd);
                 state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
                 state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
                 if (SurfNum == 0) continue;
@@ -280,9 +262,10 @@ namespace CrossVentMgr {
                 state.dataCrossVentMgr->HA_R += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HDoor(Ctd);
             } // END DOOR
             // INTERNAL Hc, HA and HAT CALCULATION
-            for (Ctd = state.dataUCSDShared->PosZ_Internal((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Internal((ZoneNum - 1) * 2 + 2);
+            for (int Ctd = state.dataUCSDShared->PosZ_Internal((ZoneNum - 1) * 2 + 1);
+                 Ctd <= state.dataUCSDShared->PosZ_Internal((ZoneNum - 1) * 2 + 2);
                  ++Ctd) {
-                SurfNum = state.dataUCSDShared->APos_Internal(Ctd);
+                int SurfNum = state.dataUCSDShared->APos_Internal(Ctd);
                 state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
                 state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
                 if (SurfNum == 0) continue;
@@ -296,20 +279,21 @@ namespace CrossVentMgr {
             } // END INTERNAL
 
             // CEILING Hc, HA and HAT CALCULATION
-            for (Ctd = state.dataUCSDShared->PosZ_Ceiling((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Ceiling((ZoneNum - 1) * 2 + 2);
+            for (int Ctd = state.dataUCSDShared->PosZ_Ceiling((ZoneNum - 1) * 2 + 1);
+                 Ctd <= state.dataUCSDShared->PosZ_Ceiling((ZoneNum - 1) * 2 + 2);
                  ++Ctd) {
-                SurfNum = state.dataUCSDShared->APos_Ceiling(Ctd);
+                int SurfNum = state.dataUCSDShared->APos_Ceiling(Ctd);
                 state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
                 state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
                 if (SurfNum == 0) continue;
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
                 CalcDetailedHcInForDVModel(
                     state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Ujet);
-                Hjet = state.dataRoomAirMod->CVHcIn(SurfNum);
+                Real64 Hjet = state.dataRoomAirMod->CVHcIn(SurfNum);
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTREC(ZoneNum);
                 CalcDetailedHcInForDVModel(
                     state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Urec);
-                Hrec = state.dataRoomAirMod->CVHcIn(SurfNum);
+                Real64 Hrec = state.dataRoomAirMod->CVHcIn(SurfNum);
                 state.dataUCSDShared->HCeiling(Ctd) =
                     state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) * Hjet + (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) * Hrec;
                 state.dataCrossVentMgr->HAT_R += state.dataSurface->Surface(SurfNum).Area * (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) *
@@ -325,20 +309,20 @@ namespace CrossVentMgr {
                 state.dataRoomAirMod->CVHcIn(SurfNum) = state.dataUCSDShared->HCeiling(Ctd);
             } // END CEILING
             // FLOOR Hc, HA and HAT CALCULATION
-            for (Ctd = state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 2);
+            for (int Ctd = state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 2);
                  ++Ctd) {
-                SurfNum = state.dataUCSDShared->APos_Floor(Ctd);
+                int SurfNum = state.dataUCSDShared->APos_Floor(Ctd);
                 state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
                 state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
                 if (SurfNum == 0) continue;
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
                 CalcDetailedHcInForDVModel(
                     state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Ujet);
-                Hjet = state.dataRoomAirMod->CVHcIn(SurfNum);
+                Real64 Hjet = state.dataRoomAirMod->CVHcIn(SurfNum);
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTREC(ZoneNum);
                 CalcDetailedHcInForDVModel(
                     state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Urec);
-                Hrec = state.dataRoomAirMod->CVHcIn(SurfNum);
+                Real64 Hrec = state.dataRoomAirMod->CVHcIn(SurfNum);
                 state.dataUCSDShared->HFloor(Ctd) =
                     state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) * Hjet + (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) * Hrec;
                 state.dataCrossVentMgr->HAT_R += state.dataSurface->Surface(SurfNum).Area * (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) *
@@ -369,8 +353,6 @@ namespace CrossVentMgr {
         // PURPOSE OF THIS SUBROUTINE:
         // Subroutine for parameter actualization in the UCSD Cross Ventilation model.
 
-        using namespace Psychrometrics;
-
         Real64 constexpr MinUin(0.2);
 
         Real64 Uin;            // Inflow air velocity [m/s]
@@ -386,11 +368,9 @@ namespace CrossVentMgr {
         Real64 YY_Wall;
         Real64 ZZ_Wall;
         Real64 ActiveSurfNum;
-        int NSides;      // Number of sides in surface
-        Real64 Wroom;    // Room width
-        Real64 Aroom;    // Room area cross section
-        int NodeNum1(0); // The first node number in an AirflowNetwork linkage data
-        int NodeNum2(0); // The Second node number in an AirflowNetwork linkage data
+        int NSides;   // Number of sides in surface
+        Real64 Wroom; // Room width
+        Real64 Aroom; // Room area cross section
 
         assert(state.dataRoomAirMod->AirModel.allocated());
         state.dataRoomAirMod->RecInflowRatio(ZoneNum) = 0.0;
@@ -432,7 +412,7 @@ namespace CrossVentMgr {
         CosPhi = std::cos((state.dataEnvrn->WindDir - SurfNorm) * DataGlobalConstants::DegToRadians);
         if (CosPhi <= 0) {
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
-            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum));
+            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
             for (int i = 1, u = flows.u(); i <= u; ++i) {
                 auto &e(flows(i));
                 e.Ujet = e.Urec = 0.0;
@@ -601,7 +581,7 @@ namespace CrossVentMgr {
             state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
             state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
             state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
-            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum));
+            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
             for (int i = 1, u = flows.u(); i <= u; ++i) {
                 auto &e(flows(i));
                 e.Ujet = e.Urec = 0.0;
@@ -625,7 +605,7 @@ namespace CrossVentMgr {
             state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
             state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
             state.dataRoomAirMod->RecInflowRatio(ZoneNum) = 0.0;
-            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum));
+            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
             for (int i = 1, u = flows.u(); i <= u; ++i) {
                 auto &e(flows(i));
                 e.Ujet = e.Urec = 0.0;
@@ -668,7 +648,7 @@ namespace CrossVentMgr {
         state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
         state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
         state.dataRoomAirMod->Qtot(ZoneNum) = 0.0;
-        auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum));
+        auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
         for (int i = 1, u = flows.u(); i <= u; ++i) {
             auto &e(flows(i));
             e.Ujet = e.Urec = e.Qrec = 0.0;
@@ -739,8 +719,8 @@ namespace CrossVentMgr {
         } else {
             // adiabatic surface
             if (surfNum == thisSurface.ExtBoundCond) {
-                NodeNum1 = state.afn->AirflowNetworkLinkageData(MaxSurf).NodeNums[0];
-                NodeNum2 = state.afn->AirflowNetworkLinkageData(MaxSurf).NodeNums[1];
+                int NodeNum1 = state.afn->AirflowNetworkLinkageData(MaxSurf).NodeNums[0];
+                int NodeNum2 = state.afn->AirflowNetworkLinkageData(MaxSurf).NodeNums[1];
                 if (thisSurface.Zone == ZoneNum) {
                     if (state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum <= 0) {
                         state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(surfNum);
@@ -793,7 +773,6 @@ namespace CrossVentMgr {
         //       DATE WRITTEN   October 2004
         //       MODIFIED       8/2013 - Sam Brunswick
         //                      To incorporate improved temperature calculations
-        //       RE-ENGINEERED  -
 
         // PURPOSE OF THIS SUBROUTINE:
         // Subroutine for cross ventilation modelling.
@@ -803,53 +782,34 @@ namespace CrossVentMgr {
         // Work funded by the California Energy Comission. More information on the model can found in:
         // "Simplified Models for Heat Transfer in Rooms" G. Carrilho da Graca, Ph.D. thesis UCSD. December 2003.
 
-        using namespace DataEnvironment;
-        using namespace DataHeatBalance;
-        using Psychrometrics::PsyCpAirFnW;
-        using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using ScheduleManager::GetCurrentScheduleValue;
-        using ScheduleManager::GetScheduleIndex;
+        auto const &zone = state.dataHeatBal->Zone(ZoneNum);
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 GainsFrac;    // Fraction of lower subzone internal gains that mix as opposed to forming plumes
-        Real64 ConvGains;    // Total convective gains in the room
-        Real64 ConvGainsJet; // Total convective gains released in jet subzone
-        Real64 ConvGainsRec; // Total convective gains released in recirculation subzone
-        Real64 MCp_Total;    // Total capacity rate into the zone - assumed to enter at low level
-        Real64 ZTAveraged;
-
-        auto &Zone(state.dataHeatBal->Zone);
-
-        Real64 MCpT_Total;
-        Real64 L;
-        Real64 ZoneMult; // total zone multiplier
-        Real64 RetAirConvGain;
-
-        GainsFrac = 0.0;
-        ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+        Real64 GainsFrac = 0.0;                                  // Fraction of lower subzone internal gains that mix as opposed to forming plumes
+        Real64 ZoneMult = zone.Multiplier * zone.ListMultiplier; // total zone multiplier
+        auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
         for (int Ctd = 1; Ctd <= state.dataRoomAirMod->TotUCSDCV; ++Ctd) {
             if (ZoneNum == state.dataRoomAirMod->ZoneUCSDCV(Ctd).ZonePtr) {
-                GainsFrac = GetCurrentScheduleValue(state, state.dataRoomAirMod->ZoneUCSDCV(Ctd).SchedGainsPtr);
+                GainsFrac = ScheduleManager::GetCurrentScheduleValue(state, state.dataRoomAirMod->ZoneUCSDCV(Ctd).SchedGainsPtr);
             }
         }
 
-        ConvGains = InternalHeatGains::zoneSumAllInternalConvectionGains(state, ZoneNum);
+        // Total convective gains in the room
+        Real64 ConvGains = InternalHeatGains::zoneSumAllInternalConvectionGains(state, ZoneNum);
         ConvGains += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                      thisZoneHB.SysDepZoneLoadsLagged + thisZoneHB.NonAirSystemResponse / ZoneMult;
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very low or zero)
-        if (Zone(ZoneNum).NoHeatToReturnAir) {
-            RetAirConvGain = InternalHeatGains::zoneSumAllReturnAirConvectionGains(state, ZoneNum, 0);
+        if (zone.NoHeatToReturnAir) {
+            Real64 RetAirConvGain = InternalHeatGains::zoneSumAllReturnAirConvectionGains(state, ZoneNum, 0);
             ConvGains += RetAirConvGain;
         }
 
-        ConvGainsJet = ConvGains * GainsFrac;
-        ConvGainsRec = ConvGains * (1.0 - GainsFrac);
-        MCp_Total = thisZoneHB.MCPI + thisZoneHB.MCPV + thisZoneHB.MCPM + thisZoneHB.MCPE + thisZoneHB.MCPC + thisZoneHB.MDotCPOA;
-        MCpT_Total = thisZoneHB.MCPTI + thisZoneHB.MCPTV + thisZoneHB.MCPTM + thisZoneHB.MCPTE + thisZoneHB.MCPTC +
-                     thisZoneHB.MDotCPOA * Zone(ZoneNum).OutDryBulbTemp;
+        Real64 ConvGainsJet = ConvGains * GainsFrac;         // Total convective gains released in jet subzone
+        Real64 ConvGainsRec = ConvGains * (1.0 - GainsFrac); // Total convective gains released in recirculation subzone
+        Real64 MCp_Total = thisZoneHB.MCPI + thisZoneHB.MCPV + thisZoneHB.MCPM + thisZoneHB.MCPE + thisZoneHB.MCPC + thisZoneHB.MDotCPOA;
+        Real64 MCpT_Total =
+            thisZoneHB.MCPTI + thisZoneHB.MCPTV + thisZoneHB.MCPTM + thisZoneHB.MCPTE + thisZoneHB.MCPTC + thisZoneHB.MDotCPOA * zone.OutDryBulbTemp;
 
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithoutDistribution) {
             MCp_Total = state.afn->exchangeData(ZoneNum).SumMCp + state.afn->exchangeData(ZoneNum).SumMVCp + state.afn->exchangeData(ZoneNum).SumMMCp;
@@ -858,7 +818,7 @@ namespace CrossVentMgr {
         }
 
         EvolveParaUCSDCV(state, ZoneNum);
-        L = state.dataRoomAirMod->Droom(ZoneNum);
+        // Real64 L = state.dataRoomAirMod->Droom(ZoneNum);
 
         if (state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel) {
             //=============================== CROSS VENTILATION  Calculation ==============================================
@@ -901,7 +861,7 @@ namespace CrossVentMgr {
                     e.Urec = 0.0;
                 }
                 for (int Ctd = 1; Ctd <= 3; ++Ctd) {
-                    ZTAveraged = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+                    Real64 ZTAveraged = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
                     state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
                     state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
                     state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
@@ -933,7 +893,7 @@ namespace CrossVentMgr {
                 e.Urec = 0.0;
             }
             for (int Ctd = 1; Ctd <= 3; ++Ctd) {
-                ZTAveraged = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+                Real64 ZTAveraged = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
                 state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
                 state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
                 state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;

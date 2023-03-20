@@ -163,7 +163,7 @@ namespace WindowManager {
         // Reads spectral data value
         assert(t_SampleDataPtr != 0); // It must not be called for zero value
         std::shared_ptr<CSpectralSampleData> aSampleData = std::make_shared<CSpectralSampleData>();
-        auto spectralData = state.dataHeatBal->SpectralData(t_SampleDataPtr);
+        auto spectralData = state.dataHeatBal->SpectralData(t_SampleDataPtr); // (AUTO_OK_OBJ)
         int numOfWl = spectralData.NumOfWavelengths;
         for (int i = 1; i <= numOfWl; ++i) {
             Real64 wl = spectralData.WaveLength(i);
@@ -177,7 +177,7 @@ namespace WindowManager {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(Material::MaterialProperties const &t_MaterialProperties)
+    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(Material::MaterialChild const &t_MaterialProperties)
     {
         Real64 Tsol = t_MaterialProperties.Trans;
         Real64 Rfsol = t_MaterialProperties.ReflectSolBeamFront;
@@ -202,17 +202,12 @@ namespace WindowManager {
         return aSampleData;
     }
 
-    ///////////////////////////////////////////////////////////////////////////////
-    //   CWindowConstructionsSimplified
-    ///////////////////////////////////////////////////////////////////////////////
-    std::unique_ptr<CWindowConstructionsSimplified> CWindowConstructionsSimplified::p_inst = nullptr;
-
-    CWindowConstructionsSimplified &CWindowConstructionsSimplified::instance()
+    CWindowConstructionsSimplified &CWindowConstructionsSimplified::instance(EnergyPlusData &state)
     {
-        if (p_inst == nullptr) {
-            p_inst = std::unique_ptr<CWindowConstructionsSimplified>(new CWindowConstructionsSimplified());
+        if (state.dataWindowManagerExterior->p_inst == nullptr) {
+            state.dataWindowManagerExterior->p_inst = std::unique_ptr<CWindowConstructionsSimplified>(new CWindowConstructionsSimplified());
         }
-        return *p_inst;
+        return *state.dataWindowManagerExterior->p_inst;
     }
 
     CWindowConstructionsSimplified::CWindowConstructionsSimplified()
@@ -244,7 +239,7 @@ namespace WindowManager {
                 aEqLayer->addLayer(iguLayers[i]);
             }
 
-            auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(state);
+            auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(state); // (AUTO_OK_OBJ)
             aEqLayer->setSourceData(aSolarSpectrum);
             m_Equivalent[std::make_pair(t_Range, t_ConstrNum)] = aEqLayer;
         }
@@ -254,18 +249,17 @@ namespace WindowManager {
 
     void CWindowConstructionsSimplified::clearState()
     {
-        p_inst = nullptr;
     }
 
     IGU_Layers CWindowConstructionsSimplified::getLayers(EnergyPlusData &state, WavelengthRange const t_Range, int const t_ConstrNum) const
     {
-        Layers_Map aMap = m_Layers.at(t_Range);
+        Layers_Map aMap = m_Layers.at(t_Range); // Do you mean to make a copy of the entire map here?
         auto it = aMap.find(t_ConstrNum);
         if (it == aMap.end()) {
             ShowFatalError(state, "Incorrect construction selection.");
             // throw std::runtime_error("Incorrect construction selection.");
         }
-        return aMap.at(t_ConstrNum);
+        return it->second;
     }
 
 } // namespace WindowManager

@@ -809,7 +809,7 @@ namespace Photovoltaics {
         // calculate the electricity production using a simple PV model
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -844,8 +844,7 @@ namespace Photovoltaics {
             state.dataPhotovoltaic->PVarray(thisPV).SurfaceSink = state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower;
 
             // array energy, power * timestep
-            state.dataPhotovoltaic->PVarray(thisPV).Report.DCEnergy =
-                state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour);
+            state.dataPhotovoltaic->PVarray(thisPV).Report.DCEnergy = state.dataPhotovoltaic->PVarray(thisPV).Report.DCPower * TimeStepSysSec;
             state.dataPhotovoltaic->PVarray(thisPV).Report.ArrayEfficiency = Eff;
         } else { // not enough incident solar, zero things out
 
@@ -868,14 +867,13 @@ namespace Photovoltaics {
         // collect statements that assign to variables tied to output variables
 
         // Using/Aliasing
-        auto SetPVTQdotSource = PhotovoltaicThermalCollectors::SetPVTQdotSource;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using TranspiredCollector::SetUTSCQdotSource;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int thisZone; // working index for zones
 
-        state.dataPhotovoltaic->PVarray(PVnum).Report.DCEnergy =
-            state.dataPhotovoltaic->PVarray(PVnum).Report.DCPower * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        state.dataPhotovoltaic->PVarray(PVnum).Report.DCEnergy = state.dataPhotovoltaic->PVarray(PVnum).Report.DCPower * TimeStepSysSec;
 
         // add check for multiplier.  if surface is attached to a zone that is on a multiplier
         // then PV production should be multiplied out as well
@@ -902,7 +900,8 @@ namespace Photovoltaics {
                 state, state.dataPhotovoltaic->PVarray(PVnum).ExtVentCavPtr, -1.0 * state.dataPhotovoltaic->PVarray(PVnum).SurfaceSink);
         } break;
         case CellIntegration::PVTSolarCollector: {
-            SetPVTQdotSource(state, state.dataPhotovoltaic->PVarray(PVnum).PVTPtr, -1.0 * state.dataPhotovoltaic->PVarray(PVnum).SurfaceSink);
+            PhotovoltaicThermalCollectors::SetPVTQdotSource(
+                state, state.dataPhotovoltaic->PVarray(PVnum).PVTPtr, -1.0 * state.dataPhotovoltaic->PVarray(PVnum).SurfaceSink);
         } break;
         default:
             break;
@@ -1175,8 +1174,6 @@ namespace Photovoltaics {
         // subroutine was taken from InitBaseboard.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 
@@ -1201,7 +1198,8 @@ namespace Photovoltaics {
         }
 
         // Do the beginning of every time step initializations
-        TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
+        TimeElapsed =
+            state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
         if (state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.TimeElapsed != TimeElapsed) {
             // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous system
             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTempK;
@@ -2249,7 +2247,7 @@ namespace Photovoltaics {
         // Using/Aliasing
         using namespace DataSurfaces;
 
-        state.dataSurface->ExtVentedCavity(VentModNum).QdotSource = QSource / state.dataSurface->ExtVentedCavity(VentModNum).ProjArea;
+        state.dataHeatBal->ExtVentedCavity(VentModNum).QdotSource = QSource / state.dataHeatBal->ExtVentedCavity(VentModNum).ProjArea;
     }
 
     void GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex)
@@ -2282,8 +2280,8 @@ namespace Photovoltaics {
         CavNum = 0;
         Found = false;
         for (thisCav = 1; thisCav <= state.dataSurface->TotExtVentCav; ++thisCav) {
-            for (ThisSurf = 1; ThisSurf <= state.dataSurface->ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
-                if (SurfacePtr == state.dataSurface->ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
+            for (ThisSurf = 1; ThisSurf <= state.dataHeatBal->ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
+                if (SurfacePtr == state.dataHeatBal->ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
                     Found = true;
                     CavNum = thisCav;
                 }
@@ -2316,7 +2314,7 @@ namespace Photovoltaics {
         // access derived type
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        TsColl = state.dataSurface->ExtVentedCavity(VentModNum).Tbaffle;
+        TsColl = state.dataHeatBal->ExtVentedCavity(VentModNum).Tbaffle;
     }
 
     // -------------------------------------------------------------------------------

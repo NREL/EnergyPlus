@@ -2098,14 +2098,10 @@ namespace WaterToAirHeatPump {
         // Data is moved from the HP data structure to the HP outlet nodes.
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
         using PlantUtilities::SafeCopyPlantNode;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 ReportingConstant;
-
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // WatertoAirHP(HPNum)%SimFlag=.FALSE.
         if (!heatPump.SimFlag) {
             // Heatpump is off; just pass through conditions
@@ -2157,11 +2153,11 @@ namespace WaterToAirHeatPump {
         heatPump.InletAirMassFlowRate = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).MassFlowRate;
         heatPump.OutletAirMassFlowRate = heatPump.InletAirMassFlowRate;
 
-        heatPump.Energy = heatPump.Power * ReportingConstant;
-        heatPump.EnergyLoadTotal = heatPump.QLoadTotal * ReportingConstant;
-        heatPump.EnergySensible = heatPump.QSensible * ReportingConstant;
-        heatPump.EnergyLatent = heatPump.QLatent * ReportingConstant;
-        heatPump.EnergySource = heatPump.QSource * ReportingConstant;
+        heatPump.Energy = heatPump.Power * TimeStepSysSec;
+        heatPump.EnergyLoadTotal = heatPump.QLoadTotal * TimeStepSysSec;
+        heatPump.EnergySensible = heatPump.QSensible * TimeStepSysSec;
+        heatPump.EnergyLatent = heatPump.QLatent * TimeStepSysSec;
+        heatPump.EnergySource = heatPump.QSource * TimeStepSysSec;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).CO2 = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).CO2;

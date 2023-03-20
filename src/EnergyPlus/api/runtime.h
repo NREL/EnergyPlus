@@ -56,6 +56,7 @@
 
 // if we are building this with C++ in mind, we can make use of these std::function based callback registration functions
 #include <functional>
+#include <string>
 ENERGYPLUSLIB_API void callbackBeginNewEnvironment(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
 ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
 ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
@@ -74,6 +75,7 @@ ENERGYPLUSLIB_API void callbackEndOfSystemSizing(EnergyPlusState state, std::fun
 ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
 ENERGYPLUSLIB_API void callbackUnitarySystemSizing(EnergyPlusState state, const std::function<void(EnergyPlusState)> &f);
 ENERGYPLUSLIB_API void registerStdOutCallback(EnergyPlusState state, std::function<void(const std::string &)>);
+ENERGYPLUSLIB_API void registerProgressCallback(EnergyPlusState state, std::function<void(int const)>);
 ENERGYPLUSLIB_API void registerExternalHVACManager(EnergyPlusState state, std::function<void(EnergyPlusState)> f);
 // ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 

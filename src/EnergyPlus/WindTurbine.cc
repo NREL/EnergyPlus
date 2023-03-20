@@ -796,7 +796,7 @@ namespace WindTurbine {
                 while (statFile.good()) { // end of file
                     auto lineIn = statFile.readLine();
                     // reconcile line with different versions of stat file
-                    auto lnPtr = index(lineIn.data, "Wind Speed");
+                    size_t lnPtr = index(lineIn.data, "Wind Speed");
                     if (lnPtr == std::string::npos) continue;
                     // have hit correct section.
                     while (statFile.good()) { // find daily avg line
@@ -1135,10 +1135,10 @@ namespace WindTurbine {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine fills remaining report variables.
 
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &windTurbine = state.dataWindTurbine->WindTurbineSys(WindTurbineNum);
 
-        windTurbine.Energy = windTurbine.Power * TimeStepSys * DataGlobalConstants::SecInHour;
+        windTurbine.Energy = windTurbine.Power * TimeStepSysSec;
     }
 
     //*****************************************************************************************

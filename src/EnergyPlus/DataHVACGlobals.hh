@@ -424,6 +424,7 @@ struct HVACGlobalsData : BaseGlobalStruct
     bool FirstTimeStepSysFlag = false; // Set to true at the start of each sub-time step
 
     Real64 TimeStepSys = 0.0;                  // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
+    Real64 TimeStepSysSec = 0.0;               // System Time Increment in seconds
     Real64 SysTimeElapsed = 0.0;               // elapsed system time in zone timestep (hours)
     Real64 FracTimeStepZone = 0.0;             // System time step divided by the zone time step
     bool ShortenTimeStepSys = false;           // Logical flag that triggers shortening of system time step
@@ -444,6 +445,7 @@ struct HVACGlobalsData : BaseGlobalStruct
     Real64 ElecHeatingCoilPower = 0.0;     // Electric power consumed by electric heating coil
     Real64 SuppHeatingCoilPower = 0.0;     // Electric power consumed by electric supplemental heating coil
     Real64 AirToAirHXElecPower = 0.0;      // Electric power consumed by Heat Exchanger:Air To Air (Generic or Flat Plate)
+    Real64 DefrostElecPower = 0.0;         // Electric power consumed by DX heating coil for defrosting (Resistive or ReverseCycle)
     // from last simulation in HeatRecovery.cc
     Real64 UnbalExhMassFlow = 0.0;      // unbalanced zone exhaust from a zone equip component [kg/s]
     Real64 BalancedExhMassFlow = 0.0;   // balanced zone exhaust (declared as so by user)  [kg/s]

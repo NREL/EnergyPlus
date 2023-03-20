@@ -79,9 +79,6 @@ namespace DataHeatBalance {
     using namespace DataComplexFenestration;
     using DataComplexFenestration::GapDeflectionState;
     using DataComplexFenestration::GapSupportPillar;
-    using DataComplexFenestration::WindowComplexShade;
-    using DataComplexFenestration::WindowThermalModelParams;
-    using DataSurfaces::MaxSlatAngs;
     using DataVectorTypes::Vector;
 
     // Parameters for Interior and Exterior Solar Distribution
@@ -582,12 +579,15 @@ namespace DataHeatBalance {
         // 2=Plenum Zone, 11=Solar Wall, 12=Roof Pond
         Real64 UserEnteredFloorArea = DataGlobalConstants::AutoCalculate; // User input floor area for this zone
         // Calculated after input
-        Real64 FloorArea = 0.0;     // Floor area used for this zone
-        Real64 CalcFloorArea = 0.0; // Calculated floor area used for this zone
-        Real64 CeilingArea = 0.0;   // Ceiling area for the zone
-        bool HasFloor = false;      // Has "Floor" surface
-        bool HasRoof = false;       // Has "Roof" or "Ceiling" Surface
-        bool HasWindow = false;     // Window(s) present in this zone
+        Real64 FloorArea = 0.0;            // Floor area used for area based internal gains and outputs
+        Real64 CalcFloorArea = 0.0;        // Calculated floor area excluding air boundary surfaces
+        Real64 geometricFloorArea = 0.0;   // Calculated floor area including air boundary surfaces
+        Real64 CeilingArea = 0.0;          // Ceiling area excluding air boundary surfaces
+        Real64 geometricCeilingArea = 0.0; // Ceiling area area including air boundary surfaces
+        bool ceilingHeightEntered = false; // True is user input ceiling height
+        bool HasFloor = false;             // Has "Floor" surface
+        bool HasRoof = false;              // Has "Roof" or "Ceiling" Surface
+        bool HasWindow = false;            // Window(s) present in this zone
         Real64 AirCapacity = 0.0;
         Real64 ExtWindowArea = 0.0;               // Exterior Window Area for Zone
         Real64 ExtWindowArea_Multiplied = 0.0;    // Exterior Window Area for Zone with multipliers
@@ -900,6 +900,55 @@ namespace DataHeatBalance {
         std::string otherEquipFuelTypeString; // Fuel Type string for Other Equipment
         ExteriorEnergyUse::ExteriorFuelUsage OtherEquipFuelType =
             ExteriorEnergyUse::ExteriorFuelUsage::Invalid; // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
+    };
+
+    struct ExtVentedCavityStruct
+    {
+        // Members
+        // from input data
+        std::string Name;
+        std::string OSCMName;                       // OtherSideConditionsModel
+        int OSCMPtr;                                // OtherSideConditionsModel index
+        Real64 Porosity;                            // fraction of absorber plate [--]
+        Real64 LWEmitt;                             // Thermal Emissivity of Baffle Surface [dimensionless]
+        Real64 SolAbsorp;                           // Solar Absorbtivity of Baffle Surface [dimensionless]
+        Material::SurfaceRoughness BaffleRoughness; // surface roughness for exterior convection calcs.
+        Real64 PlenGapThick;                        // Depth of Plenum Behind Baffle [m]
+        int NumSurfs;                               // a single baffle can have multiple surfaces underneath it
+        Array1D_int SurfPtrs;                       // = 0  ! array of pointers for participating underlying surfaces
+        Real64 HdeltaNPL;                           // Height scale for Cavity buoyancy  [m]
+        Real64 AreaRatio;                           // Ratio of actual surface are to projected surface area [dimensionless]
+        Real64 Cv;                                  // volume-based effectiveness of openings for wind-driven vent when Passive
+        Real64 Cd;                                  // discharge coefficient of openings for buoyancy-driven vent when Passive
+        // data from elsewhere and calculated
+        Real64 ActualArea;  // Overall Area of Collect with surface corrugations.
+        Real64 ProjArea;    // Overall Area of Collector projected, as if flat [m2]
+        Vector Centroid;    // computed centroid
+        Real64 TAirCav;     // modeled drybulb temperature for air between baffle and wall [C]
+        Real64 Tbaffle;     // modeled surface temperature for baffle[C]
+        Real64 TairLast;    // Old Value for modeled drybulb temp of air between baffle and wall [C]
+        Real64 TbaffleLast; // Old value for modeled surface temperature for baffle [C]
+        Real64 HrPlen;      // Modeled radiation coef for OSCM [W/m2-C]
+        Real64 HcPlen;      // Modeled Convection coef for OSCM [W/m2-C]
+        Real64 MdotVent;    // air mass flow exchanging with ambient when passive.
+        Real64 Tilt;        // Tilt from area weighted average of underlying surfaces
+        Real64 Azimuth;     // Azimuth from area weighted average of underlying surfaces
+        Real64 QdotSource;  // Source/sink term
+        // reporting data
+        Real64 Isc;              // total incident solar on baffle [W]
+        Real64 PassiveACH;       // air changes per hour when passive [1/hr]
+        Real64 PassiveMdotVent;  // Total Nat Vent air change rate  [kg/s]
+        Real64 PassiveMdotWind;  // Nat Vent air change rate from Wind-driven [kg/s]
+        Real64 PassiveMdotTherm; // Nat. Vent air change rate from buoyancy-driven flow [kg/s]
+
+        // Default Constructor
+        ExtVentedCavityStruct()
+            : OSCMPtr(0), Porosity(0.0), LWEmitt(0.0), SolAbsorp(0.0), BaffleRoughness(Material::SurfaceRoughness::VeryRough), PlenGapThick(0.0),
+              NumSurfs(0), HdeltaNPL(0.0), AreaRatio(0.0), Cv(0.0), Cd(0.0), ActualArea(0.0), ProjArea(0.0), Centroid(0.0, 0.0, 0.0), TAirCav(0.0),
+              Tbaffle(0.0), TairLast(20.0), TbaffleLast(20.0), HrPlen(0.0), HcPlen(0.0), MdotVent(0.0), Tilt(0.0), Azimuth(0.0), QdotSource(0.0),
+              Isc(0.0), PassiveACH(0.0), PassiveMdotVent(0.0), PassiveMdotWind(0.0), PassiveMdotTherm(0.0)
+        {
+        }
     };
 
     // ITE Equipment Environmental Class Data
@@ -1320,180 +1369,6 @@ namespace DataHeatBalance {
         int numberOfDevices = 0;
         int maxNumberOfDevices = 0;
         Array1D<GenericComponentZoneIntGainStruct> device;
-    };
-
-    struct WindowBlindProperties
-    {
-        // Members
-        std::string Name;
-        int MaterialNumber = 0; // Material pointer for the blind
-        // Input properties
-        DataWindowEquivalentLayer::Orientation SlatOrientation = DataWindowEquivalentLayer::Orientation::Invalid; // HORIZONTAL or VERTICAL
-        DataWindowEquivalentLayer::AngleType SlatAngleType = DataWindowEquivalentLayer::AngleType::Fixed;         // FIXED or VARIABLE
-        Real64 SlatWidth = 0.0;                                                                                   // Slat width (m)
-        Real64 SlatSeparation = 0.0;                                                                              // Slat separation (m)
-        Real64 SlatThickness = 0.0;                                                                               // Slat thickness (m)
-        Real64 SlatCrown = 0.0;        // the height of the slate (length from the chord to the curve)
-        Real64 SlatAngle = 0.0;        // Slat angle (deg)
-        Real64 MinSlatAngle = 0.0;     // Minimum slat angle for variable-angle slats (deg) (user input)
-        Real64 MaxSlatAngle = 0.0;     // Maximum slat angle for variable-angle slats (deg) (user input)
-        Real64 SlatConductivity = 0.0; // Slat conductivity (W/m-K)
-        // Solar slat properties
-        Real64 SlatTransSolBeamDiff = 0.0;     // Slat solar beam-diffuse transmittance
-        Real64 SlatFrontReflSolBeamDiff = 0.0; // Slat front solar beam-diffuse reflectance
-        Real64 SlatBackReflSolBeamDiff = 0.0;  // Slat back solar beam-diffuse reflectance
-        Real64 SlatTransSolDiffDiff = 0.0;     // Slat solar diffuse-diffuse transmittance
-        Real64 SlatFrontReflSolDiffDiff = 0.0; // Slat front solar diffuse-diffuse reflectance
-        Real64 SlatBackReflSolDiffDiff = 0.0;  // Slat back solar diffuse-diffuse reflectance
-        // Visible slat properties
-        Real64 SlatTransVisBeamDiff = 0.0;     // Slat visible beam-diffuse transmittance
-        Real64 SlatFrontReflVisBeamDiff = 0.0; // Slat front visible beam-diffuse reflectance
-        Real64 SlatBackReflVisBeamDiff = 0.0;  // Slat back visible beam-diffuse reflectance
-        Real64 SlatTransVisDiffDiff = 0.0;     // Slat visible diffuse-diffuse transmittance
-        Real64 SlatFrontReflVisDiffDiff = 0.0; // Slat front visible diffuse-diffuse reflectance
-        Real64 SlatBackReflVisDiffDiff = 0.0;  // Slat back visible diffuse-diffuse reflectance
-        // Long-wave (IR) slat properties
-        Real64 SlatTransIR = 0.0;      // Slat IR transmittance
-        Real64 SlatFrontEmissIR = 0.0; // Slat front emissivity
-        Real64 SlatBackEmissIR = 0.0;  // Slat back emissivity
-        // Some characteristics for blind thermal calculation
-        Real64 BlindToGlassDist = 0.0;    // Distance between window shade and adjacent glass (m)
-        Real64 BlindTopOpeningMult = 0.0; // Area of air-flow opening at top of blind, expressed as a fraction
-        //  of the blind-to-glass opening area at the top of the blind
-        Real64 BlindBottomOpeningMult = 0.0; // Area of air-flow opening at bottom of blind, expressed as a fraction
-        //  of the blind-to-glass opening area at the bottom of the blind
-        Real64 BlindLeftOpeningMult = 0.0; // Area of air-flow opening at left side of blind, expressed as a fraction
-        //  of the blind-to-glass opening area at the left side of the blind
-        Real64 BlindRightOpeningMult = 0.0; // Area of air-flow opening at right side of blind, expressed as a fraction
-        //  of the blind-to-glass opening area at the right side of the blind
-        // Calculated blind properties
-        // Blind solar properties
-        Array2D<Real64> SolFrontBeamBeamTrans; // Blind solar front beam-beam transmittance vs.
-        // profile angle, slat angle
-        Array2D<Real64> SolFrontBeamBeamRefl; // Blind solar front beam-beam reflectance vs. profile angle,
-        // slat angle (zero)
-        Array2D<Real64> SolBackBeamBeamTrans; // Blind solar back beam-beam transmittance vs. profile angle,
-        // slat angle
-        Array2D<Real64> SolBackBeamBeamRefl; // Blind solar back beam-beam reflectance vs. profile angle,
-        // slat angle (zero)
-        Array2D<Real64> SolFrontBeamDiffTrans; // Blind solar front beam-diffuse transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> SolFrontBeamDiffRefl; // Blind solar front beam-diffuse reflectance
-        // vs. profile angle, slat angle
-        Array2D<Real64> SolBackBeamDiffTrans; // Blind solar back beam-diffuse transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> SolBackBeamDiffRefl; // Blind solar back beam-diffuse reflectance
-        // vs. profile angle, slat angle
-        Array1D<Real64> SolFrontDiffDiffTrans; // Blind solar front diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffTransGnd; // Blind ground solar front diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffTransSky; // Blind sky solar front diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffRefl; // Blind solar front diffuse-diffuse reflectance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffReflGnd; // Blind ground solar front diffuse-diffuse reflectance
-        // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffReflSky; // Blind sky solar front diffuse-diffuse reflectance
-        // vs. slat angle
-        Array1D<Real64> SolBackDiffDiffTrans; // Blind solar back diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> SolBackDiffDiffRefl; // Blind solar back diffuse-diffuse reflectance
-        // vs. slat angle
-        Array2D<Real64> SolFrontBeamAbs;    // Blind solar front beam absorptance vs. slat angle
-        Array2D<Real64> SolBackBeamAbs;     // Blind solar back beam absorptance vs. slat angle
-        Array1D<Real64> SolFrontDiffAbs;    // Blind solar front diffuse absorptance vs. slat angle
-        Array1D<Real64> SolFrontDiffAbsGnd; // Blind ground solar front diffuse absorptance vs. slat angle
-        Array1D<Real64> SolFrontDiffAbsSky; // Blind sky solar front diffuse absorptance vs. slat angle
-        Array1D<Real64> SolBackDiffAbs;     // Blind solar back diffuse absorptance vs. slat angle
-        // Blind visible properties
-        Array2D<Real64> VisFrontBeamBeamTrans; // Blind visible front beam-beam transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> VisFrontBeamBeamRefl; // Blind visible front beam-beam reflectance
-        // vs. profile angle, slat angle (zero)
-        Array2D<Real64> VisBackBeamBeamTrans; // Blind visible back beam-beam transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> VisBackBeamBeamRefl; // Blind visible back beam-beam reflectance
-        // vs. profile angle, slat angle (zero)
-        Array2D<Real64> VisFrontBeamDiffTrans; // Blind visible front beam-diffuse transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> VisFrontBeamDiffRefl; // Blind visible front beam-diffuse reflectance
-        // vs. profile angle, slat angle
-        Array2D<Real64> VisBackBeamDiffTrans; // Blind visible back beam-diffuse transmittance
-        // vs. profile angle, slat angle
-        Array2D<Real64> VisBackBeamDiffRefl; // Blind visible back beam-diffuse reflectance
-        // vs. profile angle, slat angle
-        Array1D<Real64> VisFrontDiffDiffTrans; // Blind visible front diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> VisFrontDiffDiffRefl; // Blind visible front diffuse-diffuse reflectance
-        // vs. slat angle
-        Array1D<Real64> VisBackDiffDiffTrans; // Blind visible back diffuse-diffuse transmittance
-        // vs. slat angle
-        Array1D<Real64> VisBackDiffDiffRefl; // Blind visible back diffuse-diffuse reflectance
-        // vs. slat angle
-        // Long-wave (IR) blind properties
-        Array1D<Real64> IRFrontTrans; // Blind IR front transmittance vs. slat angle
-        Array1D<Real64> IRFrontEmiss; // Blind IR front emissivity vs. slat angle
-        Array1D<Real64> IRBackTrans;  // Blind IR back transmittance vs. slat angle
-        Array1D<Real64> IRBackEmiss;  // Blind IR back emissivity vs. slat angle
-
-        // Default Constructor
-        WindowBlindProperties()
-            : SolFrontBeamBeamTrans(MaxSlatAngs, 37, 0.0), SolFrontBeamBeamRefl(MaxSlatAngs, 37, 0.0), SolBackBeamBeamTrans(MaxSlatAngs, 37, 0.0),
-              SolBackBeamBeamRefl(MaxSlatAngs, 37, 0.0), SolFrontBeamDiffTrans(MaxSlatAngs, 37, 0.0), SolFrontBeamDiffRefl(MaxSlatAngs, 37, 0.0),
-              SolBackBeamDiffTrans(MaxSlatAngs, 37, 0.0), SolBackBeamDiffRefl(MaxSlatAngs, 37, 0.0), SolFrontDiffDiffTrans(MaxSlatAngs, 0.0),
-              SolFrontDiffDiffTransGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffTransSky(MaxSlatAngs, 0.0), SolFrontDiffDiffRefl(MaxSlatAngs, 0.0),
-              SolFrontDiffDiffReflGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffReflSky(MaxSlatAngs, 0.0), SolBackDiffDiffTrans(MaxSlatAngs, 0.0),
-              SolBackDiffDiffRefl(MaxSlatAngs, 0.0), SolFrontBeamAbs(MaxSlatAngs, 37, 0.0), SolBackBeamAbs(MaxSlatAngs, 37, 0.0),
-              SolFrontDiffAbs(MaxSlatAngs, 0.0), SolFrontDiffAbsGnd(MaxSlatAngs, 0.0), SolFrontDiffAbsSky(MaxSlatAngs, 0.0),
-              SolBackDiffAbs(MaxSlatAngs, 0.0), VisFrontBeamBeamTrans(MaxSlatAngs, 37, 0.0), VisFrontBeamBeamRefl(MaxSlatAngs, 37, 0.0),
-              VisBackBeamBeamTrans(MaxSlatAngs, 37, 0.0), VisBackBeamBeamRefl(MaxSlatAngs, 37, 0.0), VisFrontBeamDiffTrans(MaxSlatAngs, 37, 0.0),
-              VisFrontBeamDiffRefl(MaxSlatAngs, 37, 0.0), VisBackBeamDiffTrans(MaxSlatAngs, 37, 0.0), VisBackBeamDiffRefl(MaxSlatAngs, 37, 0.0),
-              VisFrontDiffDiffTrans(MaxSlatAngs, 0.0), VisFrontDiffDiffRefl(MaxSlatAngs, 0.0), VisBackDiffDiffTrans(MaxSlatAngs, 0.0),
-              VisBackDiffDiffRefl(MaxSlatAngs, 0.0), IRFrontTrans(MaxSlatAngs, 0.0), IRFrontEmiss(MaxSlatAngs, 0.0), IRBackTrans(MaxSlatAngs, 0.0),
-              IRBackEmiss(MaxSlatAngs, 0.0)
-        {
-        }
-    };
-
-    struct SurfaceScreenProperties
-    {
-        // Members
-        int MaterialNumber = 0; // Material pointer for the screen
-        Real64 BmBmTrans = 0.0; // Beam solar transmittance (dependent on sun angle)
-        // (this value can include scattering if the user so chooses)
-        Real64 BmBmTransBack = 0.0; // Beam solar transmittance (dependent on sun angle) from back side of screen
-        Real64 BmBmTransVis = 0.0;  // Visible solar transmittance (dependent on sun angle)
-        // (this value can include visible scattering if the user so chooses)
-        Real64 BmDifTrans = 0.0;     // Beam solar transmitted as diffuse radiation (dependent on sun angle)
-        Real64 BmDifTransBack = 0.0; // Beam solar transmitted as diffuse radiation (dependent on sun angle) from back side
-        Real64 BmDifTransVis = 0.0;  // Visible solar transmitted as diffuse radiation (dependent on sun angle)
-        // The following reflectance properties are dependent on sun angle:
-        Real64 ReflectSolBeamFront = 0.0;          // Beam solar reflected as diffuse radiation when sun is in front of screen
-        Real64 ReflectVisBeamFront = 0.0;          // Visible solar reflected as diffuse radiation when sun is in front of screen
-        Real64 ReflectSolBeamBack = 0.0;           // Beam solar reflected as diffuse radiation when sun is in back of screen
-        Real64 ReflectVisBeamBack = 0.0;           // Visible solar reflected as diffuse radiation when sun is in back of screen
-        Real64 AbsorpSolarBeamFront = 0.0;         // Front surface solar beam absorptance
-        Real64 AbsorpSolarBeamBack = 0.0;          // Back surface solar beam absorptance
-        Real64 DifDifTrans = 0.0;                  // Back surface diffuse solar transmitted
-        Real64 DifDifTransVis = 0.0;               // Back surface diffuse visible solar transmitted
-        Real64 DifScreenAbsorp = 0.0;              // Absorption of diffuse radiation
-        Real64 DifReflect = 0.0;                   // Back reflection of solar diffuse radiation
-        Real64 DifReflectVis = 0.0;                // Back reflection of visible diffuse radiation
-        Real64 ReflectScreen = 0.0;                // Screen assembly solar reflectance (user input adjusted for holes in screen)
-        Real64 ReflectScreenVis = 0.0;             // Screen assembly visible reflectance (user input adjusted for holes in screen)
-        Real64 ReflectCylinder = 0.0;              // Screen material solar reflectance (user input, does not account for holes in screen)
-        Real64 ReflectCylinderVis = 0.0;           // Screen material visible reflectance (user input, does not account for holes in screen)
-        Real64 ScreenDiameterToSpacingRatio = 0.0; // ratio of screen material diameter to screen material spacing
-        DataSurfaces::ScreenBeamReflectanceModel screenBeamReflectanceModel =
-            DataSurfaces::ScreenBeamReflectanceModel::Invalid; // user specified method of accounting for scattered solar beam
-    };
-
-    struct ScreenTransData
-    {
-        // Members
-        Array2D<Real64> Trans;
-        Array2D<Real64> Scatt;
     };
 
     struct ZoneCatEUseData
@@ -1930,8 +1805,6 @@ namespace DataHeatBalance {
                                  ObjexxFCL::Optional_int_const ScreenNumber = _ // Optional screen number
     );
 
-    std::string DisplayMaterialRoughness(DataSurfaces::SurfaceRoughness Roughness); // Roughness String
-
     Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
                                          int numSurf,  // index for Surface array.
                                          bool &isValid // returns true if result is valid
@@ -2033,9 +1906,8 @@ struct HeatBalanceData : BaseGlobalStruct
     int TotBlinds = 0;          // Total number of blind materials
     int TotScreens = 0;         // Total number of exterior window screen materials
     int TotTCGlazings = 0;      // Number of TC glazing object - WindowMaterial:Glazing:Thermochromic found in the idf file
-    int NumSurfaceScreens = 0;  // Total number of screens on exterior windows
+    int NumScreens = 0;         // Total number of screens on exterior windows
     int TotShades = 0;          // Total number of shade materials
-    int TotComplexShades = 0;   // Total number of shading materials for complex fenestrations
     int TotComplexGaps = 0;     // Total number of window gaps for complex fenestrations
     int TotSimpleWindow = 0;    // number of simple window systems.
     int W5GlsMatEQL = 0;        // Window5 Single-Gas Materials for Equivalent Layer window model
@@ -2209,11 +2081,6 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::MixingData> CrossMixing;
     EPVector<DataHeatBalance::AirBoundaryMixingSpecs> airBoundaryMixing;
     EPVector<DataHeatBalance::MixingData> RefDoorMixing;
-    Array1D<DataHeatBalance::WindowBlindProperties> Blind;
-    EPVector<DataHeatBalance::WindowComplexShade> ComplexShade;
-    EPVector<DataHeatBalance::WindowThermalModelParams> WindowThermalModel;
-    EPVector<DataHeatBalance::SurfaceScreenProperties> SurfaceScreens;
-    EPVector<DataHeatBalance::ScreenTransData> ScreenTrans;
     EPVector<DataHeatBalance::ZoneCatEUseData> ZoneIntEEuse;
     EPVector<DataHeatBalance::RefrigCaseCreditData> RefrigCaseCredit;
     EPVector<DataHeatBalance::HeatReclaimDataBase> HeatReclaimRefrigeratedRack;
@@ -2232,6 +2099,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::ZoneLocalEnvironmentData> ZoneLocalEnvironment;
     bool MundtFirstTimeFlag = true;
     EPVector<std::string> spaceTypes;
+    EPVector<DataHeatBalance::ExtVentedCavityStruct> ExtVentedCavity;
 
     void clear_state() override
     {

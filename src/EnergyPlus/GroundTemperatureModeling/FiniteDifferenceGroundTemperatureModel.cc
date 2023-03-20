@@ -832,7 +832,7 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // Temporary KA model for initialization
-    std::unique_ptr<KusudaGroundTempsModel> tempModel(new KusudaGroundTempsModel());
+    auto tempModel = std::make_unique<KusudaGroundTempsModel>(); // (AUTO_OK) Why does this have to be a unique_ptr?
 
     tempModel->objectName = "KAModelForFDModel";
     tempModel->objectType = GroundTempObjType::KusudaGroundTemp;

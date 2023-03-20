@@ -114,7 +114,7 @@ namespace EnergyPlus::PondGroundHeatExchanger {
 //   ASHRAE Transactions.  106(2):107-121.
 
 Real64 constexpr StefBoltzmann(5.6697e-08); // Stefan-Boltzmann constant
-auto constexpr fluidNameWater("WATER");
+constexpr std::string_view fluidNameWater = "WATER";
 
 void PondGroundHeatExchangerData::simulate(EnergyPlusData &state,
                                            [[maybe_unused]] const PlantLocation &calledFromLocation,
@@ -557,8 +557,8 @@ Real64 PondGroundHeatExchangerData::CalcTotalFLux(EnergyPlusData &state, Real64 
     Real64 SkyTempAbs = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv; // absolute value of sky temp
 
     // ASHRAE simple convection coefficient model for external surfaces.
-    Real64 ConvCoef = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(DataSurfaces::SurfaceRoughness::VeryRough,
-                                                                            DataEnvironment::WindSpeedAt(state, PondHeight));
+    Real64 ConvCoef =
+        ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(Material::SurfaceRoughness::VeryRough, DataEnvironment::WindSpeedAt(state, PondHeight));
 
     // convective flux
     Real64 FluxConvect = ConvCoef * (PondBulkTemp - ExternalTemp);

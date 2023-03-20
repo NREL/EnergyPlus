@@ -3834,9 +3834,9 @@ namespace VentilatedSlab {
                     Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                    Ch = double(thisConstruct.CTFTSourceQ(0));
-                    Ci = double(thisConstruct.CTFTSourceIn(0));
-                    Cj = double(thisConstruct.CTFTSourceOut(0));
+                    Ch = double(thisConstruct.CTFTSourceQ[0]);
+                    Ci = double(thisConstruct.CTFTSourceIn[0]);
+                    Cj = double(thisConstruct.CTFTSourceOut[0]);
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
@@ -4111,9 +4111,9 @@ namespace VentilatedSlab {
                     Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                    Ch = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0));
-                    Ci = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0));
-                    Cj = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0));
+                    Ch = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceQ[0]);
+                    Ci = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceIn[0]);
+                    Cj = double(state.dataConstruction->Construct(ConstrNum).CTFTSourceOut[0]);
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
@@ -4452,8 +4452,8 @@ namespace VentilatedSlab {
         // values to the running average.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         auto &ventSlab = state.dataVentilatedSlab->VentSlab(Item);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4725,7 +4725,7 @@ namespace VentilatedSlab {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &ventSlab = state.dataVentilatedSlab->VentSlab(Item);
 
         int RadSurfNum;               // DO loop counter for radiant surfaces in the system
@@ -4754,15 +4754,15 @@ namespace VentilatedSlab {
             ventSlab.RadCoolingPower = -TotalVentSlabRadPower;
         }
 
-        ventSlab.RadHeatingEnergy = ventSlab.RadHeatingPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        ventSlab.RadCoolingEnergy = ventSlab.RadCoolingPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        ventSlab.RadHeatingEnergy = ventSlab.RadHeatingPower * TimeStepSysSec;
+        ventSlab.RadCoolingEnergy = ventSlab.RadCoolingPower * TimeStepSysSec;
 
         // Coil Part
-        ventSlab.HeatCoilEnergy = ventSlab.HeatCoilPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        ventSlab.SensCoolCoilEnergy = ventSlab.SensCoolCoilPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        ventSlab.LateCoolCoilEnergy = ventSlab.LateCoolCoilPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        ventSlab.TotCoolCoilEnergy = ventSlab.TotCoolCoilPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        ventSlab.ElecFanEnergy = ventSlab.ElecFanPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        ventSlab.HeatCoilEnergy = ventSlab.HeatCoilPower * TimeStepSysSec;
+        ventSlab.SensCoolCoilEnergy = ventSlab.SensCoolCoilPower * TimeStepSysSec;
+        ventSlab.LateCoolCoilEnergy = ventSlab.LateCoolCoilPower * TimeStepSysSec;
+        ventSlab.TotCoolCoilEnergy = ventSlab.TotCoolCoilPower * TimeStepSysSec;
+        ventSlab.ElecFanEnergy = ventSlab.ElecFanPower * TimeStepSysSec;
 
         if ((ventSlab.SysConfg == VentilatedSlabConfig::SlabOnly) || (ventSlab.SysConfg == VentilatedSlabConfig::SeriesSlabs)) {
             ventSlab.SlabInTemp = state.dataLoopNodes->Node(ventSlab.RadInNode).Temp;

@@ -247,10 +247,11 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
 
     // Simulate a call for tank water that would produce 0.025m3 of draw in one timestep
     state->dataHVACGlobal->TimeStepSys = 10.0 / 60.0;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     state->dataWaterData->WaterStorage(TankNum).NumWaterDemands = 1;
     state->dataWaterData->WaterStorage(TankNum).VdotRequestDemand.allocate(1);
     Real64 draw = 0.025;
-    state->dataWaterData->WaterStorage(TankNum).VdotRequestDemand(1) = draw / (state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    state->dataWaterData->WaterStorage(TankNum).VdotRequestDemand(1) = draw / state->dataHVACGlobal->TimeStepSysSec;
 
     // First call, should bring predicted volume above the ValveOnCapacity
     WaterManager::ManageWater(*state);
@@ -273,7 +274,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     // Third call: Predicted volume is below ValveOnCapacity, it kicks on
     WaterManager::ManageWater(*state);
     calcVolume -= draw;
-    calcVolume += state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate * (state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    calcVolume += state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate * state->dataHVACGlobal->TimeStepSysSec;
     EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
     EXPECT_DOUBLE_EQ(1.985, calcVolume);
     EXPECT_TRUE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
@@ -283,7 +284,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     // Fourth call: it should keep on filling, until it hits ValveOffCapacity
     WaterManager::ManageWater(*state);
     calcVolume -= draw;
-    calcVolume += state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate * (state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    calcVolume += state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate * state->dataHVACGlobal->TimeStepSysSec;
     EXPECT_DOUBLE_EQ(3.76, calcVolume);
     calcVolume = min(calcVolume, state->dataWaterData->WaterStorage(TankNum).MaxCapacity);
     EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);

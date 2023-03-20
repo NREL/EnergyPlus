@@ -482,10 +482,12 @@ namespace SurfaceGroundHeatExchanger {
                     // CTF stuff
                     LayerNum = state.dataConstruction->Construct(Cons).TotLayers;
                     this->NumCTFTerms = state.dataConstruction->Construct(Cons).NumCTFTerms;
-                    this->CTFin = state.dataConstruction->Construct(Cons).CTFInside;         // Z coefficents
-                    this->CTFout = state.dataConstruction->Construct(Cons).CTFOutside;       // X coefficents
-                    this->CTFcross = state.dataConstruction->Construct(Cons).CTFCross;       // Y coefficents
-                    this->CTFflux({1, _}) = state.dataConstruction->Construct(Cons).CTFFlux; // F & f coefficents
+                    this->CTFin = state.dataConstruction->Construct(Cons).CTFInside;   // Z coefficents
+                    this->CTFout = state.dataConstruction->Construct(Cons).CTFOutside; // X coefficents
+                    this->CTFcross = state.dataConstruction->Construct(Cons).CTFCross; // Y coefficents
+                    for (size_t i = 1; i < state.dataConstruction->Construct(Cons).CTFFlux.size(); i++) {
+                        this->CTFflux[i] = state.dataConstruction->Construct(Cons).CTFFlux[i]; // F & f coefficents
+                    }
                     // QTF stuff
                     this->CTFSourceIn = state.dataConstruction->Construct(Cons).CTFSourceIn;     // Wi coefficents
                     this->CTFSourceOut = state.dataConstruction->Construct(Cons).CTFSourceOut;   // Wo coefficents
@@ -494,11 +496,17 @@ namespace SurfaceGroundHeatExchanger {
                     this->CTFTSourceQ = state.dataConstruction->Construct(Cons).CTFTSourceQ;     // w coefficents
                     this->ConstructionNum = Cons;
                     // surface properties
-                    this->BtmRoughness = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum))->Roughness;
-                    this->TopThermAbs = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum))->AbsorpThermal;
-                    this->TopRoughness = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1))->Roughness;
-                    this->TopThermAbs = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1))->AbsorpThermal;
-                    this->TopSolarAbs = state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1))->AbsorpSolar;
+                    auto const *thisMaterialLayer = dynamic_cast<Material::MaterialChild *>(
+                        state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum)));
+                    assert(thisMaterialLayer != nullptr);
+                    this->BtmRoughness = thisMaterialLayer->Roughness;
+                    this->TopThermAbs = thisMaterialLayer->AbsorpThermal;
+                    auto const *thisMaterial1 =
+                        dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1)));
+                    assert(thisMaterial1 != nullptr);
+                    this->TopRoughness = thisMaterial1->Roughness;
+                    this->TopThermAbs = thisMaterial1->AbsorpThermal;
+                    this->TopSolarAbs = thisMaterial1->AbsorpSolar;
                 }
             }
             // set one-time flag
@@ -507,13 +515,14 @@ namespace SurfaceGroundHeatExchanger {
 
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
             OutDryBulb = OutDryBulbTempAt(state, SurfaceHXHeight);
-            this->CTFflux(0) = 0.0;
-            this->TbtmHistory = OutDryBulb;
-            this->TtopHistory = OutDryBulb;
-            this->TsrcHistory = OutDryBulb;
-            this->QbtmHistory = 0.0;
-            this->QtopHistory = 0.0;
-            this->QsrcHistory = 0.0;
+            this->CTFflux[0] = 0.0;
+            this->TsrcHistory.fill(OutDryBulb);
+            this->TbtmHistory.fill(OutDryBulb);
+            this->TtopHistory.fill(OutDryBulb);
+            this->TsrcHistory.fill(OutDryBulb);
+            this->QbtmHistory.fill(0.0);
+            this->QtopHistory.fill(0.0);
+            this->QsrcHistory.fill(0.0);
             this->TsrcConstCoef = 0.0;
             this->TsrcVarCoef = 0.0;
             this->QbtmConstCoef = 0.0;
@@ -630,8 +639,8 @@ namespace SurfaceGroundHeatExchanger {
             // calc temps and fluxes with past env. conditions and average source flux
             state.dataSurfaceGroundHeatExchangers->SourceFlux = this->QSrcAvg;
             // starting values for the surface temps
-            PastTempBtm = this->TbtmHistory(1);
-            PastTempTop = this->TtopHistory(1);
+            PastTempBtm = this->TbtmHistory[1];
+            PastTempTop = this->TtopHistory[1];
             OldPastFluxTop = 1.0e+30;
             OldPastFluxBtm = 1.0e+30;
             TempB = 0.0;
@@ -730,8 +739,8 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->PastSkyTemp = state.dataEnvrn->SkyTemp;
             state.dataSurfaceGroundHeatExchangers->PastWindSpeed = DataEnvironment::WindSpeedAt(state, SurfaceHXHeight);
 
-            TempBtm = this->TbtmHistory(1);
-            TempTop = this->TtopHistory(1);
+            TempBtm = this->TbtmHistory[1];
+            TempTop = this->TtopHistory[1];
             OldFluxTop = 1.0e+30;
             OldFluxBtm = 1.0e+30;
             OldSourceFlux = 1.0e+30;
@@ -849,21 +858,21 @@ namespace SurfaceGroundHeatExchanger {
         int Term;
 
         // add current surface temperatures to history data
-        this->TbtmHistory(0) = Tbottom;
-        this->TtopHistory(0) = Ttop;
+        this->TbtmHistory[0] = Tbottom;
+        this->TtopHistory[0] = Ttop;
 
         // Bottom Surface Coefficients
         this->QbtmConstCoef = 0.0;
         for (Term = 0; Term <= this->NumCTFTerms - 1; ++Term) {
 
-            this->QbtmConstCoef += (-this->CTFin(Term) * this->TbtmHistory(Term)) + (this->CTFcross(Term) * this->TtopHistory(Term)) +
-                                   (this->CTFflux(Term) * this->QbtmHistory(Term)) + (this->CTFSourceIn(Term) * this->QsrcHistory(Term));
+            this->QbtmConstCoef += (-this->CTFin[Term] * this->TbtmHistory[Term]) + (this->CTFcross[Term] * this->TtopHistory[Term]) +
+                                   (this->CTFflux[Term] * this->QbtmHistory[Term]) + (this->CTFSourceIn[Term] * this->QsrcHistory[Term]);
         }
 
         // correct for extra bottom surface flux term
-        this->QbtmConstCoef -= this->CTFSourceIn(0) * this->QsrcHistory(0);
+        this->QbtmConstCoef -= this->CTFSourceIn[0] * this->QsrcHistory[0];
         // source flux current coefficient
-        this->QbtmVarCoef = this->CTFSourceIn(0);
+        this->QbtmVarCoef = this->CTFSourceIn[0];
     }
 
     void SurfaceGroundHeatExchangerData::CalcTopFluxCoefficents(Real64 const Tbottom, // current bottom (lower) surface temperature
@@ -892,21 +901,21 @@ namespace SurfaceGroundHeatExchanger {
         //   Engineering.
 
         // add current surface temperatures to history data
-        this->TbtmHistory(0) = Tbottom;
-        this->TtopHistory(0) = Ttop;
+        this->TbtmHistory[0] = Tbottom;
+        this->TtopHistory[0] = Ttop;
 
         // Top Surface Coefficients
         this->QtopConstCoef = 0.0;
         for (int Term = 0; Term <= this->NumCTFTerms - 1; ++Term) {
 
-            this->QtopConstCoef += (this->CTFout(Term) * this->TtopHistory(Term)) - (this->CTFcross(Term) * this->TbtmHistory(Term)) +
-                                   (this->CTFflux(Term) * this->QtopHistory(Term)) + (this->CTFSourceOut(Term) * this->QsrcHistory(Term));
+            this->QtopConstCoef += (this->CTFout[Term] * this->TtopHistory[Term]) - (this->CTFcross[Term] * this->TbtmHistory[Term]) +
+                                   (this->CTFflux[Term] * this->QtopHistory[Term]) + (this->CTFSourceOut[Term] * this->QsrcHistory[Term]);
         }
 
         // correct for extra top surface flux term
-        this->QtopConstCoef -= (this->CTFSourceOut(0) * this->QsrcHistory(0));
+        this->QtopConstCoef -= (this->CTFSourceOut[0] * this->QsrcHistory[0]);
         // surface flux current coefficient
-        this->QtopVarCoef = this->CTFSourceOut(0);
+        this->QtopVarCoef = this->CTFSourceOut[0];
     }
 
     void SurfaceGroundHeatExchangerData::CalcSourceTempCoefficents(Real64 const Tbottom, // current bottom (lower) surface temperature
@@ -938,20 +947,20 @@ namespace SurfaceGroundHeatExchanger {
         int Term;
 
         // add current surface temperatures to history data
-        this->TbtmHistory(0) = Tbottom;
-        this->TtopHistory(0) = Ttop;
+        this->TbtmHistory[0] = Tbottom;
+        this->TtopHistory[0] = Ttop;
 
         this->TsrcConstCoef = 0.0;
         for (Term = 0; Term <= this->NumCTFTerms - 1; ++Term) {
 
-            this->TsrcConstCoef += (this->CTFTSourceIn(Term) * this->TbtmHistory(Term)) + (this->CTFTSourceOut(Term) * this->TtopHistory(Term)) +
-                                   (this->CTFflux(Term) * this->TsrcHistory(Term)) + (this->CTFTSourceQ(Term) * this->QsrcHistory(Term));
+            this->TsrcConstCoef += (this->CTFTSourceIn[Term] * this->TbtmHistory[Term]) + (this->CTFTSourceOut[Term] * this->TtopHistory[Term]) +
+                                   (this->CTFflux[Term] * this->TsrcHistory[Term]) + (this->CTFTSourceQ[Term] * this->QsrcHistory[Term]);
         }
 
         // correct for extra source flux term
-        this->TsrcConstCoef -= this->CTFTSourceQ(0) * this->QsrcHistory(0);
+        this->TsrcConstCoef -= this->CTFTSourceQ[0] * this->QsrcHistory[0];
         // source flux current coefficient
-        this->TsrcVarCoef = this->CTFTSourceQ(0);
+        this->TsrcVarCoef = this->CTFTSourceQ[0];
     }
 
     Real64 SurfaceGroundHeatExchangerData::CalcSourceFlux(EnergyPlusData &state) // component number
@@ -1012,26 +1021,26 @@ namespace SurfaceGroundHeatExchanger {
         // Just shift along and replace zero index element with current value.
 
         // update top surface temps
-        this->TtopHistory = eoshift(this->TtopHistory, -1);
+        this->TtopHistory = eoshiftArray(this->TtopHistory, -1, 0.0);
 
         // update bottom surface temps
-        this->TbtmHistory = eoshift(this->TbtmHistory, -1);
+        this->TbtmHistory = eoshiftArray(this->TbtmHistory, -1, 0.0);
 
         // update bottom surface temps
-        this->TsrcHistory = eoshift(this->TsrcHistory, -1);
-        this->TsrcHistory(1) = sourceTemp;
+        this->TsrcHistory = eoshiftArray(this->TsrcHistory, -1, 0.0);
+        this->TsrcHistory[1] = sourceTemp;
 
         // update bottom surface fluxes
-        this->QbtmHistory = eoshift(this->QbtmHistory, -1);
-        this->QbtmHistory(1) = BottomFlux;
+        this->QbtmHistory = eoshiftArray(this->QbtmHistory, -1, 0.0);
+        this->QbtmHistory[1] = BottomFlux;
 
         // update bottom surface fluxes
-        this->QtopHistory = eoshift(this->QtopHistory, -1);
-        this->QtopHistory(1) = TopFlux;
+        this->QtopHistory = eoshiftArray(this->QtopHistory, -1, 0.0);
+        this->QtopHistory[1] = TopFlux;
 
         // update bottom surface fluxes
-        this->QsrcHistory = eoshift(this->QsrcHistory, -1);
-        this->QsrcHistory(1) = sourceFlux;
+        this->QsrcHistory = eoshiftArray(this->QsrcHistory, -1, 0.0);
+        this->QsrcHistory[1] = sourceFlux;
     }
 
     Real64 SurfaceGroundHeatExchangerData::CalcHXEffectTerm(EnergyPlusData &state,
@@ -1236,7 +1245,7 @@ namespace SurfaceGroundHeatExchanger {
         }
 
         // set previous surface temp
-        OldSurfTemp = this->TtopHistory(1);
+        OldSurfTemp = this->TtopHistory[1];
         // absolute temperatures
         SurfTempAbs = OldSurfTemp + DataGlobalConstants::KelvinConv;
         SkyTempAbs = ThisSkyTemp + DataGlobalConstants::KelvinConv;
@@ -1289,7 +1298,7 @@ namespace SurfaceGroundHeatExchanger {
         if (this->LowerSurfCond == SurfCond_Exposed) {
 
             // make a surface heat balance and solve for temperature
-            OldSurfTemp = this->TbtmHistory(1);
+            OldSurfTemp = this->TbtmHistory[1];
             // absolute temperatures
             SurfTempAbs = OldSurfTemp + DataGlobalConstants::KelvinConv;
             ExtTempAbs = ThisDryBulb + DataGlobalConstants::KelvinConv;
@@ -1338,8 +1347,8 @@ namespace SurfaceGroundHeatExchanger {
         // values to the running average.
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
 
@@ -1353,11 +1362,8 @@ namespace SurfaceGroundHeatExchanger {
         this->QSrc = state.dataSurfaceGroundHeatExchangers->SourceFlux;
 
         if (this->LastSysTimeElapsed == SysTimeElapsed) { // only update in normal mode
-            if (this->LastSysTimeElapsed == SysTimeElapsed) {
-                // Still iterating or reducing system time step, so subtract old values which were
-                // not valid
-                this->QSrcAvg -= this->LastQSrc * this->LastTimeStepSys / state.dataGlobal->TimeStepZone;
-            }
+            // Still iterating or reducing system time step, so subtract old values which were not valid
+            this->QSrcAvg -= this->LastQSrc * this->LastTimeStepSys / state.dataGlobal->TimeStepZone;
 
             // Update the running average and the "last" values with the current values of the appropriate variables
             this->QSrcAvg += this->QSrc * TimeStepSys / state.dataGlobal->TimeStepZone;
@@ -1409,7 +1415,7 @@ namespace SurfaceGroundHeatExchanger {
         // This subroutine simply produces output for Surface ground heat exchangers
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // update flows and temps from node data
         this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
@@ -1420,13 +1426,13 @@ namespace SurfaceGroundHeatExchanger {
         this->HeatTransferRate = state.dataSurfaceGroundHeatExchangers->SourceFlux * this->SurfaceArea;
         this->SurfHeatTransferRate =
             this->SurfaceArea * (state.dataSurfaceGroundHeatExchangers->TopSurfFlux + state.dataSurfaceGroundHeatExchangers->BtmSurfFlux);
-        this->Energy = state.dataSurfaceGroundHeatExchangers->SourceFlux * this->SurfaceArea * TimeStepSys * DataGlobalConstants::SecInHour;
+        this->Energy = state.dataSurfaceGroundHeatExchangers->SourceFlux * this->SurfaceArea * TimeStepSysSec;
         this->TopSurfaceTemp = state.dataSurfaceGroundHeatExchangers->TopSurfTemp;
         this->BtmSurfaceTemp = state.dataSurfaceGroundHeatExchangers->BtmSurfTemp;
         this->TopSurfaceFlux = state.dataSurfaceGroundHeatExchangers->TopSurfFlux;
         this->BtmSurfaceFlux = state.dataSurfaceGroundHeatExchangers->BtmSurfFlux;
-        this->SurfEnergy = SurfaceArea * (state.dataSurfaceGroundHeatExchangers->TopSurfFlux + state.dataSurfaceGroundHeatExchangers->BtmSurfFlux) *
-                           TimeStepSys * DataGlobalConstants::SecInHour;
+        this->SurfEnergy =
+            SurfaceArea * (state.dataSurfaceGroundHeatExchangers->TopSurfFlux + state.dataSurfaceGroundHeatExchangers->BtmSurfFlux) * TimeStepSysSec;
     }
     void SurfaceGroundHeatExchangerData::oneTimeInit_new(EnergyPlusData &state)
     {

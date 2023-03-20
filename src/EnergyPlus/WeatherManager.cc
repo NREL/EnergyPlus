@@ -182,7 +182,7 @@ namespace WeatherManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             state.dataWeatherManager->underwaterBoundaries.emplace_back();
-            auto &underwaterBoundary{state.dataWeatherManager->underwaterBoundaries[i - 1]};
+            auto &underwaterBoundary = state.dataWeatherManager->underwaterBoundaries[i - 1];
             underwaterBoundary.Name = state.dataIPShortCut->cAlphaArgs(1);
             underwaterBoundary.distanceFromLeadingEdge = state.dataIPShortCut->rNumericArgs(1);
             underwaterBoundary.OSCMIndex = UtilityRoutines::FindItemInList(underwaterBoundary.Name, state.dataSurface->OSCM);
@@ -237,7 +237,7 @@ namespace WeatherManager {
         Real64 constexpr beta = 0.000214;         // water thermal expansion coefficient, from engineeringtoolbox.com, 1/C
         Real64 constexpr assumedSurfaceTemp = 25; // Grashof requires a surface temp, this should suffice
         Real64 const localGrashofNumber =
-            (gravity * beta * (assumedSurfaceTemp - curWaterTemp) * pow(distanceFromBottomOfHull, 3)) / pow(waterKinematicViscosity, 2);
+            (gravity * beta * std::abs(assumedSurfaceTemp - curWaterTemp) * pow(distanceFromBottomOfHull, 3)) / pow(waterKinematicViscosity, 2);
         Real64 const localNusseltFreeConvection = pow(localGrashofNumber / 4, 0.25) * prandtlCorrection;
         Real64 const localConvectionCoeffFreeConv = localNusseltFreeConvection * waterThermalConductivity / distanceFromBottomOfHull;
         return max(localConvectionCoeff, localConvectionCoeffFreeConv);
@@ -3568,7 +3568,7 @@ namespace WeatherManager {
         }
         current_line.remove_prefix(pos + 1);
 
-        auto readNextNumber =
+        auto readNextNumber = // (AUTO_OK_LAMBDA)
             [reachedEndOfCommands = false, &state, &WYear, &WMonth, &WDay, &WHour, &WMinute, &Line, &current_line]() mutable -> Real64 {
             if (reachedEndOfCommands) {
                 return 999.0;
@@ -3635,9 +3635,9 @@ namespace WeatherManager {
                 // "123456789"
                 // becomes
                 // std::vector<int>{1,2,3,4,5,6,7,8,9};
-                auto reader = stringReader(PresWeathCodes);
+                std::stringstream reader = stringReader(PresWeathCodes);
                 for (auto &value : WCodesArr) {
-                    char c[2]{};          // a string of 2 characters, init both to 0
+                    char c[2] = {0, 0};   // a string of 2 characters, init both to 0
                     reader >> c[0];       // read next char into the first byte
                     value = std::atoi(c); // convert this short string into the appropriate int to read
                 }
@@ -8626,7 +8626,7 @@ namespace WeatherManager {
             // Process periods to set up other values.
             for (int i = 1; i <= state.dataWeatherManager->NumEPWTypExtSets; ++i) {
                 // JulianDay (Month,Day,LeapYearValue)
-                auto const ExtremePeriodTitle(UtilityRoutines::MakeUPPERCase(state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle));
+                std::string const ExtremePeriodTitle = UtilityRoutines::MakeUPPERCase(state.dataWeatherManager->TypicalExtremePeriods(i).ShortTitle);
                 if (ExtremePeriodTitle == "SUMMER") {
                     if (UtilityRoutines::SameString(state.dataWeatherManager->TypicalExtremePeriods(i).TEType, "EXTREME")) {
                         state.dataWeatherManager->TypicalExtremePeriods(i).MatchValue = "SummerExtreme";
@@ -9032,7 +9032,7 @@ namespace WeatherManager {
                                     (state.dataWeatherManager->DataPeriods(CurCount).DataEnJDay - 1 + 1);
                             }
                         } else { // weather file has actual year(s)
-                            auto &dataPeriod{state.dataWeatherManager->DataPeriods(CurCount)};
+                            auto &dataPeriod = state.dataWeatherManager->DataPeriods(CurCount);
                             dataPeriod.DataStJDay = computeJulianDate(dataPeriod.StYear, dataPeriod.StMon, dataPeriod.StDay);
                             dataPeriod.DataEnJDay = computeJulianDate(dataPeriod.EnYear, dataPeriod.EnMon, dataPeriod.EnDay);
                             dataPeriod.NumDays = dataPeriod.DataEnJDay - dataPeriod.DataStJDay + 1;
@@ -9156,7 +9156,7 @@ namespace WeatherManager {
         if (!state.dataEnvrn->DisplayWeatherMissingDataWarnings) return;
 
         bool MissedHeader = false;
-        auto missedHeaderCheck{[&](Real64 const value, std::string const &description) {
+        auto missedHeaderCheck = [&](Real64 const value, std::string const &description) {
             if (value > 0) {
                 if (!MissedHeader) {
                     ShowWarningError(state, std::string{MissString});
@@ -9164,7 +9164,7 @@ namespace WeatherManager {
                 }
                 ShowMessage(state, format(msFmt, "\"" + description + "\"", value));
             }
-        }};
+        };
 
         missedHeaderCheck(state.dataWeatherManager->Missed.DryBulb, "Dry Bulb Temperature");
         missedHeaderCheck(state.dataWeatherManager->Missed.StnPres, "Atmospheric Pressure");
@@ -9184,7 +9184,7 @@ namespace WeatherManager {
         missedHeaderCheck(state.dataWeatherManager->Missed.LiquidPrecip, "Liquid Precipitation Depth");
 
         bool OutOfRangeHeader = false;
-        auto outOfRangeHeaderCheck{
+        auto outOfRangeHeaderCheck = // (AUTO_OK_LAMBDA)
             [&](Real64 const value, std::string_view description, std::string_view rangeLow, std::string_view rangeHigh, std::string_view extraMsg) {
                 if (value > 0) {
                     if (!OutOfRangeHeader) {
@@ -9194,7 +9194,7 @@ namespace WeatherManager {
                     ShowMessage(state, EnergyPlus::format(rgFmt, description, rangeLow, rangeHigh, value));
                     if (!extraMsg.empty()) ShowMessage(state, std::string{extraMsg});
                 }
-            }};
+            };
         outOfRangeHeaderCheck(state.dataWeatherManager->OutOfRange.DryBulb, "Dry Bulb Temperatures", ">=-90", "<=70", "");
         outOfRangeHeaderCheck(
             state.dataWeatherManager->OutOfRange.StnPres, "Atmospheric Pressure", ">31000", "<=120000", "Out of Range values set to last good value");
@@ -9588,8 +9588,8 @@ namespace WeatherManager {
         Array1D<Real64> MonthlyAverageDryBulbTemp(12, 0.0); // monthly-daily average outside air temperature
 
         if (!this->OADryBulbWeatherDataProcessed) {
-            const auto statFileExists = FileSystem::fileExists(state.files.inStatFilePath.filePath);
-            const auto epwFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
+            const bool statFileExists = FileSystem::fileExists(state.files.inStatFilePath.filePath);
+            const bool epwFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
             if (statFileExists) {
                 auto statFile = state.files.inStatFilePath.try_open();
                 if (!statFile.good()) {

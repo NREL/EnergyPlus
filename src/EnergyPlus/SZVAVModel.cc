@@ -338,7 +338,7 @@ namespace SZVAVModel {
                         // this is different from the PTUnit and UnitarySys routines in this module
                         // find the water flow rate that meets the min load at region 1/2 bounday
                         if (SZVAVModel.HCoilType_Num == FanCoilUnits::HCoil::Water || !HeatingLoad) {
-                            auto f =
+                            auto f = // (AUTO_OK_LAMBDA)
                                 [&state, SysIndex, FirstHVACIteration, &SZVAVModel, ZoneLoad, coilFluidInletNode, maxCoilFluidFlow, minAirMassFlow](
                                     Real64 const PLR) {
                                     return FanCoilUnits::CalcFanCoilWaterFlowResidual(state,

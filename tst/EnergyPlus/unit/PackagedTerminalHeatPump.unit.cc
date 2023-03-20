@@ -587,7 +587,7 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
 
     // Also set BeginEnvrnFlag so code is tested for coil initialization and does not crash
     state->dataGlobal->BeginEnvrnFlag = true;
-    thisSys.initUnitarySystems(*state, 0, firstHVACIteration, 0, 0.0);
+    thisSys.initUnitarySystems(*state, 0, firstHVACIteration, 0.0);
 
     // check that an intermediate speed has the correct flow ratio
     Real64 refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference cooling data and full flow rate at speed 9
@@ -1278,7 +1278,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     bool HeatActive = false;
     bool CoolActive = false;
     Real64 latOut = 0.0;
-    thisSys.initUnitarySystems(*state, 0, FirstHVACIteration, 0, 0.0);
+    thisSys.initUnitarySystems(*state, 0, FirstHVACIteration, 0.0);
     thisSys.simulate(*state, thisSys.Name, FirstHVACIteration, 0, PTUnitNum, HeatActive, CoolActive, 0, 0.0, true, QUnitOut, latOut);
     // init sets heating mode to true due to cold ventilation air
     ASSERT_TRUE(state->dataUnitarySystems->HeatingLoad);
@@ -4357,6 +4357,328 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.m_ZoneInletNode);
     EXPECT_EQ(zoneNum, thisSys.ControlZoneNum);
+}
+
+TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "ZoneHVAC:PackagedTerminalHeatPump,",
+        "  PTHP Thermal Zone One,                  !- Name",
+        "  FanAndCoilAvailSched,                   !- Availability Schedule Name",
+        "  Thermal Zone One Exhaust Node,          !- Air Inlet Node Name",
+        "  Thermal Zone One Inlet Node,            !- Air Outlet Node Name",
+        "  OutdoorAir:Mixer,                       !- Outdoor Air Mixer Object Type",
+        "  PTHP Thermal Zone One OA Mixer,         !- Outdoor Air Mixer Name",
+        "  1.00,                                   !- Cooling Supply Air Flow Rate {m3/s}",
+        "  1.00,                                   !- Heating Supply Air Flow Rate {m3/s}",
+        "  1.00,                                   !- No Load Supply Air Flow Rate {m3/s}",
+        "  0.50,                                   !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "  0.50,                                   !- Heating Outdoor Air Flow Rate {m3/s}",
+        "  0.50,                                   !- No Load Outdoor Air Flow Rate {m3/s}",
+        "  Fan:OnOff,                              !- Supply Air Fan Object Type",
+        "  Thermal Zone One Supply Fan,            !- Supply Air Fan Name",
+        "  Coil:Heating:DX:SingleSpeed,            !- Heating Coil Object Type",
+        "  PTHP Thermal Zone One DX Htg Coil,      !- Heating Coil Name",
+        "  0.001,                                  !- Heating Convergence Tolerance {dimensionless}",
+        "  Coil:Cooling:DX:SingleSpeed,            !- Cooling Coil Object Type",
+        "  PTHP Thermal Zone One DX Clg Coil,      !- Cooling Coil Name",
+        "  0.001,                                  !- Cooling Convergence Tolerance {dimensionless}",
+        "  Coil:Heating:Electric,                  !- Supplemental Heating Coil Object Type",
+        "  PTHP Thermal Zone One Supp EL Htg Coil, !- Supplemental Heating Coil Name",
+        "  50.0,                                   !- Maximum Supply Air Temperature from Supplemental Heater {C}",
+        "  21,                                     !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}",
+        "  DrawThrough,                            !- Fan Placement",
+        "  ;                                       !- Supply Air Fan Operating Mode Schedule Name",
+
+        "OutdoorAir:Mixer,",
+        "  PTHP Thermal Zone One OA Mixer,         !- Name",
+        "  PTHP Thermal Zone One Mixed Air Node,   !- Mixed Air Node Name",
+        "  PTHP Thermal Zone One OA Node,          !- Outdoor Air Stream Node Name",
+        "  PTHP Thermal Zone One Relief Air Node,  !- Relief Air Stream Node Name",
+        "  Thermal Zone One Exhaust Node;          !- Return Air Stream Node Name",
+
+        "OutdoorAir:Node,",
+        "  PTHP Thermal Zone One OA Node;          !- Name",
+
+        "Fan:OnOff,",
+        "  Thermal Zone One Supply Fan,            !- Name",
+        "  FanAndCoilAvailSched,                   !- Availability Schedule Name",
+        "  0.7,                                    !- Fan Total Efficiency",
+        "  600.0,                                  !- Pressure Rise{ Pa }",
+        "  1.0,                                    !- Maximum Flow Rate{ m3 / s }",
+        "  0.9,                                    !- Motor Efficiency",
+        "  1.0,                                    !- Motor In Airstream Fraction",
+        "  PTHP Thermal Zone One Heating Coil Outlet Node, !- Air Inlet Node Name",
+        "  PTHP Thermal Zone One Fan Outlet Node;  !- Air Outlet Node Name",
+
+        "Coil:Heating:DX:SingleSpeed,",
+        "  PTHP Thermal Zone One DX Htg Coil,      !- Name",
+        "  FanAndCoilAvailSched,                   !- Availability Schedule Name",
+        "  18584.26,                               !- Gross Rated Heating Capacity {W}",
+        "  3.8,                                    !- Gross Rated Heating COP {W/W}",
+        "  1.0,                                    !- Rated Air Flow Rate {m3/s}",
+        "  673.3,                                  !- 2017 Rated Supply Fan Power Per Volume Flow Rate",
+        "  673.3,                                  !- 2023 Rated Supply Fan Power Per Volume Flow Rate",
+        "  PTHP Thermal Zone One Cooling Coil Outlet Node, !- Air Inlet Node Name",
+        "  PTHP Thermal Zone One Heating Coil Outlet Node, !- Air Outlet Node Name",
+        "  Curve Biquadratic,                      !- Total Cooling Capacity Function of Temperature Curve Name",
+        "  Curve Quadratic,                        !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  Curve Biquadratic,                      !- Energy Input Ratio Function of Temperature Curve Name",
+        "  Curve Quadratic,                        !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  Curve Quadratic,                        !- Part Load Fraction Correlation Curve Name",
+        "  ,                                       !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+        "  -8,                                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "  ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
+        "  5,                                      !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
+        "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "  Resistive,                              !- Defrost Strategy",
+        "  Timed,                                  !- Defrost Control",
+        "  0.166667,                               !- Defrost Time Period Fraction",
+        "  2000;                                   !- Resistive Defrost Heater Capacity {W}",
+
+        "Coil:Cooling:DX:SingleSpeed,",
+        "  PTHP Thermal Zone One DX Clg Coil,      !- Name",
+        "  FanAndCoilAvailSched,                   !- Availability Schedule Name",
+        "  18584.26,                               !- Gross Rated Total Cooling Capacity {W}",
+        "  0.75,                                   !- Gross Rated Sensible Heat Ratio",
+        "  4.40,                                   !- Gross Rated Cooling COP {W/W}",
+        "  1.0,                                    !- Rated Air Flow Rate {m3/s}",
+        "  673.3,                                  !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "  673.3,                                  !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "  PTHP Thermal Zone One Mixed Air Node,   !- Air Inlet Node Name",
+        "  PTHP Thermal Zone One Cooling Coil Outlet Node, !- Air Outlet Node Name",
+        "  Curve Biquadratic,                      !- Total Cooling Capacity Function of Temperature Curve Name",
+        "  Curve Quadratic,                        !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  Curve Biquadratic,                      !- Energy Input Ratio Function of Temperature Curve Name",
+        "  Curve Quadratic,                        !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  Curve Quadratic,                        !- Part Load Fraction Correlation Curve Name",
+        "  -25,                                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "  ,                                       !- Nominal Time for Condensate Removal to Begin {s}",
+        "  ,                                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        "  ,                                       !- Maximum Cycling Rate {cycles/hr}",
+        "  ,                                       !- Latent Capacity Time Constant {s}",
+        "  ,                                       !- Condenser Air Inlet Node Name",
+        "  AirCooled,                              !- Condenser Type",
+        "  0,                                      !- Evaporative Condenser Effectiveness {dimensionless}",
+        "  Autosize,                               !- Evaporative Condenser Air Flow Rate {m3/s}",
+        "  Autosize,                               !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  0,                                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "  ,                                       !- Supply Water Storage Tank Name",
+        "  ,                                       !- Condensate Collection Water Storage Tank Name",
+        "  0,                                      !- Basin Heater Capacity {W/K}",
+        "  10;                                     !- Basin Heater Setpoint Temperature {C}",
+
+        "Curve:Biquadratic,",
+        "  Curve Biquadratic,                      !- Name",
+        "  1.0,                                    !- Coefficient1 Constant",
+        "  0.0,                                    !- Coefficient2 x",
+        "  0.0,                                    !- Coefficient3 x**2",
+        "  0.0,                                    !- Coefficient4 y",
+        "  0.0,                                    !- Coefficient5 y**2",
+        "  0.0,                                    !- Coefficient6 x*y",
+        " -50,                                     !- Minimum Value of x {BasedOnField A2}",
+        "  50,                                     !- Maximum Value of x {BasedOnField A2}",
+        " -50,                                     !- Minimum Value of y {BasedOnField A3}",
+        "  50;                                     !- Maximum Value of y {BasedOnField A3}",
+
+        "Curve:Quadratic,",
+        "  Curve Quadratic,                        !- Name",
+        "  1.0,                                    !- Coefficient1 Constant",
+        "  0.0,                                    !- Coefficient2 x",
+        "  0,                                      !- Coefficient3 x**2",
+        "  0.0,                                    !- Minimum Value of x {BasedOnField A2}",
+        "  5.0;                                    !- Maximum Value of x {BasedOnField A2}",
+
+        "Coil:Heating:Electric,",
+        "  PTHP Thermal Zone one Supp EL Htg Coil, !- Name",
+        "  FanAndCoilAvailSched,                   !- Availability Schedule Name",
+        "  1,                                      !- Efficiency",
+        "  30000.0,                                !- Nominal Capacity {W}",
+        "  PTHP Thermal Zone One Fan Outlet Node,  !- Air Inlet Node Name",
+        "  Thermal Zone One Inlet Node;            !- Air Outlet Node Name",
+
+        "Zone,",
+        "  Thermal Zone One;                       !- Name",
+
+        "ZoneHVAC:EquipmentConnections,",
+        "  Thermal Zone One,                       !- Zone Name",
+        "  Thermal Zone One Equipment List,        !- Zone Conditioning Equipment List Name",
+        "  Thermal Zone One Inlet Node List,       !- Zone Air Inlet Node or NodeList Name",
+        "  Thermal Zone One Exhaust Node List,     !- Zone Air Exhaust Node or NodeList Name",
+        "  Thermal Zone One Air Node;              !- Zone Air Node Name",
+
+        "NodeList,",
+        "  Thermal Zone One Inlet Node List,       !- Name",
+        "  Thermal Zone One Inlet Node;            !- Node Name 1",
+
+        "NodeList,",
+        "  Thermal Zone One Exhaust Node List,     !- Name",
+        "  Thermal Zone One Exhaust Node;          !- Node Name 1",
+
+        "ZoneHVAC:EquipmentList,",
+        "  Thermal Zone One Equipment List,        !- Name",
+        "  SequentialLoad,                         !- Load Distribution Scheme",
+        "  ZoneHVAC:PackagedTerminalHeatPump,      !- Zone Equipment Object Type 1",
+        "  PTHP Thermal Zone One,                  !- Zone Equipment Name 1",
+        "  1,                                      !- Zone Equipment Cooling Sequence 1",
+        "  1,                                      !- Zone Equipment Heating or No-Load Sequence 1",
+        "  ,                                       !- Zone Equipment Sequential Cooling Fraction Schedule Name 1",
+        "  ;                                       !- Zone Equipment Sequential Heating Fraction Schedule Name 1",
+
+        "Schedule:Compact,",
+        "  FanAndCoilAvailSched,                   !- Name",
+        "  Fraction,                               !- Schedule Type Limits Name",
+        "  Through: 12/31,                         !- Field 1",
+        "  For: AllDays,                           !- Field 2",
+        "  Until: 24:00,                           !- Field 3",
+        "  1.0;                                    !- Field 4",
+
+        "ScheduleTypeLimits,",
+        "  Fraction,                               !- Name",
+        "  0,                                      !- Lower Limit Value {BasedOnField A3}",
+        "  1,                                      !- Upper Limit Value {BasedOnField A3}",
+        "  Discrete,                               !- Numeric Type",
+        "  availability;                           !- Unit Type",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool errorsFound = false;
+    ProcessScheduleInput(*state); // read schedules
+    GetZoneData(*state, errorsFound);
+    ASSERT_FALSE(errorsFound);
+
+    GetZoneEquipmentData(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    bool const zoneEquipment = true;
+    ASSERT_FALSE(has_err_output(false));
+    HVACSystemData *mySys;
+    std::string compName = "PTHP THERMAL ZONE ONE";
+    mySys = UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    auto &thisSys = state->dataUnitarySystems->unitarySys[0];
+    thisSys.getUnitarySystemInput(*state, "PTHP THERMAL ZONE ONE", zoneEquipment, 0);
+    state->dataUnitarySystems->getInputOnceFlag = false;
+    EXPECT_FALSE(errorsFound);
+
+    int zoneSupplyInlet =
+        UtilityRoutines::FindItemInList("THERMAL ZONE ONE INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneExhaustNode =
+        UtilityRoutines::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    // test PTHP node connections
+    ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
+    EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", thisSys.UnitType);
+    EXPECT_EQ(zoneExhaustNode, thisSys.AirInNode);
+    EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
+
+    thisSys.ControlZoneNum = 1;
+    // set outdoor air conditions
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutHumRat = 0.003;
+    state->dataEnvrn->StdBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+
+    // set zone air conditions
+    auto &zoneAirNode = state->dataLoopNodes->Node(
+        UtilityRoutines::FindItemInList("THERMAL ZONE ONE AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    zoneAirNode.Temp = 20.0;
+    zoneAirNode.HumRat = 0.003;
+    zoneAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode.Temp, zoneAirNode.HumRat);
+    // set mixed air conditions
+    auto &mixedAirNode = state->dataLoopNodes->Node(
+        UtilityRoutines::FindItemInList("PTHP THERMAL ZONE ONE MIXED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    mixedAirNode.Temp = 10.0;
+    mixedAirNode.HumRat = 0.003;
+    mixedAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(mixedAirNode.Temp, mixedAirNode.HumRat);
+    // set zone exhaust node
+    auto &zoneExhNode = state->dataLoopNodes->Node(
+        UtilityRoutines::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    zoneExhNode.Temp = 20.0;
+    zoneExhNode.HumRat = 0.003;
+    zoneExhNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneExhNode.Temp, zoneExhNode.HumRat);
+
+    // set sizing parameters
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataGlobal->SysSizingCalc = true;
+
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    auto &zoneSysEnergyDemand = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1);
+    auto &zoneSysMoistureDemand = state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1);
+    zoneSysEnergyDemand.RemainingOutputRequired = 30000;
+    zoneSysEnergyDemand.RemainingOutputReqToHeatSP = 30000;
+    zoneSysEnergyDemand.RemainingOutputReqToCoolSP = 35000.0;
+    zoneSysMoistureDemand.RemainingOutputReqToDehumidSP = 0.0;
+    zoneSysEnergyDemand.SequencedOutputRequired.allocate(1);
+    zoneSysEnergyDemand.SequencedOutputRequiredToCoolingSP.allocate(1);
+    zoneSysEnergyDemand.SequencedOutputRequiredToHeatingSP.allocate(1);
+    zoneSysEnergyDemand.SequencedOutputRequired(1) = zoneSysEnergyDemand.RemainingOutputRequired;
+    zoneSysEnergyDemand.SequencedOutputRequiredToCoolingSP(1) = zoneSysEnergyDemand.RemainingOutputReqToCoolSP;
+    zoneSysEnergyDemand.SequencedOutputRequiredToHeatingSP(1) = zoneSysEnergyDemand.RemainingOutputReqToHeatSP;
+    // set thermostat type
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlTypeRpt.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    // set the uni sys is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_SysAvailSchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataUnitarySystems->unitarySys[0].m_FanAvailSchedPtr).CurrentValue = 1.0;
+
+    bool HeatActive = true;
+    bool CoolActive = false;
+    bool FirstHVACIteration = false;
+    int CompIndex = 1;
+    int AirLoopNum = 0;
+    int constexpr ZoneOAUnitNum = 0;
+    Real64 sensOut = 0.0;
+    Real64 latOut = 0.0;
+    Real64 constexpr OAUCoilOutTemp = 0.0;
+    // set local variables for convenience
+    auto &supplyFan = state->dataFans->Fan(1);
+    auto &dxClgCoilMain = state->dataDXCoils->DXCoil(1);
+    auto &dxHtgCoilMain = state->dataDXCoils->DXCoil(2);
+    auto &elecHtgCoilSupp = state->dataHeatingCoils->HeatingCoil(1);
+
+    state->dataGlobal->BeginEnvrnFlag = true;
+    mySys->simulate(*state,
+                    thisSys.Name,
+                    FirstHVACIteration,
+                    AirLoopNum,
+                    CompIndex,
+                    HeatActive,
+                    CoolActive,
+                    ZoneOAUnitNum,
+                    OAUCoilOutTemp,
+                    zoneEquipment,
+                    sensOut,
+                    latOut);
+
+    EXPECT_TRUE(state->dataUnitarySystems->HeatingLoad);
+    EXPECT_FALSE(state->dataUnitarySystems->CoolingLoad);
+
+    Real64 result_pthp_ElectricityRate = supplyFan.FanPower + state->dataHVACGlobal->DXElecCoolingPower + state->dataHVACGlobal->DXElecHeatingPower +
+                                         state->dataHVACGlobal->DefrostElecPower + state->dataHVACGlobal->ElecHeatingCoilPower +
+                                         state->dataHVACGlobal->SuppHeatingCoilPower + thisSys.m_TotalAuxElecPower;
+    // test results
+    EXPECT_NEAR(30636.88, thisSys.m_ElecPower, 0.01);
+    EXPECT_NEAR(30636.88, result_pthp_ElectricityRate, 0.01);
+    EXPECT_NEAR(857.14, supplyFan.FanPower, 0.01);
+    EXPECT_NEAR(0.0, dxClgCoilMain.ElecCoolingPower, 0.01);
+    EXPECT_NEAR(0.0, state->dataHVACGlobal->DXElecCoolingPower, 0.01);
+    EXPECT_NEAR(4327.88, dxHtgCoilMain.ElecHeatingPower, 0.01);
+    EXPECT_NEAR(4327.88, state->dataHVACGlobal->DXElecHeatingPower, 0.01);
+    EXPECT_NEAR(0.0, state->dataHVACGlobal->ElecHeatingCoilPower, 0.01);
+    EXPECT_NEAR(333.33, dxHtgCoilMain.DefrostPower, 0.01);
+    EXPECT_NEAR(333.33, state->dataHVACGlobal->DefrostElecPower, 0.01);
+    EXPECT_NEAR(25118.52, elecHtgCoilSupp.ElecUseRate, 0.01);
+    EXPECT_NEAR(25118.52, state->dataHVACGlobal->SuppHeatingCoilPower, 0.01);
+    EXPECT_NEAR(0.0, thisSys.m_TotalAuxElecPower, 0.01);
 }
 
 } // namespace EnergyPlus

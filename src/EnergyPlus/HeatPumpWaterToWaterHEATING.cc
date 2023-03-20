@@ -547,7 +547,7 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     //       RE-ENGINEERED  Mar2000
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     using namespace FluidProperties;
 
     using PlantUtilities::SetComponentFlowRate;
@@ -573,18 +573,15 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     std::string ErrString;
     Real64 DutyFactor;
 
-    auto &CurrentSimTime = state.dataHPWaterToWaterHtg->CurrentSimTime;
-    auto &PrevSimTime = state.dataHPWaterToWaterHtg->PrevSimTime;
-
     // Init Module level Variables
-    if (PrevSimTime != CurrentSimTime) {
-        PrevSimTime = CurrentSimTime;
+    if (state.dataHPWaterToWaterHtg->PrevSimTime != state.dataHPWaterToWaterHtg->CurrentSimTime) {
+        state.dataHPWaterToWaterHtg->PrevSimTime = state.dataHPWaterToWaterHtg->CurrentSimTime;
     }
 
     // CALCULATE THE SIMULATION TIME
     Real64 constexpr hoursInDay = 24.0;
-    CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * hoursInDay + state.dataGlobal->HourOfDay - 1 +
-                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
+    state.dataHPWaterToWaterHtg->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * hoursInDay + state.dataGlobal->HourOfDay - 1 +
+                                                  (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
     if (MyLoad > 0.0) {
         this->MustRun = true;

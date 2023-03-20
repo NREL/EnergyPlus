@@ -328,15 +328,13 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     auto &TStatObjects = state.dataZoneCtrls->TStatObjects;
-    auto &NumTStatStatements = state.dataZoneCtrls->NumTStatStatements;
-    auto &NumTempControlledZones = state.dataZoneCtrls->NumTempControlledZones;
     auto &Zone = state.dataHeatBal->Zone;
     auto &ZoneList = state.dataHeatBal->ZoneList;
     auto &TempControlledZone = state.dataZoneCtrls->TempControlledZone;
     auto &HumidityControlZone = state.dataZoneCtrls->HumidityControlZone;
     auto &ComfortTStatObjects = state.dataZoneCtrls->ComfortTStatObjects;
     auto &ComfortControlledZone = state.dataZoneCtrls->ComfortControlledZone;
-    auto &NumOfZones = state.dataGlobal->NumOfZones;
+    int NumOfZones = state.dataGlobal->NumOfZones;
     auto &StageControlledZone = state.dataZoneCtrls->StageControlledZone;
     auto &SetPointSingleHeating = state.dataZoneTempPredictorCorrector->SetPointSingleHeating;
     auto &SetPointSingleCooling = state.dataZoneTempPredictorCorrector->SetPointSingleCooling;
@@ -350,11 +348,12 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     auto &SetPointDualHeatCool = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool;
 
     cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TStat));
-    NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    // Update Num in state and make local convenience copy
+    int NumTStatStatements = state.dataZoneCtrls->NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     TStatObjects.allocate(NumTStatStatements);
 
     // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
-    NumTempControlledZones = 0;
+    state.dataZoneCtrls->NumTempControlledZones = 0;
     for (Item = 1; Item <= NumTStatStatements; ++Item) {
         inputProcessor->getObjectItem(state,
                                       cCurrentModuleObject,
@@ -375,14 +374,14 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         ZLItem = 0;
         if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
         if (Item1 > 0) {
-            TStatObjects(Item).TempControlledZoneStartPtr = NumTempControlledZones + 1;
-            ++NumTempControlledZones;
+            TStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
+            ++state.dataZoneCtrls->NumTempControlledZones;
             TStatObjects(Item).NumOfZones = 1;
             TStatObjects(Item).ZoneListActive = false;
             TStatObjects(Item).ZoneOrZoneListPtr = Item1;
         } else if (ZLItem > 0) {
-            TStatObjects(Item).TempControlledZoneStartPtr = NumTempControlledZones + 1;
-            NumTempControlledZones += ZoneList(ZLItem).NumOfZones;
+            TStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
+            state.dataZoneCtrls->NumTempControlledZones += ZoneList(ZLItem).NumOfZones;
             TStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
             TStatObjects(Item).ZoneListActive = true;
             TStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -396,13 +395,13 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     if (ErrorsFound) {
         ShowSevereError(state, format("GetZoneAirSetpoints: Errors with invalid names in {} objects.", cCurrentModuleObject));
         ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-        NumTempControlledZones = 0;
+        state.dataZoneCtrls->NumTempControlledZones = 0;
     }
 
-    if (NumTempControlledZones > 0) {
-        TempControlledZone.allocate(NumTempControlledZones);
-        TStatControlTypes.allocate(NumTempControlledZones); // Number of set point types
-        CTSchedMapToControlledZone.dimension(NumTempControlledZones, 0);
+    if (state.dataZoneCtrls->NumTempControlledZones > 0) {
+        TempControlledZone.allocate(state.dataZoneCtrls->NumTempControlledZones);
+        TStatControlTypes.allocate(state.dataZoneCtrls->NumTempControlledZones); // Number of set point types
+        CTSchedMapToControlledZone.dimension(state.dataZoneCtrls->NumTempControlledZones, 0);
 
         TempControlledZoneNum = 0;
         state.dataZoneTempPredictorCorrector->NumOnOffCtrZone = 0;
@@ -509,7 +508,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     TempControlledZone(TempControlledZoneNum).ControlTypeName(ControlTypeNum) = cAlphaArgs(nint(2.0 * ControlTypeNum + 3));
 
                     if (!TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum).empty()) {
-                        auto ctrlType = static_cast<DataHVACGlobals::ThermostatType>(
+                        DataHVACGlobals::ThermostatType ctrlType = static_cast<DataHVACGlobals::ThermostatType>(
                             getEnumerationValue(ValidControlTypesUC, TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum)));
                         TempControlledZone(TempControlledZoneNum).ControlTypeEnum(ControlTypeNum) = ctrlType;
                         if (ctrlType == DataHVACGlobals::ThermostatType::Invalid) {
@@ -694,7 +693,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
     // Finish filling in Schedule pointing indexes
     int setPointObjectArrayIndex;
-    for (TempControlledZoneNum = 1; TempControlledZoneNum <= NumTempControlledZones; ++TempControlledZoneNum) {
+    for (TempControlledZoneNum = 1; TempControlledZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TempControlledZoneNum) {
         for (int ct = 1; ct <= state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).NumControlTypes; ct++) {
             switch (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlTypeEnum(ct)) {
             case DataHVACGlobals::ThermostatType::SingleHeating:
@@ -731,7 +730,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
     // Now, Check the schedule values/indices for validity
 
-    for (TempControlledZoneNum = 1; TempControlledZoneNum <= NumTempControlledZones; ++TempControlledZoneNum) {
+    for (TempControlledZoneNum = 1; TempControlledZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TempControlledZoneNum) {
 
         ActualZoneNum = TempControlledZone(TempControlledZoneNum).ActualZoneNum;
         CTIndex = TempControlledZone(TempControlledZoneNum).CTSchedIndex;
@@ -740,7 +739,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         SchedMax = GetScheduleMaxValue(state, CTIndex);
 
         if (SchedMin == 0 && SchedMax == 0) {
-            if (FindNumberInList(CTIndex, CTSchedMapToControlledZone, NumTempControlledZones) == 0) {
+            if (FindNumberInList(CTIndex, CTSchedMapToControlledZone, state.dataZoneCtrls->NumTempControlledZones) == 0) {
                 ShowSevereError(state, format("Control Type Schedule={}", TempControlledZone(TempControlledZoneNum).ControlTypeSchedName));
                 ShowContinueError(state, "..specifies control type 0 for all entries.");
                 ShowContinueError(state, "All zones using this Control Type Schedule have no heating or cooling available.");
@@ -835,7 +834,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         }
     }
 
-    for (TempControlledZoneNum = 1; TempControlledZoneNum <= NumTempControlledZones; ++TempControlledZoneNum) {
+    for (TempControlledZoneNum = 1; TempControlledZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TempControlledZoneNum) {
 
         ActualZoneNum = TempControlledZone(TempControlledZoneNum).ActualZoneNum;
         CTIndex = TempControlledZone(TempControlledZoneNum).CTSchedIndex;
@@ -1995,7 +1994,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
             } else {
                 for (Item = 1; Item <= TStatObjects(found).NumOfZones; ++Item) {
                     TempControlledZoneNum = TStatObjects(found).TempControlledZoneStartPtr + Item - 1;
-                    if (NumTempControlledZones == 0) continue;
+                    if (state.dataZoneCtrls->NumTempControlledZones == 0) continue;
                     TempControlledZone(TempControlledZoneNum).OperativeTempControl = true;
                     if (UtilityRoutines::SameString(cAlphaArgs(2), "Scheduled")) {
                         TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled = true;
@@ -2810,7 +2809,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
     auto &ComfortControlledZone = state.dataZoneCtrls->ComfortControlledZone;
     auto &ZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo;
     auto &ZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi;
-    auto &NumOfZones = state.dataGlobal->NumOfZones;
+    int NumOfZones = state.dataGlobal->NumOfZones;
 
     if (state.dataZoneTempPredictorCorrector->InitZoneAirSetPointsOneTimeFlag) {
         TempZoneThermostatSetPoint.dimension(NumOfZones, 0.0);
@@ -3555,15 +3554,19 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
     assert(zoneNum > 0);
     this->updateTemperatures(state, shortenTimeStepSys, useZoneTimeStepHistory, priorTimeStep, zoneNum, spaceNum);
 
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
+
     Real64 volume = 0.0;
     if (spaceNum > 0) {
         volume = state.dataHeatBal->space(spaceNum).Volume;
     } else {
         volume = state.dataHeatBal->Zone(zoneNum).Volume;
     }
+
     this->AirPowerCap = volume * state.dataHeatBal->Zone(zoneNum).ZoneVolCapMultpSens *
                         Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->MAT, this->ZoneAirHumRat) *
-                        Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat) / (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+                        Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat) / TimeStepSysSec;
     Real64 RAFNFrac = 0.0;
 
     // Calculate the various heat balance sums
@@ -3598,8 +3601,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
                                     thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).SysDepZoneLoadsLagged;
                 this->AirPowerCap = thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).AirVolume *
                                     state.dataHeatBal->Zone(zoneNum).ZoneVolCapMultpSens * thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).RhoAir *
-                                    thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).CpAir /
-                                    (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+                                    thisRoomAirflowNetworkZoneInfo.Node(RoomAirNode).CpAir / TimeStepSysSec;
                 this->TempHistoryTerm = this->AirPowerCap * (3.0 * this->ZTM[0] - (3.0 / 2.0) * this->ZTM[1] + (1.0 / 3.0) * this->ZTM[2]);
                 this->TempDepZnLd = (11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef;
                 this->TempIndZnLd = this->TempHistoryTerm + this->TempIndCoef;
@@ -3612,7 +3614,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
     // Exact solution or Euler method
     state.dataHVACGlobal->ShortenTimeStepSysRoomAir = false;
     if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
-        if (shortenTimeStepSys && state.dataHVACGlobal->TimeStepSys < state.dataGlobal->TimeStepZone) {
+        if (shortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
             if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                 this->ZoneT1 = this->ZoneTM2;
                 this->ZoneW1 = this->ZoneWM2;
@@ -3689,7 +3691,7 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
     auto &TempControlTypeRpt = state.dataHeatBalFanSys->TempControlTypeRpt;
     auto &ZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo;
     auto &ZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi;
-    auto &NumOfZones = state.dataGlobal->NumOfZones;
+    int NumOfZones = state.dataGlobal->NumOfZones;
 
     TempControlType = DataHVACGlobals::ThermostatType::Uncontrolled; // Default
 
@@ -4083,7 +4085,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         Real64 LatentGain =
             this->ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumLatentPool(zoneNum);
 
-        Real64 SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // Calculate the coefficients for the 3rd Order derivative for final
         // zone humidity ratio.  The A, B, C coefficients are analogous to the heat balance.
@@ -4115,7 +4117,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         } else {
             volume = thisZone.Volume;
         }
-        C = RhoAir * volume * thisZone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
+        C = RhoAir * volume * thisZone.ZoneVolCapMultpMoist / TimeStepSysSec;
 
         if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
             auto &roomAFNInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum);
@@ -4124,8 +4126,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
             A = roomAFNInfo.Node(RoomAirNode).SumLinkM + roomAFNInfo.Node(RoomAirNode).SumHmARa;
             B = (roomAFNInfo.Node(RoomAirNode).SumIntLatentGain / H2OHtOfVap) + roomAFNInfo.Node(RoomAirNode).SumLinkMW +
                 roomAFNInfo.Node(RoomAirNode).SumHmARaW;
-            C = roomAFNInfo.Node(RoomAirNode).RhoAir * roomAFNInfo.Node(RoomAirNode).AirVolume * thisZone.ZoneVolCapMultpMoist /
-                (DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys);
+            C = roomAFNInfo.Node(RoomAirNode).RhoAir * roomAFNInfo.Node(RoomAirNode).AirVolume * thisZone.ZoneVolCapMultpMoist / TimeStepSysSec;
         }
 
         // Use a 3rd Order derivative to predict zone moisture addition or removal and
@@ -4268,6 +4269,8 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
 
     Real64 ZoneMult = thisZone.Multiplier * thisZone.ListMultiplier;
 
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
+
     // update the variables actually used in the balance equations.
     if (!useZoneTimeStepHistory) {
         this->ZTM = this->DSXMAT;
@@ -4285,7 +4288,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
     }
     this->AirPowerCap = volume * thisZone.ZoneVolCapMultpSens *
                         Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->MAT, this->ZoneAirHumRat, RoutineName) *
-                        Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat) / (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+                        Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat) / TimeStepSysSec;
 
     // SpaceHB TODO: For now, room air model is only for zones
     if (spaceNum == 0) {
@@ -4890,7 +4893,7 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
     // Calculate hourly humidity ratio from infiltration + humidity added from latent load + system added moisture
     Real64 LatentGain = this->ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumLatentPool(zoneNum);
 
-    Real64 SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // Calculate the coefficients for the 3rd order derivative for final
     // zone humidity ratio.  The A, B, C coefficients are analogous to the
@@ -4912,7 +4915,7 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
         B = (LatentGain / H2OHtOfVap) + (exchangeData.SumMHrW + exchangeData.SumMMHrW) + (MoistureMassFlowRate) + this->SumHmARaW;
         A = ZoneMassFlowRate + exchangeData.SumMHr + exchangeData.SumMMHr + this->SumHmARa;
     }
-    Real64 C = RhoAir * zone.Volume * zone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
+    Real64 C = RhoAir * zone.Volume * zone.ZoneVolCapMultpMoist / TimeStepSysSec;
 
     if (state.afn->distribution_simulated) {
         B += state.afn->exchangeData(zoneNum).TotalLat;
@@ -5393,7 +5396,7 @@ void InverseModelHumidity(EnergyPlusData &state,
     Real64 AA(0.0);
     Real64 BB(0.0);
     Real64 ActivityLevel(0.0);
-    Real64 SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     auto &zone = state.dataHeatBal->Zone(ZoneNum);
     auto &hybridModelZone = state.dataHybridModel->HybridModelZone(ZoneNum);
@@ -5428,7 +5431,7 @@ void InverseModelHumidity(EnergyPlusData &state,
                      thisZoneHB.SumHmARaW + thisZoneHB.MixingMassFlowXHumRat + thisZoneHB.MDotOA * state.dataEnvrn->OutHumRat;
             }
 
-            Real64 CC = RhoAir * zone.Volume * zone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
+            Real64 CC = RhoAir * zone.Volume * zone.ZoneVolCapMultpMoist / TimeStepSysSec;
             Real64 DD = (3.0 * state.dataHeatBalFanSys->PreviousMeasuredHumRat1(ZoneNum) -
                          (3.0 / 2.0) * state.dataHeatBalFanSys->PreviousMeasuredHumRat2(ZoneNum) +
                          (1.0 / 3.0) * state.dataHeatBalFanSys->PreviousMeasuredHumRat3(ZoneNum));
@@ -5492,7 +5495,7 @@ void InverseModelHumidity(EnergyPlusData &state,
                      thisZoneHB.MDotOA * state.dataEnvrn->OutHumRat;
             }
 
-            Real64 CC = RhoAir * zone.Volume * zone.ZoneVolCapMultpMoist / SysTimeStepInSeconds;
+            Real64 CC = RhoAir * zone.Volume * zone.ZoneVolCapMultpMoist / TimeStepSysSec;
             Real64 DD = (3.0 * state.dataHeatBalFanSys->PreviousMeasuredHumRat1(ZoneNum) -
                          (3.0 / 2.0) * state.dataHeatBalFanSys->PreviousMeasuredHumRat2(ZoneNum) +
                          (1.0 / 3.0) * state.dataHeatBalFanSys->PreviousMeasuredHumRat3(ZoneNum));
@@ -5823,6 +5826,8 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
     auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
+
     // Sum all convective internal gains: SumIntGain
     SumIntGains = InternalHeatGains::zoneSumAllInternalConvectionGains(state, ZoneNum);
 
@@ -5872,8 +5877,8 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
                                                                thisZoneHB.ZoneAirHumRat);
                 airDistUnit.HeatRate = max(0.0, ADUHeatAddRate);
                 airDistUnit.CoolRate = std::abs(min(0.0, ADUHeatAddRate));
-                airDistUnit.HeatGain = airDistUnit.HeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-                airDistUnit.CoolGain = airDistUnit.CoolRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                airDistUnit.HeatGain = airDistUnit.HeatRate * TimeStepSysSec;
+                airDistUnit.CoolGain = airDistUnit.CoolRate * TimeStepSysSec;
             }
         }
 
@@ -5989,8 +5994,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
 
     switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-        CzdTdt = RhoAir * CpAir * thisZone.Volume * thisZone.ZoneVolCapMultpSens * (thisZoneHB.MAT - thisZoneHB.ZTM[0]) /
-                 (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        CzdTdt = RhoAir * CpAir * thisZone.Volume * thisZone.ZoneVolCapMultpSens * (thisZoneHB.MAT - thisZoneHB.ZTM[0]) / TimeStepSysSec;
         // Exact solution
     } break;
     case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
@@ -6152,7 +6156,7 @@ void DetectOscillatingZoneTemp(EnergyPlusData &state)
         state.dataZoneTempPredictorCorrector->SetupOscillationOutputFlag = false;
     }
 
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
     if (state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded) {
         // precalc the negative value for performance
         Real64 NegOscillateMagnitude = -DataHVACGlobals::OscillateMagnitude;
@@ -7121,16 +7125,15 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
 
         if (state.dataHVACGlobal->NumOfSysTimeSteps !=
             state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
-
-            this->MAT = DownInterpolate4HistoryValues(PriorTimeStep, state.dataHVACGlobal->TimeStepSys, this->XMAT, this->DSXMAT);
-            this->ZoneAirHumRat =
-                DownInterpolate4HistoryValues(PriorTimeStep, state.dataHVACGlobal->TimeStepSys, this->WPrevZoneTS, this->DSWPrevZoneTS);
+            Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+            this->MAT = DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, this->XMAT, this->DSXMAT);
+            this->ZoneAirHumRat = DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, this->WPrevZoneTS, this->DSWPrevZoneTS);
 
             if (spaceNum == 0 && state.dataRoomAirMod->anyNonMixingRoomAirModel) {
                 if (state.dataRoomAirMod->IsZoneDV(zoneNum) || state.dataRoomAirMod->IsZoneUI(zoneNum)) {
 
                     DownInterpolate4HistoryValues(PriorTimeStep,
-                                                  state.dataHVACGlobal->TimeStepSys,
+                                                  TimeStepSys,
                                                   state.dataRoomAirMod->XMATFloor(zoneNum),
                                                   state.dataRoomAirMod->XM2TFloor(zoneNum),
                                                   state.dataRoomAirMod->XM3TFloor(zoneNum),
@@ -7140,7 +7143,7 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
                                                   state.dataRoomAirMod->DSXM3TFloor(zoneNum),
                                                   state.dataRoomAirMod->DSXM4TFloor(zoneNum));
                     DownInterpolate4HistoryValues(PriorTimeStep,
-                                                  state.dataHVACGlobal->TimeStepSys,
+                                                  TimeStepSys,
                                                   state.dataRoomAirMod->XMATOC(zoneNum),
                                                   state.dataRoomAirMod->XM2TOC(zoneNum),
                                                   state.dataRoomAirMod->XM3TOC(zoneNum),
@@ -7150,7 +7153,7 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
                                                   state.dataRoomAirMod->DSXM3TOC(zoneNum),
                                                   state.dataRoomAirMod->DSXM4TOC(zoneNum));
                     DownInterpolate4HistoryValues(PriorTimeStep,
-                                                  state.dataHVACGlobal->TimeStepSys,
+                                                  TimeStepSys,
                                                   state.dataRoomAirMod->XMATMX(zoneNum),
                                                   state.dataRoomAirMod->XM2TMX(zoneNum),
                                                   state.dataRoomAirMod->XM3TMX(zoneNum),
@@ -7164,7 +7167,7 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
                     for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
                         auto &ThisRAFNNode(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).Node(LoopNode));
                         DownInterpolate4HistoryValues(PriorTimeStep,
-                                                      state.dataHVACGlobal->TimeStepSys,
+                                                      TimeStepSys,
                                                       ThisRAFNNode.AirTempX1,
                                                       ThisRAFNNode.AirTempX2,
                                                       ThisRAFNNode.AirTempX3,
@@ -7174,7 +7177,7 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
                                                       ThisRAFNNode.AirTempDSX3,
                                                       ThisRAFNNode.AirTempDSX4);
                         DownInterpolate4HistoryValues(PriorTimeStep,
-                                                      state.dataHVACGlobal->TimeStepSys,
+                                                      TimeStepSys,
                                                       ThisRAFNNode.HumRatX1,
                                                       ThisRAFNNode.HumRatX2,
                                                       ThisRAFNNode.HumRatX3,

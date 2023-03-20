@@ -165,7 +165,7 @@ namespace OutputProcessor {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the OutputProcessor data structures.
 
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         op->RVariableTypes.allocate(RVarAllocInc);
         op->MaxRVariable = RVarAllocInc;
@@ -300,7 +300,7 @@ namespace OutputProcessor {
         // Make sure that input has been read
         GetReportVariableInput(state);
 
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         // Zero out the array / counter we use to determine if there are duplicates
         op->NumExtraVars = 0;
@@ -529,7 +529,7 @@ namespace OutputProcessor {
         Array1D<Real64> rNumericArgs(1);
         Array1D_string cNumericFieldNames(1);
         Array1D_bool lNumericFieldBlanks(1);
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         // Bail out if the input has already been read in
         if (!op->GetOutputInputFlag) {
@@ -856,7 +856,7 @@ namespace OutputProcessor {
         // <etc>
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
         int NumAlpha;
         int NumNumbers;
         int Loop;
@@ -1448,7 +1448,7 @@ namespace OutputProcessor {
 
         // Basic ResourceType for Meters
         {
-            auto const &meterType(UserInputResourceType);
+            std::string const &meterType = UserInputResourceType;
 
             if (meterType == "ELECTRICITY") {
                 OutResourceType = "Electricity";
@@ -1621,7 +1621,7 @@ namespace OutputProcessor {
         // start of the simulation, primarily before any output is stored.
 
         // Make sure this isn't already in the list of meter names
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
         int Found;
 
         if (op->NumEnergyMeters > 0) {
@@ -1735,7 +1735,7 @@ namespace OutputProcessor {
         // is stored with the variable.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         ValidateNStandardizeMeterTitles(state, MtrUnits, ResourceType, EndUse, EndUseSub, Group, ErrorsFound, ZoneName, SpaceType);
 
@@ -1848,7 +1848,7 @@ namespace OutputProcessor {
         // is stored with the variable.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         if (MeterArrayPtr == 0) {
             op->VarMeterArrays.redimension(++op->NumVarMeterArrays);
@@ -1891,7 +1891,7 @@ namespace OutputProcessor {
         int Found; // For checking whether meter is already defined
         bool LocalErrorsFound = false;
         std::string MeterName;
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         // Basic ResourceType Meters
         GetStandardMeterResourceType(state, ResourceType, UtilityRoutines::MakeUPPERCase(ResourceType), LocalErrorsFound);
@@ -1907,7 +1907,7 @@ namespace OutputProcessor {
 
         //!  Group Meters
         {
-            auto const groupMeter(uppercased(Group));
+            std::string const groupMeter = uppercased(Group);
 
             if (groupMeter.empty()) {
 
@@ -1947,7 +1947,7 @@ namespace OutputProcessor {
 
         //!!! EndUse Meters
         {
-            auto const endUseMeter(uppercased(EndUse));
+            std::string const endUseMeter = uppercased(EndUse);
 
             if (endUseMeter.empty()) {
 
@@ -2258,7 +2258,7 @@ namespace OutputProcessor {
         // from calling program.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         if (!op->MeterValue.allocated()) {
             return;
@@ -2357,7 +2357,7 @@ namespace OutputProcessor {
         // Cycle through the meters and reset all accumulating values
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         for (auto &m : op->EnergyMeters) {
             m.HRValue = 0.0;
@@ -2394,7 +2394,7 @@ namespace OutputProcessor {
         }
 
         for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
-            auto &rVar(op->RVariableTypes(Loop).VarPtr);
+            auto &rVar = op->RVariableTypes(Loop).VarPtr;
             if (rVar.frequency == ReportingFrequency::Monthly || rVar.frequency == ReportingFrequency::Yearly ||
                 rVar.frequency == ReportingFrequency::Simulation) {
                 rVar.StoreValue = 0.0;
@@ -2403,7 +2403,7 @@ namespace OutputProcessor {
         }
 
         for (int Loop = 1; Loop <= op->NumOfIVariable; ++Loop) {
-            auto &iVar(op->IVariableTypes(Loop).VarPtr);
+            auto &iVar = op->IVariableTypes(Loop).VarPtr;
             if (iVar.frequency == ReportingFrequency::Monthly || iVar.frequency == ReportingFrequency::Yearly ||
                 iVar.frequency == ReportingFrequency::Simulation) {
                 iVar.StoreValue = 0;
@@ -2434,7 +2434,7 @@ namespace OutputProcessor {
         int Loop; // Loop Control
         bool PrintTimeStamp;
         int CurDayType;
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         if (!state.dataResultsFramework->resultsFramework->TSMeters.rDataFrameEnabled()) {
             state.dataResultsFramework->resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::TimeStep);
@@ -2543,7 +2543,7 @@ namespace OutputProcessor {
         int Loop; // Loop Control
         bool PrintTimeStamp;
         int CurDayType;
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         if (!state.dataResultsFramework->resultsFramework->HRMeters.rDataFrameEnabled()) {
             state.dataResultsFramework->resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Hourly);
@@ -2626,7 +2626,7 @@ namespace OutputProcessor {
         int Loop; // Loop Control
         bool PrintTimeStamp;
         int CurDayType;
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         if (!state.dataResultsFramework->resultsFramework->DYMeters.rVariablesScanned()) {
             state.dataResultsFramework->resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Daily);
@@ -2709,7 +2709,7 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
         bool PrintTimeStamp;
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         if (!state.dataResultsFramework->resultsFramework->MNMeters.rVariablesScanned()) {
             state.dataResultsFramework->resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Monthly);
@@ -2781,7 +2781,7 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
         bool PrintTimeStamp;
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         if (!state.dataResultsFramework->resultsFramework->YRMeters.rVariablesScanned()) {
             state.dataResultsFramework->resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Yearly);
@@ -2848,7 +2848,7 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop; // Loop Control
         bool PrintTimeStamp;
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         if (!state.dataResultsFramework->resultsFramework->SMMeters.rVariablesScanned()) {
             state.dataResultsFramework->resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Simulation);
@@ -2929,7 +2929,7 @@ namespace OutputProcessor {
         // in the data structure.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         for (auto &m : op->EnergyMeters) {
             OutputProcessor::RT_IPUnits const RT_forIPUnits(m.RT_forIPUnits);
@@ -3115,15 +3115,15 @@ namespace OutputProcessor {
         // meters as well as the meter contents.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         for (int VarMeter = 1; VarMeter <= op->NumVarMeterArrays; ++VarMeter) {
 
             const std::string mtrUnitString = unitEnumToStringBrackets(op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).units);
 
             std::string Multipliers;
-            const auto ZoneMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
-            const auto ZoneListMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
+            Real64 const ZoneMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
+            Real64 const ZoneListMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
             if (ZoneMult > 1 || ZoneListMult > 1) {
                 Multipliers = format(" * {}  (Zone Multiplier = {}, Zone List Multiplier = {})", ZoneMult * ZoneListMult, ZoneMult, ZoneListMult);
@@ -3168,8 +3168,8 @@ namespace OutputProcessor {
                             if (op->VarMeterArrays(VarMeter).OnMeters(VarMeter1) != Meter) continue;
 
                             std::string Multipliers;
-                            const auto ZoneMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
-                            const auto ZoneListMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
+                            Real64 const ZoneMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
+                            Real64 const ZoneListMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
                             if (ZoneMult > 1 || ZoneListMult > 1) {
                                 Multipliers = format(
@@ -3193,8 +3193,8 @@ namespace OutputProcessor {
                                 if (op->VarMeterArrays(VarMeter).OnCustomMeters(VarMeter1) != Meter) continue;
 
                                 std::string Multipliers;
-                                const auto ZoneMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
-                                const auto ZoneListMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
+                                Real64 const ZoneMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
+                                Real64 const ZoneListMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
                                 if (ZoneMult > 1 || ZoneListMult > 1) {
                                     Multipliers = format(
@@ -3229,7 +3229,7 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EndUseSubNum;
         int NumSubs;
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         bool Found = false;
         for (size_t EndUseNum = 1; EndUseNum <= state.dataGlobalConst->iEndUse.size(); ++EndUseNum) {
@@ -3268,7 +3268,7 @@ namespace OutputProcessor {
     void addEndUseSpaceType(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSpaceTypeName)
     {
 
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         bool Found = false;
         for (size_t EndUseNum = 1; EndUseNum <= state.dataGlobalConst->iEndUse.size(); ++EndUseNum) {
@@ -3492,7 +3492,7 @@ namespace OutputProcessor {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string FreqString;
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         FreqString = frequencyNotice(storeType, reportingInterval);
 
@@ -3594,11 +3594,11 @@ namespace OutputProcessor {
             const auto out = [&](InputOutputFile &of) {
                 if (of.good()) {
                     if (cumulativeMeterFlag) {
-                        static constexpr std::string_view fmt{"{},{},Cumulative {} [{}]{}\n"};
-                        const auto lenString = index(FreqString, '[');
+                        static constexpr std::string_view fmt = "{},{},Cumulative {} [{}]{}\n";
+                        size_t const lenString = index(FreqString, '[');
                         print(of, fmt, reportIDChr, 1, meterName, UnitsString, FreqString.substr(0, lenString));
                     } else {
-                        static constexpr std::string_view fmt{"{},{},{} [{}]{}\n"};
+                        static constexpr std::string_view fmt = "{},{},{} [{}]{}\n";
                         print(of, fmt, reportIDChr, frequency, meterName, UnitsString, FreqString);
                     }
                 }
@@ -4231,7 +4231,7 @@ namespace OutputProcessor {
         // assign the pointers the values passed in.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         if (varType == VariableType::Integer) {
             *op->IVariableTypes(keyVarIndex).VarPtr.Which = SetIntVal;
@@ -4430,7 +4430,7 @@ namespace OutputProcessor {
             return OutputProcessor::Unit::V;
         } else if (unitUpper == "KMOL/S") {
             return OutputProcessor::Unit::kmol_s;
-        } else if (unitUpper == "KG/S") {
+        } else if (unitUpper == "REV/MIN") {
             return OutputProcessor::Unit::rev_min;
         } else if (unitUpper == "W/M2-K") {
             return OutputProcessor::Unit::W_m2K;
@@ -4532,7 +4532,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     std::string zoneName;     // Will hold value of ZoneKey
     std::string spaceType;    // Will hold value of SpaceType
     int localIndexGroupKey;
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     if (!op->OutputInitialized) InitializeOutput(state);
 
@@ -4644,7 +4644,7 @@ void SetupOutputVariable(EnergyPlusData &state,
             thisRvar.unitNameCustomEMS = customUnitName;
         }
         AssignReportNumber(state, op->CurrentReportNumber);
-        const auto IDOut = fmt::to_string(op->CurrentReportNumber);
+        std::string const IDOut = fmt::to_string(op->CurrentReportNumber);
         thisRvar.ReportID = op->CurrentReportNumber;
         auto &thisVarPtr = thisRvar.VarPtr;
         thisVarPtr.Value = 0.0;
@@ -4775,7 +4775,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     int localIndexGroupKey;
     int Loop;
     ReportingFrequency RepFreq(ReportingFrequency::Hourly);
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     if (!op->OutputInitialized) InitializeOutput(state);
 
@@ -4831,7 +4831,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         thisIVar.KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase(KeyedValue);
         thisIVar.units = VariableUnit;
         AssignReportNumber(state, op->CurrentReportNumber);
-        const auto IDOut = fmt::to_string(op->CurrentReportNumber);
+        std::string const IDOut = fmt::to_string(op->CurrentReportNumber);
         thisIVar.ReportID = op->CurrentReportNumber;
         auto &thisVarPtr = thisIVar.VarPtr;
         thisVarPtr.Value = 0.0;
@@ -4941,7 +4941,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool TimePrint(true);        // True if the time needs to be printed
     bool EndTimeStepFlag(false); // True when it's the end of the Zone Time Step
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     if (t_TimeStepTypeKey != TimeStepType::Zone && t_TimeStepTypeKey != TimeStepType::System) {
         ShowFatalError(state, "Invalid reporting requested -- UpdateDataAndReport");
@@ -5098,7 +5098,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         if (op->IVariableTypes(Loop).timeStepType != t_TimeStepTypeKey) continue;
 
         // Act on the IVariables variable
-        auto &iVar(op->IVariableTypes(Loop).VarPtr);
+        auto &iVar = op->IVariableTypes(Loop).VarPtr;
         iVar.Stored = true;
         //      ICurVal=IVar%Which
         if (iVar.storeType == StoreType::Averaged) {
@@ -5200,10 +5200,10 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                                                                   state.dataGlobal->CalendarYear);
         }
 
-        for (auto &thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
+        for (TimeStepType thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
             for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
                 if (op->RVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
-                auto &rVar(op->RVariableTypes(Loop).VarPtr);
+                auto &rVar = op->RVariableTypes(Loop).VarPtr;
                 // Update meters on the TimeStep  (Zone)
                 if (rVar.MeterArrayPtr != 0 && !state.dataOutputProcessor->MeterValue.empty()) {
                     Real64 TimeStepValue = rVar.TSValue * rVar.ZoneMult * rVar.ZoneListMult;
@@ -5272,7 +5272,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
             for (int Loop = 1; Loop <= op->NumOfIVariable; ++Loop) {
                 if (op->IVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
-                auto &iVar(op->IVariableTypes(Loop).VarPtr);
+                auto &iVar = op->IVariableTypes(Loop).VarPtr;
                 bool ReportNow = true;
                 if (iVar.SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(state, iVar.SchedPtr) != 0.0); // SetReportNow(IVar%SchedPtr)
                 if (!ReportNow) {
@@ -5370,11 +5370,11 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                 state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0, state.dataGlobal->CalendarYear);
         }
 
-        for (auto &thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
+        for (TimeStepType thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
             op->TimeValue.at(thisTimeStepType).CurMinute = 0.0;
             for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
                 if (op->RVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
-                auto &rVar(op->RVariableTypes(Loop).VarPtr);
+                auto &rVar = op->RVariableTypes(Loop).VarPtr;
                 //        ReportNow=.TRUE.
                 //        IF (RVar%SchedPtr > 0) &
                 //          ReportNow=(GetCurrentScheduleValue(state, RVar%SchedPtr) /= 0.0)  !SetReportNow(RVar%SchedPtr)
@@ -5404,7 +5404,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
             for (int Loop = 1; Loop <= op->NumOfIVariable; ++Loop) {
                 if (op->IVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
-                auto &iVar(op->IVariableTypes(Loop).VarPtr);
+                auto &iVar = op->IVariableTypes(Loop).VarPtr;
                 //        ReportNow=.TRUE.
                 //        IF (IVar%SchedPtr > 0) &
                 //          ReportNow=(GetCurrentScheduleValue(state, IVar%SchedPtr) /= 0.0)  !SetReportNow(IVar%SchedPtr)
@@ -5474,7 +5474,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         }
 
         op->NumHoursInMonth += 24;
-        for (auto &thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
+        for (TimeStepType thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
             for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
                 if (op->RVariableTypes(Loop).timeStepType == thisTimeStepType) {
                     WriteRealVariableOutput(state, op->RVariableTypes(Loop).VarPtr, ReportingFrequency::Daily);
@@ -5524,7 +5524,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
         op->NumHoursInSim += op->NumHoursInMonth;
         state.dataEnvrn->EndMonthFlag = false;
-        for (auto &thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
+        for (TimeStepType thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
             for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
                 if (op->RVariableTypes(Loop).timeStepType == thisTimeStepType) {
                     WriteRealVariableOutput(state, op->RVariableTypes(Loop).VarPtr, ReportingFrequency::Monthly);
@@ -5568,7 +5568,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.newRow(
                 state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0, state.dataGlobal->CalendarYear);
         }
-        for (auto &thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
+        for (TimeStepType thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
             for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
                 if (op->RVariableTypes(Loop).timeStepType == thisTimeStepType) {
                     WriteRealVariableOutput(state, op->RVariableTypes(Loop).VarPtr, ReportingFrequency::Simulation);
@@ -5605,7 +5605,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             state.dataResultsFramework->resultsFramework->RIYearlyTSData.newRow(
                 state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0, state.dataGlobal->CalendarYear);
         }
-        for (auto &thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
+        for (TimeStepType thisTimeStepType : {TimeStepType::Zone, TimeStepType::System}) { // Zone, HVAC
             for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
                 if (op->RVariableTypes(Loop).timeStepType == thisTimeStepType) {
                     WriteRealVariableOutput(state, op->RVariableTypes(Loop).VarPtr, ReportingFrequency::Yearly);
@@ -5689,7 +5689,7 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
     std::map<ReportingFrequency, std::string> reportFrequency({{ReportingFrequency::EachCall, "Detailed"},
                                                                {ReportingFrequency::TimeStep, "TimeStep"},
                                                                {ReportingFrequency::Hourly, "Hourly"},
@@ -5790,7 +5790,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
     int NumReqMeterFOs;
 
     bool ErrorsFound(false); // If errors detected in input
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     GetCustomMeterInput(state, ErrorsFound);
     if (ErrorsFound) {
@@ -5798,16 +5798,16 @@ void UpdateMeterReporting(EnergyPlusData &state)
     }
 
     // Helper lambda to locate a meter index from its name. Returns a negative value if not found
-    auto setupMeterFromMeterName =
+    auto setupMeterFromMeterName = // (AUTO_OK_LAMBDA)
         [&state](std::string &name, std::string const &freqString, bool MeterFileOnlyIndicator, bool CumulativeIndicator) -> bool {
         bool result = false;
 
-        auto varnameLen = index(name, '[');
+        size_t varnameLen = index(name, '[');
         if (varnameLen != std::string::npos) {
             name.erase(varnameLen);
         }
 
-        auto &op(state.dataOutputProcessor);
+        auto &op = state.dataOutputProcessor;
 
         std::string::size_type wildCardPosition = index(name, '*');
 
@@ -5966,7 +5966,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int indexGroupKey;
     std::string indexGroup;
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     if ((FrequencyIndicator == ReportingFrequency::EachCall) ||
         (FrequencyIndicator == ReportingFrequency::TimeStep)) { // roll "detailed" into TimeStep
@@ -6360,7 +6360,7 @@ int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName)
     // static bool FirstCall( true );
     ////////////////////////////////////////////////
     int Found;
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     if (op->GetMeterIndexFirstCall || (state.dataOutputProcessor->NumValidMeters != op->NumEnergyMeters)) {
         state.dataOutputProcessor->NumValidMeters = op->NumEnergyMeters;
@@ -6520,11 +6520,11 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
     //      EnergyMeters(Meter)%TSValue=EnergyMeters(EnergyMeters(Meter)%SourceMeter)%TSValue-MeterValue(Meter)
 
     if (MeterNumber == 0) return InstantMeterValue;
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
-    auto &energy_meter(op->EnergyMeters(MeterNumber));
-    auto &cache_beg(energy_meter.InstMeterCacheStart);
-    auto &cache_end(energy_meter.InstMeterCacheEnd);
+    auto &energy_meter = op->EnergyMeters(MeterNumber);
+    auto &cache_beg = energy_meter.InstMeterCacheStart;
+    auto &cache_end = energy_meter.InstMeterCacheEnd;
     if (energy_meter.TypeOfMeter != MtrType::CustomDec) {
         // section added to speed up the execution of this routine
         // instead of looping through all the VarMeterArrays to see if a RVariableType is used for a
@@ -6532,7 +6532,7 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
         // meter.
         if (cache_beg == 0) { // not yet added to the cache
             for (int Loop = 1; Loop <= op->NumVarMeterArrays; ++Loop) {
-                auto const &var_meter_on(op->VarMeterArrays(Loop).OnMeters);
+                auto const &var_meter_on = op->VarMeterArrays(Loop).OnMeters;
                 for (int Meter = 1, Meter_end = op->VarMeterArrays(Loop).NumOnMeters; Meter <= Meter_end; ++Meter) {
                     if (var_meter_on(Meter) == MeterNumber) {
                         IncrementInstMeterCache(state);
@@ -6542,7 +6542,7 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
                         break;
                     }
                 }
-                auto const &var_meter_on_custom(op->VarMeterArrays(Loop).OnCustomMeters);
+                auto const &var_meter_on_custom = op->VarMeterArrays(Loop).OnCustomMeters;
                 for (int Meter = 1, Meter_end = op->VarMeterArrays(Loop).NumOnCustomMeters; Meter <= Meter_end; ++Meter) {
                     if (var_meter_on_custom(Meter) == MeterNumber) {
                         IncrementInstMeterCache(state);
@@ -6555,10 +6555,10 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
             }
         }
         for (int Loop = cache_beg; Loop <= cache_end; ++Loop) {
-            auto &r_var_loop(op->RVariableTypes(op->InstMeterCache(Loop)));
+            auto &r_var_loop = op->RVariableTypes(op->InstMeterCache(Loop));
             // Separate the Zone variables from the HVAC variables using TimeStepType
             if (r_var_loop.timeStepType == t_timeStepType) {
-                auto &rVar(r_var_loop.VarPtr);
+                auto &rVar = r_var_loop.VarPtr;
                 // Add to the total all of the appropriate variables
                 InstantMeterValue += (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
             }
@@ -6567,14 +6567,14 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
         // Get Source Meter value
         // Loop through all report meters to find correct report variables to add to instant meter total
         for (int Loop = 1; Loop <= op->NumVarMeterArrays; ++Loop) {
-            auto &r_var_loop(op->RVariableTypes(op->VarMeterArrays(Loop).RepVariable));
+            auto &r_var_loop = op->RVariableTypes(op->VarMeterArrays(Loop).RepVariable);
 
-            auto const &var_meter_on(op->VarMeterArrays(Loop).OnMeters);
+            auto const &var_meter_on = op->VarMeterArrays(Loop).OnMeters;
             for (int Meter = 1, Meter_end = op->VarMeterArrays(Loop).NumOnMeters; Meter <= Meter_end; ++Meter) {
                 if (var_meter_on(Meter) == energy_meter.SourceMeter) {
                     // Separate the Zone variables from the HVAC variables using TimeStepType
                     if (r_var_loop.timeStepType == t_timeStepType) {
-                        auto &rVar(r_var_loop.VarPtr);
+                        auto &rVar = r_var_loop.VarPtr;
                         // Add to the total all of the appropriate variables
                         InstantMeterValue += (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
                         break;
@@ -6582,12 +6582,12 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
                 }
             }
 
-            auto const &var_meter_on_custom(op->VarMeterArrays(Loop).OnCustomMeters);
+            auto const &var_meter_on_custom = op->VarMeterArrays(Loop).OnCustomMeters;
             for (int Meter = 1, Meter_end = op->VarMeterArrays(Loop).NumOnCustomMeters; Meter <= Meter_end; ++Meter) {
                 if (var_meter_on_custom(Meter) == energy_meter.SourceMeter) {
                     // Separate the Zone variables from the HVAC variables using TimeStepType
                     if (r_var_loop.timeStepType == t_timeStepType) {
-                        auto &rVar(r_var_loop.VarPtr);
+                        auto &rVar = r_var_loop.VarPtr;
                         // Add to the total all of the appropriate variables
                         InstantMeterValue += (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
                         break;
@@ -6597,14 +6597,14 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
 
         } // End Number of Meters Loop
         for (int Loop = 1; Loop <= op->NumVarMeterArrays; ++Loop) {
-            auto &r_var_loop(op->RVariableTypes(op->VarMeterArrays(Loop).RepVariable));
+            auto &r_var_loop = op->RVariableTypes(op->VarMeterArrays(Loop).RepVariable);
 
-            auto const &var_meter_on(op->VarMeterArrays(Loop).OnMeters);
+            auto const &var_meter_on = op->VarMeterArrays(Loop).OnMeters;
             for (int Meter = 1, Meter_end = op->VarMeterArrays(Loop).NumOnMeters; Meter <= Meter_end; ++Meter) {
                 if (var_meter_on(Meter) == MeterNumber) {
                     // Separate the Zone variables from the HVAC variables using TimeStepType
                     if (r_var_loop.timeStepType == t_timeStepType) {
-                        auto &rVar(r_var_loop.VarPtr);
+                        auto &rVar = r_var_loop.VarPtr;
                         // Add to the total all of the appropriate variables
                         InstantMeterValue -= (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
                         break;
@@ -6612,12 +6612,12 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
                 }
             }
 
-            auto const &var_meter_on_custom(op->VarMeterArrays(Loop).OnCustomMeters);
+            auto const &var_meter_on_custom = op->VarMeterArrays(Loop).OnCustomMeters;
             for (int Meter = 1, Meter_end = op->VarMeterArrays(Loop).NumOnCustomMeters; Meter <= Meter_end; ++Meter) {
                 if (var_meter_on_custom(Meter) == MeterNumber) {
                     // Separate the Zone variables from the HVAC variables using TimeStepType
                     if (r_var_loop.timeStepType == t_timeStepType) {
-                        auto &rVar(r_var_loop.VarPtr);
+                        auto &rVar = r_var_loop.VarPtr;
                         // Add to the total all of the appropriate variables
                         InstantMeterValue -= (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
                         break;
@@ -6645,7 +6645,7 @@ void IncrementInstMeterCache(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // When the array grows to large, double it.
 
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     if (!allocated(op->InstMeterCache)) {
         op->InstMeterCache.dimension(op->InstMeterCacheSizeInc, 0); // zero the entire array
@@ -6705,7 +6705,7 @@ Real64 GetInternalVariableValue(EnergyPlusData &state,
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     // na
 
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     // Select based on variable type:  integer, real, or meter
     if (varType == VariableType::NotFound) { // Variable not a found variable
@@ -6789,7 +6789,7 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     // na
 
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     // Select based on variable type:  integer, REAL(r64), or meter
     if (varType == VariableType::NotFound) { // Variable not a found variable
@@ -6845,13 +6845,13 @@ int GetNumMeteredVariables(EnergyPlusData &state,
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int Loop;
     int NumVariables = 0;
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     for (Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
         //    Pos=INDEX(RVariableTypes(Loop)%VarName,':')
         //    IF (ComponentName /= RVariableTypes(Loop)%VarNameUC(1:Pos-1)) CYCLE
         if (ComponentName != op->RVariableTypes(Loop).KeyNameOnlyUC) continue;
-        auto &rVar(op->RVariableTypes(Loop).VarPtr);
+        auto &rVar = op->RVariableTypes(Loop).VarPtr;
         if (rVar.MeterArrayPtr == 0) {
             continue;
         }
@@ -6898,7 +6898,7 @@ void GetMeteredVariables(EnergyPlusData &state,
     int MeterPtr;
     int NumOnMeterPtr;
     int MeterNum;
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     NumVariables = 0;
 
@@ -6906,7 +6906,7 @@ void GetMeteredVariables(EnergyPlusData &state,
         //    Pos=INDEX(RVariableTypes(Loop)%VarName,':')
         //    IF (ComponentName /= RVariableTypes(Loop)%VarNameUC(1:Pos-1)) CYCLE
         if (ComponentName != op->RVariableTypes(Loop).KeyNameOnlyUC) continue;
-        auto &rVar(op->RVariableTypes(Loop).VarPtr);
+        auto &rVar = op->RVariableTypes(Loop).VarPtr;
         if (rVar.MeterArrayPtr == 0) continue;
         NumOnMeterPtr = op->VarMeterArrays(rVar.MeterArrayPtr).NumOnMeters;
         MeterPtr = op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters(1);
@@ -6981,7 +6981,7 @@ void GetMeteredVariables(EnergyPlusData &state,
     int MeterPtr;
     int NumOnMeterPtr;
     int MeterNum;
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     NumVariables = 0;
 
@@ -6989,7 +6989,7 @@ void GetMeteredVariables(EnergyPlusData &state,
         //    Pos=INDEX(RVariableTypes(Loop)%VarName,':')
         //    IF (ComponentName /= RVariableTypes(Loop)%VarNameUC(1:Pos-1)) CYCLE
         if (ComponentName != op->RVariableTypes(Loop).KeyNameOnlyUC) continue;
-        auto &rVar(op->RVariableTypes(Loop).VarPtr);
+        auto &rVar = op->RVariableTypes(Loop).VarPtr;
         if (rVar.MeterArrayPtr == 0) continue;
         NumOnMeterPtr = op->VarMeterArrays(rVar.MeterArrayPtr).NumOnMeters;
         MeterPtr = op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters(1);
@@ -7090,7 +7090,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
     bool Duplicate;                  // True if keyname is a duplicate
     std::string VarKeyPlusName;      // Full variable name including keyname and units
     std::string varNameUpper;        // varName pushed to all upper case
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     // INITIALIZATIONS
     if (op->InitFlag) {
@@ -7270,7 +7270,7 @@ void GetVariableKeys(EnergyPlusData &state,
     maxKeyNames = size(keyNames);
     maxkeyVarIndexes = size(keyVarIndexes);
     varNameUpper = UtilityRoutines::MakeUPPERCase(varName);
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     // Select based on variable type:  integer, real, or meter
     if (varType == VariableType::Integer) { // Integer
@@ -7376,7 +7376,7 @@ bool ReportingThisVariable(EnergyPlusData &state, std::string const &RepVarName)
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int Found;
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     BeingReported = false;
     Found = UtilityRoutines::FindItem(RepVarName, op->ReqRepVars, &ReqReportVariables::VarName);
@@ -7495,7 +7495,7 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
 
     int indexGroupKey;
     std::string indexGroup;
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     NumReqMeters = 29;
 
@@ -7666,7 +7666,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
         }
     };
 
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     //  See if Report Variables should be turned on
     SortByName = false;
@@ -7874,7 +7874,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &op(state.dataOutputProcessor);
+    auto &op = state.dataOutputProcessor;
 
     int dup = 0; // for duplicate variable name
     if (op->NumVariablesForOutput > 0) {

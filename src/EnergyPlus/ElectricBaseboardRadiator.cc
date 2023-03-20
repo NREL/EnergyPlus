@@ -121,13 +121,12 @@ namespace ElectricBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum; // Index of unit in baseboard array
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
-        auto &GetInputFlag = state.dataElectBaseboardRad->GetInputFlag;
-        auto &NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
+        int NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
         auto &CheckEquipName = state.dataElectBaseboardRad->CheckEquipName;
 
-        if (GetInputFlag) {
+        if (state.dataElectBaseboardRad->GetInputFlag) {
             GetElectricBaseboardInput(state);
-            GetInputFlag = false;
+            state.dataElectBaseboardRad->GetInputFlag = false;
         }
 
         // Find the correct Baseboard Equipment
@@ -196,7 +195,7 @@ namespace ElectricBaseboardRadiator {
         int constexpr iHeatDesignCapacityNumericNum(1);       // get input index to HW baseboard heating capacity
         int constexpr iHeatCapacityPerFloorAreaNumericNum(2); // get input index to HW baseboard heating capacity per floor area sizing
         int constexpr iHeatFracOfAutosizedCapacityNumericNum(
-            3); // get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
+            3); // get input index to HW baseboard heating capacity sizing as fraction of autosized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AllFracsSummed; // Sum of the fractions radiant
@@ -210,13 +209,14 @@ namespace ElectricBaseboardRadiator {
 
         cCurrentModuleObject = state.dataElectBaseboardRad->cCMO_BBRadiator_Electric;
 
-        state.dataElectBaseboardRad->NumElecBaseboards = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        // Update Num in state and make local convenience copy
+        int NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // object is extensible, no max args needed as IPShortCuts being used
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
         auto &CheckEquipName = state.dataElectBaseboardRad->CheckEquipName;
         auto &ElecBaseboardNumericFields = state.dataElectBaseboardRad->ElecBaseboardNumericFields;
-        auto &NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
 
         ElecBaseboard.allocate(NumElecBaseboards);
         CheckEquipName.allocate(NumElecBaseboards);
@@ -562,9 +562,7 @@ namespace ElectricBaseboardRadiator {
         int ZoneNode;
 
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
-        auto &NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
-        auto &MyOneTimeFlag = state.dataElectBaseboardRad->MyOneTimeFlag;
-        auto &MySizeFlag = state.dataElectBaseboardRad->MySizeFlag;
+        int NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
         auto &ZeroSourceSumHATsurf = state.dataElectBaseboardRad->ZeroSourceSumHATsurf;
         auto &QBBElecRadSource = state.dataElectBaseboardRad->QBBElecRadSource;
         auto &QBBElecRadSrcAvg = state.dataElectBaseboardRad->QBBElecRadSrcAvg;
@@ -573,26 +571,24 @@ namespace ElectricBaseboardRadiator {
         auto &LastTimeStepSys = state.dataElectBaseboardRad->LastTimeStepSys;
 
         // Do the one time initializations
-        if (MyOneTimeFlag) {
+        if (state.dataElectBaseboardRad->MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            state.dataElectBaseboardRad->MyEnvrnFlag.allocate(NumElecBaseboards);
-            MySizeFlag.allocate(NumElecBaseboards);
+            state.dataElectBaseboardRad->MyEnvrnFlag.dimension(NumElecBaseboards, true);
+            state.dataElectBaseboardRad->MySizeFlag.dimension(NumElecBaseboards, true);
             ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             QBBElecRadSource.dimension(NumElecBaseboards, 0.0);
             QBBElecRadSrcAvg.dimension(NumElecBaseboards, 0.0);
             LastQBBElecRadSrc.dimension(NumElecBaseboards, 0.0);
             LastSysTimeElapsed.dimension(NumElecBaseboards, 0.0);
             LastTimeStepSys.dimension(NumElecBaseboards, 0.0);
-            state.dataElectBaseboardRad->MyEnvrnFlag = true;
-            MySizeFlag = true;
 
-            MyOneTimeFlag = false;
+            state.dataElectBaseboardRad->MyOneTimeFlag = false;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(BaseboardNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataElectBaseboardRad->MySizeFlag(BaseboardNum)) {
             // for each coil, do the sizing once.
             SizeElectricBaseboard(state, BaseboardNum);
-            MySizeFlag(BaseboardNum) = false;
+            state.dataElectBaseboardRad->MySizeFlag(BaseboardNum) = false;
         }
 
         // Do the Begin Environment initializations
@@ -938,8 +934,8 @@ namespace ElectricBaseboardRadiator {
         //       MODIFIED       Feb 2010 Daeho Kang for radiant component
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // First, update the running average if necessary...
         if (state.dataElectBaseboardRad->LastSysTimeElapsed(BaseboardNum) == SysTimeElapsed) {
@@ -1089,13 +1085,13 @@ namespace ElectricBaseboardRadiator {
         //       DATE WRITTEN   Feb 2010
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
-        ElecBaseboard(BaseboardNum).ElecUseLoad = ElecBaseboard(BaseboardNum).ElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour;
-        ElecBaseboard(BaseboardNum).TotEnergy = ElecBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        ElecBaseboard(BaseboardNum).Energy = ElecBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
-        ElecBaseboard(BaseboardNum).ConvEnergy = ElecBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        ElecBaseboard(BaseboardNum).RadEnergy = ElecBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        ElecBaseboard(BaseboardNum).ElecUseLoad = ElecBaseboard(BaseboardNum).ElecUseRate * TimeStepSysSec;
+        ElecBaseboard(BaseboardNum).TotEnergy = ElecBaseboard(BaseboardNum).TotPower * TimeStepSysSec;
+        ElecBaseboard(BaseboardNum).Energy = ElecBaseboard(BaseboardNum).Power * TimeStepSysSec;
+        ElecBaseboard(BaseboardNum).ConvEnergy = ElecBaseboard(BaseboardNum).ConvPower * TimeStepSysSec;
+        ElecBaseboard(BaseboardNum).RadEnergy = ElecBaseboard(BaseboardNum).RadPower * TimeStepSysSec;
     }
 
 } // namespace ElectricBaseboardRadiator

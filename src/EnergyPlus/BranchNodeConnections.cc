@@ -51,7 +51,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
@@ -865,14 +864,10 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     bool IsOutlet;
     bool MatchedAtLeastOne;
     int ErrorCounter;
-    int Object;
-    int EndConnect;
     Array1D_int FluidStreamInletCount;
     Array1D_int FluidStreamOutletCount;
     Array1D_int NodeObjects;
     Array1D_bool FluidStreamCounts;
-    int NumObjects;
-    int MaxFluidStream;
 
     ErrorCounter = 0;
 
@@ -1221,7 +1216,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     // Check 10 -- fluid streams cannot have multiple inlet/outlet nodes on same component
     //  can have multiple inlets with one outlet or vice versa but cannot have multiple both inlet and outlet
     if (state.dataBranchNodeConnections->NumOfNodeConnections > 0) {
-        MaxFluidStream = static_cast<int>(maxval(state.dataBranchNodeConnections->NodeConnections, &NodeConnectionDef::FluidStream));
+        int MaxFluidStream = static_cast<int>(maxval(state.dataBranchNodeConnections->NodeConnections, &NodeConnectionDef::FluidStream));
         FluidStreamInletCount.allocate(MaxFluidStream);
         FluidStreamOutletCount.allocate(MaxFluidStream);
         FluidStreamCounts.allocate(MaxFluidStream);
@@ -1231,9 +1226,9 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
         NodeObjects = 0;
         FluidStreamCounts = false;
         // Following code relies on node connections for single object type/name being grouped together
-        Object = 1;
-        EndConnect = 0;
-        NumObjects = 2;
+        int Object = 1;
+        int EndConnect = 0;
+        int NumObjects = 2;
         NodeObjects(1) = 1;
         while (Object < state.dataBranchNodeConnections->NumOfNodeConnections) {
             if (state.dataBranchNodeConnections->NodeConnections(Object).ObjectType !=
@@ -1557,25 +1552,18 @@ void GetComponentData(EnergyPlusData &state,
                       int &NumOutlets,
                       Array1D_string &OutletNodeNames,
                       Array1D_int &OutletNodeNums,
-                      Array1D<NodeInputManager::CompFluidStream> &OutletFluidStreams,
-                      bool &ErrorsFound // set to true if errors found, unchanged otherwise
-)
+                      Array1D<NodeInputManager::CompFluidStream> &OutletFluidStreams)
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   May 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine gets data for a given Component Type and Name Name.
 
     // METHODOLOGY EMPLOYED:
     // Traverses CompSet structure.
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool ErrInObject;
 
     if (allocated(InletNodeNames)) InletNodeNames.deallocate();
     if (allocated(InletNodeNums)) InletNodeNums.deallocate();
@@ -1615,7 +1603,6 @@ void GetComponentData(EnergyPlusData &state,
     OutletFluidStreams = NodeInputManager::CompFluidStream::Invalid;
     NumInlets = 0;
     NumOutlets = 0;
-    ErrInObject = false;
 
     for (int Which = 1; Which <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Which) {
         if (state.dataBranchNodeConnections->NodeConnections(Which).ObjectType != ComponentType ||
@@ -1633,14 +1620,6 @@ void GetComponentData(EnergyPlusData &state,
             OutletFluidStreams(NumOutlets) = state.dataBranchNodeConnections->NodeConnections(Which).FluidStream;
         }
     }
-    if (ErrInObject) {
-        ShowWarningError(state,
-                         format("GetParentData: Component Type={}, Component Name={} not found.",
-                                ConnectionObjectTypeNames[static_cast<int>(ComponentType)],
-                                ComponentName));
-    }
-
-    if (ErrInObject) ErrorsFound = true;
 }
 
 void GetChildrenData(EnergyPlusData &state,
@@ -1673,17 +1652,9 @@ void GetChildrenData(EnergyPlusData &state,
     Array1D_string ChildOutNodeName;
     Array1D_int ChildInNodeNum;
     Array1D_int ChildOutNodeNum;
-    int CountNum;
     bool ErrInObject;
-    std::string MatchNodeName;
-    std::string ParentInletNodeName;
-    std::string ParentOutletNodeName;
-    int ParentInletNodeNum;
-    int ParentOutletNodeNum;
-    int CountMatchLoop;
 
-    for (auto &thisChildrenCType : ChildrenCType)
-        thisChildrenCType = DataLoopNode::ConnectionObjectType::Invalid;
+    std::fill(ChildrenCType.begin(), ChildrenCType.end(), DataLoopNode::ConnectionObjectType::Invalid);
     ChildrenCName = std::string();
     InletNodeName = std::string();
     InletNodeNum = 0;
@@ -1699,6 +1670,10 @@ void GetChildrenData(EnergyPlusData &state,
                                     ConnectionObjectTypeNames[static_cast<int>(ComponentType)],
                                     ComponentName));
         } else {
+            int ParentInletNodeNum;
+            int ParentOutletNodeNum;
+            std::string ParentInletNodeName;
+            std::string ParentOutletNodeName;
             GetParentData(
                 state, ComponentType, ComponentName, ParentInletNodeName, ParentInletNodeNum, ParentOutletNodeName, ParentOutletNodeNum, ErrInObject);
             ChildCType.clear();
@@ -1713,7 +1688,7 @@ void GetChildrenData(EnergyPlusData &state,
             ChildOutNodeName = std::string();
             ChildInNodeNum = 0;
             ChildOutNodeNum = 0;
-            CountNum = 0;
+            int CountNum = 0;
             for (int Loop = 1; Loop <= state.dataBranchNodeConnections->NumCompSets; ++Loop) {
                 if (state.dataBranchNodeConnections->CompSets(Loop).ParentObjectType == ComponentType &&
                     state.dataBranchNodeConnections->CompSets(Loop).ParentCName == ComponentName) {
@@ -1736,9 +1711,9 @@ void GetChildrenData(EnergyPlusData &state,
                 ErrInObject = true;
             } else {
                 // Children arrays built.  Now "sort" for flow connection order(?)
-                MatchNodeName = ParentInletNodeName;
+                std::string MatchNodeName = ParentInletNodeName;
                 CountNum = 0;
-                CountMatchLoop = 0;
+                int CountMatchLoop = 0;
                 while (CountMatchLoop < NumChildren) {
                     ++CountMatchLoop;
                     //          Matched=.FALSE.

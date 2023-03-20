@@ -326,7 +326,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(5)) state.dataIPShortCut->cAlphaArgs(5) = "ZONE";
 
-        auto indoorType =
+        PipeIndoorBoundaryType indoorType =
             static_cast<PipeIndoorBoundaryType>(getEnumerationValue(pipeIndoorBoundaryTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
         switch (indoorType) {
         case PipeIndoorBoundaryType::Zone:
@@ -658,14 +658,16 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
             ShowContinueError(state, format("Found in {}={}", cCurrentModuleObject, state.dataPipeHT->PipeHT(Item).Name));
             ErrorsFound = true;
         } else {
-            state.dataPipeHT->PipeHT(Item).SoilDensity = state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->Density;
-            state.dataPipeHT->PipeHT(Item).SoilDepth = state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->Thickness;
-            state.dataPipeHT->PipeHT(Item).SoilCp = state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->SpecHeat;
-            state.dataPipeHT->PipeHT(Item).SoilConductivity =
-                state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->Conductivity;
-            state.dataPipeHT->PipeHT(Item).SoilThermAbs = state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->AbsorpThermal;
-            state.dataPipeHT->PipeHT(Item).SoilSolarAbs = state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->AbsorpSolar;
-            state.dataPipeHT->PipeHT(Item).SoilRoughness = state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum)->Roughness;
+            auto const *thisMaterialSoil =
+                dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(state.dataPipeHT->PipeHT(Item).SoilMaterialNum));
+            assert(thisMaterialSoil != nullptr);
+            state.dataPipeHT->PipeHT(Item).SoilDensity = thisMaterialSoil->Density;
+            state.dataPipeHT->PipeHT(Item).SoilDepth = thisMaterialSoil->Thickness;
+            state.dataPipeHT->PipeHT(Item).SoilCp = thisMaterialSoil->SpecHeat;
+            state.dataPipeHT->PipeHT(Item).SoilConductivity = thisMaterialSoil->Conductivity;
+            state.dataPipeHT->PipeHT(Item).SoilThermAbs = thisMaterialSoil->AbsorpThermal;
+            state.dataPipeHT->PipeHT(Item).SoilSolarAbs = thisMaterialSoil->AbsorpSolar;
+            state.dataPipeHT->PipeHT(Item).SoilRoughness = thisMaterialSoil->Roughness;
             state.dataPipeHT->PipeHT(Item).PipeDepth = state.dataPipeHT->PipeHT(Item).SoilDepth + state.dataPipeHT->PipeHT(Item).PipeID / 2.0;
             state.dataPipeHT->PipeHT(Item).DomainDepth = state.dataPipeHT->PipeHT(Item).PipeDepth * 2.0;
             state.dataPipeHT->PipeHT(Item).SoilDiffusivity = state.dataPipeHT->PipeHT(Item).SoilConductivity /
@@ -943,8 +945,8 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     // Check flags and update data structure
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
     using ScheduleManager::GetCurrentScheduleValue;
@@ -1013,7 +1015,7 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     if (!state.dataGlobal->BeginEnvrnFlag) this->BeginSimEnvrn = true;
 
     // time step in seconds
-    state.dataPipeHT->nsvDeltaTime = TimeStepSys * DataGlobalConstants::SecInHour;
+    state.dataPipeHT->nsvDeltaTime = TimeStepSysSec;
     state.dataPipeHT->nsvNumInnerTimeSteps = int(state.dataPipeHT->nsvDeltaTime / InnerDeltaTime);
 
     // previous temps are updated if necessary at start of timestep rather than end
@@ -1368,23 +1370,23 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
     Array3D<Real64> T_O(this->PipeNodeWidth, this->NumDepthNodes, NumSections);
 
     // Local variable placeholders for code readability
-    Real64 A1(0.0);              // Placeholder for CoefA1
-    Real64 A2(0.0);              // Placeholder for CoefA2
-    Real64 NodeBelow(0.0);       // Placeholder for Node temp below current node
-    Real64 NodeAbove(0.0);       // Placeholder for Node temp above current node
-    Real64 NodeRight(0.0);       // Placeholder for Node temp to the right of current node
-    Real64 NodeLeft(0.0);        // Placeholder for Node temp to the left of current node
-    Real64 NodePast(0.0);        // Placeholder for Node temp at current node but previous time step
-    Real64 PastNodeTempAbs(0.0); // Placeholder for absolute temperature (K) version of NodePast
-    Real64 Ttemp(0.0);           // Placeholder for a current temperature node in convergence check
-    Real64 SkyTempAbs(0.0);      // Placeholder for current sky temperature in Kelvin
-    DataSurfaces::SurfaceRoughness TopRoughness(DataSurfaces::SurfaceRoughness::Invalid); // Placeholder for soil surface roughness
-    Real64 TopThermAbs(0.0);                                                              // Placeholder for soil thermal radiation absorptivity
-    Real64 TopSolarAbs(0.0);                                                              // Placeholder for soil solar radiation absorptivity
-    Real64 kSoil(0.0);                                                                    // Placeholder for soil conductivity
-    Real64 dS(0.0);                                                                       // Placeholder for soil grid spacing
-    Real64 rho(0.0);                                                                      // Placeholder for soil density
-    Real64 Cp(0.0);                                                                       // Placeholder for soil specific heat
+    Real64 A1(0.0);                                                               // Placeholder for CoefA1
+    Real64 A2(0.0);                                                               // Placeholder for CoefA2
+    Real64 NodeBelow(0.0);                                                        // Placeholder for Node temp below current node
+    Real64 NodeAbove(0.0);                                                        // Placeholder for Node temp above current node
+    Real64 NodeRight(0.0);                                                        // Placeholder for Node temp to the right of current node
+    Real64 NodeLeft(0.0);                                                         // Placeholder for Node temp to the left of current node
+    Real64 NodePast(0.0);                                                         // Placeholder for Node temp at current node but previous time step
+    Real64 PastNodeTempAbs(0.0);                                                  // Placeholder for absolute temperature (K) version of NodePast
+    Real64 Ttemp(0.0);                                                            // Placeholder for a current temperature node in convergence check
+    Real64 SkyTempAbs(0.0);                                                       // Placeholder for current sky temperature in Kelvin
+    Material::SurfaceRoughness TopRoughness(Material::SurfaceRoughness::Invalid); // Placeholder for soil surface roughness
+    Real64 TopThermAbs(0.0);                                                      // Placeholder for soil thermal radiation absorptivity
+    Real64 TopSolarAbs(0.0);                                                      // Placeholder for soil solar radiation absorptivity
+    Real64 kSoil(0.0);                                                            // Placeholder for soil conductivity
+    Real64 dS(0.0);                                                               // Placeholder for soil grid spacing
+    Real64 rho(0.0);                                                              // Placeholder for soil density
+    Real64 Cp(0.0);                                                               // Placeholder for soil specific heat
 
     // There are a number of coefficients which change through the simulation, and they are updated here
     this->FourierDS = this->SoilDiffusivity * state.dataPipeHT->nsvDeltaTime / pow_2(this->dSregular); // Eq. D4

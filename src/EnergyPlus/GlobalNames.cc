@@ -66,7 +66,7 @@ namespace EnergyPlus::GlobalNames {
 // certain component names (esp. Chillers, Boilers)
 
 void IntraObjUniquenessCheck(EnergyPlusData &state,
-                             std::string &NameToVerify,
+                             std::string const &NameToVerify,
                              std::string_view const CurrentModuleObject,
                              std::string_view FieldName,
                              std::unordered_set<std::string> &UniqueStrings,
@@ -75,11 +75,11 @@ void IntraObjUniquenessCheck(EnergyPlusData &state,
     if (NameToVerify.empty()) {
         ShowSevereError(state, format("E+ object type {} cannot have a blank {} field", CurrentModuleObject, FieldName));
         ErrorsFound = true;
-        NameToVerify = "xxxxx";
+        // NameToVerify = "xxxxx";
         return;
     }
 
-    auto const &find_string = UniqueStrings.find(NameToVerify);
+    auto const find_string = UniqueStrings.find(NameToVerify);
     if (find_string == UniqueStrings.end()) {
         UniqueStrings.emplace(NameToVerify);
     } else {
@@ -90,7 +90,7 @@ void IntraObjUniquenessCheck(EnergyPlusData &state,
 
 bool VerifyUniqueInterObjectName(EnergyPlusData &state,
                                  std::unordered_map<std::string, std::string> &names,
-                                 std::string &object_name,
+                                 std::string const &object_name,
                                  std::string_view object_type,
                                  std::string_view field_name,
                                  bool &ErrorsFound)
@@ -98,10 +98,10 @@ bool VerifyUniqueInterObjectName(EnergyPlusData &state,
     if (object_name.empty()) {
         ShowSevereError(state, format("E+ object type {} cannot have blank {} field", object_name, field_name));
         ErrorsFound = true;
-        object_name = "xxxxx";
+        // object_name = "xxxxx";
         return true;
     }
-    auto const &names_iter = names.find(object_name);
+    auto const names_iter = names.find(object_name);
     if (names_iter == names.end()) {
         names.emplace(object_name, object_type);
     } else {
@@ -114,17 +114,17 @@ bool VerifyUniqueInterObjectName(EnergyPlusData &state,
 
 bool VerifyUniqueInterObjectName(EnergyPlusData &state,
                                  std::unordered_map<std::string, std::string> &names,
-                                 std::string &object_name,
+                                 std::string const &object_name,
                                  std::string const &object_type,
                                  bool &ErrorsFound)
 {
     if (object_name.empty()) {
         ShowSevereError(state, format("E+ object type {} has a blank field", object_name));
         ErrorsFound = true;
-        object_name = "xxxxx";
+        // object_name = "xxxxx";
         return true;
     }
-    auto const &names_iter = names.find(object_name);
+    auto const names_iter = names.find(object_name);
     if (names_iter == names.end()) {
         names.emplace(object_name, object_type);
     } else {
@@ -136,7 +136,7 @@ bool VerifyUniqueInterObjectName(EnergyPlusData &state,
 }
 
 void VerifyUniqueChillerName(
-    EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    EnergyPlusData &state, std::string_view TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
 {
 
     // SUBROUTINE INFORMATION:
