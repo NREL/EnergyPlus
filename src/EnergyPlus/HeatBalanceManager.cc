@@ -58,7 +58,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -338,7 +337,7 @@ namespace HeatBalanceManager {
         if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
             print(state.files.eio, "{}\n", "! <Representative Surface Assignment>,Surface Name,Representative Surface Name");
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                auto &RepSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
+                int RepSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
                 if (SurfNum != RepSurfNum) {
                     print(state.files.eio,
                           " Representative Surface Assignment,{},{}\n",
@@ -816,7 +815,7 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             {
-                auto const SELECT_CASE_var(AlphaName(1));
+                std::string const &SELECT_CASE_var = AlphaName(1);
 
                 if (SELECT_CASE_var == "SIMPLE") {
                     state.dataHeatBal->DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
@@ -880,7 +879,7 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             {
-                auto const SELECT_CASE_var(AlphaName(1));
+                std::string const &SELECT_CASE_var = AlphaName(1);
 
                 if ((SELECT_CASE_var == "SIMPLECOMBINED")) {
                     state.dataHeatBal->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
@@ -937,7 +936,7 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             {
-                auto const SELECT_CASE_var(AlphaName(1));
+                std::string const &SELECT_CASE_var = AlphaName(1);
                 // The default is CTF
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF;
@@ -1056,7 +1055,7 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (NumAlpha > 0) {
                 {
-                    auto const SELECT_CASE_var(AlphaName(1));
+                    std::string const &SELECT_CASE_var = AlphaName(1);
                     if (SELECT_CASE_var == "THIRDORDERBACKWARDDIFFERENCE") {
                         state.dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
                         AlphaName(1) = "ThirdOrderBackwardDifference";
@@ -1122,7 +1121,7 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (NumAlpha > 0) {
                 {
-                    auto const SELECT_CASE_var(AlphaName(1));
+                    std::string const &SELECT_CASE_var = AlphaName(1);
                     if (SELECT_CASE_var == "YES") {
                         state.dataContaminantBalance->Contaminant.CO2Simulation = true;
                         state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
@@ -1157,7 +1156,7 @@ namespace HeatBalanceManager {
             }
             if (NumAlpha > 2) {
                 {
-                    auto const SELECT_CASE_var(AlphaName(3));
+                    std::string const &SELECT_CASE_var = AlphaName(3);
                     if (SELECT_CASE_var == "YES") {
                         state.dataContaminantBalance->Contaminant.GenericContamSimulation = true;
                         if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
@@ -1346,7 +1345,7 @@ namespace HeatBalanceManager {
             if (NumAlpha > 0) {
                 HVACSystemRootFinding.Algorithm = AlphaName(1);
                 {
-                    auto const SELECT_CASE_var(AlphaName(1));
+                    std::string const &SELECT_CASE_var = AlphaName(1);
                     if ((SELECT_CASE_var == "REGULAFALSI")) {
                         HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
                     } else if (SELECT_CASE_var == "BISECTION") {
@@ -1869,19 +1868,19 @@ namespace HeatBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
-                std::string construction_name{UtilityRoutines::MakeUPPERCase(fields.at("construction_name").get<std::string>())};
-                int source_after_layer_number{fields.at("thermal_source_present_after_layer_number")};
-                int calculation_after_layer_number{fields.at("temperature_calculation_requested_after_layer_number")};
-                int ctf_dimensions{fields.at("dimensions_for_the_ctf_calculation")};
+                std::string construction_name = UtilityRoutines::MakeUPPERCase(fields.at("construction_name").get<std::string>());
+                int source_after_layer_number = fields.at("thermal_source_present_after_layer_number").get<int>();
+                int calculation_after_layer_number = fields.at("temperature_calculation_requested_after_layer_number").get<int>();
+                int ctf_dimensions = fields.at("dimensions_for_the_ctf_calculation").get<int>();
                 if ((ctf_dimensions < 1) || (ctf_dimensions > 2)) {
                     ShowWarningError(state, "ConstructionProperty:InternalHeatSource must be either 1- or 2-D.  Reset to 1-D solution.");
                     ShowContinueError(state, format("Construction={} is affected.", construction_name));
                     ctf_dimensions = 1;
                 }
-                Real64 tube_spacing{fields.at("tube_spacing")};
-                Real64 calculation_position{fields.at("two_dimensional_temperature_calculation_position")};
+                Real64 tube_spacing = fields.at("tube_spacing").get<Real64>();
+                Real64 calculation_position = fields.at("two_dimensional_temperature_calculation_position").get<Real64>();
 
                 // Find the construction
                 int construction_index = UtilityRoutines::FindItemInList(construction_name, state.dataConstruction->Construct);
@@ -1898,7 +1897,7 @@ namespace HeatBalanceManager {
 
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(state.dataHeatBalMgr->CurrentModuleObject, instance.key());
 
-                auto &thisConstruct(state.dataConstruction->Construct(construction_index));
+                auto &thisConstruct = state.dataConstruction->Construct(construction_index);
 
                 // May need some additional validation of the construction here
                 if (thisConstruct.SourceSinkPresent) {
@@ -2677,7 +2676,7 @@ namespace HeatBalanceManager {
 
         if (NumAlphas > 1 && !state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             {
-                auto const SELECT_CASE_var(cAlphaArgs(2));
+                std::string const &SELECT_CASE_var = cAlphaArgs(2);
 
                 if (SELECT_CASE_var == "SIMPLE") {
                     state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
@@ -2710,7 +2709,7 @@ namespace HeatBalanceManager {
 
         if (NumAlphas > 2 && !state.dataIPShortCut->lAlphaFieldBlanks(3)) {
             {
-                auto const SELECT_CASE_var(cAlphaArgs(3));
+                std::string const &SELECT_CASE_var = cAlphaArgs(3);
 
                 if ((SELECT_CASE_var == "SIMPLECOMBINED")) {
                     state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
@@ -2837,8 +2836,8 @@ namespace HeatBalanceManager {
                 auto extensibles = objectFields.find("tags");
                 auto const &extensionSchemaProps = objectSchemaProps["tags"]["items"]["properties"];
                 if (extensibles != objectFields.end()) {
-                    auto extensiblesArray = extensibles.value();
-                    for (auto extensibleInstance : extensiblesArray) {
+                    auto &extensiblesArray = extensibles.value();
+                    for (auto &extensibleInstance : extensiblesArray) {
                         thisSpace.tags.emplace_back(ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "tag"));
                     }
                 }
@@ -2881,8 +2880,8 @@ namespace HeatBalanceManager {
                 auto extensibles = objectFields.find("spaces");
                 auto const &extensionSchemaProps = objectSchemaProps["spaces"]["items"]["properties"];
                 if (extensibles != objectFields.end()) {
-                    auto extensiblesArray = extensibles.value();
-                    for (auto extensibleInstance : extensiblesArray) {
+                    auto &extensiblesArray = extensibles.value();
+                    for (auto &extensibleInstance : extensiblesArray) {
                         std::string thisSpaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
                         int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
                         if (thisSpaceNum > 0) {
@@ -4251,7 +4250,7 @@ namespace HeatBalanceManager {
                 if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
 
-                const auto succeeded = readList(NextLine.data.substr(19),
+                const bool succeeded = readList(NextLine.data.substr(19),
                                                 WinHeight(IGlSys),
                                                 WinWidth(IGlSys),
                                                 NGlass(IGlSys),
@@ -4628,7 +4627,7 @@ namespace HeatBalanceManager {
 
             // these Construct arrays dimensioned based on MaxSolidWinLayers
             for (int i = (state.dataHeatBal->TotConstructs - NGlSys + 1); i <= state.dataHeatBal->TotConstructs; ++i) {
-                auto &e(state.dataConstruction->Construct(i));
+                auto &e = state.dataConstruction->Construct(i);
                 e.setArraysBasedOnMaxSolidWinLayers(state);
             }
 
@@ -5320,7 +5319,7 @@ namespace HeatBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                auto thisObjectName = instance.key();
+                std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
                 if (GlobalNames::VerifyUniqueInterObjectName(
@@ -6316,7 +6315,7 @@ namespace HeatBalanceManager {
             state.dataMaterial->ComplexShade(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
             {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
+                std::string const &SELECT_CASE_var = state.dataIPShortCut->cAlphaArgs(2);
 
                 if (SELECT_CASE_var == "OTHERSHADINGTYPE") {
                     state.dataMaterial->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::DIFFSHADE;
@@ -6707,7 +6706,7 @@ namespace HeatBalanceManager {
             }
 
             {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
+                std::string const &SELECT_CASE_var = state.dataIPShortCut->cAlphaArgs(2);
                 if (SELECT_CASE_var == "ISO15099") {
                     state.dataMaterial->WindowThermalModel(Loop).CalculationStandard = TARCOGGassesParams::Stdrd::ISO15099;
                 } else if (SELECT_CASE_var == "EN673DECLARED") {
@@ -6730,7 +6729,7 @@ namespace HeatBalanceManager {
             }
 
             {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
+                std::string const &SELECT_CASE_var = state.dataIPShortCut->cAlphaArgs(3);
                 if (SELECT_CASE_var == "ISO15099") {
                     state.dataMaterial->WindowThermalModel(Loop).ThermalModel = TARCOGParams::TARCOGThermalModel::ISO15099;
                 } else if (SELECT_CASE_var == "SCALEDCAVITYWIDTH") {
@@ -6757,7 +6756,7 @@ namespace HeatBalanceManager {
             }
 
             {
-                auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
+                std::string const &SELECT_CASE_var = state.dataIPShortCut->cAlphaArgs(4);
                 if (SELECT_CASE_var == "NODEFLECTION") {
                     state.dataMaterial->WindowThermalModel(Loop).DeflectionModel = TARCOGParams::DeflectionCalculation::NONE;
                 } else if (SELECT_CASE_var == "TEMPERATUREANDPRESSUREINPUT") {
@@ -6881,7 +6880,7 @@ namespace HeatBalanceManager {
             // Construct(ConstrNum)%BSDFInput%ThermalConstruction = ThConstNum
 
             {
-                auto const SELECT_CASE_var(locAlphaArgs(2)); // Basis Type Keyword
+                std::string const &SELECT_CASE_var = locAlphaArgs(2); // Basis Type Keyword
                 if (SELECT_CASE_var == "LBNLWINDOW") {
                     thisConstruct.BSDFInput.BasisType = DataBSDFWindow::Basis::WINDOW;
                 } else if (SELECT_CASE_var == "USERDEFINED") {
@@ -6901,7 +6900,7 @@ namespace HeatBalanceManager {
             }
 
             {
-                auto const SELECT_CASE_var(locAlphaArgs(3)); // Basis Symmetry Keyword
+                std::string const &SELECT_CASE_var = locAlphaArgs(3); // Basis Symmetry Keyword
                 if (SELECT_CASE_var == "AXISYMMETRIC") {
                     thisConstruct.BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry::Axisymmetric;
                 } else if (SELECT_CASE_var == "NONE") {

@@ -5244,7 +5244,7 @@ namespace Furnaces {
         InNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
         OutNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
 
-        auto &Node(state.dataLoopNodes->Node);
+        auto &Node = state.dataLoopNodes->Node;
 
         if (state.dataFurnaces->InitFurnaceMyOneTimeFlag) {
             // initialize the environment and sizing flags
@@ -7083,7 +7083,7 @@ namespace Furnaces {
         state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
         //  OnOffAirFlowRatio = 1.0
 
-        auto &Node(state.dataLoopNodes->Node);
+        auto &Node = state.dataLoopNodes->Node;
         // Calculate the Cp Air of zone
         Real64 cpair = PsyCpAirFnW(Node(ControlZoneNode).HumRat);
 
@@ -7911,7 +7911,7 @@ namespace Furnaces {
                                                       false);
                                 }
                                 //           Now solve again with tighter PLR limits
-                                auto f =
+                                auto f = // (AUTO_OK_LAMBDA)
                                     [&state, FurnaceNum, FirstHVACIteration, OpMode, CompressorOp, SystemSensibleLoad](Real64 const PartLoadRatio) {
                                         return CalcFurnaceResidual(state,
                                                                    PartLoadRatio,
@@ -11170,7 +11170,7 @@ namespace Furnaces {
                     // Calculate the part load fraction
                     SpeedRatio = 0.0;
                     SpeedNum = 1;
-                    auto f =
+                    auto f = // (AUTO_OK_LAMBDA)
                         [&state, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](Real64 const PartLoadFrac) {
                             return VSHPCyclingResidual(
                                 state, PartLoadFrac, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp, 1.0);
@@ -11326,7 +11326,7 @@ namespace Furnaces {
                 Par[8] = static_cast<int>(CompressorOp);
                 Par[9] = 0.0;
                 if (SpeedNum < 2) {
-                    auto f =
+                    auto f = // (AUTO_OK_LAMBDA)
                         [&state, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](Real64 const PartLoadFrac) {
                             return VSHPCyclingResidual(
                                 state, PartLoadFrac, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp, 0.0);
@@ -12297,8 +12297,6 @@ namespace Furnaces {
         // na
 
         // Using/Aliasing
-        auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
-        auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
         using IntegratedHeatPump::GetAirMassFlowRateIHP;
         using IntegratedHeatPump::GetMaxSpeedNumIHP;
         using IntegratedHeatPump::IHPOperationMode;
@@ -12311,8 +12309,8 @@ namespace Furnaces {
         InletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
         OutNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
 
-        MSHPMassFlowRateLow = 0.0;  // Mass flow rate at low speed
-        MSHPMassFlowRateHigh = 0.0; // Mass flow rate at high speed
+        state.dataHVACGlobal->MSHPMassFlowRateLow = 0.0;  // Mass flow rate at low speed
+        state.dataHVACGlobal->MSHPMassFlowRateHigh = 0.0; // Mass flow rate at high speed
 
         if (state.dataFurnaces->Furnace(FurnaceNum).OpMode == ContFanCycCoil) {
             state.dataFurnaces->CompOffMassFlow = state.dataFurnaces->Furnace(FurnaceNum).IdleMassFlowRate;
@@ -12328,9 +12326,9 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling);
                 state.dataFurnaces->CompOnFlowRatio =
                     state.dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio(state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling);
-                MSHPMassFlowRateLow =
+                state.dataHVACGlobal->MSHPMassFlowRateLow =
                     state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling);
-                MSHPMassFlowRateHigh =
+                state.dataHVACGlobal->MSHPMassFlowRateHigh =
                     state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling);
             } else {
                 state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
@@ -12349,9 +12347,9 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating);
                 state.dataFurnaces->CompOnFlowRatio =
                     state.dataFurnaces->Furnace(FurnaceNum).MSHeatingSpeedRatio(state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating);
-                MSHPMassFlowRateLow =
+                state.dataHVACGlobal->MSHPMassFlowRateLow =
                     state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating);
-                MSHPMassFlowRateHigh =
+                state.dataHVACGlobal->MSHPMassFlowRateHigh =
                     state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating);
             } else {
                 state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirMassFlow;
@@ -12376,8 +12374,10 @@ namespace Furnaces {
                                           GetMaxSpeedNumIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex),
                                           1.0,
                                           false);
-                MSHPMassFlowRateLow = GetAirMassFlowRateIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, 0.0, false);
-                MSHPMassFlowRateHigh = GetAirMassFlowRateIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, 1.0, false);
+                state.dataHVACGlobal->MSHPMassFlowRateLow =
+                    GetAirMassFlowRateIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, 0.0, false);
+                state.dataHVACGlobal->MSHPMassFlowRateHigh =
+                    GetAirMassFlowRateIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, 1.0, false);
             }
 
             // Set up fan flow rate during compressor off time
@@ -12433,8 +12433,8 @@ namespace Furnaces {
                     if (SpeedNum == 1) {
                         state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(SpeedNum);
                         state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).MSHeatingSpeedRatio(SpeedNum);
-                        MSHPMassFlowRateLow = state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(1);
-                        MSHPMassFlowRateHigh = state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(1);
+                        state.dataHVACGlobal->MSHPMassFlowRateLow = state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(1);
+                        state.dataHVACGlobal->MSHPMassFlowRateHigh = state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(1);
                     } else if (SpeedNum > 1) {
                         state.dataFurnaces->CompOnMassFlow =
                             SpeedRatio * state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(SpeedNum) +
@@ -12442,15 +12442,15 @@ namespace Furnaces {
                         state.dataFurnaces->CompOnFlowRatio =
                             SpeedRatio * state.dataFurnaces->Furnace(FurnaceNum).MSHeatingSpeedRatio(SpeedNum) +
                             (1.0 - SpeedRatio) * state.dataFurnaces->Furnace(FurnaceNum).MSHeatingSpeedRatio(SpeedNum - 1);
-                        MSHPMassFlowRateLow = state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(SpeedNum - 1);
-                        MSHPMassFlowRateHigh = state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(SpeedNum);
+                        state.dataHVACGlobal->MSHPMassFlowRateLow = state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(SpeedNum - 1);
+                        state.dataHVACGlobal->MSHPMassFlowRateHigh = state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(SpeedNum);
                     }
                 } else if (state.dataFurnaces->Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::CoolingMode) {
                     if (SpeedNum == 1) {
                         state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(SpeedNum);
                         state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio(SpeedNum);
-                        MSHPMassFlowRateLow = state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(1);
-                        MSHPMassFlowRateHigh = state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(1);
+                        state.dataHVACGlobal->MSHPMassFlowRateLow = state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(1);
+                        state.dataHVACGlobal->MSHPMassFlowRateHigh = state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(1);
                     } else if (SpeedNum > 1) {
                         state.dataFurnaces->CompOnMassFlow =
                             SpeedRatio * state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(SpeedNum) +
@@ -12458,8 +12458,8 @@ namespace Furnaces {
                         state.dataFurnaces->CompOnFlowRatio =
                             SpeedRatio * state.dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio(SpeedNum) +
                             (1.0 - SpeedRatio) * state.dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio(SpeedNum - 1);
-                        MSHPMassFlowRateLow = state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(SpeedNum - 1);
-                        MSHPMassFlowRateHigh = state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(SpeedNum);
+                        state.dataHVACGlobal->MSHPMassFlowRateLow = state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(SpeedNum - 1);
+                        state.dataHVACGlobal->MSHPMassFlowRateHigh = state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(SpeedNum);
                     }
                 }
             }

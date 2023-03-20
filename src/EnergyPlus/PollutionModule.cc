@@ -278,7 +278,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
         FuelType.FuelTypeNames(Loop) = state.dataIPShortCut->cAlphaArgs(1);
 
         {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelType.FuelTypeNames(Loop)));
+            std::string const &SELECT_CASE_var = FuelType.FuelTypeNames(Loop);
             if (SELECT_CASE_var == "NATURALGAS") {
                 if (Pollution.NatGasCoef.FuelFactorUsed) {
                     ShowWarningError(
@@ -2184,7 +2184,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
         if (FuelType.FuelTypeNames(Loop).empty()) continue;
 
         {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelType.FuelTypeNames(Loop)));
+            std::string const &SELECT_CASE_var = FuelType.FuelTypeNames(Loop);
             if (SELECT_CASE_var == "NATURALGAS") {
                 // Pollutants from Natural Gas
                 SetupOutputVariable(state,

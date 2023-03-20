@@ -425,10 +425,9 @@ int ArgCheck(EnergyPlusData &state,
             return ArgCheck;
         }
 
-        if (BITF_TEST_NONE(BITF(LayerType(i)),
-                           BITF(TARCOGLayerType::SPECULAR) | BITF(TARCOGLayerType::WOVSHADE) | BITF(TARCOGLayerType::VENETBLIND_HORIZ) |
-                               BITF(TARCOGLayerType::PERFORATED) | BITF(TARCOGLayerType::DIFFSHADE) | BITF(TARCOGLayerType::BSDF) |
-                               BITF(TARCOGLayerType::VENETBLIND_VERT)))
+        if (LayerType(i) != TARCOGLayerType::SPECULAR && LayerType(i) != TARCOGLayerType::WOVSHADE &&
+            LayerType(i) != TARCOGLayerType::VENETBLIND_HORIZ && LayerType(i) != TARCOGLayerType::PERFORATED &&
+            LayerType(i) != TARCOGLayerType::DIFFSHADE && LayerType(i) != TARCOGLayerType::BSDF && LayerType(i) != TARCOGLayerType::VENETBLIND_VERT)
 
         {
             ArgCheck = 22;
