@@ -2228,8 +2228,6 @@ void CreateDefaultComputation(EnergyPlusData &state)
     //    depends on and a list of entries that are dependant on that
     //    line.
 
-    auto &econVar = state.dataEconTariff->econVar;
-
     // for each tariff that does not have a UtilityCost:Computation object go through the variables
     for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
         auto &tariff = state.dataEconTariff->tariff(iTariff);
@@ -2237,11 +2235,11 @@ void CreateDefaultComputation(EnergyPlusData &state)
         if (!computation.isUserDef) {
             // clear all variables so that they are not active
             for (int jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
-                econVar(jVar).activeNow = false;
+                state.dataEconTariff->econVar(jVar).activeNow = false;
             }
             // make all native variables active
             for (int jVar = tariff.firstNative; jVar <= tariff.lastNative; ++jVar) {
-                econVar(jVar).activeNow = true;
+                state.dataEconTariff->econVar(jVar).activeNow = true;
             }
             //"clear" the dependOn array
             state.dataEconTariff->numOperand = 0;
@@ -2250,19 +2248,19 @@ void CreateDefaultComputation(EnergyPlusData &state)
             int curSubtotal = tariff.ptSubtotal;
             int curBasis = tariff.ptBasis;
             // total SUM subtotal taxes
-            econVar(curTotal).Operator = opSUM;
-            econVar(curTotal).activeNow = true;
+            state.dataEconTariff->econVar(curTotal).Operator = opSUM;
+            state.dataEconTariff->econVar(curTotal).activeNow = true;
             addOperand(state, curTotal, curSubtotal);
             addOperand(state, curTotal, tariff.ptTaxes);
             // subtotal SUM basis adjustments surcharges
-            econVar(curSubtotal).Operator = opSUM;
-            econVar(curSubtotal).activeNow = true;
+            state.dataEconTariff->econVar(curSubtotal).Operator = opSUM;
+            state.dataEconTariff->econVar(curSubtotal).activeNow = true;
             addOperand(state, curSubtotal, curBasis);
             addOperand(state, curSubtotal, tariff.ptAdjustment);
             addOperand(state, curSubtotal, tariff.ptSurcharge);
             // basis SUM EnergyCharges DemandCharges ServiceCharges
-            econVar(curBasis).Operator = opSUM;
-            econVar(curBasis).activeNow = true;
+            state.dataEconTariff->econVar(curBasis).Operator = opSUM;
+            state.dataEconTariff->econVar(curBasis).activeNow = true;
             addOperand(state, curBasis, tariff.ptEnergyCharges);
             addOperand(state, curBasis, tariff.ptDemandCharges);
             addOperand(state, curBasis, tariff.ptServiceCharges);
@@ -2284,8 +2282,8 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 auto const &qualify = state.dataEconTariff->qualify(kObj);
                 if (qualify.tariffIndx == iTariff) {
                     int curObject = qualify.namePt;
-                    econVar(curObject).Operator = opNOOP;
-                    econVar(curObject).activeNow = true;
+                    state.dataEconTariff->econVar(curObject).Operator = opNOOP;
+                    state.dataEconTariff->econVar(curObject).activeNow = true;
                     addOperand(state, curObject, qualify.sourcePt);
                     addOperand(state, curObject, qualify.thresholdPt);
                 }
@@ -2295,8 +2293,8 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 auto const &ratchet = state.dataEconTariff->ratchet(kObj);
                 if (ratchet.tariffIndx == iTariff) {
                     int curObject = ratchet.namePt;
-                    econVar(curObject).Operator = opNOOP;
-                    econVar(curObject).activeNow = true;
+                    state.dataEconTariff->econVar(curObject).Operator = opNOOP;
+                    state.dataEconTariff->econVar(curObject).activeNow = true;
                     addOperand(state, curObject, ratchet.baselinePt);
                     addOperand(state, curObject, ratchet.adjustmentPt);
                     addOperand(state, curObject, ratchet.multiplierPt);
@@ -2308,8 +2306,8 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 auto const &chargeSimple = state.dataEconTariff->chargeSimple(kObj);
                 if (chargeSimple.tariffIndx == iTariff) {
                     int curObject = chargeSimple.namePt;
-                    econVar(curObject).Operator = opNOOP;
-                    econVar(curObject).activeNow = true;
+                    state.dataEconTariff->econVar(curObject).Operator = opNOOP;
+                    state.dataEconTariff->econVar(curObject).activeNow = true;
                     addOperand(state, curObject, chargeSimple.sourcePt);
                     addOperand(state, curObject, chargeSimple.costPerPt);
                 }
@@ -2319,8 +2317,8 @@ void CreateDefaultComputation(EnergyPlusData &state)
                 auto const &chargeBlock = state.dataEconTariff->chargeBlock(kObj);
                 if (chargeBlock.tariffIndx == iTariff) {
                     int curObject = chargeBlock.namePt;
-                    econVar(curObject).Operator = opNOOP;
-                    econVar(curObject).activeNow = true;
+                    state.dataEconTariff->econVar(curObject).Operator = opNOOP;
+                    state.dataEconTariff->econVar(curObject).activeNow = true;
                     addOperand(state, curObject, chargeBlock.sourcePt);
                     addOperand(state, curObject, chargeBlock.blkSzMultPt);
                     for (int mBlock = 1; mBlock <= chargeBlock.numBlk; ++mBlock) {
@@ -2330,8 +2328,8 @@ void CreateDefaultComputation(EnergyPlusData &state)
                     // now add a new "equation" for dependency of remainingPt on namePt
                     int remainPt = chargeBlock.remainingPt;
                     if (remainPt > 0) {
-                        econVar(remainPt).Operator = opNOOP;
-                        econVar(remainPt).activeNow = true;
+                        state.dataEconTariff->econVar(remainPt).Operator = opNOOP;
+                        state.dataEconTariff->econVar(remainPt).activeNow = true;
                         addOperand(state, remainPt, curObject);
                     }
                 }
@@ -2339,9 +2337,9 @@ void CreateDefaultComputation(EnergyPlusData &state)
             // Economic:Variable
             // make all of the user defined variables as active
             for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
-                if (econVar(iVar).tariffIndx == iTariff) {
-                    if (econVar(iVar).kindOfObj == ObjType::Variable) {
-                        econVar(iVar).activeNow = true;
+                if (state.dataEconTariff->econVar(iVar).tariffIndx == iTariff) {
+                    if (state.dataEconTariff->econVar(iVar).kindOfObj == ObjType::Variable) {
+                        state.dataEconTariff->econVar(iVar).activeNow = true;
                     }
                 }
             }
@@ -2359,13 +2357,14 @@ void CreateDefaultComputation(EnergyPlusData &state)
             // to do a topological sort of the variables into the order for computation
             // First, clear the counters
             for (int jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
-                econVar(jVar).cntMeDependOn = 0;
+                state.dataEconTariff->econVar(jVar).cntMeDependOn = 0;
             }
             // Second, add up the number of dependancies on each variable
             for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
-                if (econVar(iVar).activeNow) {
-                    if (econVar(iVar).lastOperand >= econVar(iVar).firstOperand) {
-                        econVar(iVar).cntMeDependOn = 1 + econVar(iVar).lastOperand - econVar(iVar).firstOperand;
+                if (state.dataEconTariff->econVar(iVar).activeNow) {
+                    if (state.dataEconTariff->econVar(iVar).lastOperand >= state.dataEconTariff->econVar(iVar).firstOperand) {
+                        state.dataEconTariff->econVar(iVar).cntMeDependOn =
+                            1 + state.dataEconTariff->econVar(iVar).lastOperand - state.dataEconTariff->econVar(iVar).firstOperand;
                     }
                 }
             }
@@ -2376,22 +2375,25 @@ void CreateDefaultComputation(EnergyPlusData &state)
             while ((numNoDepend != 0) || (loopCount > 100000)) {
                 numNoDepend = 0;
                 for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
-                    if (econVar(iVar).activeNow) {
+                    if (state.dataEconTariff->econVar(iVar).activeNow) {
                         // find a variable that has no more dangling dependancies
-                        if (econVar(iVar).cntMeDependOn == 0) {
+                        if (state.dataEconTariff->econVar(iVar).cntMeDependOn == 0) {
                             // If the variable is a native variable then
                             // IF (econVar(iVar)%kindOfObj .NE. iEconVarObjType::Native) THEN
-                            if ((econVar(iVar).kindOfObj != ObjType::Native) && (econVar(iVar).kindOfObj != ObjType::Variable)) {
-                                if (econVar(iVar).lastOperand >= econVar(iVar).firstOperand) {
+                            if ((state.dataEconTariff->econVar(iVar).kindOfObj != ObjType::Native) &&
+                                (state.dataEconTariff->econVar(iVar).kindOfObj != ObjType::Variable)) {
+                                if (state.dataEconTariff->econVar(iVar).lastOperand >= state.dataEconTariff->econVar(iVar).firstOperand) {
                                     // transfer variables and operator to the computation and list of steps
                                     // go through the operands backwards (end of line is evaluated first)
-                                    for (int kOperand = econVar(iVar).lastOperand; kOperand >= econVar(iVar).firstOperand; --kOperand) {
+                                    for (int kOperand = state.dataEconTariff->econVar(iVar).lastOperand;
+                                         kOperand >= state.dataEconTariff->econVar(iVar).firstOperand;
+                                         --kOperand) {
                                         incrementSteps(state);
                                         state.dataEconTariff->steps(state.dataEconTariff->numSteps) = state.dataEconTariff->operand(kOperand);
                                     }
                                     // append the operator (either SUM or NOOP)
                                     incrementSteps(state);
-                                    state.dataEconTariff->steps(state.dataEconTariff->numSteps) = econVar(iVar).Operator;
+                                    state.dataEconTariff->steps(state.dataEconTariff->numSteps) = state.dataEconTariff->econVar(iVar).Operator;
                                     // append the variable itself
                                     incrementSteps(state);
                                     state.dataEconTariff->steps(state.dataEconTariff->numSteps) = iVar;
@@ -2403,13 +2405,15 @@ void CreateDefaultComputation(EnergyPlusData &state)
                             // go through each other variable looking for places where this variable is used
                             // and decrement their counters.
                             for (int jVar = 1; jVar <= state.dataEconTariff->numEconVar; ++jVar) {
-                                if (econVar(jVar).activeNow) {
-                                    for (int kOperand = econVar(jVar).firstOperand; kOperand <= econVar(jVar).lastOperand; ++kOperand) {
+                                if (state.dataEconTariff->econVar(jVar).activeNow) {
+                                    for (int kOperand = state.dataEconTariff->econVar(jVar).firstOperand;
+                                         kOperand <= state.dataEconTariff->econVar(jVar).lastOperand;
+                                         ++kOperand) {
                                         int referVar = state.dataEconTariff->operand(kOperand);
                                         if (iVar == referVar) {
-                                            --econVar(jVar).cntMeDependOn;
+                                            --state.dataEconTariff->econVar(jVar).cntMeDependOn;
                                             // for each variable that has been decremented to zero increment the counter
-                                            if (econVar(jVar).cntMeDependOn <= 0) {
+                                            if (state.dataEconTariff->econVar(jVar).cntMeDependOn <= 0) {
                                                 ++numNoDepend;
                                             }
                                         }
@@ -2417,7 +2421,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
                                 }
                             }
                             // make the variable inactive
-                            econVar(iVar).activeNow = false;
+                            state.dataEconTariff->econVar(iVar).activeNow = false;
                         }
                     }
                 }
@@ -2430,7 +2434,7 @@ void CreateDefaultComputation(EnergyPlusData &state)
             // make sure that all variables associated with the tariff are included
             bool remainingVarFlag = false;
             for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
-                if (econVar(iVar).activeNow) {
+                if (state.dataEconTariff->econVar(iVar).activeNow) {
                     remainingVarFlag = true;
                 }
             }
@@ -2440,11 +2444,14 @@ void CreateDefaultComputation(EnergyPlusData &state)
                                         tariff.tariffName));
                 ShowContinueError(state, "  UtilityCost variables that may have invalid dependencies and the variables they are dependant on.");
                 for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
-                    if (econVar(iVar).tariffIndx == iTariff) {
-                        if (econVar(iVar).activeNow) {
-                            ShowContinueError(state, format("     {}", econVar(iVar).name));
-                            for (int kOperand = econVar(iVar).firstOperand; kOperand <= econVar(iVar).lastOperand; ++kOperand) {
-                                ShowContinueError(state, format("        ->  {}", econVar(state.dataEconTariff->operand(kOperand)).name));
+                    if (state.dataEconTariff->econVar(iVar).tariffIndx == iTariff) {
+                        if (state.dataEconTariff->econVar(iVar).activeNow) {
+                            ShowContinueError(state, format("     {}", state.dataEconTariff->econVar(iVar).name));
+                            for (int kOperand = state.dataEconTariff->econVar(iVar).firstOperand;
+                                 kOperand <= state.dataEconTariff->econVar(iVar).lastOperand;
+                                 ++kOperand) {
+                                ShowContinueError(
+                                    state, format("        ->  {}", state.dataEconTariff->econVar(state.dataEconTariff->operand(kOperand)).name));
                             }
                         }
                     }
@@ -2511,12 +2518,11 @@ void addChargesToOperand(EnergyPlusData &state, int const curTariff, int const c
     //   for the categories that are summations of ECONOMICS:CHARGES:BLOCK
     //   and ECONOMICS:CHARGES:SIMPLE
 
-    auto &econVar = state.dataEconTariff->econVar;
     auto const &chargeSimple = state.dataEconTariff->chargeSimple;
     auto const &chargeBlock = state.dataEconTariff->chargeBlock;
 
-    econVar(curPointer).Operator = opSUM;
-    econVar(curPointer).activeNow = true;
+    state.dataEconTariff->econVar(curPointer).Operator = opSUM;
+    state.dataEconTariff->econVar(curPointer).activeNow = true;
     for (int kObj = 1; kObj <= state.dataEconTariff->numChargeSimple; ++kObj) {
         if (chargeSimple(kObj).tariffIndx == curTariff) {
             if (chargeSimple(kObj).categoryPt == curPointer) {
@@ -2560,42 +2566,41 @@ void GatherForEconomics(EnergyPlusData &state)
     Real64 curRTPenergy;   // energy applied to real time price
     Real64 curRTPcost;     // cost for energy for current time
 
-    auto &tariff = state.dataEconTariff->tariff;
-
     if (state.dataEconTariff->numTariff >= 1) {
         for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+            auto &tariff = state.dataEconTariff->tariff(iTariff);
             // if the meter is defined get the value
-            if (tariff(iTariff).reportMeterIndx != 0) {
-                curInstantValue = GetCurrentMeterValue(state, tariff(iTariff).reportMeterIndx);
+            if (tariff.reportMeterIndx != 0) {
+                curInstantValue = GetCurrentMeterValue(state, tariff.reportMeterIndx);
             } else {
                 curInstantValue = 0.0;
             }
             // remember the demand is still energy over a period of time divided by the
             // length of time. This gathers the energy also.
-            tariff(iTariff).collectEnergy += curInstantValue;
-            tariff(iTariff).collectTime += state.dataGlobal->TimeStepZoneSec;
+            tariff.collectEnergy += curInstantValue;
+            tariff.collectTime += state.dataGlobal->TimeStepZoneSec;
             // added *SecInHour when adding RTP support August 2008
-            if (tariff(iTariff).collectTime >= tariff(iTariff).demWinTime * DataGlobalConstants::SecInHour) {
+            if (tariff.collectTime >= tariff.demWinTime * DataGlobalConstants::SecInHour) {
                 int curSeason;
                 int curMonth;
                 int curPeriod;
                 // get current value that has been converted into desired units
-                curDemand = tariff(iTariff).demandConv * tariff(iTariff).collectEnergy / tariff(iTariff).collectTime;
-                curEnergy = tariff(iTariff).energyConv * tariff(iTariff).collectEnergy;
+                curDemand = tariff.demandConv * tariff.collectEnergy / tariff.collectTime;
+                curEnergy = tariff.energyConv * tariff.collectEnergy;
                 // get the schedule values
                 // remember no confirmation of schedule values occurs prior to now
-                if (tariff(iTariff).seasonSchIndex != 0) {
-                    curSeason = GetCurrentScheduleValue(state, tariff(iTariff).seasonSchIndex);
+                if (tariff.seasonSchIndex != 0) {
+                    curSeason = GetCurrentScheduleValue(state, tariff.seasonSchIndex);
                 } else {
                     curSeason = 1;
                 }
-                if (tariff(iTariff).periodSchIndex != 0) {
-                    curPeriod = GetCurrentScheduleValue(state, tariff(iTariff).periodSchIndex);
+                if (tariff.periodSchIndex != 0) {
+                    curPeriod = GetCurrentScheduleValue(state, tariff.periodSchIndex);
                 } else {
                     curPeriod = 1;
                 }
-                if (tariff(iTariff).monthSchIndex != 0) {
-                    curMonth = GetCurrentScheduleValue(state, tariff(iTariff).monthSchIndex);
+                if (tariff.monthSchIndex != 0) {
+                    curMonth = GetCurrentScheduleValue(state, tariff.monthSchIndex);
                 } else {
                     // #7814 - Have to be careful with DST. tariff::seasonForMonth is overwritten at each timestep, and only the last value is
                     // retained, so make sure to capture the right one
@@ -2614,43 +2619,43 @@ void GatherForEconomics(EnergyPlusData &state)
                     }
                 }
                 if (isGood) {
-                    tariff(iTariff).seasonForMonth(curMonth) = curSeason;
-                    tariff(iTariff).gatherEnergy(curMonth, curPeriod) += curEnergy;
-                    if (tariff(iTariff).gatherDemand(curMonth, curPeriod) < curDemand) {
-                        tariff(iTariff).gatherDemand(curMonth, curPeriod) = curDemand;
+                    tariff.seasonForMonth(curMonth) = curSeason;
+                    tariff.gatherEnergy(curMonth, curPeriod) += curEnergy;
+                    if (tariff.gatherDemand(curMonth, curPeriod) < curDemand) {
+                        tariff.gatherDemand(curMonth, curPeriod) = curDemand;
                     }
                 } else {
-                    ShowWarningError(state, format("UtilityCost:Tariff: While gathering for: {}", tariff(iTariff).tariffName));
+                    ShowWarningError(state, format("UtilityCost:Tariff: While gathering for: {}", tariff.tariffName));
                     ShowContinueError(state, "Invalid schedule values - outside of range");
                 }
                 // Real Time Pricing
-                if (tariff(iTariff).chargeSchIndex != 0) {
-                    curRTPprice = GetCurrentScheduleValue(state, tariff(iTariff).chargeSchIndex);
+                if (tariff.chargeSchIndex != 0) {
+                    curRTPprice = GetCurrentScheduleValue(state, tariff.chargeSchIndex);
                     // if customer baseline load schedule is used, subtract that off of the
                     // current energy
-                    if (tariff(iTariff).baseUseSchIndex != 0) {
-                        curRTPbaseline = GetCurrentScheduleValue(state, tariff(iTariff).baseUseSchIndex);
+                    if (tariff.baseUseSchIndex != 0) {
+                        curRTPbaseline = GetCurrentScheduleValue(state, tariff.baseUseSchIndex);
                         curRTPenergy = curEnergy - curRTPbaseline;
                     } else {
                         curRTPenergy = curEnergy;
                     }
                     // calculate the real time cost for current times energy
                     curRTPcost = curRTPenergy * curRTPprice;
-                    tariff(iTariff).RTPcost(curMonth) += curRTPcost;
+                    tariff.RTPcost(curMonth) += curRTPcost;
                     if (curRTPcost > 0) {
-                        tariff(iTariff).RTPaboveBaseCost(curMonth) += curRTPcost;
+                        tariff.RTPaboveBaseCost(curMonth) += curRTPcost;
                     } else {
-                        tariff(iTariff).RTPbelowBaseCost(curMonth) += curRTPcost;
+                        tariff.RTPbelowBaseCost(curMonth) += curRTPcost;
                     }
                     if (curRTPenergy > 0) {
-                        tariff(iTariff).RTPaboveBaseEnergy(curMonth) += curRTPenergy;
+                        tariff.RTPaboveBaseEnergy(curMonth) += curRTPenergy;
                     } else {
-                        tariff(iTariff).RTPbelowBaseEnergy(curMonth) += curRTPenergy;
+                        tariff.RTPbelowBaseEnergy(curMonth) += curRTPenergy;
                     }
                 }
                 // reset the counters
-                tariff(iTariff).collectEnergy = 0.0;
-                tariff(iTariff).collectTime = 0.0;
+                tariff.collectEnergy = 0.0;
+                tariff.collectTime = 0.0;
             }
         }
     }
@@ -3187,18 +3192,16 @@ void evaluateChargeSimple(EnergyPlusData &state, int const usingVariable)
     Array1D<Real64> resultChg(MaxNumMonths);
     Array1D<Real64> seasonMask(MaxNumMonths);
 
-    auto &econVar = state.dataEconTariff->econVar;
-
-    int curTariff = econVar(usingVariable).tariffIndx;
+    int curTariff = state.dataEconTariff->econVar(usingVariable).tariffIndx;
     auto const &tariff = state.dataEconTariff->tariff(curTariff);
-    int indexInChg = econVar(usingVariable).index;
+    int indexInChg = state.dataEconTariff->econVar(usingVariable).index;
     auto const &chargeSimple = state.dataEconTariff->chargeSimple(indexInChg);
 
     // check the tariff - make sure they match
     if (chargeSimple.namePt != usingVariable) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. ChargeSimple index does not match variable pointer.");
-        ShowContinueError(state, format("   Between: {}", econVar(usingVariable).name));
-        ShowContinueError(state, format("       And: {}", econVar(chargeSimple.namePt).name));
+        ShowContinueError(state, format("   Between: {}", state.dataEconTariff->econVar(usingVariable).name));
+        ShowContinueError(state, format("       And: {}", state.dataEconTariff->econVar(chargeSimple.namePt).name));
     }
     if (chargeSimple.tariffIndx != curTariff) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. ChargeSimple index does not match tariff index.");
@@ -3206,10 +3209,10 @@ void evaluateChargeSimple(EnergyPlusData &state, int const usingVariable)
         ShowContinueError(state, format("       And: {}", state.dataEconTariff->tariff(chargeSimple.tariffIndx).tariffName));
     }
     // data from the Charge:Simple
-    sourceVals = econVar(chargeSimple.sourcePt).values;
+    sourceVals = state.dataEconTariff->econVar(chargeSimple.sourcePt).values;
     // determine if costPer should be based on variable or value
     if (chargeSimple.costPerPt != 0) {
-        costPer = econVar(chargeSimple.costPerPt).values;
+        costPer = state.dataEconTariff->econVar(chargeSimple.costPerPt).values;
     } else {
         costPer = chargeSimple.costPerVal;
     }
@@ -3217,13 +3220,13 @@ void evaluateChargeSimple(EnergyPlusData &state, int const usingVariable)
     {
         int const SELECT_CASE_var(chargeSimple.season);
         if (SELECT_CASE_var == seasonSummer) {
-            seasonMask = econVar(tariff.nativeIsSummer).values;
+            seasonMask = state.dataEconTariff->econVar(tariff.nativeIsSummer).values;
         } else if (SELECT_CASE_var == seasonWinter) {
-            seasonMask = econVar(tariff.nativeIsWinter).values;
+            seasonMask = state.dataEconTariff->econVar(tariff.nativeIsWinter).values;
         } else if (SELECT_CASE_var == seasonSpring) {
-            seasonMask = econVar(tariff.nativeIsSpring).values;
+            seasonMask = state.dataEconTariff->econVar(tariff.nativeIsSpring).values;
         } else if (SELECT_CASE_var == seasonFall) {
-            seasonMask = econVar(tariff.nativeIsAutumn).values;
+            seasonMask = state.dataEconTariff->econVar(tariff.nativeIsAutumn).values;
         } else if (SELECT_CASE_var == seasonAnnual) {
             seasonMask = 1.0; // all months are 1
         }
@@ -3231,9 +3234,9 @@ void evaluateChargeSimple(EnergyPlusData &state, int const usingVariable)
     // finally perform calculations
     resultChg = sourceVals * costPer * seasonMask;
     // store the cost in the name of the variable
-    econVar(usingVariable).values = resultChg;
+    state.dataEconTariff->econVar(usingVariable).values = resultChg;
     // set the flag that it has been evaluated so it won't be evaluated multiple times
-    econVar(usingVariable).isEvaluated = true;
+    state.dataEconTariff->econVar(usingVariable).isEvaluated = true;
 }
 
 void evaluateChargeBlock(EnergyPlusData &state, int const usingVariable)
@@ -3250,18 +3253,16 @@ void evaluateChargeBlock(EnergyPlusData &state, int const usingVariable)
     Array1D<Real64> curBlkCost(MaxNumMonths);
     Array1D<Real64> seasonMask(MaxNumMonths);
 
-    auto &econVar = state.dataEconTariff->econVar;
-
-    int curTariff = econVar(usingVariable).tariffIndx;
+    int curTariff = state.dataEconTariff->econVar(usingVariable).tariffIndx;
     auto const &tariff = state.dataEconTariff->tariff(curTariff);
-    int indexInChg = econVar(usingVariable).index;
+    int indexInChg = state.dataEconTariff->econVar(usingVariable).index;
     auto const &chargeBlock = state.dataEconTariff->chargeBlock(indexInChg);
 
     // check the tariff - make sure they match
     if (chargeBlock.namePt != usingVariable) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. chargeBlock index does not match variable pointer.");
-        ShowContinueError(state, format("   Between: {}", econVar(usingVariable).name));
-        ShowContinueError(state, format("       And: {}", econVar(chargeBlock.namePt).name));
+        ShowContinueError(state, format("   Between: {}", state.dataEconTariff->econVar(usingVariable).name));
+        ShowContinueError(state, format("       And: {}", state.dataEconTariff->econVar(chargeBlock.namePt).name));
     }
     if (chargeBlock.tariffIndx != curTariff) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. chargeBlock index does not match tariff index.");
@@ -3269,25 +3270,25 @@ void evaluateChargeBlock(EnergyPlusData &state, int const usingVariable)
         ShowContinueError(state, format("       And: {}", state.dataEconTariff->tariff(chargeBlock.tariffIndx).tariffName));
     }
     // data from the chargeBlock
-    sourceVals = econVar(chargeBlock.sourcePt).values;
+    sourceVals = state.dataEconTariff->econVar(chargeBlock.sourcePt).values;
     // find proper season mask
     {
         int const SELECT_CASE_var(chargeBlock.season);
         if (SELECT_CASE_var == seasonSummer) {
-            seasonMask = econVar(tariff.nativeIsSummer).values;
+            seasonMask = state.dataEconTariff->econVar(tariff.nativeIsSummer).values;
         } else if (SELECT_CASE_var == seasonWinter) {
-            seasonMask = econVar(tariff.nativeIsWinter).values;
+            seasonMask = state.dataEconTariff->econVar(tariff.nativeIsWinter).values;
         } else if (SELECT_CASE_var == seasonSpring) {
-            seasonMask = econVar(tariff.nativeIsSpring).values;
+            seasonMask = state.dataEconTariff->econVar(tariff.nativeIsSpring).values;
         } else if (SELECT_CASE_var == seasonFall) {
-            seasonMask = econVar(tariff.nativeIsAutumn).values;
+            seasonMask = state.dataEconTariff->econVar(tariff.nativeIsAutumn).values;
         } else if (SELECT_CASE_var == seasonAnnual) {
             seasonMask = 1.0; // all months are 1
         }
     }
     // get block size multiplier
     if (chargeBlock.blkSzMultPt != 0) {
-        blkSzMult = econVar(chargeBlock.blkSzMultPt).values;
+        blkSzMult = state.dataEconTariff->econVar(chargeBlock.blkSzMultPt).values;
     } else {
         blkSzMult = chargeBlock.blkSzMultVal;
     }
@@ -3298,12 +3299,12 @@ void evaluateChargeBlock(EnergyPlusData &state, int const usingVariable)
     // loop through the blocks performing calculations
     for (int iBlk = 1; iBlk <= chargeBlock.numBlk; ++iBlk) {
         if (chargeBlock.blkSzPt(iBlk) != 0) {
-            curBlkSz = econVar(chargeBlock.blkSzPt(iBlk)).values;
+            curBlkSz = state.dataEconTariff->econVar(chargeBlock.blkSzPt(iBlk)).values;
         } else {
             curBlkSz = chargeBlock.blkSzVal(iBlk);
         }
         if (chargeBlock.blkCostPt(iBlk) != 0) {
-            curBlkCost = econVar(chargeBlock.blkCostPt(iBlk)).values;
+            curBlkCost = state.dataEconTariff->econVar(chargeBlock.blkCostPt(iBlk)).values;
         } else {
             curBlkCost = chargeBlock.blkCostVal(iBlk);
         }
@@ -3327,7 +3328,7 @@ void evaluateChargeBlock(EnergyPlusData &state, int const usingVariable)
     }
     // store the amount remaining if a variable is specified
     if (chargeBlock.remainingPt != 0) {
-        econVar(chargeBlock.remainingPt).values = remainVals;
+        state.dataEconTariff->econVar(chargeBlock.remainingPt).values = remainVals;
     } else {
         bool flagAllZero = true;
         for (int jMonth = 1; jMonth <= MaxNumMonths; ++jMonth) {
@@ -3339,13 +3340,14 @@ void evaluateChargeBlock(EnergyPlusData &state, int const usingVariable)
         }
         if (!flagAllZero) {
             ShowWarningError(state,
-                             format("UtilityCost:Tariff Not all energy or demand was assigned in the block charge: {}", econVar(usingVariable).name));
+                             format("UtilityCost:Tariff Not all energy or demand was assigned in the block charge: {}",
+                                    state.dataEconTariff->econVar(usingVariable).name));
         }
     }
     // store the cost in the name of the variable
-    econVar(usingVariable).values = resultChg;
+    state.dataEconTariff->econVar(usingVariable).values = resultChg;
     // set the flag that it has been evaluated so it won't be evaluated multiple times
-    econVar(usingVariable).isEvaluated = true;
+    state.dataEconTariff->econVar(usingVariable).isEvaluated = true;
 }
 
 void evaluateRatchet(EnergyPlusData &state, int const usingVariable)
@@ -3649,21 +3651,20 @@ void checkMinimumMonthlyCharge(EnergyPlusData &state, int const curTariff)
     //    Check if the total is as big as the minimum monthly charge
 
     auto const &tariff = state.dataEconTariff->tariff(curTariff);
-    auto &econVar = state.dataEconTariff->econVar;
 
     int totalVar = tariff.ptTotal;
     int minMonVar = tariff.minMonthChgPt;
     // if a variable is defined use that
     if (minMonVar != 0) {
         for (int iMonth = 1; iMonth <= MaxNumMonths; ++iMonth) {
-            if (econVar(totalVar).values(iMonth) < econVar(minMonVar).values(iMonth)) {
-                econVar(totalVar).values(iMonth) = econVar(minMonVar).values(iMonth);
+            if (state.dataEconTariff->econVar(totalVar).values(iMonth) < state.dataEconTariff->econVar(minMonVar).values(iMonth)) {
+                state.dataEconTariff->econVar(totalVar).values(iMonth) = state.dataEconTariff->econVar(minMonVar).values(iMonth);
             }
         }
     } else { // use the constant value
         for (int iMonth = 1; iMonth <= MaxNumMonths; ++iMonth) {
-            if (econVar(totalVar).values(iMonth) < tariff.minMonthChgVal) {
-                econVar(totalVar).values(iMonth) = tariff.minMonthChgVal;
+            if (state.dataEconTariff->econVar(totalVar).values(iMonth) < tariff.minMonthChgVal) {
+                state.dataEconTariff->econVar(totalVar).values(iMonth) = tariff.minMonthChgVal;
             }
         }
     }
@@ -3680,8 +3681,6 @@ void setNativeVariables(EnergyPlusData &state)
     Array1D<Real64> monthVal(MaxNumMonths);
     Real64 bigNumber(0.0); // Autodesk Value not used but suppresses warning about HUGE_() call
 
-    auto &econVar = state.dataEconTariff->econVar;
-
     bigNumber = HUGE_(bigNumber);
     for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
         auto &tariff = state.dataEconTariff->tariff(iTariff);
@@ -3692,7 +3691,7 @@ void setNativeVariables(EnergyPlusData &state)
                 monthVal(kMonth) += tariff.gatherEnergy(kMonth, jPeriod);
             }
         }
-        econVar(tariff.nativeTotalEnergy).values = monthVal;
+        state.dataEconTariff->econVar(tariff.nativeTotalEnergy).values = monthVal;
         // nativeTotalDemand
         monthVal = -bigNumber;
         for (int jPeriod = 1; jPeriod <= countPeriod; ++jPeriod) {
@@ -3708,148 +3707,148 @@ void setNativeVariables(EnergyPlusData &state)
                 monthVal(kMonth) = 0.0;
             }
         }
-        econVar(tariff.nativeTotalDemand).values = monthVal;
+        state.dataEconTariff->econVar(tariff.nativeTotalDemand).values = monthVal;
         for (int kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
             // nativePeakEnergy
-            econVar(tariff.nativePeakEnergy).values(kMonth) = tariff.gatherEnergy(kMonth, periodPeak);
+            state.dataEconTariff->econVar(tariff.nativePeakEnergy).values(kMonth) = tariff.gatherEnergy(kMonth, periodPeak);
             // nativePeakDemand
-            econVar(tariff.nativePeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodPeak);
+            state.dataEconTariff->econVar(tariff.nativePeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodPeak);
             // nativeShoulderEnergy
-            econVar(tariff.nativeShoulderEnergy).values(kMonth) = tariff.gatherEnergy(kMonth, periodShoulder);
+            state.dataEconTariff->econVar(tariff.nativeShoulderEnergy).values(kMonth) = tariff.gatherEnergy(kMonth, periodShoulder);
             // nativeShoulderDemand
-            econVar(tariff.nativeShoulderDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodShoulder);
+            state.dataEconTariff->econVar(tariff.nativeShoulderDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodShoulder);
             // nativeOffPeakEnergy
-            econVar(tariff.nativeOffPeakEnergy).values(kMonth) = tariff.gatherEnergy(kMonth, periodOffPeak);
+            state.dataEconTariff->econVar(tariff.nativeOffPeakEnergy).values(kMonth) = tariff.gatherEnergy(kMonth, periodOffPeak);
             // nativeOffPeakDemand
-            econVar(tariff.nativeOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodOffPeak);
+            state.dataEconTariff->econVar(tariff.nativeOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodOffPeak);
             // nativeMidPeakEnergy
-            econVar(tariff.nativeMidPeakEnergy).values(kMonth) = tariff.gatherEnergy(kMonth, periodMidPeak);
+            state.dataEconTariff->econVar(tariff.nativeMidPeakEnergy).values(kMonth) = tariff.gatherEnergy(kMonth, periodMidPeak);
             // nativeMidPeakDemand
-            econVar(tariff.nativeMidPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodMidPeak);
+            state.dataEconTariff->econVar(tariff.nativeMidPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodMidPeak);
             // nativePeakExceedsOffPeak
             monthVal(kMonth) = tariff.gatherDemand(kMonth, periodPeak) - tariff.gatherDemand(kMonth, periodOffPeak);
             if (monthVal(kMonth) > 0) {
-                econVar(tariff.nativePeakExceedsOffPeak).values(kMonth) = monthVal(kMonth);
+                state.dataEconTariff->econVar(tariff.nativePeakExceedsOffPeak).values(kMonth) = monthVal(kMonth);
             } else {
-                econVar(tariff.nativePeakExceedsOffPeak).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativePeakExceedsOffPeak).values(kMonth) = 0.0;
             }
             // nativeOffPeakExceedsPeak
             monthVal(kMonth) = tariff.gatherDemand(kMonth, periodOffPeak) - tariff.gatherDemand(kMonth, periodPeak);
             if (monthVal(kMonth) > 0) {
-                econVar(tariff.nativeOffPeakExceedsPeak).values(kMonth) = monthVal(kMonth);
+                state.dataEconTariff->econVar(tariff.nativeOffPeakExceedsPeak).values(kMonth) = monthVal(kMonth);
             } else {
-                econVar(tariff.nativeOffPeakExceedsPeak).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativeOffPeakExceedsPeak).values(kMonth) = 0.0;
             }
             // nativePeakExceedsMidPeak
             monthVal(kMonth) = tariff.gatherDemand(kMonth, periodPeak) - tariff.gatherDemand(kMonth, periodMidPeak);
             if (monthVal(kMonth) > 0) {
-                econVar(tariff.nativePeakExceedsMidPeak).values(kMonth) = monthVal(kMonth);
+                state.dataEconTariff->econVar(tariff.nativePeakExceedsMidPeak).values(kMonth) = monthVal(kMonth);
             } else {
-                econVar(tariff.nativePeakExceedsOffPeak).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativePeakExceedsOffPeak).values(kMonth) = 0.0;
             }
             // nativeMidPeakExceedsPeak
             monthVal(kMonth) = tariff.gatherDemand(kMonth, periodMidPeak) - tariff.gatherDemand(kMonth, periodPeak);
             if (monthVal(kMonth) > 0) {
-                econVar(tariff.nativeMidPeakExceedsPeak).values(kMonth) = monthVal(kMonth);
+                state.dataEconTariff->econVar(tariff.nativeMidPeakExceedsPeak).values(kMonth) = monthVal(kMonth);
             } else {
-                econVar(tariff.nativeMidPeakExceedsPeak).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativeMidPeakExceedsPeak).values(kMonth) = 0.0;
             }
             // nativePeakExceedsShoulder
             monthVal(kMonth) = tariff.gatherDemand(kMonth, periodPeak) - tariff.gatherDemand(kMonth, periodShoulder);
             if (monthVal(kMonth) > 0) {
-                econVar(tariff.nativePeakExceedsShoulder).values(kMonth) = monthVal(kMonth);
+                state.dataEconTariff->econVar(tariff.nativePeakExceedsShoulder).values(kMonth) = monthVal(kMonth);
             } else {
-                econVar(tariff.nativePeakExceedsShoulder).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativePeakExceedsShoulder).values(kMonth) = 0.0;
             }
             // nativeShoulderExceedsPeak
             monthVal(kMonth) = tariff.gatherDemand(kMonth, periodShoulder) - tariff.gatherDemand(kMonth, periodPeak);
             if (monthVal(kMonth) > 0) {
-                econVar(tariff.nativeShoulderExceedsPeak).values(kMonth) = monthVal(kMonth);
+                state.dataEconTariff->econVar(tariff.nativeShoulderExceedsPeak).values(kMonth) = monthVal(kMonth);
             } else {
-                econVar(tariff.nativeShoulderExceedsPeak).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativeShoulderExceedsPeak).values(kMonth) = 0.0;
             }
             // nativeIsWinter
             // nativeIsNotWinter
             if (tariff.seasonForMonth(kMonth) == seasonWinter) {
-                econVar(tariff.nativeIsWinter).values(kMonth) = 1.0;
-                econVar(tariff.nativeIsNotWinter).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativeIsWinter).values(kMonth) = 1.0;
+                state.dataEconTariff->econVar(tariff.nativeIsNotWinter).values(kMonth) = 0.0;
             } else {
-                econVar(tariff.nativeIsWinter).values(kMonth) = 0.0;
-                econVar(tariff.nativeIsNotWinter).values(kMonth) = 1.0;
+                state.dataEconTariff->econVar(tariff.nativeIsWinter).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativeIsNotWinter).values(kMonth) = 1.0;
             }
             // nativeIsSpring
             // nativeIsNotSpring
             if (tariff.seasonForMonth(kMonth) == seasonSpring) {
-                econVar(tariff.nativeIsSpring).values(kMonth) = 1.0;
-                econVar(tariff.nativeIsNotSpring).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativeIsSpring).values(kMonth) = 1.0;
+                state.dataEconTariff->econVar(tariff.nativeIsNotSpring).values(kMonth) = 0.0;
             } else {
-                econVar(tariff.nativeIsSpring).values(kMonth) = 0.0;
-                econVar(tariff.nativeIsNotSpring).values(kMonth) = 1.0;
+                state.dataEconTariff->econVar(tariff.nativeIsSpring).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativeIsNotSpring).values(kMonth) = 1.0;
             }
             // nativeIsSummer
             // nativeIsNotSummer
             if (tariff.seasonForMonth(kMonth) == seasonSummer) {
-                econVar(tariff.nativeIsSummer).values(kMonth) = 1.0;
-                econVar(tariff.nativeIsNotSummer).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativeIsSummer).values(kMonth) = 1.0;
+                state.dataEconTariff->econVar(tariff.nativeIsNotSummer).values(kMonth) = 0.0;
             } else {
-                econVar(tariff.nativeIsSummer).values(kMonth) = 0.0;
-                econVar(tariff.nativeIsNotSummer).values(kMonth) = 1.0;
+                state.dataEconTariff->econVar(tariff.nativeIsSummer).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativeIsNotSummer).values(kMonth) = 1.0;
             }
             // nativeIsAutumn
             // nativeIsNotAutumn
             if (tariff.seasonForMonth(kMonth) == seasonFall) {
-                econVar(tariff.nativeIsAutumn).values(kMonth) = 1.0;
-                econVar(tariff.nativeIsNotAutumn).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativeIsAutumn).values(kMonth) = 1.0;
+                state.dataEconTariff->econVar(tariff.nativeIsNotAutumn).values(kMonth) = 0.0;
             } else {
-                econVar(tariff.nativeIsAutumn).values(kMonth) = 0.0;
-                econVar(tariff.nativeIsNotAutumn).values(kMonth) = 1.0;
+                state.dataEconTariff->econVar(tariff.nativeIsAutumn).values(kMonth) = 0.0;
+                state.dataEconTariff->econVar(tariff.nativeIsNotAutumn).values(kMonth) = 1.0;
             }
             // nativePeakAndShoulderEnergy
-            econVar(tariff.nativePeakAndShoulderEnergy).values(kMonth) =
+            state.dataEconTariff->econVar(tariff.nativePeakAndShoulderEnergy).values(kMonth) =
                 tariff.gatherEnergy(kMonth, periodPeak) + tariff.gatherEnergy(kMonth, periodShoulder);
             // nativePeakAndShoulderDemand
             if (tariff.gatherDemand(kMonth, periodPeak) > tariff.gatherDemand(kMonth, periodShoulder)) {
-                econVar(tariff.nativePeakAndShoulderDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodPeak);
+                state.dataEconTariff->econVar(tariff.nativePeakAndShoulderDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodPeak);
             } else {
-                econVar(tariff.nativePeakAndShoulderDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodShoulder);
+                state.dataEconTariff->econVar(tariff.nativePeakAndShoulderDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodShoulder);
             }
             // nativePeakAndMidPeakEnergy
-            econVar(tariff.nativePeakAndMidPeakEnergy).values(kMonth) =
+            state.dataEconTariff->econVar(tariff.nativePeakAndMidPeakEnergy).values(kMonth) =
                 tariff.gatherEnergy(kMonth, periodPeak) + tariff.gatherEnergy(kMonth, periodMidPeak);
             // nativePeakAndMidPeakDemand
             if (tariff.gatherDemand(kMonth, periodPeak) > tariff.gatherDemand(kMonth, periodMidPeak)) {
-                econVar(tariff.nativePeakAndMidPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodPeak);
+                state.dataEconTariff->econVar(tariff.nativePeakAndMidPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodPeak);
             } else {
-                econVar(tariff.nativePeakAndMidPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodMidPeak);
+                state.dataEconTariff->econVar(tariff.nativePeakAndMidPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodMidPeak);
             }
             // nativeShoulderAndOffPeakEnergy
-            econVar(tariff.nativeShoulderAndOffPeakEnergy).values(kMonth) =
+            state.dataEconTariff->econVar(tariff.nativeShoulderAndOffPeakEnergy).values(kMonth) =
                 tariff.gatherEnergy(kMonth, periodShoulder) + tariff.gatherEnergy(kMonth, periodOffPeak);
             // nativeShoulderAndOffPeakDemand
             if (tariff.gatherDemand(kMonth, periodShoulder) > tariff.gatherDemand(kMonth, periodOffPeak)) {
-                econVar(tariff.nativeShoulderAndOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodShoulder);
+                state.dataEconTariff->econVar(tariff.nativeShoulderAndOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodShoulder);
             } else {
-                econVar(tariff.nativeShoulderAndOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodOffPeak);
+                state.dataEconTariff->econVar(tariff.nativeShoulderAndOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodOffPeak);
             }
             // nativePeakAndOffPeakEnergy
-            econVar(tariff.nativePeakAndOffPeakEnergy).values(kMonth) =
+            state.dataEconTariff->econVar(tariff.nativePeakAndOffPeakEnergy).values(kMonth) =
                 tariff.gatherEnergy(kMonth, periodPeak) + tariff.gatherEnergy(kMonth, periodOffPeak);
             // nativePeakAndOffPeakDemand
             if (tariff.gatherDemand(kMonth, periodPeak) > tariff.gatherDemand(kMonth, periodOffPeak)) {
-                econVar(tariff.nativePeakAndOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodPeak);
+                state.dataEconTariff->econVar(tariff.nativePeakAndOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodPeak);
             } else {
-                econVar(tariff.nativePeakAndOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodOffPeak);
+                state.dataEconTariff->econVar(tariff.nativePeakAndOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodOffPeak);
             }
             // nativeRealTimePriceCosts
-            econVar(tariff.nativeRealTimePriceCosts).values(kMonth) = tariff.RTPcost(kMonth);
+            state.dataEconTariff->econVar(tariff.nativeRealTimePriceCosts).values(kMonth) = tariff.RTPcost(kMonth);
             // nativeAboveCustomerBaseCosts
-            econVar(tariff.nativeAboveCustomerBaseCosts).values(kMonth) = tariff.RTPaboveBaseCost(kMonth);
+            state.dataEconTariff->econVar(tariff.nativeAboveCustomerBaseCosts).values(kMonth) = tariff.RTPaboveBaseCost(kMonth);
             // nativeBelowCustomerBaseCosts
-            econVar(tariff.nativeBelowCustomerBaseCosts).values(kMonth) = tariff.RTPbelowBaseCost(kMonth);
+            state.dataEconTariff->econVar(tariff.nativeBelowCustomerBaseCosts).values(kMonth) = tariff.RTPbelowBaseCost(kMonth);
             // nativeAboveCustomerBaseEnergy
-            econVar(tariff.nativeAboveCustomerBaseEnergy).values(kMonth) = tariff.RTPaboveBaseEnergy(kMonth);
+            state.dataEconTariff->econVar(tariff.nativeAboveCustomerBaseEnergy).values(kMonth) = tariff.RTPaboveBaseEnergy(kMonth);
             // nativeBelowCustomerBaseEnergy
-            econVar(tariff.nativeBelowCustomerBaseEnergy).values(kMonth) = tariff.RTPbelowBaseEnergy(kMonth);
+            state.dataEconTariff->econVar(tariff.nativeBelowCustomerBaseEnergy).values(kMonth) = tariff.RTPbelowBaseEnergy(kMonth);
         }
     }
 }
@@ -4034,7 +4033,6 @@ void WriteTabularTariffReports(EnergyPlusData &state)
     Real64 allTotalCost;
     Real64 perAreaUnitConv(0.0);
 
-    auto const &tariff = state.dataEconTariff->tariff;
     auto &econVar = state.dataEconTariff->econVar;
 
     // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc)
@@ -4102,16 +4100,16 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                 otherTotalCost = 0.0;
                 allTotalCost = 0.0;
                 for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-                    if (tariff(iTariff).isSelected) {
-                        allTotalCost += tariff(iTariff).totalAnnualCost;
-                        if (tariff(iTariff).kindElectricMtr >= kindMeterElecSimple) {
-                            elecTotalCost += tariff(iTariff).totalAnnualCost;
-                        } else if (tariff(iTariff).kindGasMtr == kindMeterGas) {
-                            gasTotalCost += tariff(iTariff).totalAnnualCost;
-                        } else if (tariff(iTariff).kindWaterMtr == kindMeterNotWater) {
-                            otherTotalCost += tariff(iTariff).totalAnnualCost;
-                            // removed because this was confusing        columnHead(3) = tariff(iTariff)%reportMeter
-                        } else {
+                    auto const &tariff = state.dataEconTariff->tariff(iTariff);
+                    if (tariff.isSelected) {
+                        allTotalCost += tariff.totalAnnualCost;
+                        if (tariff.kindElectricMtr >= kindMeterElecSimple) {
+                            elecTotalCost += tariff.totalAnnualCost;
+                        } else if (tariff.kindGasMtr == kindMeterGas) {
+                            gasTotalCost += tariff.totalAnnualCost;
+                        } else if (tariff.kindWaterMtr == kindMeterNotWater) {
+                            otherTotalCost += tariff.totalAnnualCost;
+                            // removed because this was confusing        columnHead(3) = tariff.reportMeter
                         }
                     }
                 }
@@ -4166,20 +4164,21 @@ void WriteTabularTariffReports(EnergyPlusData &state)
             columnHead(5) = "Group";
             columnHead(6) = "Annual Cost (~~$~~)";
             for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-                rowHead(iTariff) = tariff(iTariff).tariffName;
-                if (tariff(iTariff).isSelected) {
+                auto const &tariff = state.dataEconTariff->tariff(iTariff);
+                rowHead(iTariff) = tariff.tariffName;
+                if (tariff.isSelected) {
                     tableBody(1, iTariff) = "Yes";
                 } else {
                     tableBody(1, iTariff) = "No";
                 }
-                if (tariff(iTariff).isQualified) {
+                if (tariff.isQualified) {
                     tableBody(2, iTariff) = "Yes";
                 } else {
                     tableBody(2, iTariff) = "No";
                 }
-                tableBody(3, iTariff) = tariff(iTariff).reportMeter;
+                tableBody(3, iTariff) = tariff.reportMeter;
                 {
-                    int const SELECT_CASE_var(tariff(iTariff).buyOrSell);
+                    int const SELECT_CASE_var(tariff.buyOrSell);
                     if (SELECT_CASE_var == buyFromUtility) {
                         tableBody(4, iTariff) = "Buy";
                     } else if (SELECT_CASE_var == sellToUtility) {
@@ -4188,12 +4187,12 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                         tableBody(4, iTariff) = "Net";
                     }
                 }
-                if (tariff(iTariff).groupName == "") {
+                if (tariff.groupName == "") {
                     tableBody(5, iTariff) = "(none)";
                 } else {
-                    tableBody(5, iTariff) = tariff(iTariff).groupName;
+                    tableBody(5, iTariff) = tariff.groupName;
                 }
-                tableBody(6, iTariff) = RealToStr(tariff(iTariff).totalAnnualCost, 2);
+                tableBody(6, iTariff) = RealToStr(tariff.totalAnnualCost, 2);
             }
             columnWidth = 14; // array assignment - same for all columns
             WriteSubtitle(state, "Tariff Summary");
@@ -4216,8 +4215,9 @@ void WriteTabularTariffReports(EnergyPlusData &state)
         //---------------------------------
         if (state.dataOutRptTab->displayTariffReport) {
             for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+                auto const &tariff = state.dataEconTariff->tariff(iTariff);
                 auto const &computation = state.dataEconTariff->computation(iTariff);
-                WriteReportHeaders(state, "Tariff Report", tariff(iTariff).tariffName, OutputProcessor::StoreType::Averaged);
+                WriteReportHeaders(state, "Tariff Report", tariff.tariffName, OutputProcessor::StoreType::Averaged);
                 rowHead.allocate(7);
                 columnHead.allocate(1);
                 columnWidth.allocate(1);
@@ -4231,33 +4231,33 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                 rowHead(5) = "Disqualifier";
                 rowHead(6) = "Computation";
                 rowHead(7) = "Units";
-                tableBody(1, 1) = tariff(iTariff).reportMeter;
-                if (tariff(iTariff).isSelected) {
+                tableBody(1, 1) = tariff.reportMeter;
+                if (tariff.isSelected) {
                     tableBody(1, 2) = "Yes";
                 } else {
                     tableBody(1, 2) = "No";
                 }
-                if (tariff(iTariff).groupName == "") {
+                if (tariff.groupName == "") {
                     tableBody(1, 3) = "(none)";
                 } else {
-                    tableBody(1, 3) = tariff(iTariff).groupName;
+                    tableBody(1, 3) = tariff.groupName;
                 }
-                if (tariff(iTariff).isQualified) {
+                if (tariff.isQualified) {
                     tableBody(1, 4) = "Yes";
                 } else {
                     tableBody(1, 4) = "No";
                 }
-                if (tariff(iTariff).isQualified) {
+                if (tariff.isQualified) {
                     tableBody(1, 5) = "n/a";
                 } else {
-                    tableBody(1, 5) = econVar(tariff(iTariff).ptDisqualifier).name;
+                    tableBody(1, 5) = econVar(tariff.ptDisqualifier).name;
                 }
                 if (computation.isUserDef) {
                     tableBody(1, 6) = computation.computeName;
                 } else {
                     tableBody(1, 6) = "automatic";
                 }
-                switch (tariff(iTariff).convChoice) {
+                switch (tariff.convChoice) {
                 case EconConv::USERDEF: {
                     tableBody(1, 7) = "User Defined";
                 } break;
@@ -4290,11 +4290,11 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (state.dataSQLiteProcedures->sqlite) {
                     state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName, "General");
+                        tableBody, rowHead, columnHead, "Tariff Report", tariff.tariffName, "General");
                 }
                 if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                     state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName, "General");
+                        tableBody, rowHead, columnHead, "Tariff Report", tariff.tariffName, "General");
                 }
                 columnHead.deallocate();
                 rowHead.deallocate();
@@ -4303,16 +4303,16 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                 //---- Categories
                 for (auto &e : econVar)
                     e.activeNow = false;
-                econVar(tariff(iTariff).ptEnergyCharges).activeNow = true;
-                econVar(tariff(iTariff).ptDemandCharges).activeNow = true;
-                econVar(tariff(iTariff).ptServiceCharges).activeNow = true;
-                econVar(tariff(iTariff).ptBasis).activeNow = true;
-                econVar(tariff(iTariff).ptAdjustment).activeNow = true;
-                econVar(tariff(iTariff).ptSurcharge).activeNow = true;
-                econVar(tariff(iTariff).ptSubtotal).activeNow = true;
-                econVar(tariff(iTariff).ptTaxes).activeNow = true;
-                econVar(tariff(iTariff).ptTotal).activeNow = true;
-                ReportEconomicVariable(state, "Categories", false, true, tariff(iTariff).tariffName);
+                econVar(tariff.ptEnergyCharges).activeNow = true;
+                econVar(tariff.ptDemandCharges).activeNow = true;
+                econVar(tariff.ptServiceCharges).activeNow = true;
+                econVar(tariff.ptBasis).activeNow = true;
+                econVar(tariff.ptAdjustment).activeNow = true;
+                econVar(tariff.ptSurcharge).activeNow = true;
+                econVar(tariff.ptSubtotal).activeNow = true;
+                econVar(tariff.ptTaxes).activeNow = true;
+                econVar(tariff.ptTotal).activeNow = true;
+                ReportEconomicVariable(state, "Categories", false, true, tariff.tariffName);
                 //---- Charges
                 for (auto &e : econVar)
                     e.activeNow = false;
@@ -4323,7 +4323,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                         }
                     }
                 }
-                ReportEconomicVariable(state, "Charges", true, true, tariff(iTariff).tariffName);
+                ReportEconomicVariable(state, "Charges", true, true, tariff.tariffName);
                 //---- Sources for Charges
                 for (auto &e : econVar)
                     e.activeNow = false;
@@ -4343,7 +4343,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                         }
                     }
                 }
-                ReportEconomicVariable(state, "Corresponding Sources for Charges", false, false, tariff(iTariff).tariffName);
+                ReportEconomicVariable(state, "Corresponding Sources for Charges", false, false, tariff.tariffName);
                 //---- Rachets
                 for (auto &e : econVar)
                     e.activeNow = false;
@@ -4354,7 +4354,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                         }
                     }
                 }
-                ReportEconomicVariable(state, "Ratchets", false, false, tariff(iTariff).tariffName);
+                ReportEconomicVariable(state, "Ratchets", false, false, tariff.tariffName);
                 //---- Qualifies
                 for (auto &e : econVar)
                     e.activeNow = false;
@@ -4365,14 +4365,14 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                         }
                     }
                 }
-                ReportEconomicVariable(state, "Qualifies", false, false, tariff(iTariff).tariffName);
+                ReportEconomicVariable(state, "Qualifies", false, false, tariff.tariffName);
                 //---- Native Variables
                 for (auto &e : econVar)
                     e.activeNow = false;
-                for (int kVar = tariff(iTariff).firstNative; kVar <= tariff(iTariff).lastNative; ++kVar) {
+                for (int kVar = tariff.firstNative; kVar <= tariff.lastNative; ++kVar) {
                     econVar(kVar).activeNow = true;
                 }
-                ReportEconomicVariable(state, "Native Variables", false, false, tariff(iTariff).tariffName);
+                ReportEconomicVariable(state, "Native Variables", false, false, tariff.tariffName);
                 //---- Other Variables
                 for (auto &e : econVar)
                     e.activeNow = false;
@@ -4383,7 +4383,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                         }
                     }
                 }
-                ReportEconomicVariable(state, "Other Variables", false, false, tariff(iTariff).tariffName);
+                ReportEconomicVariable(state, "Other Variables", false, false, tariff.tariffName);
                 //---- Computation
                 if (computation.isUserDef) {
                     WriteTextLine(state, "Computation -  User Defined", true);
