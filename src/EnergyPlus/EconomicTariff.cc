@@ -2706,27 +2706,24 @@ void ComputeTariff(EnergyPlusData &state)
 
     int constexpr noVar(0);
 
-    Real64 hugeValue;
     Real64 annualAggregate;
-
-    auto &econVar = state.dataEconTariff->econVar;
-    auto const &computation = state.dataEconTariff->computation;
 
     if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
         state.dataOutRptTab->WriteTabularFiles = false;
         return;
     }
 
-    hugeValue = HUGE_(Real64());
+    Real64 hugeValue = HUGE_(Real64());
     //  Clear the isEvaluated flags for all economics variables.
     for (int nVar = 1; nVar <= state.dataEconTariff->numEconVar; ++nVar) {
-        econVar(nVar).isEvaluated = false;
+        state.dataEconTariff->econVar(nVar).isEvaluated = false;
     }
     if (state.dataEconTariff->numTariff >= 1) {
         state.dataOutRptTab->WriteTabularFiles = true;
         setNativeVariables(state);
         for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-            for (int jStep = computation(iTariff).firstStep; jStep <= computation(iTariff).lastStep; ++jStep) {
+            for (int jStep = state.dataEconTariff->computation(iTariff).firstStep; jStep <= state.dataEconTariff->computation(iTariff).lastStep;
+                 ++jStep) {
                 int annualCnt = 0;
                 int curStep = state.dataEconTariff->steps(jStep);
                 int aPt;
@@ -2742,12 +2739,12 @@ void ComputeTariff(EnergyPlusData &state)
                             popStack(state, b, bPt); // pop the variable pointer
                             popStack(state, a, aPt); // pop the values
                             if (isWithinRange(state, bPt, 1, state.dataEconTariff->numEconVar)) {
-                                econVar(bPt).values = a;
+                                state.dataEconTariff->econVar(bPt).values = a;
                             }
                         }
                         state.dataEconTariff->topOfStack = 0;
                     } else if ((SELECT_CASE_var >= 1)) { // all positive values are a reference to an econVar
-                        pushStack(state, econVar(curStep).values, curStep);
+                        pushStack(state, state.dataEconTariff->econVar(curStep).values, curStep);
                     } else if (SELECT_CASE_var == opSUM) {
                         a = 0.0;
                         for (int kStack = 1, kStack_end = state.dataEconTariff->topOfStack; kStack <= kStack_end;
