@@ -3496,52 +3496,52 @@ void evaluateQualify(EnergyPlusData &state, int const usingVariable)
     int adjNumberOfMonths;
     bool isQualified;
 
-    auto &econVar = state.dataEconTariff->econVar;
-    auto const &qualify = state.dataEconTariff->qualify;
-    auto &tariff = state.dataEconTariff->tariff;
+    auto &econVar = state.dataEconTariff->econVar(usingVariable);
 
-    int curTariff = econVar(usingVariable).tariffIndx;
-    int indexInQual = econVar(usingVariable).index;
+    int curTariff = econVar.tariffIndx;
+    auto &tariff = state.dataEconTariff->tariff(curTariff);
+    int indexInQual = econVar.index;
+    auto const &qualify = state.dataEconTariff->qualify(indexInQual);
     // check the tariff - make sure they match
-    if (qualify(indexInQual).namePt != usingVariable) {
+    if (qualify.namePt != usingVariable) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. Qualify index does not match variable pointer.");
-        ShowContinueError(state, format("   Between: {}", econVar(usingVariable).name));
-        ShowContinueError(state, format("       And: {}", econVar(qualify(indexInQual).namePt).name));
+        ShowContinueError(state, format("   Between: {}", econVar.name));
+        ShowContinueError(state, format("       And: {}", state.dataEconTariff->econVar(qualify.namePt).name));
     }
-    if (qualify(indexInQual).tariffIndx != curTariff) {
+    if (qualify.tariffIndx != curTariff) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. Qualify index does not match tariff index.");
-        ShowContinueError(state, format("   Between: {}", tariff(curTariff).tariffName));
-        ShowContinueError(state, format("       And: {}", tariff(qualify(indexInQual).tariffIndx).tariffName));
+        ShowContinueError(state, format("   Between: {}", tariff.tariffName));
+        ShowContinueError(state, format("       And: {}", state.dataEconTariff->tariff(qualify.tariffIndx).tariffName));
     }
     // data from the Qualify
-    sourceVals = econVar(qualify(indexInQual).sourcePt).values;
-    bool curIsMaximum = qualify(indexInQual).isMaximum;
-    bool curIsConsecutive = qualify(indexInQual).isConsecutive;
-    int curNumberOfMonths = qualify(indexInQual).numberOfMonths;
+    sourceVals = state.dataEconTariff->econVar(qualify.sourcePt).values;
+    bool curIsMaximum = qualify.isMaximum;
+    bool curIsConsecutive = qualify.isConsecutive;
+    int curNumberOfMonths = qualify.numberOfMonths;
     // determine if threshold should be based on variable or value
-    if (qualify(indexInQual).thresholdPt != 0) {
-        thresholdVals = econVar(qualify(indexInQual).thresholdPt).values;
+    if (qualify.thresholdPt != 0) {
+        thresholdVals = state.dataEconTariff->econVar(qualify.thresholdPt).values;
     } else {
-        thresholdVals = qualify(indexInQual).thresholdVal;
+        thresholdVals = qualify.thresholdVal;
     }
     // find proper season mask
     {
-        int const SELECT_CASE_var(qualify(indexInQual).season);
+        int const SELECT_CASE_var(qualify.season);
         if (SELECT_CASE_var == seasonSummer) {
-            seasonMask = econVar(tariff(curTariff).nativeIsSummer).values;
+            seasonMask = state.dataEconTariff->econVar(tariff.nativeIsSummer).values;
         } else if (SELECT_CASE_var == seasonWinter) {
-            seasonMask = econVar(tariff(curTariff).nativeIsWinter).values;
+            seasonMask = state.dataEconTariff->econVar(tariff.nativeIsWinter).values;
         } else if (SELECT_CASE_var == seasonSpring) {
-            seasonMask = econVar(tariff(curTariff).nativeIsSpring).values;
+            seasonMask = state.dataEconTariff->econVar(tariff.nativeIsSpring).values;
         } else if (SELECT_CASE_var == seasonFall) {
-            seasonMask = econVar(tariff(curTariff).nativeIsAutumn).values;
+            seasonMask = state.dataEconTariff->econVar(tariff.nativeIsAutumn).values;
         } else if (SELECT_CASE_var == seasonAnnual) {
             seasonMask = 1.0; // all months are 1
         }
     }
     // any months with no energy use are excluded from the qualification process
     for (int iMonth = 1; iMonth <= MaxNumMonths; ++iMonth) {
-        if (econVar(tariff(curTariff).nativeTotalEnergy).values(iMonth) == 0) {
+        if (state.dataEconTariff->econVar(tariff.nativeTotalEnergy).values(iMonth) == 0) {
             seasonMask(iMonth) = 0.0;
         }
     }
@@ -3575,7 +3575,7 @@ void evaluateQualify(EnergyPlusData &state, int const usingVariable)
     } else {
         adjNumberOfMonths = curNumberOfMonths;
     }
-    // now that each month is qualified or not, depending on the type of test see if the entire qualify passe or not
+    // now that each month is qualified or not, depending on the type of test see if the entire qualify pass or not
     int cntAllQualMonths = 0;
     int cntConsecQualMonths = 0;
     int maxConsecQualMonths = 0;
@@ -3611,16 +3611,16 @@ void evaluateQualify(EnergyPlusData &state, int const usingVariable)
     }
     // now update the tariff level qualifier - only update if the tariff is still qualified
     // and the current qualifer fails.
-    if (tariff(curTariff).isQualified) {
+    if (tariff.isQualified) {
         if (!isQualified) {
-            tariff(curTariff).isQualified = false;
-            tariff(curTariff).ptDisqualifier = usingVariable;
+            tariff.isQualified = false;
+            tariff.ptDisqualifier = usingVariable;
         }
     }
     // store the cost in the name of the variable
-    econVar(usingVariable).values = monthsQualify;
+    econVar.values = monthsQualify;
     // set the flag that it has been evaluated so it won't be evaluated multiple times
-    econVar(usingVariable).isEvaluated = true;
+    econVar.isEvaluated = true;
 }
 
 void addMonthlyCharge(EnergyPlusData &state, int const usingVariable)
