@@ -1824,11 +1824,11 @@ int AssignVariablePt(EnergyPlusData &state,
     //   Return the index of the variable.
 
     int AssignVariablePt;
-    auto &econVar = state.dataEconTariff->econVar;
 
     if (flagIfNotNumeric && (len(stringIn) >= 1)) {
         std::string inNoSpaces = RemoveSpaces(state, stringIn);
         int found = 0;
+        auto &econVar = state.dataEconTariff->econVar;
         if (allocated(econVar)) {
             for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                 if (econVar(iVar).tariffIndx == tariffPt) {
