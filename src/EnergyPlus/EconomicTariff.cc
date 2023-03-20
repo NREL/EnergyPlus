@@ -3694,182 +3694,179 @@ void setNativeVariables(EnergyPlusData &state)
     //    Set up the "built in" i.e. native variables that hold
     //    the energy and demand from the simulation.
 
-    int iTariff;
-    int jPeriod;
-    int kMonth;
     Array1D<Real64> monthVal(MaxNumMonths);
     Real64 bigNumber(0.0); // Autodesk Value not used but suppresses warning about HUGE_() call
 
-    auto &tariff = state.dataEconTariff->tariff;
     auto &econVar = state.dataEconTariff->econVar;
 
     bigNumber = HUGE_(bigNumber);
-    for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+    for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+        auto &tariff = state.dataEconTariff->tariff(iTariff);
         // nativeTotalEnergy
         monthVal = 0.0;
-        for (jPeriod = 1; jPeriod <= countPeriod; ++jPeriod) {
-            for (kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
-                monthVal(kMonth) += tariff(iTariff).gatherEnergy(kMonth, jPeriod);
+        for (int jPeriod = 1; jPeriod <= countPeriod; ++jPeriod) {
+            for (int kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
+                monthVal(kMonth) += tariff.gatherEnergy(kMonth, jPeriod);
             }
         }
-        econVar(tariff(iTariff).nativeTotalEnergy).values = monthVal;
+        econVar(tariff.nativeTotalEnergy).values = monthVal;
         // nativeTotalDemand
         monthVal = -bigNumber;
-        for (jPeriod = 1; jPeriod <= countPeriod; ++jPeriod) {
-            for (kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
-                if (tariff(iTariff).gatherDemand(kMonth, jPeriod) > monthVal(kMonth)) {
-                    monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, jPeriod);
+        for (int jPeriod = 1; jPeriod <= countPeriod; ++jPeriod) {
+            for (int kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
+                if (tariff.gatherDemand(kMonth, jPeriod) > monthVal(kMonth)) {
+                    monthVal(kMonth) = tariff.gatherDemand(kMonth, jPeriod);
                 }
             }
         }
         // if no maximum was set just set to zero
-        for (kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
+        for (int kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
             if (monthVal(kMonth) == -bigNumber) {
                 monthVal(kMonth) = 0.0;
             }
         }
-        econVar(tariff(iTariff).nativeTotalDemand).values = monthVal;
-        for (kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
+        econVar(tariff.nativeTotalDemand).values = monthVal;
+        for (int kMonth = 1; kMonth <= MaxNumMonths; ++kMonth) {
             // nativePeakEnergy
-            econVar(tariff(iTariff).nativePeakEnergy).values(kMonth) = tariff(iTariff).gatherEnergy(kMonth, periodPeak);
+            econVar(tariff.nativePeakEnergy).values(kMonth) = tariff.gatherEnergy(kMonth, periodPeak);
             // nativePeakDemand
-            econVar(tariff(iTariff).nativePeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            econVar(tariff.nativePeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodPeak);
             // nativeShoulderEnergy
-            econVar(tariff(iTariff).nativeShoulderEnergy).values(kMonth) = tariff(iTariff).gatherEnergy(kMonth, periodShoulder);
+            econVar(tariff.nativeShoulderEnergy).values(kMonth) = tariff.gatherEnergy(kMonth, periodShoulder);
             // nativeShoulderDemand
-            econVar(tariff(iTariff).nativeShoulderDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodShoulder);
+            econVar(tariff.nativeShoulderDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodShoulder);
             // nativeOffPeakEnergy
-            econVar(tariff(iTariff).nativeOffPeakEnergy).values(kMonth) = tariff(iTariff).gatherEnergy(kMonth, periodOffPeak);
+            econVar(tariff.nativeOffPeakEnergy).values(kMonth) = tariff.gatherEnergy(kMonth, periodOffPeak);
             // nativeOffPeakDemand
-            econVar(tariff(iTariff).nativeOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodOffPeak);
+            econVar(tariff.nativeOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodOffPeak);
             // nativeMidPeakEnergy
-            econVar(tariff(iTariff).nativeMidPeakEnergy).values(kMonth) = tariff(iTariff).gatherEnergy(kMonth, periodMidPeak);
+            econVar(tariff.nativeMidPeakEnergy).values(kMonth) = tariff.gatherEnergy(kMonth, periodMidPeak);
             // nativeMidPeakDemand
-            econVar(tariff(iTariff).nativeMidPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodMidPeak);
+            econVar(tariff.nativeMidPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodMidPeak);
             // nativePeakExceedsOffPeak
-            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak) - tariff(iTariff).gatherDemand(kMonth, periodOffPeak);
+            monthVal(kMonth) = tariff.gatherDemand(kMonth, periodPeak) - tariff.gatherDemand(kMonth, periodOffPeak);
             if (monthVal(kMonth) > 0) {
-                econVar(tariff(iTariff).nativePeakExceedsOffPeak).values(kMonth) = monthVal(kMonth);
+                econVar(tariff.nativePeakExceedsOffPeak).values(kMonth) = monthVal(kMonth);
             } else {
-                econVar(tariff(iTariff).nativePeakExceedsOffPeak).values(kMonth) = 0.0;
+                econVar(tariff.nativePeakExceedsOffPeak).values(kMonth) = 0.0;
             }
             // nativeOffPeakExceedsPeak
-            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodOffPeak) - tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            monthVal(kMonth) = tariff.gatherDemand(kMonth, periodOffPeak) - tariff.gatherDemand(kMonth, periodPeak);
             if (monthVal(kMonth) > 0) {
-                econVar(tariff(iTariff).nativeOffPeakExceedsPeak).values(kMonth) = monthVal(kMonth);
+                econVar(tariff.nativeOffPeakExceedsPeak).values(kMonth) = monthVal(kMonth);
             } else {
-                econVar(tariff(iTariff).nativeOffPeakExceedsPeak).values(kMonth) = 0.0;
+                econVar(tariff.nativeOffPeakExceedsPeak).values(kMonth) = 0.0;
             }
             // nativePeakExceedsMidPeak
-            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak) - tariff(iTariff).gatherDemand(kMonth, periodMidPeak);
+            monthVal(kMonth) = tariff.gatherDemand(kMonth, periodPeak) - tariff.gatherDemand(kMonth, periodMidPeak);
             if (monthVal(kMonth) > 0) {
-                econVar(tariff(iTariff).nativePeakExceedsMidPeak).values(kMonth) = monthVal(kMonth);
+                econVar(tariff.nativePeakExceedsMidPeak).values(kMonth) = monthVal(kMonth);
             } else {
-                econVar(tariff(iTariff).nativePeakExceedsOffPeak).values(kMonth) = 0.0;
+                econVar(tariff.nativePeakExceedsOffPeak).values(kMonth) = 0.0;
             }
             // nativeMidPeakExceedsPeak
-            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodMidPeak) - tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            monthVal(kMonth) = tariff.gatherDemand(kMonth, periodMidPeak) - tariff.gatherDemand(kMonth, periodPeak);
             if (monthVal(kMonth) > 0) {
-                econVar(tariff(iTariff).nativeMidPeakExceedsPeak).values(kMonth) = monthVal(kMonth);
+                econVar(tariff.nativeMidPeakExceedsPeak).values(kMonth) = monthVal(kMonth);
             } else {
-                econVar(tariff(iTariff).nativeMidPeakExceedsPeak).values(kMonth) = 0.0;
+                econVar(tariff.nativeMidPeakExceedsPeak).values(kMonth) = 0.0;
             }
             // nativePeakExceedsShoulder
-            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak) - tariff(iTariff).gatherDemand(kMonth, periodShoulder);
+            monthVal(kMonth) = tariff.gatherDemand(kMonth, periodPeak) - tariff.gatherDemand(kMonth, periodShoulder);
             if (monthVal(kMonth) > 0) {
-                econVar(tariff(iTariff).nativePeakExceedsShoulder).values(kMonth) = monthVal(kMonth);
+                econVar(tariff.nativePeakExceedsShoulder).values(kMonth) = monthVal(kMonth);
             } else {
-                econVar(tariff(iTariff).nativePeakExceedsShoulder).values(kMonth) = 0.0;
+                econVar(tariff.nativePeakExceedsShoulder).values(kMonth) = 0.0;
             }
             // nativeShoulderExceedsPeak
-            monthVal(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodShoulder) - tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            monthVal(kMonth) = tariff.gatherDemand(kMonth, periodShoulder) - tariff.gatherDemand(kMonth, periodPeak);
             if (monthVal(kMonth) > 0) {
-                econVar(tariff(iTariff).nativeShoulderExceedsPeak).values(kMonth) = monthVal(kMonth);
+                econVar(tariff.nativeShoulderExceedsPeak).values(kMonth) = monthVal(kMonth);
             } else {
-                econVar(tariff(iTariff).nativeShoulderExceedsPeak).values(kMonth) = 0.0;
+                econVar(tariff.nativeShoulderExceedsPeak).values(kMonth) = 0.0;
             }
             // nativeIsWinter
             // nativeIsNotWinter
-            if (tariff(iTariff).seasonForMonth(kMonth) == seasonWinter) {
-                econVar(tariff(iTariff).nativeIsWinter).values(kMonth) = 1.0;
-                econVar(tariff(iTariff).nativeIsNotWinter).values(kMonth) = 0.0;
+            if (tariff.seasonForMonth(kMonth) == seasonWinter) {
+                econVar(tariff.nativeIsWinter).values(kMonth) = 1.0;
+                econVar(tariff.nativeIsNotWinter).values(kMonth) = 0.0;
             } else {
-                econVar(tariff(iTariff).nativeIsWinter).values(kMonth) = 0.0;
-                econVar(tariff(iTariff).nativeIsNotWinter).values(kMonth) = 1.0;
+                econVar(tariff.nativeIsWinter).values(kMonth) = 0.0;
+                econVar(tariff.nativeIsNotWinter).values(kMonth) = 1.0;
             }
             // nativeIsSpring
             // nativeIsNotSpring
-            if (tariff(iTariff).seasonForMonth(kMonth) == seasonSpring) {
-                econVar(tariff(iTariff).nativeIsSpring).values(kMonth) = 1.0;
-                econVar(tariff(iTariff).nativeIsNotSpring).values(kMonth) = 0.0;
+            if (tariff.seasonForMonth(kMonth) == seasonSpring) {
+                econVar(tariff.nativeIsSpring).values(kMonth) = 1.0;
+                econVar(tariff.nativeIsNotSpring).values(kMonth) = 0.0;
             } else {
-                econVar(tariff(iTariff).nativeIsSpring).values(kMonth) = 0.0;
-                econVar(tariff(iTariff).nativeIsNotSpring).values(kMonth) = 1.0;
+                econVar(tariff.nativeIsSpring).values(kMonth) = 0.0;
+                econVar(tariff.nativeIsNotSpring).values(kMonth) = 1.0;
             }
             // nativeIsSummer
             // nativeIsNotSummer
-            if (tariff(iTariff).seasonForMonth(kMonth) == seasonSummer) {
-                econVar(tariff(iTariff).nativeIsSummer).values(kMonth) = 1.0;
-                econVar(tariff(iTariff).nativeIsNotSummer).values(kMonth) = 0.0;
+            if (tariff.seasonForMonth(kMonth) == seasonSummer) {
+                econVar(tariff.nativeIsSummer).values(kMonth) = 1.0;
+                econVar(tariff.nativeIsNotSummer).values(kMonth) = 0.0;
             } else {
-                econVar(tariff(iTariff).nativeIsSummer).values(kMonth) = 0.0;
-                econVar(tariff(iTariff).nativeIsNotSummer).values(kMonth) = 1.0;
+                econVar(tariff.nativeIsSummer).values(kMonth) = 0.0;
+                econVar(tariff.nativeIsNotSummer).values(kMonth) = 1.0;
             }
             // nativeIsAutumn
             // nativeIsNotAutumn
-            if (tariff(iTariff).seasonForMonth(kMonth) == seasonFall) {
-                econVar(tariff(iTariff).nativeIsAutumn).values(kMonth) = 1.0;
-                econVar(tariff(iTariff).nativeIsNotAutumn).values(kMonth) = 0.0;
+            if (tariff.seasonForMonth(kMonth) == seasonFall) {
+                econVar(tariff.nativeIsAutumn).values(kMonth) = 1.0;
+                econVar(tariff.nativeIsNotAutumn).values(kMonth) = 0.0;
             } else {
-                econVar(tariff(iTariff).nativeIsAutumn).values(kMonth) = 0.0;
-                econVar(tariff(iTariff).nativeIsNotAutumn).values(kMonth) = 1.0;
+                econVar(tariff.nativeIsAutumn).values(kMonth) = 0.0;
+                econVar(tariff.nativeIsNotAutumn).values(kMonth) = 1.0;
             }
             // nativePeakAndShoulderEnergy
-            econVar(tariff(iTariff).nativePeakAndShoulderEnergy).values(kMonth) =
-                tariff(iTariff).gatherEnergy(kMonth, periodPeak) + tariff(iTariff).gatherEnergy(kMonth, periodShoulder);
+            econVar(tariff.nativePeakAndShoulderEnergy).values(kMonth) =
+                tariff.gatherEnergy(kMonth, periodPeak) + tariff.gatherEnergy(kMonth, periodShoulder);
             // nativePeakAndShoulderDemand
-            if (tariff(iTariff).gatherDemand(kMonth, periodPeak) > tariff(iTariff).gatherDemand(kMonth, periodShoulder)) {
-                econVar(tariff(iTariff).nativePeakAndShoulderDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            if (tariff.gatherDemand(kMonth, periodPeak) > tariff.gatherDemand(kMonth, periodShoulder)) {
+                econVar(tariff.nativePeakAndShoulderDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodPeak);
             } else {
-                econVar(tariff(iTariff).nativePeakAndShoulderDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodShoulder);
+                econVar(tariff.nativePeakAndShoulderDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodShoulder);
             }
             // nativePeakAndMidPeakEnergy
-            econVar(tariff(iTariff).nativePeakAndMidPeakEnergy).values(kMonth) =
-                tariff(iTariff).gatherEnergy(kMonth, periodPeak) + tariff(iTariff).gatherEnergy(kMonth, periodMidPeak);
+            econVar(tariff.nativePeakAndMidPeakEnergy).values(kMonth) =
+                tariff.gatherEnergy(kMonth, periodPeak) + tariff.gatherEnergy(kMonth, periodMidPeak);
             // nativePeakAndMidPeakDemand
-            if (tariff(iTariff).gatherDemand(kMonth, periodPeak) > tariff(iTariff).gatherDemand(kMonth, periodMidPeak)) {
-                econVar(tariff(iTariff).nativePeakAndMidPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            if (tariff.gatherDemand(kMonth, periodPeak) > tariff.gatherDemand(kMonth, periodMidPeak)) {
+                econVar(tariff.nativePeakAndMidPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodPeak);
             } else {
-                econVar(tariff(iTariff).nativePeakAndMidPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodMidPeak);
+                econVar(tariff.nativePeakAndMidPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodMidPeak);
             }
             // nativeShoulderAndOffPeakEnergy
-            econVar(tariff(iTariff).nativeShoulderAndOffPeakEnergy).values(kMonth) =
-                tariff(iTariff).gatherEnergy(kMonth, periodShoulder) + tariff(iTariff).gatherEnergy(kMonth, periodOffPeak);
+            econVar(tariff.nativeShoulderAndOffPeakEnergy).values(kMonth) =
+                tariff.gatherEnergy(kMonth, periodShoulder) + tariff.gatherEnergy(kMonth, periodOffPeak);
             // nativeShoulderAndOffPeakDemand
-            if (tariff(iTariff).gatherDemand(kMonth, periodShoulder) > tariff(iTariff).gatherDemand(kMonth, periodOffPeak)) {
-                econVar(tariff(iTariff).nativeShoulderAndOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodShoulder);
+            if (tariff.gatherDemand(kMonth, periodShoulder) > tariff.gatherDemand(kMonth, periodOffPeak)) {
+                econVar(tariff.nativeShoulderAndOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodShoulder);
             } else {
-                econVar(tariff(iTariff).nativeShoulderAndOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodOffPeak);
+                econVar(tariff.nativeShoulderAndOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodOffPeak);
             }
             // nativePeakAndOffPeakEnergy
-            econVar(tariff(iTariff).nativePeakAndOffPeakEnergy).values(kMonth) =
-                tariff(iTariff).gatherEnergy(kMonth, periodPeak) + tariff(iTariff).gatherEnergy(kMonth, periodOffPeak);
+            econVar(tariff.nativePeakAndOffPeakEnergy).values(kMonth) =
+                tariff.gatherEnergy(kMonth, periodPeak) + tariff.gatherEnergy(kMonth, periodOffPeak);
             // nativePeakAndOffPeakDemand
-            if (tariff(iTariff).gatherDemand(kMonth, periodPeak) > tariff(iTariff).gatherDemand(kMonth, periodOffPeak)) {
-                econVar(tariff(iTariff).nativePeakAndOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodPeak);
+            if (tariff.gatherDemand(kMonth, periodPeak) > tariff.gatherDemand(kMonth, periodOffPeak)) {
+                econVar(tariff.nativePeakAndOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodPeak);
             } else {
-                econVar(tariff(iTariff).nativePeakAndOffPeakDemand).values(kMonth) = tariff(iTariff).gatherDemand(kMonth, periodOffPeak);
+                econVar(tariff.nativePeakAndOffPeakDemand).values(kMonth) = tariff.gatherDemand(kMonth, periodOffPeak);
             }
             // nativeRealTimePriceCosts
-            econVar(tariff(iTariff).nativeRealTimePriceCosts).values(kMonth) = tariff(iTariff).RTPcost(kMonth);
+            econVar(tariff.nativeRealTimePriceCosts).values(kMonth) = tariff.RTPcost(kMonth);
             // nativeAboveCustomerBaseCosts
-            econVar(tariff(iTariff).nativeAboveCustomerBaseCosts).values(kMonth) = tariff(iTariff).RTPaboveBaseCost(kMonth);
+            econVar(tariff.nativeAboveCustomerBaseCosts).values(kMonth) = tariff.RTPaboveBaseCost(kMonth);
             // nativeBelowCustomerBaseCosts
-            econVar(tariff(iTariff).nativeBelowCustomerBaseCosts).values(kMonth) = tariff(iTariff).RTPbelowBaseCost(kMonth);
+            econVar(tariff.nativeBelowCustomerBaseCosts).values(kMonth) = tariff.RTPbelowBaseCost(kMonth);
             // nativeAboveCustomerBaseEnergy
-            econVar(tariff(iTariff).nativeAboveCustomerBaseEnergy).values(kMonth) = tariff(iTariff).RTPaboveBaseEnergy(kMonth);
+            econVar(tariff.nativeAboveCustomerBaseEnergy).values(kMonth) = tariff.RTPaboveBaseEnergy(kMonth);
             // nativeBelowCustomerBaseEnergy
-            econVar(tariff(iTariff).nativeBelowCustomerBaseEnergy).values(kMonth) = tariff(iTariff).RTPbelowBaseEnergy(kMonth);
+            econVar(tariff.nativeBelowCustomerBaseEnergy).values(kMonth) = tariff.RTPbelowBaseEnergy(kMonth);
         }
     }
 }
