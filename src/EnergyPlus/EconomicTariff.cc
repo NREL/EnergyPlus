@@ -3188,50 +3188,48 @@ void evaluateChargeSimple(EnergyPlusData &state, int const usingVariable)
     //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
     //    DATE WRITTEN   July 2004
 
-    int curTariff;
-    int indexInChg;
     Array1D<Real64> sourceVals(MaxNumMonths);
     Array1D<Real64> costPer(MaxNumMonths);
     Array1D<Real64> resultChg(MaxNumMonths);
     Array1D<Real64> seasonMask(MaxNumMonths);
 
     auto &econVar = state.dataEconTariff->econVar;
-    auto const &chargeSimple = state.dataEconTariff->chargeSimple;
-    auto const &tariff = state.dataEconTariff->tariff;
 
-    curTariff = econVar(usingVariable).tariffIndx;
-    indexInChg = econVar(usingVariable).index;
+    int curTariff = econVar(usingVariable).tariffIndx;
+    auto const &tariff = state.dataEconTariff->tariff(curTariff);
+    int indexInChg = econVar(usingVariable).index;
+    auto const &chargeSimple = state.dataEconTariff->chargeSimple(indexInChg);
 
     // check the tariff - make sure they match
-    if (chargeSimple(indexInChg).namePt != usingVariable) {
+    if (chargeSimple.namePt != usingVariable) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. ChargeSimple index does not match variable pointer.");
         ShowContinueError(state, format("   Between: {}", econVar(usingVariable).name));
-        ShowContinueError(state, format("       And: {}", econVar(chargeSimple(indexInChg).namePt).name));
+        ShowContinueError(state, format("       And: {}", econVar(chargeSimple.namePt).name));
     }
-    if (chargeSimple(indexInChg).tariffIndx != curTariff) {
+    if (chargeSimple.tariffIndx != curTariff) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. ChargeSimple index does not match tariff index.");
-        ShowContinueError(state, format("   Between: {}", tariff(curTariff).tariffName));
-        ShowContinueError(state, format("       And: {}", tariff(chargeSimple(indexInChg).tariffIndx).tariffName));
+        ShowContinueError(state, format("   Between: {}", tariff.tariffName));
+        ShowContinueError(state, format("       And: {}", state.dataEconTariff->tariff(chargeSimple.tariffIndx).tariffName));
     }
     // data from the Charge:Simple
-    sourceVals = econVar(chargeSimple(indexInChg).sourcePt).values;
+    sourceVals = econVar(chargeSimple.sourcePt).values;
     // determine if costPer should be based on variable or value
-    if (chargeSimple(indexInChg).costPerPt != 0) {
-        costPer = econVar(chargeSimple(indexInChg).costPerPt).values;
+    if (chargeSimple.costPerPt != 0) {
+        costPer = econVar(chargeSimple.costPerPt).values;
     } else {
-        costPer = chargeSimple(indexInChg).costPerVal;
+        costPer = chargeSimple.costPerVal;
     }
     // find proper season mask
     {
-        int const SELECT_CASE_var(chargeSimple(indexInChg).season);
+        int const SELECT_CASE_var(chargeSimple.season);
         if (SELECT_CASE_var == seasonSummer) {
-            seasonMask = econVar(tariff(curTariff).nativeIsSummer).values;
+            seasonMask = econVar(tariff.nativeIsSummer).values;
         } else if (SELECT_CASE_var == seasonWinter) {
-            seasonMask = econVar(tariff(curTariff).nativeIsWinter).values;
+            seasonMask = econVar(tariff.nativeIsWinter).values;
         } else if (SELECT_CASE_var == seasonSpring) {
-            seasonMask = econVar(tariff(curTariff).nativeIsSpring).values;
+            seasonMask = econVar(tariff.nativeIsSpring).values;
         } else if (SELECT_CASE_var == seasonFall) {
-            seasonMask = econVar(tariff(curTariff).nativeIsAutumn).values;
+            seasonMask = econVar(tariff.nativeIsAutumn).values;
         } else if (SELECT_CASE_var == seasonAnnual) {
             seasonMask = 1.0; // all months are 1
         }
