@@ -4033,8 +4033,6 @@ void WriteTabularTariffReports(EnergyPlusData &state)
     Real64 allTotalCost;
     Real64 perAreaUnitConv(0.0);
 
-    auto &econVar = state.dataEconTariff->econVar;
-
     // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc)
     // when ort->unitsStyle inputs should have been concretely processed and assigned.
     // Included this here to make sure the units specifications are correctly updated.
@@ -4048,6 +4046,8 @@ void WriteTabularTariffReports(EnergyPlusData &state)
     }
 
     if (state.dataEconTariff->numTariff > 0) {
+        auto &econVar = state.dataEconTariff->econVar;
+
         if (state.dataOutRptTab->displayEconomicResultSummary) {
             DisplayString(state, "Writing Tariff Reports");
             for (auto &e : econVar)
