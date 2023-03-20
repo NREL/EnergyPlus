@@ -3041,7 +3041,7 @@ namespace SurfaceGeometry {
             if (std::abs(baseSurface.Azimuth - subSurface.Azimuth) > warningTolerance) {
                 subSurface.lcsx = baseSurface.lcsx;
                 subSurface.lcsy = baseSurface.lcsy;
-                subSurface.lcsy = baseSurface.lcsy;
+                subSurface.lcsz = baseSurface.lcsz;
             }
         } else {
             // Not sure what this does, but keeping for now (MJW Dec 2015)
