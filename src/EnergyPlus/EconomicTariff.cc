@@ -1321,9 +1321,6 @@ void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfSca
         }
         aWord = lineOfText.substr(beginOfWord, endOfWord - beginOfWord + 1);
         endOfScan = beginOfWord - 1;
-        if (endOfScan == std::string::npos) {
-            endOfScan = std::string::npos;
-        }
     } else {
         endOfScan = std::string::npos;
         aWord = "";
