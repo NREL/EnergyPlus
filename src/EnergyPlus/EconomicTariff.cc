@@ -2567,7 +2567,6 @@ void GatherForEconomics(EnergyPlusData &state)
 
     if (state.dataEconTariff->numTariff >= 1) {
         for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-            bool isGood = false;
             // if the meter is defined get the value
             if (tariff(iTariff).reportMeterIndx != 0) {
                 curInstantValue = GetCurrentMeterValue(state, tariff(iTariff).reportMeterIndx);
@@ -2609,6 +2608,7 @@ void GatherForEconomics(EnergyPlusData &state)
                         curMonth = state.dataEnvrn->MonthTomorrow;
                     }
                 }
+                bool isGood = false;
                 if (isWithinRange(state, curSeason, 1, 5)) {
                     if (isWithinRange(state, curPeriod, 1, 4)) {
                         if (isWithinRange(state, curMonth, 1, 12)) {
