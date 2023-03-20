@@ -2112,55 +2112,55 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth.deallocate();
         tableBody.deallocate();
         //---- DEBUG ONLY - Monthly Cash Flows
-        bool showMonthlyCashFlows = false;
-        if (showMonthlyCashFlows) {
-            rowHead.allocate(elcc->lengthStudyTotalMonths);
-            columnHead.allocate(elcc->numCashFlow);
-            columnWidth.allocate(elcc->numCashFlow);
-            tableBody.allocate(elcc->numCashFlow, elcc->lengthStudyTotalMonths);
-            tableBody = "";
-            columnHead(1) = "mnt";
-            columnHead(2) = "rpr";
-            columnHead(3) = "opr";
-            columnHead(4) = "repl";
-            columnHead(5) = "mOvhl";
-            columnHead(6) = "MOvhl";
-            columnHead(7) = "oOpr";
-            columnHead(8) = "cons";
-            columnHead(9) = "slvg";
-            columnHead(10) = "oCap";
-            columnHead(11) = "H2O";
-            columnHead(12) = "ene";
-            columnHead(13) = "tEne";
-            columnHead(14) = "tOpr";
-            columnHead(15) = "tCap";
-            columnHead(16) = "Totl";
-            for (int jObj = CostCategory::Num; jObj < elcc->numCashFlow; ++jObj) {
-                columnHead(jObj + 1) = elcc->CashFlow[jObj].name;
-            }
-            for (int kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
-                rowHead(kMonth) = format("{} {}",
-                                         UtilityRoutines::MonthNamesCC[static_cast<int>(1 + (kMonth + elcc->baseDateMonth - 2) % 12) - 1],
-                                         elcc->baseDateYear + int((kMonth - 1) / 12));
-                for (int jObj = 0; jObj < elcc->numCashFlow; ++jObj) {
-                    tableBody(jObj + 1, kMonth) = RealToStr(elcc->CashFlow[jObj].mnAmount(kMonth), 2);
-                }
-            }
-            WriteSubtitle(state, "DEBUG ONLY - Monthly Cash Flows");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (state.dataSQLiteProcedures->sqlite) {
-                state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
-            }
-            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
-            }
-            columnHead.deallocate();
-            rowHead.deallocate();
-            columnWidth.deallocate();
-            tableBody.deallocate();
-        }
+        // bool showMonthlyCashFlows = false;
+        // if (showMonthlyCashFlows) {
+        //    rowHead.allocate(elcc->lengthStudyTotalMonths);
+        //    columnHead.allocate(elcc->numCashFlow);
+        //    columnWidth.allocate(elcc->numCashFlow);
+        //    tableBody.allocate(elcc->numCashFlow, elcc->lengthStudyTotalMonths);
+        //    tableBody = "";
+        //    columnHead(1) = "mnt";
+        //    columnHead(2) = "rpr";
+        //    columnHead(3) = "opr";
+        //    columnHead(4) = "repl";
+        //    columnHead(5) = "mOvhl";
+        //    columnHead(6) = "MOvhl";
+        //    columnHead(7) = "oOpr";
+        //    columnHead(8) = "cons";
+        //    columnHead(9) = "slvg";
+        //    columnHead(10) = "oCap";
+        //    columnHead(11) = "H2O";
+        //    columnHead(12) = "ene";
+        //    columnHead(13) = "tEne";
+        //    columnHead(14) = "tOpr";
+        //    columnHead(15) = "tCap";
+        //    columnHead(16) = "Totl";
+        //    for (int jObj = CostCategory::Num; jObj < elcc->numCashFlow; ++jObj) {
+        //        columnHead(jObj + 1) = elcc->CashFlow[jObj].name;
+        //    }
+        //    for (int kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
+        //        rowHead(kMonth) = format("{} {}",
+        //                                 UtilityRoutines::MonthNamesCC[static_cast<int>(1 + (kMonth + elcc->baseDateMonth - 2) % 12) - 1],
+        //                                 elcc->baseDateYear + int((kMonth - 1) / 12));
+        //        for (int jObj = 0; jObj < elcc->numCashFlow; ++jObj) {
+        //            tableBody(jObj + 1, kMonth) = RealToStr(elcc->CashFlow[jObj].mnAmount(kMonth), 2);
+        //        }
+        //    }
+        //    WriteSubtitle(state, "DEBUG ONLY - Monthly Cash Flows");
+        //    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        //    if (state.dataSQLiteProcedures->sqlite) {
+        //        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+        //            tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
+        //    }
+        //    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+        //        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+        //            tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
+        //    }
+        //    columnHead.deallocate();
+        //    rowHead.deallocate();
+        //    columnWidth.deallocate();
+        //    tableBody.deallocate();
+        //}
         //---- Monthly Total Cash Flow
         rowHead.allocate(elcc->lengthStudyYears);
         columnHead.allocate(12);
