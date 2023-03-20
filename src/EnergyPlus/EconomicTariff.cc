@@ -3630,26 +3630,24 @@ void addMonthlyCharge(EnergyPlusData &state, int const usingVariable)
 
     //    Include the monthly charges in the calculations
 
-    auto &econVar = state.dataEconTariff->econVar;
-    auto const &tariff = state.dataEconTariff->tariff;
-
-    int curTariff = econVar(usingVariable).tariffIndx;
+    int curTariff = state.dataEconTariff->econVar(usingVariable).tariffIndx;
+    auto const &tariff = state.dataEconTariff->tariff(curTariff);
     // check the tariff - make sure they match
-    if (tariff(curTariff).ptServiceCharges != usingVariable) {
+    if (tariff.ptServiceCharges != usingVariable) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. Tariff index for service charge does not match variable pointer.");
-        ShowContinueError(state, format("   Between: {}", tariff(curTariff).tariffName));
-        ShowContinueError(state, format("       And: {}", tariff(tariff(curTariff).ptServiceCharges).tariffName));
+        ShowContinueError(state, format("   Between: {}", tariff.tariffName));
+        ShowContinueError(state, format("       And: {}", state.dataEconTariff->tariff(tariff.ptServiceCharges).tariffName));
     }
-    if (tariff(curTariff).monthChgPt != 0) {
-        econVar(usingVariable).values += econVar(tariff(curTariff).monthChgPt).values;
+    if (tariff.monthChgPt != 0) {
+        state.dataEconTariff->econVar(usingVariable).values += state.dataEconTariff->econVar(tariff.monthChgPt).values;
     } else {
-        econVar(usingVariable).values += tariff(curTariff).monthChgVal;
+        state.dataEconTariff->econVar(usingVariable).values += tariff.monthChgVal;
     }
     // zero out months with no energy consumption
-    // curTotalEnergy = tariff(curTariff)%nativeTotalEnergy
+    // curTotalEnergy = tariff.nativeTotalEnergy
     // DO iMonth = 1, MaxNumMonths
-    //  IF (econVar(curTotalEnergy)%values(iMonth) .EQ. 0) THEN
-    //    econVar(usingVariable)%values(iMonth) = 0
+    //  IF (state.dataEconTariff->econVar(curTotalEnergy)%values(iMonth) .EQ. 0) THEN
+    //    state.dataEconTariff->econVar(usingVariable)%values(iMonth) = 0
     //  END IF
     // END DO
 }
@@ -3661,26 +3659,22 @@ void checkMinimumMonthlyCharge(EnergyPlusData &state, int const curTariff)
 
     //    Check if the total is as big as the minimum monthly charge
 
-    int iMonth;
-    int totalVar;
-    int minMonVar;
-
-    auto const &tariff = state.dataEconTariff->tariff;
+    auto const &tariff = state.dataEconTariff->tariff(curTariff);
     auto &econVar = state.dataEconTariff->econVar;
 
-    totalVar = tariff(curTariff).ptTotal;
-    minMonVar = tariff(curTariff).minMonthChgPt;
+    int totalVar = tariff.ptTotal;
+    int minMonVar = tariff.minMonthChgPt;
     // if a variable is defined use that
     if (minMonVar != 0) {
-        for (iMonth = 1; iMonth <= MaxNumMonths; ++iMonth) {
+        for (int iMonth = 1; iMonth <= MaxNumMonths; ++iMonth) {
             if (econVar(totalVar).values(iMonth) < econVar(minMonVar).values(iMonth)) {
                 econVar(totalVar).values(iMonth) = econVar(minMonVar).values(iMonth);
             }
         }
     } else { // use the constant value
-        for (iMonth = 1; iMonth <= MaxNumMonths; ++iMonth) {
-            if (econVar(totalVar).values(iMonth) < tariff(curTariff).minMonthChgVal) {
-                econVar(totalVar).values(iMonth) = tariff(curTariff).minMonthChgVal;
+        for (int iMonth = 1; iMonth <= MaxNumMonths; ++iMonth) {
+            if (econVar(totalVar).values(iMonth) < tariff.minMonthChgVal) {
+                econVar(totalVar).values(iMonth) = tariff.minMonthChgVal;
             }
         }
     }
