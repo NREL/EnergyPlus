@@ -90,9 +90,9 @@ void UpdateUtilityBills(EnergyPlusData &state)
     //    Single routine used to call all get input
     //    routines for economics.
 
-    bool ErrorsFound(false);
-
     if (state.dataEconTariff->Update_GetInput) {
+        bool ErrorsFound = false;
+
         GetInputEconomicsTariff(state, ErrorsFound);
         // do rest of GetInput only if at least one tariff is defined.
         GetInputEconomicsCurrencyType(state, ErrorsFound);
@@ -961,20 +961,17 @@ void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound) // true 
     //    Read the input file for "Economics:Ratchet" objects.
 
     static constexpr std::string_view RoutineName("GetInputEconomicsRatchet: ");
-    int iInObj;    // loop index variable for reading in objects
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
     bool isNotNumeric;
-    int jFld;
-    std::string CurrentModuleObject; // for ease in renaming.
 
-    auto &ratchet(state.dataEconTariff->ratchet);
-
-    CurrentModuleObject = "UtilityCost:Ratchet";
+    std::string CurrentModuleObject = "UtilityCost:Ratchet";
     state.dataEconTariff->numRatchet = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    ratchet.allocate(state.dataEconTariff->numRatchet);
-    for (iInObj = 1; iInObj <= state.dataEconTariff->numRatchet; ++iInObj) {
+    state.dataEconTariff->ratchet.allocate(state.dataEconTariff->numRatchet);
+    for (int iInObj = 1; iInObj <= state.dataEconTariff->numRatchet; ++iInObj) {
+        auto &ratchet = state.dataEconTariff->ratchet(iInObj);
+
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  iInObj,
@@ -988,47 +985,35 @@ void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound) // true 
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         // check to make sure none of the values are another economic object
-        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+        for (int jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
                 ShowWarningError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
             }
         }
         // index of the tariff name in the tariff array
-        ratchet(iInObj).tariffIndx =
+        ratchet.tariffIndx =
             FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
-        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), ratchet(iInObj).tariffIndx, ErrorsFound, CurrentModuleObject);
-        ratchet(iInObj).namePt = AssignVariablePt(
-            state, state.dataIPShortCut->cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, ObjType::Ratchet, iInObj, ratchet(iInObj).tariffIndx);
+        warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), ratchet.tariffIndx, ErrorsFound, CurrentModuleObject);
+        ratchet.namePt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, ObjType::Ratchet, iInObj, ratchet.tariffIndx);
         // index of the variable in the variable array
-        ratchet(iInObj).baselinePt = AssignVariablePt(
-            state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Ratchet, iInObj, ratchet(iInObj).tariffIndx);
+        ratchet.baselinePt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Ratchet, iInObj, ratchet.tariffIndx);
         // index of the variable in the variable array
-        ratchet(iInObj).adjustmentPt = AssignVariablePt(
-            state, state.dataIPShortCut->cAlphaArgs(4), true, varIsArgument, varNotYetDefined, ObjType::Ratchet, iInObj, ratchet(iInObj).tariffIndx);
+        ratchet.adjustmentPt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(4), true, varIsArgument, varNotYetDefined, ObjType::Ratchet, iInObj, ratchet.tariffIndx);
         // seasons to and from
-        ratchet(iInObj).seasonFrom = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(5), state.dataIPShortCut->cAlphaArgs(1));
-        ratchet(iInObj).seasonTo = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(6), state.dataIPShortCut->cAlphaArgs(1));
+        ratchet.seasonFrom = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(5), state.dataIPShortCut->cAlphaArgs(1));
+        ratchet.seasonTo = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(6), state.dataIPShortCut->cAlphaArgs(1));
         // ratchet multiplier
-        ratchet(iInObj).multiplierVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(7), isNotNumeric);
-        ratchet(iInObj).multiplierPt = AssignVariablePt(state,
-                                                        state.dataIPShortCut->cAlphaArgs(7),
-                                                        isNotNumeric,
-                                                        varIsArgument,
-                                                        varNotYetDefined,
-                                                        ObjType::Invalid,
-                                                        0,
-                                                        ratchet(iInObj).tariffIndx);
+        ratchet.multiplierVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(7), isNotNumeric);
+        ratchet.multiplierPt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(7), isNotNumeric, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, ratchet.tariffIndx);
         // ratchet offset
-        ratchet(iInObj).offsetVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(8), isNotNumeric);
-        ratchet(iInObj).offsetPt = AssignVariablePt(state,
-                                                    state.dataIPShortCut->cAlphaArgs(8),
-                                                    isNotNumeric,
-                                                    varIsArgument,
-                                                    varNotYetDefined,
-                                                    ObjType::Invalid,
-                                                    0,
-                                                    ratchet(iInObj).tariffIndx);
+        ratchet.offsetVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(8), isNotNumeric);
+        ratchet.offsetPt = AssignVariablePt(
+            state, state.dataIPShortCut->cAlphaArgs(8), isNotNumeric, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, ratchet.tariffIndx);
     }
 }
 
@@ -1041,20 +1026,13 @@ void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound) // true
 
     static constexpr std::string_view RoutineName("GetInputEconomicsVariable: ");
 
-    int numEconVarObj;
-    int tariffPt;
-    int iInObj;    // loop index variable for reading in objects
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
-    int jVal;
-    int variablePt;
-    int jFld;
-    std::string CurrentModuleObject; // for ease in renaming.
 
-    CurrentModuleObject = "UtilityCost:Variable";
-    numEconVarObj = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    for (iInObj = 1; iInObj <= numEconVarObj; ++iInObj) {
+    std::string CurrentModuleObject = "UtilityCost:Variable";
+    int numEconVarObj = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    for (int iInObj = 1; iInObj <= numEconVarObj; ++iInObj) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  iInObj,
@@ -1068,14 +1046,15 @@ void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound) // true
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         // check to make sure none of the values are another economic object
-        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+        for (int jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
                 ShowWarningError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
             }
         }
-        tariffPt = FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
-        variablePt =
+        int tariffPt =
+            FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
+        int variablePt =
             AssignVariablePt(state, state.dataIPShortCut->cAlphaArgs(1), true, varIsArgument, varUserDefined, ObjType::Variable, iInObj, tariffPt);
         warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), tariffPt, ErrorsFound, CurrentModuleObject);
         auto &econVar = state.dataEconTariff->econVar(variablePt);
@@ -1096,12 +1075,12 @@ void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound) // true
             ErrorsFound = true;
         }
         // move number inputs into econVar
-        for (jVal = 1; jVal <= NumNums; ++jVal) {
+        for (int jVal = 1; jVal <= NumNums; ++jVal) {
             econVar.values(jVal) = state.dataIPShortCut->rNumericArgs(jVal);
         }
         // fill the rest of the array with the last value entered
         if (NumNums < MaxNumMonths) {
-            for (jVal = NumNums + 1; jVal <= MaxNumMonths; ++jVal) {
+            for (int jVal = NumNums + 1; jVal <= MaxNumMonths; ++jVal) {
                 econVar.values(jVal) = state.dataIPShortCut->rNumericArgs(NumNums);
             }
         }
@@ -1118,28 +1097,21 @@ void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound) // t
 
     static constexpr std::string_view RoutineName("GetInputEconomicsComputation: ");
 
-    int tariffPt;
-    int iInObj;    // loop index variable for reading in objects
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
-    int jLine;
-    int jFld;
-    std::string CurrentModuleObject; // for ease in renaming.
 
-    auto &computation(state.dataEconTariff->computation);
-
-    CurrentModuleObject = "UtilityCost:Computation";
+    std::string CurrentModuleObject = "UtilityCost:Computation";
     state.dataEconTariff->numComputation = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    computation.allocate(state.dataEconTariff->numTariff); // not the number of Computations but the number of tariffs
+    state.dataEconTariff->computation.allocate(state.dataEconTariff->numTariff); // not the number of Computations but the number of tariffs
     // set default values for computation
-    for (auto &e : computation) {
+    for (auto &e : state.dataEconTariff->computation) {
         e.computeName.clear();
         e.firstStep = 0;
         e.lastStep = -1;
         e.isUserDef = false;
     }
-    for (iInObj = 1; iInObj <= state.dataEconTariff->numComputation; ++iInObj) {
+    for (int iInObj = 1; iInObj <= state.dataEconTariff->numComputation; ++iInObj) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
                                                                  iInObj,
@@ -1153,33 +1125,36 @@ void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound) // t
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         // check to make sure none of the values are another economic object
-        for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+        for (int jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(state.dataIPShortCut->cAlphaArgs(jFld), "UtilityCost:")) {
                 ShowWarningError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "... a field was found containing UtilityCost: which may indicate a missing comma.");
             }
         }
-        tariffPt = FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
+        int tariffPt =
+            FindTariffIndex(state, state.dataIPShortCut->cAlphaArgs(2), state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, CurrentModuleObject);
         warnIfNativeVarname(state, state.dataIPShortCut->cAlphaArgs(1), tariffPt, ErrorsFound, CurrentModuleObject);
         // tariff and computation share the same index, the tariff index
         // so all references are to the tariffPt
+        auto &computation = state.dataEconTariff->computation(tariffPt);
+
         if (isWithinRange(state, tariffPt, 1, state.dataEconTariff->numTariff)) {
-            computation(tariffPt).computeName = state.dataIPShortCut->cAlphaArgs(1);
-            computation(tariffPt).firstStep = state.dataEconTariff->numSteps + 1;
-            for (jLine = 3; jLine <= NumAlphas; ++jLine) {
+            computation.computeName = state.dataIPShortCut->cAlphaArgs(1);
+            computation.firstStep = state.dataEconTariff->numSteps + 1;
+            for (int jLine = 3; jLine <= NumAlphas; ++jLine) {
                 parseComputeLine(state, state.dataIPShortCut->cAlphaArgs(jLine), tariffPt);
             }
-            computation(tariffPt).lastStep = state.dataEconTariff->numSteps;
+            computation.lastStep = state.dataEconTariff->numSteps;
             // check to make sure that some steps were defined
-            if (computation(tariffPt).firstStep >= computation(tariffPt).lastStep) {
-                computation(tariffPt).firstStep = 0;
-                computation(tariffPt).lastStep = -1;
-                computation(tariffPt).isUserDef = false;
+            if (computation.firstStep >= computation.lastStep) {
+                computation.firstStep = 0;
+                computation.lastStep = -1;
+                computation.isUserDef = false;
                 ShowSevereError(state, format("{}{}=\"{}\" invalid data.", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "... No lines in the computation can be interpreted ");
                 ErrorsFound = true;
             } else {
-                computation(tariffPt).isUserDef = true;
+                computation.isUserDef = true;
             }
         } else {
             ShowSevereError(state, format("{}{}=\"{}\" invalid data.", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -1256,15 +1231,13 @@ void parseComputeLine(EnergyPlusData &state, std::string const &lineOfCompute, i
     //   are put into the step array.
 
     std::string word;
-    std::string::size_type endOfWord;
-    int token;
 
-    endOfWord = len(lineOfCompute) - 1;
+    size_t endOfWord = len(lineOfCompute) - 1;
     while (endOfWord != std::string::npos) {
         // get a single word (text string delimited by spaces)
         GetLastWord(lineOfCompute, endOfWord, word);
         // first see if word is an operator
-        token = lookupOperator(word);
+        int token = lookupOperator(word);
         // if not an operator then look for
         if (token == 0) {
             // see if argument or assignment (assignment will be first string on line)
