@@ -3367,60 +3367,57 @@ void evaluateRatchet(EnergyPlusData &state, int const usingVariable)
     Array1D<Real64> offsetVals(MaxNumMonths);
     Array1D<Real64> seasonFromMask(MaxNumMonths);
     Array1D<Real64> seasonToMask(MaxNumMonths);
-    bool isMonthly(false);
     Array1D<Real64> adjSeasonal(MaxNumMonths);
     Array1D<Real64> adjPeak(MaxNumMonths);
     Array1D<Real64> maxAdjBase(MaxNumMonths);
-    Real64 maximumVal;
     Array1D<Real64> finalResult(MaxNumMonths);
 
-    auto &econVar = state.dataEconTariff->econVar;
-    auto const &tariff = state.dataEconTariff->tariff;
-    auto const &ratchet = state.dataEconTariff->ratchet;
-
-    int curTariff = econVar(usingVariable).tariffIndx;
-    int indexInChg = econVar(usingVariable).index;
+    int curTariff = state.dataEconTariff->econVar(usingVariable).tariffIndx;
+    auto const &tariff = state.dataEconTariff->tariff(curTariff);
+    int indexInChg = state.dataEconTariff->econVar(usingVariable).index;
+    auto const &ratchet = state.dataEconTariff->ratchet(indexInChg);
+    bool isMonthly = false;
 
     // check the tariff - make sure they match
-    if (ratchet(indexInChg).namePt != usingVariable) {
+    if (ratchet.namePt != usingVariable) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. Ratchet index does not match variable pointer.");
-        ShowContinueError(state, format("   Between: {}", econVar(usingVariable).name));
-        ShowContinueError(state, format("       And: {}", econVar(ratchet(indexInChg).namePt).name));
+        ShowContinueError(state, format("   Between: {}", state.dataEconTariff->econVar(usingVariable).name));
+        ShowContinueError(state, format("       And: {}", state.dataEconTariff->econVar(ratchet.namePt).name));
     }
-    if (ratchet(indexInChg).tariffIndx != curTariff) {
+    if (ratchet.tariffIndx != curTariff) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. Ratchet index does not match tariff index.");
-        ShowContinueError(state, format("   Between: {}", tariff(curTariff).tariffName));
-        ShowContinueError(state, format("       And: {}", tariff(ratchet(indexInChg).tariffIndx).tariffName));
+        ShowContinueError(state, format("   Between: {}", tariff.tariffName));
+        ShowContinueError(state, format("       And: {}", state.dataEconTariff->tariff(ratchet.tariffIndx).tariffName));
     }
     // data from the Ratchet
-    baselineVals = econVar(ratchet(indexInChg).baselinePt).values;
-    adjustmentVals = econVar(ratchet(indexInChg).adjustmentPt).values;
+    baselineVals = state.dataEconTariff->econVar(ratchet.baselinePt).values;
+    adjustmentVals = state.dataEconTariff->econVar(ratchet.adjustmentPt).values;
     // determine if multiplier should be based on variable or value
-    if (ratchet(indexInChg).multiplierPt != 0) {
-        multiplierVals = econVar(ratchet(indexInChg).multiplierPt).values;
+    if (ratchet.multiplierPt != 0) {
+        multiplierVals = state.dataEconTariff->econVar(ratchet.multiplierPt).values;
     } else {
-        multiplierVals = ratchet(indexInChg).multiplierVal;
+        multiplierVals = ratchet.multiplierVal;
     }
     // determine if offset should be based on variable or value
-    if (ratchet(indexInChg).offsetPt != 0) {
-        offsetVals = econVar(ratchet(indexInChg).offsetPt).values;
+    if (ratchet.offsetPt != 0) {
+        offsetVals = state.dataEconTariff->econVar(ratchet.offsetPt).values;
     } else {
-        offsetVals = ratchet(indexInChg).offsetVal;
+        offsetVals = ratchet.offsetVal;
     }
     // find proper season from mask
     {
-        int const SELECT_CASE_var(ratchet(indexInChg).seasonFrom);
+        int const SELECT_CASE_var(ratchet.seasonFrom);
         if (SELECT_CASE_var == seasonSummer) {
-            seasonFromMask = econVar(tariff(curTariff).nativeIsSummer).values;
+            seasonFromMask = state.dataEconTariff->econVar(tariff.nativeIsSummer).values;
             isMonthly = false;
         } else if (SELECT_CASE_var == seasonWinter) {
-            seasonFromMask = econVar(tariff(curTariff).nativeIsWinter).values;
+            seasonFromMask = state.dataEconTariff->econVar(tariff.nativeIsWinter).values;
             isMonthly = false;
         } else if (SELECT_CASE_var == seasonSpring) {
-            seasonFromMask = econVar(tariff(curTariff).nativeIsSpring).values;
+            seasonFromMask = state.dataEconTariff->econVar(tariff.nativeIsSpring).values;
             isMonthly = false;
         } else if (SELECT_CASE_var == seasonFall) {
-            seasonFromMask = econVar(tariff(curTariff).nativeIsAutumn).values;
+            seasonFromMask = state.dataEconTariff->econVar(tariff.nativeIsAutumn).values;
             isMonthly = false;
         } else if (SELECT_CASE_var == seasonAnnual) {
             seasonFromMask = 1.0; // all months are 1
@@ -3434,15 +3431,15 @@ void evaluateRatchet(EnergyPlusData &state, int const usingVariable)
     }
     // find proper season to mask
     {
-        int const SELECT_CASE_var(ratchet(indexInChg).seasonTo);
+        int const SELECT_CASE_var(ratchet.seasonTo);
         if (SELECT_CASE_var == seasonSummer) {
-            seasonToMask = econVar(tariff(curTariff).nativeIsSummer).values;
+            seasonToMask = state.dataEconTariff->econVar(tariff.nativeIsSummer).values;
         } else if (SELECT_CASE_var == seasonWinter) {
-            seasonToMask = econVar(tariff(curTariff).nativeIsWinter).values;
+            seasonToMask = state.dataEconTariff->econVar(tariff.nativeIsWinter).values;
         } else if (SELECT_CASE_var == seasonSpring) {
-            seasonToMask = econVar(tariff(curTariff).nativeIsSpring).values;
+            seasonToMask = state.dataEconTariff->econVar(tariff.nativeIsSpring).values;
         } else if (SELECT_CASE_var == seasonFall) {
-            seasonToMask = econVar(tariff(curTariff).nativeIsAutumn).values;
+            seasonToMask = state.dataEconTariff->econVar(tariff.nativeIsAutumn).values;
         } else if (SELECT_CASE_var == seasonAnnual) {
             seasonToMask = 1.0; // all months are 1
         }
@@ -3451,7 +3448,7 @@ void evaluateRatchet(EnergyPlusData &state, int const usingVariable)
     if (isMonthly) {
         adjSeasonal = adjustmentVals;
     } else {
-        maximumVal = -HUGE_(Real64());
+        Real64 maximumVal = -HUGE_(Real64());
         for (int iMonth = 1; iMonth <= MaxNumMonths; ++iMonth) {
             if (seasonFromMask(iMonth) == 1) {
                 if (adjustmentVals(iMonth) > maximumVal) {
@@ -3479,9 +3476,9 @@ void evaluateRatchet(EnergyPlusData &state, int const usingVariable)
         }
     }
     // store the cost in the name of the variable
-    econVar(usingVariable).values = finalResult;
+    state.dataEconTariff->econVar(usingVariable).values = finalResult;
     // set the flag that it has been evaluated so it won't be evaluated multiple times
-    econVar(usingVariable).isEvaluated = true;
+    state.dataEconTariff->econVar(usingVariable).isEvaluated = true;
 }
 
 void evaluateQualify(EnergyPlusData &state, int const usingVariable)
