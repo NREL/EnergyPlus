@@ -3259,61 +3259,61 @@ void evaluateChargeBlock(EnergyPlusData &state, int const usingVariable)
     Array1D<Real64> seasonMask(MaxNumMonths);
 
     auto &econVar = state.dataEconTariff->econVar;
-    auto const &chargeBlock = state.dataEconTariff->chargeBlock;
-    auto const &tariff = state.dataEconTariff->tariff;
 
     int curTariff = econVar(usingVariable).tariffIndx;
+    auto const &tariff = state.dataEconTariff->tariff(curTariff);
     int indexInChg = econVar(usingVariable).index;
+    auto const &chargeBlock = state.dataEconTariff->chargeBlock(indexInChg);
 
     // check the tariff - make sure they match
-    if (chargeBlock(indexInChg).namePt != usingVariable) {
+    if (chargeBlock.namePt != usingVariable) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. chargeBlock index does not match variable pointer.");
         ShowContinueError(state, format("   Between: {}", econVar(usingVariable).name));
-        ShowContinueError(state, format("       And: {}", econVar(chargeBlock(indexInChg).namePt).name));
+        ShowContinueError(state, format("       And: {}", econVar(chargeBlock.namePt).name));
     }
-    if (chargeBlock(indexInChg).tariffIndx != curTariff) {
+    if (chargeBlock.tariffIndx != curTariff) {
         ShowWarningError(state, "UtilityCost:Tariff Debugging issue. chargeBlock index does not match tariff index.");
-        ShowContinueError(state, format("   Between: {}", tariff(curTariff).tariffName));
-        ShowContinueError(state, format("       And: {}", tariff(chargeBlock(indexInChg).tariffIndx).tariffName));
+        ShowContinueError(state, format("   Between: {}", tariff.tariffName));
+        ShowContinueError(state, format("       And: {}", state.dataEconTariff->tariff(chargeBlock.tariffIndx).tariffName));
     }
     // data from the chargeBlock
-    sourceVals = econVar(chargeBlock(indexInChg).sourcePt).values;
+    sourceVals = econVar(chargeBlock.sourcePt).values;
     // find proper season mask
     {
-        int const SELECT_CASE_var(chargeBlock(indexInChg).season);
+        int const SELECT_CASE_var(chargeBlock.season);
         if (SELECT_CASE_var == seasonSummer) {
-            seasonMask = econVar(tariff(curTariff).nativeIsSummer).values;
+            seasonMask = econVar(tariff.nativeIsSummer).values;
         } else if (SELECT_CASE_var == seasonWinter) {
-            seasonMask = econVar(tariff(curTariff).nativeIsWinter).values;
+            seasonMask = econVar(tariff.nativeIsWinter).values;
         } else if (SELECT_CASE_var == seasonSpring) {
-            seasonMask = econVar(tariff(curTariff).nativeIsSpring).values;
+            seasonMask = econVar(tariff.nativeIsSpring).values;
         } else if (SELECT_CASE_var == seasonFall) {
-            seasonMask = econVar(tariff(curTariff).nativeIsAutumn).values;
+            seasonMask = econVar(tariff.nativeIsAutumn).values;
         } else if (SELECT_CASE_var == seasonAnnual) {
             seasonMask = 1.0; // all months are 1
         }
     }
     // get block size multiplier
-    if (chargeBlock(indexInChg).blkSzMultPt != 0) {
-        blkSzMult = econVar(chargeBlock(indexInChg).blkSzMultPt).values;
+    if (chargeBlock.blkSzMultPt != 0) {
+        blkSzMult = econVar(chargeBlock.blkSzMultPt).values;
     } else {
-        blkSzMult = chargeBlock(indexInChg).blkSzMultVal;
+        blkSzMult = chargeBlock.blkSzMultVal;
     }
     // initially set the remaing energy or demand to the source
     remainVals = sourceVals;
     // initially set the result (cost) to zero
     resultChg = 0.0;
     // loop through the blocks performing calculations
-    for (int iBlk = 1; iBlk <= chargeBlock(indexInChg).numBlk; ++iBlk) {
-        if (chargeBlock(indexInChg).blkSzPt(iBlk) != 0) {
-            curBlkSz = econVar(chargeBlock(indexInChg).blkSzPt(iBlk)).values;
+    for (int iBlk = 1; iBlk <= chargeBlock.numBlk; ++iBlk) {
+        if (chargeBlock.blkSzPt(iBlk) != 0) {
+            curBlkSz = econVar(chargeBlock.blkSzPt(iBlk)).values;
         } else {
-            curBlkSz = chargeBlock(indexInChg).blkSzVal(iBlk);
+            curBlkSz = chargeBlock.blkSzVal(iBlk);
         }
-        if (chargeBlock(indexInChg).blkCostPt(iBlk) != 0) {
-            curBlkCost = econVar(chargeBlock(indexInChg).blkCostPt(iBlk)).values;
+        if (chargeBlock.blkCostPt(iBlk) != 0) {
+            curBlkCost = econVar(chargeBlock.blkCostPt(iBlk)).values;
         } else {
-            curBlkCost = chargeBlock(indexInChg).blkCostVal(iBlk);
+            curBlkCost = chargeBlock.blkCostVal(iBlk);
         }
         // loop through the months
         for (int jMonth = 1; jMonth <= MaxNumMonths; ++jMonth) {
@@ -3334,8 +3334,8 @@ void evaluateChargeBlock(EnergyPlusData &state, int const usingVariable)
         }
     }
     // store the amount remaining if a variable is specified
-    if (chargeBlock(indexInChg).remainingPt != 0) {
-        econVar(chargeBlock(indexInChg).remainingPt).values = remainVals;
+    if (chargeBlock.remainingPt != 0) {
+        econVar(chargeBlock.remainingPt).values = remainVals;
     } else {
         bool flagAllZero = true;
         for (int jMonth = 1; jMonth <= MaxNumMonths; ++jMonth) {
