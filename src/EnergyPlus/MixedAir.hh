@@ -158,7 +158,7 @@ namespace MixedAir {
         std::string Name;
         std::string ControllerType;
         MixedAirControllerType ControllerType_Num = MixedAirControllerType::None; // Parameter equivalent of controller type
-        LockoutType Lockout = LockoutType::NoLockoutPossible; // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
+        LockoutType Lockout = LockoutType::NoLockoutPossible;                     // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
         // 2=LockoutWithCompressorPossible;
         bool FixedMin = true;                  // Fixed Minimum or Proportional Minimum
         Real64 TempLim = 0.0;                  // Temperature Limit
