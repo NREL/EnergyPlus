@@ -1719,11 +1719,9 @@ int FindTariffIndex(
     //    raise a warning.
 
     int FindTariffIndex;
-    int iTariff;
-    int found;
+    int found = 0;
 
-    found = 0;
-    for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+    for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
         if (UtilityRoutines::SameString(nameOfTariff, state.dataEconTariff->tariff(iTariff).tariffName)) {
             found = iTariff;
             break;
@@ -1749,9 +1747,7 @@ void warnIfNativeVarname(
     //   Issue a warning if the variable name (usually the object name) is
     //   one of the names of native variables
 
-    bool throwError;
-
-    throwError = false;
+    bool throwError = false;
     if (UtilityRoutines::SameString(objName, "TotalEnergy")) throwError = true;
     if (UtilityRoutines::SameString(objName, "TotalDemand")) throwError = true;
     if (UtilityRoutines::SameString(objName, "PeakEnergy")) throwError = true;
@@ -1828,7 +1824,7 @@ int AssignVariablePt(EnergyPlusData &state,
     //   Return the index of the variable.
 
     int AssignVariablePt;
-    auto &econVar(state.dataEconTariff->econVar);
+    auto &econVar = state.dataEconTariff->econVar;
 
     if (flagIfNotNumeric && (len(stringIn) >= 1)) {
         std::string inNoSpaces = RemoveSpaces(state, stringIn);
