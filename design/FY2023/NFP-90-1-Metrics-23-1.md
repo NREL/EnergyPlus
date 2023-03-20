@@ -3,7 +3,7 @@
 
 **Revisions**
 -   New Feature Proposal -- 25-November-2022
--   New Feature Design -- (original) 06-December-22 (updated) 08-December-2022, 14-December-2022
+-   New Feature Design & Updates -- (original) 06-December-22, 08-December-22, 14-December-22, 24-Jan-23, 8-Feb-23
 
 ## Justification for New Feature
 Many new metrics appear in the ASHRAE 90.1-2019 \[1\] standard.
@@ -26,12 +26,21 @@ ASHRAE 90.1-2019:
 |8	|UEF <br/> [(CFR-430-2016 Appendix E)](https://www.govinfo.gov/app/details/CFR-2016-title10-vol3/CFR-2016-title10-vol3-part430-subpartB-appE) | ASHRAE 90.1-2019|	Uniform Energy Factor|	Water Heaters	|[[9]](https://www.govinfo.gov/app/details/CFR-2016-title10-vol3/CFR-2016-title10-vol3-part430-subpartB-appE)|
 |9	|FEI  <br/>[(AMCA 208-2018)](https://www.techstreet.com/amca/searches/35955048) | ASHRAE 90.1-2019 |	fan energy index	| Fan Energy |	[[10]](https://www.techstreet.com/amca/searches/35955048) |
 
-In a previous Task Order, we implemented support for calculation and reporting of SEER2 and HSPF2.  This was done for SingleSpeed, TwoSpeed, MultiSpeed Cooling and Heating coils.  It was also done for CurveFit: Speed Cooling coils.
-In this Task Order we propose to implement support for calculation and reporting of the 2022 version of the AHRI IEER metric.  If budget allows, we will also extend the range of coils reporting SEER2 and HSPF2 to include VariableSpeed Cool and heating Coils.
+In a previous Task Order, we implemented support for calculation and reporting of SEER2.  This was done for SingleSpeed, TwoSpeed, MultiSpeed, and CurveFit:Speed  DX Cooling coils.  We also implemented support for calculation and reporting of HSPF2 for the SingleSpeed and MultiSpeed DX Heating coils. All of this was implemented based on the 2023 version of the ANSI/AHRI 210-240 standard.
+In this Task Order we propose to implement support for calculating and reporting EER and IEER metrics for (7) cooling coils, according to the 2022 version of the AHRI 340-360 standard.
 
 ## IEER = Integrated Energy Efficiency Rating (2022)
-The Integrated Energy Efficiency Ratio (IEER) will be calculated and reported as defined in the 2022 version of the AHRI 340/360 standard -- "Performance Rating of Commercial and Industrial Unitary Air Conditioning and Heat Pump Equipment." This metric will be calculated and reported for Air-cooled Unitary Air-conditioners and Unitary Heat Pumps with capacities greater than 65,000 Btu/h.  When compared to the previous (limited) implementation of the 2008 version of this standard, the Temperature time bins have changed and various test conditions for calculation of this metric have have changed & been expanded.
+The Integrated Energy Efficiency Ratio (IEER) will be calculated and reported as defined in the 2022 version of the AHRI 340/360 standard -- "Performance Rating of Commercial and Industrial Unitary Air Conditioning and Heat Pump Equipment." 
+This metric will be calculated and reported for Air-cooled Unitary Air-conditioners and Unitary Heat Pumps with capacities greater than 65,000 Btu/h (19,050) and less than 135,000 Btu/h (39,565 W). A previous attempt for reporting EER and IEER was implemented in 2010, based on the 2008 version of this standard.  That implementation was for the single speed DX cooling coil only.  In this implementation round, we intend to implement support for calculating and reporting EER and IEER, based on the 2022 version of the standard, for all the following:
+- Coil:Cooling:DX (+ :CurveFit:Performance, :CurveFit:OperatingMode, :CurveFit:Speed)
+- Coil:Cooling:DX:SingleSpeed – update
+- Coil:Cooling:DX:TwoSpeed
+- Coil:Cooling:DX:MultiSpeed
+- Coil:Cooling:DX:VariableSpeed
+- Coil:Cooling:WaterToAirHeatPump:EquationFit
+- Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
 <br/><br/>
+
 **General IEER Equations** <br/>
 For units covered by this standard, the IEER shall be calculated using test derived 
 data and the below Equation<br/><br/>
@@ -82,116 +91,52 @@ minimum step of capacity, shall be calculated using the Equation below:<br/>
 **Example Test Points Used for EER Rating Points**<br/>
 ![image](https://user-images.githubusercontent.com/78803858/205357978-5b1096e7-3b38-44b4-a870-8881c911296e.png)<br/>
 
-
-## SEER2 = Seasonal Energy Efficiency Rating (2023)
-Currently, there is at least one DX cooling coil for which SEER2 is not calculated & reported. We proposal to extend SEER2 calculation and reporting to include Coil:Cooling:DX:VariableSpeed. Calculation of the SEER2 value for these Variable Speed coils will be according to the following - extracted from the AHRI 340/360-2022 standard:<br/>
- |Variable Speed Systems|
-|--|
-|Graphical representation of SEER2:<br>![image](https://user-images.githubusercontent.com/78803858/205965470-1fb0f38d-25cf-41bd-af91-eea3c3f2cf15.png)|
-
-|Variable|Formulas|Code|
-|--|--|--|
-|SEER2|!![image](https://user-images.githubusercontent.com/78803858/205966718-6e8d8c2f-4360-4801-a97f-6efdd3edefce.png)|TBD|
-|q<sub>LOW</sub>(t<sub>j</sub>)| <img src="https://user-images.githubusercontent.com/49325382/173122263-ae5eecb5-1e19-47b0-94d1-4fa087e9a8bb.png" width="80%" height="auto" />||
-|P<sub>LOW</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122290-8dd0658a-acad-4137-8cfe-abfac6e49e4c.png" width="80%" height="auto" />||
-|q<sub>Int-Bin</sub>(t<sub>j</sub>)|![image](https://user-images.githubusercontent.com/78803858/205980941-cf041fe5-e61e-41f7-ae88-dd2163163094.png)||
-|E<sub>Int-Bin</sub>(t<sub>j</sub>)|![image](https://user-images.githubusercontent.com/78803858/205981227-bf639f72-fd63-426f-9a15-114c97e23de4.png)||
-|q<sub>Int</sub>(t<sub>j</sub>)|![image](https://user-images.githubusercontent.com/78803858/205981460-9bdf08aa-9410-46d8-acc2-3a655a037c0e.png)<br><img src="https://user-images.githubusercontent.com/49325382/173122561-5ae042d0-28a6-4fd9-812d-f9486abe1066.png" width="80%" height="auto" />||
-|q<sub>Int</sub>(87)|<img src="https://user-images.githubusercontent.com/49325382/173122633-20787666-fa61-4ca2-b960-92528f8cf9bc.png" width="80%" height="auto" />||
-|P<sub>Int</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122777-aa94c891-7248-4448-a89c-93cfcef07301.png" width="80%" height="auto" />||
-|P<sub>LOW</sub>(87)|<img src="https://user-images.githubusercontent.com/49325382/173122879-6a4382de-bd4b-4ed4-8f17-880d1adb0dc4.png" width="80%" height="auto" />||
-|**Case 1**<br>![image](https://user-images.githubusercontent.com/78803858/205981627-b61c1b44-88a3-450a-a811-e79ad4a777dc.png)<br>![image](https://user-images.githubusercontent.com/78803858/205981833-4149a5c1-27dd-4eaa-821d-7012e93a930c.png)|Building load is no greater than unit capacity at low speed||
-||<img src="https://user-images.githubusercontent.com/49325382/173125098-d13579fb-6db4-4db1-bf89-54f217a378dd.png" width="80%" height="auto" />||
-|C<sub>D</sub><sup>C,low</sup>|![image](https://user-images.githubusercontent.com/78803858/205982024-6ca58141-3598-45f0-8f2c-81f91fe8d286.png)<br>![image](https://user-images.githubusercontent.com/78803858/205982193-48229efc-4c10-4add-8178-ae4a71a8b630.png)<br>Substitute Test G and I for test C and D||
-|C<sub>D</sub><sup>C</sup><br>Default Cooling Degradation Coefficient|Default: 0.25<br>If Tests G and I are not performed or C<sub>D</sub><sup>C</sup> is greater than default use default value||
-|**Case 2**<br><img src="https://user-images.githubusercontent.com/49325382/173124209-db6b6044-efe8-4e7f-88f7-aae795049240.png" width="80%" height="auto" />|Building load can be matched by modulating the compressor speed between low speed and full speed||
-|q<sub>Int-Bin</sub>(t<sub>j</sub>)|![image](https://user-images.githubusercontent.com/78803858/205982359-a03c9bd1-1c80-4faa-b8d3-d25a7fcf55f2.png)||
-|E<sub>Int-Bin</sub>(t<sub>j</sub>)|![image](https://user-images.githubusercontent.com/78803858/205982506-a7430315-3b3f-409d-9057-7cbd28788432.png)||
-||<img src="https://user-images.githubusercontent.com/49325382/173109198-c817551d-8507-44ea-8f0f-f070b5cf695e.png" width="80%" height="auto" />||
-|EER<sub>Int-Bin</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173124302-997c297d-555b-4ed2-afd5-6351d53642ba.png" width="80%" height="auto" />||
-|**Case 3**<br><img src="https://user-images.githubusercontent.com/49325382/173124546-69a9d1f7-570a-422a-9b02-05aff8282289.png" width="80%" height="auto" />|Building load is equal to or greater than unit capacity at full stage||
-||![image](https://user-images.githubusercontent.com/78803858/205982718-516326d4-76f3-4ab8-adfd-bf91b90e19ce.png)>||
-
-## HSPF2 = Heating Seasonal Performance Factor (2023)
-Currently, there is at least one DX cooling coils for which HSPF2 is not calculated. We proposal to extend HSPF2 calculation and reporting to include Coil:Heating:DX:VariableSpeed. Calculation of the HSPF2 value for these Variable Speed coils will be according to the following - extracted from the AHRI 340/360-2022 standard:<br/>
-|Variable Speed System|
-|--|
-|Graphical representation of HSPFs:<br>!![image](https://user-images.githubusercontent.com/78803858/205966121-28ec2388-32a7-4784-8885-f55416b6070e.png)|
-
-|Variable|Formulas|Code|
-|--|--|--|
-|HSPF2|![image](https://user-images.githubusercontent.com/78803858/205983900-c0ab37e2-6a2f-42f1-b840-977fc594dc28.png)|TBD|
-||<img src="https://user-images.githubusercontent.com/49325382/173148304-e6399e4d-2be1-4d94-9221-70a5d6e28c4a.png" width="80%" height="auto" />||
-|**Case 1**<br>![image](https://user-images.githubusercontent.com/78803858/205984100-d83fba93-2508-409d-9fed-036ddcd8f3ec.png)|Building Load is less than the capacity of the unit at the Low Compressor Speed||
-|**Case 2**<br><img src="https://user-images.githubusercontent.com/49325382/173150412-f1325086-f758-40c8-82c4-116db328732b.png" width="80%" height="auto" />|Building load can be matched by modulating the compressor speed between low speed and full speed||
-||<img src="https://user-images.githubusercontent.com/49325382/173150460-8e50e95d-ba7a-45c6-98ab-4257ac2382f7.png" width="80%" height="auto" />||
-|**Case 3**<br>![image](https://user-images.githubusercontent.com/78803858/205984189-47957557-9446-4276-baa7-45d3965c596e.png)|Building Load is greater than the capacity of the unit at the Full Compressor Speed||
-||<img src="https://user-images.githubusercontent.com/49325382/173150028-3732a2c7-bff3-4616-abb9-e1e3d735cea5.png" width="80%" height="auto" />|
-
 ## Approach
 For each metric, we will first identify a set of EnergyPlus components to which the metric applies. We will then locate sample files that contain these object types -- to be used in testing. Coils we currently belive will be included are shown in the outline below.
 
-For IEER, we will update code written in 2010, for partial support of the 2008 version of IEER. We will also add new code to fully support the newest version of this rating, written in 2022. This will include support for the updated Time Bins and expanded test conditions. We will also update existing unit tests and possibly add one or more unit tests to test the new implementation.
+For IEER, we will update code written in 2010, which calculated IEER for one coil type (Coil:Cooling:DX:SingleSpeed), based on the 2008 version of AHRI 340/360. We will update this code and expand generation of this metric to many other coil types.  This update will ensure that calculations are consistent with the newest version of this rating = the 2022 version of AHRI 340/360. The new code will include support for the updated Time Bins and expanded test conditions. We will also update existing unit tests and add more unit tests to verify IEER calculation and reporting for (6) new coil types.
 
-For SEER2 and HSPF2, we will update code written in the E+ 22-2 cycle to include support for the variable speed DX coils. As before, this will require adding new fields to these coils -- to enable users to specify the 'Fan Power Per Volume Flow Rate {W/(m3/s)}' inputs to the SEER2 & HSPF2 calculations. 
+The budget in this round of development, will not support implementation of SEER2 and HSPF2 calculation & reporting for variable speed DX cooling & heating coils, as we had hoped.  However, we will add the new properties that are required for that work at the same time as we are adding properties for EER/IEER calculation.  This will enable implementation of SEER2 and HSPF2 in the EnergyPlus 23-2 implementation cycle.  Two new fields were implemented on these two coil types.  One to enable implementation of SEER & HSPF (based on the 2017 version of the standard), and one to enable implementation of SEER2 & HSPF2 (based on the 2022 version of the standard). 
 
 Once the metrics are calculated we can integrate them into the corresponding report code of the equipment summary table.
 
-This will all be done by extending the implementation in StandardRatings.hh & StandardRatings.cc.  Our initial estimate for the scope of this work includes the following:
--   For IEER
-    -   SingleSpeedDXCoolingCoilStandardRatings -- used for the following E+ coils:
-        -   Coil:Cooling:DX:SingleSpeed
-        -   Coil:Cooling:WaterToAirHeatPump:EquationFit
-        -   Coil:Cooling:DX:CurveFit (single-speed operating mode)
+All of this work will all be done by extending the implementation in StandardRatings.hh & StandardRatings.cc.  Our initial estimate for the scope of this work includes the following:
+-   Expand SingleSpeedDXCoolingCoilStandardRatings to report EER/IEER values for the following E+ coils:
+    -   Coil:Cooling:DX:CurveFit (single-speed operating mode)
+    -   Coil:Cooling:DX:SingleSpeed
+    -   Coil:Cooling:WaterToAirHeatPump:EquationFit
 
-    -   MultiSpeedDXCoolingCoilStandardRatings -- used for the following E+ coils:
-        -   Coil:Cooling:DX:TwoSpeed
-        -   Coil:Cooling:DX:MultiSpeed
-        -   Coil:Cooling:DX:VariableSpeed *(Note: standard formula/test conditions are limited to 4 > speeds)*
-        -   Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
-        -   Coil:Cooling:DX:CurveFit (multi-speed operating mode)
+-   Expand MultiSpeedDXCoolingCoilStandardRatings to report EER/IEER values for the following E+ coils:
+    -   Coil:Cooling:DX:CurveFit (multi-speed operating mode)
+    -   Coil:Cooling:DX:MultiSpeed
+    -   Coil:Cooling:DX:VariableSpeed *(Note: standard formula/test conditions are limited to 4 speeds)*
+    -   Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
 
-    -   SingleSpeedDXHeatingCoilStandardRatings -- used for the
-        following E+ coils:
-        -   Coil: Heating:DX:SingleSpeed
-
-    -   MultiSpeedDXHeatingCoilStandardRatings -- used for the following E+ coils:
-        -   Coil: Heating:DX:TwoSpeed
-        -   Coil: Heating:DX:MultiSpeed
-        -   Coil: Heating:DX:VariableSpeed *(Note: standard formula/test conditions are limited to 4 > speeds)*
-
-    -   ReportDXCoilRating used to report metrics for all the coils listed above.
-    -   CheckCurveLimitsForStandardRatings
-    -   Update existing unit tests and add new tests where new cases have been added
-
--   For SEER2
-    -   MultiSpeedDXCoolingCoilStandardRatings -- add support for:
-        -   Coil:Cooling:DX:VariableSpeed
-    -   Update existing unit tests and add new tests where new cases have been added
-
--   For HSPF2
-    -   MultiSpeedDXHeatingCoilStandardRatings -- add support for:
-        -   Coil: Heating:DX:VariableSpeed
-    -   Update existing unit tests and add new tests where new cases have been added
+-   Extend ReportDXCoilRating to report metrics for all the coils listed above.
+-   CheckCurveLimitsForStandardRatings
+-   Ensure existing unit tests pass with changes
+-   Add new tests where new cases have been added
 
 ## Testing/Validation/Data Source(s)
-Example files will be simulated to confirm calculation and reporting of the new metrics. Simulation results will be compared with values generated by a third-party implementation (assuming we can locate one).  Peer reviewer input on this is eagerly invited.
+Example files will be simulated to confirm calculation and reporting of the these metrics. Simulation results will be compared with values generated by a third-party implementation (assuming we can locate one).  Peer reviewer input on this is eagerly invited.
 Unit tests for the Continuous Integration pipeline will also be updated/extended to confirm the calculation of the metrics and ensure the code produces correct results and does not fail when future code changes are merged.
 
 ## Input Output Reference Documentation
-The Input Output Documentation will be expanded to include the new metrics. There will be an update in two places: first on the related section of the EnergyPlus components for which the metric is calculated and second in the reports section, specifically the Equipment Summary report. We will also add a disclaimer: \"It is not reasonable to expect AHRI ratings calculated from model inputs to match the actual ratings in the AHRI directory. This is largely because it is common practice for manufacturers to underrate their equipment for marketing reasons and/or to build in some safety margin in case DOE audits their ratings.\"
+The Input Output Documentation will be expanded to include the new metrics. There will be an update in two places: first on the related section of the EnergyPlus components for which the metric is calculated and second in the reports section, specifically the Equipment Summary report. This will be done for (7) coil types listed in the 'IEER = Integrated Energy Efficiency Rating (2022)' section above.
+We will also add a disclaimer: \"It is not reasonable to expect AHRI ratings calculated from model inputs to match the actual ratings in the AHRI directory. This is largely because it is common practice for manufacturers to underrate their equipment for marketing reasons and/or to build in some safety margin in case DOE audits their ratings.\"
 
 ## Input Description
-New fields will be added to the variable speed DX coils (both cooling and heating) to represent the static pressure on the fans (Power per flow rate).
+New fields will be added to the the following coils, to represent the static pressure on the fans (Power per flow rate).
+- Coil:Cooling:DX:VariableSpeed -- for EER/IEER (E+ 23-1) & SEER2 (E+ 23-2)
+- Coil:Heating:DX:VariableSpeed -- for HSPF & HSPF2 (E+ 23-2)
+- Coil:Cooling:WaterToAirHeatPump:EquationFit -- for EER/IEER (E+ 23-1)
+- Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit -- for EER/IEER (E+ 23-1)
 
 ## Outputs Description
-There will be an update to the reports to include the metrics as described above.
+There will be an update to the reports to include the EER/IEER metrics for the (7) coil types listed above.
 
 ## Engineering Reference
-The Engineering Reference will be updated with a high-level description
-of the calculations with links/references to Formulae (by number)
-defined in the standards. formulas used to calculate the two metrics and
-be referenced from the corresponding EnergyPlus components.
+The Engineering Reference will be updated with a high-level description of the calculations with links/references to Formulae defined in the standard - for the (7) coil types listed in the 'IEER = Integrated Energy Efficiency Rating (2022)' section above. 
 
 ## Example Files and Transition Changes
 Transition rules will be required to accommodate the new fields added to the VariableSpeed DX coils.
@@ -209,28 +154,34 @@ Example files that include the VariableSpeed DX coils will need to be updated.
     -   HeatPumpWaterToAirEquationFit.idf 			– WaterToAirHeatPump:EquationFit	 (Condenser:WaterCooled)
     -   VSHeatPumpWaterToAirEquationFit.idf		– WaterToAirHeatPump:VariableSpeedEquationFit (Condenser:WaterCooled)
 
--   For SEER2/HSPF2: There are 11 example files that feature one or both of the variable speed DX coils.  Testing will be done with some of all of these.  We will start files which include variable speed DX coils for both heating and cooling.  For example:
-    -   PackagedTerminalAirConditionerVSAS.idf	– Variable speed cooling & heating
-    -   PackagedTerminalHeatPumpVSAS.idf		     – Variable speed cooling & heating
-
 ## E-mail and Conference Call Conclusions ##
 Comments from Technicalities call on 14-Dec-22:
 -   Neal Kruis:
     -   Will your calculations take into consideration the physical configuration of the coils -- i.e. in-building, rooftop, others?
-    -   Not saying this is required, but curious.
-    -   Will these be calculated and reported for the special coils that are specifically for Data Centers?
+    -   Not saying this is required, but am curious.
+        -   This would require numerous new fields, which will impose a further burden on the EnergyPlus user.
+        -   Additionally, see Mike's caution below 
+        -   Therefore we will not attempt it in this cycle.
 -   Mike Witte:
     -   Caution against trying to make assumptions about the configuration of coils in EnergyPlus, 
         because they are analytical models rather that exact representations of manufactured equipment.
+        -   Understood.
 -   Richard Roustad:
     -   Might want to consider a user input field -- requesting that metrics be calculated and reported 
         for that instance of the coil.
+        -   Interesting idea.  By default, these metrics will be calculated for all supported coil types. 
 -   Jason Glazer:
+    -   Will these be calculated and reported for the special coils that are specifically for Data Centers?
+        -   This is a good idea!
+        -   Unfortunately, our plates are really full with the 10 coil types already listed. Maybe a future expansion?
     -   You mentioned that some calculations are being done according to the 2023 version of an AHRI standard
         Originally, the intent in calculating these metrics was to use the versions referenced by ASHRAE 90.1
+        -   We compared the 2022 version with the 2018 version and found only a few limited differences.
+        -   It seems reasonable to expect that the 2022 version of 90.1 will update to the 2023 version of AHRI 21-/240
 -   Tianzhen Hong:
     -   Suggestion that reporting of the metrics should be very clear about what version of the standard was used 
         to do the calculations.
+        -   Yes, we are making the clear in footnotes to the report tables.
 
 ## Acknowledgments
 TBD

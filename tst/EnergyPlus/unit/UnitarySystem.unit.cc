@@ -907,6 +907,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
           0.8,                            !- High Speed Rated Sensible Heat Ratio
           3.0,                            !- High Speed Gross Rated Cooling COP{ W / W }
          autosize,                        !- High Speed Rated Air Flow Rate{ m3 / s }
+          ,
+          ,
          450,                             !- Unit Internal Static Air Pressure{ Pa }
          Cooling Coil Air Inlet Node,     !- Air Inlet Node Name
          Zone 2 Inlet Node,               !- Air Outlet Node Name
@@ -919,6 +921,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
          0.8,                             !- Low Speed Gross Rated Sensible Heat Ratio
          4.2,                             !- Low Speed Gross Rated Cooling COP{ W / W }
          autosize,                        !- Low Speed Rated Air Flow Rate{ m3 / s }
+          ,
+          ,
          Biquadratic,                     !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
          Biquadratic,                     !- Low Speed Energy Input Ratio Function of Temperature Curve Name
          ,                                !- Condenser Air Inlet Node Name
@@ -3627,6 +3631,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1359072,                      !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.26,                           !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -3637,6 +3643,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.151008,                       !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.30,                           !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -3647,6 +3655,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1661088,                      !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.33,                           !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -3657,6 +3667,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1963104,                      !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.38,                           !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -3667,6 +3679,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.226512,                       !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.44,                           !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -3677,6 +3691,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 6 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.2567136,                      !- Speed 6 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.50,                           !- Speed 6 Reference Unit Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -3687,16 +3703,22 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 7 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.2869152,                      !- Speed 7 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.57,                           !- Speed 7 Reference Unit Condenser Flow Rate{ m3 / s }
   ,                               !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
   Quadratic,                      !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+)IDF"
+                                             R"IDF(
   5520.7,                         !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity{ w }
   0.75,                           !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 8 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.3171168,                      !- Speed 8 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.63,                           !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -3709,6 +3731,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 9 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.3473184,                      !- Speed 9 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.69,                           !- Speed 9 Reference Unit Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -3719,13 +3743,17 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 10 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.37752,                        !- Speed 10 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.74,                           !- Speed 10 Reference Unit Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
   Quadratic;                      !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+)IDF"
 
+ R"IDF(
 Coil:Heating:DX:VariableSpeed,
   DX Heating Coil,                !- Name
   Heating Coil Air Inlet Node,    !- Indoor Air Inlet Node Name
@@ -3748,6 +3776,8 @@ Coil:Heating:DX:VariableSpeed,
   1838.7,                         !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
   0.1661088,                      !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -3755,6 +3785,8 @@ Coil:Heating:DX:VariableSpeed,
   2295.5,                         !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
   0.179322,                       !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -3762,6 +3794,8 @@ Coil:Heating:DX:VariableSpeed,
   2751.3,                         !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
   0.1925352,                      !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -3769,6 +3803,8 @@ Coil:Heating:DX:VariableSpeed,
   3659.6,                         !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2189616,                      !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -3776,6 +3812,8 @@ Coil:Heating:DX:VariableSpeed,
   4563.7,                         !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
    0.245388,                      !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
@@ -3783,6 +3821,8 @@ Coil:Heating:DX:VariableSpeed,
   5463.3,                         !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2718144,                      !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
@@ -3790,6 +3830,8 @@ Coil:Heating:DX:VariableSpeed,
   6358.4,                         !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2982408,                      !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
@@ -3797,6 +3839,8 @@ Coil:Heating:DX:VariableSpeed,
   7248.5,                         !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
   0.3246672,                      !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
@@ -3804,6 +3848,8 @@ Coil:Heating:DX:VariableSpeed,
   8133.6,                         !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
   0.3510936,                      !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
@@ -3811,11 +3857,14 @@ Coil:Heating:DX:VariableSpeed,
   9013.2,                         !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
   0.37752,                        !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
   Quadratic;                      !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
+)IDF"
+                                             R"IDF(
 ScheduleTypeLimits,
   Any Number;                     !- Name
 
@@ -6289,6 +6338,8 @@ Coil:Heating:DX:VariableSpeed,
   1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
   0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 1 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -6296,6 +6347,8 @@ Coil:Heating:DX:VariableSpeed,
   2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
   0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 2 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -6303,6 +6356,8 @@ Coil:Heating:DX:VariableSpeed,
   2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
   0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 3 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -6310,6 +6365,8 @@ Coil:Heating:DX:VariableSpeed,
   3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 4 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -6317,6 +6374,8 @@ Coil:Heating:DX:VariableSpeed,
   4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
    0.245388,               !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 5 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
@@ -6324,6 +6383,8 @@ Coil:Heating:DX:VariableSpeed,
   5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 6 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
@@ -6331,6 +6392,8 @@ Coil:Heating:DX:VariableSpeed,
    6358.4,                 !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2982408,             !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 7 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,        !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,         !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
@@ -6338,6 +6401,8 @@ Coil:Heating:DX:VariableSpeed,
     7248.5,                !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}
     5.0,                   !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
      0.3246672,            !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 8 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,        !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,         !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
@@ -6345,6 +6410,8 @@ Coil:Heating:DX:VariableSpeed,
     8133.6,                !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}
     5.0,                   !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3510936,             !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 9 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,        !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name
      HPACHeatEIRFT,        !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
@@ -6352,6 +6419,8 @@ Coil:Heating:DX:VariableSpeed,
     9013.2,                !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}
     5.0,                   !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
     0.37752,               !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 10 Heating Capacity Function of Temperature Curve Name
      HPACHeatCapFFF,       !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
      HPACHeatEIRFT,        !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
@@ -6649,6 +6718,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1359072, !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.26, !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -6659,6 +6730,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.151008, !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.30, !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -6669,6 +6742,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1661088, !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.33, !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -6679,6 +6754,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1963104, !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.38, !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -6689,6 +6766,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.226512, !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.44, !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -6699,6 +6778,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 6 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.2567136, !- Speed 6 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.50, !- Speed 6 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -6709,6 +6790,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 7 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.2869152, !- Speed 7 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.57, !- Speed 7 Reference Unit Condenser Flow Rate{ m3 / s }
   , !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -6719,6 +6802,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 8 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.3171168, !- Speed 8 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.63, !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -6729,6 +6814,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 9 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.3473184, !- Speed 9 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.69, !- Speed 9 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -6739,6 +6826,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 10 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.37752, !- Speed 10 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.74, !- Speed 10 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -7120,6 +7209,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1359072, !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.26, !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -7130,6 +7221,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.151008, !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.30, !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -7140,6 +7233,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1661088, !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.33, !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -7150,6 +7245,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1963104, !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.38, !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -7160,6 +7257,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.226512, !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.44, !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -7170,6 +7269,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 6 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.2567136, !- Speed 6 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.50, !- Speed 6 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -7180,6 +7281,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 7 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.2869152, !- Speed 7 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.57, !- Speed 7 Reference Unit Condenser Flow Rate{ m3 / s }
   , !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -7190,6 +7293,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 8 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.3171168, !- Speed 8 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.63, !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -7200,6 +7305,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 9 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.3473184, !- Speed 9 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.69, !- Speed 9 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -7210,6 +7317,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 10 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.37752, !- Speed 10 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.74, !- Speed 10 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -8606,6 +8715,8 @@ Coil:Heating:DX:VariableSpeed,
   1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
   0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 1 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -8613,6 +8724,8 @@ Coil:Heating:DX:VariableSpeed,
   2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
   0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 2 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -8620,6 +8733,8 @@ Coil:Heating:DX:VariableSpeed,
   2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
   0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 3 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -8627,6 +8742,8 @@ Coil:Heating:DX:VariableSpeed,
   3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 4 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -8634,6 +8751,8 @@ Coil:Heating:DX:VariableSpeed,
   4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
    0.245388,               !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 5 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
@@ -8641,6 +8760,8 @@ Coil:Heating:DX:VariableSpeed,
   5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 6 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
@@ -8648,6 +8769,8 @@ Coil:Heating:DX:VariableSpeed,
    6358.4,                 !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2982408,             !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 7 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,        !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,         !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
@@ -8655,6 +8778,8 @@ Coil:Heating:DX:VariableSpeed,
     7248.5,                !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}
     5.0,                   !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
      0.3246672,            !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 8 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,        !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,         !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
@@ -8662,6 +8787,8 @@ Coil:Heating:DX:VariableSpeed,
     8133.6,                !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}
     5.0,                   !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3510936,             !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 9 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,        !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name
      HPACHeatEIRFT,        !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
@@ -8669,6 +8796,8 @@ Coil:Heating:DX:VariableSpeed,
     9013.2,                !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}
     5.0,                   !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
     0.37752,               !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 10 Heating Capacity Function of Temperature Curve Name
      HPACHeatCapFFF,       !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
      HPACHeatEIRFT,        !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
@@ -9277,6 +9406,8 @@ Coil:Cooling:WaterToAirHeatPump:EquationFit,
   DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
   Heating Coil Air Inlet Node,  !- Air Outlet Node Name
   1.4,                     !- Rated Air Flow Rate {m3/s}
+  ,
+  ,
   0.00165,                 !- Rated Water Flow Rate {m3/s}
   40125.6,                 !- Gross Rated Total Cooling Capacity {W}
   28267.06,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -9774,6 +9905,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump_SetPointControl)
       DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
       Heating Coil Air Inlet Node,  !- Air Outlet Node Name
       1.4,                     !- Rated Air Flow Rate {m3/s}
+      ,
+      ,
       0.00165,                 !- Rated Water Flow Rate {m3/s}
       40125.6,                 !- Gross Rated Total Cooling Capacity {W}
       28267.06,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -17087,6 +17220,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.188,                          !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.260,                          !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -17097,6 +17232,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.376,                          !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.520,                          !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -17107,6 +17244,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.564,                          !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.780,                          !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -17117,6 +17256,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.752,                          !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   1.040,                          !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -17127,6 +17268,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.940,                          !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   1.300,                          !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -17156,6 +17299,8 @@ Coil:Heating:DX:VariableSpeed,
   3600.0,                         !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
   0.169,                          !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -17163,6 +17308,8 @@ Coil:Heating:DX:VariableSpeed,
   7200.0,                         !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
   0.387,                          !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -17170,6 +17317,8 @@ Coil:Heating:DX:VariableSpeed,
   10800.0,                        !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
   0.580,                          !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -17177,6 +17326,8 @@ Coil:Heating:DX:VariableSpeed,
   14400.0,                        !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
   0.773,                          !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -17184,13 +17335,14 @@ Coil:Heating:DX:VariableSpeed,
   18000.0,                        !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
   0.966,                          !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
   Quadratic;                      !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
 )IDF"
                                              R"IDF(
-
 Curve:Quadratic,
   Quadratic,                      !- Name
   1.0,                            !- Coefficient1 Constant

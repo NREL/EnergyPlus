@@ -327,13 +327,15 @@ namespace WaterToAirHeatPumpSimple {
             simpleWAHP.WAHPType = WatertoAirHP::Cooling;
             simpleWAHP.WAHPPlantType = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
             simpleWAHP.RatedAirVolFlowRate = NumArray(1);
-            simpleWAHP.RatedWaterVolFlowRate = NumArray(2);
-            simpleWAHP.RatedCapCoolTotal = NumArray(3);
-            simpleWAHP.RatedCapCoolSens = NumArray(4);
-            simpleWAHP.RatedCOPCoolAtRatedCdts = NumArray(5);
-            simpleWAHP.RatedEntWaterTemp = NumArray(6);
-            simpleWAHP.RatedEntAirDrybulbTemp = NumArray(7);
-            simpleWAHP.RatedEntAirWetbulbTemp = NumArray(8);
+            simpleWAHP.RatedEvapFanPowerPerVolFlowRate2017 = NumArray(2);
+            simpleWAHP.RatedEvapFanPowerPerVolFlowRate2023 = NumArray(3);
+            simpleWAHP.RatedWaterVolFlowRate = NumArray(4);
+            simpleWAHP.RatedCapCoolTotal = NumArray(5);
+            simpleWAHP.RatedCapCoolSens = NumArray(6);
+            simpleWAHP.RatedCOPCoolAtRatedCdts = NumArray(7);
+            simpleWAHP.RatedEntWaterTemp = NumArray(8);
+            simpleWAHP.RatedEntAirDrybulbTemp = NumArray(9);
+            simpleWAHP.RatedEntAirWetbulbTemp = NumArray(10);
             simpleWAHP.TotalCoolCapCurveIndex = Curve::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
             simpleWAHP.SensCoolCapCurveIndex = Curve::GetCurveIndex(state, AlphArray(7));  // convert curve name to number
             simpleWAHP.CoolPowCurveIndex = Curve::GetCurveIndex(state, AlphArray(8));      // convert curve name to number
@@ -392,8 +394,8 @@ namespace WaterToAirHeatPumpSimple {
                                                      "Cooling Power Consumption Curve Name");
             }
             CheckSimpleWAHPRatedCurvesOutputs(state, simpleWAHP.Name);
-            simpleWAHP.Twet_Rated = NumArray(9);
-            simpleWAHP.Gamma_Rated = NumArray(10);
+            simpleWAHP.Twet_Rated = NumArray(11);
+            simpleWAHP.Gamma_Rated = NumArray(12);
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = simpleWAHP.Name;
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).SourceType = CurrentModuleObject;
 

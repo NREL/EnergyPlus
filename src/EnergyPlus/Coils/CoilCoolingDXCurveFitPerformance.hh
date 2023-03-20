@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/StandardRatings.hh>
 
 namespace EnergyPlus {
 
@@ -159,6 +160,7 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 standardRatingSEER2_User = 0.0;          // seasonal energy efficiency ratio of single speed DX cooling coil
     Real64 standardRatingSEER2_Standard = 0.0;
     Real64 standardRatingEER2 = 0.0; // energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingIEER2 = 0.0; // Integrated energy efficiency ratio of singgle speed DX cooling coil | AHRI Std.340/360-2022(IP)
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
     int hasAlternateMode = 0;                          // 0 Normal, 1 Enhanced, 2 SubcoolReheat

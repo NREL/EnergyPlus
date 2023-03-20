@@ -63,6 +63,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataEnvironment;
@@ -233,6 +234,8 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
         "   Sys 5 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
         "   Sys 5 Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "   2.0,                     !- Rated Air Flow Rate {m3/s}",
+        "   773.3,                   !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "   934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "   0.0033,                  !- Rated Water Flow Rate {m3/s}",
         "   20000,                   !- Gross Rated Total Cooling Capacity {W}",
         "   16000,                   !- Gross Rated Sensible Cooling Capacity {W}",
@@ -675,6 +678,8 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
         "   Sys 5 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
         "   Sys 5 Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "   1.0,                     !- Rated Air Flow Rate {m3/s}",
+        "   773.3,                   !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "   934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "   0.0033,                  !- Rated Water Flow Rate {m3/s}",
         "   23125.59,                !- Gross Rated Total Cooling Capacity {W}",
         "   16267,                   !- Gross Rated Sensible Cooling Capacity {W}",
@@ -695,6 +700,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
         "  Sys 5 Heating Coil Air Inlet Node,  !- Air Inlet Node Name",
         "  Sys 5 SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "  1.0,                      !- Rated Air Flow Rate {m3/s}",
+
         "  0.0033,                   !- Rated Water Flow Rate {m3/s}",
         "  19156.73,                 !- Gross Rated Heating Capacity {W}",
         "  3.167053691,              !- Gross Rated Heating COP",
@@ -1704,4 +1710,115 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
                     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolAtRatedCdts,
                 1.23,
                 0.00001);
+}
+
+TEST_F(EnergyPlusFixture, EquationFit_Initialization)
+{
+    std::string const idf_objects = delimited_string({
+
+        " Coil:Cooling:WaterToAirHeatPump:EquationFit,",
+        "   Sys 5 Heat Pump Cooling Mode,  !- Name",
+        "   Sys 5 Water to Air Heat Pump Source Side1 Inlet Node,  !- Water Inlet Node Name",
+        "   Sys 5 Water to Air Heat Pump Source Side1 Outlet Node,  !- Water Outlet Node Name",
+        "   Sys 5 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
+        "   Sys 5 Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
+        "   2.0,                     !- Rated Air Flow Rate {m3/s}",
+        "   773.3,                   !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "   934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "   0.0033,                  !- Rated Water Flow Rate {m3/s}",
+        "   20000,                   !- Gross Rated Total Cooling Capacity {W}",
+        "   16000,                   !- Gross Rated Sensible Cooling Capacity {W}",
+        "   7.007757577,             !- Gross Rated Cooling COP",
+        "   ,                        !- Rated Entering Water Temperature",
+        "   ,                        !- Rated Entering Air Dry-Bulb Temperature",
+        "   ,                        !- Rated Entering Air Wet-Bulb Temperature",
+        "   TotCoolCapCurve,         !- Total Cooling Capacity Curve Name",
+        "   SensCoolCapCurve,        !- Sensible Cooling Capacity Curve Name",
+        "   CoolPowCurve,            !- Cooling Power Consumption Curve Name",
+        "   0,                       !- Nominal Time for Condensate Removal to Begin {s}",
+        "   0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+
+        "Curve:QuintLinear,",
+        "  SensCoolCapCurve,     ! Curve Name",
+        "  0,           ! CoefficientC1",
+        "  0.2,           ! CoefficientC2",
+        "  0.2,          ! CoefficientC3",
+        "  0.2,          ! CoefficientC4",
+        "  0.2,          ! CoefficientC5",
+        "  0.2,           ! CoefficientC6",
+        "  0.,                   ! Minimum Value of v",
+        "  100.,                 ! Maximum Value of v",
+        "  0.,                   ! Minimum Value of w",
+        "  100.,                 ! Maximum Value of w",
+        "  0.,                   ! Minimum Value of x",
+        "  100.,                 ! Maximum Value of x",
+        "  0.,                   ! Minimum Value of y",
+        "  100.,                 ! Maximum Value of y",
+        "  0,                    ! Minimum Value of z",
+        "  100,                  ! Maximum Value of z",
+        "  0.,                   ! Minimum Curve Output",
+        "  38.;                  ! Maximum Curve Output",
+
+        "Curve:QuadLinear,",
+        "  TotCoolCapCurve,      ! Curve Name",
+        "  0,          ! CoefficientC1",
+        "  0.25,           ! CoefficientC2",
+        "  0.25,          ! CoefficientC3",
+        "  0.25,           ! CoefficientC4",
+        "  0.25,          ! CoefficientC5",
+        "  0.,                   ! Minimum Value of w",
+        "  100.,                 ! Maximum Value of w",
+        "  0.,                   ! Minimum Value of x",
+        "  100.,                 ! Maximum Value of x",
+        "  0.,                   ! Minimum Value of y",
+        "  100.,                 ! Maximum Value of y",
+        "  0,                    ! Minimum Value of z",
+        "  100,                  ! Maximum Value of z",
+        "  0.,                   ! Minimum Curve Output",
+        "  38.;                  ! Maximum Curve Output",
+
+        "Curve:QuadLinear,",
+        "  CoolPowCurve,      ! Curve Name",
+        "  0,          ! CoefficientC1",
+        "  0.25,           ! CoefficientC2",
+        "  0.25,          ! CoefficientC3",
+        "  0.25,           ! CoefficientC4",
+        "  0.25,          ! CoefficientC5",
+        "  0.,                   ! Minimum Value of w",
+        "  100.,                 ! Maximum Value of w",
+        "  0.,                   ! Minimum Value of x",
+        "  100.,                 ! Maximum Value of x",
+        "  0.,                   ! Minimum Value of y",
+        "  100.,                 ! Maximum Value of y",
+        "  0,                    ! Minimum Value of z",
+        "  100,                  ! Maximum Value of z",
+        "  0.,                   ! Minimum Curve Output",
+        "  38.;                  ! Maximum Curve Output",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    std::string CurrentModuleObject = "Coil:Cooling:DX:VariableSpeed";
+    int num_coils = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
+    ASSERT_EQ(0, num_coils);
+    CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:EquationFit";
+    num_coils = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, CurrentModuleObject);
+    ASSERT_EQ(1, num_coils);
+    int TotalArgs = 0;
+    int NumAlphas = 0;
+    int NumNumbers = 0;
+    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    EXPECT_EQ(TotalArgs, 20);
+    EXPECT_EQ(NumAlphas, 8);
+    EXPECT_EQ(NumNumbers, 12);
+
+    GetCurveInput(*state);
+    WaterToAirHeatPumpSimple::GetSimpleWatertoAirHPInput(*state);
+    int HPNum(1);
+    Real64 ActualAirflow(1.0);
+    Real64 DesignWaterflow(15.0);
+    EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, "SYS 5 HEAT PUMP COOLING MODE");
+    auto &thisCoil(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum));
+    EXPECT_NEAR(thisCoil.RatedCOPCoolAtRatedCdts, 7.00776, 0.01);
+    EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedEvapFanPowerPerVolFlowRate2017, 773.3);
+    EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedEvapFanPowerPerVolFlowRate2023, 934.4);
 }

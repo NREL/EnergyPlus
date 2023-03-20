@@ -994,7 +994,7 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
         Real64 constexpr ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
         static constexpr std::string_view Format_990(
             "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-            "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
+            "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER1 {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
         print(state.files.eio, "{}", Format_990);
         for (auto &coil : state.dataCoilCooingDX->coilCoolingDXs) {
             coil.performance.calcStandardRatings210240(state);
@@ -1039,7 +1039,7 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
                   coil.performance.standardRatingEER2 * ConvFromSIToIP,
                   coil.performance.standardRatingSEER2_User * ConvFromSIToIP,
                   coil.performance.standardRatingSEER2_Standard * ConvFromSIToIP,
-                  ' ');
+                  coil.performance.standardRatingIEER2 * ConvFromSIToIP);
 
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType_2023, coil.name, "Coil:Cooling:DX");
             OutputReportPredefined::PreDefTableEntry(
@@ -1060,8 +1060,8 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
                                                      coil.name,
                                                      coil.performance.standardRatingSEER2_Standard * ConvFromSIToIP,
                                                      2);
-            // OutputReportPredefined::PreDefTableEntry(
-            // state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, coil.name, coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, coil.name, coil.performance.standardRatingIEER2 * ConvFromSIToIP, 2);
             OutputReportPredefined::addFootNoteSubTable(
                 state, state.dataOutRptPredefined->pdstDXCoolCoil_2023, "ANSI/AHRI 2023 ratings account for supply air fan heat and electric power.");
         }

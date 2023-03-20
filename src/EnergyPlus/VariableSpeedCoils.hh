@@ -60,6 +60,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/StandardRatings.hh>
 
 namespace EnergyPlus {
 
@@ -151,6 +152,8 @@ namespace VariableSpeedCoils {
         // Rated Air volume flow rate per total capacity through unit at rated conditions [m^3/w]
         Array1D<Real64> MSRatedAirVolFlowRate;
         // Air volume flow rate through unit at rated conditions [m3/s]
+        Array1D<Real64> MSRatedEvaporatorFanPowerPerVolumeFlowRate2017; // 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]
+        Array1D<Real64> MSRatedEvaporatorFanPowerPerVolumeFlowRate2023; // 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]
         Array1D<Real64> MSRatedAirMassFlowRate;
         // Air mass flow rate through unit at rated conditions [kg/s]
         Array1D<Real64> MSRatedWaterVolFlowPerRatedTotCap;
@@ -294,7 +297,10 @@ namespace VariableSpeedCoils {
               MSRatedPercentTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
               MSRatedSHR(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedCOP(DataGlobalConstants::MaxSpeedLevels, 0.0),
               MSRatedAirVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSRatedAirVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedAirMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSRatedAirVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSRatedEvaporatorFanPowerPerVolumeFlowRate2017(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSRatedEvaporatorFanPowerPerVolumeFlowRate2023(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSRatedAirMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
               MSRatedWaterVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
               MSRatedWaterVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedWaterMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
               MSRatedCBF(DataGlobalConstants::MaxSpeedLevels, 0.0), MSEffectiveAo(DataGlobalConstants::MaxSpeedLevels, 0.0),
