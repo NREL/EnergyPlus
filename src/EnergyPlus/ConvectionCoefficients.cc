@@ -4390,7 +4390,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
 
     // first pass over surfaces for outside face params
     for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
-        if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) {
+        if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment && Surface(SurfLoop).ExtBoundCond != DataSurfaces::OtherSideCondModeledExt) {
             continue;
         }
         if (!Surface(SurfLoop).HeatTransSurf) {
@@ -4519,7 +4519,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     NorthWestFacade.Height = NorthWestFacade.Zmax - NorthWestFacade.Zmin;
 
     for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
-        if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) continue;
+        if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment && Surface(SurfLoop).ExtBoundCond != DataSurfaces::OtherSideCondModeledExt)
+            continue;
         if (!Surface(SurfLoop).HeatTransSurf) continue;
         Real64 thisAzimuth = Surface(SurfLoop).Azimuth;
 
@@ -8812,16 +8813,18 @@ Real64 CalcClearRoof(EnergyPlusData &state,
     if (x > 0.0) {
         return CalcClearRoof(state, SurfTemp, AirTemp, WindAtZ, RoofArea, RoofPerimeter, RoughnessIndex);
     } else {
-        if (state.dataConvectionCoefficient->CalcClearRoofErrorIDX == 0) {
-            ShowSevereMessage(state, "CalcClearRoof: Convection model not evaluated (bad value for distance to roof edge)");
-            ShowContinueError(state, format("Value for distance to roof edge ={:.3R}", x));
-            ShowContinueError(state, format("Occurs for surface named = {}", state.dataSurface->Surface(SurfNum).Name));
-            ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
+        if (state.dataSurface->Surface(SurfNum).ExtBoundCond != DataSurfaces::OtherSideCondModeledExt) {
+            if (state.dataConvectionCoefficient->CalcClearRoofErrorIDX == 0) {
+                ShowSevereMessage(state, "CalcClearRoof: Convection model not evaluated (bad value for distance to roof edge)");
+                ShowContinueError(state, format("Value for distance to roof edge ={:.3R}", x));
+                ShowContinueError(state, format("Occurs for surface named = {}", state.dataSurface->Surface(SurfNum).Name));
+                ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
+            }
+            ShowRecurringSevereErrorAtEnd(
+                state,
+                "CalcClearRoof: Convection model not evaluated because bad value for distance to roof edge and set to 9.999 [W/m2-k]",
+                state.dataConvectionCoefficient->CalcClearRoofErrorIDX);
         }
-        ShowRecurringSevereErrorAtEnd(
-            state,
-            "CalcClearRoof: Convection model not evaluated because bad value for distance to roof edge and set to 9.999 [W/m2-k]",
-            state.dataConvectionCoefficient->CalcClearRoofErrorIDX);
         return 9.9999; // safe but noticeable
     }
 }
