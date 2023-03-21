@@ -336,16 +336,6 @@ void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf,       // Surface Defin
     //  REAL(r64) :: tltcos
 
     // Object Data
-    Vector x2;
-    Vector x3a;
-    Vector v12a;
-    Vector v0;
-    Vector v1;
-    Vector v2;
-    Vector cs3_2;
-    Vector cs3_0;
-    Vector cs3_1;
-    Vector z3;
 
     //!!     x3=VecNormalize(Surf(2)-Surf(1))
     //!!     v12=Surf(3)-Surf(2)
@@ -362,36 +352,17 @@ void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf,       // Surface Defin
     //!!!      write(OUTPUT,*) 'x=',x3
     //!!!      write(OUTPUT,*) 'y=',y3
     //!!!      write(OUTPUT,*) 'z=',z3
-    x3a = VecNormalize(Surf(3) - Surf(2));
-    v12a = Surf(1) - Surf(2);
 
     //!!     lcsx=x3a
     //!!     lcsz=VecNormalize(x3a*v12a)
     //!!     lcsy=lcsz*x3a
 
-    lcsx = x3a;
+    lcsx = VecNormalize(Surf(3) - Surf(2));
     lcsz = NewellSurfaceNormalVector;
-    lcsy = cross(lcsz, x3a);
+    lcsy = cross(lcsz, lcsx);
 
-    //!!
-
-    //    Vec3d    v0(p1 - p0);  ! BGL has different conventions...p0=surf(2), etc
-    v0 = Surf(3) - Surf(2);
-    //    Vec3d    v1(p2 - p0);
-    v1 = Surf(1) - Surf(2);
-
-    //    Vec3d    v2 = cross(v0,v1);
-    v2 = cross(v0, v1);
-    //    cs3[2] = norm(v2); // z
-    cs3_2 = VecNormalize(v2);
-    //    cs3[0] = norm(v0); // x
-    cs3_0 = VecNormalize(v0);
-    //    cs3[1] = cross(cs3[2],cs3[0]); // y
-    cs3_1 = cross(cs3_2, cs3_0);
-    //    Vec3d    z3 = cs3[2];
-    z3 = cs3_2;
     //    double costheta = dot(z3,Ref_CS[2]);
-    costheta = dot(z3, ZUnit);
+    costheta = dot(lcsz, ZUnit);
 
     //    if ( fabs(costheta) < 1.0d0) { // normal cases
     if (std::abs(costheta) < 1.0 - 1.12e-16) { // Autodesk Added - 1.12e-16 to treat 1 bit from 1.0 as 1.0 to correct different behavior seen in
@@ -399,16 +370,12 @@ void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf,       // Surface Defin
         //    // azimuth
         //    Vec3d    x2 = cross(Ref_CS[2],z3); // order is important; x2 = x1
         //    RotAng[0] = ATAN2(dot(x2,Ref_CS[1]),dot(x2,Ref_CS[0]));
-        x2 = cross(ZUnit, z3);
+        Vector x2 = cross(ZUnit, lcsz);
         rotang_0 = std::atan2(dot(x2, YUnit), dot(x2, XUnit));
-
     } else {
-
-        //    }
-        //    else { // special cases: tilt angle theta = 0, PI
         //      // azimuth
         //      RotAng[0] = ATAN2(dot(cs3[0],Ref_CS[1]),dot(cs3[0],Ref_CS[0]) );
-        rotang_0 = std::atan2(dot(cs3_0, YUnit), dot(cs3_0, XUnit));
+        rotang_0 = std::atan2(dot(lcsx, YUnit), dot(lcsx, XUnit));
     }
 
     tlt = std::acos(NewellSurfaceNormalVector.z);
