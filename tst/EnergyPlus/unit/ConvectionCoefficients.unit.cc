@@ -3741,11 +3741,11 @@ TEST_F(ConvectionCoefficientsFixture, RoofExtConvectionCoefficient)
         state->dataEnvrn->OutHumRat = 0.0075;      // kgH20/kgDryAir
 
         // set convection coefficient calc parameters
-        int const SurfNum = 1;
-        Real64 const SurfTemp = 20.0;
-        Real64 const AirTemp = 15.0;
-        Real64 const WindAtZ = 2.0; // m/s
-        Real64 const WindDirect = 0.0;
+        int constexpr SurfNum = 1;
+        Real64 constexpr SurfTemp = 20.0;
+        Real64 constexpr AirTemp = 15.0;
+        Real64 constexpr WindAtZ = 2.0; // m/s
+        Real64 constexpr WindDirect = 0.0;
         Real64 RoofArea = RoofGeo.Area;
         Real64 RoofPerimeter = RoofGeo.Perimeter;
 
