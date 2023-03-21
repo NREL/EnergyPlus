@@ -9586,7 +9586,7 @@ void ReportVRFTerminalUnit(EnergyPlusData &state, int const VRFTUNum) // index t
     IndexToTUInTUList = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).IndexToTUInTUList;
     HRHeatRequestFlag = state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList);
     HRCoolRequestFlag = state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList);
-    ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
     // account for terminal unit parasitic On/Off power use
     // account for heat recovery first since these flags will be FALSE otherwise, each TU may have different operating mode
@@ -9755,7 +9755,7 @@ void ReportVRFCondenser(EnergyPlusData &state, int const VRFCond) // index to VR
 
     Real64 ReportingConstant; // - conversion constant for energy
 
-    ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
     //   calculate VRF condenser power/energy use
     state.dataHVACVarRefFlow->VRF(VRFCond).CoolElecConsumption = state.dataHVACVarRefFlow->VRF(VRFCond).ElecCoolingPower * ReportingConstant;

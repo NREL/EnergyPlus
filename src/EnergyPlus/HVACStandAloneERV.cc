@@ -1837,7 +1837,7 @@ void ReportStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum) // n
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ReportingConstant;
 
-    ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseEnergy =
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate * ReportingConstant;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SensCoolingEnergy =

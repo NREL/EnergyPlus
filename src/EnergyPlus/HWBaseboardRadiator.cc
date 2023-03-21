@@ -1773,11 +1773,11 @@ namespace HWBaseboardRadiator {
         //       RE-ENGINEERED  na
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
 
-        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSysSec;
+        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSysSec;
         HWBaseboard(BaseboardNum).ConvEnergy =
-            HWBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+            HWBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSysSec;
+        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSysSec;
     }
 
     void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,

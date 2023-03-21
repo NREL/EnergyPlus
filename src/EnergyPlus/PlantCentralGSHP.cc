@@ -3425,7 +3425,7 @@ void WrapperSpecs::UpdateChillerRecords(EnergyPlusData &state) // Wrapper number
     Real64 SecInTimeStep; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
     int ChillerHeaterNum; // Chiller heater number
 
-    SecInTimeStep = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    SecInTimeStep = state.dataHVACGlobal->TimeStepSysSec;
 
     for (ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
         this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoad =
@@ -3451,7 +3451,7 @@ void WrapperSpecs::UpdateChillerHeaterRecords(EnergyPlusData &state) // Wrapper 
     //       DATE WRITTEN:    Feb 2013
 
     // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-    Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSysSec;
 
     for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
         this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoad =

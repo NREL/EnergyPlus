@@ -2141,7 +2141,7 @@ namespace PlantPipingSystemsManager {
         // The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
         // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
         // which would be carried over from the previous environment
-        this->Cur.CurSimTimeStepSize = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->Cur.CurSimTimeStepSize = state.dataHVACGlobal->TimeStepSysSec;
         this->Cur.CurSimTimeSeconds = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                                       (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
 

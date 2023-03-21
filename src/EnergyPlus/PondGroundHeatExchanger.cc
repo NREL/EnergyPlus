@@ -864,7 +864,7 @@ void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger(EnergyPlusData &
     // compute pond heat transfer
     Real64 effectiveness = this->CalcEffectiveness(state, this->InletTemp, this->PondTemp, this->MassFlowRate);
     this->HeatTransferRate = this->MassFlowRate * CpFluid * effectiveness * (this->InletTemp - this->PondTemp);
-    this->Energy = this->HeatTransferRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->Energy = this->HeatTransferRate * state.dataHVACGlobal->TimeStepSysSec;
 
     // keep track of the bulk temperature
     this->BulkTemperature = this->PondTemp;

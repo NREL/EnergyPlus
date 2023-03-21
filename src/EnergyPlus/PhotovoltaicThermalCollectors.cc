@@ -1100,7 +1100,7 @@ namespace PhotovoltaicThermalCollectors {
 
             this->Report.ThermHeatGain = PotentialHeatGain;
             this->Report.ThermPower = this->Report.ThermHeatGain;
-            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSysSec;
             this->Report.ThermHeatLoss = 0.0;
             this->Report.TinletWorkFluid = Tinlet;
             this->Report.MdotWorkFluid = mdot;
@@ -1166,7 +1166,7 @@ namespace PhotovoltaicThermalCollectors {
             this->Report.ThermHeatLoss = mdot * CpInlet * (Tinlet - this->Report.ToutletWorkFluid);
             this->Report.ThermHeatGain = 0.0;
             this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
-            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSysSec;
             this->Simple.LastCollectorTemp = Tcollector;
             this->Report.BypassStatus = BypassFraction;
 
@@ -1223,7 +1223,7 @@ namespace PhotovoltaicThermalCollectors {
 
             this->Report.ThermHeatGain = PotentialHeatGain;
             this->Report.ThermPower = this->Report.ThermHeatGain;
-            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSysSec;
             this->Report.ThermHeatLoss = 0.0;
             this->Report.TinletWorkFluid = Tinlet;
             this->Report.MdotWorkFluid = mdot;
@@ -1272,7 +1272,7 @@ namespace PhotovoltaicThermalCollectors {
             this->Report.ThermHeatLoss = -PotentialHeatGain;
             this->Report.ThermHeatGain = 0.0;
             this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
-            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSysSec;
             if (PotentialHeatGain < 0.0) this->BIPVT.LastCollectorTemp = Tcollector;
             this->Report.BypassStatus = BypassFraction;
         } else {

@@ -242,7 +242,7 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state)
 void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 {
 
-    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
 
     // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
     // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
@@ -1305,7 +1305,7 @@ static constexpr std::array<std::string_view, static_cast<int>(EIRFuelFiredHeatP
 
 void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 {
-    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
 
     // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
     // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly

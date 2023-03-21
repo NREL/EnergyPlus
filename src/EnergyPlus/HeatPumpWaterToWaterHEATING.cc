@@ -858,7 +858,7 @@ void GshpPeHeatingSpecs::update(EnergyPlusData &state)
         // set node flow rates;  for these load based models
         // assume that the sufficient Source Side flow rate available
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         this->Energy = this->Power * ReportingConstant;
         this->QSourceEnergy = QSource * ReportingConstant;

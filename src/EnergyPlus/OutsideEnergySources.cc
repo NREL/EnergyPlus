@@ -451,7 +451,7 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
     int const OutletNode = this->OutletNodeNum;
     state.dataLoopNodes->Node(OutletNode).Temp = this->OutletTemp;
     this->EnergyRate = std::abs(MyLoad);
-    this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSysSec;
 }
 
 void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
