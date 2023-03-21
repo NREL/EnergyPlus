@@ -555,7 +555,7 @@ namespace HVACFan {
             m_powerFractionAtSpeed.resize(m_numSpeeds, 0.0);
             m_powerFractionInputAtSpeed.resize(m_numSpeeds, false);
             if (m_numSpeeds == ((numNums - 13) / 2) || m_numSpeeds == ((numNums + 1 - 13) / 2)) {
-                for (auto loopSet = 0; loopSet < m_numSpeeds; ++loopSet) {
+                for (int loopSet = 0; loopSet < m_numSpeeds; ++loopSet) {
                     m_flowFractionAtSpeed[loopSet] = numericArgs(13 + loopSet * 2 + 1);
                     if (!isNumericFieldBlank(13 + loopSet * 2 + 2)) {
                         m_powerFractionAtSpeed[loopSet] = numericArgs(13 + loopSet * 2 + 2);
@@ -657,7 +657,7 @@ namespace HVACFan {
                                 OutputProcessor::SOVStoreType::Average,
                                 name);
         } else if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1) {
-            for (auto speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
+            for (int speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
                 SetupOutputVariable(state,
                                     "Fan Runtime Fraction Speed " + fmt::to_string(speedLoop + 1),
                                     OutputProcessor::Unit::None,

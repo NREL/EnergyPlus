@@ -921,7 +921,6 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     //        Real64 SteamMassFlowRate; // steam mass flow rate through generator
 
     constexpr const char *RoutineName("SizeAbsorpChiller");
-    constexpr const char *RoutineNameLong("SizeAbsorptionChiller");
 
     int PltSizSteamNum(0);   // Plant Sizing index for steam heating loop
     int PltSizHeatingNum(0); // Plant Sizing index for how water heating loop
@@ -1281,6 +1280,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                     }
                 }
             } else {
+                constexpr const char *RoutineNameLong("SizeAbsorptionChiller");
                 Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(
                     state, fluidNameSteam, state.dataSize->PlantSizData(PltSizSteamNum).ExitTemp, 1.0, this->SteamFluidIndex, RoutineNameLong);
                 Real64 SteamDeltaT = state.dataSize->PlantSizData(PltSizSteamNum).DeltaT;

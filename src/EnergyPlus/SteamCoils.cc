@@ -336,7 +336,7 @@ namespace SteamCoils {
                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                           ObjectIsNotParent);
 
-            auto const controlMode(UtilityRoutines::MakeUPPERCase(AlphArray(7)));
+            std::string controlMode = UtilityRoutines::MakeUPPERCase(AlphArray(7));
             state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil =
                 static_cast<CoilControlType>(getEnumerationValue(coilControlTypeNames, controlMode));
             switch (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil) {
@@ -718,8 +718,8 @@ namespace SteamCoils {
         CpAirStd = PsyCpAirFnW(0.0);
         bool coilWasAutosized(false); // coil report
 
-        auto &OASysEqSizing(state.dataSize->OASysEqSizing);
-        auto &TermUnitSizing(state.dataSize->TermUnitSizing);
+        auto &OASysEqSizing = state.dataSize->OASysEqSizing;
+        auto &TermUnitSizing = state.dataSize->TermUnitSizing;
 
         // If this is a steam coil
         // Find the appropriate steam Plant Sizing object

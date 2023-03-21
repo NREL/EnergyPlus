@@ -66,7 +66,7 @@
 
 char *listAllAPIDataCSV(EnergyPlusState state)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     std::string output = "**ACTUATORS**\n";
     for (auto const &availActuator : thisState->dataRuntimeLang->EMSActuatorAvailable) {
         if (availActuator.ComponentTypeName.empty() && availActuator.UniqueIDName.empty() && availActuator.ControlTypeName.empty()) {
@@ -124,7 +124,7 @@ char *listAllAPIDataCSV(EnergyPlusState state)
 
 int apiDataFullyReady(EnergyPlusState state)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (thisState->dataPluginManager->fullyReady) {
         return 0;
     }
@@ -133,7 +133,7 @@ int apiDataFullyReady(EnergyPlusState state)
 
 int apiErrorFlag(EnergyPlusState state)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (thisState->dataPluginManager->apiErrorFlag) {
         return 1;
     } else {
@@ -143,15 +143,15 @@ int apiErrorFlag(EnergyPlusState state)
 
 void resetErrorFlag(EnergyPlusState state)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     thisState->dataPluginManager->apiErrorFlag = false;
 }
 
 int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char *surfName, const char *matName)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    auto UCsurfName = EnergyPlus::UtilityRoutines::MakeUPPERCase(surfName);
-    auto UCmatName = EnergyPlus::UtilityRoutines::MakeUPPERCase(matName);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    std::string UCsurfName = EnergyPlus::UtilityRoutines::MakeUPPERCase(surfName);
+    std::string UCmatName = EnergyPlus::UtilityRoutines::MakeUPPERCase(matName);
     return EnergyPlus::HeatBalFiniteDiffManager::numNodesInMaterialLayer(*thisState, UCsurfName, UCmatName);
 }
 
@@ -160,7 +160,7 @@ void requestVariable(EnergyPlusState state, const char *type, const char *key)
     // allow specifying a request for an output variable, so that E+ does not have to keep all of them in memory
     // should be called before energyplus is run!
     // note that the variable request array is cleared during clear_state, so if you run multiple E+ runs, these must be requested again each time.
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::OutputProcessor::APIOutputVariableRequest request;
     request.varName = type;
     request.varKey = key;
@@ -178,7 +178,7 @@ int getVariableHandle(EnergyPlusState state, const char *type, const char *key)
     //  - index N+M being the highest integer variable handle
     // In this function, it is as simple as looping over both types and continuing to increment
     // the handle carefully.  In the getValue function it is just a matter of checking array sizes.
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
     int handle = -1; // initialize to -1 as a flag
@@ -220,7 +220,7 @@ Real64 getVariableValue(EnergyPlusState state, const int handle)
     //  - index N+1 being the first integer variable handle
     //  - index N+M being the highest integer variable handle
     // note that this function will return -1 if it cannot
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle > 0 && handle <= thisState->dataOutputProcessor->NumOfRVariable) {
         auto &thisOutputVar = thisState->dataOutputProcessor->RVariableTypes(handle);
         return *thisOutputVar.VarPtr.Which;
@@ -247,9 +247,9 @@ Real64 getVariableValue(EnergyPlusState state, const int handle)
 
 int getMeterHandle(EnergyPlusState state, const char *meterName)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     std::string const meterNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(meterName);
-    auto i = EnergyPlus::GetMeterIndex(*thisState, meterNameUC);
+    int i = EnergyPlus::GetMeterIndex(*thisState, meterNameUC);
     if (i == 0) {
         // inside E+, zero is meaningful, but through the API, I want to use negative one as a signal of a bad lookup
         return -1;
@@ -260,7 +260,7 @@ int getMeterHandle(EnergyPlusState state, const char *meterName)
 
 Real64 getMeterValue(EnergyPlusState state, int handle)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= (int)thisState->dataOutputProcessor->EnergyMeters.size()) {
         return EnergyPlus::GetCurrentMeterValue(*thisState, handle);
     } else {
@@ -285,7 +285,7 @@ int getActuatorHandle(EnergyPlusState state, const char *componentType, const ch
     std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(componentType);
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(uniqueKey);
     std::string const controlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(controlType);
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     for (int ActuatorLoop = 1; ActuatorLoop <= thisState->dataRuntimeLang->numEMSActuatorsAvailable; ++ActuatorLoop) {
         auto &availActuator = thisState->dataRuntimeLang->EMSActuatorAvailable(ActuatorLoop);
         handle++;
@@ -335,7 +335,7 @@ int getActuatorHandle(EnergyPlusState state, const char *componentType, const ch
 void resetActuator(EnergyPlusState state, int handle)
 {
     // resets the actuator so that E+ will use the internally calculated value again
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= thisState->dataRuntimeLang->numEMSActuatorsAvailable) {
         auto &theActuator(thisState->dataRuntimeLang->EMSActuatorAvailable(handle));
         *theActuator.Actuated = false;
@@ -355,7 +355,7 @@ void resetActuator(EnergyPlusState state, int handle)
 
 void setActuatorValue(EnergyPlusState state, const int handle, const Real64 value)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= thisState->dataRuntimeLang->numEMSActuatorsAvailable) {
         auto &theActuator(thisState->dataRuntimeLang->EMSActuatorAvailable(handle));
         if (theActuator.RealValue) {
@@ -384,7 +384,7 @@ void setActuatorValue(EnergyPlusState state, const int handle, const Real64 valu
 
 Real64 getActuatorValue(EnergyPlusState state, const int handle)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= thisState->dataRuntimeLang->numEMSActuatorsAvailable) {
         auto &theActuator(thisState->dataRuntimeLang->EMSActuatorAvailable(handle));
         if (theActuator.RealValue) {
@@ -420,7 +420,7 @@ int getInternalVariableHandle(EnergyPlusState state, const char *type, const cha
     int handle = 0;
     std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     for (auto const &availVariable : thisState->dataRuntimeLang->EMSInternalVarsAvailable) { // TODO: this should stop at numEMSInternalVarsAvailable
         handle++;
         std::string const variableTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availVariable.DataTypeName);
@@ -434,9 +434,9 @@ int getInternalVariableHandle(EnergyPlusState state, const char *type, const cha
 
 Real64 getInternalVariableValue(EnergyPlusState state, int handle)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= (int)thisState->dataRuntimeLang->numEMSInternalVarsAvailable) {
-        auto thisVar = thisState->dataRuntimeLang->EMSInternalVarsAvailable(handle);
+        auto const &thisVar = thisState->dataRuntimeLang->EMSInternalVarsAvailable(handle);
         if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PtrDataType::Real) {
             return *thisVar.RealValue;
         } else if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PtrDataType::Integer) {
@@ -468,13 +468,13 @@ Real64 getInternalVariableValue(EnergyPlusState state, int handle)
 
 int getPluginGlobalVariableHandle(EnergyPlusState state, const char *name)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataPluginManager->pluginManager->getGlobalVariableHandle(*thisState, name);
 }
 
 Real64 getPluginGlobalVariableValue(EnergyPlusState state, int handle)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxGlobalVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return 0
@@ -490,7 +490,7 @@ Real64 getPluginGlobalVariableValue(EnergyPlusState state, int handle)
 
 void setPluginGlobalVariableValue(EnergyPlusState state, int handle, Real64 value)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxGlobalVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -505,13 +505,13 @@ void setPluginGlobalVariableValue(EnergyPlusState state, int handle, Real64 valu
 
 int getPluginTrendVariableHandle(EnergyPlusState state, const char *name)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     return EnergyPlus::PluginManagement::PluginManager::getTrendVariableHandle(*thisState, name);
 }
 
 Real64 getPluginTrendVariableValue(EnergyPlusState state, int handle, int timeIndex)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -539,7 +539,7 @@ Real64 getPluginTrendVariableValue(EnergyPlusState state, int handle, int timeIn
 
 Real64 getPluginTrendVariableAverage(EnergyPlusState state, int handle, int count)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -568,7 +568,7 @@ Real64 getPluginTrendVariableAverage(EnergyPlusState state, int handle, int coun
 
 Real64 getPluginTrendVariableMin(EnergyPlusState state, int handle, int count)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -596,7 +596,7 @@ Real64 getPluginTrendVariableMin(EnergyPlusState state, int handle, int count)
 
 Real64 getPluginTrendVariableMax(EnergyPlusState state, int handle, int count)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -624,7 +624,7 @@ Real64 getPluginTrendVariableMax(EnergyPlusState state, int handle, int count)
 
 Real64 getPluginTrendVariableSum(EnergyPlusState state, int handle, int count)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -652,7 +652,7 @@ Real64 getPluginTrendVariableSum(EnergyPlusState state, int handle, int count)
 
 Real64 getPluginTrendVariableDirection(EnergyPlusState state, int handle, int count)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -821,7 +821,7 @@ int getConstructionHandle(EnergyPlusState state, const char *constructionName)
 {
     int handle = 0;
     std::string const nameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(constructionName);
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     for (auto const &construct : thisState->dataConstruction->Construct) {
         handle++;
         std::string const thisNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(construct.Name);

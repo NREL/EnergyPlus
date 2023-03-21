@@ -209,7 +209,6 @@ namespace BoilerSteam {
                 // Set to Electric to avoid errors when setting up output variables
                 thisBoiler.BoilerFuelTypeForOutputVariable = "Electricity";
                 ErrorsFound = true;
-                FuelTypeError = false;
             }
 
             // INPUTS from the IDF file

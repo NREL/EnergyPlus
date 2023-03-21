@@ -1319,7 +1319,7 @@ namespace SystemAvailabilityManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++Item;
                 auto const &objectFields = instance.value();
-                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 auto &mgrList = state.dataSystemAvailabilityManager->ListData(Item);
                 mgrList.Name = thisObjectName;
@@ -1327,7 +1327,7 @@ namespace SystemAvailabilityManager {
                 auto extensibles = objectFields.find("managers");
                 auto const &extensionSchemaProps = objectSchemaProps["managers"]["items"]["properties"];
                 if (extensibles != objectFields.end()) {
-                    auto extensiblesArray = extensibles.value();
+                    auto &extensiblesArray = extensibles.value();
                     int numExtensibles = extensiblesArray.size();
                     mgrList.NumItems = numExtensibles;
                     mgrList.AvailManagerName.allocate(numExtensibles);
@@ -2375,7 +2375,7 @@ namespace SystemAvailabilityManager {
         Real64 NumHoursBeforeOccupancy; // Variable to store the number of hours before occupancy in optimum start period
         bool exitLoop;                  // exit loop on found data
 
-        auto &OptStartMgr(state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum));
+        auto &OptStartMgr = state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum);
 
         // some avail managers may be used in air loop and plant availability manager lists, if so they only need be simulated once
         if (OptStartMgr.isSimulated) {
@@ -3465,7 +3465,7 @@ namespace SystemAvailabilityManager {
     void SysAvailManagerOptimumStart::SetOptStartFlag(EnergyPlusData &state, int const AirLoopNum)
     {
         // Set the OptStartFlag true for all zones on the air loop
-        auto const &thisAirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum));
+        auto const &thisAirToZoneNodeInfo = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum);
         for (int counter = 1; counter <= thisAirToZoneNodeInfo.NumZonesCooled; ++counter) {
             state.dataHVACGlobal->OptStartData.OptStartFlag(thisAirToZoneNodeInfo.CoolCtrlZoneNums(counter)) = true;
         }
