@@ -4390,7 +4390,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
 
     // first pass over surfaces for outside face params
     for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
-        if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment && Surface(SurfLoop).ExtBoundCond != DataSurfaces::OtherSideCondModeledExt) {
+        if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) {
             continue;
         }
         if (!Surface(SurfLoop).HeatTransSurf) {
@@ -4519,8 +4519,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     NorthWestFacade.Height = NorthWestFacade.Zmax - NorthWestFacade.Zmin;
 
     for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
-        if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment && Surface(SurfLoop).ExtBoundCond != DataSurfaces::OtherSideCondModeledExt)
-            continue;
+        if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) continue;
         if (!Surface(SurfLoop).HeatTransSurf) continue;
         Real64 thisAzimuth = Surface(SurfLoop).Azimuth;
 
