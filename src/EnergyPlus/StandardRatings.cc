@@ -3399,7 +3399,7 @@ namespace StandardRatings {
         return std::make_tuple(IEER_2022, QAFull, EER_2022);
     }
 
-     std::tuple<Real64, Real64, Real64> IEERCalculation(EnergyPlus::EnergyPlusData &state,
+    std::tuple<Real64, Real64, Real64> IEERCalculation(EnergyPlus::EnergyPlusData &state,
                                                        std::string const &DXCoilType, // Type of DX coil for which HSPF is calculated
                                                        const int CapFTempCurveIndex,
                                                        const Real64 RatedTotalCapacity,

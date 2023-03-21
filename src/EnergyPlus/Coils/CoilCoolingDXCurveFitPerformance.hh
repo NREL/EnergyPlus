@@ -159,7 +159,7 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 standardRatingCoolingCapacity2023 = 0.0; // net cooling capacity of single speed DX cooling coil
     Real64 standardRatingSEER2_User = 0.0;          // seasonal energy efficiency ratio of single speed DX cooling coil
     Real64 standardRatingSEER2_Standard = 0.0;
-    Real64 standardRatingEER2 = 0.0; // energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingEER2 = 0.0;  // energy efficiency ratio of single speed DX cooling coil
     Real64 standardRatingIEER2 = 0.0; // Integrated energy efficiency ratio of singgle speed DX cooling coil | AHRI Std.340/360-2022(IP)
 
     CoilCoolingDXCurveFitOperatingMode normalMode;

@@ -2423,7 +2423,6 @@ void GetDXCoils(EnergyPlusData &state)
         state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate(1) = Numbers(5);
         state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_2023(1) = Numbers(6);
 
-
         if (!lNumericBlanks(7)) {
             state.dataDXCoils->DXCoil(DXCoilNum).InternalStaticPressureDrop = Numbers(7);
             state.dataDXCoils->DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject = true;
@@ -2636,7 +2635,6 @@ void GetDXCoils(EnergyPlusData &state)
 
         state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_LowSpeed(1) = Numbers(12);
         state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_2023_LowSpeed(1) = Numbers(13);
-
 
         if (lNumericBlanks(14)) {
             state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor = -25.0;
