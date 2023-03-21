@@ -1602,7 +1602,8 @@ namespace SurfaceGeometry {
 
                 //  For each Base Surface Type (Wall, Floor, Roof/Ceiling) - put these first
 
-                for (int Loop = 1; Loop <= 3; ++Loop) {
+                for (const DataSurfaces::SurfaceClass Loop :
+                     {DataSurfaces::SurfaceClass::Wall, DataSurfaces::SurfaceClass::Floor, DataSurfaces::SurfaceClass::Roof}) {
 
                     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
@@ -1610,7 +1611,8 @@ namespace SurfaceGeometry {
                         if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone == 0) continue;
 
                         if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).spaceNum != spaceNum) continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != state.dataSurfaceGeometry->BaseSurfIDs(Loop)) continue;
+                        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != state.dataSurfaceGeometry->BaseSurfIDs(static_cast<int>(Loop)))
+                            continue;
 
                         ++MovedSurfs;
                         state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
@@ -1779,12 +1781,13 @@ namespace SurfaceGeometry {
 
         //  For each Base Surface Type (Wall, Floor, Roof)
 
-        for (int Loop = 1; Loop <= 3; ++Loop) {
+        for (const DataSurfaces::SurfaceClass Loop :
+             {DataSurfaces::SurfaceClass::Wall, DataSurfaces::SurfaceClass::Floor, DataSurfaces::SurfaceClass::Roof}) {
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
                 if (state.dataSurface->Surface(SurfNum).Zone == 0) continue;
 
-                if (state.dataSurface->Surface(SurfNum).Class != state.dataSurfaceGeometry->BaseSurfIDs(Loop)) continue;
+                if (state.dataSurface->Surface(SurfNum).Class != state.dataSurfaceGeometry->BaseSurfIDs(static_cast<int>(Loop))) continue;
 
                 //  Find all subsurfaces to this surface
                 for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
