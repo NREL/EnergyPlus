@@ -2395,7 +2395,7 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
     //  Reporting
 
     // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
     if (MyLoad >= 0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
         // Set node conditions
@@ -2467,15 +2467,15 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
 
         // Set node flow rates;  for these load based models
         // assume that sufficient evaporator flow rate is available
-        this->ChillerFalseLoad = this->ChillerFalseLoadRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-        this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-        this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->ChillerFalseLoad = this->ChillerFalseLoadRate * state.dataHVACGlobal->TimeStepSysSec;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSysSec;
+        this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSysSec;
+        this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSysSec;
         this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
         this->CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
         this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
-        this->CondenserFanEnergyConsumption = this->CondenserFanPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->CondenserFanEnergyConsumption = this->CondenserFanPower * state.dataHVACGlobal->TimeStepSysSec;
         if (this->Power != 0.0) {
             this->ActualCOP = (this->QEvaporator + this->ChillerFalseLoadRate) / this->Power;
         } else {
@@ -2489,7 +2489,7 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
         if (this->HeatRecActive) {
 
             PlantUtilities::SafeCopyPlantNode(state, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
-            this->EnergyHeatRecovery = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+            this->EnergyHeatRecovery = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSysSec;
             state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
             this->HeatRecInletTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
             this->HeatRecMassFlow = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;

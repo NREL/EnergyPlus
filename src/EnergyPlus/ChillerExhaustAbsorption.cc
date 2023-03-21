@@ -2042,7 +2042,7 @@ void ExhaustAbsorberSpecs::updateCoolRecords(EnergyPlusData &state, Real64 MyLoa
     }
 
     // convert power to energy and instantaneous use to use over the time step
-    Real64 RptConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 RptConstant = state.dataHVACGlobal->TimeStepSysSec;
     this->CoolingEnergy = this->CoolingLoad * RptConstant;
     this->TowerEnergy = this->TowerLoad * RptConstant;
     this->ThermalEnergy = this->ThermalEnergyUseRate * RptConstant;
@@ -2070,7 +2070,7 @@ void ExhaustAbsorberSpecs::updateHeatRecords(EnergyPlusData &state, Real64 MyLoa
     }
 
     // convert power to energy and instantaneous use to use over the time step
-    Real64 RptConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 RptConstant = state.dataHVACGlobal->TimeStepSysSec;
     this->HeatingEnergy = this->HeatingLoad * RptConstant;
     this->ThermalEnergy = this->ThermalEnergyUseRate * RptConstant;
     this->HeatThermalEnergy = this->HeatThermalEnergyUseRate * RptConstant;

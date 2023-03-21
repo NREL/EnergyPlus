@@ -14159,7 +14159,7 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
         }
     }
 
-    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
     switch (thisDXCoil.DXCoilType_Num) {
     case CoilDX_HeatingEmpirical:

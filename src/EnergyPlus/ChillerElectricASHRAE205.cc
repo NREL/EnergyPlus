@@ -1615,10 +1615,10 @@ void ASHRAE205ChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad, b
         state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
         // Set node flow rates;  for these load based models
         // assume that sufficient evaporator flow rate is available
-        this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-        this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-        this->OilCoolerEnergy = this->QOilCooler * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-        this->AuxiliaryEnergy = this->QAuxiliary * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSysSec;
+        this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSysSec;
+        this->OilCoolerEnergy = this->QOilCooler * state.dataHVACGlobal->TimeStepSysSec;
+        this->AuxiliaryEnergy = this->QAuxiliary * state.dataHVACGlobal->TimeStepSysSec;
         this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
         this->CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
@@ -1630,8 +1630,8 @@ void ASHRAE205ChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad, b
     }
 
     // Calculate in case of standby power
-    this->AmbientZoneGainEnergy = this->AmbientZoneGain * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->AmbientZoneGainEnergy = this->AmbientZoneGain * state.dataHVACGlobal->TimeStepSysSec;
+    this->Energy = this->Power * state.dataHVACGlobal->TimeStepSysSec;
 }
 
 void ASHRAE205ChillerSpecs::simulate(

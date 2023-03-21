@@ -787,7 +787,7 @@ namespace CoolTower {
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   Aut 2008
 
-        Real64 const TSMult = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        Real64 const TSMult = state.dataHVACGlobal->TimeStepSysSec;
 
         for (int CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
 

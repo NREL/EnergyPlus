@@ -1642,7 +1642,7 @@ void CoolingPanelParams::ReportCoolingPanel(EnergyPlusData &state)
     // REFERENCES:
     // Existing code for hot water baseboard models (radiant-convective variety)
 
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // All of the power numbers are negative for cooling.  This is because they will have a negative
     // or cooling impact on the surfaces/zones.  However, the output variables are noted as cooling.

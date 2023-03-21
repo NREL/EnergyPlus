@@ -2091,10 +2091,10 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
     } // IF(GeneratorInletNode .GT. 0)THEN
 
     // convert power to energy
-    this->GeneratorEnergy = this->QGenerator * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->PumpingEnergy = this->PumpingPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->GeneratorEnergy = this->QGenerator * state.dataHVACGlobal->TimeStepSysSec;
+    this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSysSec;
+    this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSysSec;
+    this->PumpingEnergy = this->PumpingPower * state.dataHVACGlobal->TimeStepSysSec;
 
     //                              ------
     //                            /        \.

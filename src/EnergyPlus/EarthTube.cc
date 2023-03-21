@@ -742,7 +742,7 @@ void ReportEarthTube(EnergyPlusData &state)
 
     // PURPOSE OF THIS SUBROUTINE: This subroutine fills remaining report variables.
 
-    Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
         auto &thisZone = state.dataEarthTube->ZnRptET(ZoneLoop);

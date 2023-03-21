@@ -144,9 +144,9 @@ namespace BaseboardElectric {
         PowerMet = baseboard->baseboards(BaseboardNum).Power;
 
         baseboard->baseboards(BaseboardNum).Energy =
-            baseboard->baseboards(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+            baseboard->baseboards(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSysSec;
         baseboard->baseboards(BaseboardNum).ElecUseLoad =
-            baseboard->baseboards(BaseboardNum).ElecUseRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+            baseboard->baseboards(BaseboardNum).ElecUseRate * state.dataHVACGlobal->TimeStepSysSec;
     }
 
     void GetBaseboardInput(EnergyPlusData &state)

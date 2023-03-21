@@ -201,7 +201,7 @@ namespace BaseboardRadiator {
         }
 
         UpdateBaseboard(state, CompIndex);
-        thisBaseboard.Energy = thisBaseboard.Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        thisBaseboard.Energy = thisBaseboard.Power * state.dataHVACGlobal->TimeStepSysSec;
     }
 
     void GetBaseboardInput(EnergyPlusData &state)

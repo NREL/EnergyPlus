@@ -977,7 +977,7 @@ void BoilerSpecs::UpdateBoilerRecords(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // boiler simulation reporting
 
-    Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
     int const BoilerInletNode = this->BoilerInletNodeNum;
     int const BoilerOutletNode = this->BoilerOutletNodeNum;
 

@@ -1960,12 +1960,12 @@ void GasAbsorberSpecs::updateCoolRecords(EnergyPlusData &state,
     }
 
     // convert power to energy and instantaneous use to use over the time step
-    this->CoolingEnergy = this->CoolingLoad * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->TowerEnergy = this->TowerLoad * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->FuelEnergy = this->FuelUseRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->CoolFuelEnergy = this->CoolFuelUseRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->CoolElectricEnergy = this->CoolElectricPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->CoolingEnergy = this->CoolingLoad * state.dataHVACGlobal->TimeStepSysSec;
+    this->TowerEnergy = this->TowerLoad * state.dataHVACGlobal->TimeStepSysSec;
+    this->FuelEnergy = this->FuelUseRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->CoolFuelEnergy = this->CoolFuelUseRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSysSec;
+    this->CoolElectricEnergy = this->CoolElectricPower * state.dataHVACGlobal->TimeStepSysSec;
     if (this->CoolFuelUseRate != 0.0) {
         this->FuelCOP = this->CoolingLoad / this->CoolFuelUseRate;
     } else {
@@ -1991,11 +1991,11 @@ void GasAbsorberSpecs::updateHeatRecords(EnergyPlusData &state,
     }
 
     // convert power to energy and instantaneous use to use over the time step
-    this->HeatingEnergy = this->HeatingLoad * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->FuelEnergy = this->FuelUseRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->HeatFuelEnergy = this->HeatFuelUseRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->HeatElectricEnergy = this->HeatElectricPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->HeatingEnergy = this->HeatingLoad * state.dataHVACGlobal->TimeStepSysSec;
+    this->FuelEnergy = this->FuelUseRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->HeatFuelEnergy = this->HeatFuelUseRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSysSec;
+    this->HeatElectricEnergy = this->HeatElectricPower * state.dataHVACGlobal->TimeStepSysSec;
 }
 
 void GasAbsorberSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
