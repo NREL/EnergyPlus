@@ -5174,7 +5174,7 @@ void ReportWaterCoil(EnergyPlusData &state, int const CoilNum)
             }
         }
     }
-    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
     // report the WaterCoil energy from this component
     waterCoil.TotWaterHeatingCoilEnergy = waterCoil.TotWaterHeatingCoilRate * ReportingConstant;
     waterCoil.TotWaterCoolingCoilEnergy = waterCoil.TotWaterCoolingCoilRate * ReportingConstant;

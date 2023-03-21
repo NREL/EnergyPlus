@@ -15636,7 +15636,7 @@ namespace UnitarySystems {
         auto &OASysEqSizing = state.dataSize->OASysEqSizing;
         auto &CurOASysNum = state.dataSize->CurOASysNum;
 
-        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         Real64 SensibleOutput = 0.0; // sensible output rate, {W}
         Real64 LatentOutput = 0.0;   // latent output rate, {W}
@@ -16051,7 +16051,7 @@ namespace UnitarySystems {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view routineName("UnitarySystemHeatRecovery");
 
-        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         Real64 HeatRecInletTemp = state.dataLoopNodes->Node(this->m_HeatRecoveryInletNodeNum).Temp;
         Real64 HeatRecOutletTemp = 0.0;

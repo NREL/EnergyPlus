@@ -6907,7 +6907,7 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
         Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, TankTemp_loc, this->waterIndex, RoutineName);
     }
 
-    Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSysSec;
     Real64 TimeRemaining = SecInTimeStep;
     int CycleOnCount_loc = 0;
     int MaxCycles = SecInTimeStep;
@@ -7732,7 +7732,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
         state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
 
     // Seconds in one DataGlobals::TimeStep (s)
-    const Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    const Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSysSec;
 
     // Advance tank simulation to the next system DataGlobals::TimeStep, if applicable
     if (this->TimeElapsed != TimeElapsed_loc) {
@@ -8575,7 +8575,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
     }         // validsourcetype
 
     DesupHtr.OffCycParaFuelRate = DesupHtr.OffCycParaLoad;
-    DesupHtr.OffCycParaFuelEnergy = DesupHtr.OffCycParaFuelRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    DesupHtr.OffCycParaFuelEnergy = DesupHtr.OffCycParaFuelRate * state.dataHVACGlobal->TimeStepSysSec;
 
     // check that water heater tank cut-in temp is greater than desuperheater cut-in temp
     Real64 desupHtrSetPointTemp = DesupHtr.SetPointTemp;
@@ -8958,14 +8958,14 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
         DesupHtr.HeaterRate = 0.0;
     }
 
-    DesupHtr.HeaterEnergy = DesupHtr.HeaterRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    DesupHtr.HeaterEnergy = DesupHtr.HeaterRate * state.dataHVACGlobal->TimeStepSysSec;
     DesupHtr.DesuperheaterPLR = partLoadRatio;
     DesupHtr.OnCycParaFuelRate = DesupHtr.OnCycParaLoad * partLoadRatio;
-    DesupHtr.OnCycParaFuelEnergy = DesupHtr.OnCycParaFuelRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    DesupHtr.OnCycParaFuelEnergy = DesupHtr.OnCycParaFuelRate * state.dataHVACGlobal->TimeStepSysSec;
     DesupHtr.OffCycParaFuelRate = DesupHtr.OffCycParaLoad * (1 - partLoadRatio);
-    DesupHtr.OffCycParaFuelEnergy = DesupHtr.OffCycParaFuelRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    DesupHtr.OffCycParaFuelEnergy = DesupHtr.OffCycParaFuelRate * state.dataHVACGlobal->TimeStepSysSec;
     DesupHtr.PumpPower = DesupHtr.PumpElecPower * (partLoadRatio);
-    DesupHtr.PumpEnergy = DesupHtr.PumpPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    DesupHtr.PumpEnergy = DesupHtr.PumpPower * state.dataHVACGlobal->TimeStepSysSec;
 
     // Update used waste heat (just in case multiple users of waste heat use same source)
     if (DesupHtr.ValidSourceType) {
@@ -9268,7 +9268,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
         //   If HPWH compressor is available and unit is off for another reason, off-cycle parasitics are calculated
         if (AvailSchedule != 0) {
             HeatPump.OffCycParaFuelRate = HeatPump.OffCycParaLoad * (1.0 - state.dataWaterThermalTanks->hpPartLoadRatio);
-            HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+            HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * state.dataHVACGlobal->TimeStepSysSec;
         }
 
         //   Warn if HPWH compressor cut-in temperature is less than the water heater tank's set point temp
@@ -10212,9 +10212,9 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
     HeatPump.HeatingPLR = state.dataWaterThermalTanks->hpPartLoadRatio;
     HeatPump.OnCycParaFuelRate = HeatPump.OnCycParaLoad * state.dataWaterThermalTanks->hpPartLoadRatio;
-    HeatPump.OnCycParaFuelEnergy = HeatPump.OnCycParaFuelRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    HeatPump.OnCycParaFuelEnergy = HeatPump.OnCycParaFuelRate * state.dataHVACGlobal->TimeStepSysSec;
     HeatPump.OffCycParaFuelRate = HeatPump.OffCycParaLoad * (1.0 - state.dataWaterThermalTanks->hpPartLoadRatio);
-    HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    HeatPump.OffCycParaFuelEnergy = HeatPump.OffCycParaFuelRate * state.dataHVACGlobal->TimeStepSysSec;
     if (HeatPump.HPWHTankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) {
         HeatPump.ControlTempAvg = this->TankTempAvg;
         HeatPump.ControlTempFinal = this->TankTemp;
@@ -12034,7 +12034,7 @@ void WaterThermalTankData::ReportWaterThermalTank(EnergyPlusData &state)
     //       MODIFIED       na
     //       RE-ENGINEERED  Feb 2004, PGE
 
-    Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSysSec;
 
     this->UnmetEnergy = this->UnmetRate * SecInTimeStep;
     this->LossEnergy = this->LossRate * SecInTimeStep;
@@ -12099,7 +12099,7 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
 
         Real64 TotalDrawMass = 0.243402 * Psychrometrics::RhoH2O(Constant::InitConvTemp); // 64.3 gal * rho
         Real64 DrawMass = TotalDrawMass / 6.0;                                                       // 6 equal draws
-        Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSysSec;
         Real64 DrawMassFlowRate = DrawMass / SecInTimeStep;
         Real64 FuelEnergy_loc = 0.0;
         FirstTimeFlag = true;

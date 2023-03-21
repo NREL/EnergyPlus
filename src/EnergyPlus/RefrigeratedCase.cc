@@ -15975,7 +15975,7 @@ void FinalRateCoils(EnergyPlusData &state,
             System(SystemID).InsuffCapWarn);
 
         DeRateFactor = AvailableTotalLoad / InitialTotalLoad;
-        Real64 const time_step_sec(state.dataHVACGlobal->TimeStepSys * Constant::SecInHour);
+        Real64 const time_step_sec(state.dataHVACGlobal->TimeStepSysSec);
         for (int CoilIndex = 1; CoilIndex <= NumCoils; ++CoilIndex) {
             int CoilID = System(SystemID).CoilNum(CoilIndex);
             auto &warehouse_coil = WarehouseCoil(CoilID);
@@ -16305,7 +16305,7 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
         // FROST:  keep track of frost build up on evaporator coil
         //         avoid accumulation during warm-up to avoid reverse dd test problem
         if (!state.dataGlobal->WarmupFlag) {
-            FrostChangekg = (WaterRemovRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour);
+            FrostChangekg = (WaterRemovRate * state.dataHVACGlobal->TimeStepSysSec);
             this->KgFrost += FrostChangekg;
         }
 
@@ -16323,7 +16323,7 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
     //                     a certain temperature (such as when there's no load and no ice)
     if ((DefrostSchedule > 0.0) && (this->defrostType != DefrostType::None) && (this->defrostType != DefrostType::OffCycle)) {
         DefrostLoad = DefrostCap * DefrostSchedule; // Part of the defrost that is a heat load on the zone (W)
-        Real64 DefrostEnergy = DefrostLoad * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour; // Joules
+        Real64 DefrostEnergy = DefrostLoad * state.dataHVACGlobal->TimeStepSysSec; // Joules
         Real64 StartFrostKg = this->KgFrost; // frost load at start of time step (kg of ice)
 
         if (this->DefrostControlType == DefrostCtrlType::TempTerm) {
@@ -16359,11 +16359,11 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
                     Real64 DefrostEnergyNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) /
                                                  this->DefEnergyFraction; // Joules - energy needed including E unavail to melt ice
                     DefrostSchedule = min(DefrostSchedule,
-                                          (DefrostEnergyNeeded / (DefrostCap * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour)));
+                                          (DefrostEnergyNeeded / (DefrostCap * state.dataHVACGlobal->TimeStepSysSec)));
                     // reduce heat load on warehouse by energy put into ice melting
                     // Defrost load that actually goes to melting ice (W)
                     Real64 DefrostRateNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) /
-                                               (state.dataHVACGlobal->TimeStepSys * Constant::SecInHour);
+                                               (state.dataHVACGlobal->TimeStepSysSec);
                     DefrostLoad = max(0.0, (DefrostSchedule * DefrostCap - DefrostRateNeeded));
                     this->IceTemp = this->TEvapDesign;
                 } // frost melted during time step less than amount of ice at start
@@ -16394,7 +16394,7 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
     // ReportWarehouseCoil(CoilID)
     this->ThermalDefrostPower = DefrostLoad;
     if (this->defrostType == DefrostType::Elec) {
-        this->ElecDefrostConsumption = DefrostCap * DefrostSchedule * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->ElecDefrostConsumption = DefrostCap * DefrostSchedule * state.dataHVACGlobal->TimeStepSysSec;
         this->ElecDefrostPower = DefrostCap * DefrostSchedule;
     } else {
         this->ElecDefrostConsumption = 0.0;
@@ -16406,22 +16406,22 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
     // LatentLoadServed is positive for latent heat removed from zone
     // SensLoadFromZone positive for heat REMOVED from zone, switch when do credit to zone
     this->SensCreditRate = SensLoadFromZone;
-    this->SensCreditEnergy = SensLoadFromZone * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->SensCreditEnergy = SensLoadFromZone * state.dataHVACGlobal->TimeStepSysSec;
     this->LatCreditRate = latLoadServed;
-    this->LatCreditEnergy = latLoadServed * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->LatCreditEnergy = latLoadServed * state.dataHVACGlobal->TimeStepSysSec;
     this->LatKgPerS_ToZone = WaterRemovRate;
     this->TotalCoolingLoad = CoilCapTotal;
-    this->TotalCoolingEnergy = CoilCapTotal * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->TotalCoolingEnergy = CoilCapTotal * state.dataHVACGlobal->TimeStepSysSec;
     this->SensCoolingEnergyRate = SensLoadGross;
-    this->SensCoolingEnergy = SensLoadGross * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->SensCoolingEnergy = SensLoadGross * state.dataHVACGlobal->TimeStepSysSec;
     this->SensHeatRatio = SHR;
     this->ElecFanPower = FanPowerActual;
-    this->ElecFanConsumption = FanPowerActual * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->ElecFanConsumption = FanPowerActual * state.dataHVACGlobal->TimeStepSysSec;
     this->ElecHeaterPower = HeaterLoad;
-    this->ElecHeaterConsumption = HeaterLoad * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->ElecHeaterConsumption = HeaterLoad * state.dataHVACGlobal->TimeStepSysSec;
 
     this->TotalElecPower = FanPowerActual + HeaterLoad + this->ElecDefrostPower;
-    this->TotalElecConsumption = this->TotalElecPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->TotalElecConsumption = this->TotalElecPower * state.dataHVACGlobal->TimeStepSysSec;
 
     if (this->SensCreditRate >= 0.0) {
         this->ReportSensCoolCreditRate = this->SensCreditRate;
@@ -16430,8 +16430,8 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
         this->ReportSensCoolCreditRate = 0.0;
         this->ReportHeatingCreditRate = -this->SensCreditRate;
     }
-    this->ReportSensCoolCreditEnergy = this->ReportSensCoolCreditRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    this->ReportHeatingCreditEnergy = this->ReportHeatingCreditRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    this->ReportSensCoolCreditEnergy = this->ReportSensCoolCreditRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->ReportHeatingCreditEnergy = this->ReportHeatingCreditRate * state.dataHVACGlobal->TimeStepSysSec;
     this->ReportTotalCoolCreditRate = this->ReportSensCoolCreditRate + this->LatCreditRate;
     this->ReportTotalCoolCreditEnergy = this->ReportSensCoolCreditEnergy + this->LatCreditEnergy;
 

@@ -2241,9 +2241,9 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
         thisPumpRep.PumpHeattoFluid = daPumps->PumpHeattoFluid;
         thisPumpRep.OutletTemp = thisOutNode.Temp;
         thisPump.Power = daPumps->Power;
-        thisPump.Energy = thisPump.Power * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        thisPump.Energy = thisPump.Power * state.dataHVACGlobal->TimeStepSysSec;
         thisPumpRep.ShaftPower = daPumps->ShaftPower;
-        thisPumpRep.PumpHeattoFluidEnergy = daPumps->PumpHeattoFluid * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        thisPumpRep.PumpHeattoFluidEnergy = daPumps->PumpHeattoFluid * state.dataHVACGlobal->TimeStepSysSec;
         switch (PumpType) {
         case PumpType::ConSpeed:
         case PumpType::VarSpeed:
@@ -2260,7 +2260,7 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
             break;
         }
         thisPumpRep.ZoneTotalGainRate = daPumps->Power - daPumps->PumpHeattoFluid;
-        thisPumpRep.ZoneTotalGainEnergy = thisPumpRep.ZoneTotalGainRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        thisPumpRep.ZoneTotalGainEnergy = thisPumpRep.ZoneTotalGainRate * state.dataHVACGlobal->TimeStepSysSec;
         thisPumpRep.ZoneConvGainRate = (1 - thisPump.SkinLossRadFraction) * thisPumpRep.ZoneTotalGainRate;
         thisPumpRep.ZoneRadGainRate = thisPump.SkinLossRadFraction * thisPumpRep.ZoneTotalGainRate;
     }
