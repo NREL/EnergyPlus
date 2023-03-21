@@ -1096,9 +1096,8 @@ void ExpressAsCashFlows(EnergyPlusData &state)
 
     std::map<int, std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>> resourceCosts;
     for (int jMonth = 1; jMonth <= 12; ++jMonth) {
-        std::array<Real64, static_cast<int>(Constant::ResourceType::Num)> monthMap;
-        std::fill(monthMap.begin(), monthMap.end(), 0.0);
-        resourceCosts[jMonth] = monthMap;
+        resourceCosts[jMonth] = std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>();
+        std::fill(resourceCosts[jMonth].begin(), resourceCosts[jMonth].end(), 0.0);
     }
 
     Array1D<Real64> curResourceCosts(12);
@@ -1157,9 +1156,8 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     }
     // allocate the escalated energy cost arrays
     for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
-        std::array<Real64, static_cast<int>(Constant::ResourceType::Num)> yearMap;
-        std::fill(yearMap.begin(), yearMap.end(), 0.0);
-        elcc->EscalatedEnergy[year] = yearMap;
+        elcc->EscalatedEnergy[year] = std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>();
+        std::fill(elcc->EscalatedEnergy[year].begin(), elcc->EscalatedEnergy[year].end(), 0.0);
     }
 
     elcc->EscalatedTotEnergy.allocate(elcc->lengthStudyYears);
@@ -1494,11 +1492,10 @@ void ComputePresentValue(EnergyPlusData &state)
         }
     }
     // compute the Single Present Value factors based on the discount rate
-    elcc->SPV.allocate(elcc->lengthStudyYears);
+    elcc->SPV.allocate(elcc->lengthStudyYears); // Should this be energySPV?
     for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
-        std::array<Real64, static_cast<int>(Constant::ResourceType::Num)> yearMap;
-        std::fill(yearMap.begin(), yearMap.end(), 0.0);
-        elcc->energySPV[year] = yearMap;
+        elcc->energySPV[year] = std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>();
+        std::fill(elcc->energySPV[year].begin(), elcc->energySPV[year].end(), 0.0);
     }
 
     // Depending if using Constant or Current Dollar analysis
