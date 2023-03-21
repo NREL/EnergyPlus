@@ -6608,7 +6608,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     int OutletNode(0);     // UnitarySystem outlet node number
     int ControlZoneNum(0); // index to control zone
 
-     std::string_view constexpr idf_objects = R"IDF(
+    std::string_view constexpr idf_objects = R"IDF(
 Zone,
   EAST ZONE,              !- Name
   0,                      !- Direction of Relative North{ deg }
@@ -7098,7 +7098,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     int OutletNode(0);     // UnitarySystem outlet node number
     int ControlZoneNum(0); // index to control zone
 
-     std::string_view constexpr idf_objects = R"IDF(
+    std::string_view constexpr idf_objects = R"IDF(
 
 Zone,
   EAST ZONE,              !- Name
