@@ -2423,6 +2423,7 @@ void GetDXCoils(EnergyPlusData &state)
         state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate(1) = Numbers(5);
         state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_2023(1) = Numbers(6);
 
+
         if (!lNumericBlanks(7)) {
             state.dataDXCoils->DXCoil(DXCoilNum).InternalStaticPressureDrop = Numbers(7);
             state.dataDXCoils->DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject = true;
@@ -2626,7 +2627,7 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        thisDXCoil.RatedEIR(1) = 1.0 / thisDXCoil.RatedCOP(1);
+        state.dataDXCoils->DXCoil(DXCoilNum).RatedEIR(1) = 1.0 / state.dataDXCoils->DXCoil(DXCoilNum).RatedCOP(1);
 
         state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap2 = Numbers(8);
         state.dataDXCoils->DXCoil(DXCoilNum).RatedSHR2 = Numbers(9);
@@ -2635,6 +2636,7 @@ void GetDXCoils(EnergyPlusData &state)
 
         state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_LowSpeed(1) = Numbers(12);
         state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_2023_LowSpeed(1) = Numbers(13);
+
 
         if (lNumericBlanks(14)) {
             state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor = -25.0;
@@ -2840,7 +2842,7 @@ void GetDXCoils(EnergyPlusData &state)
             }
             if (thisDXCoil.BasinHeaterSetPointTemp < 2.0) {
                 ShowWarningError(state, format("{}{}=\"{}\", freeze possible", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                ShowContinueError(state, format("...{} is < 2 {{C}}. Freezing could occur.", cNumericFields(18)));
+                ShowContinueError(state, format("...{} is < 2 {{C}}. Freezing could occur.", cNumericFields(22)));
                 ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(22)));
             }
         }
@@ -8592,9 +8594,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
 
     // Call routine that computes AHRI certified rating for single-speed DX Coils
     if ((state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingSingleSpeed &&
-         (state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air ||
-          state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(1) == DataHeatBalance::RefrigCondenserType::Evap)) ||
-        // TBD: WaterCooled Coils needs more research.
+         state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) ||
         state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical) {
         CalcDXCoilStandardRating(state,
                                  thisDXCoil.Name,

@@ -53,10 +53,10 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
-#include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 
 namespace EnergyPlus {
 
@@ -327,7 +327,7 @@ namespace StandardRatings {
         Array1A<Real64> const FanPowerPerEvapAirFlowRate, // 2023 Rated Fan Power per air volume flow rate through the evaporator coil
         Array1A<Real64> const RatedAirVolFlowRate,
         Array1A_int const EIRFTempCurveIndex,
-        Array1A<Real64> const RatedCOP, // Reference coefficient of performance [W/W]
+        Array1A<Real64> const RatedCOP,        // Reference coefficient of performance [W/W]
         Array1A_int const HSEIRFFlowCurveIndex //  | Only for HIGH SPEED
     );
 
