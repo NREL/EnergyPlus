@@ -546,7 +546,6 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     // loop capacitance based on current plant conditions
 
     Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
@@ -580,7 +579,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     // tank conditions each call.
     // Analytical solution for ODE, formulated for both final tank temp and average tank temp.
 
-    Real64 TimeStepSeconds = TimeStepSys * Constant::SecInHour;
+    Real64 TimeStepSeconds = state.dataHVACGlobal->TimeStepSysSec;
     Real64 MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
     Real64 PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TotalPumpHeat;
     Real64 ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
@@ -667,7 +666,6 @@ void UpdateCommonPipe(EnergyPlusData &state,
 
     // Using/Aliasing
     Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("UpdateCommonPipe");
@@ -715,7 +713,7 @@ void UpdateCommonPipe(EnergyPlusData &state,
     // no common pipe case.
     // calculation is separated because for common pipe, a different split for mass fraction is applied
     // The pump heat source is swapped around here compared to no common pipe (so pump heat sort stays on its own side).
-    Real64 TimeStepSeconds = TimeStepSys * Constant::SecInHour;
+    Real64 TimeStepSeconds = state.dataHVACGlobal->TimeStepSysSec;
     Real64 MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
     Real64 PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).TotalPumpHeat;
     Real64 ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;

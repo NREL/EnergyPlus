@@ -1275,7 +1275,7 @@ namespace HVACCooledBeam {
         Real64 ReportingConstant;
         auto &CoolBeam = state.dataHVACCooledBeam->CoolBeam;
 
-        ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
         // report the WaterCoil energy from this component
         CoolBeam(CBNum).BeamCoolingEnergy = CoolBeam(CBNum).BeamCoolingRate * ReportingConstant;
         CoolBeam(CBNum).SupAirCoolingEnergy = CoolBeam(CBNum).SupAirCoolingRate * ReportingConstant;

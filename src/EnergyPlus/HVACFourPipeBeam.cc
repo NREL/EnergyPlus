@@ -1416,7 +1416,7 @@ namespace FourPipeBeam {
 
         Real64 ReportingConstant;
 
-        ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         if (this->beamCoolingPresent) {
             this->beamCoolingRate = std::abs(this->qDotBeamCooling); // report var has positive sign convention

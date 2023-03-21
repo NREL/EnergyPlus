@@ -2045,7 +2045,7 @@ void FluidCoolerspecs::report(EnergyPlusData &state, bool const RunFlag)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the report variables for the fluid cooler.
 
-    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
     if (!RunFlag) {
         this->InletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
         this->OutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;

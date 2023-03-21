@@ -4681,13 +4681,10 @@ namespace FanCoilUnits {
         // REFERENCES:
         // na
 
-        // Using/Aliasing
-        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * Constant::SecInHour;
+        ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
         state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatEnergy = state.dataFanCoilUnits->FanCoil(FanCoilNum).HeatPower * ReportingConstant;
         state.dataFanCoilUnits->FanCoil(FanCoilNum).SensCoolEnergy = state.dataFanCoilUnits->FanCoil(FanCoilNum).SensCoolPower * ReportingConstant;
         state.dataFanCoilUnits->FanCoil(FanCoilNum).TotCoolEnergy = state.dataFanCoilUnits->FanCoil(FanCoilNum).TotCoolPower * ReportingConstant;

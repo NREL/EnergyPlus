@@ -1121,7 +1121,7 @@ namespace HVACFan {
 
     void FanSystem::report(EnergyPlusData &state)
     {
-        m_fanEnergy = m_fanPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        m_fanEnergy = m_fanPower * state.dataHVACGlobal->TimeStepSysSec;
         m_deltaTemp = m_outletAirTemp - m_inletAirTemp;
     }
 

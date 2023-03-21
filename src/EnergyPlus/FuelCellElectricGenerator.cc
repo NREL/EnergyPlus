@@ -2232,20 +2232,20 @@ namespace FuelCellElectricGenerator {
 
                 // now add energy to storage from charging
                 if ((this->ElecStorage.LastTimeStepStateOfCharge +
-                     tmpPcharge * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour * this->ElecStorage.EnergeticEfficCharge) <
+                     tmpPcharge * state.dataHVACGlobal->TimeStepSysSec * this->ElecStorage.EnergeticEfficCharge) <
                     this->ElecStorage.NominalEnergyCapacity) {
 
                     this->ElecStorage.ThisTimeStepStateOfCharge =
                         this->ElecStorage.LastTimeStepStateOfCharge +
-                        tmpPcharge * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour * this->ElecStorage.EnergeticEfficCharge;
+                        tmpPcharge * state.dataHVACGlobal->TimeStepSysSec * this->ElecStorage.EnergeticEfficCharge;
                 } else { // would over charge this time step
 
                     tmpPcharge = (this->ElecStorage.NominalEnergyCapacity - this->ElecStorage.LastTimeStepStateOfCharge) /
-                                 (state.dataHVACGlobal->TimeStepSys * Constant::SecInHour * this->ElecStorage.EnergeticEfficCharge);
+                                 (state.dataHVACGlobal->TimeStepSysSec * this->ElecStorage.EnergeticEfficCharge);
                     Constrained = true;
                     this->ElecStorage.ThisTimeStepStateOfCharge =
                         this->ElecStorage.LastTimeStepStateOfCharge +
-                        tmpPcharge * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour * this->ElecStorage.EnergeticEfficCharge;
+                        tmpPcharge * state.dataHVACGlobal->TimeStepSysSec * this->ElecStorage.EnergeticEfficCharge;
                 }
 
                 // losses go into QairIntake
@@ -2281,18 +2281,18 @@ namespace FuelCellElectricGenerator {
                 }
 
                 // now take energy from storage by drawing  (amplified by energetic effic)
-                if ((this->ElecStorage.LastTimeStepStateOfCharge - tmpPdraw * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour /
+                if ((this->ElecStorage.LastTimeStepStateOfCharge - tmpPdraw * state.dataHVACGlobal->TimeStepSysSec /
                                                                        this->ElecStorage.EnergeticEfficDischarge) > 0.0) {
 
                     this->ElecStorage.ThisTimeStepStateOfCharge =
                         this->ElecStorage.LastTimeStepStateOfCharge -
-                        tmpPdraw * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour / this->ElecStorage.EnergeticEfficDischarge;
+                        tmpPdraw * state.dataHVACGlobal->TimeStepSysSec / this->ElecStorage.EnergeticEfficDischarge;
                 } else { // would over drain storage this timestep so reduce tmpPdraw
                     tmpPdraw = this->ElecStorage.LastTimeStepStateOfCharge * this->ElecStorage.EnergeticEfficDischarge /
-                               (state.dataHVACGlobal->TimeStepSys * Constant::SecInHour);
+                               (state.dataHVACGlobal->TimeStepSysSec);
                     this->ElecStorage.ThisTimeStepStateOfCharge =
                         this->ElecStorage.LastTimeStepStateOfCharge -
-                        tmpPdraw * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour / this->ElecStorage.EnergeticEfficDischarge;
+                        tmpPdraw * state.dataHVACGlobal->TimeStepSysSec / this->ElecStorage.EnergeticEfficDischarge;
 
                     Constrained = true;
                 }
@@ -2990,7 +2990,7 @@ namespace FuelCellElectricGenerator {
             if (Pel > this->FCPM.PelLastTimeStep) { // powering up
                 // working variable for max allowed by transient constraint
                 Real64 MaxPel =
-                    this->FCPM.PelLastTimeStep + this->FCPM.UpTranLimit * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+                    this->FCPM.PelLastTimeStep + this->FCPM.UpTranLimit * state.dataHVACGlobal->TimeStepSysSec;
                 if (MaxPel < Pel) {
                     Pel = MaxPel;
                     Constrained = true;
@@ -3000,7 +3000,7 @@ namespace FuelCellElectricGenerator {
             } else if (Pel < this->FCPM.PelLastTimeStep) { // powering down
                                                            // working variable for min allowed by transient constraint
                 Real64 MinPel =
-                    this->FCPM.PelLastTimeStep - this->FCPM.DownTranLimit * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+                    this->FCPM.PelLastTimeStep - this->FCPM.DownTranLimit * state.dataHVACGlobal->TimeStepSysSec;
                 if (Pel < MinPel) {
                     Pel = MinPel;
                     Constrained = true;
@@ -3586,7 +3586,7 @@ namespace FuelCellElectricGenerator {
     {
 
         this->Report.ACPowerGen = this->ACPowerGen; // electrical power produced [W]
-        this->Report.ACEnergyGen = this->ACPowerGen * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour; // energy produced (J)
+        this->Report.ACEnergyGen = this->ACPowerGen * state.dataHVACGlobal->TimeStepSysSec; // energy produced (J)
         this->Report.QdotExhaust = 0.0;        // reporting: exhaust gas heat recovered (W)
         this->Report.TotalHeatEnergyRec = 0.0; // reporting: total heat recovered (J)
         this->Report.ExhaustEnergyRec = 0.0;   // reporting: exhaust gas heat recovered (J)
@@ -3605,7 +3605,7 @@ namespace FuelCellElectricGenerator {
         this->Report.NdotAir = this->FCPM.NdotAir;                     // air flow in kmol/sec
         this->Report.TotAirInEnthalphy = this->FCPM.TotAirInEnthalphy; // State point 4
         this->Report.BlowerPower = this->AirSup.PairCompEl;            // electrical power used by air supply blower
-        this->Report.BlowerEnergy = this->AirSup.PairCompEl * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour; // electrical energy
+        this->Report.BlowerEnergy = this->AirSup.PairCompEl * state.dataHVACGlobal->TimeStepSysSec; // electrical energy
         this->Report.BlowerSkinLoss = this->AirSup.QskinLoss; // heat rate of losses by blower
 
         this->Report.TfuelInlet = state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoCompress; // State point 2
@@ -3619,7 +3619,7 @@ namespace FuelCellElectricGenerator {
         this->Report.FuelCompressSkinLoss = state.dataGenerator->FuelSupply(this->FuelSupNum).QskinLoss;
         // heat rate of losses.by fuel supply compressor [W]
         this->Report.FuelEnergyLHV = this->FCPM.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupNum).LHV * 1000000.0 *
-                                     state.dataHVACGlobal->TimeStepSys * Constant::SecInHour; // reporting: Fuel Energy used (J)
+                                     state.dataHVACGlobal->TimeStepSysSec; // reporting: Fuel Energy used (J)
         this->Report.FuelEnergyUseRateLHV =
             this->FCPM.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupNum).LHV * 1000000.0; // reporting: Fuel Energy used (W)
         this->Report.FuelEnergyHHV = this->FCPM.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupNum).HHV *
@@ -3636,7 +3636,7 @@ namespace FuelCellElectricGenerator {
         this->Report.NdotWater = this->FCPM.NdotLiqwater; // water flow in kmol/sec (reformer water)
         this->Report.WaterPumpPower = this->WaterSup.PwaterCompEl;
         this->Report.WaterPumpEnergy =
-            this->WaterSup.PwaterCompEl * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour; // electrical energy
+            this->WaterSup.PwaterCompEl * state.dataHVACGlobal->TimeStepSysSec; // electrical energy
         this->Report.WaterIntoFCPMEnthalpy = this->FCPM.WaterInEnthalpy;
 
         this->Report.TprodGas = this->FCPM.TprodGasLeavingFCPM;      // temperature at State point 7
@@ -3649,7 +3649,7 @@ namespace FuelCellElectricGenerator {
         this->Report.NdotProdO2 = this->FCPM.ConstitMolalFract(3) * this->FCPM.NdotProdGas;
 
         this->Report.qHX = this->ExhaustHX.qHX;
-        this->Report.HXenergy = this->ExhaustHX.qHX * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->Report.HXenergy = this->ExhaustHX.qHX * state.dataHVACGlobal->TimeStepSysSec;
         this->Report.THXexh = this->ExhaustHX.THXexh;
         this->Report.WaterVaporFractExh = this->ExhaustHX.WaterVaporFractExh;
         this->Report.CondensateRate = this->ExhaustHX.CondensateRate;
@@ -3660,19 +3660,19 @@ namespace FuelCellElectricGenerator {
         this->Report.FCPMSkinLoss = this->FCPM.QdotSkin;                 // Skin loss of power module
 
         this->Report.ACancillariesPower = this->FCPM.PelancillariesAC;
-        this->Report.ACancillariesEnergy = this->FCPM.PelancillariesAC * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->Report.ACancillariesEnergy = this->FCPM.PelancillariesAC * state.dataHVACGlobal->TimeStepSysSec;
 
         this->Report.PCUlosses = this->Inverter.PCUlosses; // inverter losses
         this->Report.DCPowerGen = this->FCPM.Pel;          // DC power out of FCPM.
         this->Report.DCPowerEff = this->FCPM.Eel;          // FCPM efficiency Eel.
         this->Report.ElectEnergyinStorage = this->ElecStorage.ThisTimeStepStateOfCharge;
         this->Report.StoredPower = this->ElecStorage.PelIntoStorage;
-        this->Report.StoredEnergy = this->ElecStorage.PelIntoStorage * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->Report.StoredEnergy = this->ElecStorage.PelIntoStorage * state.dataHVACGlobal->TimeStepSysSec;
         this->Report.DrawnPower = this->ElecStorage.PelFromStorage;
-        this->Report.DrawnEnergy = this->ElecStorage.PelFromStorage * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->Report.DrawnEnergy = this->ElecStorage.PelFromStorage * state.dataHVACGlobal->TimeStepSysSec;
 
         this->Report.SkinLossPower = this->QconvZone + this->QradZone;
-        this->Report.SkinLossEnergy = (this->QconvZone + this->QradZone) * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        this->Report.SkinLossEnergy = (this->QconvZone + this->QradZone) * state.dataHVACGlobal->TimeStepSysSec;
         this->Report.SkinLossConvect = this->QconvZone;
         this->Report.SkinLossRadiat = this->QradZone;
     }
