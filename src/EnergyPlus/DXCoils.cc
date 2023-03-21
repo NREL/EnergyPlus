@@ -8592,7 +8592,8 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
 
     // Call routine that computes AHRI certified rating for single-speed DX Coils
     if ((state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingSingleSpeed &&
-         state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) ||
+         (state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air ||
+          state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(1) == DataHeatBalance::RefrigCondenserType::Evap)) ||
         state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical) {
         CalcDXCoilStandardRating(state,
                                  thisDXCoil.Name,
@@ -8665,8 +8666,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                                                   state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_2023,
                                                   state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_2023_LowSpeed,
                                                   state.dataDXCoils->DXCoil(DXCoilNum).CondenserType,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1),
-                                                  ObjexxFCL::Optional_bool_const());
+                                                  state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1));
     }
 
     // create predefined report entries

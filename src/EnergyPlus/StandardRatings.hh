@@ -190,8 +190,7 @@ namespace StandardRatings {
                                   Array1A<Real64> const FanPowerPerEvapAirFlowRate_2023,
                                   Array1A<Real64> const FanPowerPerEvapAirFlowRate_2023_LowSpeed,
                                   Array1D<DataHeatBalance::RefrigCondenserType> CondenserType,
-                                  int const PLFFPLRCurveIndex,
-                                  ObjexxFCL::Optional_bool_const ASHRAE127StdRprt);
+                                  int const PLFFPLRCurveIndex);
 
     // Real64 NetHeatingCapRated <- Net Heating Coil capacity at Rated conditions,
     // Real64 NetHeatingCapH3Test <- Net Heating Coil capacity at H3 test conditions
@@ -286,7 +285,7 @@ namespace StandardRatings {
         const Real64 RatedCOP,                   // Rated gross COP
         const Real64 EIRFlowModFac);             // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
 
-    std::tuple<Real64, Real64>
+    std::tuple<Real64, Real64, Real64>
     IEERCalulcationCurveFit(EnergyPlusData &state, std::string const &CoilType, EnergyPlus::CoilCoolingDXCurveFitOperatingMode operatingMode);
 
     std::tuple<Real64, Real64, Real64> IEERCalculationVariableSpeed(

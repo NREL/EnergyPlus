@@ -3187,7 +3187,6 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilAir_IEER2022ValueTest)
     Real64 NetCoolingCapRated2022(0.0);
     Real64 EER_2022(0.0);
 
-    // TODO: IEER Legacy Call to compare with IEER 2022
     Real64 constexpr AirMassFlowRatioRated(1.0); // AHRI test is at the design flow rate and hence AirMassFlowRatio is 1.0
     Real64 CapFFlowCurveIndex = thisCoil.CCapFFlow(1);
     Real64 EIRFFlowCurveIndex = thisCoil.EIRFFlow(1);
@@ -3337,7 +3336,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilEvap_IEER2022ValueTest)
     Real64 NetCoolingCapRated2022(0.0);
     Real64 EER_2022(0.0);
 
-    Real64 constexpr AirMassFlowRatioRated(1.0); // AHRI test is at the design flow rate and hence AirMassFlowRatio is 1.0
+    Real64 constexpr AirMassFlowRatioRated(1.0);
     Real64 CapFFlowCurveIndex = thisCoil.CCapFFlow(1);
     Real64 EIRFFlowCurveIndex = thisCoil.EIRFFlow(1);
 
@@ -3588,14 +3587,12 @@ Speed   Percent Load
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // GetDXCoils(*state);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "ZONE1PTHPDXCOOLCOIL");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
-    // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).CondenserType, DataHeatBalance::RefrigCondenserType.Air);
-    auto varSpeedCoilType = thisCoil.VarSpeedCoilType; // "Coil:Cooling:DX:VariableSpeed"
+    auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
@@ -3658,15 +3655,6 @@ Speed   Percent Load
     EXPECT_EQ(1.6, thisCoil.RatedAirVolFlowRate);
     EXPECT_EQ(10, thisCoil.NumOfSpeeds);
 
-    /* auto cSf = thisCoil.RatedCapCoolTotal / thisCoil.MSRatedTotCap(thisCoil.NumOfSpeeds);
-     auto rafSf = thisCoil.RatedAirVolFlowRate / thisCoil.MSRatedAirVolFlowRate(thisCoil.NumOfSpeeds);
-
-     for (int i = 1; i <= thisCoil.NumOfSpeeds; i++) {
-         thisCoil.MSRatedTotCap(i) = thisCoil.MSRatedTotCap(i) * cSf;
-         thisCoil.MSRatedAirVolFlowRate(i) = thisCoil.MSRatedAirVolFlowRate(i) * rafSf;
-         thisCoil.MSRatedCOP(i) = 3.6;
-     }*/
-
     EXPECT_NEAR(28250.81086, thisCoil.MSRatedTotCap(8), 0.01);
     EXPECT_NEAR(1.343999982, thisCoil.MSRatedAirVolFlowRate(8), 0.01);
 
@@ -3676,19 +3664,18 @@ Speed   Percent Load
     Real64 EER_2022(0.0);
     Real64 NetCoolingCapRated2022(0.0);
 
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalculationVariableSpeed(*state,
-                                     thisCoil.VarSpeedCoilType, // thisCoil.DXCoilType,
-                                     thisCoil.NumOfSpeeds,
-                                     thisCoil.MSCCapFTemp,
-                                     thisCoil.MSRatedTotCap,
-                                     thisCoil.MSCCapAirFFlow, // thisCoil.MSCCapFFlow,
-                                     thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
-                                     thisCoil.MSRatedAirVolFlowRate,
-                                     thisCoil.MSEIRFTemp,
-                                     thisCoil.MSRatedCOP,
-                                     thisCoil.MSEIRAirFFlow,
-                                     thisCoil.CondenserType); // TODO : Single Value for Condenser Type
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationVariableSpeed(*state,
+                                                                                         thisCoil.VarSpeedCoilType,
+                                                                                         thisCoil.NumOfSpeeds,
+                                                                                         thisCoil.MSCCapFTemp,
+                                                                                         thisCoil.MSRatedTotCap,
+                                                                                         thisCoil.MSCCapAirFFlow,
+                                                                                         thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
+                                                                                         thisCoil.MSRatedAirVolFlowRate,
+                                                                                         thisCoil.MSEIRFTemp,
+                                                                                         thisCoil.MSRatedCOP,
+                                                                                         thisCoil.MSEIRAirFFlow,
+                                                                                         thisCoil.CondenserType);
 
     NetCoolingCapRated(thisCoil.NumOfSpeeds) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -3923,14 +3910,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_2_IEER2022ValueTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // GetDXCoils(*state);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "ZONE1PTHPDXCOOLCOIL");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
-    auto condenserType = thisCoil.CondenserType; // Air(0)
-    // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).CondenserType, DataHeatBalance::RefrigCondenserType.Air);
-    auto varSpeedCoilType = thisCoil.VarSpeedCoilType; // "Coil:Cooling:DX:VariableSpeed"
+    auto condenserType = thisCoil.CondenserType;
+    auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
@@ -3999,19 +3984,18 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_2_IEER2022ValueTest)
     Real64 EER_2022(0.0);
     Real64 NetCoolingCapRated2022(0.0);
 
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalculationVariableSpeed(*state,
-                                     thisCoil.VarSpeedCoilType, // thisCoil.DXCoilType,
-                                     thisCoil.NumOfSpeeds,
-                                     thisCoil.MSCCapFTemp,
-                                     thisCoil.MSRatedTotCap,
-                                     thisCoil.MSCCapAirFFlow, // thisCoil.MSCCapFFlow,
-                                     thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
-                                     thisCoil.MSRatedAirVolFlowRate,
-                                     thisCoil.MSEIRFTemp,
-                                     thisCoil.MSRatedCOP,
-                                     thisCoil.MSEIRAirFFlow,
-                                     thisCoil.CondenserType); // TODO : Single Value for Condenser Type
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationVariableSpeed(*state,
+                                                                                         thisCoil.VarSpeedCoilType,
+                                                                                         thisCoil.NumOfSpeeds,
+                                                                                         thisCoil.MSCCapFTemp,
+                                                                                         thisCoil.MSRatedTotCap,
+                                                                                         thisCoil.MSCCapAirFFlow,
+                                                                                         thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
+                                                                                         thisCoil.MSRatedAirVolFlowRate,
+                                                                                         thisCoil.MSEIRFTemp,
+                                                                                         thisCoil.MSRatedCOP,
+                                                                                         thisCoil.MSEIRAirFFlow,
+                                                                                         thisCoil.CondenserType);
 
     NetCoolingCapRated(thisCoil.NumOfSpeeds) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -4247,14 +4231,13 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_3_IEER2022ValueTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // GetDXCoils(*state);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "ZONE1PTHPDXCOOLCOIL");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
-    // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).CondenserType, DataHeatBalance::RefrigCondenserType.Air);
-    auto varSpeedCoilType = thisCoil.VarSpeedCoilType; // "Coil:Cooling:DX:VariableSpeed"
+
+    auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
@@ -4323,19 +4306,18 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_3_IEER2022ValueTest)
     Real64 EER_2022(0.0);
     Real64 NetCoolingCapRated2022(0.0);
 
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalculationVariableSpeed(*state,
-                                     thisCoil.VarSpeedCoilType, // thisCoil.DXCoilType,
-                                     thisCoil.NumOfSpeeds,
-                                     thisCoil.MSCCapFTemp,
-                                     thisCoil.MSRatedTotCap,
-                                     thisCoil.MSCCapAirFFlow, // thisCoil.MSCCapFFlow,
-                                     thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
-                                     thisCoil.MSRatedAirVolFlowRate,
-                                     thisCoil.MSEIRFTemp,
-                                     thisCoil.MSRatedCOP,
-                                     thisCoil.MSEIRAirFFlow,
-                                     thisCoil.CondenserType); // TODO : Single Value for Condenser Type
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationVariableSpeed(*state,
+                                                                                         thisCoil.VarSpeedCoilType,
+                                                                                         thisCoil.NumOfSpeeds,
+                                                                                         thisCoil.MSCCapFTemp,
+                                                                                         thisCoil.MSRatedTotCap,
+                                                                                         thisCoil.MSCCapAirFFlow,
+                                                                                         thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
+                                                                                         thisCoil.MSRatedAirVolFlowRate,
+                                                                                         thisCoil.MSEIRFTemp,
+                                                                                         thisCoil.MSRatedCOP,
+                                                                                         thisCoil.MSEIRAirFFlow,
+                                                                                         thisCoil.CondenserType);
 
     NetCoolingCapRated(thisCoil.NumOfSpeeds) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -4533,14 +4515,13 @@ Speed   Percent Load
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // GetDXCoils(*state);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "ZONE1PTHPDXCOOLCOIL");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
-    // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).CondenserType, DataHeatBalance::RefrigCondenserType.Air);
-    auto varSpeedCoilType = thisCoil.VarSpeedCoilType; // "Coil:Cooling:DX:VariableSpeed"
+
+    auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
@@ -4609,19 +4590,18 @@ Speed   Percent Load
     Real64 EER_2022(0.0);
     Real64 NetCoolingCapRated2022(0.0);
 
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalculationVariableSpeed(*state,
-                                     thisCoil.VarSpeedCoilType, // thisCoil.DXCoilType,
-                                     thisCoil.NumOfSpeeds,
-                                     thisCoil.MSCCapFTemp,
-                                     thisCoil.MSRatedTotCap,
-                                     thisCoil.MSCCapAirFFlow, // thisCoil.MSCCapFFlow,
-                                     thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
-                                     thisCoil.MSRatedAirVolFlowRate,
-                                     thisCoil.MSEIRFTemp,
-                                     thisCoil.MSRatedCOP,
-                                     thisCoil.MSEIRAirFFlow,
-                                     thisCoil.CondenserType); // TODO : Single Value for Condenser Type
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationVariableSpeed(*state,
+                                                                                         thisCoil.VarSpeedCoilType,
+                                                                                         thisCoil.NumOfSpeeds,
+                                                                                         thisCoil.MSCCapFTemp,
+                                                                                         thisCoil.MSRatedTotCap,
+                                                                                         thisCoil.MSCCapAirFFlow,
+                                                                                         thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
+                                                                                         thisCoil.MSRatedAirVolFlowRate,
+                                                                                         thisCoil.MSEIRFTemp,
+                                                                                         thisCoil.MSRatedCOP,
+                                                                                         thisCoil.MSEIRAirFFlow,
+                                                                                         thisCoil.CondenserType);
 
     NetCoolingCapRated(thisCoil.NumOfSpeeds) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -4726,14 +4706,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_1Speed_IEER2022ValueTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // GetDXCoils(*state);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "DESICCANT DXSYSTEM VS COOLING COIL");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
-    // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).CondenserType, DataHeatBalance::RefrigCondenserType.Air);
-    auto varSpeedCoilType = thisCoil.VarSpeedCoilType; // "Coil:Cooling:DX:VariableSpeed"
+    auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
@@ -4798,19 +4776,18 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_1Speed_IEER2022ValueTest)
     Real64 EER_2022(0.0);
     Real64 NetCoolingCapRated2022(0.0);
 
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalculationVariableSpeed(*state,
-                                     thisCoil.VarSpeedCoilType, // thisCoil.DXCoilType,
-                                     thisCoil.NumOfSpeeds,
-                                     thisCoil.MSCCapFTemp,
-                                     thisCoil.MSRatedTotCap,
-                                     thisCoil.MSCCapAirFFlow, // thisCoil.MSCCapFFlow,
-                                     thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
-                                     thisCoil.MSRatedAirVolFlowRate,
-                                     thisCoil.MSEIRFTemp,
-                                     thisCoil.MSRatedCOP,
-                                     thisCoil.MSEIRAirFFlow,
-                                     thisCoil.CondenserType); // TODO : Single Value for Condenser Type
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationVariableSpeed(*state,
+                                                                                         thisCoil.VarSpeedCoilType,
+                                                                                         thisCoil.NumOfSpeeds,
+                                                                                         thisCoil.MSCCapFTemp,
+                                                                                         thisCoil.MSRatedTotCap,
+                                                                                         thisCoil.MSCCapAirFFlow,
+                                                                                         thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
+                                                                                         thisCoil.MSRatedAirVolFlowRate,
+                                                                                         thisCoil.MSEIRFTemp,
+                                                                                         thisCoil.MSRatedCOP,
+                                                                                         thisCoil.MSEIRAirFFlow,
+                                                                                         thisCoil.CondenserType);
 
     NetCoolingCapRated(thisCoil.NumOfSpeeds) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -4963,14 +4940,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_2Speed_IEER2022ValueTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // GetDXCoils(*state);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "HEAT PUMP ACDXCOIL 1");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
-    // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).CondenserType, DataHeatBalance::RefrigCondenserType.Air);
-    auto varSpeedCoilType = thisCoil.VarSpeedCoilType; // "Coil:Cooling:DX:VariableSpeed"
+    auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
@@ -5024,13 +4999,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_2Speed_IEER2022ValueTest)
     EXPECT_EQ(1.0, thisCapFFlowHs->coeff[0]);
     EXPECT_EQ(0.0, thisCapFFlowHs->coeff[1]);
 
-    //// EIRFFlow Speed 1
+    // EIRFFlow Speed 1
     auto &thisEIRFFlowHs(state->dataCurveManager->PerfCurve(thisCoil.MSEIRAirFFlow(1)));
     EXPECT_EQ(1.0, thisEIRFFlowHs->coeff[0]);
     EXPECT_EQ(0.0, thisEIRFFlowHs->coeff[1]);
 
-    /* EXPECT_EQ(34582.38626, thisCoil.RatedCapCoolTotal);
-     EXPECT_EQ(1.6, thisCoil.RatedAirVolFlowRate);*/
     EXPECT_EQ(2, thisCoil.NumOfSpeeds);
 
     std::map<std::string, Real64> StandardRatingsResult;
@@ -5039,19 +5012,18 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_2Speed_IEER2022ValueTest)
     Real64 EER_2022(0.0);
     Real64 NetCoolingCapRated2022(0.0);
 
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalculationVariableSpeed(*state,
-                                     thisCoil.VarSpeedCoilType, // thisCoil.DXCoilType,
-                                     thisCoil.NumOfSpeeds,
-                                     thisCoil.MSCCapFTemp,
-                                     thisCoil.MSRatedTotCap,
-                                     thisCoil.MSCCapAirFFlow, // thisCoil.MSCCapFFlow,
-                                     thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
-                                     thisCoil.MSRatedAirVolFlowRate,
-                                     thisCoil.MSEIRFTemp,
-                                     thisCoil.MSRatedCOP,
-                                     thisCoil.MSEIRAirFFlow,
-                                     thisCoil.CondenserType); // TODO : Single Value for Condenser Type
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationVariableSpeed(*state,
+                                                                                         thisCoil.VarSpeedCoilType,
+                                                                                         thisCoil.NumOfSpeeds,
+                                                                                         thisCoil.MSCCapFTemp,
+                                                                                         thisCoil.MSRatedTotCap,
+                                                                                         thisCoil.MSCCapAirFFlow,
+                                                                                         thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
+                                                                                         thisCoil.MSRatedAirVolFlowRate,
+                                                                                         thisCoil.MSEIRFTemp,
+                                                                                         thisCoil.MSRatedCOP,
+                                                                                         thisCoil.MSEIRAirFFlow,
+                                                                                         thisCoil.CondenserType);
 
     NetCoolingCapRated(thisCoil.NumOfSpeeds) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -5252,14 +5224,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_3Speed_IEER2022ValueTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // GetDXCoils(*state);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "HEAT PUMP ACDXCOIL 1");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
-    // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).CondenserType, DataHeatBalance::RefrigCondenserType.Air);
-    auto varSpeedCoilType = thisCoil.VarSpeedCoilType; // "Coil:Cooling:DX:VariableSpeed"
+    auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
@@ -5326,19 +5296,18 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_3Speed_IEER2022ValueTest)
     Real64 EER_2022(0.0);
     Real64 NetCoolingCapRated2022(0.0);
 
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalculationVariableSpeed(*state,
-                                     thisCoil.VarSpeedCoilType, // thisCoil.DXCoilType,
-                                     thisCoil.NumOfSpeeds,
-                                     thisCoil.MSCCapFTemp,
-                                     thisCoil.MSRatedTotCap,
-                                     thisCoil.MSCCapAirFFlow, // thisCoil.MSCCapFFlow,
-                                     thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
-                                     thisCoil.MSRatedAirVolFlowRate,
-                                     thisCoil.MSEIRFTemp,
-                                     thisCoil.MSRatedCOP,
-                                     thisCoil.MSEIRAirFFlow,
-                                     thisCoil.CondenserType); // TODO : Single Value for Condenser Type
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationVariableSpeed(*state,
+                                                                                         thisCoil.VarSpeedCoilType,
+                                                                                         thisCoil.NumOfSpeeds,
+                                                                                         thisCoil.MSCCapFTemp,
+                                                                                         thisCoil.MSRatedTotCap,
+                                                                                         thisCoil.MSCCapAirFFlow,
+                                                                                         thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
+                                                                                         thisCoil.MSRatedAirVolFlowRate,
+                                                                                         thisCoil.MSEIRFTemp,
+                                                                                         thisCoil.MSRatedCOP,
+                                                                                         thisCoil.MSEIRAirFFlow,
+                                                                                         thisCoil.CondenserType);
 
     NetCoolingCapRated(thisCoil.NumOfSpeeds) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -5587,14 +5556,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_4Speed_IEER2022ValueTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // GetDXCoils(*state);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "HEAT PUMP ACDXCOIL 1");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
-    // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).CondenserType, DataHeatBalance::RefrigCondenserType.Air);
-    auto varSpeedCoilType = thisCoil.VarSpeedCoilType; // "Coil:Cooling:DX:VariableSpeed"
+    auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
@@ -5648,13 +5615,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_4Speed_IEER2022ValueTest)
     EXPECT_EQ(1.0, thisCapFFlowHs->coeff[0]);
     EXPECT_EQ(0.0, thisCapFFlowHs->coeff[1]);
 
-    //// EIRFFlow Speed 1
+    // EIRFFlow Speed 1
     auto &thisEIRFFlowHs(state->dataCurveManager->PerfCurve(thisCoil.MSEIRAirFFlow(1)));
     EXPECT_EQ(1.0, thisEIRFFlowHs->coeff[0]);
     EXPECT_EQ(0.0, thisEIRFFlowHs->coeff[1]);
 
-    /* EXPECT_EQ(34582.38626, thisCoil.RatedCapCoolTotal);
-     EXPECT_EQ(1.6, thisCoil.RatedAirVolFlowRate);*/
     EXPECT_EQ(4, thisCoil.NumOfSpeeds);
 
     std::map<std::string, Real64> StandardRatingsResult;
@@ -5663,19 +5628,18 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_4Speed_IEER2022ValueTest)
     Real64 EER_2022(0.0);
     Real64 NetCoolingCapRated2022(0.0);
 
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalculationVariableSpeed(*state,
-                                     thisCoil.VarSpeedCoilType, // thisCoil.DXCoilType,
-                                     thisCoil.NumOfSpeeds,
-                                     thisCoil.MSCCapFTemp,
-                                     thisCoil.MSRatedTotCap,
-                                     thisCoil.MSCCapAirFFlow, // thisCoil.MSCCapFFlow,
-                                     thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
-                                     thisCoil.MSRatedAirVolFlowRate,
-                                     thisCoil.MSEIRFTemp,
-                                     thisCoil.MSRatedCOP,
-                                     thisCoil.MSEIRAirFFlow,
-                                     thisCoil.CondenserType); // TODO : Single Value for Condenser Type
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationVariableSpeed(*state,
+                                                                                         thisCoil.VarSpeedCoilType,
+                                                                                         thisCoil.NumOfSpeeds,
+                                                                                         thisCoil.MSCCapFTemp,
+                                                                                         thisCoil.MSRatedTotCap,
+                                                                                         thisCoil.MSCCapAirFFlow,
+                                                                                         thisCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
+                                                                                         thisCoil.MSRatedAirVolFlowRate,
+                                                                                         thisCoil.MSEIRFTemp,
+                                                                                         thisCoil.MSRatedCOP,
+                                                                                         thisCoil.MSEIRAirFFlow,
+                                                                                         thisCoil.CondenserType);
 
     NetCoolingCapRated(thisCoil.NumOfSpeeds) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -5792,15 +5756,11 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilAir_ExampleARHI_IEER2022ValueTes
     Real64 NetCoolingCapRated2022(0.0);
     Real64 EER_2022(0.0);
 
-    // TODO: IEER Legacy Call to compare with IEER 2022
     Real64 constexpr AirMassFlowRatioRated(1.0); // AHRI test is at the design flow rate and hence AirMassFlowRatio is 1.0
     Real64 CapFFlowCurveIndex = thisCoil.CCapFFlow(1);
     Real64 EIRFFlowCurveIndex = thisCoil.EIRFFlow(1);
 
-    // thisCoil.RatedTotCap(1) = 25619.345986365865;
     EXPECT_EQ(26669.5, thisCoil.RatedTotCap(1));
-    // 25619.34;
-    // thisCoil.RatedAirVolFlowRate(1) = 1.3711908092591101;
     EXPECT_NEAR(1.227, thisCoil.RatedAirVolFlowRate(1), 0.01);
     Real64 TotCapFlowModFac = Curve::CurveValue(*state, CapFFlowCurveIndex, AirMassFlowRatioRated);
     Real64 EIRFlowModFac = Curve::CurveValue(*state, EIRFFlowCurveIndex, AirMassFlowRatioRated);
@@ -6110,19 +6070,17 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI5_IEER2022ValueTest)
 
     // condenser type array values for first and second index ?? TODO
     // Create TEST with EVAP COOLED
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalculationTwoSpeed(*state,
-                                thisCoil.DXCoilType, // NoChange
-                                thisCoil.CondenserType,
-                                TSCCapFTemp,                      // thisCoil.MSCCapFTemp,
-                                TSRatedTotCap,                    // thisCoil.MSRatedTotCap,
-                                HSCCapFlow,                       // thisCoil.MSCCapFFlow, | Only for HIGH SPEED
-                                TSFanPowerPerEvapAirFlowRate2023, // thisCoil.MSFanPowerPerEvapAirFlowRate_2023,
-                                TSRatedAirVolFlowRate,            // thisCoil.MSRatedAirVolFlowRate,
-                                TSEIRFTemp,                       // thisCoil.MSEIRFTemp,
-                                TSRatedCOP,                       // thisCoil.MSRatedCOP,
-                                HSEIRFFlow                        // thisCoil.MSEIRFFlow, | Only for HIGH SPEED
-        );
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(*state,
+                                                                                    thisCoil.DXCoilType,
+                                                                                    thisCoil.CondenserType,
+                                                                                    TSCCapFTemp,
+                                                                                    TSRatedTotCap,
+                                                                                    HSCCapFlow,
+                                                                                    TSFanPowerPerEvapAirFlowRate2023,
+                                                                                    TSRatedAirVolFlowRate,
+                                                                                    TSEIRFTemp,
+                                                                                    TSRatedCOP,
+                                                                                    HSEIRFFlow);
 
     NetCoolingCapRated = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -6416,21 +6374,17 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI6_IEER2022ValueTest)
 
     const int HSEIRFFlow = thisCoil.EIRFFlow(1);
 
-    // condenser type array values for first and second index ?? TODO
-    // Create TEST with EVAP COOLED
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalculationTwoSpeed(*state,
-                                thisCoil.DXCoilType, // NoChange
-                                thisCoil.CondenserType,
-                                TSCCapFTemp,                      // thisCoil.MSCCapFTemp,
-                                TSRatedTotCap,                    // thisCoil.MSRatedTotCap,
-                                thisCoil.CCapFFlow(1),            // HSCCapFlow,                       // thisCoil.MSCCapFFlow, | Only for HIGH SPEED
-                                TSFanPowerPerEvapAirFlowRate2023, // thisCoil.MSFanPowerPerEvapAirFlowRate_2023,
-                                TSRatedAirVolFlowRate,            // thisCoil.MSRatedAirVolFlowRate,
-                                TSEIRFTemp,                       // thisCoil.MSEIRFTemp,
-                                TSRatedCOP,                       // thisCoil.MSRatedCOP,
-                                thisCoil.EIRFFlow                 // HSEIRFFlow                        // thisCoil.MSEIRFFlow, | Only for HIGH SPEED
-        );
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(*state,
+                                                                                    thisCoil.DXCoilType,
+                                                                                    thisCoil.CondenserType,
+                                                                                    TSCCapFTemp,
+                                                                                    TSRatedTotCap,
+                                                                                    thisCoil.CCapFFlow(1),
+                                                                                    TSFanPowerPerEvapAirFlowRate2023,
+                                                                                    TSRatedAirVolFlowRate,
+                                                                                    TSEIRFTemp,
+                                                                                    TSRatedCOP,
+                                                                                    thisCoil.EIRFFlow);
 
     NetCoolingCapRated = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -6707,13 +6661,16 @@ TEST_F(EnergyPlusFixture, CurveFit_alternateMode_IEER2022ValueTest)
     std::map<std::string, Real64> StandardRatingsResult;
     Array1D<Real64> NetCoolingCapRated(nsp);
     Real64 IEER_2022(0.0);
+    Real64 EER_2022(0.0);
     Real64 NetCoolingCapRated2022(0.0);
 
     // TODO: we can always decide and give precedence to Alternate Mode 1 or Alternate Mode 2 if present | Needs Discussion about the applicability.
-    std::tie(IEER_2022, NetCoolingCapRated2022) = IEERCalulcationCurveFit(*state, "Coil:Cooling:DX:CurveFit", thisCoil.performance.normalMode);
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
+        IEERCalulcationCurveFit(*state, "Coil:Cooling:DX:CurveFit", thisCoil.performance.normalMode);
 
     NetCoolingCapRated(nsp) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
+    EXPECT_TRUE(EER_2022 > 0.0);
     EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
     EXPECT_NEAR(3.47, IEER_2022, 0.01);
     EXPECT_NEAR(14513.51, NetCoolingCapRated(nsp), 0.01);
@@ -7008,13 +6965,16 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
     std::map<std::string, Real64> StandardRatingsResult;
     Array1D<Real64> NetCoolingCapRated(nsp);
     Real64 IEER_2022(0.0);
+    Real64 EER_2022(0.0);
     Real64 NetCoolingCapRated2022(0.0);
 
     // TODO: we can always decide and give precedence to Alternate Mode 1 or Alternate Mode 2 if present | Needs Discussion about the applicability.
-    std::tie(IEER_2022, NetCoolingCapRated2022) = IEERCalulcationCurveFit(*state, "Coil:Cooling:DX:CurveFit", thisCoil.performance.normalMode);
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
+        IEERCalulcationCurveFit(*state, "Coil:Cooling:DX:CurveFit", thisCoil.performance.normalMode);
 
     NetCoolingCapRated(nsp) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
+    EXPECT_TRUE(EER_2022 > 0.0);
     EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
     EXPECT_NEAR(3.24, IEER_2022, 0.01);
     EXPECT_NEAR(4798.04, NetCoolingCapRated(nsp), 0.01);
