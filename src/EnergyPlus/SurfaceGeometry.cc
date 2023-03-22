@@ -3044,13 +3044,13 @@ namespace SurfaceGeometry {
                 subSurface.lcsz = baseSurface.lcsz;
             }
         } else {
-            // Not sure what this does, but keeping for now (MJW Dec 2015)
-            if (std::abs(subSurface.Azimuth - 360.0) < 0.01) {
-                subSurface.Azimuth = 360.0 - subSurface.Azimuth;
-            }
-            if (std::abs(baseSurface.Azimuth - 360.0) < 0.01) {
-                baseSurface.Azimuth = 360.0 - baseSurface.Azimuth;
-            }
+            // // Not sure what this does, but keeping for now (MJW Dec 2015)
+            // if (std::abs(subSurface.Azimuth - 360.0) < 0.01) {
+            //     subSurface.Azimuth = 360.0 - subSurface.Azimuth;
+            // }
+            // if (std::abs(baseSurface.Azimuth - 360.0) < 0.01) {
+            //     baseSurface.Azimuth = 360.0 - baseSurface.Azimuth;
+            // }
 
             // Is base surface horizontal? If so, ignore azimuth differences
             if (std::abs(baseSurface.Tilt) <= 1.0e-5 || std::abs(baseSurface.Tilt - 180.0) <= 1.0e-5) baseSurfHoriz = true;
