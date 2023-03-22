@@ -80,7 +80,6 @@ namespace EnergyPlus::EconomicTariff {
 
 //    Compute utility bills for a building based on energy
 //    use estimate.
-using ScheduleManager::GetScheduleIndex;
 
 void UpdateUtilityBills(EnergyPlusData &state)
 {
@@ -436,8 +435,9 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // schedules
         // period schedule
         if (len(state.dataIPShortCut->cAlphaArgs(4)) > 0) {
-            tariff(iInObj).periodSchedule = state.dataIPShortCut->cAlphaArgs(4);                          // name of the period schedule (time of day)
-            tariff(iInObj).periodSchIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4)); // index to the period schedule
+            tariff(iInObj).periodSchedule = state.dataIPShortCut->cAlphaArgs(4); // name of the period schedule (time of day)
+            tariff(iInObj).periodSchIndex =
+                ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4)); // index to the period schedule
             if (tariff(iInObj).periodSchIndex == 0) {
                 ShowSevereError(state, format("{}{}=\"{}\" invalid data", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
@@ -450,7 +450,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // season schedule
         if (len(state.dataIPShortCut->cAlphaArgs(5)) > 0) {
             tariff(iInObj).seasonSchedule = state.dataIPShortCut->cAlphaArgs(5); // name of the season schedule (winter/summer)
-            tariff(iInObj).seasonSchIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5)); // index to the season schedule
+            tariff(iInObj).seasonSchIndex =
+                ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5)); // index to the season schedule
             if (tariff(iInObj).seasonSchIndex == 0) {
                 ShowSevereError(state, format("{}{}=\"{}\" invalid data", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
@@ -462,8 +463,9 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         }
         // month schedule
         if (len(state.dataIPShortCut->cAlphaArgs(6)) > 0) {
-            tariff(iInObj).monthSchedule = state.dataIPShortCut->cAlphaArgs(6);                          // name of month schedule (when months end)
-            tariff(iInObj).monthSchIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6)); // index to the month schedule
+            tariff(iInObj).monthSchedule = state.dataIPShortCut->cAlphaArgs(6); // name of month schedule (when months end)
+            tariff(iInObj).monthSchIndex =
+                ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6)); // index to the month schedule
             if (tariff(iInObj).monthSchIndex == 0) {
                 ShowSevereError(state, format("{}{}=\"{}\" invalid data", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
@@ -602,9 +604,9 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             AssignVariablePt(state, state.dataIPShortCut->cAlphaArgs(9), isNotNumeric, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, iInObj);
         // real time pricing
         tariff(iInObj).chargeSchedule = state.dataIPShortCut->cAlphaArgs(10);
-        tariff(iInObj).chargeSchIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(10));
+        tariff(iInObj).chargeSchIndex = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(10));
         tariff(iInObj).baseUseSchedule = state.dataIPShortCut->cAlphaArgs(11);
-        tariff(iInObj).baseUseSchIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
+        tariff(iInObj).baseUseSchIndex = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
         // group name for separate distribution and transmission rates
         tariff(iInObj).groupName = state.dataIPShortCut->cAlphaArgs(12);
         // buy or sell option
@@ -2556,8 +2558,6 @@ void GatherForEconomics(EnergyPlusData &state)
     //   holding the data that will be used by the tariff
     //   calculation.
 
-    using ScheduleManager::GetCurrentScheduleValue;
-
     Real64 curInstantValue;
     Real64 curDemand;
     Real64 curEnergy;
@@ -2590,17 +2590,17 @@ void GatherForEconomics(EnergyPlusData &state)
                 // get the schedule values
                 // remember no confirmation of schedule values occurs prior to now
                 if (tariff.seasonSchIndex != 0) {
-                    curSeason = GetCurrentScheduleValue(state, tariff.seasonSchIndex);
+                    curSeason = ScheduleManager::GetCurrentScheduleValue(state, tariff.seasonSchIndex);
                 } else {
                     curSeason = 1;
                 }
                 if (tariff.periodSchIndex != 0) {
-                    curPeriod = GetCurrentScheduleValue(state, tariff.periodSchIndex);
+                    curPeriod = ScheduleManager::GetCurrentScheduleValue(state, tariff.periodSchIndex);
                 } else {
                     curPeriod = 1;
                 }
                 if (tariff.monthSchIndex != 0) {
-                    curMonth = GetCurrentScheduleValue(state, tariff.monthSchIndex);
+                    curMonth = ScheduleManager::GetCurrentScheduleValue(state, tariff.monthSchIndex);
                 } else {
                     // #7814 - Have to be careful with DST. tariff::seasonForMonth is overwritten at each timestep, and only the last value is
                     // retained, so make sure to capture the right one
@@ -2630,11 +2630,11 @@ void GatherForEconomics(EnergyPlusData &state)
                 }
                 // Real Time Pricing
                 if (tariff.chargeSchIndex != 0) {
-                    curRTPprice = GetCurrentScheduleValue(state, tariff.chargeSchIndex);
+                    curRTPprice = ScheduleManager::GetCurrentScheduleValue(state, tariff.chargeSchIndex);
                     // if customer baseline load schedule is used, subtract that off of the
                     // current energy
                     if (tariff.baseUseSchIndex != 0) {
-                        curRTPbaseline = GetCurrentScheduleValue(state, tariff.baseUseSchIndex);
+                        curRTPbaseline = ScheduleManager::GetCurrentScheduleValue(state, tariff.baseUseSchIndex);
                         curRTPenergy = curEnergy - curRTPbaseline;
                     } else {
                         curRTPenergy = curEnergy;
@@ -3860,8 +3860,6 @@ void LEEDtariffReporting(EnergyPlusData &state)
 
     //    Write the economic results for LEED reporting
 
-    using namespace OutputReportPredefined;
-
     Real64 elecTotalEne;
     Real64 gasTotalEne;
     Real64 distCoolTotalEne;
@@ -3948,56 +3946,71 @@ void LEEDtariffReporting(EnergyPlusData &state)
             }
         }
         // names of the rates
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Electricity", elecTariffNames);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas", gasTariffNames);
-        if (distCoolTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling", distCoolTariffNames);
-        if (distHeatTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating", distHeatTariffNames);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Other", othrTariffNames);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Electricity", elecTariffNames);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas", gasTariffNames);
+        if (distCoolTotalEne != 0)
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling", distCoolTariffNames);
+        if (distHeatTotalEne != 0)
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating", distHeatTariffNames);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Other", othrTariffNames);
         // virtual rate
-        if (elecTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "Electricity", elecTotalCost / elecTotalEne, 3);
-        if (gasTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "Natural Gas", gasTotalCost / gasTotalEne, 3);
-        if (otherTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "Other", otherTotalCost / otherTotalEne, 3);
+        if (elecTotalEne != 0)
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsVirt, "Electricity", elecTotalCost / elecTotalEne, 3);
+        if (gasTotalEne != 0)
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsVirt, "Natural Gas", gasTotalCost / gasTotalEne, 3);
+        if (otherTotalEne != 0)
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "Other", otherTotalCost / otherTotalEne, 3);
         // units
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Electricity", format("{}", convEneStrings(elecUnits)));
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Natural Gas", format("{}", convEneStrings(gasUnits)));
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Other", format("{}", convEneStrings(othrUnits)));
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "Electricity", format("{}", convDemStrings(elecUnits)));
-        PreDefTableEntry(state,
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Electricity", format("{}", convEneStrings(elecUnits)));
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Natural Gas", format("{}", convEneStrings(gasUnits)));
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "Other", format("{}", convEneStrings(othrUnits)));
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "Electricity", format("{}", convDemStrings(elecUnits)));
+        OutputReportPredefined::PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchLeedEtsDemUnt,
                          "Natural Gas",
                          format("{}{}", convDemStrings(gasUnits), demWindowStrings(gasDemWindowUnits)));
-        PreDefTableEntry(state,
+        OutputReportPredefined::PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchLeedEtsDemUnt,
                          "Other",
                          format("{}{}", convDemStrings(othrUnits), demWindowStrings(othrDemWindowUnits)));
         // total cost
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "Electricity", elecTotalCost, 2);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "Natural Gas", gasTotalCost, 2);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "Other", otherTotalCost, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "Electricity", elecTotalCost, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "Natural Gas", gasTotalCost, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "Other", otherTotalCost, 2);
         // show district energy if used
         if (distCoolTotalEne != 0) {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Cooling", distCoolTotalCost / distCoolTotalEne, 3);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Cooling", format("{}", convEneStrings(distCoolUnits)));
-            PreDefTableEntry(state,
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Cooling", distCoolTotalCost / distCoolTotalEne, 3);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Cooling", format("{}", convEneStrings(distCoolUnits)));
+            OutputReportPredefined::PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchLeedEtsDemUnt,
                              "District Cooling",
                              format("{}{}", convDemStrings(distCoolUnits), demWindowStrings(distCoolDemWindowUnits)));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Cooling", distCoolTotalCost, 2);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Cooling", distCoolTotalCost, 2);
         }
         if (distHeatTotalEne != 0) {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Heating", distHeatTotalCost / distHeatTotalEne, 3);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating", format("{}", convEneStrings(distHeatUnits)));
-            PreDefTableEntry(state,
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Heating", distHeatTotalCost / distHeatTotalEne, 3);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating", format("{}", convEneStrings(distHeatUnits)));
+            OutputReportPredefined::PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchLeedEtsDemUnt,
                              "District Heating",
                              format("{}{}", convDemStrings(distHeatUnits), demWindowStrings(distHeatDemWindowUnits)));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating", distHeatTotalCost, 2);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating", distHeatTotalCost, 2);
         }
         // save the total costs for later to compute process fraction
         state.dataOutRptPredefined->LEEDelecCostTotal = elecTotalCost;
         state.dataOutRptPredefined->LEEDgasCostTotal = gasTotalCost;
         state.dataOutRptPredefined->LEEDothrCostTotal = distCoolTotalCost + distHeatTotalCost + otherTotalCost;
-        PreDefTableEntry(state,
+        OutputReportPredefined::PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchLeedEcsTotal,
                          "Total",
                          elecTotalCost + gasTotalCost + distCoolTotalCost + distHeatTotalCost + otherTotalCost,
@@ -4011,15 +4024,6 @@ void WriteTabularTariffReports(EnergyPlusData &state)
     //    DATE WRITTEN   July 2004
     //    MODIFIED       January 2010, Kyle Benne
     //                   Added SQLite output
-
-    using OutputReportTabular::ConvertIP;
-    using OutputReportTabular::DetermineBuildingFloorArea;
-    using OutputReportTabular::LookupSItoIP;
-    using OutputReportTabular::RealToStr;
-    using OutputReportTabular::WriteReportHeaders;
-    using OutputReportTabular::WriteSubtitle;
-    using OutputReportTabular::WriteTable;
-    using OutputReportTabular::WriteTextLine;
 
     // all arrays are in the format: (row, column)
     Array1D_string columnHead;
@@ -4042,7 +4046,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
 
     // compute floor area if no ABUPS
     if (state.dataOutRptTab->buildingConditionedFloorArea == 0.0) {
-        DetermineBuildingFloorArea(state);
+        OutputReportTabular::DetermineBuildingFloorArea(state);
     }
 
     if (state.dataEconTariff->numTariff > 0) {
@@ -4056,7 +4060,8 @@ void WriteTabularTariffReports(EnergyPlusData &state)
             //---------------------------------
             // Economics Results Summary Report
             //---------------------------------
-            WriteReportHeaders(state, "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
+            OutputReportTabular::WriteReportHeaders(
+                state, "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
                 OutputReportTabular::UnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
@@ -4075,8 +4080,8 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                 if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound) {
                     int unitConvIndex = 0;
                     std::string SIunit = "[~~$~~/m2]";
-                    LookupSItoIP(state, SIunit, unitConvIndex, perAreaUnitName);
-                    perAreaUnitConv = ConvertIP(state, unitConvIndex, 1.0);
+                    OutputReportTabular::LookupSItoIP(state, SIunit, unitConvIndex, perAreaUnitName);
+                    perAreaUnitConv = OutputReportTabular::ConvertIP(state, unitConvIndex, 1.0);
                 } else {
                     perAreaUnitName = "[~~$~~/m2]";
                     perAreaUnitConv = 1.0;
@@ -4113,26 +4118,34 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                         }
                     }
                 }
-                tableBody(1, 1) = RealToStr(elecTotalCost, 2);
-                tableBody(2, 1) = RealToStr(gasTotalCost, 2);
-                tableBody(3, 1) = RealToStr(otherTotalCost, 2);
-                tableBody(4, 1) = RealToStr(allTotalCost, 2);
+                tableBody(1, 1) = OutputReportTabular::RealToStr(elecTotalCost, 2);
+                tableBody(2, 1) = OutputReportTabular::RealToStr(gasTotalCost, 2);
+                tableBody(3, 1) = OutputReportTabular::RealToStr(otherTotalCost, 2);
+                tableBody(4, 1) = OutputReportTabular::RealToStr(allTotalCost, 2);
                 if (state.dataOutRptTab->buildingGrossFloorArea > 0.0) {
-                    tableBody(1, 2) = RealToStr((elecTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
-                    tableBody(2, 2) = RealToStr((gasTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
-                    tableBody(3, 2) = RealToStr((otherTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
-                    tableBody(4, 2) = RealToStr((allTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
+                    tableBody(1, 2) =
+                        OutputReportTabular::RealToStr((elecTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
+                    tableBody(2, 2) =
+                        OutputReportTabular::RealToStr((gasTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
+                    tableBody(3, 2) =
+                        OutputReportTabular::RealToStr((otherTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
+                    tableBody(4, 2) =
+                        OutputReportTabular::RealToStr((allTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
                 }
                 if (state.dataOutRptTab->buildingConditionedFloorArea > 0.0) {
-                    tableBody(1, 3) = RealToStr((elecTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
-                    tableBody(2, 3) = RealToStr((gasTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
-                    tableBody(3, 3) = RealToStr((otherTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
-                    tableBody(4, 3) = RealToStr((allTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
+                    tableBody(1, 3) =
+                        OutputReportTabular::RealToStr((elecTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
+                    tableBody(2, 3) =
+                        OutputReportTabular::RealToStr((gasTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
+                    tableBody(3, 3) =
+                        OutputReportTabular::RealToStr((otherTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
+                    tableBody(4, 3) =
+                        OutputReportTabular::RealToStr((allTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
                 }
                 columnWidth = 14; // array assignment - same for all columns
                 if (produceTabular) {
-                    WriteSubtitle(state, "Annual Cost");
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    OutputReportTabular::WriteSubtitle(state, "Annual Cost");
+                    OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
                 if (produceSQLite) {
                     if (state.dataSQLiteProcedures->sqlite) {
@@ -4192,11 +4205,11 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                 } else {
                     tableBody(5, iTariff) = tariff.groupName;
                 }
-                tableBody(6, iTariff) = RealToStr(tariff.totalAnnualCost, 2);
+                tableBody(6, iTariff) = OutputReportTabular::RealToStr(tariff.totalAnnualCost, 2);
             }
             columnWidth = 14; // array assignment - same for all columns
-            WriteSubtitle(state, "Tariff Summary");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+            OutputReportTabular::WriteSubtitle(state, "Tariff Summary");
+            OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
@@ -4217,7 +4230,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
             for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                 auto const &tariff = state.dataEconTariff->tariff(iTariff);
                 auto const &computation = state.dataEconTariff->computation(iTariff);
-                WriteReportHeaders(state, "Tariff Report", tariff.tariffName, OutputProcessor::StoreType::Averaged);
+                OutputReportTabular::WriteReportHeaders(state, "Tariff Report", tariff.tariffName, OutputProcessor::StoreType::Averaged);
                 rowHead.allocate(7);
                 columnHead.allocate(1);
                 columnWidth.allocate(1);
@@ -4286,8 +4299,8 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                     break;
                 }
                 columnWidth = 14; // array assignment - same for all columns
-                WriteSubtitle(state, "General");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                OutputReportTabular::WriteSubtitle(state, "General");
+                OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 if (state.dataSQLiteProcedures->sqlite) {
                     state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Tariff Report", tariff.tariffName, "General");
@@ -4386,9 +4399,9 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                 ReportEconomicVariable(state, "Other Variables", false, false, tariff.tariffName);
                 //---- Computation
                 if (computation.isUserDef) {
-                    WriteTextLine(state, "Computation -  User Defined", true);
+                    OutputReportTabular::WriteTextLine(state, "Computation -  User Defined", true);
                 } else {
-                    WriteTextLine(state, "Computation -  Automatic", true);
+                    OutputReportTabular::WriteTextLine(state, "Computation -  Automatic", true);
                 }
                 std::string outString = "";
                 for (int lStep = computation.firstStep; lStep <= computation.lastStep; ++lStep) {
@@ -4396,7 +4409,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                     {
                         int const SELECT_CASE_var(curStep);
                         if (SELECT_CASE_var == 0) { // end of line
-                            WriteTextLine(state, rstrip(outString));
+                            OutputReportTabular::WriteTextLine(state, rstrip(outString));
                             outString = "";
                         } else if ((SELECT_CASE_var >= 1)) { // all positive values are a reference to an econVar
                             outString = econVar(curStep).name + ' ' + outString;
@@ -4531,11 +4544,6 @@ void ReportEconomicVariable(
 
     //    Report all econVar that show as activeNow
 
-    using OutputReportTabular::RealToStr;
-    using OutputReportTabular::WriteReportHeaders;
-    using OutputReportTabular::WriteSubtitle;
-    using OutputReportTabular::WriteTable;
-
     // all arrays are in the format: (row, column)
     Array1D_string columnHead;
     Array1D_int columnWidth;
@@ -4612,14 +4620,14 @@ void ReportEconomicVariable(
             for (jMonth = 1; jMonth <= 12; ++jMonth) { // note not all months get printed out if more than 12 are used.- need to fix this later
                 curVal = econVar(iVar).values(jMonth);
                 if ((curVal > 0) && (curVal < 1)) {
-                    tableBody(jMonth, nCntOfVar) = RealToStr(curVal, 4);
+                    tableBody(jMonth, nCntOfVar) = OutputReportTabular::RealToStr(curVal, 4);
                 } else {
-                    tableBody(jMonth, nCntOfVar) = RealToStr(curVal, 2);
+                    tableBody(jMonth, nCntOfVar) = OutputReportTabular::RealToStr(curVal, 2);
                 }
             }
             getMaxAndSum(state, iVar, sumVal, maximumVal);
-            tableBody(13, nCntOfVar) = RealToStr(sumVal, 2);
-            tableBody(14, nCntOfVar) = RealToStr(maximumVal, 2);
+            tableBody(13, nCntOfVar) = OutputReportTabular::RealToStr(sumVal, 2);
+            tableBody(14, nCntOfVar) = OutputReportTabular::RealToStr(maximumVal, 2);
             if (includeCategory) {
                 // first find category
                 curCategory = 0;
@@ -4672,8 +4680,8 @@ void ReportEconomicVariable(
         }
     }
     columnWidth = 14; // array assignment - same for all columns
-    WriteSubtitle(state, titleString);
-    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+    OutputReportTabular::WriteSubtitle(state, titleString);
+    OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
     if (state.dataSQLiteProcedures->sqlite) {
         state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
     }

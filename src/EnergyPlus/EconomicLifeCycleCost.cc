@@ -95,12 +95,6 @@ namespace EnergyPlus::EconomicLifeCycleCost {
 //   Systems", and "Engineering Economic Analysis, Ninth Edition", by
 //   Donald Newnan, Ted Eschenback, and Jerome Lavelle.
 
-// OTHER NOTES:
-// na
-
-// Using/Aliasing
-using namespace DataGlobalConstants;
-
 // Functions
 
 void GetInputForLifeCycleCost(EnergyPlusData &state)
@@ -865,7 +859,8 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
             //       \key Water
             //       \key OtherFuel1
             //       \key OtherFuel2
-            elcc->UsePriceEscalation(iInObj).resource = AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
+            elcc->UsePriceEscalation(iInObj).resource =
+                DataGlobalConstants::AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
             if (NumAlphas > 3) {
                 ShowWarningError(state, format("In {} contains more alpha fields than expected.", CurrentModuleObject));
             }
@@ -1015,7 +1010,7 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
             //       \key Water
             //       \key OtherFuel1
             //       \key OtherFuel2
-            elcc->UseAdjustment(iInObj).resource = AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
+            elcc->UseAdjustment(iInObj).resource = DataGlobalConstants::AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
             if (NumAlphas > 2) {
                 ShowWarningError(state, format("In {} contains more alpha fields than expected.", CurrentModuleObject));
             }
@@ -1047,35 +1042,10 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
     //    DATE WRITTEN   July 2010
-    //    MODIFIED       na
-    //    RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //    Convert all recurring and nonrecurring costs into cash flows
     //    used in calculations and reporting.
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Using/Aliasing
-    using EconomicTariff::GetMonthlyCostForResource;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int iCashFlow;
@@ -1090,7 +1060,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> resourceCosts;
     for (int jMonth = 1; jMonth <= 12; ++jMonth) {
         std::map<DataGlobalConstants::ResourceType, Real64> monthMap;
-        for (ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
+        for (DataGlobalConstants::ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
             monthMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
         }
         resourceCosts.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(jMonth, monthMap));
@@ -1099,12 +1069,12 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     Array1D<Real64> curResourceCosts(12);
 
     std::map<DataGlobalConstants::ResourceType, bool> resourceCostNotZero;
-    for (ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
+    for (DataGlobalConstants::ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
         resourceCostNotZero.insert(std::pair<DataGlobalConstants::ResourceType, bool>(iResource, false));
     }
 
     std::map<DataGlobalConstants::ResourceType, Real64> resourceCostAnnual;
-    for (ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
+    for (DataGlobalConstants::ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
         resourceCostAnnual.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
     }
 
@@ -1139,8 +1109,8 @@ void ExpressAsCashFlows(EnergyPlusData &state)
 
     // gather costs from EconomicTariff for each end use
     elcc->numResourcesUsed = 0;
-    for (ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
-        GetMonthlyCostForResource(state, iResource, curResourceCosts);
+    for (DataGlobalConstants::ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
+        EconomicTariff::GetMonthlyCostForResource(state, iResource, curResourceCosts);
         annualCost = 0.0;
         for (int jMonth = 1; jMonth <= 12; ++jMonth) {
             resourceCosts.at(jMonth).at(iResource) = curResourceCosts(jMonth);
@@ -1157,7 +1127,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     // allocate the escalated energy cost arrays
     for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
         std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
-        for (ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
+        for (DataGlobalConstants::ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
             yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
         }
         elcc->EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
@@ -1247,7 +1217,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     // Put resource costs into cashflows
     // the first cash flow for resources should be after the categories, recurring and nonrecurring costs
     int cashFlowCounter = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost - 1; // Since CashFlow starts at 0
-    for (ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
+    for (DataGlobalConstants::ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
         if (resourceCostNotZero.at(iResource)) {
             ++cashFlowCounter;
 
@@ -1369,7 +1339,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     }
     // generate a warning if resource referenced was not used
     for (int nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
-        ResourceType curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
+        DataGlobalConstants::ResourceType curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
         if (!resourceCostNotZero.at(curResource) && state.dataGlobal->DoWeathSim) {
             ShowWarningError(state,
                              format("The resource referenced by LifeCycleCost:UsePriceEscalation= \"{}\" has no energy cost. ",
@@ -1389,7 +1359,7 @@ void ComputeEscalatedEnergyCosts(EnergyPlusData &state)
     for (int iCashFlow = 0; iCashFlow < elcc->numCashFlow; ++iCashFlow) {
         if (elcc->CashFlow[iCashFlow].pvKind == PrValKind::Energy) {
             // make sure this is not water
-            ResourceType curResource = elcc->CashFlow[iCashFlow].Resource;
+            DataGlobalConstants::ResourceType curResource = elcc->CashFlow[iCashFlow].Resource;
             if (elcc->CashFlow[iCashFlow].Resource == DataGlobalConstants::ResourceType::Water ||
                 (elcc->CashFlow[iCashFlow].Resource >= DataGlobalConstants::ResourceType::OnSiteWater &&
                  elcc->CashFlow[iCashFlow].Resource <= DataGlobalConstants::ResourceType::Condensate)) {
@@ -1416,7 +1386,7 @@ void ComputeEscalatedEnergyCosts(EnergyPlusData &state)
             }
         }
     }
-    for (ResourceType kResource : state.dataGlobalConst->AllResourceTypes) {
+    for (DataGlobalConstants::ResourceType kResource : state.dataGlobalConst->AllResourceTypes) {
         for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
             elcc->EscalatedTotEnergy(jYear) += elcc->EscalatedEnergy.at(jYear).at(kResource);
         }
@@ -1497,7 +1467,7 @@ void ComputePresentValue(EnergyPlusData &state)
     elcc->SPV.allocate(elcc->lengthStudyYears);
     for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
         std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
-        for (ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
+        for (DataGlobalConstants::ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
             yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
         }
         elcc->energySPV.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
@@ -1519,13 +1489,13 @@ void ComputePresentValue(EnergyPlusData &state)
     }
     // use SPV as default values for all energy types
     for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-        for (ResourceType kResource : state.dataGlobalConst->AllResourceTypes) {
+        for (DataGlobalConstants::ResourceType kResource : state.dataGlobalConst->AllResourceTypes) {
             elcc->energySPV.at(jYear).at(kResource) = elcc->SPV(jYear);
         }
     }
     // loop through the resources and if they match a UseEscalation use those values instead
     for (nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
-        ResourceType curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
+        DataGlobalConstants::ResourceType curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
         if (curResource != DataGlobalConstants::ResourceType::None) {
             for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 // the following is based on UPV* formula from NIST 135 supplement but is for a single year
@@ -1547,7 +1517,7 @@ void ComputePresentValue(EnergyPlusData &state)
             break;
         }
         case PrValKind::Energy: {
-            ResourceType curResource = elcc->CashFlow[iCashFlow].Resource;
+            DataGlobalConstants::ResourceType curResource = elcc->CashFlow[iCashFlow].Resource;
             if (curResource != DataGlobalConstants::ResourceType::None) {
                 totalPV = 0.0;
                 for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
@@ -1708,30 +1678,6 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
     //    Write the output report related to life-cycle costing
     //    to the tabular output file.
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using OutputReportTabular::RealToStr;
-    using OutputReportTabular::WriteReportHeaders;
-    using OutputReportTabular::WriteSubtitle;
-    using OutputReportTabular::WriteTable;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // all arrays are in the format: (row, column)
     Array1D_string columnHead;
@@ -1745,7 +1691,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         //---------------------------------
         // Life-Cycle Cost Verification and Results Report
         //---------------------------------
-        WriteReportHeaders(state, "Life-Cycle Cost Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
+        OutputReportTabular::WriteReportHeaders(state, "Life-Cycle Cost Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
         //---- Life-Cycle Cost Parameters
         rowHead.allocate(11);
         columnHead.allocate(1);
@@ -1769,29 +1715,29 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         tableBody(1, 2) = DiscConvNames[static_cast<int>(elcc->discountConvention)];
         tableBody(1, 3) = InflApprNames[static_cast<int>(elcc->inflationApproach)];
         if (elcc->inflationApproach == InflAppr::ConstantDollar) {
-            tableBody(1, 4) = RealToStr(elcc->realDiscountRate, 4);
+            tableBody(1, 4) = OutputReportTabular::RealToStr(elcc->realDiscountRate, 4);
         } else {
             tableBody(1, 4) = "-- N/A --";
         }
         if (elcc->inflationApproach == InflAppr::CurrentDollar) {
-            tableBody(1, 5) = RealToStr(elcc->nominalDiscountRate, 4);
+            tableBody(1, 5) = OutputReportTabular::RealToStr(elcc->nominalDiscountRate, 4);
         } else {
             tableBody(1, 5) = "-- N/A --";
         }
         if (elcc->inflationApproach == InflAppr::CurrentDollar) {
-            tableBody(1, 6) = RealToStr(elcc->inflation, 4);
+            tableBody(1, 6) = OutputReportTabular::RealToStr(elcc->inflation, 4);
         } else {
             tableBody(1, 6) = "-- N/A --";
         }
         tableBody(1, 7) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear);
         tableBody(1, 8) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->serviceDateMonth)], elcc->serviceDateYear);
         tableBody(1, 9) = fmt::to_string(elcc->lengthStudyYears);
-        tableBody(1, 10) = RealToStr(elcc->taxRate, 4);
+        tableBody(1, 10) = OutputReportTabular::RealToStr(elcc->taxRate, 4);
         tableBody(1, 11) = DeprMethodNames[static_cast<int>(elcc->depreciationMethod)];
 
         columnWidth = 14; // array assignment - same for all columns
-        WriteSubtitle(state, "Life-Cycle Cost Parameters");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Life-Cycle Cost Parameters");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters");
@@ -1827,11 +1773,11 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         }
         for (int jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) {
             for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                tableBody(jObj, iYear + 2) = RealToStr(elcc->UsePriceEscalation(jObj).Escalation(iYear), 6);
+                tableBody(jObj, iYear + 2) = OutputReportTabular::RealToStr(elcc->UsePriceEscalation(jObj).Escalation(iYear), 6);
             }
         }
-        WriteSubtitle(state, "Use Price Escalation");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Use Price Escalation");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation");
@@ -1865,11 +1811,11 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             }
             for (int jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) {
                 for (int iYear = 1; iYear <= numYears; ++iYear) {
-                    tableBody(jObj, iYear + 1) = RealToStr(elcc->UseAdjustment(jObj).Adjustment(iYear), 6);
+                    tableBody(jObj, iYear + 1) = OutputReportTabular::RealToStr(elcc->UseAdjustment(jObj).Adjustment(iYear), 6);
                 }
             }
-            WriteSubtitle(state, "Use Adjustment");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+            OutputReportTabular::WriteSubtitle(state, "Use Adjustment");
+            OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment");
@@ -1902,11 +1848,11 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             tableBody(jObj + 1, 1) = SourceKindTypeNames[static_cast<int>(elcc->CashFlow[curCashFlow].SourceKind)];
 
             for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                tableBody(jObj + 1, iYear + 1) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
+                tableBody(jObj + 1, iYear + 1) = OutputReportTabular::RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
             }
         }
-        WriteSubtitle(state, "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                                rowHead,
@@ -1942,16 +1888,16 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             int curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
             columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
             for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                tableBody(jObj + 1, iYear) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
+                tableBody(jObj + 1, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
             }
         }
         columnHead(numColumns) = Total;
         for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-            tableBody(elcc->numResourcesUsed + 1, iYear) =
-                RealToStr(elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
+            tableBody(elcc->numResourcesUsed + 1, iYear) = OutputReportTabular::RealToStr(
+                elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
         }
-        WriteSubtitle(state, "Energy and Water Cost Cash Flows (Without Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Energy and Water Cost Cash Flows (Without Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy and Water Cost Cash Flows (Without Escalation)");
@@ -1977,24 +1923,24 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         for (int jObj = 0; jObj < elcc->numResourcesUsed; ++jObj) {
             int curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
             columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
-            ResourceType curResource = elcc->CashFlow[curCashFlow].Resource;
+            DataGlobalConstants::ResourceType curResource = elcc->CashFlow[curCashFlow].Resource;
             if (elcc->CashFlow[curCashFlow].Resource != DataGlobalConstants::ResourceType::Water) {
                 for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                    tableBody(jObj + 1, iYear) = RealToStr(elcc->EscalatedEnergy.at(iYear).at(curResource), 2);
+                    tableBody(jObj + 1, iYear) = OutputReportTabular::RealToStr(elcc->EscalatedEnergy.at(iYear).at(curResource), 2);
                 }
             } else { // for water just use the original cashflow since not involved in escalation
                 for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                    tableBody(jObj + 1, iYear) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
+                    tableBody(jObj + 1, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
                 }
             }
         }
         columnHead(numColumns) = Total;
         for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             tableBody(elcc->numResourcesUsed + 1, iYear) =
-                RealToStr(elcc->EscalatedTotEnergy(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
+                OutputReportTabular::RealToStr(elcc->EscalatedTotEnergy(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
         }
-        WriteSubtitle(state, "Energy and Water Cost Cash Flows (With Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Energy and Water Cost Cash Flows (With Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy and Water Cost Cash Flows (With Escalation)");
@@ -2024,11 +1970,11 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
             for (int CostCategory = CostCategory::Construction, tableColumnIndex = 1; CostCategory <= CostCategory::TotCaptl;
                  ++tableColumnIndex, ++CostCategory) {
-                tableBody(tableColumnIndex, iYear) = RealToStr(elcc->CashFlow[CostCategory].yrAmount(iYear), 2);
+                tableBody(tableColumnIndex, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[CostCategory].yrAmount(iYear), 2);
             }
         }
-        WriteSubtitle(state, "Capital Cash Flow by Category (Without Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Capital Cash Flow by Category (Without Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Capital Cash Flow by Category (Without Escalation)");
@@ -2057,11 +2003,11 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
             for (int CashFlowCostCategory = CostCategory::Maintenance; CashFlowCostCategory <= CostCategory::TotOper; ++CashFlowCostCategory) {
-                tableBody(CashFlowCostCategory + 1, iYear) = RealToStr(elcc->CashFlow[CashFlowCostCategory].yrAmount(iYear), 2);
+                tableBody(CashFlowCostCategory + 1, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[CashFlowCostCategory].yrAmount(iYear), 2);
             }
         }
-        WriteSubtitle(state, "Operating Cash Flow by Category (Without Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Operating Cash Flow by Category (Without Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Operating Cash Flow by Category (Without Escalation)");
@@ -2090,15 +2036,15 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
             for (int CashFlowCostCategory = CostCategory::Maintenance; CashFlowCostCategory <= CostCategory::Water; ++CashFlowCostCategory) {
-                tableBody(CashFlowCostCategory + 1, iYear) = RealToStr(elcc->CashFlow[CashFlowCostCategory].yrAmount(iYear), 2);
+                tableBody(CashFlowCostCategory + 1, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[CashFlowCostCategory].yrAmount(iYear), 2);
             }
-            tableBody(9, iYear) = RealToStr(elcc->EscalatedTotEnergy(iYear), 2);
+            tableBody(9, iYear) = OutputReportTabular::RealToStr(elcc->EscalatedTotEnergy(iYear), 2);
             Real64 yearly_total_cost = elcc->CashFlow[CostCategory::TotOper].yrAmount(iYear) + elcc->EscalatedTotEnergy(iYear) -
                                        elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear);
-            tableBody(10, iYear) = RealToStr(yearly_total_cost, 2);
+            tableBody(10, iYear) = OutputReportTabular::RealToStr(yearly_total_cost, 2);
         }
-        WriteSubtitle(state, "Operating Cash Flow by Category (With Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Operating Cash Flow by Category (With Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Operating Cash Flow by Category (With Escalation)");
@@ -2143,11 +2089,11 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         //                                 UtilityRoutines::MonthNamesCC[static_cast<int>(1 + (kMonth + elcc->baseDateMonth - 2) % 12) - 1],
         //                                 elcc->baseDateYear + int((kMonth - 1) / 12));
         //        for (int jObj = 0; jObj < elcc->numCashFlow; ++jObj) {
-        //            tableBody(jObj + 1, kMonth) = RealToStr(elcc->CashFlow[jObj].mnAmount(kMonth), 2);
+        //            tableBody(jObj + 1, kMonth) = OutputReportTabular::RealToStr(elcc->CashFlow[jObj].mnAmount(kMonth), 2);
         //        }
         //    }
-        //    WriteSubtitle(state, "DEBUG ONLY - Monthly Cash Flows");
-        //    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        //    OutputReportTabular::WriteSubtitle(state, "DEBUG ONLY - Monthly Cash Flows");
+        //    OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         //    if (state.dataSQLiteProcedures->sqlite) {
         //        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
         //            tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
@@ -2174,11 +2120,12 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = fmt::to_string(elcc->baseDateYear + iYear - 1);
             for (int kMonth = 1; kMonth <= 12; ++kMonth) {
-                tableBody(kMonth, iYear) = RealToStr(elcc->CashFlow[CostCategory::TotGrand].mnAmount((iYear - 1) * 12 + kMonth), 2);
+                tableBody(kMonth, iYear) =
+                    OutputReportTabular::RealToStr(elcc->CashFlow[CostCategory::TotGrand].mnAmount((iYear - 1) * 12 + kMonth), 2);
             }
         }
-        WriteSubtitle(state, "Monthly Total Cash Flow (Without Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Monthly Total Cash Flow (Without Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)");
@@ -2248,18 +2195,19 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
                 break;
             }
             }
-            tableBody(3, jObj + 1) = RealToStr(elcc->CashFlow[offset + jObj].orginalCost, 2);
-            tableBody(4, jObj + 1) = RealToStr(elcc->CashFlow[offset + jObj].presentValue, 2);
+            tableBody(3, jObj + 1) = OutputReportTabular::RealToStr(elcc->CashFlow[offset + jObj].orginalCost, 2);
+            tableBody(4, jObj + 1) = OutputReportTabular::RealToStr(elcc->CashFlow[offset + jObj].presentValue, 2);
             totalPV += elcc->CashFlow[offset + jObj].presentValue;
             if (elcc->CashFlow[offset + jObj].orginalCost != 0.0) {
-                tableBody(5, jObj + 1) = RealToStr(elcc->CashFlow[offset + jObj].presentValue / elcc->CashFlow[offset + jObj].orginalCost, 4);
+                tableBody(5, jObj + 1) =
+                    OutputReportTabular::RealToStr(elcc->CashFlow[offset + jObj].presentValue / elcc->CashFlow[offset + jObj].orginalCost, 4);
             } else {
                 tableBody(5, jObj + 1) = "-";
             }
         }
-        tableBody(4, numRows + 1) = RealToStr(totalPV, 2);
-        WriteSubtitle(state, "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        tableBody(4, numRows + 1) = OutputReportTabular::RealToStr(totalPV, 2);
+        OutputReportTabular::WriteSubtitle(state, "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody,
@@ -2295,11 +2243,11 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnHead(1) = "Present Value";
 
         for (int CashFlowCostCategory = CostCategory::Maintenance; CashFlowCostCategory <= CostCategory::TotGrand; ++CashFlowCostCategory) {
-            tableBody(1, CashFlowCostCategory + 1) = RealToStr(elcc->CashFlow[CashFlowCostCategory].presentValue, 2);
+            tableBody(1, CashFlowCostCategory + 1) = OutputReportTabular::RealToStr(elcc->CashFlow[CashFlowCostCategory].presentValue, 2);
         }
 
-        WriteSubtitle(state, "Present Value by Category");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Present Value by Category");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category");
@@ -2326,20 +2274,20 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         totalPV = 0.0;
         for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
-            tableBody(1, iYear) = RealToStr(elcc->CashFlow[CostCategory::TotGrand].yrAmount(iYear), 2);
+            tableBody(1, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[CostCategory::TotGrand].yrAmount(iYear), 2);
             // adjust for escalated energy costs
             Real64 yearly_total_cost = elcc->CashFlow[CostCategory::TotGrand].yrAmount(iYear) + elcc->EscalatedTotEnergy(iYear) -
                                        elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear);
-            tableBody(2, iYear) = RealToStr(yearly_total_cost, 2);
-            tableBody(3, iYear) = RealToStr(elcc->CashFlow[CostCategory::TotGrand].yrPresVal(iYear), 2);
+            tableBody(2, iYear) = OutputReportTabular::RealToStr(yearly_total_cost, 2);
+            tableBody(3, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[CostCategory::TotGrand].yrPresVal(iYear), 2);
             totalPV += elcc->CashFlow[CostCategory::TotGrand].yrPresVal(iYear);
         }
 
         rowHead(elcc->lengthStudyYears + 1) = TotalUC;
-        tableBody(3, elcc->lengthStudyYears + 1) = RealToStr(totalPV, 2);
+        tableBody(3, elcc->lengthStudyYears + 1) = OutputReportTabular::RealToStr(totalPV, 2);
 
-        WriteSubtitle(state, "Present Value by Year");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Present Value by Year");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year");
@@ -2370,19 +2318,19 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
                 rowHead(iYear) =
                     format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
-                tableBody(1, iYear) = RealToStr(elcc->DepreciatedCapital(iYear), 2);
-                tableBody(2, iYear) = RealToStr(elcc->TaxableIncome(iYear), 2);
-                tableBody(3, iYear) = RealToStr(elcc->Taxes(iYear), 2);
-                tableBody(4, iYear) = RealToStr(elcc->AfterTaxCashFlow(iYear), 2);
-                tableBody(5, iYear) = RealToStr(elcc->AfterTaxPresentValue(iYear), 2);
+                tableBody(1, iYear) = OutputReportTabular::RealToStr(elcc->DepreciatedCapital(iYear), 2);
+                tableBody(2, iYear) = OutputReportTabular::RealToStr(elcc->TaxableIncome(iYear), 2);
+                tableBody(3, iYear) = OutputReportTabular::RealToStr(elcc->Taxes(iYear), 2);
+                tableBody(4, iYear) = OutputReportTabular::RealToStr(elcc->AfterTaxCashFlow(iYear), 2);
+                tableBody(5, iYear) = OutputReportTabular::RealToStr(elcc->AfterTaxPresentValue(iYear), 2);
                 totalPV += elcc->AfterTaxPresentValue(iYear);
             }
 
             rowHead(elcc->lengthStudyYears + 1) = TotalUC;
-            tableBody(5, elcc->lengthStudyYears + 1) = RealToStr(totalPV, 2);
+            tableBody(5, elcc->lengthStudyYears + 1) = OutputReportTabular::RealToStr(totalPV, 2);
 
-            WriteSubtitle(state, "After Tax Estimate");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+            OutputReportTabular::WriteSubtitle(state, "After Tax Estimate");
+            OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate");
