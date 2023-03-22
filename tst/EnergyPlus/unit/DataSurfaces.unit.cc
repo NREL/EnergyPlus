@@ -418,22 +418,49 @@ TEST_F(EnergyPlusFixture, SurfaceTest_HashMap)
 TEST_F(EnergyPlusFixture, SurfaceTest_Azimuth_non_conv)
 {
     // Unit test for PR 9907 to fix Issue 9906 incorrect Azimuth angle calculation for some non-convex surfaces
-    SurfaceData s;
-    s.Vertex.dimension(6);
-    s.Shape = SurfaceShape::Polygonal;
+    {
+        SurfaceData s;
+        s.Vertex.dimension(6);
+        s.Shape = SurfaceShape::Polygonal;
 
-    s.Vertex = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 0, -1), Vector(2, 0, -1), Vector(2, 0, 1), Vector(0, 0, 1)};
-    Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
-    Vectors::DetermineAzimuthAndTilt(s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
+        s.Vertex = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 0, -1), Vector(2, 0, -1), Vector(2, 0, 1), Vector(0, 0, 1)};
+        Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(
+            s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
 
-    EXPECT_DOUBLE_EQ(s.Azimuth, 180.0); // Orignal code without PR 9907 fix would fail this one by getting an s.Azimuth of 0.0
-    EXPECT_DOUBLE_EQ(s.Tilt, 90.0);
+        EXPECT_DOUBLE_EQ(s.Azimuth, 180.0); // Orignal code without PR 9907 fix would fail this one by getting an s.Azimuth of 0.0
+        EXPECT_DOUBLE_EQ(s.Tilt, 90.0);
 
-    s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
-    s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
-    s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
 
-    EXPECT_NEAR(s.SinAzim, 0.0, 1e-15);
-    EXPECT_DOUBLE_EQ(s.CosAzim, -1.0);
-    EXPECT_DOUBLE_EQ(s.SinTilt, 1.0);
+        EXPECT_NEAR(s.SinAzim, 0.0, 1e-15);
+        EXPECT_DOUBLE_EQ(s.CosAzim, -1.0);
+        EXPECT_DOUBLE_EQ(s.SinTilt, 1.0);
+    }
+
+    // Test an "ordinary" scenario to make sure the new code would not break anything
+    {
+        SurfaceData s;
+        s.Vertex.dimension(5);
+        s.Shape = SurfaceShape::Polygonal;
+
+        s.Vertex = {Vector(0, 0, 0), Vector(1, 0, -1), Vector(2, 0, -1), Vector(2, 0, 1), Vector(0, 0, 1)};
+        Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
+        Vectors::DetermineAzimuthAndTilt(
+            s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
+
+        // Orignal code should get the same result in this case
+        EXPECT_DOUBLE_EQ(s.Azimuth, 180.0);
+        EXPECT_DOUBLE_EQ(s.Tilt, 90.0);
+
+        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+
+        EXPECT_NEAR(s.SinAzim, 0.0, 1e-15);
+        EXPECT_DOUBLE_EQ(s.CosAzim, -1.0);
+        EXPECT_DOUBLE_EQ(s.SinTilt, 1.0);
+    }
 }
