@@ -2332,7 +2332,7 @@ namespace StandardRatings {
 
         // Table 6 from AHRI Std. 340/360-2022 (IP)
         // Cooling
-        Real64 CoilInletAirWetBulbTemp = 23.89;  // 75F
+        // Real64 CoilInletAirWetBulbTemp = 23.89;  // 75F
         Real64 CoilInletAirCoolDryBulb = 35;     // 95F
         Real64 CoilWaterOutletTemp = 35;         // 95F
         Real64 CoilWaterInletTemp = 29.44;       // 85F
@@ -2528,7 +2528,7 @@ namespace StandardRatings {
             Real64 EER_BLow(0.0);
             Real64 EER_BHigh(0.0);
             for (int i = 1; i <= 2; ++i) {
-                if (i > speedsForB.size()) continue;
+                if ((unsigned long)i > speedsForB.size()) continue;
 
                 RedCapNum = speedsForB(i);
                 if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
@@ -2570,7 +2570,7 @@ namespace StandardRatings {
             Real64 EER_CLow(0.0);
             Real64 EER_CHigh(0.0);
             for (int i = 1; i <= 2; ++i) {
-                if (i > speedsForC.size()) continue;
+                if ((unsigned long)i > speedsForC.size()) continue;
 
                 RedCapNum = speedsForC(i);
                 if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
@@ -2612,7 +2612,7 @@ namespace StandardRatings {
             Real64 EER_DLow(0.0);
             Real64 EER_DHigh(0.0);
             for (int i = 1; i <= 2; ++i) {
-                if (i > speedsForD.size()) continue;
+                if ((unsigned long)i > speedsForD.size()) continue;
 
                 RedCapNum = speedsForD(i);
                 if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
@@ -2728,7 +2728,6 @@ namespace StandardRatings {
         Array1D<Real64> EIRFlowModFac(nsp);    // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
         Array1D<Real64> TotCapTempModFac(nsp);
         Array1D<Real64> NetCoolingCapRated(nsp);
-        int constexpr NumOfReducedCap(4);                  // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
         Real64 OutdoorUnitInletAirDryBulbTempReduced(0.0); // Outdoor unit entering air dry-bulb temperature at reduced capacity [C]
         Array1D<Real64> NetCoolingCapReduced(nsp);         // Net Cooling Coil capacity at reduced conditions, accounting for supply fan heat [W]
         Array1D<Real64> EIRTempModFac(nsp);                // EIR modifier (function of entering wetbulb, outside drybulb) [-]
@@ -2945,7 +2944,7 @@ namespace StandardRatings {
             Real64 EER_BLow(0.0);
             Real64 EER_BHigh(0.0);
             for (int i = 1; i <= 2; ++i) {
-                if (i > speedsForB.size()) continue;
+                if ((unsigned long)i > speedsForB.size()) continue;
 
                 RedCapNum = speedsForB(i);
                 if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
@@ -2985,7 +2984,7 @@ namespace StandardRatings {
             Real64 EER_CLow(0.0);
             Real64 EER_CHigh(0.0);
             for (int i = 1; i <= 2; ++i) {
-                if (i > speedsForC.size()) continue;
+                if ((unsigned long)i > speedsForC.size()) continue;
 
                 RedCapNum = speedsForC(i);
                 if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
@@ -5647,13 +5646,16 @@ namespace StandardRatings {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2UserIP_2023, CompName, SEERUserIP, 2);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2StandardIP_2023, CompName, SEERStandardIP, 2);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, CompName, IEERValueIP, 1);
-                addFootNoteSubTable(
-                    state,
-                    state.dataOutRptPredefined->pdstDXCoolCoil_2023,
-                    "ANSI/AHRI ratings account for supply air fan heat and electric power. "
-                    "SEER2 User is calculated using user-input PLF curve and cooling coefficient of degradation whereas SEER2 Standard "
-                    "is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation. "
-                    "IEER Calculation was removed from the 2023 Version of the Standard.");
+                addFootNoteSubTable(state,
+                                    state.dataOutRptPredefined->pdstDXCoolCoil_2023,
+                                    "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
+                                    "1 - EnergyPlus object type. <br/>"
+                                    "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2023. <br/>"
+                                    "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2022. <br/>"
+                                    "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
+                                    "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
+                                    "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
+                                    "from the appropriate AHRI standard.");
             }
             break;
         }
@@ -5764,12 +5766,16 @@ namespace StandardRatings {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2StandardIP_2023, CompName, SEERStandardIP, 2);
                 }
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, CompName, IEERValueIP, 1);
-                addFootNoteSubTable(
-                    state,
-                    state.dataOutRptPredefined->pdstDXCoolCoil_2023,
-                    "ANSI/AHRI ratings account for supply air fan heat and electric power. "
-                    "SEER2 User is calculated using user-input PLF curve and cooling coefficient of degradation whereas SEER2 Standard "
-                    "is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.");
+                addFootNoteSubTable(state,
+                                    state.dataOutRptPredefined->pdstDXCoolCoil_2023,
+                                    "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
+                                    "1 - EnergyPlus object type. <br/>"
+                                    "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2023. <br/>"
+                                    "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2022. <br/>"
+                                    "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
+                                    "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
+                                    "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
+                                    "from the appropriate AHRI standard.");
             }
 
             break;

@@ -346,15 +346,15 @@ namespace OutputReportPredefined {
         s->pdchDXCoolCoilIEERIP = newPreDefColumn(state, s->pdstDXCoolCoil, "IEER [Btu/W-h]");
 
         // for DX Cooling Coil AHRI Standard 2023 Ratings | SEER2
-        s->pdstDXCoolCoil_2023 = newPreDefSubTable(state, s->pdrEquip, "DX Cooling Coils [ SEER2 ]");
-        s->pdchDXCoolCoilType_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "DX Cooling Coil Type");
-        s->pdchDXCoolCoilNetCapSI_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rated Net Cooling Capacity [W]");
+        s->pdstDXCoolCoil_2023 = newPreDefSubTable(state, s->pdrEquip, "DX Cooling Coils - Standard Ratings");
+        s->pdchDXCoolCoilType_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Cooling Coil Type [1]");
+        s->pdchDXCoolCoilNetCapSI_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rated Net Cooling Capacity [W] [2]");
 
-        s->pdchDXCoolCoilCOP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rated Net COP2 [W/W]");
-        s->pdchDXCoolCoilEERIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "EER2 [Btu/W-h]");
-        s->pdchDXCoolCoilSEER2UserIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "SEER2 User [Btu/W-h]");
-        s->pdchDXCoolCoilSEER2StandardIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "SEER2 Standard [Btu/W-h]");
-        s->pdchDXCoolCoilIEERIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "IEER 2022 [Btu/W-h]");
+        s->pdchDXCoolCoilCOP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rated Net COP [W/W] [2]");
+        s->pdchDXCoolCoilEERIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "EER [Btu/W-h] [2]");
+        s->pdchDXCoolCoilSEER2UserIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "SEER User [Btu/W-h] [2,3]");
+        s->pdchDXCoolCoilSEER2StandardIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "SEER Standard [Btu/W-h] [2,3]");
+        s->pdchDXCoolCoilIEERIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "IEER [Btu/W-h] [2]");
 
         // for DX Cooling Coil ASHRAE 127-12 Report
         s->pdstDXCoolCoil2 = newPreDefSubTable(state, s->pdrEquip, "DX Cooling Coil ASHRAE 127 Standard Ratings Report");
