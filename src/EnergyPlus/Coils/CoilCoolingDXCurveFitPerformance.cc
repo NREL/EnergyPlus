@@ -590,7 +590,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
         // applicability.
         Real64 IEER_2022(0.0);
         Real64 EER_2022(0.0);
-        Real64 NetCoolingCapRated2022(0.0); 
+        Real64 NetCoolingCapRated2022(0.0);
         std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
             StandardRatings::IEERCalulcationCurveFit(state, "Coil:Cooling:DX:CurveFit", this->normalMode);
 

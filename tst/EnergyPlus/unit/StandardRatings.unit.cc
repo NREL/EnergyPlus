@@ -3223,7 +3223,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilEvap_IEER2022ValueTest)
         "    ,    !- Availability Schedule Name", // FanAndCoilAvailSched
         "    32000,                   !- Gross Rated Total Cooling Capacity {W}",
         "    0.75,                    !- Gross Rated Sensible Heat Ratio",
-        "    3.66,                     !- Gross Rated Cooling COP {W/W}",
+        "    3.8,                     !- Gross Rated Cooling COP {W/W}",
         "    1.7,                     !- Rated Air Flow Rate {m3/s}",
         "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
         "    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}",
@@ -3359,9 +3359,9 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilEvap_IEER2022ValueTest)
     EXPECT_TRUE(IEER_2022 > 0.0);
     EXPECT_TRUE(EER_2022 > 0.0);
     EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
-    EXPECT_NEAR(3.08, IEER_2022, 0.01); // 2.65
+    EXPECT_NEAR(2.98, IEER_2022, 0.01); // 2.65
     EXPECT_NEAR(30391.40, NetCoolingCapRated, 0.01);
-    EXPECT_NEAR(10.51, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01); // 9.05
+    EXPECT_NEAR(10.16, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01); // 9.05
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCooling_IEER2022ValueTest)
@@ -3592,9 +3592,11 @@ Speed   Percent Load
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "ZONE1PTHPDXCOOLCOIL");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
+    EXPECT_TRUE(DataHeatBalance::RefrigCondenserType::Air == condenserType);
     auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
+    EXPECT_TRUE(30 == vsCoilType);
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(pLFfPLR_Curve));
     // ckeck user PLF curve coefficients
@@ -3915,9 +3917,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_2_IEER2022ValueTest)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "ZONE1PTHPDXCOOLCOIL");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType;
+    EXPECT_TRUE(DataHeatBalance::RefrigCondenserType::Air == condenserType);
     auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
+    EXPECT_TRUE(30 == vsCoilType);
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(pLFfPLR_Curve));
     // ckeck user PLF curve coefficients
@@ -4236,10 +4240,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_3_IEER2022ValueTest)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "ZONE1PTHPDXCOOLCOIL");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
-
+    EXPECT_TRUE(DataHeatBalance::RefrigCondenserType::Air == condenserType);
     auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
+    EXPECT_TRUE(30 == vsCoilType);
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(pLFfPLR_Curve));
     // ckeck user PLF curve coefficients
@@ -4520,10 +4525,11 @@ Speed   Percent Load
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "ZONE1PTHPDXCOOLCOIL");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
-
+    EXPECT_TRUE(DataHeatBalance::RefrigCondenserType::Air == condenserType);
     auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
+    EXPECT_TRUE(30 == vsCoilType);
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(pLFfPLR_Curve));
     // ckeck user PLF curve coefficients
@@ -4711,9 +4717,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_1Speed_IEER2022ValueTest)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "DESICCANT DXSYSTEM VS COOLING COIL");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
+    EXPECT_TRUE(DataHeatBalance::RefrigCondenserType::Air == condenserType);
     auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
+    EXPECT_TRUE(30 == vsCoilType);
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(pLFfPLR_Curve));
     // ckeck user PLF curve coefficients
@@ -4945,9 +4953,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_2Speed_IEER2022ValueTest)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "HEAT PUMP ACDXCOIL 1");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
+    EXPECT_TRUE(DataHeatBalance::RefrigCondenserType::Air == condenserType);
     auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
+    EXPECT_TRUE(30 == vsCoilType);
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(pLFfPLR_Curve));
     // ckeck user PLF curve coefficients
@@ -5229,9 +5239,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_3Speed_IEER2022ValueTest)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "HEAT PUMP ACDXCOIL 1");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
+    EXPECT_TRUE(DataHeatBalance::RefrigCondenserType::Air == condenserType);
     auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
+    EXPECT_TRUE(30 == vsCoilType);
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(pLFfPLR_Curve));
     // ckeck user PLF curve coefficients
@@ -5561,9 +5573,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_4Speed_IEER2022ValueTest)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).Name, "HEAT PUMP ACDXCOIL 1");
     auto &thisCoil(state->dataVariableSpeedCoils->VarSpeedCoil(1));
     auto condenserType = thisCoil.CondenserType; // Air(0)
+    EXPECT_TRUE(DataHeatBalance::RefrigCondenserType::Air == condenserType);
     auto varSpeedCoilType = thisCoil.VarSpeedCoilType;
     EXPECT_EQ(varSpeedCoilType, "Coil:Cooling:DX:VariableSpeed");
     auto vsCoilType = thisCoil.VSCoilType; // 30
+    EXPECT_TRUE(30 == vsCoilType);
     auto pLFfPLR_Curve = thisCoil.PLFFPLR;
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(pLFfPLR_Curve));
     // ckeck user PLF curve coefficients
@@ -5977,10 +5991,6 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI5_IEER2022ValueTest)
     EXPECT_EQ(0.0, minEIRfLowPLRXInput);
     EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
 
-    Real64 constexpr AirMassFlowRatioRated(1.0); // AHRI test is at the design flow rate and hence AirMassFlowRatio is 1.0
-    Real64 CapFFlowCurveIndex = thisCoil.CCapFFlow(1);
-    Real64 EIRFFlowCurveIndex = thisCoil.EIRFFlow(1);
-
     // Rated Total Capacity
     EXPECT_NEAR(33703.17, thisCoil.RatedTotCap(1), 0.01);
     EXPECT_NEAR(18463.47741, thisCoil.RatedTotCap2, 0.01);
@@ -6284,9 +6294,6 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI6_IEER2022ValueTest)
     EXPECT_EQ(0.0, minEIRfLowPLRXInput);
     EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
 
-    Real64 CapFFlowCurveIndex = thisCoil.CCapFFlow(1);
-    Real64 EIRFFlowCurveIndex = thisCoil.EIRFFlow(1);
-
     // Rated Total Capacity
     EXPECT_NEAR(33703.17, thisCoil.RatedTotCap(1), 0.01);
     EXPECT_NEAR(18463.47741, thisCoil.RatedTotCap2, 0.01);
@@ -6350,8 +6357,6 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI6_IEER2022ValueTest)
     TSCCapFTemp.push_back(thisCoil.CCapFTemp(1));
     TSCCapFTemp.push_back(thisCoil.CCapFTemp2);
 
-    const int HSCCapFlow = thisCoil.CCapFFlow(1);
-
     Array1D<Real64> TSFanPowerPerEvapAirFlowRate2023;
     TSFanPowerPerEvapAirFlowRate2023.push_back(thisCoil.FanPowerPerEvapAirFlowRate_2023(1));
     TSFanPowerPerEvapAirFlowRate2023.push_back(thisCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed(1));
@@ -6371,8 +6376,6 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI6_IEER2022ValueTest)
     Array1D<Real64> TSRatedCOP;
     TSRatedCOP.push_back(thisCoil.RatedCOP(1));
     TSRatedCOP.push_back(thisCoil.RatedCOP2);
-
-    const int HSEIRFFlow = thisCoil.EIRFFlow(1);
 
     std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(*state,
                                                                                     thisCoil.DXCoilType,
@@ -6592,6 +6595,8 @@ TEST_F(EnergyPlusFixture, CurveFit_alternateMode_IEER2022ValueTest)
     auto hasAlternateMode = thisCoil.performance.hasAlternateMode;
     auto normalMode = thisCoil.performance.normalMode.speeds;
     auto alternateMode1 = thisCoil.performance.alternateMode;
+    EXPECT_EQ(1, hasAlternateMode);
+    EXPECT_TRUE(2 == normalMode.size());
     auto speedA1 = alternateMode1.speeds[0];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 1 PERFORMANCE2", speedA1.name);
     auto speedA2 = alternateMode1.speeds[1];
@@ -6896,7 +6901,9 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
     auto hasAlternateMode = thisCoil.performance.hasAlternateMode;
     auto alternateMode1 = thisCoil.performance.alternateMode.speeds;
     auto alternateMode2 = thisCoil.performance.alternateMode2.speeds;
-
+    EXPECT_EQ(0, hasAlternateMode);
+    EXPECT_TRUE(0 == alternateMode1.size());
+    EXPECT_TRUE(0 == alternateMode2.size());
     auto pLFfPLR_Curve = speed1.indexPLRFPLF;
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(pLFfPLR_Curve));
     // ckeck user PLF curve coefficients

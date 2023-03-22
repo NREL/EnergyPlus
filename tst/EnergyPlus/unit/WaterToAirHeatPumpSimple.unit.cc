@@ -1814,8 +1814,6 @@ TEST_F(EnergyPlusFixture, EquationFit_Initialization)
     GetCurveInput(*state);
     WaterToAirHeatPumpSimple::GetSimpleWatertoAirHPInput(*state);
     int HPNum(1);
-    Real64 ActualAirflow(1.0);
-    Real64 DesignWaterflow(15.0);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, "SYS 5 HEAT PUMP COOLING MODE");
     auto &thisCoil(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum));
     EXPECT_NEAR(thisCoil.RatedCOPCoolAtRatedCdts, 7.00776, 0.01);
