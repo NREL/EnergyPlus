@@ -88,25 +88,29 @@ class Version:
     @staticmethod
     def check_idf_imf_energyplus_version(file_path: str) -> Tuple[bool, str, int]:
         """Attempts to read a version number from an IDF syntax file"""
+        file_path_object = Path(file_path)
         # noinspection PyBroadException
         try:
-            with open(file_path, "r") as f:
-                cur_line = f.readline()
-                while cur_line:
-                    cur_line = cur_line.strip()
-                    if len(cur_line) > 0 and cur_line[0] != "!" and "VERSION" in cur_line.upper():
-                        cur_line = Version.line_with_no_comment(cur_line)
-                        if ";" in cur_line:  # one liner version object ("Version, 8.4;")
-                            poss_obj = cur_line
-                        else:  # hoping for a two-liner version object ("Version,\n  8.4;")
-                            next_line = Version.line_with_no_comment(f.readline().strip())
-                            poss_obj = cur_line + next_line
-                        hopeful_object = poss_obj[:-1] if poss_obj[-1] == ";" else poss_obj
-                        fields = hopeful_object.split(',')
-                        return True, fields[1], Version.numeric_version_from_string(fields[1])
-                    cur_line = f.readline()  # get the next line
+            file_contents = file_path_object.read_text()
+            file_lines = [x.strip() for x in file_contents.split('\n')]
+            for index, cur_line in enumerate(file_lines):
+                if len(cur_line) > 0 and cur_line[0] != "!" and "VERSION" in cur_line.upper():
+                    trimmed_line = Version.line_with_no_comment(cur_line)
+                    if ";" in trimmed_line:  # one liner version object ("Version, 8.4;")
+                        poss_obj = trimmed_line
+                    else:  # hoping for a two-liner version object ("Version,\n  8.4;")
+                        if index + 1 <= len(file_lines):
+                            next_line_trimmed = Version.line_with_no_comment(file_lines[index+1])
+                            poss_obj = trimmed_line + next_line_trimmed
+                        else:
+                            return False, '<invalid>', 0  # hit the end of the file in the middle of the version object
+                    hopeful_object = poss_obj[:-1] if poss_obj[-1] == ";" else poss_obj
+                    fields = hopeful_object.split(',')
+                    return True, fields[1], Version.numeric_version_from_string(fields[1])
+            else:
+                return False, '<missing>', 0
         except:
-            return False, '', 0
+            return False, '<error>', 0
 
     @staticmethod
     def line_with_no_comment(in_string: str) -> str:
@@ -260,18 +264,7 @@ class EPlusRunManager(object):
         v = Version()
         is_found, current_version, numeric_version = v.check_energyplus_version(full_file_path)
         if not is_found:
-            errors = "wrong version"
-            column_data = {
-                ColumnNames.Errors: errors,
-                ColumnNames.Warnings: '',
-                ColumnNames.Runtime: 0,
-                ColumnNames.Version: current_version
-            }
-            return EPLaunchWorkflowResponse1(
-                success=False,
-                message="Incorrect Version found {}: {}!".format(current_version, file_name),
-                column_data=column_data
-            )
+            workflow_instance.callback("***Error occurred processing version, attempting to continue")
 
         if by_api:
             # if calling through API, then the arguments don't include the E+ binary
