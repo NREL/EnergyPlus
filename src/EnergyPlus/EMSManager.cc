@@ -563,6 +563,7 @@ namespace EMSManager {
             state.dataRuntimeLang->Sensor.allocate(state.dataRuntimeLang->NumSensors);
 
             for (int SensorNum = 1; SensorNum <= state.dataRuntimeLang->NumSensors; ++SensorNum) {
+                auto &thisSensor = state.dataRuntimeLang->Sensor(SensorNum);
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          SensorNum,
@@ -575,10 +576,9 @@ namespace EMSManager {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 DataRuntimeLanguage::ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
-                    state.dataRuntimeLang->Sensor(SensorNum).Name = cAlphaArgs(1);
+                    thisSensor.Name = cAlphaArgs(1);
 
                     // really needs to check for conflicts with program and function names too...done later
                     int VariableNum = RuntimeLanguageProcessor::FindEMSVariable(state, cAlphaArgs(1), 0);
@@ -590,14 +590,14 @@ namespace EMSManager {
                         ErrorsFound = true;
                     } else {
                         VariableNum = RuntimeLanguageProcessor::NewEMSVariable(state, cAlphaArgs(1), 0);
-                        state.dataRuntimeLang->Sensor(SensorNum).VariableNum = VariableNum;
+                        thisSensor.VariableNum = VariableNum;
                         state.dataRuntimeLang->ErlVariable(VariableNum).Value.initialized = true;
                     }
                 }
 
                 if (cAlphaArgs(2) == "*") cAlphaArgs(2).clear();
-                state.dataRuntimeLang->Sensor(SensorNum).UniqueKeyName = cAlphaArgs(2);
-                state.dataRuntimeLang->Sensor(SensorNum).OutputVarName = cAlphaArgs(3);
+                thisSensor.UniqueKeyName = cAlphaArgs(2);
+                thisSensor.OutputVarName = cAlphaArgs(3);
 
                 int VarIndex = GetMeterIndex(state, cAlphaArgs(3));
                 if (VarIndex > 0) {
@@ -606,18 +606,18 @@ namespace EMSManager {
                         ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
                         ShowContinueError(state, "Meter Name found; Key Name will be ignored"); // why meters have no keys..
                     } else {
-                        state.dataRuntimeLang->Sensor(SensorNum).VariableType = OutputProcessor::VariableType::Meter;
-                        state.dataRuntimeLang->Sensor(SensorNum).Index = VarIndex;
-                        state.dataRuntimeLang->Sensor(SensorNum).CheckedOkay = true;
+                        thisSensor.VariableType = OutputProcessor::VariableType::Meter;
+                        thisSensor.Index = VarIndex;
+                        thisSensor.CheckedOkay = true;
                     }
                 } else {
                     // Search for variable names
                     GetVariableTypeAndIndex(state, cAlphaArgs(3), cAlphaArgs(2), VarType, VarIndex);
                     if (VarType != OutputProcessor::VariableType::NotFound) {
-                        state.dataRuntimeLang->Sensor(SensorNum).VariableType = VarType;
+                        thisSensor.VariableType = VarType;
                         if (VarIndex != 0) {
-                            state.dataRuntimeLang->Sensor(SensorNum).Index = VarIndex;
-                            state.dataRuntimeLang->Sensor(SensorNum).CheckedOkay = true;
+                            thisSensor.Index = VarIndex;
+                            thisSensor.CheckedOkay = true;
                         }
                     }
                 }
@@ -640,6 +640,7 @@ namespace EMSManager {
                                     state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
                                     state.dataRuntimeLang->NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed;
                  ++ActuatorNum) {
+                auto &thisEMSactuator = state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum);
                 // If we process the ExternalInterface actuators, all we need to do is to change the
                 // name of the module object, and shift the ActuatorNum in GetObjectItem
                 if (ActuatorNum <= state.dataRuntimeLang->numActuatorsUsed) {
@@ -705,10 +706,9 @@ namespace EMSManager {
                         cNumericFieldNames);
                 }
 
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 DataRuntimeLanguage::ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
-                    state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).Name = cAlphaArgs(1);
+                    thisEMSactuator.Name = cAlphaArgs(1);
 
                     // really needs to check for conflicts with program and function names too...
                     int VariableNum = RuntimeLanguageProcessor::FindEMSVariable(state, cAlphaArgs(1), 0);
@@ -720,7 +720,7 @@ namespace EMSManager {
                         ErrorsFound = true;
                     } else {
                         VariableNum = RuntimeLanguageProcessor::NewEMSVariable(state, cAlphaArgs(1), 0);
-                        state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ErlVariableNum = VariableNum;
+                        thisEMSactuator.ErlVariableNum = VariableNum;
                         // initialize Erl variable for actuator to null
                         state.dataRuntimeLang->ErlVariable(VariableNum).Value = state.dataRuntimeLang->Null;
                         if (ActuatorNum > state.dataRuntimeLang->numActuatorsUsed) {
@@ -732,9 +732,9 @@ namespace EMSManager {
                 }
 
                 // need to store characters to finish processing later (once available Actuators have all been setup)
-                state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ComponentTypeName = cAlphaArgs(3);
-                state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).UniqueIDName = cAlphaArgs(2);
-                state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ControlTypeName = cAlphaArgs(4);
+                thisEMSactuator.ComponentTypeName = cAlphaArgs(3);
+                thisEMSactuator.UniqueIDName = cAlphaArgs(2);
+                thisEMSactuator.ControlTypeName = cAlphaArgs(4);
 
                 int ActuatorVariableNum;
                 bool FoundActuatorName = false;
@@ -754,8 +754,8 @@ namespace EMSManager {
 
                 if (FoundActuatorName) {
                     // SetupNodeSetPointAsActuators has NOT been called yet at this point
-                    state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ActuatorVariableNum = ActuatorVariableNum;
-                    state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).CheckedOkay = true;
+                    thisEMSactuator.ActuatorVariableNum = ActuatorVariableNum;
+                    thisEMSactuator.CheckedOkay = true;
 
                     int nHandle = state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).handleCount;
                     if (nHandle > 0) {
@@ -763,9 +763,9 @@ namespace EMSManager {
                                                      format("Seems like you already tried to get a Handle on this Actuator {}times.", nHandle));
                         EnergyPlus::ShowContinueError(state,
                                                       format("Occurred for componentType='{}', controlType='{}', uniqueKey='{}'.",
-                                                             state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ComponentTypeName,
-                                                             state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ControlTypeName,
-                                                             state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).UniqueIDName));
+                                                             thisEMSactuator.ComponentTypeName,
+                                                             thisEMSactuator.ControlTypeName,
+                                                             thisEMSactuator.UniqueIDName));
                         EnergyPlus::ShowContinueError(state, "You should take note that there is a risk of overwritting.");
                     }
                     ++state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).handleCount;
@@ -792,7 +792,6 @@ namespace EMSManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 DataRuntimeLanguage::ValidateEMSVariableName(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(1), errFlag, ErrorsFound);
                 if (!errFlag) {
                     state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).Name = cAlphaArgs(1);
@@ -853,7 +852,6 @@ namespace EMSManager {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
 
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).Name = cAlphaArgs(1);
 
                 state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint =

@@ -211,9 +211,11 @@ namespace EcoRoofManager {
                                                                 state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
                                                                 state.dataHeatBalSurf->SurfHAirExt(SurfNum));
         }
-        // Long Wave Radiation (W/m^2)
-        Real64 Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
-                      1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
+        // Long Wave Radiation (W/m^2) - original equation shown in comment
+        // Real64 Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
+        //               1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
+        Real64 Latm = Sigma * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
+                      Sigma * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
 
         if (state.dataEcoRoofMgr->EcoRoofbeginFlag)
             initEcoRoofFirstTime(state, SurfNum, ConstrNum); // Initialization statements for first entry into ecoroof routines
