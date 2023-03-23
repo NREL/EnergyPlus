@@ -2493,9 +2493,6 @@ void UpdateFan(EnergyPlusData &state, int const FanNum)
     state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = Fan(FanNum).MassFlowRateMaxAvail;
     state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = Fan(FanNum).MassFlowRateMinAvail;
 
-    // make sure inlet has the same mass flow as outlet
-    state.dataLoopNodes->Node(InletNode).MassFlowRate = Fan(FanNum).OutletAirMassFlowRate;
-
     if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
         state.dataLoopNodes->Node(InletNode).MassFlowRate = Fan(FanNum).InletAirMassFlowRate;
         if (state.afn->AirflowNetworkNumOfExhFan == 0) {
