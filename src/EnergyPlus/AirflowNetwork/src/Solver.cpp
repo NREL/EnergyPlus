@@ -8321,9 +8321,9 @@ namespace AirflowNetwork {
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             CompNum = AirflowNetworkLinkageData(i).CompNum;
             CompTypeNum = AirflowNetworkCompData(CompNum).CompTypeNum;
-            std::string CompName = AirflowNetworkCompData(CompNum).EPlusName;
+            std::string_view CompName = AirflowNetworkCompData(CompNum).EPlusName;
             // Calculate duct moisture diffusion loss
-            if (CompTypeNum == iComponentTypeNum::DWC && CompName == std::string()) { // Duct component only
+            if (CompTypeNum == iComponentTypeNum::DWC && CompName.empty()) { // Duct component only
                 // TypeNum = AirflowNetworkCompData(CompNum).TypeNum;
                 if (AirflowNetworkLinkSimu(i).FLOW > 0.0) { // flow direction is the same as input from node 1 to node 2
                     LF = AirflowNetworkLinkageData(i).NodeNums[0];
@@ -9447,8 +9447,8 @@ namespace AirflowNetwork {
         }
 
         for (std::size_t i = 0; i < linkReport.size(); ++i) {
-            auto &r(linkReport[i]);
-            auto const &s(AirflowNetworkLinkSimu[i]);
+            auto &r = linkReport[i];
+            auto const &s = AirflowNetworkLinkSimu[i];
             r.FLOW = s.FLOW;
             r.FLOW2 = s.FLOW2;
             r.VolFLOW = s.VolFLOW;
@@ -12214,8 +12214,8 @@ namespace AirflowNetwork {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
                         auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
-                        auto const &deltaP = simulation_control.ductSizing.supply_trunk_pressure_loss;
-                        auto const &MassFlowRate = DisSysCompCVFData(1).FlowRate;
+                        Real64 const deltaP = simulation_control.ductSizing.supply_trunk_pressure_loss;
+                        Real64 const MassFlowRate = DisSysCompCVFData(1).FlowRate;
                         auto f = [&thisState, deltaP, MassFlowRate, SumLength, DynamicLoss, MaxRough](Real64 const D) {
                             return DuctDResidual(thisState, D, deltaP, MassFlowRate, SumLength, DynamicLoss, MaxRough);
                         };
@@ -12333,7 +12333,7 @@ namespace AirflowNetwork {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
                         auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
-                        auto const &deltaP = simulation_control.ductSizing.supply_branch_pressure_loss;
+                        Real64 const deltaP = simulation_control.ductSizing.supply_branch_pressure_loss;
                         auto f = [&thisState, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough](Real64 const D) {
                             return DuctDResidual(thisState, D, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough);
                         };
@@ -12455,8 +12455,8 @@ namespace AirflowNetwork {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
                         auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
-                        auto const &deltaP = simulation_control.ductSizing.return_trunk_pressure_loss;
-                        auto const &massFlowRate = DisSysCompCVFData(1).FlowRate;
+                        Real64 const deltaP = simulation_control.ductSizing.return_trunk_pressure_loss;
+                        Real64 const massFlowRate = DisSysCompCVFData(1).FlowRate;
                         auto f = [&thisState, deltaP, massFlowRate, SumLength, DynamicLoss, MaxRough](Real64 const D) {
                             return DuctDResidual(thisState, D, deltaP, massFlowRate, SumLength, DynamicLoss, MaxRough);
                         };
@@ -12575,7 +12575,7 @@ namespace AirflowNetwork {
                         Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
                         Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
                         auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
-                        auto const &deltaP = simulation_control.ductSizing.return_branch_pressure_loss;
+                        Real64 const deltaP = simulation_control.ductSizing.return_branch_pressure_loss;
                         auto f = [&thisState, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough](Real64 const D) {
                             return DuctDResidual(thisState, D, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough);
                         };

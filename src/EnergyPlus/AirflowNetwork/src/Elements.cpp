@@ -3494,14 +3494,14 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    void generic_crack(Real64 const &coefficient, // Flow coefficient
-                       Real64 const exponent,     // Flow exponent
-                       bool const linear,         // Initialization flag. If true, use linear relationship
-                       Real64 const pdrop,        // Total pressure drop across a component (P1 - P2) [Pa]
-                       const AirState &propN,     // Node 1 properties
-                       const AirState &propM,     // Node 2 properties
-                       std::array<Real64, 2> &F,  // Airflow through the component [kg/s]
-                       std::array<Real64, 2> &DF  // Partial derivative:  DF/DP
+    void generic_crack(Real64 const coefficient, // Flow coefficient
+                       Real64 const exponent,    // Flow exponent
+                       bool const linear,        // Initialization flag. If true, use linear relationship
+                       Real64 const pdrop,       // Total pressure drop across a component (P1 - P2) [Pa]
+                       const AirState &propN,    // Node 1 properties
+                       const AirState &propM,    // Node 2 properties
+                       std::array<Real64, 2> &F, // Airflow through the component [kg/s]
+                       std::array<Real64, 2> &DF // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
