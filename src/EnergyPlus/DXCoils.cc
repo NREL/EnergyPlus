@@ -14920,7 +14920,16 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, thisDXCoil.Name, IEER, 2);
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, thisDXCoil.Name, "N/A");
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, thisDXCoil.Name, "N/A");
-    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
+    addFootNoteSubTable(state,
+                        state.dataOutRptPredefined->pdstDXCoolCoil,
+                        "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
+                        "1 - EnergyPlus object type. <br/>"
+                        "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2017. <br/>"
+                        "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2007. <br/>"
+                        "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
+                        "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
+                        "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
+                        "from the appropriate AHRI standard.");
 
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilType, thisDXCoil.Name, "Coil:Cooling:DX:TwoSpeed");
     if (thisDXCoil.RateWithInternalStaticAndFanObject) {
