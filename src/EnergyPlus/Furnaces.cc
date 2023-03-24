@@ -10917,7 +10917,7 @@ namespace Furnaces {
         }
 
         // calculate delivered capacity
-        AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+        AirMassFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
 
         state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = AirMassFlow;
 
