@@ -512,19 +512,45 @@ These output variables express the sum of heat gain in Watts (for rate) or joule
 
 \paragraph{Space or Zone Total Internal Convective Heating Energy {[}J{]}}\label{zone-total-internal-convective-heating-energy-j}
 
-These output variables represent the sum of convective gains from specific sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes convective gain from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
+These output variables represent the sum of convective gains from specific sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes convective gain from Energyplus objects that are listed in Table \ref{table:space-or-zone-total-internal-heat-gain-constituents}: 
+
+\begin{longtable}[c]{@{}lcc@{}}
+	\caption{Space or Zone Total Internal Heat Gain Constituents} \label{table:space-or-zone-total-internal-heat-gain-constituents} \tabularnewline
+	\toprule
+	EnergyPlus Object &  Internal Heat Gain Type \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{Space or Zone Total Internal Heat Gain Constituents} \tabularnewline
+	\toprule
+	EnergyPlus Object &  Internal Heat Gain Type \tabularnewline
+	\midrule
+	\endhead
+	
+	People   &  People \tabularnewline
+	Lights   &  Lights \tabularnewline
+	ElectricEquipment   &  ElectricEquipment \tabularnewline
+	ElectricEquipment:ITE:AirCooled   &  ElectricEquipmentITEAirCooled \tabularnewline
+	GasEquipment   &  GasEquipment \tabularnewline
+	HotWaterEquipment   &  HotWaterEquipment \tabularnewline
+	SteamEquipment   &  SteamEquipment \tabularnewline
+	OtherEquipment   &  OtherEquipment \tabularnewline
+	
+	\bottomrule
+
+\end{longtable}
 
 \paragraph{Space or Zone Total Internal Latent Gain Rate {[}W{]}}\label{zone-total-internal-latent-gain-rate-w}
 
 \paragraph{Space or Zone Total Internal Latent Gain Energy {[}J{]}}\label{zone-total-internal-latent-gain-energy-j}
 
-These output variables represent the sum of latent gains from specific internal sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes latent gain from \hyperref[people]{People}, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
+These output variables represent the sum of latent gains from specific internal sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes latent gain from Energyplus objects that are listed in Table \ref{table:space-or-zone-total-internal-heat-gain-constituents}.
 
 \paragraph{Space or Zone Total Internal Total Heating Rate {[}W{]}}\label{zone-total-internal-total-heating-rate-w}
 
 \paragraph{Space or Zone Total Internal Total Heating Energy {[}J{]}}\label{zone-total-internal-total-heating-energy-j}
 
-These output variables represent the sum of all heat gains throughout the space or zone in Watts (for rate) or joules. This includes all heat gains from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
+These output variables represent the sum of all heat gains throughout the space or zone in Watts (for rate) or joules. This includes all heat gains from Energyplus objects that are listed in Table \ref{table:space-or-zone-total-internal-heat-gain-constituents}.
 
 \paragraph{Zone Exfiltration Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-heat-transfer-rate-w}
 
