@@ -370,11 +370,11 @@ namespace Furnaces {
                       Real64 const HeatPartLoadRatio,                    // DX heating coil part load ratio (0 for other heating coil types)
                       Real64 const HeatCoilLoad,                         // Heating coil load for gas heater
                       Real64 const ReheatCoilLoad,                       // Reheating coil load for gas heater
-                      Real64 &SensibleLoadMet,   // Sensible cooling load met (furnace outlet with respect to control zone temp)
-                      Real64 &LatentLoadMet,     // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
-                      Real64 &OnOffAirFlowRatio, // Ratio of compressor ON mass flow rate to AVERAGE
-                      bool const HXUnitOn,       // flag to enable HX based on zone moisture load
-                      ObjexxFCL::Optional<Real64 const> CoolingHeatingPLRRat = _ // cooling PLR to heating PLR ratio, used for cycling fan RH control
+                      Real64 &SensibleLoadMet,                           // Sensible cooling load met (furnace outlet with respect to control zone temp)
+                      Real64 &LatentLoadMet,                             // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
+                      Real64 &OnOffAirFlowRatio,                         // Ratio of compressor ON mass flow rate to AVERAGE
+                      bool const HXUnitOn,                               // flag to enable HX based on zone moisture load
+                      Real64 const CoolingHeatingPLRRatio = 1.0          // cooling PLR to heating PLR ratio, used for cycling fan RH control
     );
 
     //        End of Update subroutines for the Furnace Module

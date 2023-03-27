@@ -398,7 +398,7 @@ namespace OutputProcessor {
         }
     }
 
-    ReportingFrequency determineFrequency(EnergyPlusData &state, const std::string &FreqString)
+    ReportingFrequency determineFrequency(EnergyPlusData &state, const std::string_view FreqString)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4488,16 +4488,16 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                      // Associated Key for this variable
-                         ObjexxFCL::Optional_string_const ReportFreq,            // Internal use -- causes reporting at this frequency
-                         ObjexxFCL::Optional_string_const ResourceTypeKey,       // Meter Resource Type (Electricity, Gas, etc)
-                         ObjexxFCL::Optional_string_const EndUseKey,             // Meter End Use Key (Lights, Heating, Cooling, etc)
-                         ObjexxFCL::Optional_string_const EndUseSubKey,          // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         ObjexxFCL::Optional_string_const GroupKey,              // Meter Super Group Key (Building, System, Plant)
-                         ObjexxFCL::Optional_string_const ZoneKey,               // Meter Zone Key (zone name)
-                         ObjexxFCL::Optional_int_const ZoneMult,                 // Zone Multiplier, defaults to 1
-                         ObjexxFCL::Optional_int_const ZoneListMult,             // Zone List Multiplier, defaults to 1
+                         std::string_view const ReportFreq,                      // Internal use -- causes reporting at this frequency
+                         std::string_view const ResourceTypeKey,                 // Meter Resource Type (Electricity, Gas, etc)
+                         std::string_view const EndUseKey,                       // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         std::string_view const EndUseSubKey,                    // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         std::string_view const GroupKey,                        // Meter Super Group Key (Building, System, Plant)
+                         std::string_view const ZoneKey,                         // Meter Zone Key (zone name)
+                         int const ZoneMult,                 // Zone Multiplier, defaults to 1
+                         int const ZoneListMult,             // Zone List Multiplier, defaults to 1
                          ObjexxFCL::Optional_int_const indexGroupKey,            // Group identifier for SQL output
-                         ObjexxFCL::Optional_string_const customUnitName,        // the custom name for the units from EMS definition of units
+                         std::string_view const customUnitName,        // the custom name for the units from EMS definition of units
                          ObjexxFCL::Optional_string_const SpaceType              // Space type (applicable for Building group only)
 )
 {
@@ -4548,7 +4548,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     }
 
     // If ReportFreq present, overrides input
-    if (present(ReportFreq)) {
+    if (!ReportFreq.empty()) {
         RepFreq = determineFrequency(state, ReportFreq);
         op->NumExtraVars = 1;
         op->ReportList = 0;
@@ -4564,37 +4564,37 @@ void SetupOutputVariable(EnergyPlusData &state,
 
         if (Loop == 1) {
             OnMeter = false;
-            if (present(ResourceTypeKey)) {
+            if (!ResourceTypeKey.empty()) {
                 ResourceType = ResourceTypeKey;
                 OnMeter = true;
             } else {
                 ResourceType = "";
             }
-            if (present(EndUseKey)) {
+            if (!EndUseKey.empty()) {
                 EndUse = EndUseKey;
                 OnMeter = true;
             } else {
                 EndUse = "";
             }
-            if (present(EndUseSubKey)) {
+            if (!EndUseSubKey.empty()) {
                 EndUseSub = EndUseSubKey;
                 OnMeter = true;
             } else {
                 EndUseSub = "";
-                if (present(EndUseKey)) {
+                if (!EndUseKey.empty()) {
                     if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::MakeUPPERCase(std::string{EndUseKey})) !=
                         endUseCategoryNames.end()) {
                         EndUseSub = "General";
                     }
                 }
             }
-            if (present(GroupKey)) {
+            if (!GroupKey.empty()) {
                 Group = GroupKey;
                 OnMeter = true;
             } else {
                 Group = "";
             }
-            if (present(ZoneKey)) {
+            if (!ZoneKey.empty()) {
                 zoneName = ZoneKey;
                 OnMeter = true;
             } else {
@@ -4611,11 +4611,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         TimeStepType = ValidateTimeStepType(state, TimeStepTypeKey);
         VariableType = validateVariableType(state, VariableTypeKey);
 
-        if (present(customUnitName)) {
-            AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VariableType::Real, VariableUnit, customUnitName);
-        } else {
-            AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VariableType::Real, VariableUnit);
-        }
+        AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VariableType::Real, VariableUnit, customUnitName);
         ++op->NumTotalRVariable;
 
         if (!OnMeter && !ThisOneOnTheList) continue;
@@ -4623,8 +4619,8 @@ void SetupOutputVariable(EnergyPlusData &state,
         ++op->NumOfRVariable;
         if (Loop == 1 && VariableType == StoreType::Summed) {
             ++op->NumOfRVariable_Sum;
-            if (present(ResourceTypeKey)) {
-                if (!ResourceTypeKey().empty()) ++op->NumOfRVariable_Meter;
+            if (!ResourceTypeKey.empty()) {
+                ++op->NumOfRVariable_Meter;
             }
         }
         if (op->NumOfRVariable > op->MaxRVariable) {
@@ -4664,12 +4660,8 @@ void SetupOutputVariable(EnergyPlusData &state,
         thisVarPtr.frequency = ReportingFrequency::Hourly;
         thisVarPtr.SchedPtr = 0;
         thisVarPtr.MeterArrayPtr = 0;
-        thisVarPtr.ZoneMult = 1;
-        thisVarPtr.ZoneListMult = 1;
-        if (present(ZoneMult) && present(ZoneListMult)) {
-            thisVarPtr.ZoneMult = ZoneMult;
-            thisVarPtr.ZoneListMult = ZoneListMult;
-        }
+        thisVarPtr.ZoneMult = ZoneMult;
+        thisVarPtr.ZoneListMult = ZoneListMult;
 
         if (Loop == 1) {
             if (OnMeter) {
@@ -4747,8 +4739,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                      // Associated Key for this variable
-                         ObjexxFCL::Optional_string_const ReportFreq,            // Internal use -- causes reporting at this freqency
-                         ObjexxFCL::Optional_int_const indexGroupKey             // Group identifier for SQL output
+                         std::string_view const ReportFreq,                      // Internal use -- causes reporting at this freqency
+                         int const indexGroupKey                                 // Group identifier for SQL output
 )
 {
 
@@ -4772,7 +4764,6 @@ void SetupOutputVariable(EnergyPlusData &state,
     int CV;
     TimeStepType TimeStepType; // 1=TimeStepZone, 2=TimeStepSys
     StoreType VariableType;    // 1=Average, 2=Sum, 3=Min/Max
-    int localIndexGroupKey;
     int Loop;
     ReportingFrequency RepFreq(ReportingFrequency::Hourly);
     auto &op = state.dataOutputProcessor;
@@ -4791,7 +4782,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     }
 
     // If ReportFreq present, overrides input
-    if (present(ReportFreq)) {
+    if (!ReportFreq.empty()) {
         RepFreq = determineFrequency(state, ReportFreq);
         op->NumExtraVars = 1;
         op->ReportList = 0;
@@ -4865,18 +4856,13 @@ void SetupOutputVariable(EnergyPlusData &state,
         }
 
         if (thisVarPtr.Report) {
-            if (present(indexGroupKey)) {
-                localIndexGroupKey = indexGroupKey;
-            } else {
-                localIndexGroupKey = -999; // Unknown Group
-            }
 
             if (thisVarPtr.SchedPtr != 0) {
                 WriteReportVariableDictionaryItem(state,
                                                   thisVarPtr.frequency,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
-                                                  localIndexGroupKey,
+                                                  indexGroupKey,
                                                   std::string(sovTimeStepTypeStrings[(int)TimeStepTypeKey]),
                                                   thisVarPtr.ReportIDChr,
                                                   KeyedValue,
@@ -4889,7 +4875,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                                                   thisVarPtr.frequency,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
-                                                  localIndexGroupKey,
+                                                  indexGroupKey,
                                                   std::string(sovTimeStepTypeStrings[(int)TimeStepTypeKey]),
                                                   thisVarPtr.ReportIDChr,
                                                   KeyedValue,
@@ -7838,7 +7824,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
                              OutputProcessor::StoreType const StateType,
                              OutputProcessor::VariableType const VariableType,
                              OutputProcessor::Unit const unitsForVar,
-                             ObjexxFCL::Optional_string_const customUnitName // the custom name for the units from EMS definition of units
+                             std::string_view const customUnitName // the custom name for the units from EMS definition of units
 )
 {
 
@@ -7893,7 +7879,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
         op->DDVariableTypes(op->NumVariablesForOutput).variableType = VariableType;
         op->DDVariableTypes(op->NumVariablesForOutput).VarNameOnly = VarName;
         op->DDVariableTypes(op->NumVariablesForOutput).units = unitsForVar;
-        if (present(customUnitName) && unitsForVar == OutputProcessor::Unit::customEMS) {
+        if (!customUnitName.empty() && unitsForVar == OutputProcessor::Unit::customEMS) {
             op->DDVariableTypes(op->NumVariablesForOutput).unitNameCustomEMS = customUnitName;
         }
     } else if (unitsForVar != op->DDVariableTypes(dup).units) { // not the same as first units
@@ -7916,7 +7902,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
             op->DDVariableTypes(op->NumVariablesForOutput).variableType = VariableType;
             op->DDVariableTypes(op->NumVariablesForOutput).VarNameOnly = VarName;
             op->DDVariableTypes(op->NumVariablesForOutput).units = unitsForVar;
-            if (present(customUnitName) && unitsForVar == OutputProcessor::Unit::customEMS) {
+            if (!customUnitName.empty() && unitsForVar == OutputProcessor::Unit::customEMS) {
                 op->DDVariableTypes(op->NumVariablesForOutput).unitNameCustomEMS = customUnitName;
             }
             op->DDVariableTypes(dup).Next = op->NumVariablesForOutput;

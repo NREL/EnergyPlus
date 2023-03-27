@@ -4786,7 +4786,7 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).ListMultiplier,
                                 _,
-                                _,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->Lights(lightsNum).spaceIndex).spaceType);
         }
 
@@ -5001,7 +5001,7 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(elecEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(elecEqNum).ZonePtr).ListMultiplier,
                                 _,
-                                _,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneElectric(elecEqNum).spaceIndex).spaceType);
 
             SetupOutputVariable(state,
@@ -5289,7 +5289,7 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(gasEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(gasEqNum).ZonePtr).ListMultiplier,
                                 _,
-                                _,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneGas(gasEqNum).spaceIndex).spaceType);
 
             SetupOutputVariable(state,
@@ -5580,7 +5580,7 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(hwEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(hwEqNum).ZonePtr).ListMultiplier,
                                 _,
-                                _,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneHWEq(hwEqNum).spaceIndex).spaceType);
 
             SetupOutputVariable(state,
@@ -5869,7 +5869,7 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(stmEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(stmEqNum).ZonePtr).ListMultiplier,
                                 _,
-                                _,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneSteamEq(stmEqNum).spaceIndex).spaceType);
 
             SetupOutputVariable(state,
@@ -6160,7 +6160,7 @@ namespace InternalHeatGains {
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr).Multiplier,
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr).ListMultiplier,
                                     _,
-                                    _,
+                                    {},
                                     state.dataHeatBal->space(state.dataHeatBal->ZoneOtherEq(othEqNum).spaceIndex).spaceType);
             }
 
@@ -6488,7 +6488,7 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
                                 _,
-                                _,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
 
             SetupOutputVariable(state,
@@ -6507,7 +6507,7 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
                                 _,
-                                _,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
             SetupOutputVariable(state,
                                 "ITE UPS Electricity Energy",
@@ -6525,7 +6525,7 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
                                 _,
-                                _,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
             SetupOutputVariable(state,
                                 "ITE CPU Electricity Energy at Design Inlet Conditions",
@@ -6985,7 +6985,7 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr).ListMultiplier,
                                 _,
-                                _,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneBBHeat(bbHeatNum).spaceIndex).spaceType);
 
             SetupOutputVariable(state,
@@ -8764,23 +8764,14 @@ namespace InternalHeatGains {
     }
 
     void UpdateInternalGainValues(EnergyPlusData &state,
-                                  ObjexxFCL::Optional_bool_const SuppressRadiationUpdate,
-                                  ObjexxFCL::Optional_bool_const SumLatentGains)
+                                  bool const SuppressRadiationUpdate,
+                                  bool const SumLatentGains)
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec. 2011
-        bool DoRadiationUpdate = true;
-        bool ReSumLatentGains = false;
-
-        if (present(SuppressRadiationUpdate)) {
-            if (SuppressRadiationUpdate) DoRadiationUpdate = false;
-        }
-
-        if (present(SumLatentGains)) {
-            if (SumLatentGains) ReSumLatentGains = true;
-        }
+        bool DoRadiationUpdate{!SuppressRadiationUpdate};
 
         // store pointer values to hold generic internal gain values constant for entire timestep
         for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
@@ -8800,7 +8791,7 @@ namespace InternalHeatGains {
                     *thisIntGain.device(Loop).PtrGenericContamGainRate * thisIntGain.device(Loop).spaceGainFrac;
             }
         }
-        if (ReSumLatentGains) {
+        if (SumLatentGains) {
             for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
                 auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
                 thisZoneHB.ZoneLatentGain = InternalHeatGains::SumAllInternalLatentGains(state, NZ);

@@ -9426,10 +9426,10 @@ namespace Furnaces {
                            Real64 const HeatCoilLoad,              // Heating coil load for gas heater
                            Real64 const ReheatCoilLoad,            // Reheating coil load for gas heater
                            Real64 &SensibleLoadMet,                // Sensible cooling load met (furnace outlet with respect to control zone temp)
-                           Real64 &LatentLoadMet,     // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
-                           Real64 &OnOffAirFlowRatio, // Ratio of compressor ON mass flow rate to AVERAGE
-                           bool const HXUnitOn,       // flag to enable HX based on zone moisture load
-                           ObjexxFCL::Optional<Real64 const> CoolingHeatingPLRRat // cooling PLR to heating PLR ratio, used for cycling fan RH control
+                           Real64 &LatentLoadMet,                  // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
+                           Real64 &OnOffAirFlowRatio,              // Ratio of compressor ON mass flow rate to AVERAGE
+                           bool const HXUnitOn,                    // flag to enable HX based on zone moisture load
+                           Real64 const CoolingHeatingPLRRatio     // cooling PLR to heating PLR ratio, used for cycling fan RH control
     )
     {
 
@@ -9490,11 +9490,7 @@ namespace Furnaces {
         CompPartLoadRatio = state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio;
         state.dataFurnaces->ModifiedHeatCoilLoad = 0.0;
 
-        if (present(CoolingHeatingPLRRat)) {
-            state.dataFurnaces->CoolHeatPLRRat = CoolingHeatingPLRRat;
-        } else {
-            state.dataFurnaces->CoolHeatPLRRat = 1.0;
-        }
+        state.dataFurnaces->CoolHeatPLRRat = CoolingHeatingPLRRatio;
 
         // Cooling to Heating PLR Ratio (CoolHeatPLRRat) is used to track the air mass flow rate of both the heating
         // and cooling coils when RH control is used and the heating coil operates longer than the cooling coil.

@@ -1765,11 +1765,11 @@ namespace UnitHeater {
     }
 
     void CalcUnitHeaterComponents(EnergyPlusData &state,
-                                  int const UnitHeatNum,                          // Unit index in unit heater array
-                                  bool const FirstHVACIteration,                  // flag for 1st HVAV iteration in the time step
-                                  Real64 &LoadMet,                                // load met by unit (watts)
-                                  ObjexxFCL::Optional_int_const OpMode,           // fan operating mode
-                                  ObjexxFCL::Optional<Real64 const> PartLoadRatio // part-load ratio
+                                  int const UnitHeatNum,         // Unit index in unit heater array
+                                  bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
+                                  Real64 &LoadMet,               // load met by unit (watts)
+                                  int const OpMode,              // fan operating mode
+                                  Real64 const PartLoadRatio     // part-load ratio
     )
     {
 
@@ -1805,24 +1805,12 @@ namespace UnitHeater {
         int OutletNode;      // unit air outlet node
         Real64 QCoilReq;     // Heat addition required from an electric/gas heating coil
         Real64 mdot;         // local temporary for fluid mass flow rate
-        int FanOpMode;       // Fan operting mode or fan type
-        Real64 PartLoadFrac; // part-load ratio
 
         InletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
         OutletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;
         QCoilReq = 0.0;
 
-        if (present(PartLoadRatio)) {
-            PartLoadFrac = PartLoadRatio;
-        } else {
-            PartLoadFrac = 1.0;
-        }
-        if (present(OpMode)) {
-            FanOpMode = OpMode;
-        } else {
-            FanOpMode = ContFanCycCoil;
-        }
-        if (FanOpMode != CycFanCycCoil) {
+        if (OpMode != CycFanCycCoil) {
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(state,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
@@ -1898,7 +1886,7 @@ namespace UnitHeater {
 
         } else { // OnOff fan cycling
 
-            state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRateMax * PartLoadFrac;
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRateMax * PartLoadRatio;
             AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             // Set the fan inlet node maximum available mass flow rates for cycling fans
             state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
@@ -1930,7 +1918,7 @@ namespace UnitHeater {
                         state.dataUnitHeaters->QZnReq - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                             (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
                                                              state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
-                    mdot = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotWaterFlow * PartLoadFrac;
+                    mdot = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotWaterFlow * PartLoadRatio;
                 }
                 if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
                 SetComponentFlowRate(state,
@@ -1943,8 +1931,8 @@ namespace UnitHeater {
                                             FirstHVACIteration,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
                                             QCoilReq,
-                                            FanOpMode,
-                                            PartLoadFrac);
+                                            OpMode,
+                                            PartLoadRatio);
                 break;
             }
             case HCoilType::SteamCoil: {
@@ -1958,7 +1946,7 @@ namespace UnitHeater {
                         state.dataUnitHeaters->QZnReq - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                             (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
                                                              state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
-                    mdot = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotSteamFlow * PartLoadFrac;
+                    mdot = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotSteamFlow * PartLoadRatio;
                 }
                 if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
                 SetComponentFlowRate(state,
@@ -1972,8 +1960,8 @@ namespace UnitHeater {
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
                                             QCoilReq,
                                             _,
-                                            FanOpMode,
-                                            PartLoadFrac);
+                                            OpMode,
+                                            PartLoadRatio);
                 break;
             }
             case HCoilType::Electric:
@@ -1997,8 +1985,8 @@ namespace UnitHeater {
                                               state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
                                               _,
                                               _,
-                                              FanOpMode,
-                                              PartLoadFrac);
+                                              OpMode,
+                                              PartLoadRatio);
                 break;
             }
             default:

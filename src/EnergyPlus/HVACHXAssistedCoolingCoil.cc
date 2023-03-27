@@ -1421,10 +1421,10 @@ namespace HVACHXAssistedCoolingCoil {
     }
 
     int GetCoilGroupTypeNum(EnergyPlusData &state,
-                            std::string const &CoilType,                // must match coil types in this module
-                            std::string const &CoilName,                // must match coil names for the coil type
-                            bool &ErrorsFound,                          // set to true if problem
-                            ObjexxFCL::Optional_bool_const PrintWarning // prints warning message if true
+                            std::string const &CoilType, // must match coil types in this module
+                            std::string const &CoilName, // must match coil names for the coil type
+                            bool &ErrorsFound,           // set to true if problem
+                            bool const PrintWarning      // prints warning message if true
     )
     {
 
@@ -1451,12 +1451,6 @@ namespace HVACHXAssistedCoolingCoil {
                 false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
-        if (present(PrintWarning)) {
-            PrintMessage = PrintWarning;
-        } else {
-            PrintMessage = true;
-        }
-
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
             WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         } else {
@@ -1467,7 +1461,7 @@ namespace HVACHXAssistedCoolingCoil {
             // coil does not have capacity in input so mine information from DX cooling coil
             TypeNum = state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HXAssistedCoilType_Num;
         } else {
-            if (PrintMessage) {
+            if (PrintWarning) {
                 ShowSevereError(state, format("GetCoilGroupTypeNum: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
             }
             ErrorsFound = true;
@@ -1478,10 +1472,10 @@ namespace HVACHXAssistedCoolingCoil {
     }
 
     int GetCoilObjectTypeNum(EnergyPlusData &state,
-                             std::string const &CoilType,                // must match coil types in this module
-                             std::string const &CoilName,                // must match coil names for the coil type
-                             bool &ErrorsFound,                          // set to true if problem
-                             ObjexxFCL::Optional_bool_const PrintWarning // prints warning message if true
+                             std::string const &CoilType, // must match coil types in this module
+                             std::string const &CoilName, // must match coil names for the coil type
+                             bool &ErrorsFound,           // set to true if problem
+                             bool const PrintWarning      // prints warning message if true
     )
     {
 
@@ -1497,21 +1491,12 @@ namespace HVACHXAssistedCoolingCoil {
         // Return value
         int TypeNum; // returned integerized type of matched coil
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        bool PrintMessage;
-
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (state.dataHVACAssistedCC->GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
             GetHXAssistedCoolingCoilInput(state);
             state.dataHVACAssistedCC->GetCoilsInputFlag =
                 false; // Set logic flag to disallow getting the input data on future calls to this subroutine
-        }
-
-        if (present(PrintWarning)) {
-            PrintMessage = PrintWarning;
-        } else {
-            PrintMessage = true;
         }
 
         int WhichCoil = 0;
@@ -1522,7 +1507,7 @@ namespace HVACHXAssistedCoolingCoil {
         if (WhichCoil != 0) {
             TypeNum = state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num;
         } else {
-            if (PrintMessage) {
+            if (PrintWarning) {
                 ShowSevereError(state, format("GetCoilObjectTypeNum: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
             }
             ErrorsFound = true;
