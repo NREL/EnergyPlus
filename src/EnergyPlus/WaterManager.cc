@@ -671,7 +671,8 @@ namespace WaterManager {
                     ErrorsFound = true;
                 } else if ((state.dataWaterData->RainFall.RainSchedID != 0) &&
                            (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign)) {
-                    if (!CheckScheduleValueMinMax(state, state.dataWaterData->RainFall.RainSchedID, ">=", 0.0)) {
+                    if (!CheckScheduleValueMinMax(
+                            state, state.dataWaterData->RainFall.RainSchedID, ScheduleManager::MinimumMode::GreaterOrEqual, 0.0)) {
                         ShowSevereError(state, format("Schedule={} for {} object has values < 0.", cAlphaArgs(2), cCurrentModuleObject));
                         ErrorsFound = true;
                     }
@@ -711,7 +712,8 @@ namespace WaterManager {
                     ErrorsFound = true;
                 } else if ((state.dataWaterData->Irrigation.IrrSchedID == 0) &&
                            (state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSchedDesign)) {
-                    if (!CheckScheduleValueMinMax(state, state.dataWaterData->Irrigation.IrrSchedID, ">=", 0.0)) {
+                    if (!CheckScheduleValueMinMax(
+                            state, state.dataWaterData->Irrigation.IrrSchedID, ScheduleManager::MinimumMode::GreaterOrEqual, 0.0)) {
                         ShowSevereError(state, format("Schedule={} for {} object has values < 0.", cAlphaArgs(2), cCurrentModuleObject));
                         ErrorsFound = true;
                     }
