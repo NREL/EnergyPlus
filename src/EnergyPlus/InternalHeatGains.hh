@@ -78,7 +78,7 @@ namespace InternalHeatGains {
     };
 
     void ManageInternalHeatGains(EnergyPlusData &state,
-                                 ObjexxFCL::Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
+                                 bool const InitOnly); // when true, just calls the get input, if appropriate and returns.
 
     void GetInternalHeatGainsInput(EnergyPlusData &state);
 

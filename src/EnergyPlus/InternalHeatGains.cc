@@ -127,7 +127,7 @@ namespace InternalHeatGains {
     using namespace DataSurfaces;
 
     void ManageInternalHeatGains(EnergyPlusData &state,
-                                 ObjexxFCL::Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
+                                 bool const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {
 
         // SUBROUTINE INFORMATION:
@@ -144,8 +144,8 @@ namespace InternalHeatGains {
             state.dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
         }
 
-        if (present(InitOnly)) {
-            if (InitOnly) return;
+        if (InitOnly) {
+            return;
         }
 
         InitInternalHeatGains(state);

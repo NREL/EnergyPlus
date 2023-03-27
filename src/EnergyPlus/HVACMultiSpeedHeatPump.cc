@@ -4407,11 +4407,11 @@ namespace HVACMultiSpeedHeatPump {
     }
 
     void SetAverageAirFlow(EnergyPlusData &state,
-                           int const MSHeatPumpNum,                     // Unit index
-                           Real64 const PartLoadRatio,                  // unit part load ratio
-                           Real64 &OnOffAirFlowRatio,                   // ratio of compressor ON airflow to average airflow over timestep
-                           ObjexxFCL::Optional_int_const SpeedNum,      // Speed number
-                           ObjexxFCL::Optional<Real64 const> SpeedRatio // Speed ratio
+                           int const MSHeatPumpNum,    // Unit index
+                           Real64 const PartLoadRatio, // unit part load ratio
+                           Real64 &OnOffAirFlowRatio,  // ratio of compressor ON airflow to average airflow over timestep
+                           int const SpeedNum,         // Speed number
+                           Real64 const SpeedRatio     // Speed ratio
     )
     {
 
@@ -4438,7 +4438,7 @@ namespace HVACMultiSpeedHeatPump {
         MSHPMassFlowRateHigh = 0.0; // Mass flow rate at high speed
 
         if (!state.dataZoneEnergyDemand->CurDeadBandOrSetback(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).ControlZoneNum) &&
-            present(SpeedNum)) {
+            (SpeedNum > 0)) {
             if (state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::HeatingMode) {
                 if (SpeedNum == 1) {
                     state.dataHVACMultiSpdHP->CompOnMassFlow = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HeatMassFlowRate(SpeedNum);
@@ -4476,7 +4476,7 @@ namespace HVACMultiSpeedHeatPump {
         InletNode = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).AirInletNodeNum;
 
         // Set up fan flow rate during compressor off time
-        if (state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).OpMode == ContFanCycCoil && present(SpeedNum)) {
+        if (state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).OpMode == ContFanCycCoil && (SpeedNum > 0)) {
             if (state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).AirFlowControl == AirflowControl::UseCompressorOnFlow &&
                 state.dataHVACMultiSpdHP->CompOnMassFlow > 0.0) {
                 if (state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).LastMode == ModeOfOperation::HeatingMode) {
@@ -4489,7 +4489,7 @@ namespace HVACMultiSpeedHeatPump {
             }
         }
 
-        if (present(SpeedNum)) {
+        if (SpeedNum > 0) {
             if (SpeedNum > 1) {
                 AverageUnitMassFlow = state.dataHVACMultiSpdHP->CompOnMassFlow;
                 state.dataHVACMultiSpdHP->FanSpeedRatio = state.dataHVACMultiSpdHP->CompOnFlowRatio;

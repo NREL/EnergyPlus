@@ -9327,7 +9327,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::update(ObjexxFCL::Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
+    void Solver::update(bool const FirstHVACIteration) // True when solution technique on first iteration
     {
 
         // SUBROUTINE INFORMATION:
@@ -9507,8 +9507,8 @@ namespace AirflowNetwork {
                 break;
             }
         }
-        if (present(FirstHVACIteration)) {
-            if (FirstHVACIteration && OnOffFanFlag) {
+        if (FirstHVACIteration) {
+            if (OnOffFanFlag) {
                 multiExchangeData = exchangeData;
                 for (i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                     nodeReport(i).PZ = AirflowNetworkNodeSimu(i).PZ;
