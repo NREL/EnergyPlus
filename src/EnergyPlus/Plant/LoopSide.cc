@@ -2070,9 +2070,7 @@ namespace DataPlant {
         }
     }
 
-    void HalfLoopData::SimulateAllLoopSidePumps(EnergyPlusData &state,
-                                                ObjexxFCL::Optional<PlantLocation const> SpecificPumpLocation,
-                                                ObjexxFCL::Optional<Real64 const> SpecificPumpFlowRate)
+    void HalfLoopData::SimulateAllLoopSidePumps(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2086,29 +2084,14 @@ namespace DataPlant {
         int PumpLoopNum;
         DataPlant::LoopSideLocation PumpLoopSideNum;
 
-        // If we have a specific loop/side/br/comp, then find the index and only do that one, otherwise do all pumps on the loop side
-        if (present(SpecificPumpLocation)) {
-            PumpLoopNum = SpecificPumpLocation().loopNum;
-            PumpLoopSideNum = SpecificPumpLocation().loopSideNum;
-            int const PumpBranchNum = SpecificPumpLocation().branchNum;
-            int const PumpCompNum = SpecificPumpLocation().compNum;
-            PumpIndexStart =
-                state.dataPlnt->PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum).Branch(PumpBranchNum).Comp(PumpCompNum).IndexInLoopSidePumps;
-            PumpIndexEnd = PumpIndexStart;
-        } else {
-            PumpLoopNum = this->plantLoc.loopNum;
-            PumpLoopSideNum = this->plantLoc.loopSideNum;
-            PumpIndexStart = 1;
-            PumpIndexEnd = this->TotalPumps;
-        }
+        // Do all pumps on the loop side
+        PumpLoopNum = this->plantLoc.loopNum;
+        PumpLoopSideNum = this->plantLoc.loopSideNum;
+        PumpIndexStart = 1;
+        PumpIndexEnd = this->TotalPumps;
 
         // If we have a flow rate to hit, then go for it, otherwise, just operate in request mode with zero flow
-        Real64 FlowToRequest;
-        if (present(SpecificPumpFlowRate)) {
-            FlowToRequest = SpecificPumpFlowRate;
-        } else {
-            FlowToRequest = 0.0;
-        }
+        Real64 FlowToRequest = 0.0;
 
         //~ Now loop through all the pumps and simulate them, keeping track of their status
         auto &loop_side(state.dataPlnt->PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum));
@@ -2121,6 +2104,7 @@ namespace DataPlant {
             int const PumpCompNum = pump.CompNum;
             int const PumpOutletNode = pump.PumpOutletNode;
 
+            // This call is probably not necessary now, it only can zero it out
             this->AdjustPumpFlowRequestByEMSControls(PumpBranchNum, PumpCompNum, FlowToRequest);
 
             // Call SimPumps, routine takes a flow request, and returns some info about the status of the pump

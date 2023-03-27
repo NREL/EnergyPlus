@@ -154,10 +154,10 @@ namespace PlantUtilities {
 
     void SafeCopyPlantNode(EnergyPlusData &state,
                            int InletNodeNum,
-                           int OutletNodeNum,
-                           ObjexxFCL::Optional_int_const LoopNum = _,
-                           ObjexxFCL::Optional<Real64 const> OutletTemp = _ // set on outlet node if present and water.
+                           int OutletNodeNum
     );
+
+    void SafeCopyPlantNode(EnergyPlusData &state, int const InletNodeNum, int const OutletNodeNum, int const LoopNum);
 
     Real64 BoundValueToNodeMinMaxAvail(EnergyPlusData &state, Real64 ValueToBound, int NodeNumToBoundWith);
 

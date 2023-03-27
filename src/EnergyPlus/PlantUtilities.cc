@@ -1403,10 +1403,44 @@ void RegisterPlantCompDesignFlow(EnergyPlusData &state,
 
 void SafeCopyPlantNode(EnergyPlusData &state,
                        int const InletNodeNum,
-                       int const OutletNodeNum,
-                       ObjexxFCL::Optional_int_const LoopNum,
-                       [[maybe_unused]] ObjexxFCL::Optional<Real64 const> OutletTemp // set on outlet node if present and water.
+                       int const OutletNodeNum
 )
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         B.  Griffith
+    //       DATE WRITTEN   February, 2010
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Provide a safer alternative for Node(outlet) = Node(inlet)
+    // Intended just for plant
+
+    // METHODOLOGY EMPLOYED:
+    // Copy over state variables but not setpoints
+    // derived from adiabatic Pipes
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    state.dataLoopNodes->Node(OutletNodeNum).FluidType = state.dataLoopNodes->Node(InletNodeNum).FluidType;
+
+    state.dataLoopNodes->Node(OutletNodeNum).Temp = state.dataLoopNodes->Node(InletNodeNum).Temp;
+    state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;
+    state.dataLoopNodes->Node(OutletNodeNum).Quality = state.dataLoopNodes->Node(InletNodeNum).Quality;
+    state.dataLoopNodes->Node(OutletNodeNum).Enthalpy =
+        state.dataLoopNodes->Node(InletNodeNum).Enthalpy; // should have routines that keep this current with temp?
+
+    state.dataLoopNodes->Node(OutletNodeNum).TempMin = state.dataLoopNodes->Node(InletNodeNum).TempMin;
+    state.dataLoopNodes->Node(OutletNodeNum).TempMax = state.dataLoopNodes->Node(InletNodeNum).TempMax;
+    state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMinAvail =
+        max(state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMin, state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMinAvail);
+    state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMaxAvail =
+        min(state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMax, state.dataLoopNodes->Node(InletNodeNum).MassFlowRateMaxAvail);
+
+    state.dataLoopNodes->Node(OutletNodeNum).HumRat = state.dataLoopNodes->Node(InletNodeNum).HumRat; // air only?
+}
+
+void SafeCopyPlantNode(EnergyPlusData &state, int const InletNodeNum, int const OutletNodeNum, int const LoopNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1442,14 +1476,12 @@ void SafeCopyPlantNode(EnergyPlusData &state,
     state.dataLoopNodes->Node(OutletNodeNum).HumRat = state.dataLoopNodes->Node(InletNodeNum).HumRat; // air only?
 
     // Only pass pressure if we aren't doing a pressure simulation
-    if (present(LoopNum)) {
-        switch (state.dataPlnt->PlantLoop(LoopNum).PressureSimType) {
-        case DataPlant::PressSimType::NoPressure:
-            state.dataLoopNodes->Node(OutletNodeNum).Press = state.dataLoopNodes->Node(InletNodeNum).Press;
-        default:
-            // Don't do anything
-            break;
-        }
+    switch (state.dataPlnt->PlantLoop(LoopNum).PressureSimType) {
+    case DataPlant::PressSimType::NoPressure:
+        state.dataLoopNodes->Node(OutletNodeNum).Press = state.dataLoopNodes->Node(InletNodeNum).Press;
+    default:
+        // Don't do anything
+        break;
     }
 }
 

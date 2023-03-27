@@ -1800,7 +1800,7 @@ namespace SystemAvailabilityManager {
                 SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->OptimumStartData);
             }
             if (SysAvailNum > 0) {
-                CalcOptStartSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
+                CalcOptStartSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus);
             } else {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:OptimumStart not found: {}", SysAvailName));
             }
@@ -2316,9 +2316,7 @@ namespace SystemAvailabilityManager {
     void CalcOptStartSysAvailMgr(EnergyPlusData &state,
                                  int const SysAvailNum,  // number of the current scheduled system availability manager
                                  int const PriAirSysNum, // number of the primary air system affected by this Avail. Manager
-                                 int &AvailStatus,       // System status indicator
-                                 [[maybe_unused]] ObjexxFCL::Optional_int_const ZoneEquipType, // Type of ZoneHVAC equipment component
-                                 [[maybe_unused]] ObjexxFCL::Optional_int_const CompNum        // Index of ZoneHVAC equipment component
+                                 int &AvailStatus        // System status indicator
     )
     {
 
