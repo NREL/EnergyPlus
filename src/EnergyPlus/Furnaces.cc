@@ -11464,650 +11464,557 @@ namespace Furnaces {
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will calcultes MSHP performance based on given system load
 
-        // Using/Aliasing
-        using Fans::SimulateFanComponents;
-        using IntegratedHeatPump::SimIHP;
-        using VariableSpeedCoils::SimVariableSpeedCoils;
+        Real64 constexpr ErrorToler = 0.001; // supplemental heating coil convergence tollerance
+        Real64 SavePartloadRatio = 0.0;      // part-load ratio
+        Real64 SaveSpeedRatio = 0.0;         // speed ratio
+        Real64 QCoilActual = 0.0;            // coil load actually delivered returned to calling component
+        Real64 HeatCoilLoad = 0.0;           // required heating coil load
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        //  INTEGER, PARAMETER  ::   On  = 1           ! Compressor on flag
-        //  INTEGER, PARAMETER  ::   Off = 2           ! Compressor off flag
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVMS TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int OutletNode;           // MSHP air outlet node
-        int InletNode;            // MSHP air inlet node
-        Real64 AirMassFlow;       // Air mass flow rate [kg/s]
-        Real64 SavePartloadRatio; // part-load ratio
-        Real64 SaveSpeedRatio;    // speed ratio
-        Real64 QCoilActual;       // coil load actually delivered returned to calling component
-        Real64 ErrorToler;        // supplemental heating coil convergence tollerance
-        bool SuppHeatingCoilFlag; // whether to turn on the supplemental heater
-        Real64 HeatCoilLoad;      // REQUIRED HEAT COIL LOAD
-
-        InletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
-        OutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
-
-        HeatCoilLoad = 0.0;
         state.dataFurnaces->SaveCompressorPLR = 0.0;
-        SavePartloadRatio = 0.0;
-        ErrorToler = 0.001;
 
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
         SetVSHPAirFlow(state, FurnaceNum, PartLoadFrac, OnOffAirFlowRatio, SpeedNum, SpeedRatio);
 
-        if ((SupHeaterLoad > 1.0e-10) && (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool) &&
-            (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex == 0)) {
+        auto &thisFurnace = state.dataFurnaces->Furnace(FurnaceNum);
+
+        if ((SupHeaterLoad > 1.0e-10) && (thisFurnace.FurnaceType_Num == UnitarySys_HeatCool) && (thisFurnace.SuppHeatCoilIndex == 0)) {
             // ONLY HEATING COIL, NO SUPPLEMENTAL COIL, USED FOR REHEAT DURING DUHMI
-            HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity * PartLoadFrac; // REHEAT IN FAN ON TIME
+            HeatCoilLoad = thisFurnace.DesignHeatingCapacity * PartLoadFrac; // REHEAT IN FAN ON TIME
 
             if (HeatCoilLoad > SupHeaterLoad) HeatCoilLoad = SupHeaterLoad; // HEATING COIL RUN TIME < FAN ON TIME
 
-        } else if ((QZnReq > SmallLoad) && (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
-            HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity * PartLoadFrac;
+        } else if ((QZnReq > SmallLoad) && (thisFurnace.FurnaceType_Num == UnitarySys_HeatCool)) {
+            HeatCoilLoad = thisFurnace.DesignHeatingCapacity * PartLoadFrac;
         } else {
             HeatCoilLoad = 0.0;
         }
 
-        AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         // if blow through, simulate fan then coils
-        if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == BlowThru) {
-            SimulateFanComponents(
-                state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+        if (thisFurnace.FanPlace == BlowThru) {
+            Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
 
-            if ((!state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream) &&
-                (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
+            if ((!thisFurnace.CoolingCoilUpstream) && (thisFurnace.FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
-                SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state,
-                                      FurnaceNum,
-                                      SuppHeatingCoilFlag,
-                                      FirstHVACIteration,
-                                      HeatCoilLoad,
-                                      state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                      QCoilActual);
+                bool SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
+                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, thisFurnace.OpMode, QCoilActual);
             }
 
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad))) &&
-                (state.dataEnvrn->OutDryBulbTemp >=
-                 state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling)) { // COOLING MODE or dehumidification mode
+                (state.dataEnvrn->OutDryBulbTemp >= thisFurnace.MinOATCompressorCooling)) { // COOLING MODE or dehumidification mode
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                    SimIHP(state,
-                           BlankString,
-                           state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                           state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                           state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                           state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                           state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                           CompressorOp,
-                           PartLoadFrac,
-                           SpeedNum,
-                           SpeedRatio,
-                           QZnReq,
-                           QLatReq,
-                           false,
-                           false,
-                           OnOffAirFlowRatio);
+                if (thisFurnace.bIsIHP) {
+                    IntegratedHeatPump::SimIHP(state,
+                                               BlankString,
+                                               thisFurnace.CoolingCoilIndex,
+                                               thisFurnace.OpMode,
+                                               thisFurnace.MaxONOFFCyclesperHour,
+                                               thisFurnace.HPTimeConstant,
+                                               thisFurnace.FanDelayTime,
+                                               CompressorOp,
+                                               PartLoadFrac,
+                                               SpeedNum,
+                                               SpeedRatio,
+                                               QZnReq,
+                                               QLatReq,
+                                               false,
+                                               false,
+                                               OnOffAirFlowRatio);
                 } else {
-                    SimVariableSpeedCoils(state,
-                                          BlankString,
-                                          state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                          state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                          state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                          state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                          state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                          CompressorOp,
-                                          PartLoadFrac,
-                                          SpeedNum,
-                                          SpeedRatio,
-                                          QZnReq,
-                                          QLatReq,
-                                          OnOffAirFlowRatio);
+                    VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                              BlankString,
+                                                              thisFurnace.CoolingCoilIndex,
+                                                              thisFurnace.OpMode,
+                                                              thisFurnace.MaxONOFFCyclesperHour,
+                                                              thisFurnace.HPTimeConstant,
+                                                              thisFurnace.FanDelayTime,
+                                                              CompressorOp,
+                                                              PartLoadFrac,
+                                                              SpeedNum,
+                                                              SpeedRatio,
+                                                              QZnReq,
+                                                              QLatReq,
+                                                              OnOffAirFlowRatio);
                 }
 
                 SavePartloadRatio = PartLoadFrac;
                 SaveSpeedRatio = SpeedRatio;
 
-                state.dataFurnaces->SaveCompressorPLR =
-                    state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+                state.dataFurnaces->SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(thisFurnace.CoolingCoilIndex).PartLoadRatio;
             } else {
-                if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                    SimIHP(state,
-                           BlankString,
-                           state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                           state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                           state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                           state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                           state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                           CompressorOp,
-                           PartLoadFrac,
-                           SpeedNum,
-                           SpeedRatio,
-                           QZnReq,
-                           QLatReq,
-                           false,
-                           false,
-                           OnOffAirFlowRatio);
+                if (thisFurnace.bIsIHP) {
+                    IntegratedHeatPump::SimIHP(state,
+                                               BlankString,
+                                               thisFurnace.CoolingCoilIndex,
+                                               thisFurnace.OpMode,
+                                               thisFurnace.MaxONOFFCyclesperHour,
+                                               thisFurnace.HPTimeConstant,
+                                               thisFurnace.FanDelayTime,
+                                               CompressorOp,
+                                               PartLoadFrac,
+                                               SpeedNum,
+                                               SpeedRatio,
+                                               QZnReq,
+                                               QLatReq,
+                                               false,
+                                               false,
+                                               OnOffAirFlowRatio);
                 } else {
-                    SimVariableSpeedCoils(state,
-                                          BlankString,
-                                          state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                          state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                          state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                          state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                          state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                          CompressorOp,
-                                          0.0,
-                                          1,
-                                          0.0,
-                                          0.0,
-                                          0.0,
-                                          OnOffAirFlowRatio);
+                    VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                              BlankString,
+                                                              thisFurnace.CoolingCoilIndex,
+                                                              thisFurnace.OpMode,
+                                                              thisFurnace.MaxONOFFCyclesperHour,
+                                                              thisFurnace.HPTimeConstant,
+                                                              thisFurnace.FanDelayTime,
+                                                              CompressorOp,
+                                                              0.0,
+                                                              1,
+                                                              0.0,
+                                                              0.0,
+                                                              0.0,
+                                                              OnOffAirFlowRatio);
                 }
             }
 
-            if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != UnitarySys_HeatCool) {
+            if (thisFurnace.FurnaceType_Num != UnitarySys_HeatCool) {
                 if ((QZnReq > SmallLoad) && state.dataFurnaces->HeatingLoad) {
-                    if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                        SimIHP(state,
-                               BlankString,
-                               state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                               state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                               state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                               state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                               state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                               CompressorOp,
-                               PartLoadFrac,
-                               SpeedNum,
-                               SpeedRatio,
-                               QZnReq,
-                               QLatReq,
-                               false,
-                               false,
-                               OnOffAirFlowRatio);
+                    if (thisFurnace.bIsIHP) {
+                        IntegratedHeatPump::SimIHP(state,
+                                                   BlankString,
+                                                   thisFurnace.HeatingCoilIndex,
+                                                   thisFurnace.OpMode,
+                                                   thisFurnace.MaxONOFFCyclesperHour,
+                                                   thisFurnace.HPTimeConstant,
+                                                   thisFurnace.FanDelayTime,
+                                                   CompressorOp,
+                                                   PartLoadFrac,
+                                                   SpeedNum,
+                                                   SpeedRatio,
+                                                   QZnReq,
+                                                   QLatReq,
+                                                   false,
+                                                   false,
+                                                   OnOffAirFlowRatio);
                     } else {
-                        SimVariableSpeedCoils(state,
-                                              BlankString,
-                                              state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                              state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                              state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                              state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                              state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                              CompressorOp,
-                                              PartLoadFrac,
-                                              SpeedNum,
-                                              SpeedRatio,
-                                              QZnReq,
-                                              QLatReq,
-                                              OnOffAirFlowRatio);
+                        VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                                  BlankString,
+                                                                  thisFurnace.HeatingCoilIndex,
+                                                                  thisFurnace.OpMode,
+                                                                  thisFurnace.MaxONOFFCyclesperHour,
+                                                                  thisFurnace.HPTimeConstant,
+                                                                  thisFurnace.FanDelayTime,
+                                                                  CompressorOp,
+                                                                  PartLoadFrac,
+                                                                  SpeedNum,
+                                                                  SpeedRatio,
+                                                                  QZnReq,
+                                                                  QLatReq,
+                                                                  OnOffAirFlowRatio);
                     }
 
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
 
-                    state.dataFurnaces->SaveCompressorPLR =
-                        state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+                    state.dataFurnaces->SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(thisFurnace.HeatingCoilIndex).PartLoadRatio;
                 } else {
-                    if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                        SimIHP(state,
-                               BlankString,
-                               state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                               state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                               state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                               state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                               state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                               CompressorOp,
-                               PartLoadFrac,
-                               SpeedNum,
-                               SpeedRatio,
-                               QZnReq,
-                               QLatReq,
-                               false,
-                               false,
-                               OnOffAirFlowRatio);
+                    if (thisFurnace.bIsIHP) {
+                        IntegratedHeatPump::SimIHP(state,
+                                                   BlankString,
+                                                   thisFurnace.CoolingCoilIndex,
+                                                   thisFurnace.OpMode,
+                                                   thisFurnace.MaxONOFFCyclesperHour,
+                                                   thisFurnace.HPTimeConstant,
+                                                   thisFurnace.FanDelayTime,
+                                                   CompressorOp,
+                                                   PartLoadFrac,
+                                                   SpeedNum,
+                                                   SpeedRatio,
+                                                   QZnReq,
+                                                   QLatReq,
+                                                   false,
+                                                   false,
+                                                   OnOffAirFlowRatio);
                     } else {
-                        SimVariableSpeedCoils(state,
-                                              BlankString,
-                                              state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                              state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                              state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                              state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                              state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                              CompressorOp,
-                                              0.0,
-                                              1,
-                                              0.0,
-                                              0.0,
-                                              0.0,
-                                              OnOffAirFlowRatio);
+                        VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                                  BlankString,
+                                                                  thisFurnace.HeatingCoilIndex,
+                                                                  thisFurnace.OpMode,
+                                                                  thisFurnace.MaxONOFFCyclesperHour,
+                                                                  thisFurnace.HPTimeConstant,
+                                                                  thisFurnace.FanDelayTime,
+                                                                  CompressorOp,
+                                                                  0.0,
+                                                                  1,
+                                                                  0.0,
+                                                                  0.0,
+                                                                  0.0,
+                                                                  OnOffAirFlowRatio);
                     }
                 }
-            } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream &&
-                       (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
+            } else if (thisFurnace.CoolingCoilUpstream && (thisFurnace.FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
-                SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state,
-                                      FurnaceNum,
-                                      SuppHeatingCoilFlag,
-                                      FirstHVACIteration,
-                                      HeatCoilLoad,
-                                      state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                      QCoilActual);
+                bool SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
+                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, thisFurnace.OpMode, QCoilActual);
             }
 
             // Call twice to ensure the fan outlet conditions are updated
-            SimulateFanComponents(
-                state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+            Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
 
-            if ((!state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream) &&
-                (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
+            if ((!thisFurnace.CoolingCoilUpstream) && (thisFurnace.FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
-                SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state,
-                                      FurnaceNum,
-                                      SuppHeatingCoilFlag,
-                                      FirstHVACIteration,
-                                      HeatCoilLoad,
-                                      state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                      QCoilActual);
+                bool SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
+                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, thisFurnace.OpMode, QCoilActual);
             }
 
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad))) &&
-                (state.dataEnvrn->OutDryBulbTemp >= state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling)) {
+                (state.dataEnvrn->OutDryBulbTemp >= thisFurnace.MinOATCompressorCooling)) {
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                    SimIHP(state,
-                           BlankString,
-                           state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                           state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                           state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                           state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                           state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                           CompressorOp,
-                           PartLoadFrac,
-                           SpeedNum,
-                           SpeedRatio,
-                           QZnReq,
-                           QLatReq,
-                           false,
-                           false,
-                           OnOffAirFlowRatio);
+                if (thisFurnace.bIsIHP) {
+                    IntegratedHeatPump::SimIHP(state,
+                                               BlankString,
+                                               thisFurnace.CoolingCoilIndex,
+                                               thisFurnace.OpMode,
+                                               thisFurnace.MaxONOFFCyclesperHour,
+                                               thisFurnace.HPTimeConstant,
+                                               thisFurnace.FanDelayTime,
+                                               CompressorOp,
+                                               PartLoadFrac,
+                                               SpeedNum,
+                                               SpeedRatio,
+                                               QZnReq,
+                                               QLatReq,
+                                               false,
+                                               false,
+                                               OnOffAirFlowRatio);
                 } else {
-                    SimVariableSpeedCoils(state,
-                                          BlankString,
-                                          state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                          state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                          state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                          state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                          state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                          CompressorOp,
-                                          PartLoadFrac,
-                                          SpeedNum,
-                                          SpeedRatio,
-                                          QZnReq,
-                                          QLatReq,
-                                          OnOffAirFlowRatio);
+                    VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                              BlankString,
+                                                              thisFurnace.CoolingCoilIndex,
+                                                              thisFurnace.OpMode,
+                                                              thisFurnace.MaxONOFFCyclesperHour,
+                                                              thisFurnace.HPTimeConstant,
+                                                              thisFurnace.FanDelayTime,
+                                                              CompressorOp,
+                                                              PartLoadFrac,
+                                                              SpeedNum,
+                                                              SpeedRatio,
+                                                              QZnReq,
+                                                              QLatReq,
+                                                              OnOffAirFlowRatio);
                 }
 
                 SavePartloadRatio = PartLoadFrac;
                 SaveSpeedRatio = SpeedRatio;
-                state.dataFurnaces->SaveCompressorPLR =
-                    state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+                state.dataFurnaces->SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(thisFurnace.CoolingCoilIndex).PartLoadRatio;
             } else {
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                    SimIHP(state,
-                           BlankString,
-                           state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                           state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                           state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                           state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                           state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                           CompressorOp,
-                           PartLoadFrac,
-                           SpeedNum,
-                           SpeedRatio,
-                           QZnReq,
-                           QLatReq,
-                           false,
-                           false,
-                           OnOffAirFlowRatio);
+                if (thisFurnace.bIsIHP) {
+                    IntegratedHeatPump::SimIHP(state,
+                                               BlankString,
+                                               thisFurnace.CoolingCoilIndex,
+                                               thisFurnace.OpMode,
+                                               thisFurnace.MaxONOFFCyclesperHour,
+                                               thisFurnace.HPTimeConstant,
+                                               thisFurnace.FanDelayTime,
+                                               CompressorOp,
+                                               PartLoadFrac,
+                                               SpeedNum,
+                                               SpeedRatio,
+                                               QZnReq,
+                                               QLatReq,
+                                               false,
+                                               false,
+                                               OnOffAirFlowRatio);
                 } else {
-                    SimVariableSpeedCoils(state,
-                                          BlankString,
-                                          state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                          state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                          state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                          state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                          state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                          CompressorOp,
-                                          0.0,
-                                          1,
-                                          0.0,
-                                          0.0,
-                                          0.0,
-                                          OnOffAirFlowRatio);
+                    VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                              BlankString,
+                                                              thisFurnace.CoolingCoilIndex,
+                                                              thisFurnace.OpMode,
+                                                              thisFurnace.MaxONOFFCyclesperHour,
+                                                              thisFurnace.HPTimeConstant,
+                                                              thisFurnace.FanDelayTime,
+                                                              CompressorOp,
+                                                              0.0,
+                                                              1,
+                                                              0.0,
+                                                              0.0,
+                                                              0.0,
+                                                              OnOffAirFlowRatio);
                 }
             }
 
-            if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != UnitarySys_HeatCool) {
+            if (thisFurnace.FurnaceType_Num != UnitarySys_HeatCool) {
                 if ((QZnReq > SmallLoad) && state.dataFurnaces->HeatingLoad) {
-                    if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                        SimIHP(state,
-                               BlankString,
-                               state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                               state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                               state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                               state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                               state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                               CompressorOp,
-                               PartLoadFrac,
-                               SpeedNum,
-                               SpeedRatio,
-                               QZnReq,
-                               QLatReq,
-                               false,
-                               false,
-                               OnOffAirFlowRatio);
+                    if (thisFurnace.bIsIHP) {
+                        IntegratedHeatPump::SimIHP(state,
+                                                   BlankString,
+                                                   thisFurnace.HeatingCoilIndex,
+                                                   thisFurnace.OpMode,
+                                                   thisFurnace.MaxONOFFCyclesperHour,
+                                                   thisFurnace.HPTimeConstant,
+                                                   thisFurnace.FanDelayTime,
+                                                   CompressorOp,
+                                                   PartLoadFrac,
+                                                   SpeedNum,
+                                                   SpeedRatio,
+                                                   QZnReq,
+                                                   QLatReq,
+                                                   false,
+                                                   false,
+                                                   OnOffAirFlowRatio);
                     } else {
-                        SimVariableSpeedCoils(state,
-                                              BlankString,
-                                              state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                              state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                              state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                              state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                              state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                              CompressorOp,
-                                              PartLoadFrac,
-                                              SpeedNum,
-                                              SpeedRatio,
-                                              QZnReq,
-                                              QLatReq,
-                                              OnOffAirFlowRatio);
+                        VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                                  BlankString,
+                                                                  thisFurnace.HeatingCoilIndex,
+                                                                  thisFurnace.OpMode,
+                                                                  thisFurnace.MaxONOFFCyclesperHour,
+                                                                  thisFurnace.HPTimeConstant,
+                                                                  thisFurnace.FanDelayTime,
+                                                                  CompressorOp,
+                                                                  PartLoadFrac,
+                                                                  SpeedNum,
+                                                                  SpeedRatio,
+                                                                  QZnReq,
+                                                                  QLatReq,
+                                                                  OnOffAirFlowRatio);
                     }
 
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
-                    state.dataFurnaces->SaveCompressorPLR =
-                        state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+                    state.dataFurnaces->SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(thisFurnace.HeatingCoilIndex).PartLoadRatio;
                 } else {
-                    if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                        SimIHP(state,
-                               BlankString,
-                               state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                               state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                               state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                               state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                               state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                               CompressorOp,
-                               PartLoadFrac,
-                               SpeedNum,
-                               SpeedRatio,
-                               QZnReq,
-                               QLatReq,
-                               false,
-                               false,
-                               OnOffAirFlowRatio);
+                    if (thisFurnace.bIsIHP) {
+                        IntegratedHeatPump::SimIHP(state,
+                                                   BlankString,
+                                                   thisFurnace.CoolingCoilIndex,
+                                                   thisFurnace.OpMode,
+                                                   thisFurnace.MaxONOFFCyclesperHour,
+                                                   thisFurnace.HPTimeConstant,
+                                                   thisFurnace.FanDelayTime,
+                                                   CompressorOp,
+                                                   PartLoadFrac,
+                                                   SpeedNum,
+                                                   SpeedRatio,
+                                                   QZnReq,
+                                                   QLatReq,
+                                                   false,
+                                                   false,
+                                                   OnOffAirFlowRatio);
                     } else {
-                        SimVariableSpeedCoils(state,
-                                              BlankString,
-                                              state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                              state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                              state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                              state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                              state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                              CompressorOp,
-                                              0.0,
-                                              1,
-                                              0.0,
-                                              0.0,
-                                              0.0,
-                                              OnOffAirFlowRatio);
+                        VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                                  BlankString,
+                                                                  thisFurnace.HeatingCoilIndex,
+                                                                  thisFurnace.OpMode,
+                                                                  thisFurnace.MaxONOFFCyclesperHour,
+                                                                  thisFurnace.HPTimeConstant,
+                                                                  thisFurnace.FanDelayTime,
+                                                                  CompressorOp,
+                                                                  0.0,
+                                                                  1,
+                                                                  0.0,
+                                                                  0.0,
+                                                                  0.0,
+                                                                  OnOffAirFlowRatio);
                     }
                 }
-            } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream &&
-                       (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
+            } else if (thisFurnace.CoolingCoilUpstream && (thisFurnace.FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
-                SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state,
-                                      FurnaceNum,
-                                      SuppHeatingCoilFlag,
-                                      FirstHVACIteration,
-                                      HeatCoilLoad,
-                                      state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                      QCoilActual);
+                bool SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
+                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, thisFurnace.OpMode, QCoilActual);
             }
 
             //  Simulate supplemental heating coil for blow through fan
-            if (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex > 0) {
-                SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state,
-                                      FurnaceNum,
-                                      SuppHeatingCoilFlag,
-                                      FirstHVACIteration,
-                                      SupHeaterLoad,
-                                      state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                      QCoilActual);
+            if (thisFurnace.SuppHeatCoilIndex > 0) {
+                bool SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil
+                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, SupHeaterLoad, thisFurnace.OpMode, QCoilActual);
             }
         } else { // otherwise simulate DX coils then fan then supplemental heater
 
-            if ((!state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream) &&
-                (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
+            if ((!thisFurnace.CoolingCoilUpstream) && (thisFurnace.FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
-                SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state,
-                                      FurnaceNum,
-                                      SuppHeatingCoilFlag,
-                                      FirstHVACIteration,
-                                      HeatCoilLoad,
-                                      state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                      QCoilActual);
+                bool SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
+                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, thisFurnace.OpMode, QCoilActual);
             }
 
             if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad))) &&
-                (state.dataEnvrn->OutDryBulbTemp >= state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling)) {
+                (state.dataEnvrn->OutDryBulbTemp >= thisFurnace.MinOATCompressorCooling)) {
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                    SimIHP(state,
-                           BlankString,
-                           state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                           state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                           state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                           state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                           state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                           CompressorOp,
-                           PartLoadFrac,
-                           SpeedNum,
-                           SpeedRatio,
-                           QZnReq,
-                           QLatReq,
-                           false,
-                           false,
-                           OnOffAirFlowRatio);
+                if (thisFurnace.bIsIHP) {
+                    IntegratedHeatPump::SimIHP(state,
+                                               BlankString,
+                                               thisFurnace.CoolingCoilIndex,
+                                               thisFurnace.OpMode,
+                                               thisFurnace.MaxONOFFCyclesperHour,
+                                               thisFurnace.HPTimeConstant,
+                                               thisFurnace.FanDelayTime,
+                                               CompressorOp,
+                                               PartLoadFrac,
+                                               SpeedNum,
+                                               SpeedRatio,
+                                               QZnReq,
+                                               QLatReq,
+                                               false,
+                                               false,
+                                               OnOffAirFlowRatio);
                 } else {
-                    SimVariableSpeedCoils(state,
-                                          BlankString,
-                                          state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                          state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                          state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                          state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                          state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                          CompressorOp,
-                                          PartLoadFrac,
-                                          SpeedNum,
-                                          SpeedRatio,
-                                          QZnReq,
-                                          QLatReq,
-                                          OnOffAirFlowRatio);
+                    VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                              BlankString,
+                                                              thisFurnace.CoolingCoilIndex,
+                                                              thisFurnace.OpMode,
+                                                              thisFurnace.MaxONOFFCyclesperHour,
+                                                              thisFurnace.HPTimeConstant,
+                                                              thisFurnace.FanDelayTime,
+                                                              CompressorOp,
+                                                              PartLoadFrac,
+                                                              SpeedNum,
+                                                              SpeedRatio,
+                                                              QZnReq,
+                                                              QLatReq,
+                                                              OnOffAirFlowRatio);
                 }
 
                 SavePartloadRatio = PartLoadFrac;
                 SaveSpeedRatio = SpeedRatio;
 
-                state.dataFurnaces->SaveCompressorPLR =
-                    state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+                state.dataFurnaces->SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(thisFurnace.CoolingCoilIndex).PartLoadRatio;
             } else {
-                if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                    SimIHP(state,
-                           BlankString,
-                           state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                           state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                           state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                           state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                           state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                           CompressorOp,
-                           PartLoadFrac,
-                           SpeedNum,
-                           SpeedRatio,
-                           QZnReq,
-                           QLatReq,
-                           false,
-                           false,
-                           OnOffAirFlowRatio);
+                if (thisFurnace.bIsIHP) {
+                    IntegratedHeatPump::SimIHP(state,
+                                               BlankString,
+                                               thisFurnace.CoolingCoilIndex,
+                                               thisFurnace.OpMode,
+                                               thisFurnace.MaxONOFFCyclesperHour,
+                                               thisFurnace.HPTimeConstant,
+                                               thisFurnace.FanDelayTime,
+                                               CompressorOp,
+                                               PartLoadFrac,
+                                               SpeedNum,
+                                               SpeedRatio,
+                                               QZnReq,
+                                               QLatReq,
+                                               false,
+                                               false,
+                                               OnOffAirFlowRatio);
                 } else {
-                    SimVariableSpeedCoils(state,
-                                          BlankString,
-                                          state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                          state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                          state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                          state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                          state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                          CompressorOp,
-                                          0.0,
-                                          1,
-                                          0.0,
-                                          0.0,
-                                          0.0,
-                                          OnOffAirFlowRatio);
+                    VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                              BlankString,
+                                                              thisFurnace.CoolingCoilIndex,
+                                                              thisFurnace.OpMode,
+                                                              thisFurnace.MaxONOFFCyclesperHour,
+                                                              thisFurnace.HPTimeConstant,
+                                                              thisFurnace.FanDelayTime,
+                                                              CompressorOp,
+                                                              0.0,
+                                                              1,
+                                                              0.0,
+                                                              0.0,
+                                                              0.0,
+                                                              OnOffAirFlowRatio);
                 }
             }
 
-            if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != UnitarySys_HeatCool) {
-                if (QZnReq > SmallLoad && (state.dataEnvrn->OutDryBulbTemp >= state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorCooling)) {
+            if (thisFurnace.FurnaceType_Num != UnitarySys_HeatCool) {
+                if (QZnReq > SmallLoad && (state.dataEnvrn->OutDryBulbTemp >= thisFurnace.MinOATCompressorCooling)) {
 
-                    if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                        SimIHP(state,
-                               BlankString,
-                               state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                               state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                               state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                               state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                               state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                               CompressorOp,
-                               PartLoadFrac,
-                               SpeedNum,
-                               SpeedRatio,
-                               QZnReq,
-                               QLatReq,
-                               false,
-                               false,
-                               OnOffAirFlowRatio);
+                    if (thisFurnace.bIsIHP) {
+                        IntegratedHeatPump::SimIHP(state,
+                                                   BlankString,
+                                                   thisFurnace.HeatingCoilIndex,
+                                                   thisFurnace.OpMode,
+                                                   thisFurnace.MaxONOFFCyclesperHour,
+                                                   thisFurnace.HPTimeConstant,
+                                                   thisFurnace.FanDelayTime,
+                                                   CompressorOp,
+                                                   PartLoadFrac,
+                                                   SpeedNum,
+                                                   SpeedRatio,
+                                                   QZnReq,
+                                                   QLatReq,
+                                                   false,
+                                                   false,
+                                                   OnOffAirFlowRatio);
                     } else {
-                        SimVariableSpeedCoils(state,
-                                              BlankString,
-                                              state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                              state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                              state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                              state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                              state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                              CompressorOp,
-                                              PartLoadFrac,
-                                              SpeedNum,
-                                              SpeedRatio,
-                                              QZnReq,
-                                              QLatReq,
-                                              OnOffAirFlowRatio);
+                        VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                                  BlankString,
+                                                                  thisFurnace.HeatingCoilIndex,
+                                                                  thisFurnace.OpMode,
+                                                                  thisFurnace.MaxONOFFCyclesperHour,
+                                                                  thisFurnace.HPTimeConstant,
+                                                                  thisFurnace.FanDelayTime,
+                                                                  CompressorOp,
+                                                                  PartLoadFrac,
+                                                                  SpeedNum,
+                                                                  SpeedRatio,
+                                                                  QZnReq,
+                                                                  QLatReq,
+                                                                  OnOffAirFlowRatio);
                     }
 
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
-                    state.dataFurnaces->SaveCompressorPLR =
-                        state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+                    state.dataFurnaces->SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(thisFurnace.HeatingCoilIndex).PartLoadRatio;
                 } else {
-                    if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                        SimIHP(state,
-                               BlankString,
-                               state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                               state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                               state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                               state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                               state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                               CompressorOp,
-                               PartLoadFrac,
-                               SpeedNum,
-                               SpeedRatio,
-                               QZnReq,
-                               QLatReq,
-                               false,
-                               false,
-                               OnOffAirFlowRatio);
+                    if (thisFurnace.bIsIHP) {
+                        IntegratedHeatPump::SimIHP(state,
+                                                   BlankString,
+                                                   thisFurnace.CoolingCoilIndex,
+                                                   thisFurnace.OpMode,
+                                                   thisFurnace.MaxONOFFCyclesperHour,
+                                                   thisFurnace.HPTimeConstant,
+                                                   thisFurnace.FanDelayTime,
+                                                   CompressorOp,
+                                                   PartLoadFrac,
+                                                   SpeedNum,
+                                                   SpeedRatio,
+                                                   QZnReq,
+                                                   QLatReq,
+                                                   false,
+                                                   false,
+                                                   OnOffAirFlowRatio);
                     } else {
-                        SimVariableSpeedCoils(state,
-                                              BlankString,
-                                              state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                              state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                              state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                              state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                              state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                              CompressorOp,
-                                              0.0,
-                                              1,
-                                              0.0,
-                                              0.0,
-                                              0.0,
-                                              OnOffAirFlowRatio);
+                        VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                                  BlankString,
+                                                                  thisFurnace.HeatingCoilIndex,
+                                                                  thisFurnace.OpMode,
+                                                                  thisFurnace.MaxONOFFCyclesperHour,
+                                                                  thisFurnace.HPTimeConstant,
+                                                                  thisFurnace.FanDelayTime,
+                                                                  CompressorOp,
+                                                                  0.0,
+                                                                  1,
+                                                                  0.0,
+                                                                  0.0,
+                                                                  0.0,
+                                                                  OnOffAirFlowRatio);
                     }
                 }
-            } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream &&
-                       (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
+            } else if (thisFurnace.CoolingCoilUpstream && (thisFurnace.FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
-                SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state,
-                                      FurnaceNum,
-                                      SuppHeatingCoilFlag,
-                                      FirstHVACIteration,
-                                      HeatCoilLoad,
-                                      state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                      QCoilActual);
+                bool SuppHeatingCoilFlag = false; // if true simulates supplemental heating coil
+                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, thisFurnace.OpMode, QCoilActual);
             }
 
-            SimulateFanComponents(
-                state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+            Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
             //  Simulate supplemental heating coil for draw through fan
-            if (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex > 0) {
-                SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil
-                CalcNonDXHeatingCoils(state,
-                                      FurnaceNum,
-                                      SuppHeatingCoilFlag,
-                                      FirstHVACIteration,
-                                      SupHeaterLoad,
-                                      state.dataFurnaces->Furnace(FurnaceNum).OpMode,
-                                      QCoilActual);
+            if (thisFurnace.SuppHeatCoilIndex > 0) {
+                bool SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil
+                CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, SupHeaterLoad, thisFurnace.OpMode, QCoilActual);
             }
         }
 
         // If the fan runs continually do not allow coils to set OnOffFanPartLoadRatio.
-        if (state.dataFurnaces->Furnace(FurnaceNum).OpMode == ContFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
+        if (thisFurnace.OpMode == ContFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
 
-        auto &outNode = state.dataLoopNodes->Node(OutletNode);
-        AirMassFlow = outNode.MassFlowRate;
-        auto &zoneNode = state.dataLoopNodes->Node(state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone);
+        auto &outNode = state.dataLoopNodes->Node(thisFurnace.FurnaceOutletNodeNum);
+        Real64 AirMassFlow = outNode.MassFlowRate;
+        auto &zoneNode = state.dataLoopNodes->Node(thisFurnace.NodeNumOfControlledZone);
         Real64 zoneEnthalpy = PsyHFnTdbW(zoneNode.Temp, zoneNode.HumRat);
         Real64 outletEnthalpy = PsyHFnTdbW(outNode.Temp, outNode.HumRat);
         Real64 totalLoadMet = AirMassFlow * (outletEnthalpy - zoneEnthalpy);
         SensibleLoadMet =
             AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(outNode.Temp, outNode.HumRat, zoneNode.Temp, zoneNode.HumRat); // sensible {W};
         LatentLoadMet = totalLoadMet - SensibleLoadMet;
-        state.dataFurnaces->Furnace(FurnaceNum).LatentLoadMet = LatentLoadMet;
+        thisFurnace.LatentLoadMet = LatentLoadMet;
     }
 
     //******************************************************************************
