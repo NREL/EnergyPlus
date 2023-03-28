@@ -2227,7 +2227,7 @@ namespace OutdoorAirUnit {
             {
 
                 if (Sim) {
-                    SimHeatRecovery(state, EquipName, FirstHVACIteration, CompIndex, ContFanCycCoil, _, _, _, _, false, false);
+                    SimHeatRecovery(state, EquipName, FirstHVACIteration, CompIndex, ContFanCycCoil, {}, {}, 0, false, false, false);
                 }
             } break;
             // Desiccant Dehumidifier

@@ -2585,8 +2585,8 @@ namespace DesiccantDehumidifiers {
                                                   true,
                                                   CompanionCoilIndexNum,
                                                   desicDehum.RegenInletIsOutsideAirNode,
-                                                  _,
-                                                  _,
+                                                  false,
+                                                  false,
                                                   desicDehum.coolingCoil_TypeNum);
 
                     //       calculate desiccant part-load ratio
@@ -2667,8 +2667,8 @@ namespace DesiccantDehumidifiers {
                                                       true,
                                                       CompanionCoilIndexNum,
                                                       desicDehum.RegenInletIsOutsideAirNode,
-                                                      _,
-                                                      _,
+                                                      false,
+                                                      false,
                                                       desicDehum.coolingCoil_TypeNum);
 
                         //         calculate desiccant part-load ratio
@@ -2742,8 +2742,8 @@ namespace DesiccantDehumidifiers {
                                           true,
                                           CompanionCoilIndexNum,
                                           desicDehum.RegenInletIsOutsideAirNode,
-                                          _,
-                                          _,
+                                          false,
+                                          false,
                                           desicDehum.coolingCoil_TypeNum);
 
             if (desicDehum.RegenFanPlacement == DataHVACGlobals::DrawThru) {
@@ -2801,8 +2801,8 @@ namespace DesiccantDehumidifiers {
                                           false,
                                           CompanionCoilIndexNum,
                                           desicDehum.RegenInletIsOutsideAirNode,
-                                          _,
-                                          _,
+                                          false,
+                                          false,
                                           desicDehum.coolingCoil_TypeNum);
 
             if (desicDehum.RegenFanPlacement == DataHVACGlobals::DrawThru) {

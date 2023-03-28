@@ -3641,9 +3641,9 @@ void SimAirLoopComponent(EnergyPlusData &state,
                         CompIndex,
                         AirLoopControlInfo(AirLoopNum).FanOpMode,
                         state.dataAirLoop->AirLoopFlow(AirLoopNum).FanPLR,
-                        _,
-                        _,
-                        _,
+                        {},
+                        0,
+                        false,
                         AirLoopControlInfo(AirLoopNum).EconoActive,
                         AirLoopControlInfo(AirLoopNum).HighHumCtrlActive);
 

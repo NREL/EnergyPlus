@@ -2223,10 +2223,10 @@ namespace SteamCoils {
     }
 
     void SetSteamCoilData(EnergyPlusData &state,
-                          int const CoilNum,                                  // Number of hot water heating Coil
-                          bool &ErrorsFound,                                  // Set to true if certain errors found
-                          ObjexxFCL::Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-                          ObjexxFCL::Optional_int DesiccantDehumIndex         // Index for the desiccant dehum system where this caoil is used
+                          int const CoilNum,                    // Number of hot water heating Coil
+                          bool &ErrorsFound,                    // Set to true if certain errors found
+                          bool const DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
+                          int const DesiccantDehumIndex         // Index for the desiccant dehum system where this caoil is used
     )
     {
 
@@ -2253,13 +2253,9 @@ namespace SteamCoils {
             return;
         }
 
-        if (present(DesiccantRegenerationCoil)) {
-            state.dataSteamCoils->SteamCoil(CoilNum).DesiccantRegenerationCoil = DesiccantRegenerationCoil;
-        }
+        state.dataSteamCoils->SteamCoil(CoilNum).DesiccantRegenerationCoil = DesiccantRegenerationCoil;
 
-        if (present(DesiccantDehumIndex)) {
-            state.dataSteamCoils->SteamCoil(CoilNum).DesiccantDehumNum = DesiccantDehumIndex;
-        }
+        state.dataSteamCoils->SteamCoil(CoilNum).DesiccantDehumNum = DesiccantDehumIndex;
     }
     // End of Utility subroutines for the SteamCoil Module
 

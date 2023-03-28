@@ -48,6 +48,8 @@
 #ifndef HeatRecovery_hh_INCLUDED
 #define HeatRecovery_hh_INCLUDED
 
+#include <optional>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -390,17 +392,17 @@ namespace HeatRecovery {
     };
 
     void SimHeatRecovery(EnergyPlusData &state,
-                         std::string_view CompName,                             // name of the heat exchanger unit
-                         bool FirstHVACIteration,                               // TRUE if 1st HVAC simulation of system timestep
-                         int &CompIndex,                                        // Pointer to Component
-                         int FanOpMode,                                         // Supply air fan operating mode
-                         ObjexxFCL::Optional<Real64 const> HXPartLoadRatio = _, // Part load ratio requested of DX compressor
-                         ObjexxFCL::Optional_bool_const HXUnitEnable = _,       // Flag to operate heat exchanger
-                         ObjexxFCL::Optional_int_const CompanionCoilIndex = _,  // index of companion cooling coil
-                         ObjexxFCL::Optional_bool_const RegenInletIsOANode = _, // flag to determine if supply inlet is OA node, if so air flow cycles
-                         ObjexxFCL::Optional_bool_const EconomizerFlag = _,     // economizer operation flag passed by airloop or OA sys
-                         ObjexxFCL::Optional_bool_const HighHumCtrlFlag = _,    // high humidity control flag passed by airloop or OA sys
-                         ObjexxFCL::Optional_int_const CompanionCoilType_Num = _ // cooling coil type of coil
+                         std::string_view CompName,                   // name of the heat exchanger unit
+                         bool FirstHVACIteration,                     // TRUE if 1st HVAC simulation of system timestep
+                         int &CompIndex,                              // Pointer to Component
+                         int FanOpMode,                               // Supply air fan operating mode
+                         Real64 const HXPartLoadRatio = 1.0,          // Part load ratio requested of DX compressor
+                         std::optional<bool> const HXUnitEnable = {}, // Flag to operate heat exchanger
+                         int const CompanionCoilIndex = 0,            // index of companion cooling coil
+                         bool const RegenInletIsOANode = false,       // flag to determine if supply inlet is OA node, if so air flow cycles
+                         bool const EconomizerFlag = false,           // economizer operation flag passed by airloop or OA sys
+                         bool const HighHumCtrlFlag = false,          // high humidity control flag passed by airloop or OA sys
+                         int const CompanionCoilType_Num = 0          // cooling coil type of coil
     );
 
     void GetHeatRecoveryInput(EnergyPlusData &state);

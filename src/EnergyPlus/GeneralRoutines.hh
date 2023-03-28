@@ -192,12 +192,12 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Real64 const QdotSource,                    // Source/sink term, e.g. electricity exported from solar cell [W]
                                   Real64 &TsBaffle,                           // Temperature of baffle (both sides) use lagged value on input [C]
                                   Real64 &TaGap,                              // Temperature of air gap (assumed mixed) use lagged value on input [C]
-                                  ObjexxFCL::Optional<Real64> HcGapRpt = _,
-                                  ObjexxFCL::Optional<Real64> HrGapRpt = _,
-                                  ObjexxFCL::Optional<Real64> IscRpt = _,
-                                  ObjexxFCL::Optional<Real64> MdotVentRpt = _,
-                                  ObjexxFCL::Optional<Real64> VdotWindRpt = _,
-                                  ObjexxFCL::Optional<Real64> VdotBuoyRpt = _);
+                                  Real64 &HcGapRpt,
+                                  Real64 &HrGapRpt,
+                                  Real64 &IscRpt,
+                                  Real64 &MdotVentRpt,
+                                  Real64 &VdotWindRpt,
+                                  Real64 &VdotBuoyRpt);
 
 //****************************************************************************
 
