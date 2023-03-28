@@ -9471,7 +9471,6 @@ namespace Furnaces {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FurnaceInletNode;     // Furnace inlet node number
         int FurnaceOutletNode;    // Furnace outlet node number
-        Real64 AirMassFlow;       // Furnace inlet node temperature
         Real64 WSHPRuntimeFrac;   // Compressor runtime fraction
         Real64 CompPartLoadRatio; // Compressor part load ratio
         Real64 Dummy;             // dummy variable
@@ -9528,8 +9527,7 @@ namespace Furnaces {
             }
         }
 
-        AirMassFlow = state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate;
-        state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRateMaxAvail = AirMassFlow;
+        state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate;
 
         // Simulate the air-to-air heat pump
         if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_AirToAir) {
@@ -9844,6 +9842,9 @@ namespace Furnaces {
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, ReheatCoilLoad, FanOpMode, QActual);
             }
         } // IF(Furnace(FurnaceNum)%FurnaceType_Num == UnitarySys_HeatPump_AirToAir)THEN
+
+        // Get mass flow rate after components are simulated
+        Real64 AirMassFlow = state.dataLoopNodes->Node(FurnaceOutletNode).MassFlowRate;
 
         // check the DesignMaxOutletTemp and reset if necessary (for Coil:Gas:Heating or Coil:Electric:Heating only)
         if (state.dataLoopNodes->Node(state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp >
