@@ -393,7 +393,7 @@ Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature 
 
 \paragraph{Zone Air Heat Balance Internal Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-internal-convective-heat-gain-rate-w}
 
-The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watts, of heat transferred to the zone air from all types of internal gains from energyplus objects (e.g., people, lights, devices, appliances, equipment) listed in Table \ref{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-constituents}. This and the following provide results on the load components of the zone air heat balance. This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watts, of heat transferred to the zone air from all types of internal gains from energyplus objects (e.g., people, lights, devices, appliances, equipment) listed in Tables \ref{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-constituents} and \ref{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-from-fenestration}. In addition to the convective heat gains listed in these tables, if a zone or a space is served by a zone HVAC equipment, i.e., the zone has no return air node, or served by an AirloopHVAC system that has cycling fan operating mode, then the convective heat gain specified to the return air is re-directed to the space or the zone air heat balance as convective internal heat gain. This and the following provide results on the load components of the zone air heat balance. This field is not multiplied by zone or group multipliers.
 
 \begin{longtable}[c]{@{}lcc@{}}
 	\caption{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain Constituents} \label{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-constituents} \tabularnewline
@@ -460,7 +460,33 @@ The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watt
 	ElectricLoadCenter:Storage:Simple     &     ElectricLoadCenterStorageSimple    \tabularnewline
 	ElectricLoadCenter:Storage:Converter     &     ElectricLoadCenterConverter    \tabularnewline
 
+	\bottomrule
+
+\end{longtable}
+
+
+
+\begin{longtable}[c]{@{}lcc@{}}
+	\caption{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain from fenestration} \label{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-from-fenestration} \tabularnewline
+	\toprule
+	FenestrationSurface:Detailed Components &  Internal Convective Heat Gain Sources \tabularnewline
+	\midrule
+	\endfirsthead
 	
+	\caption[]{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain Constituents} \tabularnewline
+	\toprule
+	FenestrationSurface:Detailed Components &  Internal Convective Heat Gain Sources \tabularnewline
+	\midrule
+	\endhead
+	
+	WindowProperty:FrameAndDivider &  Convective heat gain from window frame and divider  \tabularnewline
+	Construction:WindowEquivalentLayer  &  Other convective heat gain from equivalent layer window model \tabularnewline
+	Construction &  Natural convection heat gain from a gap \tabularnewline
+	  &             between glass and interior shade or blind \tabularnewline
+	Construction:ComplexFenestrationState &  Convective heat gain from air flow \tabularnewline
+	  &             through a gap between glass and interior shade or blind \tabularnewline
+
+
 	\bottomrule
 
 \end{longtable}
