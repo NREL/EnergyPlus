@@ -128,6 +128,7 @@ namespace MixedAir {
     // stored as int since it is used in SetupOutputVariable()
     enum class OALimitFactor
     {
+        Invalid = -1,
         None = 0,        // No limit other than fixed OA amount
         Limits = 1,      // Limits and scheduled limits
         Economizer = 2,  // Economizer operation
