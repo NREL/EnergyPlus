@@ -14498,10 +14498,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(1.00, thisHeatEIRFPLR->inputLimits[0].max);
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);                           // getinput checks this
     EXPECT_GT(thisHeatEIRFPLR->inputLimits[0].min, thisVRF.MinPLR); // expect warning message
-    EXPECT_EQ(thisVRF.FuelType, "Electricity"); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
-    EXPECT_TRUE(compare_enums(thisVRF.FuelTypeNum,
-                              DataGlobalConstants::eResource::Electricity)); // Check fuel type input that uses
-                                                                                // UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
+    EXPECT_TRUE(compare_enums(thisVRF.FuelTypeNum, DataGlobalConstants::eResource::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)

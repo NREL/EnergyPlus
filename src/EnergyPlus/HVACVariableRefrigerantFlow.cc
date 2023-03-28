@@ -2320,7 +2320,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             }
         }
 
-        thisVrfSys.FuelType = "Electricity";
         if (!lAlphaFieldBlanks(39)) {
             // A39; \field Fuel type, Validate fuel type input
             thisVrfSys.FuelTypeNum = static_cast<DataGlobalConstants::eResource>(
@@ -2468,7 +2467,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfFluidCtrl.Name = cAlphaArgs(1);
         thisVrfFluidCtrl.VRFSystemTypeNum = VRF_HeatPump;
         thisVrfFluidCtrl.VRFAlgorithmType = AlgorithmType::FluidTCtrl;
-        thisVrfFluidCtrl.FuelType = "Electricity";
         thisVrfFluidCtrl.FuelTypeNum = DataGlobalConstants::eResource::Electricity;
 
         if (lAlphaFieldBlanks(2)) {
@@ -2870,7 +2868,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfFluidCtrlHR.HeatRecoveryUsed = true;
         thisVrfFluidCtrlHR.VRFSystemTypeNum = VRF_HeatPump;
         thisVrfFluidCtrlHR.VRFAlgorithmType = AlgorithmType::FluidTCtrl;
-        thisVrfFluidCtrlHR.FuelType = "Electricity";
         thisVrfFluidCtrlHR.FuelTypeNum = DataGlobalConstants::eResource::Electricity;
 
         if (lAlphaFieldBlanks(2)) {

@@ -1151,7 +1151,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
 
     // gather costs from EconomicTariff for each end use
     elcc->numResourcesUsed = 0;
-    for (ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
+    for (eResource iResource : state.dataGlobalConst->AllResourceTypes) {
         GetMonthlyCostForResource(state, iResource, curResourceCosts);
         annualCost = 0.0;
         for (int jMonth = 1; jMonth <= 12; ++jMonth) {
@@ -1259,7 +1259,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     // Put resource costs into cashflows
     // the first cash flow for resources should be after the categories, recurring and nonrecurring costs
     int cashFlowCounter = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost - 1; // Since CashFlow starts at 0
-    for (ResourceType iResource : state.dataGlobalConst->AllResourceTypes) {
+    for (eResource iResource : state.dataGlobalConst->AllResourceTypes) {
         if (resourceCostNotZero.at(iResource)) {
             ++cashFlowCounter;
 
@@ -1381,7 +1381,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     }
     // generate a warning if resource referenced was not used
     for (int nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
-        ResourceType curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
+        eResource curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
         if (!resourceCostNotZero.at(curResource) && state.dataGlobal->DoWeathSim) {
             ShowWarningError(state,
                              format("The resource referenced by LifeCycleCost:UsePriceEscalation= \"{}\" has no energy cost. ",
@@ -1428,7 +1428,7 @@ void ComputeEscalatedEnergyCosts(EnergyPlusData &state)
             }
         }
     }
-    for (ResourceType kResource : state.dataGlobalConst->AllResourceTypes) {
+    for (eResource kResource : state.dataGlobalConst->AllResourceTypes) {
         for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
             elcc->EscalatedTotEnergy(jYear) += elcc->EscalatedEnergy.at(jYear).at(kResource);
         }
@@ -1532,7 +1532,7 @@ void ComputePresentValue(EnergyPlusData &state)
     }
     // use SPV as default values for all energy types
     for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-        for (ResourceType kResource : state.dataGlobalConst->AllResourceTypes) {
+        for (eResource kResource : state.dataGlobalConst->AllResourceTypes) {
             elcc->energySPV.at(jYear).at(kResource) = elcc->SPV(jYear);
         }
     }

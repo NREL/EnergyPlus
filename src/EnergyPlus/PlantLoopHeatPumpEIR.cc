@@ -1943,18 +1943,15 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
             // A6 Fuel Type
             std::string tempRsrStr = UtilityRoutines::MakeUPPERCase(fields.at("fuel_type").get<std::string>());
-            thisPLHP.fuelType = DataGlobalConstants::AssignResourceTypeNum(tempRsrStr);
+            thisPLHP.fuelType = static_cast<DataGlobalConstants::eResource>(getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, tempRsrStr));
             // Validate fuel type input
             static constexpr std::string_view RoutineName("processInputForEIRPLHP: ");
-            bool FuelTypeError = false;
-            UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(tempRsrStr, tempRsrStr, thisPLHP.fuelType, FuelTypeError);
-            if (FuelTypeError) {
+            if (thisPLHP.fuelType == DataGlobalConstants::eResource::Invalid) {
                 ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, cCurrentModuleObject, thisPLHP.name));
                 ShowContinueError(state, format("Invalid Fuel Type = {}", tempRsrStr));
                 ShowContinueError(state, "Reset the Fuel Type to \"NaturalGas\".");
-                thisPLHP.fuelType = DataGlobalConstants::ResourceType::Natural_Gas;
+                thisPLHP.fuelType = DataGlobalConstants::eResource::NaturalGas;
                 errorsFound = true;
-                FuelTypeError = false;
             }
 
             // A7 End use category
@@ -2402,7 +2399,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
                                 _,
-                                DataGlobalConstants::GetResourceTypeChar(this->fuelType),
+                                DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->fuelType)],
                                 "Cooling",
                                 this->endUseSubcat, //"Heat Pump",
                                 "Plant");
@@ -2428,7 +2425,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
                                 _,
-                                DataGlobalConstants::GetResourceTypeChar(this->fuelType),
+                                DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->fuelType)],
                                 "Heating",
                                 this->endUseSubcat, // "Heat Pump",
                                 "Plant");
