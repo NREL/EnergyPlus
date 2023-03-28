@@ -393,7 +393,78 @@ Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature 
 
 \paragraph{Zone Air Heat Balance Internal Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-internal-convective-heat-gain-rate-w}
 
-The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watts, of heat transferred to the zone air from all types of internal gains, including people, lights, equipment etc. This and the following provide results on the load components of the zone air heat balance. This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watts, of heat transferred to the zone air from all types of internal gains from energyplus objects (e.g., people, lights, devices, appliances, equipment) listed in Table \ref{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-constituents}. This and the following provide results on the load components of the zone air heat balance. This field is not multiplied by zone or group multipliers.
+
+\begin{longtable}[c]{@{}lcc@{}}
+	\caption{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain Constituents} \label{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-constituents} \tabularnewline
+	\toprule
+	EnergyPlus Object &  Convective Heat Gain Type \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain Constituents} \tabularnewline
+	\toprule
+	EnergyPlus Object &  Convective Heat Gain Type \tabularnewline
+	\midrule
+	\endhead
+	
+	People     &     People    \tabularnewline
+	Lights     &     Lights    \tabularnewline
+	ElectricEquipment     &     ElectricEquipment    \tabularnewline
+	ElectricEquipment:ITE:AirCooled     &     ElectricEquipmentITEAirCooled    \tabularnewline
+	GasEquipment     &     GasEquipment    \tabularnewline
+	HotWaterEquipment     &     HotWaterEquipment    \tabularnewline
+	SteamEquipment     &     SteamEquipment    \tabularnewline
+	OtherEquipment     &     OtherEquipment    \tabularnewline
+	Refrigeration:Case     &     RefrigerationCase    \tabularnewline
+	Refrigeration:CompressorRack     &     RefrigerationCompressorRack    \tabularnewline
+	Refrigeration:System:Condenser:AirCooled     &     RefrigerationSystemAirCooledCondenser    \tabularnewline
+	Refrigeration:System:SuctionPipe     &     RefrigerationSystemSuctionPipe    \tabularnewline
+	Refrigeration:SecondarySystem:Receiver     &     RefrigerationSecondaryReceiver    \tabularnewline
+	Refrigeration:SecondarySystem:Pipe     &     RefrigerationSecondaryPipe    \tabularnewline
+	Refrigeration:WalkIn     &     RefrigerationWalkIn    \tabularnewline
+	Refrigeration:TranscriticalSystem:GasCooler:AirCooled     &     RefrigerationTransSysAirCooledGasCooler    \tabularnewline
+	Refrigeration:TranscriticalSystem:SuctionPipeMT     &     RefrigerationTransSysSuctionPipeMT    \tabularnewline
+	Refrigeration:TranscriticalSystem:SuctionPipeLT     &     RefrigerationTransSysSuctionPipeLT    \tabularnewline
+	WaterUse:Equipment     &     WaterUseEquipment    \tabularnewline
+	WaterHeater:Mixed     &     WaterHeaterMixed    \tabularnewline
+	WaterHeater:Stratified     &     WaterHeaterStratified    \tabularnewline
+	ZoneBaseboard:OutdoorTemperatureControlled     &     ZoneBaseboardOutdoorTemperatureControlled    \tabularnewline
+	ThermalStorage:ChilledWater:Mixed     &     ThermalStorageChilledWaterMixed    \tabularnewline
+	ThermalStorage:ChilledWater:Stratified     &     ThermalStorageChilledWaterStratified    \tabularnewline
+	Pipe:Indoor     &     PipeIndoor    \tabularnewline
+	Pump:VariableSpeed     &     Pump_VarSpeed    \tabularnewline
+	Pump:ConstantSpeed     &     Pump_ConSpeed    \tabularnewline
+	Pump:VariableSpeed:Condensate     &     Pump_Cond    \tabularnewline
+	HeaderedPumps:VariableSpeed     &     PumpBank_VarSpeed    \tabularnewline
+	HeaderedPumps:ConstantSpeed     &     PumpBank_ConSpeed    \tabularnewline
+	PlantComponent:UserDefined     &     PlantComponentUserDefined    \tabularnewline
+	Coil:UserDefined     &     CoilUserDefined    \tabularnewline
+	ZoneHVAC:ForcedAir:UserDefined     &     ZoneHVACForcedAirUserDefined    \tabularnewline
+	AirTerminal:SingleDuct:UserDefined     &     AirTerminalUserDefined    \tabularnewline
+	Coil:Cooling:DX:SingleSpeed:ThermalStorage     &     PackagedTESCoilTank    \tabularnewline
+	Fan:SystemModel     &     FanSystemModel    \tabularnewline
+	Coil:Cooling:DX:SingleSpeed     &     SecCoolingDXCoilSingleSpeed    \tabularnewline
+	Coil:Heating:DX:SingleSpeed     &     SecHeatingDXCoilSingleSpeed    \tabularnewline
+	Coil:Cooling:DX:TwoSpeed     &     SecCoolingDXCoilTwoSpeed    \tabularnewline
+	Coil:Cooling:DX:MultiSpeed     &     SecCoolingDXCoilMultiSpeed    \tabularnewline
+	Coil:Heating:DX:MultiSpeed     &     SecHeatingDXCoilMultiSpeed    \tabularnewline
+	Generator:FuelCell     &     GeneratorFuelCell    \tabularnewline
+	Generator:MicroCHP     &     GeneratorMicroCHP    \tabularnewline
+	ElectricLoadCenter:Transformer     &     ElectricLoadCenterTransformer    \tabularnewline
+	ElectricLoadCenter:Inverter:Simple     &     ElectricLoadCenterInverterSimple    \tabularnewline
+	ElectricLoadCenter:Inverter:FunctionOfPower     &     ElectricLoadCenterInverterFunctionOfPower    \tabularnewline
+	ElectricLoadCenter:Inverter:LookUpTable     &     ElectricLoadCenterInverterLookUpTable    \tabularnewline
+	ElectricLoadCenter:Storage:LiIonNMCBattery     &     ElectricLoadCenterStorageLiIonNmcBattery    \tabularnewline
+	ElectricLoadCenter:Storage:Battery     &     ElectricLoadCenterStorageBattery    \tabularnewline
+	ElectricLoadCenter:Storage:Simple     &     ElectricLoadCenterStorageSimple    \tabularnewline
+	ElectricLoadCenter:Storage:Converter     &     ElectricLoadCenterConverter    \tabularnewline
+
+	
+	\bottomrule
+
+\end{longtable}
+
 
 \paragraph{Zone Air Heat Balance Surface Convection Rate {[}W{]}}\label{zone-air-heat-balance-surface-convection-rate-w}
 
