@@ -1083,8 +1083,8 @@ void ScanForReports(EnergyPlusData &state,
                     std::string const &reportName,
                     bool &DoReport,
                     ObjexxFCL::Optional_string_const ReportKey,
-                    ObjexxFCL::Optional_string Option1,
-                    ObjexxFCL::Optional_string Option2)
+                    OptionalOutput<std::string> Option1,
+                    OptionalOutput<std::string> Option2)
 {
 
     // SUBROUTINE INFORMATION:

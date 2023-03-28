@@ -59,6 +59,88 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
+template <typename T> class DoNotUseOptionalOutput
+{
+public:
+    DoNotUseOptionalOutput() : m_t(nullptr)
+    {
+    }
+
+    DoNotUseOptionalOutput(T &t) : m_t(&t)
+    {
+    }
+
+    constexpr operator bool() const
+    {
+        return m_t != nullptr;
+    }
+
+    constexpr operator T() const
+    {
+        return *m_t;
+    }
+
+    constexpr const T *operator->() const noexcept
+    {
+        return m_t;
+    }
+
+    constexpr T *operator->() noexcept
+    {
+        return m_t;
+    }
+
+    constexpr const T &operator*() const &noexcept
+    {
+        return *m_t;
+    }
+
+    constexpr T &operator*() &noexcept
+    {
+        return *m_t;
+    }
+
+    // constexpr const T&& operator*() const&& noexcept;
+    // constexpr T&& operator*() && noexcept;
+
+    constexpr DoNotUseOptionalOutput &operator=(T &other) noexcept
+    {
+        *m_t = other;
+        return *this;
+    }
+
+    //constexpr DoNotUseOptionalOutput &operator=(T other) noexcept
+    //{
+    //    *m_t = other;
+    //    return *this;
+    //}
+    // constexpr optional& operator=( std::nullopt_t ) noexcept;
+    // constexpr optional& operator=( const optional& other );
+    // constexpr optional& operator=( optional&& other ) noexcept(/* see below */);
+    // template< class U = T > constexpr optional& operator=( U&& value );
+    // template< class U > constexpr optional& operator=( const optional<U>& other );
+    // template< class U > constexpr optional& operator=( optional<U>&& other );
+
+private:
+    T *m_t;
+};
+
+template <typename T> std::ostream &operator<<(std::ostream &stream, const DoNotUseOptionalOutput<T> &out)
+{
+    stream << T{out};
+    return stream;
+}
+
+template <typename T> constexpr double operator*(T left, const DoNotUseOptionalOutput<T> &right)
+{
+    return left * (*right);
+}
+
+template <typename T> constexpr bool present(const DoNotUseOptionalOutput<T> &out)
+{
+    return bool{out};
+}
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -206,9 +288,9 @@ namespace General {
     void ScanForReports(EnergyPlusData &state,
                         std::string const &reportName,
                         bool &DoReport,
-                        ObjexxFCL::Optional_string_const ReportKey = _,
-                        ObjexxFCL::Optional_string Option1 = _,
-                        ObjexxFCL::Optional_string Option2 = _);
+                        std::string_view const ReportKey = {},
+                        DoNotUseOptionalOutput<std::string> Option1 = {},
+                        DoNotUseOptionalOutput<std::string> Option2 = {});
 
     void CheckCreatedZoneItemName(EnergyPlusData &state,
                                   std::string_view calledFrom,              // routine called from
