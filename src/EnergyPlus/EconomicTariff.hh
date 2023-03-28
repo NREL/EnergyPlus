@@ -368,7 +368,7 @@ namespace EconomicTariff {
         int kindElectricMtr;                           // kind of electric meter - see enumerated list above, 0 is not electric
         int kindWaterMtr;                              // kind of water meter - 0 (default) is not water, 1 is water
         int kindGasMtr;                                // kind of gas meter - 0 (default) is not gas, 1 is gas
-        DataGlobalConstants::ResourceType resourceNum; // based on list of DataGlobalConstants
+        DataGlobalConstants::eResource resourceNum; // based on list of DataGlobalConstants
         EconConv convChoice;                           // enumerated choice index of the conversion factor
         Real64 energyConv;                             // energy conversion factor
         Real64 demandConv;                             // demand conversion factor
@@ -471,7 +471,7 @@ namespace EconomicTariff {
 
         // Default Constructor
         TariffType()
-            : reportMeterIndx(0), kindElectricMtr(0), kindWaterMtr(0), kindGasMtr(0), resourceNum(DataGlobalConstants::ResourceType::None),
+            : reportMeterIndx(0), kindElectricMtr(0), kindWaterMtr(0), kindGasMtr(0), resourceNum(DataGlobalConstants::eResource::Invalid),
               convChoice(EconConv::USERDEF), energyConv(0.0), demandConv(0.0), periodSchIndex(0), seasonSchIndex(0), monthSchIndex(0),
               demandWindow(DemandWindow::Invalid), demWinTime(0.0), monthChgVal(0.0), monthChgPt(0), minMonthChgVal(0.0), minMonthChgPt(0),
               chargeSchIndex(0), baseUseSchIndex(0), buyOrSell(0), firstCategory(0), lastCategory(0), ptEnergyCharges(0), ptDemandCharges(0),
@@ -735,7 +735,7 @@ namespace EconomicTariff {
 
     void selectTariff(EnergyPlusData &state);
 
-    void GetMonthlyCostForResource(EnergyPlusData &state, DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts);
+    void GetMonthlyCostForResource(EnergyPlusData &state, DataGlobalConstants::eResource const inResourceNumber, Array1A<Real64> outMonthlyCosts);
 
 } // namespace EconomicTariff
 

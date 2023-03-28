@@ -179,7 +179,7 @@ namespace DataZoneEquipment {
         // Members
         std::string ReportVarName;
         OutputProcessor::Unit ReportVarUnits;
-        DataGlobalConstants::ResourceType ResourceType;
+        DataGlobalConstants::eResource ResourceType;
         std::string EndUse;
         SystemReports::EndUseType EndUse_CompMode;
         std::string Group;
@@ -190,7 +190,7 @@ namespace DataZoneEquipment {
 
         // Default Constructor
         EquipMeterData()
-            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None),
+            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::eResource::Invalid),
               EndUse_CompMode(SystemReports::EndUseType::NoHeatNoCool), ReportVarIndex(0), ReportVarIndexType(OutputProcessor::TimeStepType::Zone),
               ReportVarType(OutputProcessor::VariableType::NotFound), CurMeterReading(0.0)
         {

@@ -54,11 +54,13 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -70,9 +72,9 @@ namespace BoilerSteam {
     struct BoilerSpecs : PlantComponent
     {
         // Members
-        std::string Name;                                                                     // user identifier
-        DataGlobalConstants::ResourceType FuelType = DataGlobalConstants::ResourceType::None; // resource type
-        bool Available = false;                                                               // TRUE if machine available in current time step
+        std::string Name;                                                                        // user identifier
+        DataGlobalConstants::eResource FuelType = DataGlobalConstants::eResource::Invalid; // resource type
+        bool Available = false;                                                                  // TRUE if machine available in current time step
         bool ON = false;                            // TRUE: simulate the machine at it's operating part load ratio
         bool MissingSetPointErrDone = false;        // Missing outlet node setpoint message flag
         bool UseLoopSetPoint = false;               // Flag to use setpoint from loop
@@ -109,8 +111,6 @@ namespace BoilerSteam {
         Real64 BoilerEnergy = 0.0;    // J - Boiler energy integrated over time
         Real64 FuelConsumed = 0.0;    // J - Boiler Fuel consumed integrated over time
         Real64 BoilerInletTemp = 0.0; // C - Boiler inlet temperature
-
-        std::string BoilerFuelTypeForOutputVariable = "";
 
         void initialize(EnergyPlusData &state);
 

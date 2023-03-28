@@ -426,13 +426,13 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-    std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
+    std::map<int, DataGlobalConstants::eResource> ResourceTypes;  // ResourceTypes for each variable
     Array1D_string EndUses(NumVariables);                            // EndUses for each variable
     Array1D_string Groups(NumVariables);                             // Groups for each variable
     Array1D_string Names(NumVariables);                              // Variable Names for each variable
 
     for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+        ResourceTypes.insert(std::pair<int, DataGlobalConstants::eResource>(varN, DataGlobalConstants::eResource::Invalid));
     }
 
     GetMeteredVariables(
@@ -443,29 +443,29 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     // Check the meters associated with the ZoneHVAC:HybridUnitaryHVAC outputs
     EXPECT_EQ(14, NumFound);
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer)); // ENERGYTRANSFER - Cooling
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(1), DataGlobalConstants::eResource::EnergyTransfer)); // ENERGYTRANSFER - Cooling
     EXPECT_EQ(EndUses(1), "COOLINGCOILS");
     EXPECT_EQ(Groups(1), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(2), DataGlobalConstants::ResourceType::EnergyTransfer)); // ENERGYTRANSFER - Heating
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(2), DataGlobalConstants::eResource::EnergyTransfer)); // ENERGYTRANSFER - Heating
     EXPECT_EQ(EndUses(2), "HEATINGCOILS");
     EXPECT_EQ(Groups(2), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(3), DataGlobalConstants::ResourceType::Electricity)); // ELECTRIC - Cooling Energy
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(3), DataGlobalConstants::eResource::Electricity)); // ELECTRIC - Cooling Energy
     EXPECT_EQ(EndUses(3), "COOLING");
     EXPECT_EQ(Groups(3), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(4), DataGlobalConstants::ResourceType::Electricity)); // ELECTRIC - Fan Energy
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(4), DataGlobalConstants::eResource::Electricity)); // ELECTRIC - Fan Energy
     EXPECT_EQ(EndUses(4), "FANS");
     EXPECT_EQ(Groups(4), "HVAC");
     EXPECT_TRUE(compare_enums(
         ResourceTypes.at(5),
-        DataGlobalConstants::ResourceType::Natural_Gas)); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
+        DataGlobalConstants::eResource::NaturalGas)); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
     EXPECT_EQ(EndUses(5), "COOLING");
     EXPECT_EQ(Groups(5), "HVAC");
     EXPECT_TRUE(compare_enums(
         ResourceTypes.at(6),
-        DataGlobalConstants::ResourceType::DistrictCooling)); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
+        DataGlobalConstants::eResource::DistrictCooling)); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
     EXPECT_EQ(EndUses(6), "COOLING");
     EXPECT_EQ(Groups(6), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(7), DataGlobalConstants::ResourceType::Water)); // WATER - Cooling Water Use
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(7), DataGlobalConstants::eResource::Water)); // WATER - Cooling Water Use
     EXPECT_EQ(EndUses(7), "COOLING");
     EXPECT_EQ(Groups(7), "HVAC");
 

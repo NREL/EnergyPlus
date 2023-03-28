@@ -2323,16 +2323,15 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfSys.FuelType = "Electricity";
         if (!lAlphaFieldBlanks(39)) {
             // A39; \field Fuel type, Validate fuel type input
-            bool FuelTypeError(false);
-            UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(cAlphaArgs(39), thisVrfSys.FuelType, thisVrfSys.FuelTypeNum, FuelTypeError);
-            if (FuelTypeError) {
+            thisVrfSys.FuelTypeNum = static_cast<DataGlobalConstants::eResource>(
+                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(39))));
+            if (thisVrfSys.FuelTypeNum == DataGlobalConstants::eResource::Invalid) {
                 ShowSevereError(
                     state,
                     format("{} = \"{}\", {} = \"{}\" was not found.", cCurrentModuleObject, thisVrfSys.Name, cAlphaFieldNames(39), cAlphaArgs(39)));
                 ShowContinueError(
                     state, "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
-                FuelTypeError = false;
             }
         }
 
@@ -2470,7 +2469,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfFluidCtrl.VRFSystemTypeNum = VRF_HeatPump;
         thisVrfFluidCtrl.VRFAlgorithmType = AlgorithmType::FluidTCtrl;
         thisVrfFluidCtrl.FuelType = "Electricity";
-        thisVrfFluidCtrl.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
+        thisVrfFluidCtrl.FuelTypeNum = DataGlobalConstants::eResource::Electricity;
 
         if (lAlphaFieldBlanks(2)) {
             thisVrfFluidCtrl.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -2872,7 +2871,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfFluidCtrlHR.VRFSystemTypeNum = VRF_HeatPump;
         thisVrfFluidCtrlHR.VRFAlgorithmType = AlgorithmType::FluidTCtrl;
         thisVrfFluidCtrlHR.FuelType = "Electricity";
-        thisVrfFluidCtrlHR.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
+        thisVrfFluidCtrlHR.FuelTypeNum = DataGlobalConstants::eResource::Electricity;
 
         if (lAlphaFieldBlanks(2)) {
             thisVrfFluidCtrlHR.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -4864,6 +4863,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     for (int NumCond = 1; NumCond <= state.dataHVACVarRefFlow->NumVRFCond; ++NumCond) {
         auto &thisVrf = state.dataHVACVarRefFlow->VRF(NumCond);
+        std::string_view const sFuelType =
+            DataGlobalConstants::ResourceTypeNames[static_cast<int>(thisVrf.FuelTypeNum)];
         SetupOutputVariable(state,
                             "VRF Heat Pump Total Cooling Rate",
                             OutputProcessor::Unit::W,
@@ -4879,40 +4880,40 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
-                            "VRF Heat Pump Cooling " + thisVrf.FuelType + " Rate",
+                            format("VRF Heat Pump Cooling {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
                             thisVrf.ElecCoolingPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
-                            "VRF Heat Pump Cooling " + thisVrf.FuelType + " Energy",
+                            format("VRF Heat Pump Cooling {} Energy", sFuelType),
                             OutputProcessor::Unit::J,
                             thisVrf.CoolElecConsumption,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisVrf.Name,
                             _,
-                            thisVrf.FuelType,
+                            sFuelType,
                             "COOLING",
                             _,
                             "System");
         SetupOutputVariable(state,
-                            "VRF Heat Pump Heating " + thisVrf.FuelType + " Rate",
+                            format("VRF Heat Pump Heating {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
                             thisVrf.ElecHeatingPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
-                            "VRF Heat Pump Heating " + thisVrf.FuelType + " Energy",
+                            format("VRF Heat Pump Heating {} Energy", sFuelType),
                             OutputProcessor::Unit::J,
                             thisVrf.HeatElecConsumption,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisVrf.Name,
                             _,
-                            thisVrf.FuelType,
+                            sFuelType,
                             "HEATING",
                             _,
                             "System");
@@ -5053,7 +5054,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         if (thisVrf.DefrostStrategy == StandardRatings::DefrostStrat::Resistive ||
             (thisVrf.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
-             thisVrf.FuelTypeNum == DataGlobalConstants::ResourceType::Electricity)) {
+             thisVrf.FuelTypeNum == DataGlobalConstants::eResource::Electricity)) {
             SetupOutputVariable(state,
                                 "VRF Heat Pump Defrost Electricity Rate",
                                 OutputProcessor::Unit::W,
@@ -5075,21 +5076,21 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 "System");
         } else { // defrost energy applied to fuel type
             SetupOutputVariable(state,
-                                "VRF Heat Pump Defrost " + thisVrf.FuelType + " Rate",
+                                format("VRF Heat Pump Defrost {} Rate", sFuelType),
                                 OutputProcessor::Unit::W,
                                 thisVrf.DefrostPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
-                                "VRF Heat Pump Defrost " + thisVrf.FuelType + " Energy",
+                                format("VRF Heat Pump Defrost {} Energy", sFuelType),
                                 OutputProcessor::Unit::J,
                                 thisVrf.DefrostConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
                                 _,
-                                thisVrf.FuelType,
+                                sFuelType,
                                 "HEATING",
                                 _,
                                 "System");
