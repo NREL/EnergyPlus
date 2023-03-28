@@ -9450,10 +9450,8 @@ namespace Furnaces {
         auto &thisFurnace = state.dataFurnaces->Furnace(FurnaceNum);
         auto &inletNode = state.dataLoopNodes->Node(thisFurnace.FurnaceInletNodeNum);
         int CoolingCoilType_Num = thisFurnace.CoolingCoilType_Num;
-        int HeatingCoilType_Num = thisFurnace.HeatingCoilType_Num;
-        Real64 QActual = 0.0;                                     // heating coil load met or delivered
-        Real64 WSHPRuntimeFrac = thisFurnace.WSHPRuntimeFrac;     // Compressor runtime fraction
-        Real64 CompPartLoadRatio = thisFurnace.CompPartLoadRatio; // Compressor part load ratio
+        Real64 QActual = 0.0;                                 // heating coil load met or delivered
+        Real64 WSHPRuntimeFrac = thisFurnace.WSHPRuntimeFrac; // Compressor runtime fraction
         state.dataFurnaces->ModifiedHeatCoilLoad = 0.0;
         state.dataFurnaces->CoolHeatPLRRat = CoolingHeatingPLRRat; // Optional parameter defaults to 1.0
 
