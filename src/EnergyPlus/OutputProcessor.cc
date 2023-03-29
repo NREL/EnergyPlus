@@ -7670,7 +7670,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
 
     //  See if Report Variables should be turned on
     SortByName = false;
-    ScanForReports(state, "VariableDictionary", DoReport, _, VarOption1, VarOption2);
+    ScanForReports(state, "VariableDictionary", DoReport, {}, VarOption1, VarOption2);
     //  IF (.not. DoReport) RETURN
 
     if (DoReport) {

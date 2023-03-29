@@ -485,7 +485,7 @@ namespace HeatBalanceIntRadExchange {
 
         auto &ViewFactorReport = state.dataHeatBalIntRadExchg->ViewFactorReport;
 
-        ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
+        ScanForReports(state, "ViewFactorInfo", ViewFactorReport, {}, Option1);
 
         if (ViewFactorReport) { // Print heading
             print(state.files.eio, "{}\n", "! <Surface View Factor and Grey Interchange Information>");
@@ -805,7 +805,7 @@ namespace HeatBalanceIntRadExchange {
 
         bool ErrorsFound = false;
         bool ViewFactorReport = false;
-        General::ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
+        General::ScanForReports(state, "ViewFactorInfo", ViewFactorReport, {}, Option1);
 
         if (ViewFactorReport) { // Print heading
             print(state.files.eio, "{}\n", "! <Solar View Factor Information>");

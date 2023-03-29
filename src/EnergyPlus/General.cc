@@ -1082,9 +1082,9 @@ void ParseTime(Real64 const Time, // Time value in seconds
 void ScanForReports(EnergyPlusData &state,
                     std::string const &reportName,
                     bool &DoReport,
-                    ObjexxFCL::Optional_string_const ReportKey,
-                    OptionalOutput<std::string> Option1,
-                    OptionalOutput<std::string> Option2)
+                    std::string_view const ReportKey,
+                    DoNotUseOptionalOutput<std::string> Option1,
+                    DoNotUseOptionalOutput<std::string> Option2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1341,9 +1341,9 @@ void ScanForReports(EnergyPlusData &state,
         static_cast<ReportName>(getEnumerationValue(ReportNamesUC, UtilityRoutines::MakeUPPERCase(UtilityRoutines::MakeUPPERCase(reportName))));
     switch (rptName) {
     case ReportName::Constructions: {
-        if (present(ReportKey)) {
-            if (UtilityRoutines::SameString(ReportKey(), "Constructions")) DoReport = state.dataGeneral->Constructions;
-            if (UtilityRoutines::SameString(ReportKey(), "Materials")) DoReport = state.dataGeneral->Materials;
+        if (!ReportKey.empty()) {
+            if (UtilityRoutines::SameString(ReportKey, "Constructions")) DoReport = state.dataGeneral->Constructions;
+            if (UtilityRoutines::SameString(ReportKey, "Materials")) DoReport = state.dataGeneral->Materials;
         }
     } break;
     case ReportName::Viewfactorinfo: {
@@ -1359,7 +1359,7 @@ void ScanForReports(EnergyPlusData &state,
         //      IF (PRESENT(Option1)) Option1=SchRptOption
     } break;
     case ReportName::Surfaces: {
-        RptKey rptKey = static_cast<RptKey>(getEnumerationValue(RptKeyNamesUC, UtilityRoutines::MakeUPPERCase(ReportKey())));
+        RptKey rptKey = static_cast<RptKey>(getEnumerationValue(RptKeyNamesUC, UtilityRoutines::MakeUPPERCase(ReportKey)));
         switch (rptKey) { // Autodesk:OPTIONAL ReportKey used without PRESENT check
         case RptKey::Costinfo: {
             DoReport = state.dataGeneral->CostInfo;
