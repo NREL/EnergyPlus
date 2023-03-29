@@ -191,9 +191,7 @@ namespace DataPlant {
 
         void UpdateAnyLoopDemandAlterations(EnergyPlusData &state, int BranchNum, int CompNum);
 
-        void SimulateAllLoopSidePumps(EnergyPlusData &state,
-                                      ObjexxFCL::Optional<PlantLocation const> SpecificPumpLocation = _,
-                                      ObjexxFCL::Optional<Real64 const> SpecificPumpFlowRate = _);
+        void SimulateAllLoopSidePumps(EnergyPlusData &state);
 
         void AdjustPumpFlowRequestByEMSControls(int BranchNum, int CompNum, Real64 &FlowToRequest);
 

@@ -2870,9 +2870,9 @@ int GetFanAvailSchPtr(EnergyPlusData &state,
 }
 
 int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
-                               std::string &FanType,           // must match fan types in this module (set if nonzero index passed)
-                               std::string &FanName,           // must match fan names for the fan type (set if nonzero index passed)
-                               ObjexxFCL::Optional_int IndexIn // optional fan index if fan type and name are unknown or index needs setting
+                               std::string &FanType, // must match fan types in this module (set if nonzero index passed)
+                               std::string &FanName, // must match fan names for the fan type (set if nonzero index passed)
+                               int &IndexIn          // optional fan index if fan type and name are unknown or index needs setting
 )
 {
 
@@ -2901,19 +2901,15 @@ int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
         state.dataFans->GetFanInputFlag = false;
     }
 
-    if (present(IndexIn)) {
-        if (IndexIn > 0) {
-            WhichFan = IndexIn;
-            FanType = Fan(WhichFan).FanType;
-            FanName = Fan(WhichFan).FanName;
-        } else {
-            WhichFan = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
-            IndexIn = WhichFan;
-        }
+    if (IndexIn > 0) {
+        WhichFan = IndexIn;
+        FanType = Fan(WhichFan).FanType;
+        FanName = Fan(WhichFan).FanName;
     } else {
         WhichFan = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
+        IndexIn = WhichFan;
     }
-
+ 
     if (WhichFan != 0) {
         FanSpeedRatioCurveIndex = Fan(WhichFan).FanPowerRatAtSpeedRatCurveIndex;
     } else {
