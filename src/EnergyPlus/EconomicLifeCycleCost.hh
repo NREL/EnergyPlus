@@ -356,11 +356,11 @@ namespace EconomicLifeCycleCost {
     struct UsePriceEscalationType
     {
         // Members
-        std::string name;                           // Name
+        std::string name;                        // Name
         DataGlobalConstants::eResource resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        int escalationStartYear;                    // Escalation Start Year 1900-2100
-        int escalationStartMonth;                   // Escalation Start Month 1 to 12
-        Array1D<Real64> Escalation;                 // Escalation by year, first year is baseDateYear
+        int escalationStartYear;                 // Escalation Start Year 1900-2100
+        int escalationStartMonth;                // Escalation Start Month 1 to 12
+        Array1D<Real64> Escalation;              // Escalation by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
@@ -372,9 +372,9 @@ namespace EconomicLifeCycleCost {
     struct UseAdjustmentType
     {
         // Members
-        std::string name;                           // Name
+        std::string name;                        // Name
         DataGlobalConstants::eResource resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        Array1D<Real64> Adjustment;                 // Adjustment by year, first year is baseDateYear
+        Array1D<Real64> Adjustment;              // Adjustment by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
@@ -386,11 +386,11 @@ namespace EconomicLifeCycleCost {
     struct CashFlowType
     {
         // Members
-        std::string name;                           // Name - just for labeling output - use Category for aggregation
-        SourceKindType SourceKind;                  // 1=recurring, 2=nonrecurring, 3=resource
+        std::string name;                        // Name - just for labeling output - use Category for aggregation
+        SourceKindType SourceKind;               // 1=recurring, 2=nonrecurring, 3=resource
         DataGlobalConstants::eResource Resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        CostCategory Category;                      // uses "costCat" constants above
-        Array1D<Real64> mnAmount;                   // cashflow dollar amount by month, first year is baseDateYear
+        CostCategory Category;                   // uses "costCat" constants above
+        Array1D<Real64> mnAmount;                // cashflow dollar amount by month, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
         Array1D<Real64> yrAmount;  // cashflow dollar amount by year, first year is baseDateYear
         PrValKind pvKind;          // kind of present value 1=energy, 2=non-energy,3=not computed but summed

@@ -78,15 +78,15 @@ namespace ICEngineElectricGenerator {
         std::string TypeOf; // Type of Generator
         GeneratorType CompType_Num;
         DataGlobalConstants::eResource FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
-        Real64 RatedPowerOutput;                    // W - design nominal capacity of Generator
-        int ElectricCircuitNode;                    // Electric Circuit Node
-        Real64 MinPartLoadRat;                      // (IC ENGINE MIN) min allowed operating frac full load
-        Real64 MaxPartLoadRat;                      // (IC ENGINE MAX) max allowed operating frac full load
-        Real64 OptPartLoadRat;                      // (IC ENGINE BEST) optimal operating frac full load
-        Real64 ElecOutputFuelRat;                   // (RELDC) Ratio of Generator output to Fuel Energy Input
-        int ElecOutputFuelCurve;                    // Curve Index for generator output to Fuel Energy Input Coeff Poly Fit
-        Real64 RecJacHeattoFuelRat;                 // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
-        int RecJacHeattoFuelCurve;                  // Curve Index for Ratio of Recoverable Jacket Heat to
+        Real64 RatedPowerOutput;                 // W - design nominal capacity of Generator
+        int ElectricCircuitNode;                 // Electric Circuit Node
+        Real64 MinPartLoadRat;                   // (IC ENGINE MIN) min allowed operating frac full load
+        Real64 MaxPartLoadRat;                   // (IC ENGINE MAX) max allowed operating frac full load
+        Real64 OptPartLoadRat;                   // (IC ENGINE BEST) optimal operating frac full load
+        Real64 ElecOutputFuelRat;                // (RELDC) Ratio of Generator output to Fuel Energy Input
+        int ElecOutputFuelCurve;                 // Curve Index for generator output to Fuel Energy Input Coeff Poly Fit
+        Real64 RecJacHeattoFuelRat;              // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
+        int RecJacHeattoFuelCurve;               // Curve Index for Ratio of Recoverable Jacket Heat to
         // Fuel Energy Input Coeff Poly Fit
         Real64 RecLubeHeattoFuelRat; // (RLUBDC) Ratio of Recoverable Lube Oil Heat to Fuel Energy Input
         int RecLubeHeattoFuelCurve;  // Curve Index for Ratio of Recoverable Lube Oil Heat to

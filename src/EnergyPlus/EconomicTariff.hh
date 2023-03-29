@@ -362,26 +362,26 @@ namespace EconomicTariff {
     struct TariffType
     {
         // Members
-        std::string tariffName;                        // name of the tariff
-        std::string reportMeter;                       // name of the report meter
-        int reportMeterIndx;                           // index of the report meter
-        int kindElectricMtr;                           // kind of electric meter - see enumerated list above, 0 is not electric
-        int kindWaterMtr;                              // kind of water meter - 0 (default) is not water, 1 is water
-        int kindGasMtr;                                // kind of gas meter - 0 (default) is not gas, 1 is gas
+        std::string tariffName;                     // name of the tariff
+        std::string reportMeter;                    // name of the report meter
+        int reportMeterIndx;                        // index of the report meter
+        int kindElectricMtr;                        // kind of electric meter - see enumerated list above, 0 is not electric
+        int kindWaterMtr;                           // kind of water meter - 0 (default) is not water, 1 is water
+        int kindGasMtr;                             // kind of gas meter - 0 (default) is not gas, 1 is gas
         DataGlobalConstants::eResource resourceNum; // based on list of DataGlobalConstants
-        EconConv convChoice;                           // enumerated choice index of the conversion factor
-        Real64 energyConv;                             // energy conversion factor
-        Real64 demandConv;                             // demand conversion factor
-        std::string periodSchedule;                    // name of the period schedule (time of day)
-        int periodSchIndex;                            // index to the period schedule
-        std::string seasonSchedule;                    // name of the season schedule (winter/summer)
-        int seasonSchIndex;                            // index to the season schedule
-        std::string monthSchedule;                     // name of month schedule (when months end)
-        int monthSchIndex;                             // index to the month schedule
-        DemandWindow demandWindow;                     // enumerated list of the kind of demand window
-        Real64 demWinTime;                             // length of time for the demand window
-        Real64 monthChgVal;                            // monthly charge value
-        int monthChgPt;                                // pointer to a variable that contains the monthly charge
+        EconConv convChoice;                        // enumerated choice index of the conversion factor
+        Real64 energyConv;                          // energy conversion factor
+        Real64 demandConv;                          // demand conversion factor
+        std::string periodSchedule;                 // name of the period schedule (time of day)
+        int periodSchIndex;                         // index to the period schedule
+        std::string seasonSchedule;                 // name of the season schedule (winter/summer)
+        int seasonSchIndex;                         // index to the season schedule
+        std::string monthSchedule;                  // name of month schedule (when months end)
+        int monthSchIndex;                          // index to the month schedule
+        DemandWindow demandWindow;                  // enumerated list of the kind of demand window
+        Real64 demWinTime;                          // length of time for the demand window
+        Real64 monthChgVal;                         // monthly charge value
+        int monthChgPt;                             // pointer to a variable that contains the monthly charge
         // if 0 then use monthChgVal
         Real64 minMonthChgVal; // minimum monthly charge value
         int minMonthChgPt;     // pointer to a variable that contains the minimum monthly charge

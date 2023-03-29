@@ -1943,7 +1943,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
             // A6 Fuel Type
             std::string tempRsrStr = UtilityRoutines::MakeUPPERCase(fields.at("fuel_type").get<std::string>());
-            thisPLHP.fuelType = static_cast<DataGlobalConstants::eResource>(getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, tempRsrStr));
+            thisPLHP.fuelType =
+                static_cast<DataGlobalConstants::eResource>(getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, tempRsrStr));
             // Validate fuel type input
             static constexpr std::string_view RoutineName("processInputForEIRPLHP: ");
             if (thisPLHP.fuelType == DataGlobalConstants::eResource::Invalid) {

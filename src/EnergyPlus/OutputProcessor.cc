@@ -6864,17 +6864,17 @@ int GetNumMeteredVariables(EnergyPlusData &state,
 }
 
 void GetMeteredVariables(EnergyPlusData &state,
-                         std::string const &ComponentType,                                // Given Component Type
-                         std::string const &ComponentName,                                // Given Component Name (user defined)
-                         Array1D_int &VarIndexes,                                         // Variable Numbers
-                         Array1D<OutputProcessor::VariableType> &VarTypes,                // Variable Types (1=integer, 2=real, 3=meter)
-                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,           // Variable Index Types (1=Zone,2=HVAC)
-                         Array1D<OutputProcessor::Unit> &unitsForVar,                     // units from enum for each variable
+                         std::string const &ComponentType,                             // Given Component Type
+                         std::string const &ComponentName,                             // Given Component Name (user defined)
+                         Array1D_int &VarIndexes,                                      // Variable Numbers
+                         Array1D<OutputProcessor::VariableType> &VarTypes,             // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,        // Variable Index Types (1=Zone,2=HVAC)
+                         Array1D<OutputProcessor::Unit> &unitsForVar,                  // units from enum for each variable
                          std::map<int, DataGlobalConstants::eResource> &ResourceTypes, // ResourceTypes for each variable
-                         Array1D_string &EndUses,                                         // EndUses for each variable
-                         Array1D_string &Groups,                                          // Groups for each variable
-                         Array1D_string &Names,                                           // Variable Names for each variable
-                         int &NumFound                                                    // Number Found
+                         Array1D_string &EndUses,                                      // EndUses for each variable
+                         Array1D_string &Groups,                                       // Groups for each variable
+                         Array1D_string &Names,                                        // Variable Names for each variable
+                         int &NumFound                                                 // Number Found
 )
 {
 
@@ -6948,17 +6948,17 @@ void GetMeteredVariables(EnergyPlusData &state,
 }
 
 void GetMeteredVariables(EnergyPlusData &state,
-                         std::string const &ComponentType,                                // Given Component Type
-                         std::string const &ComponentName,                                // Given Component Name (user defined)
-                         Array1D_int &VarIndexes,                                         // Variable Numbers
-                         Array1D<OutputProcessor::VariableType> &VarTypes,                // Variable Types (1=integer, 2=real, 3=meter)
-                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,           // Variable Index Types (1=Zone,2=HVAC)
-                         Array1D<OutputProcessor::Unit> &unitsForVar,                     // units from enum for each variable
+                         std::string const &ComponentType,                             // Given Component Type
+                         std::string const &ComponentName,                             // Given Component Name (user defined)
+                         Array1D_int &VarIndexes,                                      // Variable Numbers
+                         Array1D<OutputProcessor::VariableType> &VarTypes,             // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,        // Variable Index Types (1=Zone,2=HVAC)
+                         Array1D<OutputProcessor::Unit> &unitsForVar,                  // units from enum for each variable
                          std::map<int, DataGlobalConstants::eResource> &ResourceTypes, // ResourceTypes for each variable
-                         Array1D_string &EndUses,                                         // EndUses for each variable
-                         Array1D_string &Groups,                                          // Groups for each variable
-                         Array1D_string &Names,                                           // Variable Names for each variable
-                         Array1D_int &VarIDs                                              // Variable Report Numbers
+                         Array1D_string &EndUses,                                      // EndUses for each variable
+                         Array1D_string &Groups,                                       // Groups for each variable
+                         Array1D_string &Names,                                        // Variable Names for each variable
+                         Array1D_int &VarIDs                                           // Variable Report Numbers
 )
 {
 

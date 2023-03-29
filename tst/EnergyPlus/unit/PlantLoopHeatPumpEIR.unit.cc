@@ -2970,7 +2970,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-    std::map<int, DataGlobalConstants::eResource> ResourceTypes;  // ResourceTypes for each variable
+    std::map<int, DataGlobalConstants::eResource> ResourceTypes;     // ResourceTypes for each variable
     Array1D_string EndUses(NumVariables);                            // EndUses for each variable
     Array1D_string Groups(NumVariables);                             // Groups for each variable
     Array1D_string Names(NumVariables);                              // Variable Names for each variable
@@ -3071,7 +3071,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-    std::map<int, DataGlobalConstants::eResource> ResourceTypes;  // ResourceTypes for each variable
+    std::map<int, DataGlobalConstants::eResource> ResourceTypes;     // ResourceTypes for each variable
     Array1D_string EndUses(NumVariables);                            // EndUses for each variable
     Array1D_string Groups(NumVariables);                             // Groups for each variable
     Array1D_string Names(NumVariables);                              // Variable Names for each variable

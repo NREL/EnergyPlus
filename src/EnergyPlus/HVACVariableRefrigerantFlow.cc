@@ -4860,8 +4860,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     for (int NumCond = 1; NumCond <= state.dataHVACVarRefFlow->NumVRFCond; ++NumCond) {
         auto &thisVrf = state.dataHVACVarRefFlow->VRF(NumCond);
-        std::string_view const sFuelType =
-            DataGlobalConstants::ResourceTypeNames[static_cast<int>(thisVrf.FuelTypeNum)];
+        std::string_view const sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(thisVrf.FuelTypeNum)];
         SetupOutputVariable(state,
                             "VRF Heat Pump Total Cooling Rate",
                             OutputProcessor::Unit::W,

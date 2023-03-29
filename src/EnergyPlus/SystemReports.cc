@@ -2204,16 +2204,16 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     bool IsParent;
 
     // Dimension GetMeteredVariables arrays
-    Array1D_int VarIndexes;                                         // Variable Numbers
-    Array1D<OutputProcessor::VariableType> VarTypes;                // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D_string UnitsStrings;                                    // UnitsStrings for each variable
-    Array1D<OutputProcessor::TimeStepType> IndexTypes;              // Variable Idx Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar;                     // units from enum for each variable
+    Array1D_int VarIndexes;                                      // Variable Numbers
+    Array1D<OutputProcessor::VariableType> VarTypes;             // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D_string UnitsStrings;                                 // UnitsStrings for each variable
+    Array1D<OutputProcessor::TimeStepType> IndexTypes;           // Variable Idx Types (1=Zone,2=HVAC)
+    Array1D<OutputProcessor::Unit> unitsForVar;                  // units from enum for each variable
     std::map<int, DataGlobalConstants::eResource> ResourceTypes; // ResourceTypes for each variable
-    Array1D_string EndUses;                                         // EndUses for each variable
-    Array1D_string Groups;                                          // Groups for each variable
-    Array1D_string Names;                                           // Variable Names for each variable
-    int NumFound;                                                   // Number Found
+    Array1D_string EndUses;                                      // EndUses for each variable
+    Array1D_string Groups;                                       // Groups for each variable
+    Array1D_string Names;                                        // Variable Names for each variable
+    int NumFound;                                                // Number Found
     int NumVariables;
     int NumLeft; // Counter for deeper components
 
@@ -2439,8 +2439,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             unitsForVar.allocate(NumVariables);
                             ResourceTypes.clear();
                             for (int idx = 1; idx <= NumVariables; ++idx) {
-                                ResourceTypes.insert(
-                                    std::pair<int, DataGlobalConstants::eResource>(idx, DataGlobalConstants::eResource::Invalid));
+                                ResourceTypes.insert(std::pair<int, DataGlobalConstants::eResource>(idx, DataGlobalConstants::eResource::Invalid));
                             }
                             EndUses.allocate(NumVariables);
                             Groups.allocate(NumVariables);
@@ -2862,8 +2861,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             unitsForVar.allocate(NumVariables);
                             ResourceTypes.clear();
                             for (int idx = 1; idx <= NumVariables; ++idx) {
-                                ResourceTypes.insert(
-                                    std::pair<int, DataGlobalConstants::eResource>(idx, DataGlobalConstants::eResource::Invalid));
+                                ResourceTypes.insert(std::pair<int, DataGlobalConstants::eResource>(idx, DataGlobalConstants::eResource::Invalid));
                             }
                             EndUses.allocate(NumVariables);
                             Groups.allocate(NumVariables);
@@ -3101,8 +3099,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             unitsForVar.allocate(NumVariables);
                             ResourceTypes.clear();
                             for (int idx = 1; idx <= NumVariables; ++idx) {
-                                ResourceTypes.insert(
-                                    std::pair<int, DataGlobalConstants::eResource>(idx, DataGlobalConstants::eResource::Invalid));
+                                ResourceTypes.insert(std::pair<int, DataGlobalConstants::eResource>(idx, DataGlobalConstants::eResource::Invalid));
                             }
                             EndUses.allocate(NumVariables);
                             Groups.allocate(NumVariables);

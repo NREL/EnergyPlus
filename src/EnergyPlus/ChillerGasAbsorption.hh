@@ -77,38 +77,38 @@ namespace ChillerGasAbsorption {
         bool InCoolingMode = false;
         bool InHeatingMode = false;
         // Part of Type that directly corresponds with IDD definition
-        std::string Name;                           // user identifier
-        DataGlobalConstants::eResource FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
-        Real64 NomCoolingCap = 0.0;                 // W - design nominal capacity of Absorber
-        bool NomCoolingCapWasAutoSized = false;     // true if nominal capacity was autosize on input
-        Real64 NomHeatCoolRatio = 0.0;              // ratio of heating to cooling capacity
-        Real64 FuelCoolRatio = 0.0;                 // ratio of fuel input to cooling output
-        Real64 FuelHeatRatio = 0.0;                 // ratio of fuel input to heating output
-        Real64 ElecCoolRatio = 0.0;                 // ratio of electricity input to cooling output
-        Real64 ElecHeatRatio = 0.0;                 // ratio of electricity input to heating output
-        int ChillReturnNodeNum = 0;                 // Node number on the inlet side of the plant
-        int ChillSupplyNodeNum = 0;                 // Node number on the outlet side of the plant
-        bool ChillSetPointErrDone = false;          // flag to report missing setpoint on CW outlet
-        bool ChillSetPointSetToLoop = false;        // flag to use overall loop setpoint
-        int CondReturnNodeNum = 0;                  // Node number on the inlet side of the condenser
-        int CondSupplyNodeNum = 0;                  // Node number on the outlet side of the condenser
-        int HeatReturnNodeNum = 0;                  // absorber steam inlet node number, water side
-        int HeatSupplyNodeNum = 0;                  // absorber steam outlet node number, water side
-        bool HeatSetPointErrDone = false;           // flag to report missing setpoint on HW outlet
-        bool HeatSetPointSetToLoop = false;         // flag to use overall loop setpoint
-        Real64 MinPartLoadRat = 0.0;                // min allowed operating frac full load
-        Real64 MaxPartLoadRat = 0.0;                // max allowed operating frac full load
-        Real64 OptPartLoadRat = 0.0;                // optimal operating frac full load
-        Real64 TempDesCondReturn = 0.0;             // design secondary loop fluid temperature at the Absorber condenser side inlet
-        Real64 TempDesCHWSupply = 0.0;              // design chilled water supply temperature
-        Real64 EvapVolFlowRate = 0.0;               // m**3/s - design nominal water volumetric flow rate through the evaporator
-        bool EvapVolFlowRateWasAutoSized = false;   // true if evaporator flow rate was autosize on input
-        Real64 CondVolFlowRate = 0.0;               // m**3/s - design nominal water volumetric flow rate through the condenser
-        bool CondVolFlowRateWasAutoSized = false;   // true if condenser flow rate was autosize on input
-        Real64 HeatVolFlowRate = 0.0;               // m**3/s - design nominal water volumetric flow rate through the heater side
-        bool HeatVolFlowRateWasAutoSized = false;   // true if hot water flow rate was autosize on input
-        Real64 SizFac = 0.0;                        // sizing factor
-        int CoolCapFTCurve = 0;                     // cooling capacity as a function of temperature curve (chilled water temp,
+        std::string Name;                         // user identifier
+        DataGlobalConstants::eResource FuelType;  // Type of Fuel - DIESEL, GASOLINE, GAS
+        Real64 NomCoolingCap = 0.0;               // W - design nominal capacity of Absorber
+        bool NomCoolingCapWasAutoSized = false;   // true if nominal capacity was autosize on input
+        Real64 NomHeatCoolRatio = 0.0;            // ratio of heating to cooling capacity
+        Real64 FuelCoolRatio = 0.0;               // ratio of fuel input to cooling output
+        Real64 FuelHeatRatio = 0.0;               // ratio of fuel input to heating output
+        Real64 ElecCoolRatio = 0.0;               // ratio of electricity input to cooling output
+        Real64 ElecHeatRatio = 0.0;               // ratio of electricity input to heating output
+        int ChillReturnNodeNum = 0;               // Node number on the inlet side of the plant
+        int ChillSupplyNodeNum = 0;               // Node number on the outlet side of the plant
+        bool ChillSetPointErrDone = false;        // flag to report missing setpoint on CW outlet
+        bool ChillSetPointSetToLoop = false;      // flag to use overall loop setpoint
+        int CondReturnNodeNum = 0;                // Node number on the inlet side of the condenser
+        int CondSupplyNodeNum = 0;                // Node number on the outlet side of the condenser
+        int HeatReturnNodeNum = 0;                // absorber steam inlet node number, water side
+        int HeatSupplyNodeNum = 0;                // absorber steam outlet node number, water side
+        bool HeatSetPointErrDone = false;         // flag to report missing setpoint on HW outlet
+        bool HeatSetPointSetToLoop = false;       // flag to use overall loop setpoint
+        Real64 MinPartLoadRat = 0.0;              // min allowed operating frac full load
+        Real64 MaxPartLoadRat = 0.0;              // max allowed operating frac full load
+        Real64 OptPartLoadRat = 0.0;              // optimal operating frac full load
+        Real64 TempDesCondReturn = 0.0;           // design secondary loop fluid temperature at the Absorber condenser side inlet
+        Real64 TempDesCHWSupply = 0.0;            // design chilled water supply temperature
+        Real64 EvapVolFlowRate = 0.0;             // m**3/s - design nominal water volumetric flow rate through the evaporator
+        bool EvapVolFlowRateWasAutoSized = false; // true if evaporator flow rate was autosize on input
+        Real64 CondVolFlowRate = 0.0;             // m**3/s - design nominal water volumetric flow rate through the condenser
+        bool CondVolFlowRateWasAutoSized = false; // true if condenser flow rate was autosize on input
+        Real64 HeatVolFlowRate = 0.0;             // m**3/s - design nominal water volumetric flow rate through the heater side
+        bool HeatVolFlowRateWasAutoSized = false; // true if hot water flow rate was autosize on input
+        Real64 SizFac = 0.0;                      // sizing factor
+        int CoolCapFTCurve = 0;                   // cooling capacity as a function of temperature curve (chilled water temp,
         // condenser water temp)
         int FuelCoolFTCurve = 0; // Fuel-Input-to cooling output Ratio Function of Temperature Curve (chilled
         // water temp, condenser water temp)
