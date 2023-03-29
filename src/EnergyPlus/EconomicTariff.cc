@@ -3972,13 +3972,13 @@ void LEEDtariffReporting(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchLeedEtsDemUnt, "Electricity", format("{}", convDemStrings(elecUnits)));
         OutputReportPredefined::PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchLeedEtsDemUnt,
-                         "Natural Gas",
-                         format("{}{}", convDemStrings(gasUnits), demWindowStrings(gasDemWindowUnits)));
+                                                 state.dataOutRptPredefined->pdchLeedEtsDemUnt,
+                                                 "Natural Gas",
+                                                 format("{}{}", convDemStrings(gasUnits), demWindowStrings(gasDemWindowUnits)));
         OutputReportPredefined::PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchLeedEtsDemUnt,
-                         "Other",
-                         format("{}{}", convDemStrings(othrUnits), demWindowStrings(othrDemWindowUnits)));
+                                                 state.dataOutRptPredefined->pdchLeedEtsDemUnt,
+                                                 "Other",
+                                                 format("{}{}", convDemStrings(othrUnits), demWindowStrings(othrDemWindowUnits)));
         // total cost
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "Electricity", elecTotalCost, 2);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "Natural Gas", gasTotalCost, 2);
@@ -3990,9 +3990,9 @@ void LEEDtariffReporting(EnergyPlusData &state)
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Cooling", format("{}", convEneStrings(distCoolUnits)));
             OutputReportPredefined::PreDefTableEntry(state,
-                             state.dataOutRptPredefined->pdchLeedEtsDemUnt,
-                             "District Cooling",
-                             format("{}{}", convDemStrings(distCoolUnits), demWindowStrings(distCoolDemWindowUnits)));
+                                                     state.dataOutRptPredefined->pdchLeedEtsDemUnt,
+                                                     "District Cooling",
+                                                     format("{}{}", convDemStrings(distCoolUnits), demWindowStrings(distCoolDemWindowUnits)));
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Cooling", distCoolTotalCost, 2);
         }
         if (distHeatTotalEne != 0) {
@@ -4001,9 +4001,9 @@ void LEEDtariffReporting(EnergyPlusData &state)
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating", format("{}", convEneStrings(distHeatUnits)));
             OutputReportPredefined::PreDefTableEntry(state,
-                             state.dataOutRptPredefined->pdchLeedEtsDemUnt,
-                             "District Heating",
-                             format("{}{}", convDemStrings(distHeatUnits), demWindowStrings(distHeatDemWindowUnits)));
+                                                     state.dataOutRptPredefined->pdchLeedEtsDemUnt,
+                                                     "District Heating",
+                                                     format("{}{}", convDemStrings(distHeatUnits), demWindowStrings(distHeatDemWindowUnits)));
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating", distHeatTotalCost, 2);
         }
         // save the total costs for later to compute process fraction
@@ -4011,10 +4011,10 @@ void LEEDtariffReporting(EnergyPlusData &state)
         state.dataOutRptPredefined->LEEDgasCostTotal = gasTotalCost;
         state.dataOutRptPredefined->LEEDothrCostTotal = distCoolTotalCost + distHeatTotalCost + otherTotalCost;
         OutputReportPredefined::PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchLeedEcsTotal,
-                         "Total",
-                         elecTotalCost + gasTotalCost + distCoolTotalCost + distHeatTotalCost + otherTotalCost,
-                         2);
+                                                 state.dataOutRptPredefined->pdchLeedEcsTotal,
+                                                 "Total",
+                                                 elecTotalCost + gasTotalCost + distCoolTotalCost + distHeatTotalCost + otherTotalCost,
+                                                 2);
     }
 }
 
