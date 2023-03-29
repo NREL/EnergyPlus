@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -183,6 +183,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataHVACGlobal->TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     state->dataGlobal->BeginTimeStepFlag = true;
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -307,6 +308,7 @@ TEST_F(EnergyPlusFixture, PVWattsInverter_Constructor)
     ASSERT_TRUE(eplc.inverterPresent);
     EXPECT_DOUBLE_EQ(eplc.inverterObj->pvWattsDCCapacity(), 4000.0);
     state->dataHVACGlobal->TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     eplc.inverterObj->simulate(*state, 884.018);
     EXPECT_NEAR(eplc.inverterObj->aCPowerOut(), 842.527, 0.001);
 }

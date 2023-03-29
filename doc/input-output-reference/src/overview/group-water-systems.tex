@@ -77,7 +77,7 @@ Reference to the schedule object specifying the flow rate fraction relative to t
 
 \paragraph{Field: Target Temperature Schedule Name}\label{field-target-temperature-schedule-name}
 
-Reference to the schedule object specifying the target water temperature {[}C{]}. Hot and cold water are mixed at the tap to attain the target temperature. If insufficient hot water is available to reach the target temperature, the result is cooler water at the tap. If blank, the target temperature defaults to the hot water supply temperature.
+Reference to the schedule object specifying the target water temperature {[}C{]}. Hot and cold water are mixed at the tap to attain the target temperature. If insufficient hot water is available to reach the target temperature, the result is cooler water at the tap. If this field is left blank, the target water temperature can take either the cold water temperature or the hot water temperature depending on a couple of other settings: if no water connection is used, and if the hot water schedule is not set, the target temperature will default to the cold water supply temperature; if there is water connection used for the water use equipment, or there is a hot water schedule present, the target water temperature will default to the hot water supply temperature.
 
 \paragraph{Field: Hot Water Supply Temperature Schedule Name}\label{field-hot-water-supply-temperature-schedule-name}
 

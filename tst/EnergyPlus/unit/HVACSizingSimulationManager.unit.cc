@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -97,7 +97,7 @@ protected:
         state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).ConcurrenceOption = Coincident;
         state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).NumTimeStepsInAvg = 1;
         state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).PlantLoopName = "Test Plant Loop 1";
-        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).LoopType = HeatingLoop;
+        state->dataSize->PlantSizData(state->dataSize->NumPltSizInput).LoopType = DataSizing::TypeOfPlantLoop::Heating;
 
         // set up a plant loop
         state->dataPlnt->TotNumLoops = 1;
@@ -177,6 +177,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     state->dataGlobal->TimeStepZone = 15.0 / 60.0;
     state->dataHVACGlobal->NumOfSysTimeSteps = 3;
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     // first HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -393,6 +394,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
     state->dataGlobal->TimeStepZone = 15.0 / 60.0;
     state->dataHVACGlobal->NumOfSysTimeSteps = 3;
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     // first HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -539,6 +541,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
     state->dataGlobal->TimeStepZone = 15.0 / 60.0;
     state->dataHVACGlobal->NumOfSysTimeSteps = 1;
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     // first HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -627,6 +630,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
     state->dataGlobal->TimeStepZone = 15.0 / 60.0;
     state->dataHVACGlobal->NumOfSysTimeSteps = 1;
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
     // first HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
@@ -641,6 +645,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
 
             state->dataHVACGlobal->NumOfSysTimeSteps = state->dataGlobal->TimeStep;
             state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
+            state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
             for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
                 state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute +=
@@ -670,6 +675,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
             state->dataHVACGlobal->NumOfSysTimeSteps = state->dataGlobal->TimeStep;
             state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
+            state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
             for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
                 state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute +=

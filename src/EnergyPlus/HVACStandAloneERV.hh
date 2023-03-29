@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -176,18 +176,6 @@ namespace HVACStandAloneERV {
                                 std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
                                 std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
                                 bool &ErrorsFound               // set to true if problem
-    );
-
-    int GetSupplyAirInletNode(EnergyPlusData &state,
-                              std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
-                              std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
-                              bool &ErrorsFound               // set to true if problem
-    );
-
-    int GetExhaustAirInletNode(EnergyPlusData &state,
-                               std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
-                               std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
-                               bool &ErrorsFound               // set to true if problem
     );
 
     int GetStandAloneERVOutAirNode(EnergyPlusData &state, int StandAloneERVNum);

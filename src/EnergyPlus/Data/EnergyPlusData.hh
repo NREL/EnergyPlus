@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -117,6 +117,7 @@ struct DemandManagerData;
 struct DesiccantDehumidifiersData;
 struct DisplacementVentMgrData;
 struct DualDuctData;
+struct EIRFuelFiredHeatPumpsData;
 struct EIRPlantLoopHeatPumpsData;
 struct EMSManagerData;
 struct EarthTubeData;
@@ -307,6 +308,7 @@ struct WindowComplexManagerData;
 struct WindowEquivLayerData;
 struct WindowEquivalentLayerData;
 struct WindowManagerData;
+struct WindowManagerExteriorData;
 struct ZoneAirLoopEquipmentManagerData;
 struct ZoneContaminantPredictorCorrectorData;
 struct ZoneDehumidifierData;
@@ -375,6 +377,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<DesiccantDehumidifiersData> dataDesiccantDehumidifiers;
     std::unique_ptr<DisplacementVentMgrData> dataDispVentMgr;
     std::unique_ptr<DualDuctData> dataDualDuct;
+    std::unique_ptr<EIRFuelFiredHeatPumpsData> dataEIRFuelFiredHeatPump;
     std::unique_ptr<EIRPlantLoopHeatPumpsData> dataEIRPlantLoopHeatPump;
     std::unique_ptr<EMSManagerData> dataEMSMgr;
     std::unique_ptr<EarthTubeData> dataEarthTube;
@@ -565,6 +568,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<WindowEquivLayerData> dataWindowEquivLayer;
     std::unique_ptr<WindowEquivalentLayerData> dataWindowEquivalentLayer;
     std::unique_ptr<WindowManagerData> dataWindowManager;
+    std::unique_ptr<WindowManagerExteriorData> dataWindowManagerExterior;
     std::unique_ptr<ZoneAirLoopEquipmentManagerData> dataZoneAirLoopEquipmentManager;
     std::unique_ptr<ZoneContaminantPredictorCorrectorData> dataZoneContaminantPredictorCorrector;
     std::unique_ptr<ZoneDehumidifierData> dataZoneDehumidifier;

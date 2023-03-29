@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -319,12 +319,12 @@ namespace FanCoilUnits {
     );
 
     void Calc4PipeFanCoil(EnergyPlusData &state,
-                          int FanCoilNum,              // Unit index in fan coil array
-                          int ControlledZoneNum,       // ZoneEquipConfig index
-                          bool FirstHVACIteration,     // flag for 1st HVAV iteration in the time step
-                          Real64 &LoadMet,             // load met by unit (watts)
-                          Optional<Real64> PLR = _,    // Part Load Ratio, fraction of time step fancoil is on
-                          Real64 ElecHeatCoilPLR = 1.0 // electric heating coil PLR used with MultiSpeedFan capacity control
+                          int FanCoilNum,                      // Unit index in fan coil array
+                          int ControlledZoneNum,               // ZoneEquipConfig index
+                          bool FirstHVACIteration,             // flag for 1st HVAV iteration in the time step
+                          Real64 &LoadMet,                     // load met by unit (watts)
+                          ObjexxFCL::Optional<Real64> PLR = _, // Part Load Ratio, fraction of time step fancoil is on
+                          Real64 ElecHeatCoilPLR = 1.0         // electric heating coil PLR used with MultiSpeedFan capacity control
     );
 
     void SimMultiStage4PipeFanCoil(EnergyPlusData &state,

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -107,7 +107,7 @@ namespace GroundTemperatureManager {
 
         // Check if this instance of this model has already been retrieved
         for (int i = 0; i < numGTMs; ++i) {
-            auto currentModel(state.dataGrndTempModelMgr->groundTempModels[i]);
+            auto currentModel = state.dataGrndTempModelMgr->groundTempModels[i]; // (AUTO_OK_UNIQUE_PTR)
             // Check if the type and name match
             if (objectType == currentModel->objectType && objectName == currentModel->objectName) {
                 return state.dataGrndTempModelMgr->groundTempModels[i];

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -167,8 +167,11 @@ namespace OutputReportPredefined {
     // Creates an entry for predefined tables when the entry
     // is a real variable. numSigDigits defaults to 2, and if supplied must be in [0-9]
     // Internally it uses a Fortran-Style write statement, meaning numbers are rounded rather than trimmed
-    void PreDefTableEntry(
-        EnergyPlusData &state, int const columnIndex, std::string_view objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = _);
+    void PreDefTableEntry(EnergyPlusData &state,
+                          int const columnIndex,
+                          std::string_view objName,
+                          Real64 const tableEntryReal,
+                          ObjexxFCL::Optional_int_const numSigDigits = _);
 
     void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string_view objName, std::string_view tableEntryChar);
 

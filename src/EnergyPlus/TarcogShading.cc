@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1212,9 +1212,8 @@ namespace TarcogShading {
                 Ar_eff(i) = 0.0;
                 Atop_eff(i) = Atop(i);
                 Abot_eff(i) = Abot(i);
-            } else if (BITF_TEST_ANY(BITF(LayerType(i)),
-                                     BITF(TARCOGLayerType::PERFORATED) | BITF(TARCOGLayerType::DIFFSHADE) | BITF(TARCOGLayerType::BSDF) |
-                                         BITF(TARCOGLayerType::WOVSHADE))) {
+            } else if ((LayerType(i) == TARCOGLayerType::PERFORATED) || (LayerType(i) == TARCOGLayerType::DIFFSHADE) ||
+                       (LayerType(i) == TARCOGLayerType::BSDF) || (LayerType(i) == TARCOGLayerType::WOVSHADE)) {
                 Ah_eff(i) = width * height * C1_SHADE * pow((Ah(i) / (width * height)), C2_SHADE);
                 Al_eff(i) = Al(i) * C3_SHADE;
                 Ar_eff(i) = Ar(i) * C3_SHADE;

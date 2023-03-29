@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -296,7 +296,7 @@ namespace CommandLineInterface {
         state.dataStrGlobals->inputDirPath = FileSystem::getParentDirectoryPath(state.dataStrGlobals->inputFilePath);
 
         {
-            auto const fileType = FileSystem::getFileType(state.dataStrGlobals->inputFilePath);
+            FileSystem::FileTypes const fileType = FileSystem::getFileType(state.dataStrGlobals->inputFilePath);
             state.dataGlobal->isEpJSON = FileSystem::is_all_json_type(fileType);
             switch (fileType) {
             case FileSystem::FileTypes::IDF:
@@ -586,7 +586,7 @@ namespace CommandLineInterface {
 
         // Check for IDD and IDF files
         if (FileSystem::fileExists(state.files.iniFile.filePath)) {
-            auto iniFile = state.files.iniFile.try_open();
+            EnergyPlus::InputFile iniFile = state.files.iniFile.try_open();
             if (!iniFile.good()) {
                 DisplayString(state, "ERROR: Could not open file " + iniFile.filePath.string() + " for input (read).");
                 if (eplusRunningViaAPI) {
@@ -598,7 +598,7 @@ namespace CommandLineInterface {
             state.dataStrGlobals->CurrentWorkingFolder = iniFile.filePath;
             // Relying on compiler to supply full path name here
             // TODO: not sure I understand this block
-            // const auto TempIndx = index(state.dataStrGlobals->CurrentWorkingFolder, state.dataStrGlobals->pathChar, true);
+            // const int TempIndx = index(state.dataStrGlobals->CurrentWorkingFolder, state.dataStrGlobals->pathChar, true);
             // if (TempIndx == std::string::npos) {
             // state.dataStrGlobals->CurrentWorkingFolder = "";
             //} else {
@@ -792,7 +792,7 @@ namespace CommandLineInterface {
         bool NewHeading = false;
 
         while (inputFile.good() && !Found) {
-            const auto readResult = inputFile.readLine();
+            EnergyPlus::InputFile::ReadResult const readResult = inputFile.readLine();
 
             if (readResult.eof) {
                 break;
@@ -816,12 +816,12 @@ namespace CommandLineInterface {
 
             //                                  Heading line found, now looking for Kind
             while (inputFile.good() && !NewHeading) {
-                const auto innerReadResult = inputFile.readLine();
+                const auto innerReadResult = inputFile.readLine(); // readLine returns a ReadResult<std::string>, hence no & (THIS_AUTO_OK)
                 if (innerReadResult.eof) {
                     break;
                 }
 
-                auto line = innerReadResult.data;
+                std::string line = innerReadResult.data;
                 strip(line);
 
                 if (line.empty()) continue; // Ignore Blank Lines
@@ -889,22 +889,22 @@ namespace CommandLineInterface {
         fs::path const RVIfile = (state.dataStrGlobals->inputDirPath / state.dataStrGlobals->inputFilePathNameOnly).replace_extension(".rvi");
         fs::path const MVIfile = (state.dataStrGlobals->inputDirPath / state.dataStrGlobals->inputFilePathNameOnly).replace_extension(".mvi");
 
-        const auto rviFileExists = FileSystem::fileExists(RVIfile);
+        const bool rviFileExists = FileSystem::fileExists(RVIfile);
         if (!rviFileExists) {
             std::ofstream ofs{RVIfile};
             if (!ofs.good()) {
-                ShowFatalError(state, "EnergyPlus: Could not open file \"" + RVIfile.string() + "\" for output (write).");
+                ShowFatalError(state, format("EnergyPlus: Could not open file \"{}\" for output (write).", RVIfile.string()));
             } else {
                 ofs << state.files.eso.filePath.string() << '\n';
                 ofs << state.files.csv.filePath.string() << '\n';
             }
         }
 
-        const auto mviFileExists = FileSystem::fileExists(MVIfile);
+        const bool mviFileExists = FileSystem::fileExists(MVIfile);
         if (!mviFileExists) {
             std::ofstream ofs{MVIfile};
             if (!ofs.good()) {
-                ShowFatalError(state, "EnergyPlus: Could not open file \"" + RVIfile.string() + "\" for output (write).");
+                ShowFatalError(state, format("EnergyPlus: Could not open file \"{}\" for output (write).", RVIfile.string()));
             } else {
                 ofs << state.files.mtr.filePath.string() << '\n';
                 ofs << state.files.mtr_csv.filePath.string() << '\n';

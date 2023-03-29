@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -121,13 +121,12 @@ namespace ElectricBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum; // Index of unit in baseboard array
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
-        auto &GetInputFlag = state.dataElectBaseboardRad->GetInputFlag;
-        auto &NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
+        int NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
         auto &CheckEquipName = state.dataElectBaseboardRad->CheckEquipName;
 
-        if (GetInputFlag) {
+        if (state.dataElectBaseboardRad->GetInputFlag) {
             GetElectricBaseboardInput(state);
-            GetInputFlag = false;
+            state.dataElectBaseboardRad->GetInputFlag = false;
         }
 
         // Find the correct Baseboard Equipment
@@ -196,7 +195,7 @@ namespace ElectricBaseboardRadiator {
         int constexpr iHeatDesignCapacityNumericNum(1);       // get input index to HW baseboard heating capacity
         int constexpr iHeatCapacityPerFloorAreaNumericNum(2); // get input index to HW baseboard heating capacity per floor area sizing
         int constexpr iHeatFracOfAutosizedCapacityNumericNum(
-            3); // get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
+            3); // get input index to HW baseboard heating capacity sizing as fraction of autosized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AllFracsSummed; // Sum of the fractions radiant
@@ -210,13 +209,14 @@ namespace ElectricBaseboardRadiator {
 
         cCurrentModuleObject = state.dataElectBaseboardRad->cCMO_BBRadiator_Electric;
 
-        state.dataElectBaseboardRad->NumElecBaseboards = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        // Update Num in state and make local convenience copy
+        int NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // object is extensible, no max args needed as IPShortCuts being used
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
         auto &CheckEquipName = state.dataElectBaseboardRad->CheckEquipName;
         auto &ElecBaseboardNumericFields = state.dataElectBaseboardRad->ElecBaseboardNumericFields;
-        auto &NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
 
         ElecBaseboard.allocate(NumElecBaseboards);
         CheckEquipName.allocate(NumElecBaseboards);
@@ -562,9 +562,7 @@ namespace ElectricBaseboardRadiator {
         int ZoneNode;
 
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
-        auto &NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
-        auto &MyOneTimeFlag = state.dataElectBaseboardRad->MyOneTimeFlag;
-        auto &MySizeFlag = state.dataElectBaseboardRad->MySizeFlag;
+        int NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
         auto &ZeroSourceSumHATsurf = state.dataElectBaseboardRad->ZeroSourceSumHATsurf;
         auto &QBBElecRadSource = state.dataElectBaseboardRad->QBBElecRadSource;
         auto &QBBElecRadSrcAvg = state.dataElectBaseboardRad->QBBElecRadSrcAvg;
@@ -573,26 +571,24 @@ namespace ElectricBaseboardRadiator {
         auto &LastTimeStepSys = state.dataElectBaseboardRad->LastTimeStepSys;
 
         // Do the one time initializations
-        if (MyOneTimeFlag) {
+        if (state.dataElectBaseboardRad->MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            state.dataElectBaseboardRad->MyEnvrnFlag.allocate(NumElecBaseboards);
-            MySizeFlag.allocate(NumElecBaseboards);
+            state.dataElectBaseboardRad->MyEnvrnFlag.dimension(NumElecBaseboards, true);
+            state.dataElectBaseboardRad->MySizeFlag.dimension(NumElecBaseboards, true);
             ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             QBBElecRadSource.dimension(NumElecBaseboards, 0.0);
             QBBElecRadSrcAvg.dimension(NumElecBaseboards, 0.0);
             LastQBBElecRadSrc.dimension(NumElecBaseboards, 0.0);
             LastSysTimeElapsed.dimension(NumElecBaseboards, 0.0);
             LastTimeStepSys.dimension(NumElecBaseboards, 0.0);
-            state.dataElectBaseboardRad->MyEnvrnFlag = true;
-            MySizeFlag = true;
 
-            MyOneTimeFlag = false;
+            state.dataElectBaseboardRad->MyOneTimeFlag = false;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(BaseboardNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataElectBaseboardRad->MySizeFlag(BaseboardNum)) {
             // for each coil, do the sizing once.
             SizeElectricBaseboard(state, BaseboardNum);
-            MySizeFlag(BaseboardNum) = false;
+            state.dataElectBaseboardRad->MySizeFlag(BaseboardNum) = false;
         }
 
         // Do the Begin Environment initializations
@@ -613,7 +609,7 @@ namespace ElectricBaseboardRadiator {
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-            ZeroSourceSumHATsurf(ControlledZoneNum) = SumHATsurf(state, ControlledZoneNum);
+            ZeroSourceSumHATsurf(ControlledZoneNum) = state.dataHeatBal->Zone(ControlledZoneNum).sumHATsurf(state);
             QBBElecRadSrcAvg(BaseboardNum) = 0.0;
             LastQBBElecRadSrc(BaseboardNum) = 0.0;
             LastSysTimeElapsed(BaseboardNum) = 0.0;
@@ -818,7 +814,7 @@ namespace ElectricBaseboardRadiator {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
-                LoadMet = (SumHATsurf(state, ZoneNum) - state.dataElectBaseboardRad->ZeroSourceSumHATsurf(ZoneNum)) +
+                LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataElectBaseboardRad->ZeroSourceSumHATsurf(ZoneNum)) +
                           (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) + (RadHeat * ElecBaseboard(BaseboardNum).FracDistribPerson);
 
                 if (LoadMet < 0.0) {
@@ -835,15 +831,15 @@ namespace ElectricBaseboardRadiator {
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
-                    TempZeroSourceSumHATsurf = SumHATsurf(state, ZoneNum);
+                    TempZeroSourceSumHATsurf = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
                     // Now, turn it back on:
                     state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum) = RadHeat;
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Recalculate LoadMet with new ZeroSource... term and see if it is positive now.  If not, shut it down.
-                    LoadMet = (SumHATsurf(state, ZoneNum) - TempZeroSourceSumHATsurf) + (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) +
-                              (RadHeat * ElecBaseboard(BaseboardNum).FracDistribPerson);
+                    LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - TempZeroSourceSumHATsurf) +
+                              (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) + (RadHeat * ElecBaseboard(BaseboardNum).FracDistribPerson);
                     if (LoadMet < 0.0) {
                         // LoadMet is still less than zero so shut everything down
                         UpdateElectricBaseboardOff(LoadMet,
@@ -938,8 +934,8 @@ namespace ElectricBaseboardRadiator {
         //       MODIFIED       Feb 2010 Daeho Kang for radiant component
 
         // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // First, update the running average if necessary...
         if (state.dataElectBaseboardRad->LastSysTimeElapsed(BaseboardNum) == SysTimeElapsed) {
@@ -1089,67 +1085,13 @@ namespace ElectricBaseboardRadiator {
         //       DATE WRITTEN   Feb 2010
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
-        ElecBaseboard(BaseboardNum).ElecUseLoad = ElecBaseboard(BaseboardNum).ElecUseRate * TimeStepSys * DataGlobalConstants::SecInHour;
-        ElecBaseboard(BaseboardNum).TotEnergy = ElecBaseboard(BaseboardNum).TotPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        ElecBaseboard(BaseboardNum).Energy = ElecBaseboard(BaseboardNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
-        ElecBaseboard(BaseboardNum).ConvEnergy = ElecBaseboard(BaseboardNum).ConvPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        ElecBaseboard(BaseboardNum).RadEnergy = ElecBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
-    }
-
-    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   July 2003
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
-        // The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector
-        // and should be updated accordingly.
-
-        // Using/Aliasing
-        using namespace DataSurfaces;
-        using namespace DataHeatBalance;
-
-        // Return value
-        Real64 SumHATsurf;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int SurfNum; // Surface number
-        Real64 Area; // Effective surface area
-
-        SumHATsurf = 0.0;
-
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-            Area = state.dataSurface->Surface(SurfNum).Area;
-
-            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
-                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                    // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
-                }
-
-                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
-                    // Window frame contribution
-                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
-                }
-
-                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
-                    !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                    // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
-                }
-            }
-
-            SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
-        }
-
-        return SumHATsurf;
+        ElecBaseboard(BaseboardNum).ElecUseLoad = ElecBaseboard(BaseboardNum).ElecUseRate * TimeStepSysSec;
+        ElecBaseboard(BaseboardNum).TotEnergy = ElecBaseboard(BaseboardNum).TotPower * TimeStepSysSec;
+        ElecBaseboard(BaseboardNum).Energy = ElecBaseboard(BaseboardNum).Power * TimeStepSysSec;
+        ElecBaseboard(BaseboardNum).ConvEnergy = ElecBaseboard(BaseboardNum).ConvPower * TimeStepSysSec;
+        ElecBaseboard(BaseboardNum).RadEnergy = ElecBaseboard(BaseboardNum).RadPower * TimeStepSysSec;
     }
 
 } // namespace ElectricBaseboardRadiator

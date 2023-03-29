@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -70,9 +71,11 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -283,11 +286,10 @@ protected:
         cbvav.CBVAVBoxOutletNode.allocate(1);
         cbvav.CBVAVBoxOutletNode(1) = 11;
 
-        state->dataCurveManager->PerfCurve.allocate(1);
-        state->dataCurveManager->NumCurves = 1;
-        state->dataCurveManager->PerfCurve(1).InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
-        state->dataCurveManager->PerfCurve(1).curveType = CurveManager::CurveType::Linear;
-        state->dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
+        state->dataCurveManager->allocateCurveVector(1);
+        state->dataCurveManager->PerfCurve(1)->interpolationType = Curve::InterpType::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(1)->curveType = Curve::CurveType::Linear;
+        state->dataCurveManager->PerfCurve(1)->coeff[0] = 1.0;
 
         state->dataEnvrn->OutDryBulbTemp = 35.0;
         state->dataEnvrn->OutHumRat = 0.0141066;
@@ -1061,4 +1063,675 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     EXPECT_NEAR(state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate, 0.402, 0.001);
     systemFlow = state->dataLoopNodes->Node(cbvav.PlenumMixerInletAirNode).MassFlowRate + state->dataLoopNodes->Node(cbvav.AirOutNode).MassFlowRate;
     EXPECT_NEAR(systemFlow, cbvav.MaxHeatAirMassFlow, 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "  ScheduleTypeLimits,",
+        "    Any Number;              !- Name",
+
+        "  ScheduleTypeLimits,",
+        "    Fraction,                !- Name",
+        "    0.0,                     !- Lower Limit Value",
+        "    1.0,                     !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+        "  ScheduleTypeLimits,",
+        "    Temperature,             !- Name",
+        "    -60,                     !- Lower Limit Value",
+        "    200,                     !- Upper Limit Value",
+        "    CONTINUOUS,              !- Numeric Type",
+        "    Temperature;             !- Unit Type",
+
+        "  ScheduleTypeLimits,",
+        "    Control Type,            !- Name",
+        "    0,                       !- Lower Limit Value",
+        "    4,                       !- Upper Limit Value",
+        "    DISCRETE;                !- Numeric Type",
+
+        "  Schedule:Compact,",
+        "    FanAndCoilAvailSched,    !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 16",
+        "    For: AllDays,            !- Field 17",
+        "    Until: 24:00,1.0;        !- Field 18",
+
+        "  Schedule:Compact,",
+        "    Heating Setpoints,       !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,20.0;       !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Cooling Setpoints,       !- Name",
+        "    Temperature,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,24.0;       !- Field 5",
+
+        "  Schedule:Compact,",
+        "    Zone Control Type Sched, !- Name",
+        "    Control Type,            !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,4;          !- Field 3",
+
+        "  Schedule:Compact,",
+        "    SAT Sch,                 !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,17;         !- Field 3",
+
+        "  Material,",
+        "    C4 - 4 IN COMMON BRICK,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.1014984,               !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1922.216,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7600000,               !- Solar Absorptance",
+        "    0.7600000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    C10 - 8 IN HW CONCRETE,  !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.2033016,               !- Thickness {m}",
+        "    1.729577,                !- Conductivity {W/m-K}",
+        "    2242.585,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    C12 - 2 IN HW CONCRETE,  !- Name",
+        "    MediumRough,             !- Roughness",
+        "    5.0901599E-02,           !- Thickness {m}",
+        "    1.729577,                !- Conductivity {W/m-K}",
+        "    2242.585,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+
+        "  Construction,",
+        "    EXTWALL80,               !- Name",
+        "    C4 - 4 IN COMMON BRICK;  !- Outside Layer",
+
+        "  Construction,",
+        "    FLOOR SLAB 8 IN,         !- Name",
+        "    C10 - 8 IN HW CONCRETE;  !- Outside Layer",
+
+        "  Construction,",
+        "    ROOF34,                  !- Name",
+        "    C12 - 2 IN HW CONCRETE;  !- Outside Layer",
+
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    Relative;                !- Coordinate System",
+
+        "  Zone,",
+        "    WEST ZONE,               !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall001,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    WEST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall002,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    WEST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,0,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall003,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    WEST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall004,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    WEST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    6.096000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Flr001,            !- Name",
+        "    Floor,                   !- Surface Type",
+        "    FLOOR SLAB 8 IN,         !- Construction Name",
+        "    WEST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn001:Flr001,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,6.096000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,6.096000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Roof001,           !- Name",
+        "    Roof,                    !- Surface Type",
+        "    ROOF34,                  !- Construction Name",
+        "    WEST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,3.048000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.096000,0,3.048000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  ZoneControl:Thermostat,",
+        "    Zone 1 Thermostat,       !- Name",
+        "    West ZONE,               !- Zone or ZoneList Name",
+        "    Zone Control Type Sched, !- Control Type Schedule Name",
+        "    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
+        "    Temperature Setpoints;   !- Control 1 Name",
+
+        "  AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,",
+        "    Zone 1 VAV System,       !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    Zone 1 Reheat Air Inlet Node,  !- Damper Air Outlet Node Name",
+        "    Zone 1 VAV Inlet Node,   !- Air Inlet Node Name",
+        "    0.80000,                !- Maximum Air Flow Rate {m3/s}",
+        "    0.20,                    !- Zone Minimum Air Flow Fraction",
+        "    Coil:Heating:Electric,   !- Reheat Coil Object Type",
+        "    Reheat Coil Zone 1,      !- Reheat Coil Name",
+        "    0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
+        "    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
+        "    Zone 1 Reheat Air Outlet Node,  !- Air Outlet Node Name",
+        "    0.001,                   !- Convergence Tolerance",
+        "    22;                      !- Maximum Reheat Air Temperature {C}",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Zone1TermReheat,         !- Name",
+        "    Zone 1 Reheat Air Outlet Node,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,  !- Air Terminal Object Type",
+        "    Zone 1 VAV System;       !- Air Terminal Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Zone1Equipment,          !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Zone1TermReheat,         !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    WEST ZONE,               !- Zone Name",
+        "    Zone1Equipment,          !- Zone Conditioning Equipment List Name",
+        "    Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name",
+        "    ,                        !- Zone Air Exhaust Node or NodeList Name",
+        "    Zone 1 Node,             !- Zone Air Node Name",
+        "    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name",
+
+        "  Fan:OnOff,",
+        "    Supply Fan 1,            !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    600.0,                   !- Pressure Rise {Pa}",
+        "    0.80000,                 !- Maximum Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    Mixed Air Node,          !- Air Inlet Node Name",
+        "    DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
+
+        "  Coil:Heating:Electric,",
+        "    Reheat Coil Zone 1,      !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    1.0,                     !- Efficiency",
+        "    20000.0,                 !- Nominal Capacity {W}",
+        "    Zone 1 Reheat Air Inlet Node,  !- Air Inlet Node Name",
+        "    Zone 1 Reheat Air Outlet Node;  !- Air Outlet Node Name",
+
+        "  AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,",
+        "    CBVAV Heat Pump System,  !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    0.80000,                 !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.80000,                 !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.80000,                 !- No Load Supply Air Flow Rate {m3/s}",
+        "    0.2,                     !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    0.2,                     !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    0.2,                     !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    ,                        !- Outdoor Air Flow Rate Multiplier Schedule Name",
+        "    Air Loop Inlet Node,     !- Air Inlet Node Name",
+        "    Mixer Inlet Node,        !- Bypass Duct Mixer Node Name",
+        "    Heating Coil Air Outlet Node,  !- Bypass Duct Splitter Node Name",
+        "    Air Loop Outlet Node,    !- Air Outlet Node Name",
+        "    OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type",
+        "    Outside Air Mixer,       !- Outdoor Air Mixer Name",
+        "    Fan:OnOff,               !- Supply Air Fan Object Type",
+        "    Supply Fan 1,            !- Supply Air Fan Name",
+        "    BlowThrough,             !- Supply Air Fan Placement",
+        "    Fan OpMode Schedule,     !- Supply Air Fan Operating Mode Schedule Name",
+        "    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type",
+        "    Main Cooling Coil 1,     !- Cooling Coil Name",
+        "    Coil:Heating:DX:VariableSpeed,  !- Heating Coil Object Type",
+        "    Main DX Heating Coil 1,  !- Heating Coil Name",
+        "    CoolingPriority,         !- Priority Control Mode",
+        "    10.0,                    !- Minimum Outlet Air Temperature During Cooling Operation {C}",
+        "    50.0,                    !- Maximum Outlet Air Temperature During Heating Operation {C}",
+        "    None;                    !- Dehumidification Control Type",
+
+        "  AirLoopHVAC,",
+        "    Changeover Bypass VAV Heat Pump,  !- Name",
+        "    ,                        !- Controller List Name",
+        "    Furnace 1 Avail List,    !- Availability Manager List Name",
+        "    0.80000,                    !- Design Supply Air Flow Rate {m3/s}",
+        "    Air Loop Branches,       !- Branch List Name",
+        "    ,                        !- Connector List Name",
+        "    Air Loop Inlet Node,     !- Supply Side Inlet Node Name",
+        "    Return Air Mixer Outlet, !- Demand Side Outlet Node Name",
+        "    Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names",
+        "    Air Loop Outlet Node;    !- Supply Side Outlet Node Names",
+
+        "  OutdoorAir:Mixer,",
+        "    Outside Air Mixer,       !- Name",
+        "    Mixed Air Node,          !- Mixed Air Node Name",
+        "    Outside Air Inlet Node,  !- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node,  !- Relief Air Stream Node Name",
+        "    Mixer Inlet Node;        !- Return Air Stream Node Name",
+
+        "  AirLoopHVAC:ZoneSplitter,",
+        "    Zone Supply Air Splitter,!- Name",
+        "    Zone Equipment Inlet Node,  !- Inlet Node Name",
+        "    Zone 1 VAV Inlet Node;   !- Outlet 1 Node Name",
+
+        "  AirLoopHVAC:SupplyPath,",
+        "    FurnaceSupplyPath,       !- Name",
+        "    Zone Equipment Inlet Node,  !- Supply Air Path Inlet Node Name",
+        "    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type",
+        "    Zone Supply Air Splitter;!- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneMixer,",
+        "    Zone Return Air Mixer,   !- Name",
+        "    Return Air Mixer Outlet, !- Outlet Node Name",
+        "    Zone 1 Outlet Node;      !- Inlet 1 Node Name",
+
+        "  AirLoopHVAC:ReturnPath,",
+        "    FurnaceReturnPath,       !- Name",
+        "    Return Air Mixer Outlet, !- Return Air Path Outlet Node Name",
+        "    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type",
+        "    Zone Return Air Mixer;   !- Component 1 Name",
+
+        "  Branch,",
+        "    Air Loop Main Branch,    !- Name",
+        "    ,                        !- Pressure Drop Curve Name",
+        "    AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,  !- Component 1 Object Type",
+        "    CBVAV Heat Pump System,  !- Component 1 Name",
+        "    Air Loop Inlet Node,     !- Component 1 Inlet Node Name",
+        "    Air Loop Outlet Node;    !- Component 1 Outlet Node Name",
+
+        "  BranchList,",
+        "    Air Loop Branches,       !- Name",
+        "    Air Loop Main Branch;    !- Branch 1 Name",
+
+        "  NodeList,",
+        "    Zone1Inlets,             !- Name",
+        "    Zone 1 Reheat Air Outlet Node;  !- Node 1 Name",
+
+        "  NodeList,",
+        "    OutsideAirInletNodes,    !- Name",
+        "    Outside Air Inlet Node;  !- Node 1 Name",
+
+        "  OutdoorAir:NodeList,",
+        "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
+
+        "  AvailabilityManager:ScheduledOn,",
+        "    Furnace 1 AvailOn,       !- Name",
+        "    FanAndCoilAvailSched;    !- Schedule Name",
+
+        "  AvailabilityManager:ScheduledOff,",
+        "    Furnace 1 AvailOff,      !- Name",
+        "    FanAndCoilAvailSched;    !- Schedule Name",
+
+        "  AvailabilityManagerAssignmentList,",
+        "    Furnace 1 Avail List,    !- Name",
+        "    AvailabilityManager:ScheduledOn,  !- Availability Manager 1 Object Type",
+        "    Furnace 1 AvailOn,       !- Availability Manager 1 Name",
+        "    AvailabilityManager:ScheduledOff,  !- Availability Manager 2 Object Type",
+        "    Furnace 1 AvailOff;      !- Availability Manager 2 Name",
+
+        "  SetpointManager:Scheduled,",
+        "    Air Loop Schedule,       !- Name",
+        "    Temperature,             !- Control Variable",
+        "    SAT Sch,                 !- Schedule Name",
+        "    Air Loop Outlet Node;    !- Setpoint Node or NodeList Name",
+
+        "  Coil:Heating:DX:VariableSpeed,",
+        "    Main DX Heating Coil 1,  !- Name",
+        "    Heating Coil Air Inlet Node,  !- Indoor Air Inlet Node Name",
+        "    Heating Coil Air Outlet Node,  !- Indoor Air Outlet Node Name",
+        "    5.0,                     !-Number of Speeds{dimensionless}",
+        "    3.0,                     !- Nominal Speed Level {dimensionless}",
+        "    17000,                   !- Rated Heating Capacity At Selected Nominal Speed Level {W}",
+        "    0.80,                    !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+        "    HPPLFFPLR,               !- Energy Part Load Fraction Curve Name",
+        "    ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+        "    -5.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
+        "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
+        "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "    Resistive,               !- Defrost Strategy",
+        "    OnDemand,                !- Defrost Control",
+        "    0.166667,                !- Defrost Time Period Fraction",
+        "    1000.0,                  !- Resistive Defrost Heater Capacity {W}",
+        "    8000.0,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}",
+        "    4.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {W/W}",
+        "    0.375,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    HPCurveFTemp,            !- Speed 1 Heating Capacity Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPCurveFTemp,            !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    10000.0,                 !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}",
+        "    4.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {W/W}",
+        "    0.47,                    !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    HPCurveFTemp,            !- Speed 2 Heating Capacity Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPCurveFTemp,            !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    12000.0,                 !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}",
+        "    4.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {W/W}",
+        "    0.56,                    !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    HPCurveFTemp,            !- Speed 3 Heating Capacity Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPCurveFTemp,            !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    15000.0,                 !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}",
+        "    4.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {W/W}",
+        "    0.700,                   !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    HPCurveFTemp,            !- Speed 4 Heating Capacity Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPCurveFTemp,            !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    17000.0,                 !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}",
+        "    4.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {W/W}",
+        "    0.80,                    !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    HPCurveFTemp,            !- Speed 5 Heating Capacity Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPCurveFTemp,            !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACFFF;                 !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+
+        "  Coil:Cooling:DX:VariableSpeed,",
+        "    Main Cooling Coil 1,     !- Name",
+        "    DX Cooling Coil Air Inlet Node,  !- Indoor Air Inlet Node Name",
+        "    Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name",
+        "    4.0,                     !- Number of Speeds {dimensionless}",
+        "    4.0,                     !- Nominal Speed Level {dimensionless}",
+        "    18000.0,                 !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}",
+        "    0.800,                   !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+        "    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
+        "    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    HPPLFFPLR,               !- Energy Part Load Fraction Curve Name",
+        "    ,                        !- Condenser Air Inlet Node Name",
+        "    AirCooled,               !- Condenser Type",
+        "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    0.0,                     !- Crankcase Heater Capacity {W}",
+        "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    ,                        !- Condensate Collection Water Storage Tank Name",
+        "    ,                        !- Basin Heater Capacity {W/K}",
+        "    ,                        !- Basin Heater Setpoint Temperature {C}",
+        "    ,                        !- Basin Heater Operating Schedule Name",
+        "    10000.0,                 !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}",
+        "    0.79,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
+        "    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}",
+        "    0.550,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    0.855,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}",
+        "    HPCurveFTemp,            !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    HPCurveFTemp,            !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    12000.0,                 !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}",
+        "    0.73,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
+        "    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}",
+        "    0.60,                    !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    1.31,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}",
+        "    HPCurveFTemp,            !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    HPCurveFTemp,            !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    15000.0,                 !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}",
+        "    0.78,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
+        "    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}",
+        "    0.780,                   !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    7.965,                   !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}",
+        "    HPCurveFTemp,            !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    HPCurveFTemp,            !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    18000.0,                 !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}",
+        "    0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
+        "    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}",
+        "    0.85,                    !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    10.62,                   !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}",
+        "    HPCurveFTemp,            !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+        "    HPACFFF,                 !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    HPCurveFTemp,            !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACFFF;                 !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+
+        "  Curve:Biquadratic,",
+        "    HPCurveFTemp,                           !- Name,",
+        "    1.0,                                    !- Coefficient1 Constant",
+        "    0.0,                                    !- Coefficient2 x",
+        "    0.0,                                    !- Coefficient3 x**2",
+        "    0.0,                                    !- Coefficient4 y",
+        "    0.0,                                    !- Coefficient5 y**2",
+        "    0.0,                                    !- Coefficient6 x*y",
+        "   -50,                                     !- Minimum Value of x",
+        "    50,                                     !- Maximum Value of x",
+        "   -50,                                     !- Minimum Value of y",
+        "    50;                                     !- Maximum Value of y",
+
+        "  Curve:Quadratic,",
+        "    HPPLFFPLR,                              !- Name",
+        "    1.0,                                    !- Coefficient1 Constant",
+        "    0.0,                                    !- Coefficient2 x",
+        "    0,                                      !- Coefficient3 x**2",
+        "    0.0,                                    !- Minimum Value of x",
+        "    1.5;                                    !- Maximum Value of x",
+
+        "  Curve:Cubic,",
+        "    HPACFFF,                                !- Name",
+        "    1.0,                                    !- Coefficient1 Constant",
+        "    0.0,                                    !- Coefficient2 x",
+        "    0.0,                                    !- Coefficient3 x**2",
+        "    0.0,                                    !- Coefficient4 x**3",
+        "    0.5,                                    !- Minimum Value of x",
+        "    1.5;                                    !- Maximum Value of x",
+
+        "  OutdoorAir:Node,",
+        "    Main Cooling Coil 1 Condenser Node,  !- Name",
+        "    -1.0;                    !- Height Above Ground {m}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    int CBVAVNum = 1;
+    bool HXUnitOn = false;
+    bool ErrorsFound = false;
+    bool firstHVACIteration = true;
+    // get various objects
+    SimulationManager::GetProjectData(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetHeatBalanceInput(*state);
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    ZoneTempPredictorCorrector::InitZoneAirSetPoints(*state);
+    bool simZone = false;
+    bool simAir = false;
+    state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
+    ZoneEquipmentManager::ManageZoneEquipment(*state, firstHVACIteration, simZone, simAir);
+    SimAirServingZones::GetAirPathData(*state);
+    SplitterComponent::GetSplitterInput(*state);
+    SimAirServingZones::InitAirLoops(*state, firstHVACIteration);
+    HVACUnitaryBypassVAV::GetCBVAV(*state);
+
+    // set up zone load indicators
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    auto &zoneSysEnergyDemand = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1);
+    auto &zoneSysMoistureDemand = state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1);
+    zoneSysEnergyDemand.RemainingOutputRequired = 10000;
+    zoneSysEnergyDemand.RemainingOutputReqToHeatSP = 10000;
+    zoneSysEnergyDemand.RemainingOutputReqToCoolSP = 12000.0;
+    zoneSysMoistureDemand.RemainingOutputReqToDehumidSP = 0.0;
+    zoneSysEnergyDemand.SequencedOutputRequired.allocate(1);
+    zoneSysEnergyDemand.SequencedOutputRequiredToCoolingSP.allocate(1);
+    zoneSysEnergyDemand.SequencedOutputRequiredToHeatingSP.allocate(1);
+    zoneSysEnergyDemand.SequencedOutputRequired(1) = zoneSysEnergyDemand.RemainingOutputRequired;
+    zoneSysEnergyDemand.SequencedOutputRequiredToCoolingSP(1) = zoneSysEnergyDemand.RemainingOutputReqToCoolSP;
+    zoneSysEnergyDemand.SequencedOutputRequiredToHeatingSP(1) = zoneSysEnergyDemand.RemainingOutputReqToHeatSP;
+    // set outdoor air conditions
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutHumRat = 0.003;
+    state->dataEnvrn->StdBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    // set shortcut to system
+    auto &BypassVAV = state->dataHVACUnitaryBypassVAV->CBVAV(1);
+    // set zone air conditions
+    auto &zoneAirNode =
+        state->dataLoopNodes->Node(UtilityRoutines::FindItemInList("ZONE 1 NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    zoneAirNode.Temp = 20.0;
+    zoneAirNode.HumRat = 0.005;
+    zoneAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode.Temp, zoneAirNode.HumRat);
+    //  set inlet air data
+    auto &airInNode = state->dataLoopNodes->Node(BypassVAV.AirInNode);
+    airInNode.Temp = 20.0;
+    airInNode.HumRat = 0.005;
+    airInNode.Enthalpy = Psychrometrics::PsyHFnTdbW(airInNode.Temp, airInNode.HumRat);
+    // set outside air inlet node
+    auto &oaMixerAirInletNode = state->dataLoopNodes->Node(
+        UtilityRoutines::FindItemInList("OUTSIDE AIR INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    // auto &oaMixerAirInletNode = state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode);
+    oaMixerAirInletNode.Temp = state->dataEnvrn->OutDryBulbTemp;
+    oaMixerAirInletNode.HumRat = state->dataEnvrn->OutHumRat;
+    oaMixerAirInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(oaMixerAirInletNode.Temp, oaMixerAirInletNode.HumRat);
+    // set sizing variables
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataGlobal->SysSizingCalc = true;
+    state->dataGlobal->SysSizingCalc = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    // set local variables for convenience
+    auto &supplyFan = state->dataFans->Fan(1);
+    auto &dxClgCoilMain = state->dataVariableSpeedCoils->VarSpeedCoil(1);
+    auto &dxHtgCoilMain = state->dataVariableSpeedCoils->VarSpeedCoil(2);
+    // initialize priority control
+    BypassVAV.PriorityControl = HVACUnitaryBypassVAV::PriorityCtrlMode::HeatingPriority;
+    BypassVAV.AirFlowControl = HVACUnitaryBypassVAV::AirFlowCtrlMode::UseCompressorOnFlow;
+    BypassVAV.changeOverTimer = -1.0;
+    state->dataGlobal->DayOfSim = 15;
+    state->dataGlobal->HourOfDay = 6;
+    state->dataScheduleMgr->Schedule(BypassVAV.SchedPtr).CurrentValue = 1.0;
+
+    Real64 QUnitOut = 0.0;
+    Real64 OnOffAirFlowRatio = 1;
+    // initialize the changeover-bypass VAV system
+    HVACUnitaryBypassVAV::InitCBVAV(*state, CBVAVNum, firstHVACIteration, BypassVAV.AirLoopNumber, OnOffAirFlowRatio, HXUnitOn);
+    // check it is heating mode operation
+    EXPECT_EQ(BypassVAV.HeatCoolMode, 2);
+    EXPECT_EQ(BypassVAV.NumZonesHeated, 1);
+    EXPECT_EQ(BypassVAV.NumZonesCooled, 0);
+    EXPECT_EQ(BypassVAV.HeatCoolMode, HVACUnitaryBypassVAV::HeatingMode);
+
+    firstHVACIteration = false;
+    // simulate the ByPass VAV unit
+    HVACUnitaryBypassVAV::SimCBVAV(*state, CBVAVNum, firstHVACIteration, QUnitOut, OnOffAirFlowRatio, HXUnitOn);
+    // calculate expected result
+    Real64 result_BypassVAV_ElectricityRate =
+        supplyFan.FanPower + dxClgCoilMain.Power + dxHtgCoilMain.Power + dxHtgCoilMain.CrankcaseHeaterPower + state->dataHVACGlobal->DefrostElecPower;
+    // test the components and total electricity rate results
+    EXPECT_NEAR(2160.62, BypassVAV.ElecPower, 0.01);
+    EXPECT_NEAR(2160.62, result_BypassVAV_ElectricityRate, 0.01);
+    EXPECT_NEAR(685.71, supplyFan.FanPower, 0.01);
+    EXPECT_NEAR(0.0, dxClgCoilMain.Power, 0.01);
+    EXPECT_NEAR(0.0, state->dataHVACGlobal->DXElecCoolingPower, 0.01);
+    EXPECT_NEAR(1453.86, dxHtgCoilMain.Power + dxHtgCoilMain.CrankcaseHeaterPower, 0.01);
+    EXPECT_NEAR(1453.86, state->dataHVACGlobal->DXElecHeatingPower, 0.01);
+    EXPECT_NEAR(0.0, state->dataHVACGlobal->ElecHeatingCoilPower, 0.01);
+    EXPECT_NEAR(21.05, dxHtgCoilMain.DefrostPower, 0.01);
+    EXPECT_NEAR(21.05, state->dataHVACGlobal->DefrostElecPower, 0.01);
+    EXPECT_NEAR(0.0, state->dataHVACGlobal->SuppHeatingCoilPower, 0.01);
 }

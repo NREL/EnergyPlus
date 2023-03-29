@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,7 +60,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -79,6 +78,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -102,19 +102,6 @@ namespace WindowComplexManager {
     using namespace DataHeatBalance;
     using namespace DataShadowingCombinations;
     using namespace Vectors;
-    using namespace DataHeatBalFanSys;
-
-    // Parameters for gas definitions
-    enum class GasCoeffs
-    {
-        Invalid = -1,
-        Custom,
-        Air,
-        Argon,
-        Krypton,
-        Xenon,
-        Num
-    };
 
     void InitBSDFWindows(EnergyPlusData &state)
     {
@@ -1604,9 +1591,10 @@ namespace WindowComplexManager {
                         BSHit.HitDsq = HitDsq;
                     }
                 }
-            }                   // back surf loop
-            if (TotHits == 0) { // this should not happen--means a ray has gotten lost
-                //    CALL ShowWarningError(state, 'BSDF--Zone surfaces do not completely enclose zone--transmitted ray lost')
+            } // back surf loop
+            if (TotHits == 0) {
+                // this should not happen--means a ray has gotten lost
+                // ShowWarningError(state, "BSDF--Zone surfaces do not completely enclose zone--transmitted ray lost");
             } else {
                 KBkSurf = BSHit.KBkSurf;
                 JSurf = BSHit.HitSurf;
@@ -2706,7 +2694,6 @@ namespace WindowComplexManager {
         int CalcSHGC(0);              // SHGC calculations are not necessary for E+ run
         int NumOfIterations(0);
 
-        int GasType; // locally used coefficient to point at correct gas type
         int ICoeff;
 
         std::string tarcogErrorMessage; // store error text from tarcog
@@ -2753,13 +2740,13 @@ namespace WindowComplexManager {
         Pa = state.dataEnvrn->OutBaroPress;
 
         ThermalModelNum = state.dataConstruction->Construct(ConstrNum).BSDFInput.ThermalModel;
-        standard = state.dataHeatBal->WindowThermalModel(ThermalModelNum).CalculationStandard;
-        ThermalMod = state.dataHeatBal->WindowThermalModel(ThermalModelNum).ThermalModel;
-        CalcDeflection = state.dataHeatBal->WindowThermalModel(ThermalModelNum).DeflectionModel;
-        SDScalar = state.dataHeatBal->WindowThermalModel(ThermalModelNum).SDScalar;
-        VacuumPressure = state.dataHeatBal->WindowThermalModel(ThermalModelNum).VacuumPressureLimit;
-        Tini = state.dataHeatBal->WindowThermalModel(ThermalModelNum).InitialTemperature - DataGlobalConstants::KelvinConv;
-        Pini = state.dataHeatBal->WindowThermalModel(ThermalModelNum).InitialPressure;
+        standard = state.dataMaterial->WindowThermalModel(ThermalModelNum).CalculationStandard;
+        ThermalMod = state.dataMaterial->WindowThermalModel(ThermalModelNum).ThermalModel;
+        CalcDeflection = state.dataMaterial->WindowThermalModel(ThermalModelNum).DeflectionModel;
+        SDScalar = state.dataMaterial->WindowThermalModel(ThermalModelNum).SDScalar;
+        VacuumPressure = state.dataMaterial->WindowThermalModel(ThermalModelNum).VacuumPressureLimit;
+        Tini = state.dataMaterial->WindowThermalModel(ThermalModelNum).InitialTemperature - DataGlobalConstants::KelvinConv;
+        Pini = state.dataMaterial->WindowThermalModel(ThermalModelNum).InitialPressure;
 
         nlayer = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
         isky = 3; // IR radiation is provided from external source
@@ -2866,13 +2853,12 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        GasType = static_cast<int>(GasCoeffs::Air);
-        wght(iprop(1, 1)) = GasWght[GasType - 1];
-        gama(iprop(1, 1)) = GasSpecificHeatRatio[GasType - 1];
+        wght(iprop(1, 1)) = Material::GasWght[static_cast<int>(Material::GasType::Air)];
+        gama(iprop(1, 1)) = Material::GasSpecificHeatRatio[static_cast<int>(Material::GasType::Air)];
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon[ICoeff - 1][GasType - 1];
-            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis[ICoeff - 1][GasType - 1];
-            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp[ICoeff - 1][GasType - 1];
+            gcon(ICoeff, iprop(1, 1)) = Material::GasCoeffsCon[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
+            gvis(ICoeff, iprop(1, 1)) = Material::GasCoeffsVis[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
+            gcp(ICoeff, iprop(1, 1)) = Material::GasCoeffsCp[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
         }
 
         // Fill window layer properties needed for window layer heat balance calculation
@@ -2880,57 +2866,58 @@ namespace WindowComplexManager {
         IGap = 0;
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(LayPtr));
+            assert(thisMaterial != nullptr);
 
-            if ((state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::WindowGlass) ||
-                (state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing)) {
+            if ((thisMaterial->group == Material::Group::WindowGlass) || (thisMaterial->group == Material::Group::WindowSimpleGlazing)) {
                 ++IGlass;
                 LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
-                thick(IGlass) = state.dataMaterial->Material(LayPtr).Thickness;
-                scon(IGlass) = state.dataMaterial->Material(LayPtr).Conductivity;
-                emis(2 * IGlass - 1) = state.dataMaterial->Material(LayPtr).AbsorpThermalFront;
-                emis(2 * IGlass) = state.dataMaterial->Material(LayPtr).AbsorpThermalBack;
-                tir(2 * IGlass - 1) = state.dataMaterial->Material(LayPtr).TransThermal;
-                tir(2 * IGlass) = state.dataMaterial->Material(LayPtr).TransThermal;
-                YoungsMod(IGlass) = state.dataMaterial->Material(LayPtr).YoungModulus;
-                PoissonsRat(IGlass) = state.dataMaterial->Material(LayPtr).PoissonsRatio;
-            } else if (state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::ComplexWindowShade) {
+                thick(IGlass) = thisMaterial->Thickness;
+                scon(IGlass) = thisMaterial->Conductivity;
+                emis(2 * IGlass - 1) = thisMaterial->AbsorpThermalFront;
+                emis(2 * IGlass) = thisMaterial->AbsorpThermalBack;
+                tir(2 * IGlass - 1) = thisMaterial->TransThermal;
+                tir(2 * IGlass) = thisMaterial->TransThermal;
+                YoungsMod(IGlass) = thisMaterial->YoungModulus;
+                PoissonsRat(IGlass) = thisMaterial->PoissonsRatio;
+            } else if (thisMaterial->group == Material::Group::ComplexWindowShade) {
                 ++IGlass;
-                TempInt = state.dataMaterial->Material(LayPtr).ComplexShadePtr;
-                LayerType(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LayerType;
+                TempInt = thisMaterial->ComplexShadePtr;
+                LayerType(IGlass) = state.dataMaterial->ComplexShade(TempInt).LayerType;
 
-                thick(IGlass) = state.dataHeatBal->ComplexShade(TempInt).Thickness;
-                scon(IGlass) = state.dataHeatBal->ComplexShade(TempInt).Conductivity;
-                emis(2 * IGlass - 1) = state.dataHeatBal->ComplexShade(TempInt).FrontEmissivity;
-                emis(2 * IGlass) = state.dataHeatBal->ComplexShade(TempInt).BackEmissivity;
-                tir(2 * IGlass - 1) = state.dataHeatBal->ComplexShade(TempInt).IRTransmittance;
-                tir(2 * IGlass) = state.dataHeatBal->ComplexShade(TempInt).IRTransmittance;
+                thick(IGlass) = state.dataMaterial->ComplexShade(TempInt).Thickness;
+                scon(IGlass) = state.dataMaterial->ComplexShade(TempInt).Conductivity;
+                emis(2 * IGlass - 1) = state.dataMaterial->ComplexShade(TempInt).FrontEmissivity;
+                emis(2 * IGlass) = state.dataMaterial->ComplexShade(TempInt).BackEmissivity;
+                tir(2 * IGlass - 1) = state.dataMaterial->ComplexShade(TempInt).IRTransmittance;
+                tir(2 * IGlass) = state.dataMaterial->ComplexShade(TempInt).IRTransmittance;
 
                 // This needs to be converted into correct areas. That can be done only after loading complete window data
-                Atop(IGlass) = state.dataHeatBal->ComplexShade(TempInt).TopOpeningMultiplier;
-                Abot(IGlass) = state.dataHeatBal->ComplexShade(TempInt).BottomOpeningMultiplier;
-                Al(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LeftOpeningMultiplier;
-                Ar(IGlass) = state.dataHeatBal->ComplexShade(TempInt).RightOpeningMultiplier;
-                Ah(IGlass) = state.dataHeatBal->ComplexShade(TempInt).FrontOpeningMultiplier;
+                Atop(IGlass) = state.dataMaterial->ComplexShade(TempInt).TopOpeningMultiplier;
+                Abot(IGlass) = state.dataMaterial->ComplexShade(TempInt).BottomOpeningMultiplier;
+                Al(IGlass) = state.dataMaterial->ComplexShade(TempInt).LeftOpeningMultiplier;
+                Ar(IGlass) = state.dataMaterial->ComplexShade(TempInt).RightOpeningMultiplier;
+                Ah(IGlass) = state.dataMaterial->ComplexShade(TempInt).FrontOpeningMultiplier;
 
-                SlatThick(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatThickness;
-                SlatWidth(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatWidth;
-                SlatAngle(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatAngle;
-                SlatCond(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatConductivity;
-                SlatSpacing(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatSpacing;
-                SlatCurve(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatCurve;
-            } else if (state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
+                SlatThick(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatThickness;
+                SlatWidth(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatWidth;
+                SlatAngle(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatAngle;
+                SlatCond(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatConductivity;
+                SlatSpacing(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatSpacing;
+                SlatCurve(IGlass) = state.dataMaterial->ComplexShade(TempInt).SlatCurve;
+            } else if (thisMaterial->group == Material::Group::ComplexWindowGap) {
                 ++IGap;
-                gap(IGap) = state.dataMaterial->Material(LayPtr).Thickness;
-                presure(IGap) = state.dataMaterial->Material(LayPtr).Pressure;
+                gap(IGap) = thisMaterial->Thickness;
+                presure(IGap) = thisMaterial->Pressure;
 
-                DeflectionPtr = state.dataMaterial->Material(LayPtr).DeflectionStatePtr;
+                DeflectionPtr = thisMaterial->DeflectionStatePtr;
                 if (DeflectionPtr != 0) {
                     GapDefMax(IGap) = state.dataHeatBal->DeflectionState(DeflectionPtr).DeflectedThickness;
                 } else {
                     GapDefMax(IGap) = gap(IGap);
                 }
 
-                PillarPtr = state.dataMaterial->Material(LayPtr).SupportPillarPtr;
+                PillarPtr = thisMaterial->SupportPillarPtr;
 
                 if (PillarPtr != 0) {
                     SupportPlr(IGap) = 1;
@@ -2938,25 +2925,27 @@ namespace WindowComplexManager {
                     PillarRadius(IGap) = state.dataHeatBal->SupportPillar(PillarPtr).Radius;
                 }
 
-                GasPointer = state.dataMaterial->Material(LayPtr).GasPointer;
+                GasPointer = thisMaterial->GasPointer;
 
-                nmix(IGap + 1) = state.dataMaterial->Material(GasPointer).NumberOfGasesInMixture;
+                auto const *thisMaterialGas = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(GasPointer));
+                assert(thisMaterialGas != nullptr);
+                nmix(IGap + 1) = thisMaterialGas->NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
-                    frct(IMix, IGap + 1) = state.dataMaterial->Material(GasPointer).GasFract(IMix);
+                    frct(IMix, IGap + 1) = thisMaterialGas->GasFract(IMix);
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
                     // to be correctly referenced by gap arrays
 
                     // First check if gas coefficients are already part of array.  Duplicates are not necessary
                     bool feedData(false);
-                    CheckGasCoefs(state.dataMaterial->Material(GasPointer).GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
+                    CheckGasCoefs(thisMaterialGas->GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
                     if (feedData) {
-                        wght(iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer).GasWght(IMix);
-                        gama(iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer).GasSpecHeatRatio(IMix);
+                        wght(iprop(IMix, IGap + 1)) = thisMaterialGas->GasWght(IMix);
+                        gama(iprop(IMix, IGap + 1)) = thisMaterialGas->GasSpecHeatRatio(IMix);
                         for (i = 1; i <= 3; ++i) {
-                            gcon(i, iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer).GasCon(i, IMix);
-                            gvis(i, iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer).GasVis(i, IMix);
-                            gcp(i, iprop(IMix, IGap + 1)) = state.dataMaterial->Material(GasPointer).GasCp(i, IMix);
+                            gcon(i, iprop(IMix, IGap + 1)) = thisMaterialGas->GasCon(i, IMix);
+                            gvis(i, iprop(IMix, IGap + 1)) = thisMaterialGas->GasVis(i, IMix);
+                            gcp(i, iprop(IMix, IGap + 1)) = thisMaterialGas->GasCp(i, IMix);
                         }
                     } // IF feedData THEN
                 }
@@ -3192,9 +3181,9 @@ namespace WindowComplexManager {
             tarcogErrorMessage = "message = \"" + tarcogErrorMessage + "\"";
             ShowContinueErrorTimeStamp(state, tarcogErrorMessage);
             if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
-                ShowContinueError(state, "surface name = " + state.dataSurface->Surface(SurfNum).Name);
+                ShowContinueError(state, format("surface name = {}", state.dataSurface->Surface(SurfNum).Name));
             }
-            ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
+            ShowContinueError(state, format("construction name = {}", state.dataConstruction->Construct(ConstrNum).Name));
             ShowFatalError(state, "halting because of error in tarcog");
         } else if (CalcCondition == DataBSDFWindow::Condition::Winter) {
             state.dataHeatBal->NominalU(ConstrNum) = ufactor;
@@ -3315,14 +3304,15 @@ namespace WindowComplexManager {
                 // air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
                 if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Indoor ||
                     state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Return) {
+                    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
                     if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::Indoor) {
-                        InletAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
+                        InletAirHumRat = thisZoneHB.ZoneAirHumRat;
                     } else { // AirflowSource = outside air
                         InletAirHumRat = state.dataEnvrn->OutHumRat;
                     }
-                    ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum); // this should be Tin (account for different reference temps)
+                    ZoneTemp = thisZoneHB.MAT; // this should be Tin (account for different reference temps)
                     CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
-                    CpAirZone = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+                    CpAirZone = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
                     if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Indoor) {
                         state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;

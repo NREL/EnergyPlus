@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -104,7 +104,7 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
 // Manufacturers performance data can be used to generate the coefficients for the model.
 
 static constexpr std::string_view calcChillerAbsorptionIndirect("CALC Chiller:Absorption:Indirect ");
-auto constexpr waterIndex(1);
+int constexpr waterIndex = 1;
 static constexpr std::string_view fluidNameSteam = "STEAM";
 static constexpr std::string_view fluidNameWater = "WATER";
 
@@ -122,7 +122,7 @@ PlantComponent *IndirectAbsorberSpecs::factory(EnergyPlusData &state, std::strin
         }
     }
     // If we didn't find it, fatal
-    ShowFatalError(state, "LocalIndirectAbsorptionChillerFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+    ShowFatalError(state, format("LocalIndirectAbsorptionChillerFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
     return nullptr; // LCOV_EXCL_LINE
 }
@@ -231,7 +231,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
     int NumIndirectAbsorbers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
     if (NumIndirectAbsorbers <= 0) {
-        ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
+        ShowSevereError(state, format("No {} equipment specified in input file", state.dataIPShortCut->cCurrentModuleObject));
         // See if load distribution manager has already gotten the input
         ErrorsFound = true;
     }
@@ -275,7 +275,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
         }
         if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
             ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ErrorsFound = true;
         }
         // Assign Node Numbers to specified nodes
@@ -329,28 +329,28 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                            state.dataIPShortCut->cAlphaArgs(5),
                                            "Condenser (not tested) Nodes");
 
-        thisChiller.GeneratorInputCurvePtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
+        thisChiller.GeneratorInputCurvePtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
         if (thisChiller.GeneratorInputCurvePtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        thisChiller.GeneratorInputCurvePtr,         // Curve index
-                                                        {1},                                        // Valid dimensions
-                                                        RoutineName,                                // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                        thisChiller.Name,                           // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisChiller.GeneratorInputCurvePtr,         // Curve index
+                                                 {1},                                        // Valid dimensions
+                                                 RoutineName,                                // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                 thisChiller.Name,                           // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
         }
 
-        thisChiller.PumpPowerCurvePtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8));
+        thisChiller.PumpPowerCurvePtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8));
         if (thisChiller.PumpPowerCurvePtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        thisChiller.PumpPowerCurvePtr,              // Curve index
-                                                        {1},                                        // Valid dimensions
-                                                        RoutineName,                                // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                        thisChiller.Name,                           // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(8)); // Field Name
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisChiller.PumpPowerCurvePtr,              // Curve index
+                                                 {1},                                        // Valid dimensions
+                                                 RoutineName,                                // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                 thisChiller.Name,                           // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(8)); // Field Name
         }
 
         if (NumAlphas > 15) {
@@ -362,9 +362,9 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                        state.dataIPShortCut->cAlphaArgs(16).empty()) {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
             } else {
-                ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + ", Name=" + state.dataIPShortCut->cAlphaArgs(1));
+                ShowWarningError(state, format("{}, Name={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "...Generator heat source type must be Steam or Hot Water.");
-                ShowContinueError(state, "...Entered generator heat source type = " + state.dataIPShortCut->cAlphaArgs(16));
+                ShowContinueError(state, format("...Entered generator heat source type = {}", state.dataIPShortCut->cAlphaArgs(16)));
                 ErrorsFound = true;
             }
         } else {
@@ -429,15 +429,15 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                    "Steam Nodes");
             }
         } else if (state.dataIPShortCut->cAlphaArgs(9).empty() != state.dataIPShortCut->cAlphaArgs(10).empty()) {
-            ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + ", Name=" + state.dataIPShortCut->cAlphaArgs(1));
+            ShowWarningError(state, format("{}, Name={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "...Generator fluid nodes must both be entered (or both left blank).");
-            ShowContinueError(state, "...Generator fluid inlet node  = " + state.dataIPShortCut->cAlphaArgs(9));
-            ShowContinueError(state, "...Generator fluid outlet node = " + state.dataIPShortCut->cAlphaArgs(10));
+            ShowContinueError(state, format("...Generator fluid inlet node  = {}", state.dataIPShortCut->cAlphaArgs(9)));
+            ShowContinueError(state, format("...Generator fluid outlet node = {}", state.dataIPShortCut->cAlphaArgs(10)));
             ErrorsFound = true;
         } else {
             //     Generator fluid type must be steam if generator inlet/outlet nodes are not used
             if (thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
-                ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + ", Name=" + state.dataIPShortCut->cAlphaArgs(1));
+                ShowWarningError(state, format("{}, Name={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "...Generator fluid type must be Steam if generator inlet/outlet nodes are blank.");
                 ShowContinueError(state, "...Generator fluid type is set to Steam and the simulation continues.");
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
@@ -449,73 +449,72 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                 static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\",");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
+                                format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
                 ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
                 thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
             };
         }
 
-        thisChiller.CapFCondenserTempPtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11));
+        thisChiller.CapFCondenserTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11));
         if (thisChiller.CapFCondenserTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        thisChiller.CapFCondenserTempPtr,            // Curve index
-                                                        {1},                                         // Valid dimensions
-                                                        RoutineName,                                 // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,  // Object Type
-                                                        thisChiller.Name,                            // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(11)); // Field Name
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisChiller.CapFCondenserTempPtr,            // Curve index
+                                                 {1},                                         // Valid dimensions
+                                                 RoutineName,                                 // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,  // Object Type
+                                                 thisChiller.Name,                            // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(11)); // Field Name
         }
 
-        thisChiller.CapFEvaporatorTempPtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(12));
+        thisChiller.CapFEvaporatorTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(12));
         if (thisChiller.CapFEvaporatorTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        thisChiller.CapFEvaporatorTempPtr,           // Curve index
-                                                        {1},                                         // Valid dimensions
-                                                        RoutineName,                                 // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,  // Object Type
-                                                        thisChiller.Name,                            // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(12)); // Field Name
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisChiller.CapFEvaporatorTempPtr,           // Curve index
+                                                 {1},                                         // Valid dimensions
+                                                 RoutineName,                                 // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,  // Object Type
+                                                 thisChiller.Name,                            // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(12)); // Field Name
         }
 
-        thisChiller.CapFGeneratorTempPtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(13));
+        thisChiller.CapFGeneratorTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(13));
         if (thisChiller.CapFGeneratorTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        thisChiller.CapFGeneratorTempPtr,            // Curve index
-                                                        {1},                                         // Valid dimensions
-                                                        RoutineName,                                 // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,  // Object Type
-                                                        thisChiller.Name,                            // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(13)); // Field Name
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisChiller.CapFGeneratorTempPtr,            // Curve index
+                                                 {1},                                         // Valid dimensions
+                                                 RoutineName,                                 // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,  // Object Type
+                                                 thisChiller.Name,                            // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(13)); // Field Name
         }
 
-        thisChiller.HeatInputFCondTempPtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(14));
+        thisChiller.HeatInputFCondTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(14));
         if (thisChiller.HeatInputFCondTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        thisChiller.HeatInputFCondTempPtr,           // Curve index
-                                                        {1},                                         // Valid dimensions
-                                                        RoutineName,                                 // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,  // Object Type
-                                                        thisChiller.Name,                            // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(14)); // Field Name
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisChiller.HeatInputFCondTempPtr,           // Curve index
+                                                 {1},                                         // Valid dimensions
+                                                 RoutineName,                                 // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,  // Object Type
+                                                 thisChiller.Name,                            // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(14)); // Field Name
         }
 
-        thisChiller.HeatInputFEvapTempPtr = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(15));
+        thisChiller.HeatInputFEvapTempPtr = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(15));
         if (thisChiller.HeatInputFEvapTempPtr > 0) {
             // Verify Curve Object, only legal types are Quadratic or Cubic
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        thisChiller.HeatInputFEvapTempPtr,           // Curve index
-                                                        {1},                                         // Valid dimensions
-                                                        RoutineName,                                 // Routine name
-                                                        state.dataIPShortCut->cCurrentModuleObject,  // Object Type
-                                                        thisChiller.Name,                            // Object Name
-                                                        state.dataIPShortCut->cAlphaFieldNames(15)); // Field Name
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisChiller.HeatInputFEvapTempPtr,           // Curve index
+                                                 {1},                                         // Valid dimensions
+                                                 RoutineName,                                 // Routine name
+                                                 state.dataIPShortCut->cCurrentModuleObject,  // Object Type
+                                                 thisChiller.Name,                            // Object Name
+                                                 state.dataIPShortCut->cAlphaFieldNames(15)); // Field Name
         }
 
         // Get remaining data
@@ -541,7 +540,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
         }
 
         if (thisChiller.GeneratorVolFlowRate == 0.0 && thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
-            ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + ", Name=" + state.dataIPShortCut->cAlphaArgs(1));
+            ShowWarningError(state, format("{}, Name={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, "...Generator water flow rate must be greater than 0 when absorber generator fluid type is hot water.");
             ErrorsFound = true;
         }
@@ -849,7 +848,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
             (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 if (!this->ModulatedFlowErrDone) {
-                    ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                    ShowWarningError(state, format("Missing temperature setpoint for LeavingSetpointModulated mode chiller named {}", this->Name));
                     ShowContinueError(
                         state, "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
                     ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
@@ -863,7 +862,8 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                 state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                 if (FatalError) {
                     if (!this->ModulatedFlowErrDone) {
-                        ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                        ShowWarningError(state,
+                                         format("Missing temperature setpoint for LeavingSetpointModulated mode chiller named {}", this->Name));
                         ShowContinueError(state,
                                           "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                         ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
@@ -1035,7 +1035,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
 
     Real64 SteamInputRatNom = 1.0; // nominal energy input ratio (steam or hot water)
     if (this->GeneratorInputCurvePtr > 0) {
-        SteamInputRatNom = CurveManager::CurveValue(state, this->GeneratorInputCurvePtr, 1.0);
+        SteamInputRatNom = Curve::CurveValue(state, this->GeneratorInputCurvePtr, 1.0);
     }
 
     // find the appropriate Plant Sizing object
@@ -1053,7 +1053,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                 state, "Chiller:Absorption:Indirect", this->Name, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum, LoopErrorsFound);
         } else {
             for (int PltSizIndex = 1; PltSizIndex <= state.dataSize->NumPltSizInput; ++PltSizIndex) {
-                if (state.dataSize->PlantSizData(PltSizIndex).LoopType == DataSizing::SteamLoop) {
+                if (state.dataSize->PlantSizData(PltSizIndex).LoopType == DataSizing::TypeOfPlantLoop::Steam) {
                     PltSizSteamNum = PltSizIndex;
                 }
             }
@@ -1064,7 +1064,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                 state, "Chiller:Absorption:Indirect", this->Name, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum, LoopErrorsFound);
         } else {
             for (int PltSizIndex = 1; PltSizIndex <= state.dataSize->NumPltSizInput; ++PltSizIndex) {
-                if (state.dataSize->PlantSizData(PltSizIndex).LoopType == DataSizing::HeatingLoop) {
+                if (state.dataSize->PlantSizData(PltSizIndex).LoopType == DataSizing::TypeOfPlantLoop::Heating) {
                     PltSizHeatingNum = PltSizIndex;
                 }
             }
@@ -1114,7 +1114,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                                      NomCapUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
+                                ShowMessage(state, format("SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for {}", this->Name));
                                 ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
                                 ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1130,7 +1130,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
         if (this->NomCapWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Absorption Chiller nominal capacity requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Chiller:Absorption:Indirect object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Chiller:Absorption:Indirect object={}", this->Name));
                 ErrorsFound = true;
             }
         } else {
@@ -1170,7 +1170,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                                  NomPumpPowerUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpNomPumpPower - NomPumpPowerUser) / NomPumpPowerUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                            ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
+                            ShowMessage(state, format("SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for {}", this->Name));
                             ShowContinueError(state, format("User-Specified Nominal Pumping Power of {:.2R} [W]", NomPumpPowerUser));
                             ShowContinueError(state, format("differs from Design Size Nominal Pumping Power of {:.2R} [W]", tmpNomPumpPower));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1218,7 +1218,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "SizeChillerElectricIndirect: Potential issue with equipment sizing for " + this->Name);
+                                ShowMessage(state, format("SizeChillerElectricIndirect: Potential issue with equipment sizing for {}", this->Name));
                                 ShowContinueError(state,
                                                   format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
                                 ShowContinueError(
@@ -1236,7 +1236,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
         if (this->EvapVolFlowRateWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Absorption Chiller evap flow rate requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Chiller:Absorption:Indirect object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Chiller:Absorption:Indirect object={}", this->Name));
                 ErrorsFound = true;
             }
         } else {
@@ -1307,7 +1307,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
+                                ShowMessage(state, format("SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for {}", this->Name));
                                 ShowContinueError(state,
                                                   format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
                                 ShowContinueError(
@@ -1326,7 +1326,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Absorption Chiller condenser flow rate requires a condenser");
                 ShowContinueError(state, "loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Chiller:Absorption:Indirect object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Chiller:Absorption:Indirect object={}", this->Name));
                 ErrorsFound = true;
             }
         } else {
@@ -1398,7 +1398,8 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
                                         state.dataSize->AutoVsHardSizingThreshold) {
-                                        ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
+                                        ShowMessage(
+                                            state, format("SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for {}", this->Name));
                                         ShowContinueError(
                                             state,
                                             format("User-Specified Design Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
@@ -1479,7 +1480,8 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
                                         state.dataSize->AutoVsHardSizingThreshold) {
-                                        ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
+                                        ShowMessage(
+                                            state, format("SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for {}", this->Name));
                                         ShowContinueError(
                                             state,
                                             format("User-Specified Design Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
@@ -1512,7 +1514,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                 ShowSevereError(state, "Autosizing of Absorption Chiller generator flow rate requires a loop Sizing:Plant object.");
                 ShowContinueError(state, " For steam loops, use a steam Sizing:Plant object.");
                 ShowContinueError(state, " For hot water loops, use a heating Sizing:Plant object.");
-                ShowContinueError(state, "Occurs in Chiller:Absorption:Indirect object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Chiller:Absorption:Indirect object={}", this->Name));
                 ErrorsFound = true;
             }
         } else {
@@ -1620,7 +1622,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
         if (!state.dataGlobal->WarmupFlag) {
             if (this->MinCondInletTempCtr < 1) {
                 ++this->MinCondInletTempCtr;
-                ShowWarningError(state, "Chiller:Absorption:Indirect \"" + this->Name + "\"");
+                ShowWarningError(state, format("Chiller:Absorption:Indirect \"{}\"", this->Name));
                 ShowContinueError(state,
                                   format("...Entering condenser water temperature below specified minimum ({:.3R} C).", this->MinCondInletTemp));
                 ShowContinueError(
@@ -1642,7 +1644,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
             if (!state.dataGlobal->WarmupFlag) {
                 if (this->MinGenInletTempCtr < 1) {
                     ++this->MinGenInletTempCtr;
-                    ShowWarningError(state, "Chiller:Absorption:Indirect \"" + this->Name + "\"");
+                    ShowWarningError(state, format("Chiller:Absorption:Indirect \"{}\"", this->Name));
                     ShowContinueError(
                         state, format("...Entering generator fluid temperature below specified minimum ({:.3R} C).", this->MinGeneratorInletTemp));
                     ShowContinueError(
@@ -1703,12 +1705,12 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
 
     Real64 CapacityfAbsorberTemp = 1.0; // performance curve output
     if (this->CapFCondenserTempPtr > 0) {
-        CapacityfAbsorberTemp = CurveManager::CurveValue(state, this->CapFCondenserTempPtr, TempCondIn);
+        CapacityfAbsorberTemp = Curve::CurveValue(state, this->CapFCondenserTempPtr, TempCondIn);
     }
 
     Real64 CapacityfEvaporatorTemp = 1.0; // performance curve output
     if (this->CapFEvaporatorTempPtr > 0) {
-        CapacityfEvaporatorTemp = CurveManager::CurveValue(state, this->CapFEvaporatorTempPtr, TempEvapOut);
+        CapacityfEvaporatorTemp = Curve::CurveValue(state, this->CapFEvaporatorTempPtr, TempEvapOut);
     }
 
     Real64 CapacityfGeneratorTemp = 1.0; // performance curve output
@@ -1716,7 +1718,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
         if (this->GeneratorInletNodeNum > 0) {
             if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                 CapacityfGeneratorTemp =
-                    CurveManager::CurveValue(state, this->CapFGeneratorTempPtr, state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp);
+                    Curve::CurveValue(state, this->CapFGeneratorTempPtr, state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp);
             } else {
                 CapacityfGeneratorTemp = 1.0;
             }
@@ -1918,8 +1920,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
     Real64 HeatInputfCondTemp = 1.0; // performance curve output
     if (this->GeneratorInletNodeNum > 0) {
         if (this->HeatInputFCondTempPtr > 0) {
-            HeatInputfCondTemp =
-                CurveManager::CurveValue(state, this->HeatInputFCondTempPtr, state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp);
+            HeatInputfCondTemp = Curve::CurveValue(state, this->HeatInputFCondTempPtr, state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp);
         } else {
             HeatInputfCondTemp = 1.0;
         }
@@ -1927,19 +1928,19 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
 
     Real64 HeatInputfEvapTemp = 1.0; // performance curve output
     if (this->HeatInputFEvapTempPtr > 0) {
-        HeatInputfEvapTemp = CurveManager::CurveValue(state, this->HeatInputFEvapTempPtr, state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp);
+        HeatInputfEvapTemp = Curve::CurveValue(state, this->HeatInputFEvapTempPtr, state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp);
     }
 
     // Calculate steam input ratio. Include impact of generator and evaporator temperatures
     Real64 HeatInputRat = HeatInputfCondTemp * HeatInputfEvapTemp; // generator heat input ratio
     if (this->GeneratorInputCurvePtr > 0) {
-        HeatInputRat = CurveManager::CurveValue(state, this->GeneratorInputCurvePtr, PartLoadRat) * HeatInputfCondTemp * HeatInputfEvapTemp;
+        HeatInputRat = Curve::CurveValue(state, this->GeneratorInputCurvePtr, PartLoadRat) * HeatInputfCondTemp * HeatInputfEvapTemp;
     }
 
     // Calculate electric input ratio
     Real64 ElectricInputRat = 1.0; // energy input ratio
     if (this->PumpPowerCurvePtr > 0) {
-        ElectricInputRat = CurveManager::CurveValue(state, this->PumpPowerCurvePtr, PartLoadRat);
+        ElectricInputRat = Curve::CurveValue(state, this->PumpPowerCurvePtr, PartLoadRat);
     }
 
     this->QGenerator = HeatInputRat * AbsorberNomCap * FRAC;

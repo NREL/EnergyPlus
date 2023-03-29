@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -266,9 +266,9 @@ namespace WaterCoils {
                                      std::string_view CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
-                                     Optional<Real64> QActual = _,
-                                     Optional_int_const FanOpMode = _,
-                                     Optional<Real64 const> PartLoadRatio = _);
+                                     ObjexxFCL::Optional<Real64> QActual = _,
+                                     ObjexxFCL::Optional_int_const FanOpMode = _,
+                                     ObjexxFCL::Optional<Real64 const> PartLoadRatio = _);
 
     void GetWaterCoilInput(EnergyPlusData &state);
 
@@ -512,11 +512,11 @@ namespace WaterCoils {
     // sets data to a coil that is used as a regeneration air heating coil in
     // desiccant dehumidification system
     void SetWaterCoilData(EnergyPlusData &state,
-                          int const CoilNum,                           // index of hot water heating Coil
-                          bool &ErrorsFound,                           // Set to true if certain errors found
-                          Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
-                          Optional_int DesiccantDehumIndex = _,        // Index for the desiccant dehum system where this caoil is used
-                          Optional_bool heatRecoveryCoil = _           // true if water coil is connected to heat recovery loop
+                          int const CoilNum,                                      // index of hot water heating Coil
+                          bool &ErrorsFound,                                      // Set to true if certain errors found
+                          ObjexxFCL::Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
+                          ObjexxFCL::Optional_int DesiccantDehumIndex = _,        // Index for the desiccant dehum system where this caoil is used
+                          ObjexxFCL::Optional_bool heatRecoveryCoil = _           // true if water coil is connected to heat recovery loop
     );
 
     // estimate heating coil design inlet water temperature for autosizing UA-value

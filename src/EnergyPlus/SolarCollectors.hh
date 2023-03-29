@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -188,13 +188,13 @@ namespace SolarCollectors {
                       bool RunFlag) override;
 
         void CalcTransRefAbsOfCover(EnergyPlusData &state,
-                                    Real64 IncidentAngle,              // Angle of incidence (radians)
-                                    Real64 &TransSys,                  // cover system solar transmittance
-                                    Real64 &ReflSys,                   // cover system solar reflectance
-                                    Real64 &AbsCover1,                 // Inner cover solar absorptance
-                                    Real64 &AbsCover2,                 // Outer cover solar absorptance
-                                    Optional_bool_const InOUTFlag = _, // flag for calc. diffuse solar refl of cover from inside out
-                                    Optional<Real64> RefSysDiffuse = _ // cover system solar reflectance from inner to outer cover
+                                    Real64 IncidentAngle,                         // Angle of incidence (radians)
+                                    Real64 &TransSys,                             // cover system solar transmittance
+                                    Real64 &ReflSys,                              // cover system solar reflectance
+                                    Real64 &AbsCover1,                            // Inner cover solar absorptance
+                                    Real64 &AbsCover2,                            // Outer cover solar absorptance
+                                    ObjexxFCL::Optional_bool_const InOUTFlag = _, // flag for calc. diffuse solar refl of cover from inside out
+                                    ObjexxFCL::Optional<Real64> RefSysDiffuse = _ // cover system solar reflectance from inner to outer cover
         ) const;
 
         void CalcSolarCollector(EnergyPlusData &state);

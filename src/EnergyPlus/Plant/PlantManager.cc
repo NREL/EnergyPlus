@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -286,7 +286,7 @@ void GetPlantLoopData(EnergyPlusData &state)
     // Using/Aliasing
     using ScheduleManager::GetScheduleIndex;
     using SetPointManager::IsNodeOnSetPtManager;
-    auto localTempSetPt = SetPointManager::CtrlVarType::Temp;
+    SetPointManager::CtrlVarType localTempSetPt = SetPointManager::CtrlVarType::Temp;
     using NodeInputManager::GetOnlySingleNode;
     using namespace BranchInputManager;
     using DataSizing::AutoSize;
@@ -1176,6 +1176,18 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                         break;
                     }
+                    case PlantEquipmentType::HeatPumpFuelFiredHeating: {
+                        this_comp.compPtr = EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::factory(
+                            state, PlantEquipmentType::HeatPumpFuelFiredHeating, CompNames(CompNum));
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
+                        break;
+                    }
+                    case PlantEquipmentType::HeatPumpFuelFiredCooling: {
+                        this_comp.compPtr = EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::factory(
+                            state, PlantEquipmentType::HeatPumpFuelFiredCooling, CompNames(CompNum));
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
+                        break;
+                    }
                     case PlantEquipmentType::HeatPumpVRF: {
                         if (LoopSideNum == LoopSideLocation::Demand) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
@@ -1851,7 +1863,7 @@ void GetPlantInput(EnergyPlusData &state)
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     //                    auto &this_comp_type(CompTypes(CompNum));
                     auto &this_comp(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
-                    auto type = this_comp.TypeOf;
+                    // auto type = this_comp.TypeOf;
                     this_comp.oneTimeInit(state);
                 }
             }
@@ -4228,6 +4240,17 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                     } break;
                     case DataPlant::PlantEquipmentType::HeatPumpEIRCooling:
                     case PlantEquipmentType::HeatPumpEIRHeating: { // 95, 96
+                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
+                        if (LoopSideCtr == LoopSideLocation::Demand) {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
+                        } else {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
+                        }
+                    } break;
+                    case DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling:
+                    case PlantEquipmentType::HeatPumpFuelFiredHeating: {
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         if (LoopSideCtr == LoopSideLocation::Demand) {
                             this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;

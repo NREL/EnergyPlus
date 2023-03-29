@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -133,7 +133,7 @@ namespace DXFEarClipping {
                                            Array1D<Real64> &yvt,
                                            Array1D<Real64> &zvt);
 
-    void reorder(int &nvert); // unused1208
+    // void reorder(int &nvert); // unused1208
 
 } // namespace DXFEarClipping
 

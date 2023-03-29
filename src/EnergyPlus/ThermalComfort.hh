@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -175,9 +175,9 @@ namespace ThermalComfort {
     void InitThermalComfort(EnergyPlusData &state);
 
     void CalcThermalComfortFanger(EnergyPlusData &state,
-                                  Optional_int_const PNum = _,     // People number for thermal comfort control
-                                  Optional<Real64 const> Tset = _, // Temperature setpoint for thermal comfort control
-                                  Optional<Real64> PMVResult = _   // PMV value for thermal comfort control
+                                  ObjexxFCL::Optional_int_const PNum = _,     // People number for thermal comfort control
+                                  ObjexxFCL::Optional<Real64 const> Tset = _, // Temperature setpoint for thermal comfort control
+                                  ObjexxFCL::Optional<Real64> PMVResult = _   // PMV value for thermal comfort control
     );
     Real64 CalcFangerPMV(
         EnergyPlusData &state, Real64 AirTemp, Real64 RadTemp, Real64 RelHum, Real64 AirVel, Real64 ActLevel, Real64 CloUnit, Real64 WorkEff);
@@ -231,16 +231,16 @@ namespace ThermalComfort {
 
     void CalcThermalComfortAdaptiveASH55(
         EnergyPlusData &state,
-        bool const initiate,                  // true if supposed to initiate
-        Optional_bool_const wthrsim = _,      // true if this is a weather simulation
-        Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day
+        bool const initiate,                             // true if supposed to initiate
+        ObjexxFCL::Optional_bool_const wthrsim = _,      // true if this is a weather simulation
+        ObjexxFCL::Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day
     );
 
     void CalcThermalComfortAdaptiveCEN15251(
         EnergyPlusData &state,
-        bool const initiate,                  // true if supposed to initiate
-        Optional_bool_const wthrsim = _,      // true if this is a weather simulation
-        Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day
+        bool const initiate,                             // true if supposed to initiate
+        ObjexxFCL::Optional_bool_const wthrsim = _,      // true if this is a weather simulation
+        ObjexxFCL::Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day
     );
 
     void DynamicClothingModel(EnergyPlusData &state);

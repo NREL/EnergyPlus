@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -111,9 +111,9 @@ namespace EMSManager {
     void CheckIfAnyEMS(EnergyPlusData &state);
 
     void ManageEMS(EnergyPlusData &state,
-                   EMSCallFrom iCalledFrom,                   // indicates where subroutine was called from, parameters in DataGlobals.
-                   bool &anyProgramRan,                       // true if any Erl programs ran for this call
-                   Optional_int_const ProgramManagerToRun = _ // specific program manager to run
+                   EMSCallFrom iCalledFrom,                              // indicates where subroutine was called from, parameters in DataGlobals.
+                   bool &anyProgramRan,                                  // true if any Erl programs ran for this call
+                   ObjexxFCL::Optional_int_const ProgramManagerToRun = _ // specific program manager to run
     );
 
     void InitEMS(EnergyPlusData &state, EMSCallFrom iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.

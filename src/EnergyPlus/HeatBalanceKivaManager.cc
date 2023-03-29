@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,7 +59,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -270,7 +269,7 @@ void KivaInstanceMap::setInitialBoundaryConditions(
         case KIVAZONE_TEMPCONTROL: {
 
             int controlTypeSchId = state.dataZoneCtrls->TempControlledZone(zoneControlNum).CTSchedIndex;
-            auto controlType =
+            DataHVACGlobals::ThermostatType controlType =
                 static_cast<DataHVACGlobals::ThermostatType>(ScheduleManager::LookUpScheduleValue(state, controlTypeSchId, hour, timestep));
 
             switch (controlType) {
@@ -400,7 +399,7 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
     Real64 Atotal = 0.0;
     Real64 TARadTotal = 0.0;
     Real64 TAConvTotal = 0.0;
-    for (auto &wl : wallSurfaces) {
+    for (int wl : wallSurfaces) {
         Real64 Q = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(wl) +      // solar
                    state.dataHeatBal->SurfQdotRadIntGainsInPerArea(wl) + // internal gains
                    state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(wl);  // HVAC
@@ -476,8 +475,8 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
         if (LineResult.eof) {
             ShowFatalError(
                 state,
-                "Kiva::ReadWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" +
-                    Header(HdLine));
+                format("Kiva::ReadWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header={}",
+                       Header(HdLine)));
         }
 
         // Use headers to know how to read data to memory (e.g., number of periods, number of intervals)
@@ -498,7 +497,7 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
 
         if ((Pos == std::string::npos) && (!has_prefixi(Header(HdLine), "COMMENTS"))) {
             ShowSevereError(state, "Invalid Header line in in.epw -- no commas");
-            ShowContinueError(state, "Line=" + LineResult.data);
+            ShowContinueError(state, format("Line={}", LineResult.data));
             ShowFatalError(state, "Previous conditions cause termination.");
         }
         if (Pos != std::string::npos) LineResult.data.erase(0, Pos + 1);
@@ -688,14 +687,15 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                         if (Surfaces(wl).Class == DataSurfaces::SurfaceClass::Floor) {
                             ErrorsFound = true;
                             ShowSevereError(state,
-                                            "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name +
-                                                "\", only one floor per Foundation:Kiva Object allowed.");
+                                            format("Foundation:Kiva=\"{}\", only one floor per Foundation:Kiva Object allowed.",
+                                                   foundationInputs[surface.OSCPtr].name));
                         } else {
                             ErrorsFound = true;
                             ShowSevereError(state,
-                                            "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name +
-                                                "\", only floor and wall surfaces are allowed to reference Foundation Outside Boundary Conditions.");
-                            ShowContinueError(state, "Surface=\"" + Surfaces(wl).Name + "\", is not a floor or wall.");
+                                            format("Foundation:Kiva=\"{}\", only floor and wall surfaces are allowed to reference Foundation Outside "
+                                                   "Boundary Conditions.",
+                                                   foundationInputs[surface.OSCPtr].name));
+                            ShowContinueError(state, format("Surface=\"{}\", is not a floor or wall.", Surfaces(wl).Name));
                         }
                     } else {
                         wallSurfaces.push_back(wl);
@@ -715,7 +715,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                 userSetExposedPerimeter = true;
                 useDetailedExposedPerimeter = expPerimMap[surfNum].useDetailedExposedPerimeter;
                 if (useDetailedExposedPerimeter) {
-                    for (auto s : expPerimMap[surfNum].isExposedPerimeter) {
+                    for (bool s : expPerimMap[surfNum].isExposedPerimeter) {
                         isExposedPerimeter.push_back(s);
                     }
                 } else {
@@ -724,14 +724,14 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
             } else {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                "Surface=\"" + Surfaces(surfNum).Name +
-                                    "\", references a Foundation Outside Boundary Condition but there is no corresponding "
-                                    "SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER object defined.");
+                                format("Surface=\"{}\", references a Foundation Outside Boundary Condition but there is no corresponding "
+                                       "SURFACEPROPERTY:EXPOSEDFOUNDATIONPERIMETER object defined.",
+                                       Surfaces(surfNum).Name));
             }
 
             Kiva::Polygon floorPolygon;
             for (std::size_t i = 0; i < surface.Vertex.size(); ++i) {
-                auto &v = surface.Vertex[i];
+                auto const &v = surface.Vertex[i];
                 floorPolygon.outer().push_back(Kiva::Point(v.x, v.y));
                 if (!userSetExposedPerimeter) {
                     isExposedPerimeter.push_back(true);
@@ -746,8 +746,8 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                 } else {
                     iNext = i + 1;
                 }
-                auto &v = surface.Vertex[i];
-                auto &vNext = surface.Vertex[iNext];
+                auto const &v = surface.Vertex[i];
+                auto const &vNext = surface.Vertex[iNext];
                 totalPerimeter += distance(v, vNext);
             }
 
@@ -761,8 +761,8 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                     } else {
                         iNext = i + 1;
                     }
-                    auto &p = floorPolygon.outer()[i];
-                    auto &pNext = floorPolygon.outer()[iNext];
+                    auto const &p = floorPolygon.outer()[i];
+                    auto const &pNext = floorPolygon.outer()[iNext];
                     Real64 perim = Kiva::getDistance(p, pNext);
                     total2DPerimeter += perim;
                     if (isExposedPerimeter[i]) {
@@ -786,15 +786,15 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
             std::map<std::pair<int, Real64>, WallGroup> combinationMap;
 
             if (!wallSurfaces.empty()) {
-                for (auto &wl : wallSurfaces) {
+                for (int wl : wallSurfaces) {
 
-                    auto &v = Surfaces(wl).Vertex;
-                    auto numVs = v.size();
+                    auto const &v = Surfaces(wl).Vertex;
+                    size_t numVs = v.size();
                     // Enforce quadrilateralism
                     if (numVs > 4) {
                         ShowWarningError(state,
-                                         "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name +
-                                             "\", wall surfaces with more than four vertices referencing");
+                                         format("Foundation:Kiva=\"{}\", wall surfaces with more than four vertices referencing",
+                                                foundationInputs[surface.OSCPtr].name));
                         ShowContinueError(
                             state, "...Foundation Outside Boundary Conditions may not be interpreted correctly in the 2D finite difference model.");
                         ShowContinueError(state, format("Surface=\"{}\", has {} vertices.", Surfaces(wl).Name, numVs));
@@ -822,9 +822,9 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                     }
 
                     if (perimeter == 0.0) {
-                        ShowWarningError(state, "Foundation:Kiva=\"" + foundationInputs[surface.OSCPtr].name + "\".");
-                        ShowContinueError(state, "   Wall Surface=\"" + Surfaces(wl).Name + "\", does not have any vertices that are");
-                        ShowContinueError(state, "   coplanar with the corresponding Floor Surface=\"" + Surfaces(surfNum).Name + "\".");
+                        ShowWarningError(state, format("Foundation:Kiva=\"{}\".", foundationInputs[surface.OSCPtr].name));
+                        ShowContinueError(state, format("   Wall Surface=\"{}\", does not have any vertices that are", Surfaces(wl).Name));
+                        ShowContinueError(state, format("   coplanar with the corresponding Floor Surface=\"{}\".", Surfaces(surfNum).Name));
                         ShowContinueError(state,
                                           "   Simulation will continue using the distance between the two lowest points in the wall for the "
                                           "interface distance.");
@@ -902,19 +902,19 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                     // Push back construction's layers
                     for (int layer = 1; layer <= c.TotLayers; layer++) {
-                        auto &mat = Materials(c.LayerPoint(layer));
-                        if (mat.ROnly) {
+                        auto const *mat = Materials(c.LayerPoint(layer));
+                        if (mat->ROnly) {
                             ErrorsFound = true;
-                            ShowSevereError(state, "Construction=\"" + c.Name + "\", constructions referenced by surfaces with a");
+                            ShowSevereError(state, format("Construction=\"{}\", constructions referenced by surfaces with a", c.Name));
                             ShowContinueError(state, "\"Foundation\" Outside Boundary Condition must use only regular material objects");
-                            ShowContinueError(state, "Material=\"" + mat.Name + "\", is not a regular material object");
+                            ShowContinueError(state, format("Material=\"{}\", is not a regular material object", mat->Name));
                             return ErrorsFound;
                         }
 
                         Kiva::Layer tempLayer;
 
-                        tempLayer.material = Kiva::Material(mat.Conductivity, mat.Density, mat.SpecHeat);
-                        tempLayer.thickness = mat.Thickness;
+                        tempLayer.material = Kiva::Material(mat->Conductivity, mat->Density, mat->SpecHeat);
+                        tempLayer.thickness = mat->Thickness;
 
                         fnd.wall.layers.push_back(tempLayer);
                     }
@@ -926,20 +926,20 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                 // Set slab construction
                 for (int i = 0; i < Constructs(surface.Construction).TotLayers; ++i) {
-                    auto &mat = Materials(Constructs(surface.Construction).LayerPoint[i]);
-                    if (mat.ROnly) {
+                    auto const *mat = Materials(Constructs(surface.Construction).LayerPoint[i]);
+                    if (mat->ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(
-                            state, "Construction=\"" + Constructs(surface.Construction).Name + "\", constructions referenced by surfaces with a");
+                            state, format("Construction=\"{}\", constructions referenced by surfaces with a", Constructs(surface.Construction).Name));
                         ShowContinueError(state, "\"Foundation\" Outside Boundary Condition must use only regular material objects");
-                        ShowContinueError(state, "Material=\"" + mat.Name + "\", is not a regular material object");
+                        ShowContinueError(state, format("Material=\"{}\", is not a regular material object", mat->Name));
                         return ErrorsFound;
                     }
 
                     Kiva::Layer tempLayer;
 
-                    tempLayer.material = Kiva::Material(mat.Conductivity, mat.Density, mat.SpecHeat);
-                    tempLayer.thickness = mat.Thickness;
+                    tempLayer.material = Kiva::Material(mat->Conductivity, mat->Density, mat->SpecHeat);
+                    tempLayer.thickness = mat->Thickness;
 
                     fnd.slab.layers.push_back(tempLayer);
                 }
@@ -953,11 +953,11 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                 fnd.perimeterSurfaceWidth = 0.0;
 
                 // Add blocks
-                auto intHIns = foundationInputs[surface.OSCPtr].intHIns;
-                auto intVIns = foundationInputs[surface.OSCPtr].intVIns;
-                auto extHIns = foundationInputs[surface.OSCPtr].extHIns;
-                auto extVIns = foundationInputs[surface.OSCPtr].extVIns;
-                auto footing = foundationInputs[surface.OSCPtr].footing;
+                auto intHIns = foundationInputs[surface.OSCPtr].intHIns; // (AUTO_OK_OBJ) intend to make a copy?
+                auto intVIns = foundationInputs[surface.OSCPtr].intVIns; // (AUTO_OK_OBJ) intend to make a copy?
+                auto extHIns = foundationInputs[surface.OSCPtr].extHIns; // (AUTO_OK_OBJ) intend to make a copy?
+                auto extVIns = foundationInputs[surface.OSCPtr].extVIns; // (AUTO_OK_OBJ) intend to make a copy?
+                auto footing = foundationInputs[surface.OSCPtr].footing; // (AUTO_OK_OBJ) intend to make a copy?
 
                 if (std::abs(intHIns.width) > 0.0) {
                     intHIns.z += fnd.foundationDepth + fnd.slab.totalWidth();
@@ -1017,7 +1017,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                 floorAggregator.add_instance(kivaInstances[inst].instance.ground.get(), floorWeight);
 
                 // Walls can only have one associated ground instance
-                for (auto &wl : wallIDs) {
+                for (int wl : wallIDs) {
                     surfaceMap[wl] = Kiva::Aggregator(Kiva::Surface::ST_WALL_INT);
                     surfaceMap[wl].add_instance(kivaInstances[inst].instance.ground.get(), 1.0);
                 }
@@ -1036,8 +1036,8 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                     assignKivaInstances = false;
                     if (remainingExposedPerimeter < -0.1) {
                         ErrorsFound = true;
-                        ShowSevereError(state, "For Floor Surface=\"" + Surfaces(surfNum).Name + "\", the Wall surfaces referencing");
-                        ShowContinueError(state, "  the same Foundation:Kiva=\"" + foundationInputs[Surfaces(surfNum).OSCPtr].name + "\" have");
+                        ShowSevereError(state, format("For Floor Surface=\"{}\", the Wall surfaces referencing", Surfaces(surfNum).Name));
+                        ShowContinueError(state, format("  the same Foundation:Kiva=\"{}\" have", foundationInputs[Surfaces(surfNum).OSCPtr].name));
                         ShowContinueError(state, "  a combined length greater than the exposed perimeter of the foundation.");
                         ShowContinueError(state, "  Ensure that each Wall surface shares at least one edge with the corresponding");
                         ShowContinueError(state, "  Floor surface.");
@@ -1052,21 +1052,21 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
     }
 
     // Loop through Foundation surfaces and make sure they are all assigned to an instance
-    for (auto surfNum : state.dataSurface->AllHTKivaSurfaceList) {
+    for (int surfNum : state.dataSurface->AllHTKivaSurfaceList) {
         if (surfaceMap[surfNum].size() == 0) {
             ErrorsFound = true;
-            ShowSevereError(state, "Surface=\"" + Surfaces(surfNum).Name + "\" has a 'Foundation' Outside Boundary Condition");
-            ShowContinueError(state, "  referencing Foundation:Kiva=\"" + foundationInputs[Surfaces(surfNum).OSCPtr].name + "\".");
+            ShowSevereError(state, format("Surface=\"{}\" has a 'Foundation' Outside Boundary Condition", Surfaces(surfNum).Name));
+            ShowContinueError(state, format("  referencing Foundation:Kiva=\"{}\".", foundationInputs[Surfaces(surfNum).OSCPtr].name));
             if (Surfaces(surfNum).Class == DataSurfaces::SurfaceClass::Wall) {
-                ShowContinueError(state, "  You must also reference Foundation:Kiva=\"" + foundationInputs[Surfaces(surfNum).OSCPtr].name + "\"");
+                ShowContinueError(state, format("  You must also reference Foundation:Kiva=\"{}\"", foundationInputs[Surfaces(surfNum).OSCPtr].name));
                 ShowContinueError(state,
-                                  "  in a floor surface within the same Zone=\"" + state.dataHeatBal->Zone(Surfaces(surfNum).Zone).Name + "\".");
+                                  format("  in a floor surface within the same Zone=\"{}\".", state.dataHeatBal->Zone(Surfaces(surfNum).Zone).Name));
             } else if (Surfaces(surfNum).Class == DataSurfaces::SurfaceClass::Floor) {
                 ShowContinueError(state, "  However, this floor was never assigned to a Kiva instance.");
                 ShowContinueError(state, "  This should not occur for floor surfaces. Please report to EnergyPlus Development Team.");
             } else {
                 ShowContinueError(state, "  Only floor and wall surfaces are allowed to reference 'Foundation' Outside Boundary Conditions.");
-                ShowContinueError(state, "  Surface=\"" + Surfaces(surfNum).Name + "\", is not a floor or wall.");
+                ShowContinueError(state, format("  Surface=\"{}\", is not a floor or wall.", Surfaces(surfNum).Name));
             }
         }
     }
@@ -1078,7 +1078,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
           "Surface(s)\n");
 
     for (auto &kv : kivaInstances) {
-        auto grnd = kv.instance.ground.get();
+        auto grnd = kv.instance.ground.get(); // (AUTO_OK_OBJ)
 
         std::string constructionName;
         if (kv.constructionNum <= 0) {
@@ -1088,7 +1088,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
         }
 
         std::string wallSurfaceString;
-        for (auto &wl : kv.wallSurfaces) {
+        for (int wl : kv.wallSurfaces) {
             wallSurfaceString += "," + state.dataSurface->Surface(wl).Name;
         }
 
@@ -1171,7 +1171,7 @@ void KivaInstanceMap::plotDomain(EnergyPlusData &state)
 
 void KivaManager::calcKivaSurfaceResults(EnergyPlusData &state)
 {
-    for (auto surfNum : state.dataSurface->AllHTKivaSurfaceList) {
+    for (int surfNum : state.dataSurface->AllHTKivaSurfaceList) {
         std::pair<EnergyPlusData *, std::string> contextPair{&state, format("Surface=\"{}\"", state.dataSurface->Surface(surfNum).Name)};
         Kiva::setMessageCallback(kivaErrorCallback, &contextPair);
         surfaceMap[surfNum].calc_weighted_results();

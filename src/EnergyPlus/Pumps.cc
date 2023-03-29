@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -216,8 +216,8 @@ void GetPumpInput(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
-    using CurveManager::GetCurveIndex;
-    using CurveManager::GetCurveMinMaxValues;
+    using Curve::GetCurveIndex;
+    using Curve::GetCurveMinMaxValues;
     using DataSizing::AutoSize;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSatDensityRefrig;
@@ -384,13 +384,13 @@ void GetPumpInput(EnergyPlusData &state)
             if (TempCurveIndex == 0) {
                 thisPump.PressureCurve_Index = -1;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            TempCurveIndex,                  // Curve index
-                                                            {1},                             // Valid dimensions
-                                                            RoutineName,                     // Routine name
-                                                            cCurrentModuleObject,            // Object Type
-                                                            thisPump.Name,                   // Object Name
-                                                            thisInput->cAlphaFieldNames(6)); // Field Name
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     TempCurveIndex,                  // Curve index
+                                                     {1},                             // Valid dimensions
+                                                     RoutineName,                     // Routine name
+                                                     cCurrentModuleObject,            // Object Type
+                                                     thisPump.Name,                   // Object Name
+                                                     thisInput->cAlphaFieldNames(6)); // Field Name
 
                 if (!ErrorsFound) {
                     thisPump.PressureCurve_Index = TempCurveIndex;
@@ -616,13 +616,13 @@ void GetPumpInput(EnergyPlusData &state)
             if (TempCurveIndex == 0) {
                 thisPump.PressureCurve_Index = -1;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                            TempCurveIndex,                  // Curve index
-                                                            {1},                             // Valid dimensions
-                                                            RoutineName,                     // Routine name
-                                                            cCurrentModuleObject,            // Object Type
-                                                            thisPump.Name,                   // Object Name
-                                                            thisInput->cAlphaFieldNames(6)); // Field Name
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     TempCurveIndex,                  // Curve index
+                                                     {1},                             // Valid dimensions
+                                                     RoutineName,                     // Routine name
+                                                     cCurrentModuleObject,            // Object Type
+                                                     thisPump.Name,                   // Object Name
+                                                     thisInput->cAlphaFieldNames(6)); // Field Name
 
                 if (!ErrorsFound) {
                     thisPump.PressureCurve_Index = TempCurveIndex;
@@ -2042,7 +2042,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     Real64 DesVolFlowRatePerBranch; // local temporary for split of branch pumps
 
     auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
-    auto &thisOkToReport = state.dataPlnt->PlantFinalSizesOkayToReport;
+    bool thisOkToReport = state.dataPlnt->PlantFinalSizesOkayToReport;
 
     // Calculate density at InitConvTemp once here, to remove RhoH2O calls littered throughout
     if (thisPump.plantLoc.loopNum > 0) {
@@ -2145,7 +2145,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     }
 
     // Note that autocalculation of power is based on nominal volume flow, regardless of whether the flow was
-    //  auto sized or manually sized.  Thus, this must go after the flow sizing block above.
+    //  auto-sized or manually sized.  Thus, this must go after the flow sizing block above.
     if (thisPump.NomPowerUseWasAutoSized) {
         if (thisPump.NomVolFlowRate >= SmallWaterVolFlow) {
             switch (thisPump.powerSizingMethod) {

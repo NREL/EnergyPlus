@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -704,7 +705,7 @@ namespace DataRoomAirModel {
 
 struct RoomAirModelData : BaseGlobalStruct
 {
-
+    bool anyNonMixingRoomAirModel = false; // True if any zone RoomAirModelType is not Mixing
     int TotNumOfAirNodes = 0;
     int TotNumOfRoomAFNNodes = 0;
     Array1D_int TotNumOfZoneAirNodes;
@@ -845,6 +846,7 @@ struct RoomAirModelData : BaseGlobalStruct
 
     void clear_state() override
     {
+        anyNonMixingRoomAirModel = false;
         TotNumOfAirNodes = 0;
         TotNumOfRoomAFNNodes = 0;
         TotNumOfZoneAirNodes.clear();

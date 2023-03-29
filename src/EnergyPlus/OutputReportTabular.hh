@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -566,7 +566,7 @@ namespace OutputReportTabular {
     void WriteTableOfContents(EnergyPlusData &state);
 
     void AddTOCReportPeriod(const int nReportPeriods,
-                            const std::string kw,
+                            const std::string &kw,
                             const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
                             std::ostream &tbl_stream);
 
@@ -649,7 +649,7 @@ namespace OutputReportTabular {
 
     void WriteCompCostTable(EnergyPlusData &state);
 
-    void writeRowReportPeriodInputVeri(const std::string reportType,
+    void writeRowReportPeriodInputVeri(const std::string &reportType,
                                        Array2D_string &tableBody,
                                        const int rowid,
                                        const int periodIdx,
@@ -664,7 +664,7 @@ namespace OutputReportTabular {
     std::string formatReportPeriodTimestamp(const int year, const int month, const int day, const int hour);
 
     void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
-                                          const std::string reportKeyWord,
+                                          const std::string &reportKeyWord,
                                           const int periodIdx,
                                           const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData);
 
@@ -859,7 +859,7 @@ namespace OutputReportTabular {
 
     void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle);
 
-    void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, Optional_bool_const isBold = _);
+    void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, ObjexxFCL::Optional_bool_const isBold = _);
 
     void WriteTable(EnergyPlusData &state,
                     Array2S_string const body, // row,column

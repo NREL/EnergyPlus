@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -223,25 +223,6 @@ TEST_F(EnergyPlusFixture, General_CreateTimeString)
     { // Time = -1
         // Should probably be a failure
         EXPECT_EQ("00:00:-1.0", General::CreateTimeString(-1));
-    }
-}
-
-TEST_F(EnergyPlusFixture, General_CreateTimeIntervalString)
-{
-    { // Time = 0 - 1
-        EXPECT_EQ("00:00:00.0 - 00:00:01.0", General::CreateTimeIntervalString(0, 1));
-    }
-    { // Time = 0 - 0
-        EXPECT_EQ("00:00:00.0 - 00:00:00.0", General::CreateTimeIntervalString(0, 0));
-    }
-    { // Time = 1 - 0
-        EXPECT_EQ("00:00:01.0 - 00:00:00.0", General::CreateTimeIntervalString(1, 0));
-    }
-    { // Time = 1 - 59
-        EXPECT_EQ("00:00:01.0 - 00:00:59.0", General::CreateTimeIntervalString(1, 59));
-    }
-    { // Time = 59 - 59.9
-        EXPECT_EQ("00:00:59.0 - 00:00:59.9", General::CreateTimeIntervalString(59, 59.9));
     }
 }
 

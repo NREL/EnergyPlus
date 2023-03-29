@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -353,7 +353,7 @@ namespace WaterToAirHeatPump {
 
             if ((heatPump.LoadSideOutsideUACoeff < DataGlobalConstants::rTinyValue) ||
                 (heatPump.LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue)) {
-                ShowSevereError(state, "Input problem for " + CurrentModuleObject + '=' + heatPump.Name);
+                ShowSevereError(state, format("Input problem for {}={}", CurrentModuleObject, heatPump.Name));
                 ShowContinueError(state, " One or both load side UA values entered are below tolerance, likely zero or blank.");
                 ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
                 ShowContinueError(state, "  the release of EnergyPlus version 5.");
@@ -537,7 +537,7 @@ namespace WaterToAirHeatPump {
 
             heatPump.LoadSideTotalUACoeff = NumArray(5);
             if (heatPump.LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue) {
-                ShowSevereError(state, "Input problem for " + CurrentModuleObject + '=' + heatPump.Name);
+                ShowSevereError(state, format("Input problem for {}={}", CurrentModuleObject, heatPump.Name));
                 ShowContinueError(state, " Load side UA value is less than tolerance, likely zero or blank.");
                 ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
                 ShowContinueError(state, "  the release of EnergyPlus version 5.");
@@ -939,7 +939,7 @@ namespace WaterToAirHeatPump {
 
             if (state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidName == "WATER") {
                 if (heatPump.SourceSideUACoeff < DataGlobalConstants::rTinyValue) {
-                    ShowSevereError(state, "Input problem for water to air heat pump, \"" + heatPump.Name + "\".");
+                    ShowSevereError(state, format("Input problem for water to air heat pump, \"{}\".", heatPump.Name));
                     ShowContinueError(state, " Source side UA value is less than tolerance, likely zero or blank.");
                     ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
                     ShowContinueError(state, "  the release of EnergyPlus version 5.");
@@ -947,7 +947,7 @@ namespace WaterToAirHeatPump {
                 }
             } else {
                 if ((heatPump.SourceSideHTR1 < DataGlobalConstants::rTinyValue) || (heatPump.SourceSideHTR2 < DataGlobalConstants::rTinyValue)) {
-                    ShowSevereError(state, "Input problem for water to air heat pump, \"" + heatPump.Name + "\".");
+                    ShowSevereError(state, format("Input problem for water to air heat pump, \"{}\".", heatPump.Name));
                     ShowContinueError(state, " A source side heat transfer resistance value is less than tolerance, likely zero or blank.");
                     ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
                     ShowContinueError(state, "  the release of EnergyPlus version 5.");
@@ -2098,14 +2098,10 @@ namespace WaterToAirHeatPump {
         // Data is moved from the HP data structure to the HP outlet nodes.
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
         using PlantUtilities::SafeCopyPlantNode;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 ReportingConstant;
-
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // WatertoAirHP(HPNum)%SimFlag=.FALSE.
         if (!heatPump.SimFlag) {
             // Heatpump is off; just pass through conditions
@@ -2157,11 +2153,11 @@ namespace WaterToAirHeatPump {
         heatPump.InletAirMassFlowRate = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).MassFlowRate;
         heatPump.OutletAirMassFlowRate = heatPump.InletAirMassFlowRate;
 
-        heatPump.Energy = heatPump.Power * ReportingConstant;
-        heatPump.EnergyLoadTotal = heatPump.QLoadTotal * ReportingConstant;
-        heatPump.EnergySensible = heatPump.QSensible * ReportingConstant;
-        heatPump.EnergyLatent = heatPump.QLatent * ReportingConstant;
-        heatPump.EnergySource = heatPump.QSource * ReportingConstant;
+        heatPump.Energy = heatPump.Power * TimeStepSysSec;
+        heatPump.EnergyLoadTotal = heatPump.QLoadTotal * TimeStepSysSec;
+        heatPump.EnergySensible = heatPump.QSensible * TimeStepSysSec;
+        heatPump.EnergyLatent = heatPump.QLatent * TimeStepSysSec;
+        heatPump.EnergySource = heatPump.QSource * TimeStepSysSec;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).CO2 = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).CO2;
@@ -2386,7 +2382,7 @@ namespace WaterToAirHeatPump {
         IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterToAirHeatPump->WatertoAirHP);
 
         if (IndexNum == 0) {
-            ShowSevereError(state, "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
         }
 
@@ -2442,7 +2438,7 @@ namespace WaterToAirHeatPump {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError(state, "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
             CoilCapacity = -1000.0;
         }
@@ -2490,7 +2486,7 @@ namespace WaterToAirHeatPump {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError(state, "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
             NodeNumber = 0;
         }
@@ -2538,7 +2534,7 @@ namespace WaterToAirHeatPump {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError(state, "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
             NodeNumber = 0;
         }

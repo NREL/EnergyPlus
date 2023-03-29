@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1057,7 +1057,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     state->dataSize->CurSysNum = 1;
     state->dataSize->UnitarySysEqSizing.allocate(1);
     // run init to size system
-    thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0, 0.0);
+    thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0.0);
     DataHVACGlobals::CompressorOperation CompOn = DataHVACGlobals::CompressorOperation::On;
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
     // system meets temperature set point
@@ -1071,7 +1071,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
 
     // test cool reheat latent control
     thisSys->m_DesiredOutletHumRat = RHControlHumRat;
-    thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0, 0.0);
+    thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0.0);
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
 
     Real64 outTemp2 = state->dataLoopNodes->Node(ControlNode).Temp;
@@ -1092,7 +1092,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
 
     // test multimode latent control (change CoilSystem:Cooling:DX coolreheat to multimode)
     thisSys->m_DehumidControlType_Num = UnitarySystems::UnitarySys::DehumCtrlType::Multimode;
-    thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0, 0.0);
+    thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0.0);
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
 
     Real64 outTemp3 = state->dataLoopNodes->Node(ControlNode).Temp;

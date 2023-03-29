@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -125,10 +125,6 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
 
 void HVACSizingSimulationManager::SetupSizingAnalyses(EnergyPlusData &state)
 {
-    using DataSizing::CondenserLoop;
-    using DataSizing::CoolingLoop;
-    using DataSizing::HeatingLoop;
-    using DataSizing::SteamLoop;
 
     for (auto &P : plantCoincAnalyObjs) {
         // call setup log routine for each coincident plant analysis object
@@ -136,12 +132,12 @@ void HVACSizingSimulationManager::SetupSizingAnalyses(EnergyPlusData &state)
             sizingLogger.SetupVariableSizingLog(state, state.dataLoopNodes->Node(P.supplySideInletNodeNum).MassFlowRate, P.numTimeStepsInAvg);
         P.supplyInletNodeTemp_LogIndex =
             sizingLogger.SetupVariableSizingLog(state, state.dataLoopNodes->Node(P.supplySideInletNodeNum).Temp, P.numTimeStepsInAvg);
-        if (state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop ||
-            state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == SteamLoop) {
+        if (state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == DataSizing::TypeOfPlantLoop::Heating ||
+            state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == DataSizing::TypeOfPlantLoop::Steam) {
             P.loopDemand_LogIndex =
                 sizingLogger.SetupVariableSizingLog(state, state.dataPlnt->PlantLoop(P.plantLoopIndex).HeatingDemand, P.numTimeStepsInAvg);
-        } else if (state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop ||
-                   state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == CondenserLoop) {
+        } else if (state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == DataSizing::TypeOfPlantLoop::Cooling ||
+                   state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == DataSizing::TypeOfPlantLoop::Condenser) {
             P.loopDemand_LogIndex =
                 sizingLogger.SetupVariableSizingLog(state, state.dataPlnt->PlantLoop(P.plantLoopIndex).CoolingDemand, P.numTimeStepsInAvg);
         }

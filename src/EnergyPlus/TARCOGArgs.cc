@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -425,10 +425,9 @@ int ArgCheck(EnergyPlusData &state,
             return ArgCheck;
         }
 
-        if (BITF_TEST_NONE(BITF(LayerType(i)),
-                           BITF(TARCOGLayerType::SPECULAR) | BITF(TARCOGLayerType::WOVSHADE) | BITF(TARCOGLayerType::VENETBLIND_HORIZ) |
-                               BITF(TARCOGLayerType::PERFORATED) | BITF(TARCOGLayerType::DIFFSHADE) | BITF(TARCOGLayerType::BSDF) |
-                               BITF(TARCOGLayerType::VENETBLIND_VERT)))
+        if (LayerType(i) != TARCOGLayerType::SPECULAR && LayerType(i) != TARCOGLayerType::WOVSHADE &&
+            LayerType(i) != TARCOGLayerType::VENETBLIND_HORIZ && LayerType(i) != TARCOGLayerType::PERFORATED &&
+            LayerType(i) != TARCOGLayerType::DIFFSHADE && LayerType(i) != TARCOGLayerType::BSDF && LayerType(i) != TARCOGLayerType::VENETBLIND_VERT)
 
         {
             ArgCheck = 22;

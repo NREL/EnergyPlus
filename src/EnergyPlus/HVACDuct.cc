@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -137,7 +137,7 @@ namespace HVACDuct {
         if (CompIndex == 0) {
             DuctNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACDuct->Duct);
             if (DuctNum == 0) {
-                ShowFatalError(state, "SimDuct: Component not found=" + std::string{CompName});
+                ShowFatalError(state, format("SimDuct: Component not found={}", CompName));
             }
             CompIndex = DuctNum;
         } else {
@@ -247,7 +247,7 @@ namespace HVACDuct {
         // No output variables
 
         if (ErrorsFound) {
-            ShowFatalError(state, std::string{RoutineName} + " Errors found in input");
+            ShowFatalError(state, format("{} Errors found in input", RoutineName));
         }
     }
 

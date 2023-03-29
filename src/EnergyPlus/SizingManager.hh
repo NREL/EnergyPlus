@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -145,15 +145,15 @@ namespace SizingManager {
     );
 
     void ReportSysSizing(EnergyPlusData &state,
-                         std::string const &SysName,      // the name of the zone
-                         std::string const &LoadType,     // either "Cooling" or "Heating"
-                         std::string const &PeakLoadType, // either "Sensible" or "Total"
-                         Real64 UserDesCap,               // User  Design Capacity
-                         Real64 CalcDesVolFlow,           // Calculated  Design Air Flow Rate
-                         Real64 UserDesVolFlow,           // User Design Air Flow Rate
-                         std::string const &DesDayName,   // the name of the design day that produced the peak
-                         std::string const &DesDayDate,   // the date that produced the peak
-                         int TimeStepIndex                // time step of the peak
+                         std::string const &SysName,    // the name of the zone
+                         std::string_view LoadType,     // either "Cooling" or "Heating"
+                         std::string_view PeakLoadType, // either "Sensible" or "Total"
+                         Real64 UserDesCap,             // User  Design Capacity
+                         Real64 CalcDesVolFlow,         // Calculated  Design Air Flow Rate
+                         Real64 UserDesVolFlow,         // User Design Air Flow Rate
+                         std::string const &DesDayName, // the name of the design day that produced the peak
+                         std::string const &DesDayDate, // the date that produced the peak
+                         int TimeStepIndex              // time step of the peak
     );
 
     std::string TimeIndexToHrMinString(EnergyPlusData &state, int timeIndex);
