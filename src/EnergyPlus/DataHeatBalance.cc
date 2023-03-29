@@ -1151,15 +1151,13 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     ReflectCyl = thisScreen.ReflectCylinder;
     ReflectCylVis = thisScreen.ReflectCylinderVis;
 
-    if (std::abs(SunAzimuthToScreenNormal - Constant::PiOvr2) < Small ||
-        std::abs(SunAltitudeToScreenNormal - Constant::PiOvr2) < Small) {
+    if (std::abs(SunAzimuthToScreenNormal - Constant::PiOvr2) < Small || std::abs(SunAltitudeToScreenNormal - Constant::PiOvr2) < Small) {
         Tscattered = 0.0;
         TscatteredVis = 0.0;
     } else {
         //   DeltaMax and Delta are in degrees
         DeltaMax = 89.7 - (10.0 * Gamma / 0.16);
-        Delta = std::sqrt(pow_2(SunAzimuthToScreenNormal / Constant::DegToRadians) +
-                          pow_2(SunAltitudeToScreenNormal / Constant::DegToRadians));
+        Delta = std::sqrt(pow_2(SunAzimuthToScreenNormal / Constant::DegToRadians) + pow_2(SunAltitudeToScreenNormal / Constant::DegToRadians));
 
         //   Use empirical model to determine maximum (peak) scattering
         Tscattermax = 0.0229 * Gamma + 0.2971 * ReflectCyl - 0.03624 * pow_2(Gamma) + 0.04763 * pow_2(ReflectCyl) - 0.44416 * Gamma * ReflectCyl;

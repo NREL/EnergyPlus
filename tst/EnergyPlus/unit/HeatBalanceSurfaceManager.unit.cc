@@ -2489,23 +2489,21 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     EXPECT_DOUBLE_EQ(0.25, state->dataSurface->Surface(3).ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(0.25, state->dataSurface->Surface(3).ViewFactorGroundIR);
     // Test if sky and grd view factor and temperature correctly overwritten
-    EXPECT_DOUBLE_EQ((Constant::StefanBoltzmann * 0.9 * 0.3 *
-                      (pow_4(20.0 + Constant::KelvinConv) - pow_4(15.0 + Constant::KelvinConv)) / (20.0 - 15.0)),
-                     state->dataHeatBalSurf->SurfHSkyExt(1));
-    EXPECT_DOUBLE_EQ((Constant::StefanBoltzmann * 0.9 * 0.1 *
-                      (pow_4(20.0 + Constant::KelvinConv) - pow_4(22.0 + Constant::KelvinConv)) / (20.0 - 22.0)),
-                     state->dataHeatBalSurf->SurfHGrdExt(1));
+    EXPECT_DOUBLE_EQ(
+        (Constant::StefanBoltzmann * 0.9 * 0.3 * (pow_4(20.0 + Constant::KelvinConv) - pow_4(15.0 + Constant::KelvinConv)) / (20.0 - 15.0)),
+        state->dataHeatBalSurf->SurfHSkyExt(1));
+    EXPECT_DOUBLE_EQ(
+        (Constant::StefanBoltzmann * 0.9 * 0.1 * (pow_4(20.0 + Constant::KelvinConv) - pow_4(22.0 + Constant::KelvinConv)) / (20.0 - 22.0)),
+        state->dataHeatBalSurf->SurfHGrdExt(1));
 
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.6 *
-                         (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv)),
+    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv)),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(1));
     EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 *
                          (0.3 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv)) +
                           0.3 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv))),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(2));
-    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.5 *
-                         (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv)),
+    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.5 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv)),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(3));
     EXPECT_DOUBLE_EQ(0.0, state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(4));
 }

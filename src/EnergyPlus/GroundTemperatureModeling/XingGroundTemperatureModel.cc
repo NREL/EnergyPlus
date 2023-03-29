@@ -165,13 +165,11 @@ Real64 XingGroundTempsModel::getGroundTemp(EnergyPlusData &state)
 
     n = 1;
     term1 = -depth * std::sqrt((n * Constant::Pi) / (groundThermalDiffisivity * tp));
-    term2 = (2 * Constant::Pi * n) / tp * (simTimeInDays - PL_1) -
-            depth * std::sqrt((n * Constant::Pi) / (groundThermalDiffisivity * tp));
+    term2 = (2 * Constant::Pi * n) / tp * (simTimeInDays - PL_1) - depth * std::sqrt((n * Constant::Pi) / (groundThermalDiffisivity * tp));
 
     n = 2;
     term3 = -depth * std::sqrt((n * Constant::Pi) / (groundThermalDiffisivity * tp));
-    term4 = (2 * Constant::Pi * n) / tp * (simTimeInDays - PL_2) -
-            depth * std::sqrt((n * Constant::Pi) / (groundThermalDiffisivity * tp));
+    term4 = (2 * Constant::Pi * n) / tp * (simTimeInDays - PL_2) - depth * std::sqrt((n * Constant::Pi) / (groundThermalDiffisivity * tp));
 
     summation = std::exp(term1) * Ts_1 * std::cos(term2) + std::exp(term3) * Ts_2 * std::cos(term4);
 

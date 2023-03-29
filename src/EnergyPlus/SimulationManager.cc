@@ -365,8 +365,7 @@ namespace SimulationManager {
             if (ErrorsFound) break;
             if ((!state.dataGlobal->DoDesDaySim) && (state.dataGlobal->KindOfSim != Constant::KindOfSim::RunPeriodWeather)) continue;
             if ((!state.dataGlobal->DoWeathSim) && (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) continue;
-            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay)
-                continue; // don't run these here, only for sizing simulations
+            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
 
             if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeRunPeriodDesign)
                 continue; // don't run these here, only for sizing simulations

@@ -426,11 +426,9 @@ void CalcEQLWindowUvalue(EnergyPlusData &state,
     for (I = 1; I <= 10; ++I) {
         TGO = TOUT + U * DT / HXO; // update glazing surface temps
         TGI = TIN - U * DT / HXI;
-        HRO = Constant::StefanBoltzmann * EO *
-              (pow_2(TGO + Constant::KelvinConv) + pow_2(TOUT + Constant::KelvinConv)) *
+        HRO = Constant::StefanBoltzmann * EO * (pow_2(TGO + Constant::KelvinConv) + pow_2(TOUT + Constant::KelvinConv)) *
               ((TGO + Constant::KelvinConv) + (TOUT + Constant::KelvinConv));
-        HRI = Constant::StefanBoltzmann * EI *
-              (pow_2(TGI + Constant::KelvinConv) + pow_2(TIN + Constant::KelvinConv)) *
+        HRI = Constant::StefanBoltzmann * EI * (pow_2(TGI + Constant::KelvinConv) + pow_2(TIN + Constant::KelvinConv)) *
               ((TGI + Constant::KelvinConv) + (TIN + Constant::KelvinConv));
         // HCI = HIC_ASHRAE( Height, TGI, TI)  ! BAN June 2103 Raplaced with ISO Std 15099
         TGIK = TGI + Constant::KelvinConv;
@@ -748,8 +746,8 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
                     auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
                     for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
                         SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-                        SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                         Constant::KelvinConv;
+                        SrdSurfTempAbs =
+                            GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
                         OutSrdIR += Constant::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                     }
                 }
@@ -825,8 +823,8 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
         ConvHeatFlowNatural = state.dataSurface->Surface(SurfNum).Area * QOCFRoom;
     }
     state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = SurfInsideTemp;
-    NetIRHeatGainWindow = state.dataSurface->Surface(SurfNum).Area * LWAbsIn *
-                          (Constant::StefanBoltzmann * pow_4(SurfInsideTemp + Constant::KelvinConv) - rmir);
+    NetIRHeatGainWindow =
+        state.dataSurface->Surface(SurfNum).Area * LWAbsIn * (Constant::StefanBoltzmann * pow_4(SurfInsideTemp + Constant::KelvinConv) - rmir);
     ConvHeatGainWindow = state.dataSurface->Surface(SurfNum).Area * HcIn * (SurfInsideTemp - TaIn);
     // Window heat gain (or loss) is calculated here
     state.dataSurface->SurfWinHeatGain(SurfNum) =
@@ -7443,18 +7441,9 @@ bool VB_SWP(EnergyPlusData &state,
 
     SL_WR = VB_SLAT_RADIUS_RATIO(L.W, L.C);
 
-    VB_DIFF(state,
-            L.S,
-            L.W,
-            Constant::DegToRadians * L.PHI_DEG,
-            L.SWP_MAT.RHOSBDD,
-            L.SWP_MAT.RHOSFDD,
-            L.SWP_MAT.TAUS_DD,
-            LSWP.RHOSFDD,
-            LSWP.TAUS_DD);
+    VB_DIFF(state, L.S, L.W, Constant::DegToRadians * L.PHI_DEG, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSFDD, LSWP.TAUS_DD);
 
-    VB_DIFF(
-        state, L.S, L.W, -Constant::DegToRadians * L.PHI_DEG, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
+    VB_DIFF(state, L.S, L.W, -Constant::DegToRadians * L.PHI_DEG, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBDD, TAUX);
 
     return true;
 }

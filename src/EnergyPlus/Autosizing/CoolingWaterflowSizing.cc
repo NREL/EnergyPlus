@@ -170,8 +170,7 @@ Real64 CoolingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgWaterTemp(
                 state, this->compName, this->compType, this->dataDesInletWaterTemp + CoilDesWaterDeltaT);
         } else {
-            state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntWaterTemp(
-                state, this->compName, this->compType, Constant::CWInitConvTemp);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntWaterTemp(state, this->compName, this->compType, Constant::CWInitConvTemp);
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgWaterTemp(
                 state, this->compName, this->compType, Constant::CWInitConvTemp + CoilDesWaterDeltaT);
         }

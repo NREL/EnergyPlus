@@ -84,7 +84,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calc_k_taoalpha)
     k_taoalpha = thisBIPVT.calc_k_taoalpha(theta, glass_thickness, refrac_index_glass, k_glass);
     EXPECT_EQ(k_taoalpha, 0.0);
     theta = Constant::Pi / 4.0; // mid-range value
-    refrac_index_glass = 2.0;              // higher value
+    refrac_index_glass = 2.0;   // higher value
     k_taoalpha = thisBIPVT.calc_k_taoalpha(theta, glass_thickness, refrac_index_glass, k_glass);
     EXPECT_NEAR(k_taoalpha, 0.986, 0.001);
     k_glass = 10.0; // higher value

@@ -508,8 +508,7 @@ namespace GeneratorDynamicsManager {
                         newOpMode = DataGenerators::OperatingMode::Off;
                         PLRShutDown = true;
                         LastSystemTimeStepFractionalDay = CurrentFractionalDay - (TimeStepSys / Constant::HoursInDay);
-                        PLRforSubtimestepShutDown =
-                            (EndingFractionalDay - LastSystemTimeStepFractionalDay) * Constant::HoursInDay / TimeStepSys;
+                        PLRforSubtimestepShutDown = (EndingFractionalDay - LastSystemTimeStepFractionalDay) * Constant::HoursInDay / TimeStepSys;
                     } else { // CurrentFractionalDay > EndingFractionalDay
                         newOpMode = DataGenerators::OperatingMode::CoolDown;
                     }
@@ -532,8 +531,7 @@ namespace GeneratorDynamicsManager {
                         newOpMode = DataGenerators::OperatingMode::Standby;
                         PLRShutDown = true;
                         LastSystemTimeStepFractionalDay = CurrentFractionalDay - (TimeStepSys / Constant::HoursInDay);
-                        PLRforSubtimestepShutDown =
-                            (EndingFractionalDay - LastSystemTimeStepFractionalDay) * Constant::HoursInDay / TimeStepSys;
+                        PLRforSubtimestepShutDown = (EndingFractionalDay - LastSystemTimeStepFractionalDay) * Constant::HoursInDay / TimeStepSys;
                     } else { // CurrentFractionalDay < EndingFractionalDay
                         newOpMode = DataGenerators::OperatingMode::CoolDown;
                     }
@@ -562,8 +560,7 @@ namespace GeneratorDynamicsManager {
                             // could go to warm up or normal now
                             PLRShutDown = true;
                             LastSystemTimeStepFractionalDay = CurrentFractionalDay - (TimeStepSys / Constant::HoursInDay);
-                            PLRforSubtimestepShutDown =
-                                (EndingFractionalDay - LastSystemTimeStepFractionalDay) * Constant::HoursInDay / TimeStepSys;
+                            PLRforSubtimestepShutDown = (EndingFractionalDay - LastSystemTimeStepFractionalDay) * Constant::HoursInDay / TimeStepSys;
                             if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay == 0.0) {
                                 newOpMode = DataGenerators::OperatingMode::Normal;
                                 // possible PLR on start up.
@@ -606,9 +603,8 @@ namespace GeneratorDynamicsManager {
                                                    (int(state.dataGlobal->CurrentTime) +
                                                     (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
                                                        Constant::HoursInDay;
-                            EndingFractionalDay =
-                                state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown +
-                                state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay / Constant::HoursInDay;
+                            EndingFractionalDay = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown +
+                                                  state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay / Constant::HoursInDay;
                             if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
                                 (CurrentFractionalDay > EndingFractionalDay)) { // CurrentFractionalDay == EndingFractionalDay
                                 newOpMode = DataGenerators::OperatingMode::Normal;

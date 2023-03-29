@@ -2520,8 +2520,8 @@ namespace WindowManager {
                         auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
                         for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
                             SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                             Constant::KelvinConv;
+                            SrdSurfTempAbs =
+                                GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
                             OutSrdIR += state.dataWindowManager->sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
                         }
                     }
@@ -5990,7 +5990,7 @@ namespace WindowManager {
         // 0,10,20,...,80,90 degress
 
         Real64 const DPhiR(10.0 * Constant::DegToRadians); // Half of 10-deg incidence angle increment (radians)
-        int IPhi;                                                     // Incidence angle counter
+        int IPhi;                                          // Incidence angle counter
 
         DiffuseAverage = 0.0;
         for (IPhi = 1; IPhi <= 9; ++IPhi) {
@@ -7727,7 +7727,7 @@ namespace WindowManager {
                     st_lay = 0.0;
                     if (state.dataMaterial->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
                         bld_el = state.dataMaterial->Blind(BlindNum).SlatAngle * Constant::DegToRadians;
-                    } else {                                                                               // Variable slat angle
+                    } else {                                                                    // Variable slat angle
                         bld_el = (Constant::Pi / (Material::MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
                     }
                     BlindOpticsDiffuse(state, BlindNum, ISolVis, bld_pr, bld_el, st_lay);
@@ -7765,7 +7765,7 @@ namespace WindowManager {
                         st_lay = 0.0;
                         if (state.dataMaterial->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
                             bld_el = state.dataMaterial->Blind(BlindNum).SlatAngle * Constant::DegToRadians;
-                        } else {                                                                               // Variable slat angle
+                        } else {                                                                    // Variable slat angle
                             bld_el = (Constant::Pi / (Material::MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
                         }
 
@@ -8567,11 +8567,11 @@ namespace WindowManager {
 
             //       Set up sources for direct-diffuse slat properties
             if (std::abs(phis - phib) <= Constant::PiOvr2) { // Beam hits front of slat
-                Q(3) = c(4) + c(7);                                     // beam-beam trans of slat + beam-diff trans of slat
-                Q(4) = c(5) + c(8);                                     // front beam-beam refl of slat + front beam-diff refl of slat
-            } else {                                                    // Beam hits back of slat
-                Q(3) = c(6) + c(9);                                     // back beam-beam refl of slat  + back beam-diff refl of slat
-                Q(4) = c(4) + c(7);                                     // beam-beam trans of slat + beam-diff trans of slat
+                Q(3) = c(4) + c(7);                          // beam-beam trans of slat + beam-diff trans of slat
+                Q(4) = c(5) + c(8);                          // front beam-beam refl of slat + front beam-diff refl of slat
+            } else {                                         // Beam hits back of slat
+                Q(3) = c(6) + c(9);                          // back beam-beam refl of slat  + back beam-diff refl of slat
+                Q(4) = c(4) + c(7);                          // beam-beam trans of slat + beam-diff trans of slat
             }
 
             //       Correct for fraction of beam that is not directly transmitted; 1 - this fraction is
@@ -8696,9 +8696,8 @@ namespace WindowManager {
         Real64 ProfAng1 = std::clamp(ProfAng, -Constant::PiOvr2, Constant::PiOvr2);
 
         Real64 constexpr DeltaProfAng(Constant::Pi / 36.0);
-        int IAlpha = int((ProfAng1 + Constant::PiOvr2) / DeltaProfAng) + 1; // Profile angle index
-        Real64 ProfAngRatio =
-            (ProfAng1 + Constant::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng; // Profile angle interpolation factor
+        int IAlpha = int((ProfAng1 + Constant::PiOvr2) / DeltaProfAng) + 1;                               // Profile angle index
+        Real64 ProfAngRatio = (ProfAng1 + Constant::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng; // Profile angle interpolation factor
 
         Real64 Val1;
         Real64 Val2;

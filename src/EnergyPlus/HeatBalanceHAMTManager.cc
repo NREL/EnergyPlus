@@ -754,8 +754,7 @@ namespace HeatBalanceHAMTManager {
                 Real64 const sin_negPIOvr2 = std::sin(-Constant::Pi / 2.0);
                 while (true) {
                     testlen = thisMaterial->Thickness *
-                              ((std::sin(Constant::Pi * (-1.0 / double(thisMaterial->divs)) - Constant::Pi / 2.0) / 2.0) -
-                               (sin_negPIOvr2 / 2.0));
+                              ((std::sin(Constant::Pi * (-1.0 / double(thisMaterial->divs)) - Constant::Pi / 2.0) / 2.0) - (sin_negPIOvr2 / 2.0));
                     if (testlen > adjdist) break;
                     --thisMaterial->divs;
                     if (thisMaterial->divs < 1) {
@@ -858,10 +857,9 @@ namespace HeatBalanceHAMTManager {
                     cells(cid).spech = thisMaterial->SpecHeat;
 
                     // Make cells smaller near the surface
-                    cells(cid).length(1) =
-                        thisMaterial->Thickness *
-                        ((std::sin(Constant::Pi * (-double(did) / double(thisMaterial->divs)) - Constant::Pi / 2.0) / 2.0) -
-                         (std::sin(Constant::Pi * (-double(did - 1) / double(thisMaterial->divs)) - Constant::Pi / 2.0) / 2.0));
+                    cells(cid).length(1) = thisMaterial->Thickness *
+                                           ((std::sin(Constant::Pi * (-double(did) / double(thisMaterial->divs)) - Constant::Pi / 2.0) / 2.0) -
+                                            (std::sin(Constant::Pi * (-double(did - 1) / double(thisMaterial->divs)) - Constant::Pi / 2.0) / 2.0));
 
                     cells(cid).origin(1) = runor + cells(cid).length(1) / 2.0;
                     runor += cells(cid).length(1);

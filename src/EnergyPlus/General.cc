@@ -1437,9 +1437,8 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
         ShowWarningError(state, fmt::format("{}{} Combination of ZoneList and Object Name generate a name too long.", calledFrom, CurrentObject));
         ShowContinueError(state, format("Object Name=\"{}\".", ItemName));
         ShowContinueError(state, format("ZoneList/Zone Name=\"{}\".", ZoneName));
-        ShowContinueError(
-            state,
-            format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.", ItemLength, Constant::MaxNameLength));
+        ShowContinueError(state,
+                          format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.", ItemLength, Constant::MaxNameLength));
         ShowContinueError(state,
                           format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.",
                                  MaxZoneNameLength + 1 + ItemNameLength - Constant::MaxNameLength));

@@ -1034,10 +1034,10 @@ namespace DataSizing {
         int OAFlowFracSchPtr = ScheduleManager::ScheduleAlwaysOn; // - Fraction schedule applied to total OA requirement
         int OAPropCtlMinRateSchPtr =
             ScheduleManager::ScheduleAlwaysOn; // - Fraction schedule applied to Proportional Control Minimum Outdoor Air Flow Rate
-        int CO2MaxMinLimitErrorCount = 0;          // Counter when max CO2 concentration < min CO2 concentration for SOAM_ProportionalControlSchOcc
-        int CO2MaxMinLimitErrorIndex = 0;          // Index for max CO2 concentration < min CO2 concentration recurring error message for
-                                                   // SOAM_ProportionalControlSchOcc
-        int CO2GainErrorCount = 0;                 // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
+        int CO2MaxMinLimitErrorCount = 0;      // Counter when max CO2 concentration < min CO2 concentration for SOAM_ProportionalControlSchOcc
+        int CO2MaxMinLimitErrorIndex = 0;      // Index for max CO2 concentration < min CO2 concentration recurring error message for
+                                               // SOAM_ProportionalControlSchOcc
+        int CO2GainErrorCount = 0;             // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
         int CO2GainErrorIndex = 0; // Index for recurring error message when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
         bool myEnvrnFlag = true;
 

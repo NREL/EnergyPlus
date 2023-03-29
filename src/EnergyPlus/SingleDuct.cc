@@ -3289,8 +3289,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         } else {
             MaxAirVolFractionDuringReheatDes = 0.0;
         }
-        if (this->MaxAirVolFlowRateDuringReheat == Constant::AutoCalculate &&
-            this->MaxAirVolFractionDuringReheat == Constant::AutoCalculate) {
+        if (this->MaxAirVolFlowRateDuringReheat == Constant::AutoCalculate && this->MaxAirVolFractionDuringReheat == Constant::AutoCalculate) {
             // if both inputs are autosize (the default) report both out and save in the Sys array.
             BaseSizer::reportSizerOutput(
                 state, this->sysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", MaxAirVolFractionDuringReheatDes);
@@ -3303,8 +3302,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             }
             this->MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
             this->MaxAirVolFractionDuringReheat = MaxAirVolFractionDuringReheatDes;
-        } else if (this->MaxAirVolFlowRateDuringReheat == Constant::AutoCalculate &&
-                   this->MaxAirVolFractionDuringReheat != Constant::AutoCalculate) {
+        } else if (this->MaxAirVolFlowRateDuringReheat == Constant::AutoCalculate && this->MaxAirVolFractionDuringReheat != Constant::AutoCalculate) {
             // if max reheat flow fraction was input, set the max reheat flow design value correspondingly, report both out.
             // Check for optional caution message that user input value is not within 10% of the design value.
             MaxAirVolFlowRateDuringReheatDes = this->MaxAirVolFractionDuringReheat * this->MaxAirVolFlowRate;
@@ -3337,8 +3335,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                 }
             }
-        } else if (this->MaxAirVolFlowRateDuringReheat != Constant::AutoCalculate &&
-                   this->MaxAirVolFractionDuringReheat == Constant::AutoCalculate) {
+        } else if (this->MaxAirVolFlowRateDuringReheat != Constant::AutoCalculate && this->MaxAirVolFractionDuringReheat == Constant::AutoCalculate) {
             // if max reheat flow was input set the design max reheat flow frac to the corresponding value, report both out, save the design value
             // of the flow frac in Sys. Check for optional caution message that user input value is not within 10% of the design value.
             if (this->MaxAirVolFlowRate > 0.0) {

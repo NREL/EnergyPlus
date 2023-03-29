@@ -1967,8 +1967,7 @@ void therm1d(EnergyPlusData &state,
         }
 
         if (IsShadingLayer(LayerType(nlayer))) {
-            ShadeEmisRatioIn =
-                qr_gap_in / (emis(2 * nlayer - 2) * Constant::StefanBoltzmann * (pow_4(trmin) - pow_4(theta(2 * nlayer - 2))));
+            ShadeEmisRatioIn = qr_gap_in / (emis(2 * nlayer - 2) * Constant::StefanBoltzmann * (pow_4(trmin) - pow_4(theta(2 * nlayer - 2))));
             qc_gap_in = q(2 * nlayer - 1) - qr_gap_in;
             hc_modified_in = (qc_gap_in / (tind - theta(2 * nlayer - 2)));
             ShadeHcModifiedIn = hc_modified_in;
@@ -2535,7 +2534,7 @@ void filmi(EnergyPlusData &state,
         default:
             break;
         }
-    } else {                                                  // main IF - else
+    } else {                                       // main IF - else
         tiltr = tilt * 2.0 * Constant::Pi / 360.0; // convert tilt in degrees to radians
         tmean = tair + 0.25 * (t - tair);
         delt = std::abs(tair - t);
@@ -2782,11 +2781,10 @@ void filmPillar(EnergyPlusData &state,
             state.dataThermalISO15099Calc->aveGlassConductivity =
                 (scon(state.dataThermalISO15099Calc->iFP) + scon(state.dataThermalISO15099Calc->iFP + 1)) / 2;
 
-            state.dataThermalISO15099Calc->cpa = 2.0 * state.dataThermalISO15099Calc->aveGlassConductivity *
-                                                 PillarRadius(state.dataThermalISO15099Calc->iFP) /
-                                                 (pow_2(PillarSpacing(state.dataThermalISO15099Calc->iFP)) *
-                                                  (1.0 + 2.0 * gap(state.dataThermalISO15099Calc->iFP) /
-                                                             (Constant::Pi * PillarRadius(state.dataThermalISO15099Calc->iFP))));
+            state.dataThermalISO15099Calc->cpa =
+                2.0 * state.dataThermalISO15099Calc->aveGlassConductivity * PillarRadius(state.dataThermalISO15099Calc->iFP) /
+                (pow_2(PillarSpacing(state.dataThermalISO15099Calc->iFP)) *
+                 (1.0 + 2.0 * gap(state.dataThermalISO15099Calc->iFP) / (Constant::Pi * PillarRadius(state.dataThermalISO15099Calc->iFP))));
 
             // It is important to add on prevoius values caluculated for gas
             hcgas(state.dataThermalISO15099Calc->iFP + 1) += state.dataThermalISO15099Calc->cpa;
@@ -2828,7 +2826,7 @@ void nusselt(Real64 const tilt, Real64 const ra, Real64 const asp, Real64 &gnu, 
     Nu60 = 0.0;
     G = 0.0;
     tiltr = tilt * 2.0 * Constant::Pi / 360.0; // convert tilt in degrees to radians
-    if ((tilt >= 0.0) && (tilt < 60.0)) {                 // ISO/DIS 15099 - chapter 5.3.3.1
+    if ((tilt >= 0.0) && (tilt < 60.0)) {      // ISO/DIS 15099 - chapter 5.3.3.1
         subNu1 = 1.0 - 1708.0 / (ra * std::cos(tiltr));
         subNu1 = pos(subNu1);
         subNu2 = 1.0 - (1708.0 * std::pow(std::sin(1.8 * tiltr), 1.6)) / (ra * std::cos(tiltr));

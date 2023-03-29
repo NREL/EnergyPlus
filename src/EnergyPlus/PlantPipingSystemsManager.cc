@@ -5194,16 +5194,16 @@ namespace PlantPipingSystemsManager {
         ++Denominator;
 
         //'add effects from interface cell
-        Real64 Resistance = std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) /
-                            (2 * Constant::Pi * cell.depth() * ThisRadialCellConductivity);
+        Real64 Resistance =
+            std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * Constant::Pi * cell.depth() * ThisRadialCellConductivity);
         Numerator += (Beta / Resistance) * cell.Temperature;
         Denominator += (Beta / Resistance);
 
         //'add effects from inner radial cell
-        Resistance = (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) /
-                      (2 * Constant::Pi * cell.depth() * ThisRadialCellConductivity)) +
-                     (std::log(NextOuterRadialCellOuterRadius / NextOuterRadialCellRadialCentroid) /
-                      (2 * Constant::Pi * cell.depth() * NextOuterRadialCellConductivity));
+        Resistance =
+            (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) / (2 * Constant::Pi * cell.depth() * ThisRadialCellConductivity)) +
+            (std::log(NextOuterRadialCellOuterRadius / NextOuterRadialCellRadialCentroid) /
+             (2 * Constant::Pi * cell.depth() * NextOuterRadialCellConductivity));
         Numerator += (Beta / Resistance) * NextOuterRadialCellTemperature;
         Denominator += (Beta / Resistance);
 
@@ -5250,10 +5250,10 @@ namespace PlantPipingSystemsManager {
             ++Denominator;
 
             //'add effects from outer cell
-            Real64 Resistance = (std::log(OuterRadialCellRadialCentroid / OuterRadialCellInnerRadius) /
-                                 (2 * Constant::Pi * cell.depth() * OuterRadialCellConductivity)) +
-                                (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) /
-                                 (2 * Constant::Pi * cell.depth() * ThisRadialCellConductivity));
+            Real64 Resistance =
+                (std::log(OuterRadialCellRadialCentroid / OuterRadialCellInnerRadius) /
+                 (2 * Constant::Pi * cell.depth() * OuterRadialCellConductivity)) +
+                (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * Constant::Pi * cell.depth() * ThisRadialCellConductivity));
             Numerator += (thisSoilCell.Beta / Resistance) * OuterRadialCellTemperature;
             Denominator += (thisSoilCell.Beta / Resistance);
 
@@ -5320,18 +5320,18 @@ namespace PlantPipingSystemsManager {
         ++Denominator;
 
         //'add effects from outer radial cell
-        Resistance = (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
-                      (2 * Constant::Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
-                     (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) /
-                      (2 * Constant::Pi * cell.depth() * ThisRadialCellConductivity));
+        Resistance =
+            (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
+             (2 * Constant::Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
+            (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) / (2 * Constant::Pi * cell.depth() * ThisRadialCellConductivity));
         Numerator += (soilZero.Beta / Resistance) * OuterNeighborRadialCellTemperature;
         Denominator += (soilZero.Beta / Resistance);
 
         //'add effects from pipe cell
-        Resistance = (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) /
-                      (2 * Constant::Pi * cell.depth() * ThisRadialCellConductivity)) +
-                     (std::log(InnerNeighborRadialCellOuterRadius / InnerNeighborRadialCellRadialCentroid) /
-                      (2 * Constant::Pi * cell.depth() * InnerNeighborRadialCellConductivity));
+        Resistance =
+            (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) / (2 * Constant::Pi * cell.depth() * ThisRadialCellConductivity)) +
+            (std::log(InnerNeighborRadialCellOuterRadius / InnerNeighborRadialCellRadialCentroid) /
+             (2 * Constant::Pi * cell.depth() * InnerNeighborRadialCellConductivity));
         Numerator += (soilZero.Beta / Resistance) * InnerNeighborRadialCellTemperature;
         Denominator += (soilZero.Beta / Resistance);
 
@@ -5370,10 +5370,10 @@ namespace PlantPipingSystemsManager {
         Denominator += (ThisInsulationCell.Beta / Resistance);
 
         //'add effects from pipe cell
-        Resistance = (std::log(ThisInsulationCell.RadialCentroid / ThisInsulationCell.InnerRadius) /
-                      (2 * Constant::Pi * cell.depth() * ThisInsulationCell.Properties.Conductivity)) +
-                     (std::log(PipeCell.OuterRadius / PipeCell.RadialCentroid) /
-                      (2 * Constant::Pi * cell.depth() * PipeCell.Properties.Conductivity));
+        Resistance =
+            (std::log(ThisInsulationCell.RadialCentroid / ThisInsulationCell.InnerRadius) /
+             (2 * Constant::Pi * cell.depth() * ThisInsulationCell.Properties.Conductivity)) +
+            (std::log(PipeCell.OuterRadius / PipeCell.RadialCentroid) / (2 * Constant::Pi * cell.depth() * PipeCell.Properties.Conductivity));
         Numerator += (ThisInsulationCell.Beta / Resistance) * PipeCell.Temperature;
         Denominator += (ThisInsulationCell.Beta / Resistance);
 
@@ -5426,10 +5426,10 @@ namespace PlantPipingSystemsManager {
         ++Denominator;
 
         //'add effects from outer radial cell
-        Real64 Resistance = (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
-                             (2 * Constant::Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
-                            (std::log(ThisPipeCellOuterRadius / ThisPipeCellRadialCentroid) /
-                             (2 * Constant::Pi * cell.depth() * ThisPipeCellConductivity));
+        Real64 Resistance =
+            (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
+             (2 * Constant::Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
+            (std::log(ThisPipeCellOuterRadius / ThisPipeCellRadialCentroid) / (2 * Constant::Pi * cell.depth() * ThisPipeCellConductivity));
         Numerator += (cell.PipeCellData.Pipe.Beta / Resistance) * OuterNeighborRadialCellTemperature;
         Denominator += (cell.PipeCellData.Pipe.Beta / Resistance);
 
@@ -5475,8 +5475,7 @@ namespace PlantPipingSystemsManager {
         //'add effects from outer pipe cell
         Real64 PipeConductionResistance =
             std::log(PipeCellRadialCentroid / PipeCellInnerRadius) / (2 * Constant::Pi * cell.depth() * PipeCellConductivity);
-        Real64 ConvectiveResistance =
-            1.0 / (thisCircuit->CurCircuitConvectionCoefficient * 2 * Constant::Pi * PipeCellInnerRadius * cell.depth());
+        Real64 ConvectiveResistance = 1.0 / (thisCircuit->CurCircuitConvectionCoefficient * 2 * Constant::Pi * PipeCellInnerRadius * cell.depth());
         Real64 TotalPipeResistance = PipeConductionResistance + ConvectiveResistance;
         Numerator += (cell.PipeCellData.Fluid.Beta / TotalPipeResistance) * PipeCellTemperature;
         Denominator += (cell.PipeCellData.Fluid.Beta / TotalPipeResistance);

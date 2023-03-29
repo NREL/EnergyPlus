@@ -78,12 +78,12 @@ ZoneTimestepObject::ZoneTimestepObject()
 
 ZoneTimestepObject::ZoneTimestepObject(
     Constant::KindOfSim kindSim, // kind of simulation
-    int environmentNum,                     // index in Environment data structure, usually WeatherManager::Envrn
-    int daySim,                             // days into simulation period, usually DataGlobals::DayOfSim
-    int hourDay,                            // hour into day, 1-24, filled by DataGlobals::HourOfDay
-    int timeStep,                           // time steps into hour, filled by DataGlobals::TimeStep
-    Real64 timeStepDurat,                   // duration of timestep in fractional hours, usually OutputProcessor::TimeValue( ZoneIndex ).TimeStep
-    int numOfTimeStepsPerHour               // timesteps in each hour, usually DataGlobals::NumOfTimeStepInHour
+    int environmentNum,          // index in Environment data structure, usually WeatherManager::Envrn
+    int daySim,                  // days into simulation period, usually DataGlobals::DayOfSim
+    int hourDay,                 // hour into day, 1-24, filled by DataGlobals::HourOfDay
+    int timeStep,                // time steps into hour, filled by DataGlobals::TimeStep
+    Real64 timeStepDurat,        // duration of timestep in fractional hours, usually OutputProcessor::TimeValue( ZoneIndex ).TimeStep
+    int numOfTimeStepsPerHour    // timesteps in each hour, usually DataGlobals::NumOfTimeStepInHour
     )
     : kindOfSim(kindSim), envrnNum(environmentNum), dayOfSim(daySim), hourOfDay(hourDay),
 

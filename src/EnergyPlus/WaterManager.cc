@@ -997,14 +997,12 @@ namespace WaterManager {
         state.dataWaterData->Irrigation.ScheduledAmount = 0.0;
 
         if (state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSchedDesign) {
-            schedRate = GetCurrentScheduleValue(state, state.dataWaterData->Irrigation.IrrSchedID); // m/hr
-            state.dataWaterData->Irrigation.ScheduledAmount =
-                schedRate * TimeStepSysSec / Constant::SecInHour; // convert to m/timestep // LOL
+            schedRate = GetCurrentScheduleValue(state, state.dataWaterData->Irrigation.IrrSchedID);             // m/hr
+            state.dataWaterData->Irrigation.ScheduledAmount = schedRate * TimeStepSysSec / Constant::SecInHour; // convert to m/timestep // LOL
 
         } else if (state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSmartSched) {
-            schedRate = GetCurrentScheduleValue(state, state.dataWaterData->Irrigation.IrrSchedID); // m/hr
-            state.dataWaterData->Irrigation.ScheduledAmount =
-                schedRate * TimeStepSysSec / Constant::SecInHour; // convert to m/timestep // LOL
+            schedRate = GetCurrentScheduleValue(state, state.dataWaterData->Irrigation.IrrSchedID);             // m/hr
+            state.dataWaterData->Irrigation.ScheduledAmount = schedRate * TimeStepSysSec / Constant::SecInHour; // convert to m/timestep // LOL
         }
     }
 

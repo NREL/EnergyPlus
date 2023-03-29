@@ -642,8 +642,7 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
 
         Real64 OSky = OpaqueSkyCover;
         Real64 TDewK = min(DryBulb, DewPoint) + Constant::KelvinConv;
-        Real64 ESky = (0.787 + 0.764 * std::log(TDewK / Constant::KelvinConv)) *
-                      (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
+        Real64 ESky = (0.787 + 0.764 * std::log(TDewK / Constant::KelvinConv)) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
 
         kivaWeather.skyEmissivity.push_back(ESky);
 

@@ -2281,8 +2281,8 @@ namespace FuelCellElectricGenerator {
                 }
 
                 // now take energy from storage by drawing  (amplified by energetic effic)
-                if ((this->ElecStorage.LastTimeStepStateOfCharge - tmpPdraw * state.dataHVACGlobal->TimeStepSysSec /
-                                                                       this->ElecStorage.EnergeticEfficDischarge) > 0.0) {
+                if ((this->ElecStorage.LastTimeStepStateOfCharge -
+                     tmpPdraw * state.dataHVACGlobal->TimeStepSysSec / this->ElecStorage.EnergeticEfficDischarge) > 0.0) {
 
                     this->ElecStorage.ThisTimeStepStateOfCharge =
                         this->ElecStorage.LastTimeStepStateOfCharge -
@@ -2812,12 +2812,12 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        Real64 constexpr A = 29.0373;                                               // shomate coeff
-        Real64 constexpr B = 10.2573;                                               // shomate coeff
-        Real64 constexpr C = 2.81048;                                               // shomate coeff
-        Real64 constexpr D = -0.95914;                                              // shomate coeff
-        Real64 constexpr E = 0.11725;                                               // shomate coeff
-        Real64 constexpr F = -250.569;                                              // shomate coeff
+        Real64 constexpr A = 29.0373;                                    // shomate coeff
+        Real64 constexpr B = 10.2573;                                    // shomate coeff
+        Real64 constexpr C = 2.81048;                                    // shomate coeff
+        Real64 constexpr D = -0.95914;                                   // shomate coeff
+        Real64 constexpr E = 0.11725;                                    // shomate coeff
+        Real64 constexpr F = -250.569;                                   // shomate coeff
         Real64 const Tsho = (FluidTemp + Constant::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
         HGasWater = A * Tsho + B * pow_2(Tsho) / 2.0 + C * pow_3(Tsho) / 3.0 + D * pow_4(Tsho) / 4.0 - E / Tsho + F; //- H
@@ -2989,8 +2989,7 @@ namespace FuelCellElectricGenerator {
             // unit is neither starting or stopping and the only constraints would come from transient limits
             if (Pel > this->FCPM.PelLastTimeStep) { // powering up
                 // working variable for max allowed by transient constraint
-                Real64 MaxPel =
-                    this->FCPM.PelLastTimeStep + this->FCPM.UpTranLimit * state.dataHVACGlobal->TimeStepSysSec;
+                Real64 MaxPel = this->FCPM.PelLastTimeStep + this->FCPM.UpTranLimit * state.dataHVACGlobal->TimeStepSysSec;
                 if (MaxPel < Pel) {
                     Pel = MaxPel;
                     Constrained = true;
@@ -2999,8 +2998,7 @@ namespace FuelCellElectricGenerator {
                 }
             } else if (Pel < this->FCPM.PelLastTimeStep) { // powering down
                                                            // working variable for min allowed by transient constraint
-                Real64 MinPel =
-                    this->FCPM.PelLastTimeStep - this->FCPM.DownTranLimit * state.dataHVACGlobal->TimeStepSysSec;
+                Real64 MinPel = this->FCPM.PelLastTimeStep - this->FCPM.DownTranLimit * state.dataHVACGlobal->TimeStepSysSec;
                 if (Pel < MinPel) {
                     Pel = MinPel;
                     Constrained = true;
@@ -3585,11 +3583,11 @@ namespace FuelCellElectricGenerator {
     void FCDataStruct::UpdateFuelCellGeneratorRecords(EnergyPlusData &state)
     {
 
-        this->Report.ACPowerGen = this->ACPowerGen; // electrical power produced [W]
+        this->Report.ACPowerGen = this->ACPowerGen;                                         // electrical power produced [W]
         this->Report.ACEnergyGen = this->ACPowerGen * state.dataHVACGlobal->TimeStepSysSec; // energy produced (J)
-        this->Report.QdotExhaust = 0.0;        // reporting: exhaust gas heat recovered (W)
-        this->Report.TotalHeatEnergyRec = 0.0; // reporting: total heat recovered (J)
-        this->Report.ExhaustEnergyRec = 0.0;   // reporting: exhaust gas heat recovered (J)
+        this->Report.QdotExhaust = 0.0;                                                     // reporting: exhaust gas heat recovered (W)
+        this->Report.TotalHeatEnergyRec = 0.0;                                              // reporting: total heat recovered (J)
+        this->Report.ExhaustEnergyRec = 0.0;                                                // reporting: exhaust gas heat recovered (J)
 
         this->Report.HeatRecInletTemp = 0.0;  // reporting: Heat Recovery Loop Inlet Temperature (C)
         this->Report.HeatRecOutletTemp = 0.0; // reporting: Heat Recovery Loop Outlet Temperature (C)
@@ -3600,13 +3598,13 @@ namespace FuelCellElectricGenerator {
         this->Report.OverallEfficiency = 0.0;
         this->Report.ExergyEfficiency = 0.0;
 
-        this->Report.TairInlet = this->AirSup.TairIntoBlower;          // State point 1
-        this->Report.TairIntoFCPM = this->AirSup.TairIntoFCPM;         // State point 4
-        this->Report.NdotAir = this->FCPM.NdotAir;                     // air flow in kmol/sec
-        this->Report.TotAirInEnthalphy = this->FCPM.TotAirInEnthalphy; // State point 4
-        this->Report.BlowerPower = this->AirSup.PairCompEl;            // electrical power used by air supply blower
+        this->Report.TairInlet = this->AirSup.TairIntoBlower;                                       // State point 1
+        this->Report.TairIntoFCPM = this->AirSup.TairIntoFCPM;                                      // State point 4
+        this->Report.NdotAir = this->FCPM.NdotAir;                                                  // air flow in kmol/sec
+        this->Report.TotAirInEnthalphy = this->FCPM.TotAirInEnthalphy;                              // State point 4
+        this->Report.BlowerPower = this->AirSup.PairCompEl;                                         // electrical power used by air supply blower
         this->Report.BlowerEnergy = this->AirSup.PairCompEl * state.dataHVACGlobal->TimeStepSysSec; // electrical energy
-        this->Report.BlowerSkinLoss = this->AirSup.QskinLoss; // heat rate of losses by blower
+        this->Report.BlowerSkinLoss = this->AirSup.QskinLoss;                                       // heat rate of losses by blower
 
         this->Report.TfuelInlet = state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoCompress; // State point 2
         this->Report.TfuelIntoFCPM = state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoFCPM;  // TEmperature state point 5 [C]
@@ -3614,8 +3612,8 @@ namespace FuelCellElectricGenerator {
         this->Report.TotFuelInEnthalpy = this->FCPM.TotFuelInEnthalphy;                                // enthalpy at state point 5 [W]
         this->Report.FuelCompressPower = state.dataGenerator->FuelSupply(this->FuelSupNum).PfuelCompEl;
         // electrical power used by fuel supply compressor [W]
-        this->Report.FuelCompressEnergy = state.dataGenerator->FuelSupply(this->FuelSupNum).PfuelCompEl * state.dataHVACGlobal->TimeStepSys *
-                                          Constant::SecInHour; // elect energy
+        this->Report.FuelCompressEnergy =
+            state.dataGenerator->FuelSupply(this->FuelSupNum).PfuelCompEl * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour; // elect energy
         this->Report.FuelCompressSkinLoss = state.dataGenerator->FuelSupply(this->FuelSupNum).QskinLoss;
         // heat rate of losses.by fuel supply compressor [W]
         this->Report.FuelEnergyLHV = this->FCPM.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupNum).LHV * 1000000.0 *
@@ -3635,8 +3633,7 @@ namespace FuelCellElectricGenerator {
         this->Report.TwaterIntoFCPM = this->WaterSup.TwaterIntoFCPM;
         this->Report.NdotWater = this->FCPM.NdotLiqwater; // water flow in kmol/sec (reformer water)
         this->Report.WaterPumpPower = this->WaterSup.PwaterCompEl;
-        this->Report.WaterPumpEnergy =
-            this->WaterSup.PwaterCompEl * state.dataHVACGlobal->TimeStepSysSec; // electrical energy
+        this->Report.WaterPumpEnergy = this->WaterSup.PwaterCompEl * state.dataHVACGlobal->TimeStepSysSec; // electrical energy
         this->Report.WaterIntoFCPMEnthalpy = this->FCPM.WaterInEnthalpy;
 
         this->Report.TprodGas = this->FCPM.TprodGasLeavingFCPM;      // temperature at State point 7

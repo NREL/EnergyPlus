@@ -351,8 +351,7 @@ namespace WaterToAirHeatPump {
             heatPump.LoadSideTotalUACoeff = NumArray(7);
             heatPump.LoadSideOutsideUACoeff = NumArray(8);
 
-            if ((heatPump.LoadSideOutsideUACoeff < Constant::rTinyValue) ||
-                (heatPump.LoadSideTotalUACoeff < Constant::rTinyValue)) {
+            if ((heatPump.LoadSideOutsideUACoeff < Constant::rTinyValue) || (heatPump.LoadSideTotalUACoeff < Constant::rTinyValue)) {
                 ShowSevereError(state, format("Input problem for {}={}", CurrentModuleObject, heatPump.Name));
                 ShowContinueError(state, " One or both load side UA values entered are below tolerance, likely zero or blank.");
                 ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");

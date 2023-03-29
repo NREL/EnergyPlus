@@ -1439,9 +1439,9 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
 
     static constexpr std::string_view RoutineName("UpdateMicroCHPGeneratorRecords");
 
-    this->A42Model.ACPowerGen = this->A42Model.Pnet; // electrical power produced [W]
-    this->A42Model.ACEnergyGen = this->A42Model.Pnet * state.dataHVACGlobal->TimeStepSysSec; // energy produced (J)
-    this->A42Model.QdotHX = this->A42Model.UAhx * (this->A42Model.Teng - this->A42Model.TcwOut);                           //  heat recovered rate (W)
+    this->A42Model.ACPowerGen = this->A42Model.Pnet;                                             // electrical power produced [W]
+    this->A42Model.ACEnergyGen = this->A42Model.Pnet * state.dataHVACGlobal->TimeStepSysSec;     // energy produced (J)
+    this->A42Model.QdotHX = this->A42Model.UAhx * (this->A42Model.Teng - this->A42Model.TcwOut); //  heat recovered rate (W)
 
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
@@ -1450,16 +1450,15 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
                                                        RoutineName);
 
     this->A42Model.QdotHR = this->PlantMassFlowRate * Cp * (this->A42Model.TcwOut - this->A42Model.TcwIn);
-    this->A42Model.TotalHeatEnergyRec =
-        this->A42Model.QdotHR * state.dataHVACGlobal->TimeStepSysSec; // heat recovered energy (J)
+    this->A42Model.TotalHeatEnergyRec = this->A42Model.QdotHR * state.dataHVACGlobal->TimeStepSysSec; // heat recovered energy (J)
 
     this->A42Model.HeatRecInletTemp = this->A42Model.TcwIn;   // Heat Recovery Loop Inlet Temperature (C)
     this->A42Model.HeatRecOutletTemp = this->A42Model.TcwOut; // Heat Recovery Loop Outlet Temperature (C)
 
     this->A42Model.FuelCompressPower = state.dataGenerator->FuelSupply(this->FuelSupplyID).PfuelCompEl;
     // electrical power used by fuel supply compressor [W]
-    this->A42Model.FuelCompressEnergy = state.dataGenerator->FuelSupply(this->FuelSupplyID).PfuelCompEl * state.dataHVACGlobal->TimeStepSys *
-                                        Constant::SecInHour; // elect energy
+    this->A42Model.FuelCompressEnergy =
+        state.dataGenerator->FuelSupply(this->FuelSupplyID).PfuelCompEl * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour; // elect energy
     this->A42Model.FuelCompressSkinLoss = state.dataGenerator->FuelSupply(this->FuelSupplyID).QskinLoss;
     // heat rate of losses.by fuel supply compressor [W]
     this->A42Model.FuelEnergyHHV = this->A42Model.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupplyID).HHV *
@@ -1469,14 +1468,13 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
     this->A42Model.FuelEnergyUseRateHHV = this->A42Model.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupplyID).HHV *
                                           state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
     // reporting: Fuel Energy used (J)
-    this->A42Model.FuelEnergyLHV = this->A42Model.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000000.0 *
-                                   state.dataHVACGlobal->TimeStepSysSec;
+    this->A42Model.FuelEnergyLHV =
+        this->A42Model.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000000.0 * state.dataHVACGlobal->TimeStepSysSec;
     // reporting: Fuel Energy used (W)
     this->A42Model.FuelEnergyUseRateLHV = this->A42Model.NdotFuel * state.dataGenerator->FuelSupply(this->FuelSupplyID).LHV * 1000000.0;
 
     this->A42Model.SkinLossPower = this->A42Model.QdotConvZone + this->A42Model.QdotRadZone;
-    this->A42Model.SkinLossEnergy =
-        (this->A42Model.QdotConvZone + this->A42Model.QdotRadZone) * state.dataHVACGlobal->TimeStepSysSec;
+    this->A42Model.SkinLossEnergy = (this->A42Model.QdotConvZone + this->A42Model.QdotRadZone) * state.dataHVACGlobal->TimeStepSysSec;
     this->A42Model.SkinLossConvect = this->A42Model.QdotConvZone;
     this->A42Model.SkinLossRadiat = this->A42Model.QdotRadZone;
 

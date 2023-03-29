@@ -137,13 +137,13 @@ using namespace WindowManager;
 using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
 
-int constexpr NPhi = 6;                                           // Number of altitude angle steps for sky integration
-int constexpr NTheta = 24;                                        // Number of azimuth angle steps for sky integration
-Real64 constexpr Eps = 1.e-10;                                    // Small number
+int constexpr NPhi = 6;                                // Number of altitude angle steps for sky integration
+int constexpr NTheta = 24;                             // Number of azimuth angle steps for sky integration
+Real64 constexpr Eps = 1.e-10;                         // Small number
 Real64 constexpr DPhi = Constant::PiOvr2 / NPhi;       // Altitude step size
 Real64 constexpr DTheta = 2.0 * Constant::Pi / NTheta; // Azimuth step size
-Real64 constexpr DThetaDPhi = DTheta * DPhi;                      // Product of DTheta and DPhi
-Real64 constexpr PhiMin = 0.5 * DPhi;                             // Minimum altitude
+Real64 constexpr DThetaDPhi = DTheta * DPhi;           // Product of DTheta and DPhi
+Real64 constexpr PhiMin = 0.5 * DPhi;                  // Minimum altitude
 
 Real64 constexpr HCMULT = 100000.0; // Multiplier used to change meters to .01 millimeters for homogeneous coordinates.
                                     // Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters
@@ -6748,11 +6748,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 Real64 tfshBB =
                                     state.dataSurface->SurfWinBlindBmBmTrans(SurfNum); // Bare-blind front and back beam-beam solar transmittance
                                 auto const &thisBlind = state.dataMaterial->Blind(BlNum);
-                                Real64 tbshBB = WindowManager::BlindBeamBeamTrans(ProfAng,
-                                                                                  Constant::Pi - SlatAng,
-                                                                                  thisBlind.SlatWidth,
-                                                                                  thisBlind.SlatSeparation,
-                                                                                  thisBlind.SlatThickness);
+                                Real64 tbshBB = WindowManager::BlindBeamBeamTrans(
+                                    ProfAng, Constant::Pi - SlatAng, thisBlind.SlatWidth, thisBlind.SlatSeparation, thisBlind.SlatThickness);
                                 Real64 tfshBd = FrontBeamDiffTrans; // Bare-blind front and back beam-diffuse solar transmittance
                                 Real64 tbshBd = BackBeamDiffTrans;
                                 Real64 rfshB = FrontBeamDiffRefl; // Bare-blind front and back beam solar reflectance
@@ -8600,7 +8597,7 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
             if (state.dataSurface->Surface(SurfNum2).activeShadedConstruction > 0)
                 ConstrNum = state.dataSurface->Surface(SurfNum2).activeShadedConstruction;
             auto aLayer = // (AUTO_OK_OBJ)
-                CWindowConstructionsSimplified::instance(state).getEquivalentLayer(state, WavelengthRange::Solar, ConstrNum); 
+                CWindowConstructionsSimplified::instance(state).getEquivalentLayer(state, WavelengthRange::Solar, ConstrNum);
 
             ///////////////////////////////////////////////
             // Solar absorbed in window layers
@@ -9917,9 +9914,9 @@ void WindowShadingManager(EnergyPlusData &state)
                     if (BlNum > 0) {
                         Real64 InputSlatAngle = state.dataMaterial->Blind(BlNum).SlatAngle *
                                                 Constant::DegToRadians; // Slat angle of associated Material:WindowBlind (rad)
-                        Real64 ProfAng;                                            // Solar profile angle (rad)
-                        Real64 SlatAng;                                            // Slat angle this time step (rad)
-                        Real64 PermeabilityA;                                      // Intermediate variables in blind permeability calc
+                        Real64 ProfAng;                                 // Solar profile angle (rad)
+                        Real64 SlatAng;                                 // Slat angle this time step (rad)
+                        Real64 PermeabilityA;                           // Intermediate variables in blind permeability calc
                         Real64 PermeabilityB;
                         Real64 ThetaBase;   // Intermediate slat angle variable (rad)
                         Real64 ThetaBlock1; // Slat angles that just block beam solar (rad)
@@ -10054,8 +10051,7 @@ void WindowShadingManager(EnergyPlusData &state)
                             break;
                         }
 
-                        state.dataSurface->SurfWinSlatAngThisTSDeg(ISurf) =
-                            state.dataSurface->SurfWinSlatAngThisTS(ISurf) / Constant::DegToRadians;
+                        state.dataSurface->SurfWinSlatAngThisTSDeg(ISurf) = state.dataSurface->SurfWinSlatAngThisTS(ISurf) / Constant::DegToRadians;
                         if (state.dataSurface->SurfWinSlatAngThisTSDegEMSon(ISurf)) {
                             state.dataSurface->SurfWinSlatAngThisTSDeg(ISurf) = state.dataSurface->SurfWinSlatAngThisTSDegEMSValue(ISurf);
                             state.dataSurface->SurfWinSlatAngThisTS(ISurf) =

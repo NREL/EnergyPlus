@@ -1814,8 +1814,7 @@ namespace SolarCollectors {
 
         if (NumCovers == 1) {
             // calc linearized radiation coefficient
-            tempnom = Constant::StefanBoltzmann *
-                      ((TempAbsPlate + Constant::KelvinConv) + (TempOuterCover + Constant::KelvinConv)) *
+            tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::KelvinConv) + (TempOuterCover + Constant::KelvinConv)) *
                       (pow_2(TempAbsPlate + Constant::KelvinConv) + pow_2(TempOuterCover + Constant::KelvinConv));
             tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfOuterCover - 1.0;
             hRadCoefA2C = tempnom / tempdenom;
@@ -1828,8 +1827,7 @@ namespace SolarCollectors {
             for (int CoverNum = 1; CoverNum <= NumCovers; ++CoverNum) {
                 if (CoverNum == 1) {
                     // calc linearized radiation coefficient
-                    tempnom = Constant::StefanBoltzmann *
-                              ((TempAbsPlate + Constant::KelvinConv) + (TempInnerCover + Constant::KelvinConv)) *
+                    tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::KelvinConv) + (TempInnerCover + Constant::KelvinConv)) *
                               (pow_2(TempAbsPlate + Constant::KelvinConv) + pow_2(TempInnerCover + Constant::KelvinConv));
                     tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfInnerCover - 1.0;
                     hRadCoefA2C = tempnom / tempdenom;
@@ -1838,8 +1836,7 @@ namespace SolarCollectors {
                         TempAbsPlate, TempOuterCover, AirGapDepth, this->CosTilt, this->SinTilt);
                 } else {
                     // calculate the linearized radiation coeff.
-                    tempnom = Constant::StefanBoltzmann *
-                              ((TempInnerCover + Constant::KelvinConv) + (TempOuterCover + Constant::KelvinConv)) *
+                    tempnom = Constant::StefanBoltzmann * ((TempInnerCover + Constant::KelvinConv) + (TempOuterCover + Constant::KelvinConv)) *
                               (pow_2(TempInnerCover + Constant::KelvinConv) + pow_2(TempOuterCover + Constant::KelvinConv));
                     tempdenom = 1.0 / EmissOfInnerCover + 1.0 / EmissOfOuterCover - 1.0;
                     hRadCoefC2C = tempnom / tempdenom;

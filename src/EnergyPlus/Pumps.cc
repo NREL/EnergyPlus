@@ -1526,8 +1526,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
 
         } else {
             auto &thisPumpPlant = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
-            TempWaterDensity =
-                GetDensityGlycol(state, thisPumpPlant.FluidName, Constant::InitConvTemp, thisPumpPlant.FluidIndex, RoutineName);
+            TempWaterDensity = GetDensityGlycol(state, thisPumpPlant.FluidName, Constant::InitConvTemp, thisPumpPlant.FluidIndex, RoutineName);
             mdotMax = thisPump.NomVolFlowRate * TempWaterDensity;
             // mdotMin = PumpEquip(PumpNum)%MinVolFlowRate * TempWaterDensity
             // see note above

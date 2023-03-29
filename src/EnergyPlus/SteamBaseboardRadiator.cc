@@ -1590,16 +1590,13 @@ namespace SteamBaseboardRadiator {
         //       RE-ENGINEERED  na
 
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotEnergy =
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSys *
-            Constant::SecInHour;
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Energy =
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSysSec;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvEnergy =
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSys *
-            Constant::SecInHour;
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadEnergy =
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSys *
-            Constant::SecInHour;
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     }
 
     void

@@ -2337,14 +2337,14 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                             _,
                             _,
                             "Plant");
-        // SetupOutputVariable(state,
+        // Setup Output Variable(state,
         //                    "Fuel-fired Absorption Heat Pump Source Side Heat Transfer Rate",
         //                    OutputProcessor::Unit::W,
         //                    this->sourceSideHeatTransfer,
         //                    OutputProcessor::SOVTimeStepType::System,
         //                    OutputProcessor::SOVStoreType::Average,
         //                    this->name);
-        // SetupOutputVariable(state,
+        // Setup Output Variable(state,
         //                    "Fuel-fired Absorption Heat Pump Source Side Heat Transfer Energy",
         //                    OutputProcessor::Unit::J,
         //                    this->sourceSideEnergy,
@@ -2365,14 +2365,14 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
-        // SetupOutputVariable(state,
+        // Setup Output Variable(state,
         //                    "Fuel-fired Absorption Heat Pump Source Side Inlet Temperature",
         //                    OutputProcessor::Unit::C,
         //                    this->sourceSideInletTemp,
         //                    OutputProcessor::SOVTimeStepType::System,
         //                    OutputProcessor::SOVStoreType::Average,
         //                    this->name);
-        // SetupOutputVariable(state,
+        // Setup Output Variable(state,
         //                    "Heat Pump Source Side Outlet Temperature",
         //                    OutputProcessor::Unit::C,
         //                    this->sourceSideOutletTemp,

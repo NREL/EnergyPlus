@@ -7065,8 +7065,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     //  Allow for modification of TemperatureCoefficient with unitary sine wave.
                     Real64 ConstantTempCoef; // Temperature Coefficient as input or modified using sine wave COP mod
                     if (state.dataSurface->OSC(OPtr).SinusoidalConstTempCoef) { // Sine wave C4
-                        ConstantTempCoef =
-                            std::sin(2 * Constant::Pi * state.dataGlobal->CurrentTime / state.dataSurface->OSC(OPtr).SinusoidPeriod);
+                        ConstantTempCoef = std::sin(2 * Constant::Pi * state.dataGlobal->CurrentTime / state.dataSurface->OSC(OPtr).SinusoidPeriod);
                     } else {
                         ConstantTempCoef = state.dataSurface->OSC(OPtr).ConstTempCoef;
                     }
@@ -8140,8 +8139,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                                            // time) | Convection and damping term
                 state.dataHeatBalSurf->SurfTempIn(SurfNum) = state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
 
-                Real64 const Sigma_Temp_4(Constant::StefanBoltzmann *
-                                          pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::KelvinConv));
+                Real64 const Sigma_Temp_4(Constant::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::KelvinConv));
 
                 // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                 if (state.dataHeatBalSurf->AnyRadiantSystems(SurfNum))
@@ -9638,8 +9636,7 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
     state.dataHeatBal->ExtVentedCavity(CavNum).HcPlen = HcPlen;
     state.dataHeatBal->ExtVentedCavity(CavNum).PassiveACH =
         (MdotVent / RhoAir) *
-        (1.0 / (state.dataHeatBal->ExtVentedCavity(CavNum).ProjArea * state.dataHeatBal->ExtVentedCavity(CavNum).PlenGapThick)) *
-        Constant::SecInHour;
+        (1.0 / (state.dataHeatBal->ExtVentedCavity(CavNum).ProjArea * state.dataHeatBal->ExtVentedCavity(CavNum).PlenGapThick)) * Constant::SecInHour;
     state.dataHeatBal->ExtVentedCavity(CavNum).PassiveMdotVent = MdotVent;
     state.dataHeatBal->ExtVentedCavity(CavNum).PassiveMdotWind = VdotWind * RhoAir;
     state.dataHeatBal->ExtVentedCavity(CavNum).PassiveMdotTherm = VdotThermal * RhoAir;

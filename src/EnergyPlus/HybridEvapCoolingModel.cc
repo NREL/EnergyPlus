@@ -1799,14 +1799,12 @@ namespace HybridEvapCoolingModel {
         RequestedLoadToCoolingSetpoint = RequestedCoolingLoad;
         Real64 LambdaRa = Psychrometrics::PsyHfgAirFnWTdb(0, InletTemp);
         RequestedHumdificationMass = OutputRequiredToHumidify;
-        RequestedHumdificationLoad = OutputRequiredToHumidify * LambdaRa; // [W];
-        RequestedHumdificationEnergy =
-            OutputRequiredToHumidify * LambdaRa * state.dataHVACGlobal->TimeStepSysSec; // [j]
+        RequestedHumdificationLoad = OutputRequiredToHumidify * LambdaRa;                                          // [W];
+        RequestedHumdificationEnergy = OutputRequiredToHumidify * LambdaRa * state.dataHVACGlobal->TimeStepSysSec; // [j]
 
         RequestedDeHumdificationMass = OutputRequiredToDehumidify;
-        RequestedDeHumdificationLoad = OutputRequiredToDehumidify * LambdaRa; // [W];
-        RequestedDeHumdificationEnergy =
-            OutputRequiredToDehumidify * LambdaRa * state.dataHVACGlobal->TimeStepSysSec; // [j]
+        RequestedDeHumdificationLoad = OutputRequiredToDehumidify * LambdaRa;                                          // [W];
+        RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * LambdaRa * state.dataHVACGlobal->TimeStepSysSec; // [j]
 
         MinOA_Msa = DesignMinVR; // as mass flow kg/s
 
@@ -1951,19 +1949,19 @@ namespace HybridEvapCoolingModel {
             // set UNIT outputs for cooling and heating
             if (QTotZoneOut > 0) // zone cooling is positive, else remain zero
             {
-                UnitTotalCoolingRate = std::abs(QTotZoneOut);                                                                       // Watts
+                UnitTotalCoolingRate = std::abs(QTotZoneOut);                                         // Watts
                 UnitTotalCoolingEnergy = UnitTotalCoolingRate * state.dataHVACGlobal->TimeStepSysSec; // J
             } else {
-                UnitTotalHeatingRate = std::abs(QTotZoneOut);                                                                       // Watts
+                UnitTotalHeatingRate = std::abs(QTotZoneOut);                                         // Watts
                 UnitTotalHeatingEnergy = UnitTotalHeatingRate * state.dataHVACGlobal->TimeStepSysSec; // J
             }
 
             if (QSensZoneOut > 0) // zone cooling is positive, else remain zero
             {
-                UnitSensibleCoolingRate = std::abs(QSensZoneOut);                                                                         // Watts
+                UnitSensibleCoolingRate = std::abs(QSensZoneOut);                                           // Watts
                 UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * state.dataHVACGlobal->TimeStepSysSec; // J
             } else {
-                UnitSensibleHeatingRate = std::abs(QSensZoneOut);                                                                         // Watts
+                UnitSensibleHeatingRate = std::abs(QSensZoneOut);                                           // Watts
                 UnitSensibleHeatingEnergy = UnitSensibleHeatingRate * state.dataHVACGlobal->TimeStepSysSec; // J
             }
 

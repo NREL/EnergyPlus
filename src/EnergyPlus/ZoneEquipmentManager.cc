@@ -5303,15 +5303,12 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                         if (!(state.dataZoneEquip->ZoneEquipAvail(zoneNum) == DataHVACGlobals::CycleOn ||
                               state.dataZoneEquip->ZoneEquipAvail(zoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) ||
                             !state.afn->AirflowNetworkZoneFlag(zoneNum))
-                            state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
-                                thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSysSec;
+                            state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec += thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSysSec;
                     } else if (!state.afn->AirflowNetworkZoneFlag(zoneNum)) {
-                        state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
-                            thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSysSec;
+                        state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec += thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSysSec;
                     }
                 } else {
-                    state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
-                        thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSysSec;
+                    state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec += thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSysSec;
                 }
             }
             // Intake fans will add some heat to the air, raising the temperature for an intake fan...

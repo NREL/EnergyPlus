@@ -435,7 +435,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
     for (int year = 1; year <= state->dataEconLifeCycleCost->lengthStudyYears; ++year) {
         std::array<Real64, static_cast<int>(Constant::ResourceType::Num)> yearMap;
-	std::fill(yearMap.begin(), yearMap.end(), 0.0);
+        std::fill(yearMap.begin(), yearMap.end(), 0.0);
         state->dataEconLifeCycleCost->EscalatedEnergy[year] = yearMap;
     }
 

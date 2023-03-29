@@ -1173,7 +1173,7 @@ namespace DaylightingDevices {
         Real64 SINI;            // Sine of incident angle
 
         Real64 const dPH = 90.0 * Constant::DegToRadians / NPH; // Altitude angle of sky element
-        Real64 PH = 0.5 * dPH;                                             // Altitude angle increment
+        Real64 PH = 0.5 * dPH;                                  // Altitude angle increment
 
         // Integrate from 0 to Pi/2 altitude
         for (int N = 1; N <= NPH; ++N) {
@@ -1236,8 +1236,8 @@ namespace DaylightingDevices {
         Real64 CosPhi;          // Cosine of TDD:DOME altitude angle
         Real64 Theta;           // TDD:DOME azimuth angle
 
-        CosPhi = std::cos(Constant::PiOvr2 - state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Tilt *
-                                                            Constant::DegToRadians);
+        CosPhi = std::cos(Constant::PiOvr2 -
+                          state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Tilt * Constant::DegToRadians);
         Theta = state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Azimuth * Constant::DegToRadians;
 
         if (CosPhi > 0.01) { // Dome has a view of the horizon
@@ -1245,7 +1245,7 @@ namespace DaylightingDevices {
             Real64 const THMIN = Theta - Constant::PiOvr2; // Minimum azimuth integration limit
             // Real64 const THMAX = Theta + PiOvr2; // Maximum azimuth integration limit
             Real64 const dTH = 180.0 * Constant::DegToRadians / NTH; // Azimuth angle increment
-            Real64 TH = THMIN + 0.5 * dTH;                                      // Azimuth angle of sky horizon element
+            Real64 TH = THMIN + 0.5 * dTH;                           // Azimuth angle of sky horizon element
 
             for (int N = 1; N <= NTH; ++N) {
                 // Calculate incident angle between dome outward normal and horizon element

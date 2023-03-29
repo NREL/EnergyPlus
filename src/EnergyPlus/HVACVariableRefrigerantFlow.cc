@@ -5052,8 +5052,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         if (thisVrf.DefrostStrategy == StandardRatings::DefrostStrat::Resistive ||
-            (thisVrf.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
-             thisVrf.FuelTypeNum == Constant::ResourceType::Electricity)) {
+            (thisVrf.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle && thisVrf.FuelTypeNum == Constant::ResourceType::Electricity)) {
             SetupOutputVariable(state,
                                 "VRF Heat Pump Defrost Electricity Rate",
                                 OutputProcessor::Unit::W,

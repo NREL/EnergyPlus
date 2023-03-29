@@ -675,14 +675,10 @@ namespace HeatingCoils {
             heatingCoil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
             heatingCoil.FuelType_Num = Constant::AssignResourceTypeNum(Alphas(3));
-            if (!(heatingCoil.FuelType_Num == Constant::ResourceType::Natural_Gas ||
-                  heatingCoil.FuelType_Num == Constant::ResourceType::Propane ||
-                  heatingCoil.FuelType_Num == Constant::ResourceType::Diesel ||
-                  heatingCoil.FuelType_Num == Constant::ResourceType::Gasoline ||
-                  heatingCoil.FuelType_Num == Constant::ResourceType::FuelOil_1 ||
-                  heatingCoil.FuelType_Num == Constant::ResourceType::FuelOil_2 ||
-                  heatingCoil.FuelType_Num == Constant::ResourceType::OtherFuel1 ||
-                  heatingCoil.FuelType_Num == Constant::ResourceType::OtherFuel2 ||
+            if (!(heatingCoil.FuelType_Num == Constant::ResourceType::Natural_Gas || heatingCoil.FuelType_Num == Constant::ResourceType::Propane ||
+                  heatingCoil.FuelType_Num == Constant::ResourceType::Diesel || heatingCoil.FuelType_Num == Constant::ResourceType::Gasoline ||
+                  heatingCoil.FuelType_Num == Constant::ResourceType::FuelOil_1 || heatingCoil.FuelType_Num == Constant::ResourceType::FuelOil_2 ||
+                  heatingCoil.FuelType_Num == Constant::ResourceType::OtherFuel1 || heatingCoil.FuelType_Num == Constant::ResourceType::OtherFuel2 ||
                   heatingCoil.FuelType_Num == Constant::ResourceType::Coal) ||
                 heatingCoil.FuelType_Num == Constant::ResourceType::None) {
                 ShowSevereError(state,

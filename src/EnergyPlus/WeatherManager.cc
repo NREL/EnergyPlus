@@ -716,8 +716,7 @@ namespace WeatherManager {
             if (state.dataWeatherManager->NumOfEnvrn > 0) {
                 ResolveLocationInformation(state, ErrorsFound); // Obtain weather related info from input file
                 CheckLocationValidity(state);
-                if ((state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn !=
-                     Constant::KindOfSim::DesignDay) &&
+                if ((state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn != Constant::KindOfSim::DesignDay) &&
                     (state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn !=
                      Constant::KindOfSim::HVACSizeDesignDay)) {
                     CheckWeatherFileValidity(state);
@@ -1259,8 +1258,7 @@ namespace WeatherManager {
                 state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn) =
                     state.dataWeatherManager->Environment(i); // copy over seed data from current array element
                 state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).SeedEnvrnNum = i;
-                state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn =
-                    Constant::KindOfSim::HVACSizeDesignDay;
+                state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = Constant::KindOfSim::HVACSizeDesignDay;
                 state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).Title =
                     format("{} HVAC Sizing Pass {}", state.dataWeatherManager->Environment(i).Title, HVACSizingIterCount);
                 state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
@@ -1870,8 +1868,8 @@ namespace WeatherManager {
             // In a multi year simulation with run period less than 365, we need to position the weather line
             // appropriately.
 
-            if ((!state.dataGlobal->WarmupFlag) && ((thisEnvrn.KindOfEnvrn != Constant::KindOfSim::DesignDay) &&
-                                                    (thisEnvrn.KindOfEnvrn != Constant::KindOfSim::HVACSizeDesignDay))) {
+            if ((!state.dataGlobal->WarmupFlag) &&
+                ((thisEnvrn.KindOfEnvrn != Constant::KindOfSim::DesignDay) && (thisEnvrn.KindOfEnvrn != Constant::KindOfSim::HVACSizeDesignDay))) {
                 if (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) {
                     if (state.dataGlobal->DayOfSim == state.dataWeatherManager->curSimDayForEndOfRunPeriod) {
                         state.dataWeatherManager->curSimDayForEndOfRunPeriod += thisEnvrn.RawSimDays;
@@ -2000,8 +1998,7 @@ namespace WeatherManager {
 
             // at the end of each day find the min/max weather used for DOAS sizing
             if (state.dataGlobal->AirLoopHVACDOASUsedInSim) {
-                if (thisEnvrn.KindOfEnvrn == Constant::KindOfSim::RunPeriodDesign ||
-                    thisEnvrn.KindOfEnvrn == Constant::KindOfSim::DesignDay) {
+                if (thisEnvrn.KindOfEnvrn == Constant::KindOfSim::RunPeriodDesign || thisEnvrn.KindOfEnvrn == Constant::KindOfSim::DesignDay) {
                     for (size_t i = 0; i < state.dataWeatherManager->TodayOutDryBulbTemp.size(); ++i) {
                         if (state.dataWeatherManager->TodayOutDryBulbTemp[i] > thisEnvrn.maxCoolingOATSizing) {
                             thisEnvrn.maxCoolingOATSizing = state.dataWeatherManager->TodayOutDryBulbTemp[i];
@@ -2027,8 +2024,7 @@ namespace WeatherManager {
 
         if (state.dataGlobal->EndEnvrnFlag &&
             (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != Constant::KindOfSim::DesignDay) &&
-            (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn !=
-             Constant::KindOfSim::HVACSizeDesignDay)) {
+            (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != Constant::KindOfSim::HVACSizeDesignDay)) {
             state.files.inputWeatherFile.rewind();
             SkipEPlusWFHeader(state);
             ReportMissing_RangeData(state);
@@ -3845,9 +3841,7 @@ namespace WeatherManager {
             print(state.files.eio, "{:.4R},", C);
             print(state.files.eio, "{:.1R},", AVSC);
             print(state.files.eio, "{:.2R},", state.dataWeatherManager->DesignDay(EnvrnNum).EquationOfTime * 60.0);
-            print(state.files.eio,
-                  "{:.1R},",
-                  std::asin(state.dataWeatherManager->DesignDay(EnvrnNum).SinSolarDeclinAngle) / Constant::DegToRadians);
+            print(state.files.eio, "{:.1R},", std::asin(state.dataWeatherManager->DesignDay(EnvrnNum).SinSolarDeclinAngle) / Constant::DegToRadians);
 
             if (state.dataWeatherManager->DesDayInput(EnvrnNum).SolarModel == DesignDaySolarModel::ASHRAE_ClearSky) {
                 StringOut = "ASHRAEClearSky";
@@ -4055,8 +4049,7 @@ namespace WeatherManager {
                     state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == SkyTempCalcType::BerdahlMartinModel ||
                     state.dataWeatherManager->Environment(EnvrnNum).SkyTempModel == SkyTempCalcType::ClarkAllenModel) {
                     // Design day not scheduled
-                    state.dataWeatherManager->TomorrowSkyTemp(ts, hour) =
-                        (DryBulb + Constant::KelvinConv) * root_4(ESky) - Constant::KelvinConv;
+                    state.dataWeatherManager->TomorrowSkyTemp(ts, hour) = (DryBulb + Constant::KelvinConv) * root_4(ESky) - Constant::KelvinConv;
                 }
                 // Generate solar values for timestep
                 //    working results = BeamRad and DiffRad
@@ -4539,8 +4532,8 @@ namespace WeatherManager {
         EP_SIZE_CHECK(SUNCOS, 3); // NOLINT(misc-static-assert)
 
         // COMPUTE THE HOUR ANGLE
-        Real64 H = (15.0 * (12.0 - (TimeValue + EqOfTime)) + (state.dataEnvrn->TimeZoneMeridian - state.dataEnvrn->Longitude)) *
-                   Constant::DegToRadians;
+        Real64 H =
+            (15.0 * (12.0 - (TimeValue + EqOfTime)) + (state.dataEnvrn->TimeZoneMeridian - state.dataEnvrn->Longitude)) * Constant::DegToRadians;
         Real64 COSH = std::cos(H);
         // COMPUTE THE COSINE OF THE SOLAR ZENITH ANGLE.
         // This is also the Sine of the Solar Altitude Angle
@@ -4718,8 +4711,7 @@ namespace WeatherManager {
         // in this module.  At some point, this subroutine will be converted
         // to read information directly from the new input file.
 
-        if (state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn ==
-                Constant::KindOfSim::RunPeriodWeather &&
+        if (state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn == Constant::KindOfSim::RunPeriodWeather &&
             state.dataWeatherManager->WeatherFileExists) {
             if (state.dataWeatherManager->LocationGathered) {
                 // See if "matching" location
@@ -5077,11 +5069,9 @@ namespace WeatherManager {
         }
         for (int Env = 1; Env <= RPD1 + RPD2; ++Env) {
             if (!state.dataSysVars->DDOnly) {
-                state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + Env).KindOfEnvrn =
-                    Constant::KindOfSim::RunPeriodDesign;
+                state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + Env).KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
             } else {
-                state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + Env).KindOfEnvrn =
-                    Constant::KindOfSim::RunPeriodWeather;
+                state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + Env).KindOfEnvrn = Constant::KindOfSim::RunPeriodWeather;
             }
         }
         for (int Env = 1; Env <= state.dataWeatherManager->TotRunPers; ++Env) {
@@ -5782,8 +5772,7 @@ namespace WeatherManager {
         if (nRunPeriods == 0 && state.dataSysVars->FullAnnualRun) {
             ShowWarningError(state, "No Run Periods input but Full Annual Simulation selected.  Adding Run Period to 1/1 through 12/31.");
             state.dataWeatherManager->Environment.redimension(++state.dataWeatherManager->NumOfEnvrn);
-            state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn =
-                Constant::KindOfSim::RunPeriodWeather;
+            state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = Constant::KindOfSim::RunPeriodWeather;
             nRunPeriods = 1;
             state.dataGlobal->WeathSimReq = true;
             state.dataWeatherManager->RunPeriodInput.allocate(nRunPeriods);
@@ -8095,9 +8084,9 @@ namespace WeatherManager {
         int const latitude_sign = (state.dataEnvrn->Latitude >= 0) ? 1 : -1;
 
         // calculated water main temp (F)
-        Real64 CurrentWaterMainsTemp = Tavg + Offset +
-                                       Ratio * (Tdiff / 2.0) * latitude_sign *
-                                           std::sin((0.986 * (state.dataEnvrn->DayOfYear - 15.0 - Lag) - 90) * Constant::DegToRadians);
+        Real64 CurrentWaterMainsTemp =
+            Tavg + Offset +
+            Ratio * (Tdiff / 2.0) * latitude_sign * std::sin((0.986 * (state.dataEnvrn->DayOfYear - 15.0 - Lag) - 90) * Constant::DegToRadians);
 
         if (CurrentWaterMainsTemp < 32.0) CurrentWaterMainsTemp = 32.0;
 
@@ -8262,8 +8251,8 @@ namespace WeatherManager {
                                                       128814.0,
                                                       130471.0}); // Monthly exterrestrial direct normal illuminance (lum/m2)
 
-        Real64 const SunZenith = std::acos(state.dataEnvrn->SOLCOS(3));     // Solar zenith angle (radians)
-        Real64 const SunAltitude = Constant::PiOvr2 - SunZenith; // Solar altitude angle (radians)
+        Real64 const SunZenith = std::acos(state.dataEnvrn->SOLCOS(3)); // Solar zenith angle (radians)
+        Real64 const SunAltitude = Constant::PiOvr2 - SunZenith;        // Solar altitude angle (radians)
         Real64 const SinSunAltitude = std::sin(SunAltitude);
         // Clearness of sky. SkyClearness close to 1.0 corresponds to an overcast sky.
         // SkyClearness > 6 is a clear sky.

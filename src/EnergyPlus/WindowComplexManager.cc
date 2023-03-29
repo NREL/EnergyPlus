@@ -1008,7 +1008,7 @@ namespace WindowComplexManager {
             if (state.dataConstruction->Construct(IConst).BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry::None) {
                 // No basis symmetry
                 Basis.BasisSymmetryType = DataBSDFWindow::BasisSymmetry::None;
-                Thetas(1) = 0.0;                                     // By convention, the first basis point is at the center (theta=0,phi=0)
+                Thetas(1) = 0.0;                          // By convention, the first basis point is at the center (theta=0,phi=0)
                 Thetas(NThetas + 1) = 0.5 * Constant::Pi; // and there is an N+1st point (not a basis element) at Pi/2
                 NPhis(1) = 1;
                 NumElem = 1;
@@ -1083,9 +1083,9 @@ namespace WindowComplexManager {
             } else { // BST
                 //  Axisymmetric basis symmetry (Note this only useful specular systems, where it allows shorter data input)
                 Basis.BasisSymmetryType = DataBSDFWindow::BasisSymmetry::Axisymmetric;
-                Thetas(1) = 0.0;                                     // By convention, the first basis point is at the center (theta=0,phi=0)
+                Thetas(1) = 0.0;                          // By convention, the first basis point is at the center (theta=0,phi=0)
                 Thetas(NThetas + 1) = 0.5 * Constant::Pi; // and there is an N+1st point (not a basis element) at Pi/2
-                NPhis = 1;                                           // As insurance, define one phi for each theta
+                NPhis = 1;                                // As insurance, define one phi for each theta
                 NumElem = 1;
                 for (I = 2; I <= NThetas; ++I) {
                     Thetas(I) = state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(1, I) * Constant::DegToRadians;
@@ -2782,8 +2782,8 @@ namespace WindowComplexManager {
                         auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
                         for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
                             SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                             Constant::KelvinConv;
+                            SrdSurfTempAbs =
+                                GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
                             OutSrdIR += Constant::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                         }
                     }
@@ -3388,8 +3388,7 @@ namespace WindowComplexManager {
                 Real64 EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[0];
                 Real64 EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[0];
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
-                    (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - Constant::KelvinConv)) /
-                    (EffShBlEmiss + EffGlEmiss);
+                    (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - Constant::KelvinConv)) / (EffShBlEmiss + EffGlEmiss);
 
             } else {
                 SurfOutsideTemp = theta(1) - Constant::KelvinConv;

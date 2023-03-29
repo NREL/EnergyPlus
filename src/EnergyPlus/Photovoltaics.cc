@@ -955,9 +955,9 @@ namespace Photovoltaics {
         thisPVarray.SNLPVinto.IncidenceAngle =
             std::acos(state.dataHeatBal->SurfCosIncidenceAngle(ThisSurf)) / Constant::DegToRadians;         // (deg) from dataHeatBalance
         thisPVarray.SNLPVinto.ZenithAngle = std::acos(state.dataEnvrn->SOLCOS(3)) / Constant::DegToRadians; //(degrees),
-        thisPVarray.SNLPVinto.Tamb = state.dataSurface->SurfOutDryBulbTemp(ThisSurf);                                  //(deg. C)
-        thisPVarray.SNLPVinto.WindSpeed = state.dataSurface->SurfOutWindSpeed(ThisSurf);                               // (m/s)
-        thisPVarray.SNLPVinto.Altitude = state.dataEnvrn->Elevation;                                                   // from DataEnvironment via USE
+        thisPVarray.SNLPVinto.Tamb = state.dataSurface->SurfOutDryBulbTemp(ThisSurf);                       //(deg. C)
+        thisPVarray.SNLPVinto.WindSpeed = state.dataSurface->SurfOutWindSpeed(ThisSurf);                    // (m/s)
+        thisPVarray.SNLPVinto.Altitude = state.dataEnvrn->Elevation;                                        // from DataEnvironment via USE
 
         if (((thisPVarray.SNLPVinto.IcBeam + thisPVarray.SNLPVinto.IcDiffuse) > DataPhotovoltaics::MinIrradiance) && (RunFlag)) {
 
@@ -1325,8 +1325,7 @@ namespace Photovoltaics {
                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity * state.dataPhotovoltaicState->PVTimeStep));
                 } break;
                 case CellIntegration::SurfaceOutsideFace: {
-                    CellTemp =
-                        state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::KelvinConv;
+                    CellTemp = state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::KelvinConv;
                 } break;
                 case CellIntegration::TranspiredCollector: {
                     GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, CellTemp);

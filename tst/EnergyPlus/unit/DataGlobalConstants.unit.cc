@@ -81,12 +81,9 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_AssignResourceTypeNum)
     EXPECT_TRUE(compare_enums(Constant::ResourceType::Steam, Constant::AssignResourceTypeNum("Steam")));
     EXPECT_TRUE(compare_enums(Constant::ResourceType::DistrictCooling, Constant::AssignResourceTypeNum("DistrictCooling")));
     EXPECT_TRUE(compare_enums(Constant::ResourceType::DistrictHeating, Constant::AssignResourceTypeNum("DistrictHeating")));
-    EXPECT_TRUE(
-        compare_enums(Constant::ResourceType::ElectricityProduced, Constant::AssignResourceTypeNum("ElectricityProduced")));
-    EXPECT_TRUE(
-        compare_enums(Constant::ResourceType::ElectricityPurchased, Constant::AssignResourceTypeNum("ElectricityPurchased")));
-    EXPECT_TRUE(compare_enums(Constant::ResourceType::ElectricitySurplusSold,
-                              Constant::AssignResourceTypeNum("ElectricitySurplusSold")));
+    EXPECT_TRUE(compare_enums(Constant::ResourceType::ElectricityProduced, Constant::AssignResourceTypeNum("ElectricityProduced")));
+    EXPECT_TRUE(compare_enums(Constant::ResourceType::ElectricityPurchased, Constant::AssignResourceTypeNum("ElectricityPurchased")));
+    EXPECT_TRUE(compare_enums(Constant::ResourceType::ElectricitySurplusSold, Constant::AssignResourceTypeNum("ElectricitySurplusSold")));
     EXPECT_TRUE(compare_enums(Constant::ResourceType::ElectricityNet, Constant::AssignResourceTypeNum("ElectricityNet")));
     EXPECT_TRUE(compare_enums(Constant::ResourceType::SolarWater, Constant::AssignResourceTypeNum("SolarWater")));
     EXPECT_TRUE(compare_enums(Constant::ResourceType::SolarAir, Constant::AssignResourceTypeNum("SolarAir")));
@@ -105,13 +102,10 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_AssignResourceTypeNum)
     EXPECT_TRUE(compare_enums(Constant::ResourceType::Pb, Constant::AssignResourceTypeNum("Pb")));
     EXPECT_TRUE(compare_enums(Constant::ResourceType::NuclearHigh, Constant::AssignResourceTypeNum("Nuclear High")));
     EXPECT_TRUE(compare_enums(Constant::ResourceType::NuclearLow, Constant::AssignResourceTypeNum("Nuclear Low")));
-    EXPECT_TRUE(compare_enums(Constant::ResourceType::WaterEnvironmentalFactors,
-                              Constant::AssignResourceTypeNum("WaterEnvironmentalFactors")));
+    EXPECT_TRUE(compare_enums(Constant::ResourceType::WaterEnvironmentalFactors, Constant::AssignResourceTypeNum("WaterEnvironmentalFactors")));
     EXPECT_TRUE(compare_enums(Constant::ResourceType::CarbonEquivalent, Constant::AssignResourceTypeNum("Carbon Equivalent")));
-    EXPECT_TRUE(compare_enums(Constant::ResourceType::PlantLoopHeatingDemand,
-                              Constant::AssignResourceTypeNum("PlantLoopHeatingDemand")));
-    EXPECT_TRUE(compare_enums(Constant::ResourceType::PlantLoopCoolingDemand,
-                              Constant::AssignResourceTypeNum("PlantLoopCoolingDemand")));
+    EXPECT_TRUE(compare_enums(Constant::ResourceType::PlantLoopHeatingDemand, Constant::AssignResourceTypeNum("PlantLoopHeatingDemand")));
+    EXPECT_TRUE(compare_enums(Constant::ResourceType::PlantLoopCoolingDemand, Constant::AssignResourceTypeNum("PlantLoopCoolingDemand")));
     EXPECT_TRUE(compare_enums(Constant::ResourceType::None, Constant::AssignResourceTypeNum("XYZ")));
 }
 

@@ -8884,9 +8884,9 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
     Real64 visc; // Kinematic viscosity of air, m2/s
     Real64 k_SI_n;
     Real64 k_SI_d;
-    Real64 k_SI;                                               // Thermal conductivity of air, W/m.K
-    Real64 Ra;                                                 // Rayleigh number
-    Real64 Re;                                                 // Reynolds number
+    Real64 k_SI;                                    // Thermal conductivity of air, W/m.K
+    Real64 Ra;                                      // Rayleigh number
+    Real64 Re;                                      // Reynolds number
     constexpr Real64 g = Constant::GravityConstant; // Acceleration of gravity, m/s2
 
     auto const &surface = state.dataSurface->Surface(SurfNum);

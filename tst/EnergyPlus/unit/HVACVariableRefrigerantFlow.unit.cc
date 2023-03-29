@@ -14501,7 +14501,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(thisVRF.FuelType, "Electricity"); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
     EXPECT_TRUE(compare_enums(thisVRF.FuelTypeNum,
                               Constant::ResourceType::Electricity)); // Check fuel type input that uses
-                                                                                // UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
+                                                                     // UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)

@@ -585,8 +585,8 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
              material->MoistCCoeff * material->MoistDCoeff * pow(RHaver, material->MoistDCoeff - 1);
 
     // Convert vapor density and temperature of zone air to RH
-    RHZone = rho_vapor_air_in * 461.52 * (TempZone + Constant::KelvinConv) *
-             std::exp(-23.7093 + 4111.0 / ((TempZone + Constant::KelvinConv) - 35.45));
+    RHZone =
+        rho_vapor_air_in * 461.52 * (TempZone + Constant::KelvinConv) * std::exp(-23.7093 + 4111.0 / ((TempZone + Constant::KelvinConv) - 35.45));
 
     // Convert stored vapor density from previous timestep to RH.
     RH_deep_layer_old = PsyRhFnTdbRhov(state, Taver, rv_deep_old);

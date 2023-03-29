@@ -2414,8 +2414,7 @@ void InverseModelCO2(EnergyPlusData &state,
             }
 
             // Add threshold for air change rate
-            Real64 ACH_inf =
-                max(0.0, min(10.0, M_inf / (CpAir * AirDensity / Constant::SecInHour * state.dataHeatBal->Zone(ZoneNum).Volume)));
+            Real64 ACH_inf = max(0.0, min(10.0, M_inf / (CpAir * AirDensity / Constant::SecInHour * state.dataHeatBal->Zone(ZoneNum).Volume)));
             M_inf = ACH_inf * state.dataHeatBal->Zone(ZoneNum).Volume * AirDensity / Constant::SecInHour;
             state.dataHeatBal->Zone(ZoneNum).MCPIHM = M_inf;
             state.dataHeatBal->Zone(ZoneNum).InfilOAAirChangeRateHM = ACH_inf;

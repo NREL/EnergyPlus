@@ -3083,8 +3083,8 @@ namespace HeatBalanceManager {
             PerformSolarCalculations(state);
         }
 
-        if (state.dataGlobal->BeginDayFlag && !state.dataGlobal->WarmupFlag &&
-            state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather && state.dataSysVars->ReportExtShadingSunlitFrac) {
+        if (state.dataGlobal->BeginDayFlag && !state.dataGlobal->WarmupFlag && state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather &&
+            state.dataSysVars->ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     constexpr const char *ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");

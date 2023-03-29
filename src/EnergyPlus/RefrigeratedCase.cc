@@ -11381,8 +11381,7 @@ void RefrigCaseData::CalculateCase(EnergyPlusData &state) // Absolute pointer to
             // Reduce defrost heat load on case by amount of ice melted during time step
             // However, don't reduce the defrost capacity applied
 
-            DefrostLoad_Actual =
-                DefrostCap_Actual - FrostMeltedKg * IceMeltEnthalpy / state.dataGlobal->TimeStepZone / Constant::SecInHour;
+            DefrostLoad_Actual = DefrostCap_Actual - FrostMeltedKg * IceMeltEnthalpy / state.dataGlobal->TimeStepZone / Constant::SecInHour;
 
             if (!state.dataGlobal->WarmupFlag) { // avoid reverse dd test problems
                 // keep running total of defrost energy above that needed to melt frost for use in evaluating
@@ -16322,9 +16321,9 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
     //                     on the coils that stops defrost if the coils get above
     //                     a certain temperature (such as when there's no load and no ice)
     if ((DefrostSchedule > 0.0) && (this->defrostType != DefrostType::None) && (this->defrostType != DefrostType::OffCycle)) {
-        DefrostLoad = DefrostCap * DefrostSchedule; // Part of the defrost that is a heat load on the zone (W)
+        DefrostLoad = DefrostCap * DefrostSchedule;                                // Part of the defrost that is a heat load on the zone (W)
         Real64 DefrostEnergy = DefrostLoad * state.dataHVACGlobal->TimeStepSysSec; // Joules
-        Real64 StartFrostKg = this->KgFrost; // frost load at start of time step (kg of ice)
+        Real64 StartFrostKg = this->KgFrost;                                       // frost load at start of time step (kg of ice)
 
         if (this->DefrostControlType == DefrostCtrlType::TempTerm) {
             //  Need to turn defrost system off early if controlled by temperature and all ice melted
@@ -16358,12 +16357,10 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
                     this->KgFrost = 0.0;
                     Real64 DefrostEnergyNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) /
                                                  this->DefEnergyFraction; // Joules - energy needed including E unavail to melt ice
-                    DefrostSchedule = min(DefrostSchedule,
-                                          (DefrostEnergyNeeded / (DefrostCap * state.dataHVACGlobal->TimeStepSysSec)));
+                    DefrostSchedule = min(DefrostSchedule, (DefrostEnergyNeeded / (DefrostCap * state.dataHVACGlobal->TimeStepSysSec)));
                     // reduce heat load on warehouse by energy put into ice melting
                     // Defrost load that actually goes to melting ice (W)
-                    Real64 DefrostRateNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) /
-                                               (state.dataHVACGlobal->TimeStepSysSec);
+                    Real64 DefrostRateNeeded = (IceSensHeatNeeded + (FrostChangekg * IceMeltEnthalpy)) / (state.dataHVACGlobal->TimeStepSysSec);
                     DefrostLoad = max(0.0, (DefrostSchedule * DefrostCap - DefrostRateNeeded));
                     this->IceTemp = this->TEvapDesign;
                 } // frost melted during time step less than amount of ice at start

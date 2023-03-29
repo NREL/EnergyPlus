@@ -315,8 +315,7 @@ void InitEnergyReports(EnergyPlusData &state)
                 if (ListNum > 0 && AirDistUnitNum > 0) {
                     auto &thisZoneEquipList = state.dataZoneEquip->ZoneEquipList(ListNum);
                     for (int VarNum = 1; VarNum <= thisZoneEquipList.EquipData(AirDistUnitNum).NumMeteredVars; ++VarNum) {
-                        if (thisZoneEquipList.EquipData(AirDistUnitNum).MeteredVar(VarNum).ResourceType ==
-                            Constant::ResourceType::EnergyTransfer) {
+                        if (thisZoneEquipList.EquipData(AirDistUnitNum).MeteredVar(VarNum).ResourceType == Constant::ResourceType::EnergyTransfer) {
                             thisZoneEquipList.EquipData(AirDistUnitNum).EnergyTransComp = EnergyTransfer;
                             const std::string &CompType = thisZoneEquipList.EquipData(AirDistUnitNum).TypeOf;
                             const std::string &CompName = thisZoneEquipList.EquipData(AirDistUnitNum).Name;
@@ -2201,16 +2200,16 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     bool IsParent;
 
     // Dimension GetMeteredVariables arrays
-    Array1D_int VarIndexes;                                         // Variable Numbers
-    Array1D<OutputProcessor::VariableType> VarTypes;                // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D_string UnitsStrings;                                    // UnitsStrings for each variable
-    Array1D<OutputProcessor::TimeStepType> IndexTypes;              // Variable Idx Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar;                     // units from enum for each variable
+    Array1D_int VarIndexes;                              // Variable Numbers
+    Array1D<OutputProcessor::VariableType> VarTypes;     // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D_string UnitsStrings;                         // UnitsStrings for each variable
+    Array1D<OutputProcessor::TimeStepType> IndexTypes;   // Variable Idx Types (1=Zone,2=HVAC)
+    Array1D<OutputProcessor::Unit> unitsForVar;          // units from enum for each variable
     std::map<int, Constant::ResourceType> ResourceTypes; // ResourceTypes for each variable
-    Array1D_string EndUses;                                         // EndUses for each variable
-    Array1D_string Groups;                                          // Groups for each variable
-    Array1D_string Names;                                           // Variable Names for each variable
-    int NumFound;                                                   // Number Found
+    Array1D_string EndUses;                              // EndUses for each variable
+    Array1D_string Groups;                               // Groups for each variable
+    Array1D_string Names;                                // Variable Names for each variable
+    int NumFound;                                        // Number Found
     int NumVariables;
     int NumLeft; // Counter for deeper components
 
@@ -2507,8 +2506,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 unitsForVar.allocate(NumVariables);
                                 ResourceTypes.clear();
                                 for (int idx = 1; idx <= NumVariables; ++idx) {
-                                    ResourceTypes.insert(
-                                        std::pair<int, Constant::ResourceType>(idx, Constant::ResourceType::None));
+                                    ResourceTypes.insert(std::pair<int, Constant::ResourceType>(idx, Constant::ResourceType::None));
                                 }
                                 EndUses.allocate(NumVariables);
                                 Groups.allocate(NumVariables);
@@ -3165,8 +3163,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 unitsForVar.allocate(NumVariables);
                                 ResourceTypes.clear();
                                 for (int idx = 1; idx <= NumVariables; ++idx) {
-                                    ResourceTypes.insert(
-                                        std::pair<int, Constant::ResourceType>(idx, Constant::ResourceType::None));
+                                    ResourceTypes.insert(std::pair<int, Constant::ResourceType>(idx, Constant::ResourceType::None));
                                 }
                                 EndUses.allocate(NumVariables);
                                 Groups.allocate(NumVariables);
@@ -3792,8 +3789,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case COIL_WATERHEATING_AIRTOWATERHEATPUMP_VARIABLESPEED:
 
         if (CompLoadFlag) thisSysLoadRepVars.CCCompCLNG += std::abs(CompLoad);
-        if ((EnergyType == Constant::ResourceType::PlantLoopCoolingDemand) ||
-            (EnergyType == Constant::ResourceType::DistrictCooling)) {
+        if ((EnergyType == Constant::ResourceType::PlantLoopCoolingDemand) || (EnergyType == Constant::ResourceType::DistrictCooling)) {
             thisSysLoadRepVars.CCCompH2OCOLD += CompEnergy;
         } else if (EnergyType == Constant::ResourceType::Electricity) {
             thisSysLoadRepVars.CCCompElec += CompEnergy;
@@ -3814,8 +3810,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case COIL_HEATING_DESUPERHEATER:
 
         if (CompLoadFlag) thisSysLoadRepVars.HCCompHTNG += std::abs(CompLoad);
-        if ((EnergyType == Constant::ResourceType::PlantLoopHeatingDemand) ||
-            (EnergyType == Constant::ResourceType::DistrictHeating)) {
+        if ((EnergyType == Constant::ResourceType::PlantLoopHeatingDemand) || (EnergyType == Constant::ResourceType::DistrictHeating)) {
             thisSysLoadRepVars.HCCompH2OHOT += CompEnergy;
         } else if (EnergyType == Constant::ResourceType::Steam) {
             thisSysLoadRepVars.HCCompSteam += CompEnergy;
@@ -3846,11 +3841,9 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
                 thisSysLoadRepVars.HCCompHTNG += std::abs(CompLoad);
             }
         }
-        if ((EnergyType == Constant::ResourceType::PlantLoopHeatingDemand) ||
-            (EnergyType == Constant::ResourceType::DistrictHeating)) {
+        if ((EnergyType == Constant::ResourceType::PlantLoopHeatingDemand) || (EnergyType == Constant::ResourceType::DistrictHeating)) {
             thisSysLoadRepVars.HCCompH2OHOT += CompEnergy;
-        } else if ((EnergyType == Constant::ResourceType::PlantLoopCoolingDemand) ||
-                   (EnergyType == Constant::ResourceType::DistrictCooling)) {
+        } else if ((EnergyType == Constant::ResourceType::PlantLoopCoolingDemand) || (EnergyType == Constant::ResourceType::DistrictCooling)) {
             thisSysLoadRepVars.CCCompH2OCOLD += CompEnergy;
         } else if (EnergyType == Constant::ResourceType::Steam) {
             thisSysLoadRepVars.HCCompSteam += CompEnergy;
@@ -4013,11 +4006,9 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
                 thisSysLoadRepVars.UserDefinedTerminalHeating += std::abs(CompLoad);
             }
         }
-        if ((EnergyType == Constant::ResourceType::PlantLoopHeatingDemand) ||
-            (EnergyType == Constant::ResourceType::DistrictHeating)) {
+        if ((EnergyType == Constant::ResourceType::PlantLoopHeatingDemand) || (EnergyType == Constant::ResourceType::DistrictHeating)) {
             thisSysLoadRepVars.HCCompH2OHOT += CompEnergy;
-        } else if ((EnergyType == Constant::ResourceType::PlantLoopCoolingDemand) ||
-                   (EnergyType == Constant::ResourceType::DistrictCooling)) {
+        } else if ((EnergyType == Constant::ResourceType::PlantLoopCoolingDemand) || (EnergyType == Constant::ResourceType::DistrictCooling)) {
             thisSysLoadRepVars.CCCompH2OCOLD += CompEnergy;
         } else if (EnergyType == Constant::ResourceType::Steam) {
             thisSysLoadRepVars.HCCompSteam += CompEnergy;

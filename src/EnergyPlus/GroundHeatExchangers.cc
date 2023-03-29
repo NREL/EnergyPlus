@@ -1046,8 +1046,7 @@ void GLHEVert::setupTimeVectors()
     // Determine how many g-function pairs to generate based on user defined maximum simulation time
     while (true) {
         Real64 maxPossibleSimTime = exp(tempLNTTS.back()) * t_s;
-        if (maxPossibleSimTime <
-            this->myRespFactors->maxSimYears * numDaysInYear * Constant::HoursInDay * Constant::SecInHour) {
+        if (maxPossibleSimTime < this->myRespFactors->maxSimYears * numDaysInYear * Constant::HoursInDay * Constant::SecInHour) {
             tempLNTTS.push_back(tempLNTTS.back() + lnttsStepSize);
         } else {
             break;
@@ -1349,8 +1348,7 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
             if (leftCell.type == CellType::GROUT && rightCell.type == CellType::SOIL) {
 
                 Real64 left_conductance = 2 * Constant::Pi * leftCell.conductivity / log(leftCell.radius_outer / leftCell.radius_inner);
-                Real64 right_conductance =
-                    2 * Constant::Pi * rightCell.conductivity / log(rightCell.radius_center / leftCell.radius_inner);
+                Real64 right_conductance = 2 * Constant::Pi * rightCell.conductivity / log(rightCell.radius_center / leftCell.radius_inner);
 
                 T_bhWall =
                     (left_conductance * leftCell.temperature + right_conductance * rightCell.temperature) / (left_conductance + right_conductance);
@@ -1360,8 +1358,7 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
 
         total_time += time_step;
 
-        GFNC_shortTimestep.push_back(2 * Constant::Pi * this->soil.k *
-                                     ((Cells[0].temperature - initial_temperature) / heat_flux - bhResistance));
+        GFNC_shortTimestep.push_back(2 * Constant::Pi * this->soil.k * ((Cells[0].temperature - initial_temperature) / heat_flux - bhResistance));
         LNTTS_shortTimestep.push_back(log(total_time / t_s));
 
     } // end timestep loop
@@ -1693,8 +1690,7 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
             }         // n1
         }             // m1
 
-        this->myRespFactors->GFNC(NT) =
-            (gFunc * (this->coilDiameter / 2.0)) / (4 * Constant::Pi * fraction * this->numTrenches * this->numCoils);
+        this->myRespFactors->GFNC(NT) = (gFunc * (this->coilDiameter / 2.0)) / (4 * Constant::Pi * fraction * this->numTrenches * this->numCoils);
         this->myRespFactors->LNTTS(NT) = tLg;
 
     } // NT time
@@ -2098,8 +2094,7 @@ void GLHEBase::calcGroundHeatExchanger(EnergyPlusData &state)
     state.dataGroundHeatExchanger->currentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 +
                                                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
                                                     state.dataHVACGlobal->SysTimeElapsed; //+ TimeStepsys
-    state.dataGroundHeatExchanger->locHourOfDay =
-        static_cast<int>(mod(state.dataGroundHeatExchanger->currentSimTime, Constant::HoursInDay) + 1);
+    state.dataGroundHeatExchanger->locHourOfDay = static_cast<int>(mod(state.dataGroundHeatExchanger->currentSimTime, Constant::HoursInDay) + 1);
     state.dataGroundHeatExchanger->locDayOfSim = static_cast<int>(state.dataGroundHeatExchanger->currentSimTime / 24 + 1);
 
     if (state.dataGlobal->DayOfSim > 1) {
@@ -2425,12 +2420,11 @@ void GLHEBase::calcAggregateLoad(EnergyPlusData &state)
     }
 
     // CHECK IF A MONTH PASSES...
-    if (mod(((state.dataGroundHeatExchanger->locDayOfSim - 1) * Constant::HoursInDay + (state.dataGroundHeatExchanger->locHourOfDay)),
-            hrsPerMonth) == 0 &&
+    if (mod(((state.dataGroundHeatExchanger->locDayOfSim - 1) * Constant::HoursInDay + (state.dataGroundHeatExchanger->locHourOfDay)), hrsPerMonth) ==
+            0 &&
         this->prevHour != state.dataGroundHeatExchanger->locHourOfDay) {
         Real64 MonthNum = static_cast<int>(
-            (state.dataGroundHeatExchanger->locDayOfSim * Constant::HoursInDay + state.dataGroundHeatExchanger->locHourOfDay) /
-            hrsPerMonth);
+            (state.dataGroundHeatExchanger->locDayOfSim * Constant::HoursInDay + state.dataGroundHeatExchanger->locHourOfDay) / hrsPerMonth);
         Real64 SumQnMonth = 0.0;
         for (int J = 1; J <= int(hrsPerMonth); ++J) {
             SumQnMonth += this->QnHr(J);
@@ -2919,8 +2913,8 @@ Real64 GLHESlinky::calcHXResistance(EnergyPlusData &state)
         Rconv = 0.0;
     } else {
         // Re=Rho*V*D/Mu
-        Real64 reynoldsNum = fluidDensity * pipeInnerDia *
-                             (singleSlinkyMassFlowRate / fluidDensity / (Constant::Pi * pow_2(pipeInnerRad))) / fluidViscosity;
+        Real64 reynoldsNum =
+            fluidDensity * pipeInnerDia * (singleSlinkyMassFlowRate / fluidDensity / (Constant::Pi * pow_2(pipeInnerRad))) / fluidViscosity;
         Real64 prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
         //   Convection Resistance
         if (reynoldsNum <= 2300) {

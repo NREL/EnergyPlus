@@ -1469,9 +1469,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
                  state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired),
                 0.00001);
 
-    state->dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
-    state->dataGlobal->KindOfSim =
-        Constant::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
+    state->dataGlobal->DoWeathSim = true;                                 // flag to trick tabular reports to scan meters
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
     UpdateTabularReports(*state, OutputProcessor::TimeStepType::System);
 
     // zone equipment should report single zone magnitude, multipliers do not apply, should be > 0 or what's the point
@@ -2512,9 +2511,8 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
               (state->dataHeatBal->Zone(2).Volume * state->dataHeatBal->Zone(2).Multiplier * state->dataHeatBal->Zone(2).ListMultiplier) /
                   (state->dataHeatBal->Zone(1).Volume * state->dataHeatBal->Zone(1).Multiplier * state->dataHeatBal->Zone(1).ListMultiplier));
 
-    state->dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
-    state->dataGlobal->KindOfSim =
-        Constant::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
+    state->dataGlobal->DoWeathSim = true;                                 // flag to trick tabular reports to scan meters
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
     UpdateTabularReports(*state, OutputProcessor::TimeStepType::System);
 
     EXPECT_NEAR(1.86168, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
@@ -3640,30 +3638,26 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-    EXPECT_EQ(extLitUse * 3,
-              state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1));
+    EXPECT_EQ(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1));
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-    EXPECT_EQ(extLitUse * 6,
-              state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1));
+    EXPECT_EQ(extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1));
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-    EXPECT_EQ(extLitUse * 9,
-              state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1));
+    EXPECT_EQ(extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1));
 
     ResetBEPSGathering(*state);
 
-    EXPECT_EQ(0., state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1));
+    EXPECT_EQ(0., state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1));
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-    EXPECT_EQ(extLitUse * 3,
-              state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1));
+    EXPECT_EQ(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
@@ -7967,7 +7961,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea)
 
     // Assume that we only have electricity with a value of 3.6e6 * 1e4 J =10.000 kWh.
     // And that this only comes for a single end use state->dataGlobalConst->iEndUse.at(Constant::EndUse::Heating)=1
-    state->dataOutRptTab->gatherEndUseBySourceBEPS(1, static_cast<int>(Constant::EndUse::Heating)+1) = 3.6e10;
+    state->dataOutRptTab->gatherEndUseBySourceBEPS(1, static_cast<int>(Constant::EndUse::Heating) + 1) = 3.6e10;
     state->dataOutRptTab->gatherTotalsBySourceBEPS(1) = 3.6e10;
     Real64 eleckWh = 1e4;
 
@@ -8137,49 +8131,31 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-    EXPECT_NEAR(extLitUse * 3,
-                state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1),
-                1.);
+    EXPECT_NEAR(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1), 1.);
     // General
-    EXPECT_NEAR(extLitUse * 2,
-                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1, 1),
-                1.);
+    EXPECT_NEAR(extLitUse * 2, state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_NEAR(extLitUse * 1,
-                state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights)+1, 1),
-                1.);
+    EXPECT_NEAR(extLitUse * 1, state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-    EXPECT_NEAR(extLitUse * 6,
-                state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1),
-                1.);
+    EXPECT_NEAR(extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1), 1.);
     // General
-    EXPECT_NEAR(extLitUse * 4,
-                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1, 1),
-                1.);
+    EXPECT_NEAR(extLitUse * 4, state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_NEAR(extLitUse * 2,
-                state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights)+1, 1),
-                1.);
+    EXPECT_NEAR(extLitUse * 2, state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-    EXPECT_NEAR(extLitUse * 9,
-                state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1),
-                1.);
+    EXPECT_NEAR(extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1), 1.);
     // General
-    EXPECT_NEAR(extLitUse * 6,
-                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1, 1),
-                1.);
+    EXPECT_NEAR(extLitUse * 6, state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_NEAR(extLitUse * 3,
-                state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights)+1, 1),
-                1.);
+    EXPECT_NEAR(extLitUse * 3, state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
 
     OutputReportTabular::WriteBEPSTable(*state);
     OutputReportTabular::WriteDemandEndUseSummary(*state);
@@ -9114,7 +9090,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
 
     // Assume that we only have electricity with a value of 3.6e6 * 1e4 J =10.000 kWh.
     // And that this only comes for a single end use static_cast<int>(Constant::EndUse::Heating)=1
-    state->dataOutRptTab->gatherEndUseBySourceBEPS(1, static_cast<int>(Constant::EndUse::Heating)+1) = 3.6e10;
+    state->dataOutRptTab->gatherEndUseBySourceBEPS(1, static_cast<int>(Constant::EndUse::Heating) + 1) = 3.6e10;
     state->dataOutRptTab->gatherTotalsBySourceBEPS(1) = 3.6e10;
     Real64 eleckWh = 1e4;
 
@@ -9750,49 +9726,31 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-    EXPECT_NEAR(extLitUse * 3,
-                state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1),
-                1.);
+    EXPECT_NEAR(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1), 1.);
     // General
-    EXPECT_NEAR(extLitUse * 2,
-                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1, 1),
-                1.);
+    EXPECT_NEAR(extLitUse * 2, state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_NEAR(extLitUse * 1,
-                state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights)+1, 1),
-                1.);
+    EXPECT_NEAR(extLitUse * 1, state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-    EXPECT_NEAR(extLitUse * 6,
-                state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1),
-                1.);
+    EXPECT_NEAR(extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1), 1.);
     // General
-    EXPECT_NEAR(extLitUse * 4,
-                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1, 1),
-                1.);
+    EXPECT_NEAR(extLitUse * 4, state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_NEAR(extLitUse * 2,
-                state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights)+1, 1),
-                1.);
+    EXPECT_NEAR(extLitUse * 2, state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
 
     UpdateMeterReporting(*state);
     UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
     GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-    EXPECT_NEAR(extLitUse * 9,
-                state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1),
-                1.);
+    EXPECT_NEAR(extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1), 1.);
     // General
-    EXPECT_NEAR(extLitUse * 6,
-                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights)+1, 1),
-                1.);
+    EXPECT_NEAR(extLitUse * 6, state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
     // AnotherEndUseSubCat
-    EXPECT_NEAR(extLitUse * 3,
-                state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights)+1, 1),
-                1.);
+    EXPECT_NEAR(extLitUse * 3, state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
 
     OutputReportTabular::WriteBEPSTable(*state);
     OutputReportTabular::WriteDemandEndUseSummary(*state);

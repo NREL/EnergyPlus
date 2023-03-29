@@ -741,9 +741,9 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         state.dataPipeHT->PipeHT(Item).SectionArea = Constant::Pi * 0.25 * pow_2(state.dataPipeHT->PipeHT(Item).PipeID);
 
         // pipe & insulation mass
-        state.dataPipeHT->PipeHT(Item).PipeHeatCapacity = state.dataPipeHT->PipeHT(Item).PipeCp * state.dataPipeHT->PipeHT(Item).PipeDensity *
-                                                          (Constant::Pi * 0.25 * pow_2(state.dataPipeHT->PipeHT(Item).PipeOD) -
-                                                           state.dataPipeHT->PipeHT(Item).SectionArea); // the metal component
+        state.dataPipeHT->PipeHT(Item).PipeHeatCapacity =
+            state.dataPipeHT->PipeHT(Item).PipeCp * state.dataPipeHT->PipeHT(Item).PipeDensity *
+            (Constant::Pi * 0.25 * pow_2(state.dataPipeHT->PipeHT(Item).PipeOD) - state.dataPipeHT->PipeHT(Item).SectionArea); // the metal component
     }
 
     // final error check

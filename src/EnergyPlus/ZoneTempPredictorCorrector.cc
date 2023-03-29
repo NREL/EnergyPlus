@@ -5274,9 +5274,9 @@ void InverseModelTemperature(EnergyPlusData &state,
                                                              thisZoneHB.ZoneAirHumRat) *
                            Psychrometrics::PsyCpAirFnW(thisZoneHB.ZoneAirHumRat)) *
                           (state.dataGlobal->TimeStepZone * Constant::SecInHour); // Inverse equation
-                if ((MultpHM < 1.0) || (MultpHM > 30.0)) {                                   // Temperature capacity multiplier greater than
-                                                                                             // 1 and less than 30
-                    MultpHM = 1.0;                                                           // Default value 1.0
+                if ((MultpHM < 1.0) || (MultpHM > 30.0)) {                        // Temperature capacity multiplier greater than
+                                                                                  // 1 and less than 30
+                    MultpHM = 1.0;                                                // Default value 1.0
                 }
             } else {
                 MultpHM = 1.0; // Default value 1.0

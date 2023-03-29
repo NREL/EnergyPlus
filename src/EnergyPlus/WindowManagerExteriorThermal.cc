@@ -640,7 +640,7 @@ namespace WindowManager {
         std::shared_ptr<Tarcog::ISO15099::ISurface> frontSurface = std::make_shared<Tarcog::ISO15099::CSurface>(emissFront, transThermalFront);
         std::shared_ptr<Tarcog::ISO15099::ISurface> backSurface = std::make_shared<Tarcog::ISO15099::CSurface>(emissBack, transThermalBack);
         auto aSolidLayer = // (AUTO_OK_SPTR)
-            std::make_shared<Tarcog::ISO15099::CIGUSolidLayer>(thickness, conductivity, frontSurface, backSurface); 
+            std::make_shared<Tarcog::ISO15099::CIGUSolidLayer>(thickness, conductivity, frontSurface, backSurface);
         if (createOpenness) {
             auto aOpenings = std::make_shared<Tarcog::ISO15099::CShadeOpenings>(Atop, Abot, Aleft, Aright, Afront, Afront); // (AUTO_OK_SPTR)
             aSolidLayer = std::make_shared<Tarcog::ISO15099::CIGUShadeLayer>(aSolidLayer, aOpenings);
@@ -893,9 +893,9 @@ namespace WindowManager {
     {
         // NFRC 100 Section 4.3.1
         Real64 airTemperature = -18.0 + Constant::KelvinConv; // Kelvins
-        Real64 airSpeed = 5.5;                                           // meters per second
+        Real64 airSpeed = 5.5;                                // meters per second
         Real64 tSky = -18.0 + Constant::KelvinConv;           // Kelvins
-        Real64 solarRadiation = 0.;                                      // W/m2
+        Real64 solarRadiation = 0.;                           // W/m2
         if (useSummerConditions) {
             // NFRC 200 Section 4.3.1
             airTemperature = 32.0 + Constant::KelvinConv;

@@ -279,16 +279,14 @@ namespace PlantChillers {
                 //  since it is not used elsewhere for connection
                 // for transition purposes, add this node if not there.
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
                     }
                 }
                 if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
@@ -2237,16 +2235,14 @@ namespace PlantChillers {
                 // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
                 //  since it is not used elsewhere for connection
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
                     }
                 }
                 if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
@@ -4252,16 +4248,14 @@ namespace PlantChillers {
                 // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
                 // since it is not used elsewhere for connection
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
                     }
                 }
                 if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
@@ -6186,16 +6180,14 @@ namespace PlantChillers {
                 // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
                 //  since it is not used elsewhere for connection
                 if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(4) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(4) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
                     }
                 }
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";

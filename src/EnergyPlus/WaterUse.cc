@@ -1264,8 +1264,7 @@ namespace WaterUse {
                 Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, 0.0);
                 Real64 ZoneMassMax =
                     (ZoneHumRatSat - ZoneHumRat) * RhoAirDry * state.dataHeatBal->Zone(this->Zone).Volume; // Max water that can be evaporated to zone
-                Real64 FlowMassMax =
-                    this->TotalMassFlowRate * state.dataHVACGlobal->TimeStepSysSec; // Max water in flow
+                Real64 FlowMassMax = this->TotalMassFlowRate * state.dataHVACGlobal->TimeStepSysSec;       // Max water in flow
                 Real64 MoistureMassMax = min(ZoneMassMax, FlowMassMax);
 
                 this->MoistureMass = ScheduleManager::GetCurrentScheduleValue(state, this->LatentFracSchedule) * MoistureMassMax;
@@ -1280,8 +1279,8 @@ namespace WaterUse {
             if (this->DrainMassFlowRate == 0.0) {
                 this->DrainTemp = this->MixedTemp;
             } else {
-                this->DrainTemp = (this->TotalMassFlowRate * Psychrometrics::CPHW(Constant::InitConvTemp) * this->MixedTemp -
-                                   this->SensibleRate - this->LatentRate) /
+                this->DrainTemp = (this->TotalMassFlowRate * Psychrometrics::CPHW(Constant::InitConvTemp) * this->MixedTemp - this->SensibleRate -
+                                   this->LatentRate) /
                                   (this->DrainMassFlowRate * Psychrometrics::CPHW(Constant::InitConvTemp));
             }
         }
@@ -1513,10 +1512,8 @@ namespace WaterUse {
             }
 
             this->RecoveryRate = this->Effectiveness * MinCapacityRate * (this->DrainTemp - this->ColdSupplyTemp);
-            this->RecoveryTemp =
-                this->ColdSupplyTemp + this->RecoveryRate / (Psychrometrics::CPHW(Constant::InitConvTemp) * this->TotalMassFlowRate);
-            this->WasteTemp =
-                this->DrainTemp - this->RecoveryRate / (Psychrometrics::CPHW(Constant::InitConvTemp) * this->TotalMassFlowRate);
+            this->RecoveryTemp = this->ColdSupplyTemp + this->RecoveryRate / (Psychrometrics::CPHW(Constant::InitConvTemp) * this->TotalMassFlowRate);
+            this->WasteTemp = this->DrainTemp - this->RecoveryRate / (Psychrometrics::CPHW(Constant::InitConvTemp) * this->TotalMassFlowRate);
 
             if (this->RecoveryTankNum > 0) {
                 state.dataWaterData->WaterStorage(this->RecoveryTankNum).VdotAvailSupply(this->TankSupplyID) = this->DrainVolFlowRate;
@@ -1588,8 +1585,7 @@ namespace WaterUse {
             thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * state.dataHVACGlobal->TimeStepSysSec;
 
             if (thisWEq.Connections == 0) {
-                thisWEq.Power =
-                    thisWEq.HotMassFlowRate * Psychrometrics::CPHW(Constant::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
+                thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(Constant::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
             } else {
                 thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(Constant::InitConvTemp) *
                                 (thisWEq.HotTemp - state.dataWaterUse->WaterConnections(thisWEq.Connections).ReturnTemp);
@@ -1622,8 +1618,7 @@ namespace WaterUse {
             thisWEq.TotalVolume = thisWEq.TotalVolFlowRate * state.dataHVACGlobal->TimeStepSysSec;
 
             if (thisWEq.Connections == 0) {
-                thisWEq.Power =
-                    thisWEq.HotMassFlowRate * Psychrometrics::CPHW(Constant::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
+                thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(Constant::InitConvTemp) * (thisWEq.HotTemp - thisWEq.ColdTemp);
             } else {
                 thisWEq.Power = thisWEq.HotMassFlowRate * Psychrometrics::CPHW(Constant::InitConvTemp) *
                                 (thisWEq.HotTemp - state.dataWaterUse->WaterConnections(thisWEq.Connections).ReturnTemp);

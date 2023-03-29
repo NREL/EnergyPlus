@@ -336,16 +336,14 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
             // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
             // since it is not used elsewhere for connection
             if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                    Constant::MaxNameLength - 25) { // protect against long name leading to > 100 chars
+                if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 25) { // protect against long name leading to > 100 chars
                     state.dataIPShortCut->cAlphaArgs(7) = state.dataIPShortCut->cAlphaArgs(1) + " INLET NODE FOR CONDENSER";
                 } else {
                     state.dataIPShortCut->cAlphaArgs(7) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 75) + " INLET NODE FOR CONDENSER";
                 }
             }
             if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                    Constant::MaxNameLength - 26) { // protect against long name leading to > 100 chars
+                if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 26) { // protect against long name leading to > 100 chars
                     state.dataIPShortCut->cAlphaArgs(8) = state.dataIPShortCut->cAlphaArgs(1) + " OUTLET NODE FOR CONDENSER";
                 } else {
                     state.dataIPShortCut->cAlphaArgs(8) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 74) + " OUTLET NODE FOR CONDENSER";

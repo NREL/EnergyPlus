@@ -1413,8 +1413,7 @@ namespace HVACMultiSpeedHeatPump {
             MSHeatPump(MSHPNum).DesignHeatRecFlowRate = Numbers(6);
             if (MSHeatPump(MSHPNum).DesignHeatRecFlowRate > 0.0) {
                 MSHeatPump(MSHPNum).HeatRecActive = true;
-                MSHeatPump(MSHPNum).DesignHeatRecMassFlowRate =
-                    RhoH2O(Constant::HWInitConvTemp) * MSHeatPump(MSHPNum).DesignHeatRecFlowRate;
+                MSHeatPump(MSHPNum).DesignHeatRecMassFlowRate = RhoH2O(Constant::HWInitConvTemp) * MSHeatPump(MSHPNum).DesignHeatRecFlowRate;
                 MSHeatPump(MSHPNum).HeatRecInletNodeNum =
                     GetOnlySingleNode(state,
                                       Alphas(16),

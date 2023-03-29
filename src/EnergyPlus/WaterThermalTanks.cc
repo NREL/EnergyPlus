@@ -6228,8 +6228,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             this->SourceOutletTemp = 0.0;
             this->SourceMassFlowRate = 0.0;
             this->SavedSourceOutletTemp = 0.0;
-            Real64 rho =
-                FluidProperties::GetDensityGlycol(state, fluidNameWater, Constant::InitConvTemp, this->FluidIndex, SizeTankForDemand);
+            Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, Constant::InitConvTemp, this->FluidIndex, SizeTankForDemand);
             this->PlantSourceMassFlowRateMax = this->SourceDesignVolFlowRate * rho;
         }
 
@@ -11216,8 +11215,8 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
                 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), this->waterIndex, RoutineName);
             }
 
-            tmpMaxCapacity = SumPeopleAllZones * this->Sizing.RecoveryCapacityPerPerson * (Tfinish - Tstart) *
-                             (1.0 / Constant::SecInHour) * rho * Cp; // m3/hr/person | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+            tmpMaxCapacity = SumPeopleAllZones * this->Sizing.RecoveryCapacityPerPerson * (Tfinish - Tstart) * (1.0 / Constant::SecInHour) * rho *
+                             Cp; // m3/hr/person | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
         }
 
         if (this->VolumeWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
@@ -11262,8 +11261,8 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
                 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), this->waterIndex, RoutineName);
                 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), this->waterIndex, RoutineName);
             }
-            tmpMaxCapacity = SumFloorAreaAllZones * this->Sizing.RecoveryCapacityPerArea * (Tfinish - Tstart) *
-                             (1.0 / Constant::SecInHour) * rho * Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+            tmpMaxCapacity = SumFloorAreaAllZones * this->Sizing.RecoveryCapacityPerArea * (Tfinish - Tstart) * (1.0 / Constant::SecInHour) * rho *
+                             Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
         }
         if (this->VolumeWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
             this->Volume = tmpTankVolume;
@@ -11307,8 +11306,8 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
                 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), this->waterIndex, RoutineName);
                 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), this->waterIndex, RoutineName);
             }
-            tmpMaxCapacity = this->Sizing.NumberOfUnits * this->Sizing.RecoveryCapacityPerUnit * (Tfinish - Tstart) *
-                             (1.0 / Constant::SecInHour) * rho * Cp; // m3/hr/ea | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+            tmpMaxCapacity = this->Sizing.NumberOfUnits * this->Sizing.RecoveryCapacityPerUnit * (Tfinish - Tstart) * (1.0 / Constant::SecInHour) *
+                             rho * Cp; // m3/hr/ea | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
         }
 
         if (this->VolumeWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
@@ -11914,8 +11913,8 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             if (this->MaxCapacityWasAutoSized) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), this->waterIndex, RoutineName);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), this->waterIndex, RoutineName);
-                tmpMaxCapacity = SumPeopleAllZones * this->Sizing.RecoveryCapacityPerPerson * (Tfinish - Tstart) *
-                                 (1.0 / Constant::SecInHour) * rho * Cp; // m3/hr/person | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+                tmpMaxCapacity = SumPeopleAllZones * this->Sizing.RecoveryCapacityPerPerson * (Tfinish - Tstart) * (1.0 / Constant::SecInHour) * rho *
+                                 Cp; // m3/hr/person | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
             }
 
             if (this->VolumeWasAutoSized) {
@@ -11939,8 +11938,8 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             if (this->MaxCapacityWasAutoSized) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), this->waterIndex, RoutineName);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, ((Tfinish + Tstart) / 2.0), this->waterIndex, RoutineName);
-                tmpMaxCapacity = SumFloorAreaAllZones * this->Sizing.RecoveryCapacityPerArea * (Tfinish - Tstart) *
-                                 (1.0 / Constant::SecInHour) * rho * Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+                tmpMaxCapacity = SumFloorAreaAllZones * this->Sizing.RecoveryCapacityPerArea * (Tfinish - Tstart) * (1.0 / Constant::SecInHour) *
+                                 rho * Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
             }
             if (this->VolumeWasAutoSized) {
                 this->Volume = tmpTankVolume;
@@ -12098,7 +12097,7 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                 e.Temp = 57.2222;
 
         Real64 TotalDrawMass = 0.243402 * Psychrometrics::RhoH2O(Constant::InitConvTemp); // 64.3 gal * rho
-        Real64 DrawMass = TotalDrawMass / 6.0;                                                       // 6 equal draws
+        Real64 DrawMass = TotalDrawMass / 6.0;                                            // 6 equal draws
         Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSysSec;
         Real64 DrawMassFlowRate = DrawMass / SecInTimeStep;
         Real64 FuelEnergy_loc = 0.0;

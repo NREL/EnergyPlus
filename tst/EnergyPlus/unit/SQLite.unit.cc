@@ -119,8 +119,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // There needs to be a simulation record otherwise the foreign key constraint will fail
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
-    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        1, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::DesignDay);
+    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(1, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::DesignDay);
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
         2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::DesignDay, 1);
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(

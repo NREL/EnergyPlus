@@ -236,9 +236,9 @@ namespace PhotovoltaicThermalCollectors {
         int IOStatus;   // Used in GetObjectItem
         int Found;
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        using ScheduleManager::ScheduleAlwaysOn;
         using DataSurfaces::OSCMData;
         using ScheduleManager::GetScheduleIndex;
+        using ScheduleManager::ScheduleAlwaysOn;
 
         tmpBIPVTperf.allocate(NumBIPVTPerform);
         for (Item = 1; Item <= NumBIPVTPerform; ++Item) {

@@ -14551,7 +14551,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_TRUE(compare_enums(UnitarySys::UnitarySysCtrlType::Load, thisSys->m_ControlType));       // checks control type
     EXPECT_TRUE(compare_enums(UnitarySys::DehumCtrlType::None, thisSys->m_DehumidControlType_Num)); // checks Dehumidification Control type
     EXPECT_EQ(UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone), thisSys->ControlZoneNum); // checks zone ID
-    EXPECT_EQ(ScheduleManager::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                              // checks availability schedule name
+    EXPECT_EQ(ScheduleManager::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                                  // checks availability schedule name
     EXPECT_EQ("NODE 29", state->dataLoopNodes->NodeID(thisSys->AirInNode));                                     // checks air inlet node name
     EXPECT_EQ("NODE 30", state->dataLoopNodes->NodeID(thisSys->AirOutNode));                                    // checks air outlet node name
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, thisSys->m_FanType_Num);                                    // checks fan object type "FAN:ONOFF"

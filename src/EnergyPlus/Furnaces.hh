@@ -274,11 +274,11 @@ namespace Furnaces {
               HotWaterCoilMaxIterIndex2(0), EMSOverrideSensZoneLoadRequest(false), EMSSensibleZoneLoadValue(0.0),
               EMSOverrideMoistZoneLoadRequest(false), EMSMoistureZoneLoadValue(0.0), HeatCoolMode(Furnaces::ModeOfOperation::Invalid),
               NumOfSpeedCooling(0), NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0),
-              CheckFanFlow(true), HeatVolumeFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0),
-              HeatMassFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0), CoolVolumeFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0),
-              CoolMassFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0), MSHeatingSpeedRatio(DataHVACGlobals::MaxSpeedLevels, 0.0),
-              MSCoolingSpeedRatio(DataHVACGlobals::MaxSpeedLevels, 0.0), bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0), ErrIndexCyc(0),
-              ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0), iterationMode(0), FirstPass(true)
+              CheckFanFlow(true), HeatVolumeFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0), HeatMassFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              CoolVolumeFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0), CoolMassFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSHeatingSpeedRatio(DataHVACGlobals::MaxSpeedLevels, 0.0), MSCoolingSpeedRatio(DataHVACGlobals::MaxSpeedLevels, 0.0), bIsIHP(false),
+              CompSpeedNum(0), CompSpeedRatio(0.0), ErrIndexCyc(0), ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0), iterationMode(0),
+              FirstPass(true)
         {
         }
     };

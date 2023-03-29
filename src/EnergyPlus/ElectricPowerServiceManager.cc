@@ -126,17 +126,17 @@ void ElectricPowerServiceManager::manageElectricPowerService(
 
     // retrieve data from meters for demand and production
     totalBldgElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec;
-    totalHVACElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::System) /
-                           (state.dataHVACGlobal->TimeStepSysSec);
+    totalHVACElecDemand_ =
+        GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
-    elecProducedPVRate_ = GetInstantMeterValue(state, elecProducedPVIndex_, OutputProcessor::TimeStepType::System) /
-                          (state.dataHVACGlobal->TimeStepSysSec);
-    elecProducedWTRate_ = GetInstantMeterValue(state, elecProducedWTIndex_, OutputProcessor::TimeStepType::System) /
-                          (state.dataHVACGlobal->TimeStepSysSec);
-    elecProducedStorageRate_ = GetInstantMeterValue(state, elecProducedStorageIndex_, OutputProcessor::TimeStepType::System) /
-                               (state.dataHVACGlobal->TimeStepSysSec);
-    elecProducedCoGenRate_ = GetInstantMeterValue(state, elecProducedCoGenIndex_, OutputProcessor::TimeStepType::System) /
-                             (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedPVRate_ =
+        GetInstantMeterValue(state, elecProducedPVIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedWTRate_ =
+        GetInstantMeterValue(state, elecProducedWTIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedStorageRate_ =
+        GetInstantMeterValue(state, elecProducedStorageIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedCoGenRate_ =
+        GetInstantMeterValue(state, elecProducedCoGenIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
     elecProducedPowerConversionRate_ = GetInstantMeterValue(state, elecProducedPowerConversionIndex_, OutputProcessor::TimeStepType::System) /
                                        (state.dataHVACGlobal->TimeStepSysSec);
 
@@ -482,17 +482,17 @@ void ElectricPowerServiceManager::updateWholeBuildingRecords(EnergyPlusData &sta
 
     // main panel balancing.
     totalBldgElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec;
-    totalHVACElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::System) /
-                           (state.dataHVACGlobal->TimeStepSysSec);
+    totalHVACElecDemand_ =
+        GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
-    elecProducedPVRate_ = GetInstantMeterValue(state, elecProducedPVIndex_, OutputProcessor::TimeStepType::System) /
-                          (state.dataHVACGlobal->TimeStepSysSec);
-    elecProducedWTRate_ = GetInstantMeterValue(state, elecProducedWTIndex_, OutputProcessor::TimeStepType::System) /
-                          (state.dataHVACGlobal->TimeStepSysSec);
-    elecProducedStorageRate_ = GetInstantMeterValue(state, elecProducedStorageIndex_, OutputProcessor::TimeStepType::System) /
-                               (state.dataHVACGlobal->TimeStepSysSec);
-    elecProducedCoGenRate_ = GetInstantMeterValue(state, elecProducedCoGenIndex_, OutputProcessor::TimeStepType::System) /
-                             (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedPVRate_ =
+        GetInstantMeterValue(state, elecProducedPVIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedWTRate_ =
+        GetInstantMeterValue(state, elecProducedWTIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedStorageRate_ =
+        GetInstantMeterValue(state, elecProducedStorageIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedCoGenRate_ =
+        GetInstantMeterValue(state, elecProducedCoGenIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
     elecProducedPowerConversionRate_ = GetInstantMeterValue(state, elecProducedPowerConversionIndex_, OutputProcessor::TimeStepType::System) /
                                        (state.dataHVACGlobal->TimeStepSysSec);
 
@@ -1458,9 +1458,9 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state,
         // The TRACK CUSTOM METER scheme tries to have the generators meet all of the
         //   electrical demand from a meter, it can also be a user-defined Custom Meter
         //   and PV is ignored.
-        customMeterDemand = GetInstantMeterValue(state, demandMeterPtr_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
-                            GetInstantMeterValue(state, demandMeterPtr_, OutputProcessor::TimeStepType::System) /
-                                (state.dataHVACGlobal->TimeStepSysSec);
+        customMeterDemand =
+            GetInstantMeterValue(state, demandMeterPtr_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
+            GetInstantMeterValue(state, demandMeterPtr_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
 
         remainingLoad = customMeterDemand;
         loadCenterElectricLoad = remainingLoad;
@@ -1707,8 +1707,7 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state,
         // Get meter rate
         subpanelFeedInRequest =
             GetInstantMeterValue(state, trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
-            GetInstantMeterValue(state, trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::System) /
-                (state.dataHVACGlobal->TimeStepSysSec);
+            GetInstantMeterValue(state, trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
         subpanelDrawRequest = 0.0;
         break;
     }
@@ -4076,8 +4075,8 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
             powerDischarge = maxPowerDraw_;
         }
         // now check if will empty this timestep, power draw is amplified by energetic effic
-        if ((lastTimeStepStateOfCharge_ - powerDischarge * state.dataHVACGlobal->TimeStepSysSec /
-                                              energeticEfficDischarge_) <= (maxEnergyCapacity_ * controlSOCMinFracLimit)) {
+        if ((lastTimeStepStateOfCharge_ - powerDischarge * state.dataHVACGlobal->TimeStepSysSec / energeticEfficDischarge_) <=
+            (maxEnergyCapacity_ * controlSOCMinFracLimit)) {
             powerDischarge = (lastTimeStepStateOfCharge_ - (maxEnergyCapacity_ * controlSOCMinFracLimit)) * energeticEfficDischarge_ /
                              (state.dataHVACGlobal->TimeStepSysSec);
         }
@@ -4091,14 +4090,12 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
     if (charging) {
         pelIntoStorage_ = powerCharge;
         pelFromStorage_ = 0.0;
-        thisTimeStepStateOfCharge_ =
-            lastTimeStepStateOfCharge_ + powerCharge * state.dataHVACGlobal->TimeStepSysSec * energeticEfficCharge_;
+        thisTimeStepStateOfCharge_ = lastTimeStepStateOfCharge_ + powerCharge * state.dataHVACGlobal->TimeStepSysSec * energeticEfficCharge_;
     }
     if (discharging) {
         pelIntoStorage_ = 0.0;
         pelFromStorage_ = powerDischarge;
-        thisTimeStepStateOfCharge_ = lastTimeStepStateOfCharge_ -
-                                     powerDischarge * state.dataHVACGlobal->TimeStepSysSec / energeticEfficDischarge_;
+        thisTimeStepStateOfCharge_ = lastTimeStepStateOfCharge_ - powerDischarge * state.dataHVACGlobal->TimeStepSysSec / energeticEfficDischarge_;
         thisTimeStepStateOfCharge_ = max(thisTimeStepStateOfCharge_, 0.0);
     }
 

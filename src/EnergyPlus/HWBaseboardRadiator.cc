@@ -1775,8 +1775,7 @@ namespace HWBaseboardRadiator {
 
         HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSysSec;
         HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSysSec;
-        HWBaseboard(BaseboardNum).ConvEnergy =
-            HWBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSysSec;
+        HWBaseboard(BaseboardNum).ConvEnergy = HWBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSysSec;
         HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSysSec;
     }
 

@@ -160,15 +160,15 @@ namespace WeatherManager {
     struct EnvironmentData
     {
         // Members
-        std::string Title;                          // Environment name
-        std::string cKindOfEnvrn;                   // kind of environment
+        std::string Title;               // Environment name
+        std::string cKindOfEnvrn;        // kind of environment
         Constant::KindOfSim KindOfEnvrn; // Type of environment (see Parameters for KindOfSim in DataGlobals)
-        int DesignDayNum;                           // index in DesignDay structure and DesignDayInput
-        int RunPeriodDesignNum;                     // for WeatherFileDays, index in  RunPeriodDesign and RunPeriodDesignInput
-        int SeedEnvrnNum;           // for HVAC sizing sim, new environments are copies of original environments, this is the index for original
-        int HVACSizingIterationNum; // environments for HVAC sizing simulations are associated with iteration
-        int TotalDays;              // Number of days in environment
-        int StartJDay;              // Day of year of first day of environment
+        int DesignDayNum;                // index in DesignDay structure and DesignDayInput
+        int RunPeriodDesignNum;          // for WeatherFileDays, index in  RunPeriodDesign and RunPeriodDesignInput
+        int SeedEnvrnNum;                // for HVAC sizing sim, new environments are copies of original environments, this is the index for original
+        int HVACSizingIterationNum;      // environments for HVAC sizing simulations are associated with iteration
+        int TotalDays;                   // Number of days in environment
+        int StartJDay;                   // Day of year of first day of environment
         int StartMonth;
         int StartDay;
         int StartYear;
@@ -207,13 +207,12 @@ namespace WeatherManager {
 
         // Default Constructor
         EnvironmentData()
-            : KindOfEnvrn(Constant::KindOfSim::Invalid), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0),
-              HVACSizingIterationNum(0), TotalDays(0), StartJDay(0), StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0),
-              EndJDay(0), EndYear(0), EndDate(0), DayOfWeek(0), UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true),
-              UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false), NumSimYears(1), CurrentCycle(0), WP_Type1(0),
-              SkyTempModel(SkyTempCalcType::ClarkAllenModel), UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false),
-              RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0),
-              firstHrInterpUseHr1(false)
+            : KindOfEnvrn(Constant::KindOfSim::Invalid), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0), HVACSizingIterationNum(0),
+              TotalDays(0), StartJDay(0), StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0), EndJDay(0), EndYear(0),
+              EndDate(0), DayOfWeek(0), UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true), UseSnow(true), MonWeekDay(12, 0),
+              SetWeekDays(false), NumSimYears(1), CurrentCycle(0), WP_Type1(0), SkyTempModel(SkyTempCalcType::ClarkAllenModel),
+              UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false), RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true),
+              MatchYear(false), ActualWeather(false), RawSimDays(0), firstHrInterpUseHr1(false)
         {
         }
     };

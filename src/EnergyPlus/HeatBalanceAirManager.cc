@@ -2125,8 +2125,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 thisVentilation.OpenEff = rNumericArgs(2);
-                if (thisVentilation.OpenEff != Constant::AutoCalculate &&
-                    (thisVentilation.OpenEff < 0.0 || thisVentilation.OpenEff > 1.0)) {
+                if (thisVentilation.OpenEff != Constant::AutoCalculate && (thisVentilation.OpenEff < 0.0 || thisVentilation.OpenEff > 1.0)) {
                     ShowSevereError(
                         state,
                         format("{}{}=\"{}\", {} must be between 0 and 1.", RoutineName, cCurrentModuleObject, cAlphaArgs(1), cNumericFieldNames(2)));
@@ -2150,8 +2149,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 thisVentilation.DiscCoef = rNumericArgs(5);
-                if (thisVentilation.DiscCoef != Constant::AutoCalculate &&
-                    (thisVentilation.DiscCoef < 0.0 || thisVentilation.DiscCoef > 1.0)) {
+                if (thisVentilation.DiscCoef != Constant::AutoCalculate && (thisVentilation.DiscCoef < 0.0 || thisVentilation.DiscCoef > 1.0)) {
                     ShowSevereError(
                         state,
                         format("{}{}=\"{}\", {} must be between 0 and 1.", RoutineName, cCurrentModuleObject, cAlphaArgs(1), cNumericFieldNames(5)));

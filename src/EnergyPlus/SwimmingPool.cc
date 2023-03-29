@@ -1160,8 +1160,7 @@ void ReportSwimmingPool(EnergyPlusData &state)
         // Finally calculate the summed up report variables
         state.dataSwimmingPools->Pool(PoolNum).MiscEquipEnergy =
             state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower * state.dataHVACGlobal->TimeStepSysSec;
-        state.dataSwimmingPools->Pool(PoolNum).HeatEnergy =
-            state.dataSwimmingPools->Pool(PoolNum).HeatPower * state.dataHVACGlobal->TimeStepSysSec;
+        state.dataSwimmingPools->Pool(PoolNum).HeatEnergy = state.dataSwimmingPools->Pool(PoolNum).HeatPower * state.dataHVACGlobal->TimeStepSysSec;
         state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMass =
             state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate * state.dataHVACGlobal->TimeStepSysSec;
         state.dataSwimmingPools->Pool(PoolNum).EvapEnergyLoss =

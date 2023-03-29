@@ -314,10 +314,8 @@ namespace SurfaceGeometry {
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
-            state.dataSurfaceGeometry->CosZoneRelNorth(ZoneNum) =
-                std::cos(-state.dataHeatBal->Zone(ZoneNum).RelNorth * Constant::DegToRadians);
-            state.dataSurfaceGeometry->SinZoneRelNorth(ZoneNum) =
-                std::sin(-state.dataHeatBal->Zone(ZoneNum).RelNorth * Constant::DegToRadians);
+            state.dataSurfaceGeometry->CosZoneRelNorth(ZoneNum) = std::cos(-state.dataHeatBal->Zone(ZoneNum).RelNorth * Constant::DegToRadians);
+            state.dataSurfaceGeometry->SinZoneRelNorth(ZoneNum) = std::sin(-state.dataHeatBal->Zone(ZoneNum).RelNorth * Constant::DegToRadians);
         }
         GetSurfaceData(state, ErrorsFound);
 
@@ -8519,7 +8517,7 @@ namespace SurfaceGeometry {
     void GetSurfaceGroundSurfsData(EnergyPlusData &state, bool &ErrorsFound)
     {
 
-        std::string const &cCurrentModuleObject = "SurfaceProperty:GroundSurfaces";
+        std::string const cCurrentModuleObject = "SurfaceProperty:GroundSurfaces";
         state.dataSurface->TotSurfPropGndSurfs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -15877,12 +15875,12 @@ namespace SurfaceGeometry {
 
         using namespace Vectors;
 
-        Real64 Diagonal1; // Length of diagonal of 4-sided figure from vertex 1 to vertex 3 (m)
-        Real64 Diagonal2; // Length of diagonal of 4-sided figure from vertex 2 to vertex 4 (m)
-        Real64 DotProd;   // Dot product of two adjacent sides - to test for right angle
+        Real64 Diagonal1;                                                // Length of diagonal of 4-sided figure from vertex 1 to vertex 3 (m)
+        Real64 Diagonal2;                                                // Length of diagonal of 4-sided figure from vertex 2 to vertex 4 (m)
+        Real64 DotProd;                                                  // Dot product of two adjacent sides - to test for right angle
         Real64 const cos89deg = std::cos(89.0 * Constant::DegToRadians); // tolerance for right angle
-        Vector Vect32;                                                              // normalized vector from vertex 3 to vertex 2
-        Vector Vect21;                                                              // normalized vector from vertex 2 to vertex 1
+        Vector Vect32;                                                   // normalized vector from vertex 3 to vertex 2
+        Vector Vect21;                                                   // normalized vector from vertex 2 to vertex 1
 
         Diagonal1 = VecLength(state.dataSurface->Surface(ThisSurf).Vertex(1) - state.dataSurface->Surface(ThisSurf).Vertex(3));
         Diagonal2 = VecLength(state.dataSurface->Surface(ThisSurf).Vertex(2) - state.dataSurface->Surface(ThisSurf).Vertex(4));

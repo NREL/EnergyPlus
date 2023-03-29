@@ -256,8 +256,7 @@ void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t
         ort->UpdateTabularReportsGetInput = false;
         date_and_time(_, _, _, ort->td);
     }
-    if (state.dataGlobal->DoOutputReporting && ort->WriteTabularFiles &&
-        (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) {
+    if (state.dataGlobal->DoOutputReporting && ort->WriteTabularFiles && (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) {
         if (t_timeStepType == OutputProcessor::TimeStepType::Zone) {
             ort->gatherElapsedTimeBEPS += state.dataGlobal->TimeStepZone;
         }
@@ -1804,23 +1803,24 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->sourceTypeNames(12) = "OtherFuel2";
 
         // initialize the end use names
-        ort->endUseNames(static_cast<int>(Constant::EndUse::Heating)+1) = "Heating";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::Cooling)+1) = "Cooling";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::InteriorLights)+1) = "InteriorLights";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::ExteriorLights)+1) = "ExteriorLights";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::InteriorEquipment)+1) = "InteriorEquipment";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::ExteriorEquipment)+1) = "ExteriorEquipment";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::Fans)+1) = "Fans";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::Pumps)+1) = "Pumps";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::HeatRejection)+1) = "HeatRejection";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::Humidification)+1) = "Humidifier";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::HeatRecovery)+1) = "HeatRecovery";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::WaterSystem)+1) = "WaterSystems";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::Refrigeration)+1) = "Refrigeration";
-        ort->endUseNames(static_cast<int>(Constant::EndUse::Cogeneration)+1) = "Cogeneration";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Heating) + 1) = "Heating";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Cooling) + 1) = "Cooling";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::InteriorLights) + 1) = "InteriorLights";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::ExteriorLights) + 1) = "ExteriorLights";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::InteriorEquipment) + 1) = "InteriorEquipment";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1) = "ExteriorEquipment";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Fans) + 1) = "Fans";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Pumps) + 1) = "Pumps";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::HeatRejection) + 1) = "HeatRejection";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Humidification) + 1) = "Humidifier";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::HeatRecovery) + 1) = "HeatRecovery";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::WaterSystem) + 1) = "WaterSystems";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Refrigeration) + 1) = "Refrigeration";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Cogeneration) + 1) = "Cogeneration";
 
         // End use subs must be dynamically allocated to accomodate the end use with the most subcategories
-        ort->meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
+        ort->meterNumEndUseSubBEPS.allocate(
+            state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->meterNumEndUseSpTypeBEPS.allocate(
             state.dataOutputProcessor->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         for (int endUse = 1; endUse <= static_cast<int>(Constant::EndUse::Num); ++endUse) {
@@ -1878,7 +1878,8 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->gatherEndUseSpTypeBEPS.allocate(
             state.dataOutputProcessor->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->gatherEndUseSpTypeBEPS = 0.0;
-        ort->gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
+        ort->gatherDemandEndUseSub.allocate(
+            state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->gatherDemandEndUseSub = 0.0;
         ort->gatherDemandIndEndUseSub.allocate(
             state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
@@ -6311,9 +6312,8 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         }
         // full load hours per week
         if ((state.dataHeatBal->Lights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS) > 0) {
-            state.dataOutRptTab->HrsPerWeek =
-                24 * 7 * state.dataHeatBal->Lights(iLight).SumConsumption /
-                (state.dataHeatBal->Lights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS * Constant::SecInHour);
+            state.dataOutRptTab->HrsPerWeek = 24 * 7 * state.dataHeatBal->Lights(iLight).SumConsumption /
+                                              (state.dataHeatBal->Lights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS * Constant::SecInHour);
             PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchInLtFullLoadHrs, state.dataHeatBal->Lights(iLight).Name, state.dataOutRptTab->HrsPerWeek);
         }
@@ -6822,16 +6822,10 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         // annual
         // PreDefTableEntry(state,  pdchSHGSAnHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacHt * convertJtoGJ, 3 );
         // PreDefTableEntry(state,  pdchSHGSAnHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacCl * convertJtoGJ, 3 );
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnZoneEqHt,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnZoneEqHt * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnZoneEqCl,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnZoneEqCl * Constant::convertJtoGJ,
-                         3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnZoneEqHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqHt * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnZoneEqCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqCl * Constant::convertJtoGJ, 3);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchSHGSAnHvacATUHt,
                          Zone(iZone).Name,
@@ -6842,76 +6836,34 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                          Zone(iZone).Name,
                          ZonePreDefRep(iZone).SHGSAnHvacATUCl * Constant::convertJtoGJ,
                          3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnSurfHt,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnSurfHt * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnSurfCl,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnSurfCl * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnPeoplAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnPeoplAdd * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnLiteAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnLiteAdd * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnEquipAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnEquipAdd * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnWindAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnWindAdd * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnIzaAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnIzaAdd * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnInfilAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnInfilAdd * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnOtherAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnOtherAdd * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnEquipRem,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnEquipRem * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnWindRem,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnWindRem * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnIzaRem,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnIzaRem * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnInfilRem,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnInfilRem * Constant::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnOtherRem,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnOtherRem * Constant::convertJtoGJ,
-                         3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnSurfHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfHt * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnSurfCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfCl * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnPeoplAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnPeoplAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnLiteAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnLiteAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnEquipAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnEquipAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnWindAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnWindAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnIzaAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnIzaAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnInfilAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnInfilAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnOtherAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnOtherAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnEquipRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnEquipRem * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnWindRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnWindRem * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnIzaRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnIzaRem * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnInfilRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnInfilRem * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnOtherRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnOtherRem * Constant::convertJtoGJ, 3);
         // peak cooling
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClTimePeak, Zone(iZone).Name, DateToString(ZonePreDefRep(iZone).clPtTimeStamp));
         // PreDefTableEntry(state,  pdchSHGSClHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacHt );
@@ -6992,96 +6944,42 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
     }
     // PreDefTableEntry(state,  pdchSHGSAnHvacHt, "Total Facility", totalHvacHt * convertJtoGJ, 3 );
     // PreDefTableEntry(state,  pdchSHGSAnHvacCl, "Total Facility", totalHvacCl * convertJtoGJ, 3 );
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnZoneEqHt,
-                     "Total Facility",
-                     state.dataOutRptTab->totalZoneEqHt * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnZoneEqCl,
-                     "Total Facility",
-                     state.dataOutRptTab->totalZoneEqCl * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnHvacATUHt,
-                     "Total Facility",
-                     state.dataOutRptTab->totalHvacATUHt * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnHvacATUCl,
-                     "Total Facility",
-                     state.dataOutRptTab->totalHvacATUCl * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnSurfHt,
-                     "Total Facility",
-                     state.dataOutRptTab->totalSurfHt * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnSurfCl,
-                     "Total Facility",
-                     state.dataOutRptTab->totalSurfCl * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnPeoplAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalPeoplAdd * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnLiteAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalLiteAdd * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnEquipAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalEquipAdd * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnWindAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalWindAdd * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnIzaAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalIzaAdd * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnInfilAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalInfilAdd * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnOtherAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalOtherAdd * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnEquipRem,
-                     "Total Facility",
-                     state.dataOutRptTab->totalEquipRem * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnWindRem,
-                     "Total Facility",
-                     state.dataOutRptTab->totalWindRem * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnIzaRem,
-                     "Total Facility",
-                     state.dataOutRptTab->totalIzaRem * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnInfilRem,
-                     "Total Facility",
-                     state.dataOutRptTab->totalInfilRem * Constant::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnOtherRem,
-                     "Total Facility",
-                     state.dataOutRptTab->totalOtherRem * Constant::convertJtoGJ,
-                     3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnZoneEqHt, "Total Facility", state.dataOutRptTab->totalZoneEqHt * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnZoneEqCl, "Total Facility", state.dataOutRptTab->totalZoneEqCl * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnHvacATUHt, "Total Facility", state.dataOutRptTab->totalHvacATUHt * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnHvacATUCl, "Total Facility", state.dataOutRptTab->totalHvacATUCl * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnSurfHt, "Total Facility", state.dataOutRptTab->totalSurfHt * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnSurfCl, "Total Facility", state.dataOutRptTab->totalSurfCl * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnPeoplAdd, "Total Facility", state.dataOutRptTab->totalPeoplAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnLiteAdd, "Total Facility", state.dataOutRptTab->totalLiteAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnEquipAdd, "Total Facility", state.dataOutRptTab->totalEquipAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnWindAdd, "Total Facility", state.dataOutRptTab->totalWindAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnIzaAdd, "Total Facility", state.dataOutRptTab->totalIzaAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnInfilAdd, "Total Facility", state.dataOutRptTab->totalInfilAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnOtherAdd, "Total Facility", state.dataOutRptTab->totalOtherAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnEquipRem, "Total Facility", state.dataOutRptTab->totalEquipRem * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnWindRem, "Total Facility", state.dataOutRptTab->totalWindRem * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnIzaRem, "Total Facility", state.dataOutRptTab->totalIzaRem * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnInfilRem, "Total Facility", state.dataOutRptTab->totalInfilRem * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnOtherRem, "Total Facility", state.dataOutRptTab->totalOtherRem * Constant::convertJtoGJ, 3);
     // building level results for peak cooling
     PreDefTableEntry(
         state, state.dataOutRptPredefined->pdchSHGSClTimePeak, "Total Facility", DateToString(state.dataHeatBal->BuildingPreDefRep.clPtTimeStamp));
@@ -8206,9 +8104,9 @@ void WriteBEPSTable(EnergyPlusData &state)
             // determine which resource is the primary heating resourse
             resourcePrimaryHeating = 0;
             heatingMaximum = 0.0;
-            for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                if (collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating)+1) > heatingMaximum) { // +1 because enum is 0-based
-                    heatingMaximum = collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating)+1);
+            for (iResource = 1; iResource <= 12; ++iResource) {                                                     // don't do water
+                if (collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating) + 1) > heatingMaximum) { // +1 because enum is 0-based
+                    heatingMaximum = collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating) + 1);
                     resourcePrimaryHeating = iResource;
                 }
             }
@@ -8683,25 +8581,25 @@ void WriteBEPSTable(EnergyPlusData &state)
             tableBody.allocate(13, 16);
             for (iResource = 1; iResource <= 13; ++iResource) {
                 for (int iEndUse = 0; iEndUse < static_cast<int>(Constant::EndUse::Num); ++iEndUse) {
-                    useVal(iResource, iEndUse+1) = collapsedEndUse(iResource, iEndUse+1);
+                    useVal(iResource, iEndUse + 1) = collapsedEndUse(iResource, iEndUse + 1);
                 }
                 useVal(iResource, 15) = collapsedTotal(iResource); // totals
             }
 
-            rowHead(static_cast<int>(Constant::EndUse::Heating)+1) = "Heating";
-            rowHead(static_cast<int>(Constant::EndUse::Cooling)+1) = "Cooling";
-            rowHead(static_cast<int>(Constant::EndUse::InteriorLights)+1) = "Interior Lighting";
-            rowHead(static_cast<int>(Constant::EndUse::ExteriorLights)+1) = "Exterior Lighting";
-            rowHead(static_cast<int>(Constant::EndUse::InteriorEquipment)+1) = "Interior Equipment";
-            rowHead(static_cast<int>(Constant::EndUse::ExteriorEquipment)+1) = "Exterior Equipment";
-            rowHead(static_cast<int>(Constant::EndUse::Fans)+1) = "Fans";
-            rowHead(static_cast<int>(Constant::EndUse::Pumps)+1) = "Pumps";
-            rowHead(static_cast<int>(Constant::EndUse::HeatRejection)+1) = "Heat Rejection";
-            rowHead(static_cast<int>(Constant::EndUse::Humidification)+1) = "Humidification";
-            rowHead(static_cast<int>(Constant::EndUse::HeatRecovery)+1) = "Heat Recovery";
-            rowHead(static_cast<int>(Constant::EndUse::WaterSystem)+1) = "Water Systems";
-            rowHead(static_cast<int>(Constant::EndUse::Refrigeration)+1) = "Refrigeration";
-            rowHead(static_cast<int>(Constant::EndUse::Cogeneration)+1) = "Generators";
+            rowHead(static_cast<int>(Constant::EndUse::Heating) + 1) = "Heating";
+            rowHead(static_cast<int>(Constant::EndUse::Cooling) + 1) = "Cooling";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorLights) + 1) = "Interior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorLights) + 1) = "Exterior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorEquipment) + 1) = "Interior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1) = "Exterior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::Fans) + 1) = "Fans";
+            rowHead(static_cast<int>(Constant::EndUse::Pumps) + 1) = "Pumps";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRejection) + 1) = "Heat Rejection";
+            rowHead(static_cast<int>(Constant::EndUse::Humidification) + 1) = "Humidification";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRecovery) + 1) = "Heat Recovery";
+            rowHead(static_cast<int>(Constant::EndUse::WaterSystem) + 1) = "Water Systems";
+            rowHead(static_cast<int>(Constant::EndUse::Refrigeration) + 1) = "Refrigeration";
+            rowHead(static_cast<int>(Constant::EndUse::Cogeneration) + 1) = "Generators";
             rowHead(15) = "";
             rowHead(16) = "Total End Uses";
 
@@ -9141,28 +9039,26 @@ void WriteBEPSTable(EnergyPlusData &state)
             tableBody.allocate(13, 4);
             for (iResource = 1; iResource <= 13; ++iResource) {
                 // Lights     <- InteriorLights | <- ExteriorLights
-		normalVal(iResource, 1) =
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::InteriorLights)+1) +
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::ExteriorLights)+1); 
+                normalVal(iResource, 1) = collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::InteriorLights) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::ExteriorLights) + 1);
 
-                // HVAC       <- fans | <- pumps | <- heating | <- cooling | <- heat rejection | <- humidification | <- water system | <- domestic hot water		
-                normalVal(iResource, 2) =
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Fans)+1) +
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Pumps)+1) +
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating)+1) +
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Cooling)+1) +
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::HeatRejection)+1) +
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Humidification)+1) +
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::WaterSystem)+1); 
+                // HVAC       <- fans | <- pumps | <- heating | <- cooling | <- heat rejection | <- humidification | <- water system | <- domestic hot
+                // water
+                normalVal(iResource, 2) = collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Fans) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Pumps) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Cooling) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::HeatRejection) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Humidification) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::WaterSystem) + 1);
 
                 // Other <- InteriorEquipment | <- ExteriorEquipment | <- generator fuel | <- Heat Recovery (parasitics) | <- Refrigeration
-                normalVal(iResource, 3) =
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::InteriorEquipment)+1) +
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::ExteriorEquipment)+1) +
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Cogeneration)+1) +
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::HeatRecovery)+1) +
-                    collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Refrigeration)+1); 
-                                                                                      
+                normalVal(iResource, 3) = collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::InteriorEquipment) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Cogeneration) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::HeatRecovery) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Refrigeration) + 1);
+
                 normalVal(iResource, 4) = collapsedTotal(iResource); // totals
             }
             // convert the normalized end use values to MJ from GJ if using J
@@ -10090,25 +9986,25 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
             tableBody.allocate(12, 16);
             for (iResource = 1; iResource <= 13; ++iResource) {
                 for (int iEndUse = 0; iEndUse < static_cast<int>(Constant::EndUse::Num); ++iEndUse) {
-                    useVal(iResource, iEndUse+1) = collapsedEndUse(iResource, iEndUse+1);
-		}
+                    useVal(iResource, iEndUse + 1) = collapsedEndUse(iResource, iEndUse + 1);
+                }
                 useVal(iResource, 15) = collapsedTotal(iResource); // totals
             }
 
-            rowHead(static_cast<int>(Constant::EndUse::Heating)+1) = "Heating";
-            rowHead(static_cast<int>(Constant::EndUse::Cooling)+1) = "Cooling";
-            rowHead(static_cast<int>(Constant::EndUse::InteriorLights)+1) = "Interior Lighting";
-            rowHead(static_cast<int>(Constant::EndUse::ExteriorLights)+1) = "Exterior Lighting";
-            rowHead(static_cast<int>(Constant::EndUse::InteriorEquipment)+1) = "Interior Equipment";
-            rowHead(static_cast<int>(Constant::EndUse::ExteriorEquipment)+1) = "Exterior Equipment";
-            rowHead(static_cast<int>(Constant::EndUse::Fans)+1) = "Fans";
-            rowHead(static_cast<int>(Constant::EndUse::Pumps)+1) = "Pumps";
-            rowHead(static_cast<int>(Constant::EndUse::HeatRejection)+1) = "Heat Rejection";
-            rowHead(static_cast<int>(Constant::EndUse::Humidification)+1) = "Humidification";
-            rowHead(static_cast<int>(Constant::EndUse::HeatRecovery)+1) = "Heat Recovery";
-            rowHead(static_cast<int>(Constant::EndUse::WaterSystem)+1) = "Water Systems";
-            rowHead(static_cast<int>(Constant::EndUse::Refrigeration)+1) = "Refrigeration";
-            rowHead(static_cast<int>(Constant::EndUse::Cogeneration)+1) = "Generators";
+            rowHead(static_cast<int>(Constant::EndUse::Heating) + 1) = "Heating";
+            rowHead(static_cast<int>(Constant::EndUse::Cooling) + 1) = "Cooling";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorLights) + 1) = "Interior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorLights) + 1) = "Exterior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorEquipment) + 1) = "Interior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1) = "Exterior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::Fans) + 1) = "Fans";
+            rowHead(static_cast<int>(Constant::EndUse::Pumps) + 1) = "Pumps";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRejection) + 1) = "Heat Rejection";
+            rowHead(static_cast<int>(Constant::EndUse::Humidification) + 1) = "Humidification";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRecovery) + 1) = "Heat Recovery";
+            rowHead(static_cast<int>(Constant::EndUse::WaterSystem) + 1) = "Water Systems";
+            rowHead(static_cast<int>(Constant::EndUse::Refrigeration) + 1) = "Refrigeration";
+            rowHead(static_cast<int>(Constant::EndUse::Cogeneration) + 1) = "Generators";
             rowHead(15) = "";
             rowHead(16) = "Total Source Energy End Use Components";
 
@@ -10164,7 +10060,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
             tableBody = "";
             for (iResource = 1; iResource <= 12; ++iResource) {
-                 for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                     tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / largeConversionFactor, 2);
                 }
                 tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / largeConversionFactor, 2);
@@ -10542,27 +10438,27 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             columnWidth = 10; // array assignment - same for all columns
             tableBody.allocate(13, 17);
             for (iResource = 1; iResource <= 13; ++iResource) {
-		    for (int iEndUse = 0; iEndUse < static_cast<int>(Constant::EndUse::Num); ++iEndUse) { 		    
-                    useVal(iResource, iEndUse+1) = collapsedEndUse(iResource, iEndUse+1);
-		}
+                for (int iEndUse = 0; iEndUse < static_cast<int>(Constant::EndUse::Num); ++iEndUse) {
+                    useVal(iResource, iEndUse + 1) = collapsedEndUse(iResource, iEndUse + 1);
+                }
                 useVal(iResource, 15) = collapsedTotal(iResource); // totals
             }
 
             rowHead(1) = "Time of Peak";
-            rowHead(static_cast<int>(Constant::EndUse::Heating)+2) = "Heating";
-            rowHead(static_cast<int>(Constant::EndUse::Cooling)+2) = "Cooling";
-            rowHead(static_cast<int>(Constant::EndUse::InteriorLights)+2) = "Interior Lighting";
-            rowHead(static_cast<int>(Constant::EndUse::ExteriorLights)+2) = "Exterior Lighting";
-            rowHead(static_cast<int>(Constant::EndUse::InteriorEquipment)+2) = "Interior Equipment";
-            rowHead(static_cast<int>(Constant::EndUse::ExteriorEquipment)+2) = "Exterior Equipment";
-            rowHead(static_cast<int>(Constant::EndUse::Fans)+2) = "Fans";
-            rowHead(static_cast<int>(Constant::EndUse::Pumps)+2) = "Pumps";
-            rowHead(static_cast<int>(Constant::EndUse::HeatRejection)+2) = "Heat Rejection";
-            rowHead(static_cast<int>(Constant::EndUse::Humidification)+2) = "Humidification";
-            rowHead(static_cast<int>(Constant::EndUse::HeatRecovery)+2) = "Heat Recovery";
-            rowHead(static_cast<int>(Constant::EndUse::WaterSystem)+2) = "Water Systems";
-            rowHead(static_cast<int>(Constant::EndUse::Refrigeration)+2) = "Refrigeration";
-            rowHead(static_cast<int>(Constant::EndUse::Cogeneration)+2) = "Generators";
+            rowHead(static_cast<int>(Constant::EndUse::Heating) + 2) = "Heating";
+            rowHead(static_cast<int>(Constant::EndUse::Cooling) + 2) = "Cooling";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorLights) + 2) = "Interior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorLights) + 2) = "Exterior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorEquipment) + 2) = "Interior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorEquipment) + 2) = "Exterior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::Fans) + 2) = "Fans";
+            rowHead(static_cast<int>(Constant::EndUse::Pumps) + 2) = "Pumps";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRejection) + 2) = "Heat Rejection";
+            rowHead(static_cast<int>(Constant::EndUse::Humidification) + 2) = "Humidification";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRecovery) + 2) = "Heat Recovery";
+            rowHead(static_cast<int>(Constant::EndUse::WaterSystem) + 2) = "Water Systems";
+            rowHead(static_cast<int>(Constant::EndUse::Refrigeration) + 2) = "Refrigeration";
+            rowHead(static_cast<int>(Constant::EndUse::Cogeneration) + 2) = "Generators";
             rowHead(16) = "";
             rowHead(17) = "Total End Uses";
 

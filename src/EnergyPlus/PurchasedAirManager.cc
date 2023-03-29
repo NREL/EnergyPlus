@@ -486,8 +486,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             if (PurchAir(PurchAirNum).OutdoorAir) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                     // If there is outdoor air and outdoor air inlet node is blank, then create one
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        Constant::MaxNameLength - 23) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 23) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(13) = state.dataIPShortCut->cAlphaArgs(1) + " OUTDOOR AIR INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(13) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 75) + " OUTDOOR AIR INLET NODE";

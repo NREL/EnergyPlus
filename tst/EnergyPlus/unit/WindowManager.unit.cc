@@ -2842,8 +2842,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     HeatBalanceSurfaceManager::ReportSurfaceHeatBalance(*state);
 
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.84 * 0.6 *
-                         (pow_4(25.0 + Constant::KelvinConv) - pow_4(state->dataWindowManager->thetas[0])),
+    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(state->dataWindowManager->thetas[0])),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(surfNum2));
     EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->SurfQHeatEmiReport(surfNum2), 3);
 }
@@ -7700,8 +7699,7 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
             int winNum = i;
             state->dataSurface->SurfOutDryBulbTemp(winNum) = T_out;
             state->dataHeatBal->SurfTempEffBulkAir(winNum) = T_in;
-            state->dataSurface->SurfWinIRfromParentZone(winNum) =
-                Constant::StefanBoltzmann * std::pow(T_in + Constant::KelvinConv, 4);
+            state->dataSurface->SurfWinIRfromParentZone(winNum) = Constant::StefanBoltzmann * std::pow(T_in + Constant::KelvinConv, 4);
         }
     }
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);

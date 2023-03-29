@@ -143,7 +143,7 @@ void GASSES90(EnergyPlusData &state,
             molmix = frct(1) * xwght(iprop(1));                 // initialize equation 56
             cpmixm = molmix * state.dataTARCOGGasses90->fcp(1); // initialize equation 58
             state.dataTARCOGGasses90->kprime(1) =
-                3.75 * Constant::UniversalGasConst / xwght(iprop(1)) * state.dataTARCOGGasses90->fvis(1);        // equation 67
+                3.75 * Constant::UniversalGasConst / xwght(iprop(1)) * state.dataTARCOGGasses90->fvis(1);                   // equation 67
             state.dataTARCOGGasses90->kdblprm(1) = state.dataTARCOGGasses90->fcon(1) - state.dataTARCOGGasses90->kprime(1); // equation 67
             // initialize sumations for eqns 60-66:
             state.dataTARCOGGasses90->mukpdwn(1) = 1.0;
@@ -169,7 +169,7 @@ void GASSES90(EnergyPlusData &state,
                 molmix += frct(i) * xwght(iprop(i));                                    // equation 56
                 cpmixm += frct(i) * state.dataTARCOGGasses90->fcp(i) * xwght(iprop(i)); // equation 58-59
                 state.dataTARCOGGasses90->kprime(i) =
-                    3.75 * Constant::UniversalGasConst / xwght(iprop(i)) * state.dataTARCOGGasses90->fvis(i);        // equation 67
+                    3.75 * Constant::UniversalGasConst / xwght(iprop(i)) * state.dataTARCOGGasses90->fvis(i);                   // equation 67
                 state.dataTARCOGGasses90->kdblprm(i) = state.dataTARCOGGasses90->fcon(i) - state.dataTARCOGGasses90->kprime(i); // equation 68
                 state.dataTARCOGGasses90->mukpdwn(i) = 1.0; // initialize denominator of equation 60
                 state.dataTARCOGGasses90->kpdown(i) = 1.0;  // initialize denominator of equation 63
@@ -218,7 +218,7 @@ void GASSES90(EnergyPlusData &state,
 
             // calculate the density of the mixture assuming an ideal gas:
             Real64 const rhomix = pres * molmix / (Constant::UniversalGasConst * tmean); // equation 57
-            Real64 const kmix = kpmix + kdpmix;                                                     // equation 68-a
+            Real64 const kmix = kpmix + kdpmix;                                          // equation 68-a
 
             // final mixture properties:
             visc = mumix;
@@ -260,8 +260,7 @@ void GassesLow(Real64 const tmean, Real64 const mwght, Real64 const pressure, Re
         return;
     }
 
-    Real64 const B =
-        alpha * (gama + 1) / (gama - 1) * std::sqrt(Constant::UniversalGasConst / (8 * Constant::Pi * mwght * tmean));
+    Real64 const B = alpha * (gama + 1) / (gama - 1) * std::sqrt(Constant::UniversalGasConst / (8 * Constant::Pi * mwght * tmean));
 
     cond = B * pressure;
 }

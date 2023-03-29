@@ -121,12 +121,10 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
     state->dataHeatBal->People(1).ZonePtr = 1;
     state->dataHeatBal->People(1).NumberOfPeople = 100.0;
-    state->dataHeatBal->People(1).NumberOfPeoplePtr =
-        ScheduleManager::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = ScheduleManager::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
     state->dataHeatBal->People(2).ZonePtr = 1;
     state->dataHeatBal->People(2).NumberOfPeople = 200.0;
-    state->dataHeatBal->People(2).NumberOfPeoplePtr =
-        ScheduleManager::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(2).NumberOfPeoplePtr = ScheduleManager::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
 
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
 

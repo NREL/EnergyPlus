@@ -1219,10 +1219,9 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
 
         // effective fin diameter for detailed flat fin coil
         if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
-            state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam =
-                std::sqrt(4.0 * state.dataWaterCoils->WaterCoil(CoilNum).FinDiam * state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth /
-                          (Constant::Pi * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows *
-                           state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow));
+            state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam = std::sqrt(
+                4.0 * state.dataWaterCoils->WaterCoil(CoilNum).FinDiam * state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth /
+                (Constant::Pi * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow));
 
             //   calculate fixed geometric parameters of the coil:
             //   Total Area
