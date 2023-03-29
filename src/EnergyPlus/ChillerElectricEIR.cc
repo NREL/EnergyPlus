@@ -802,7 +802,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Cooling",
                         this->EndUseSubcategory,
@@ -823,10 +823,10 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -884,10 +884,10 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -965,10 +965,10 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -1032,7 +1032,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 {},
                                 "ELECTRICITY",
                                 "Cooling",
-                                _,
+                                {},
                                 "Plant");
         }
         if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
@@ -1046,7 +1046,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 {},
                                 "Water",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -1059,7 +1059,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 {},
                                 "MainsWater",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
 
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
@@ -1081,7 +1081,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                     {},
                                     "Electricity",
                                     "CHILLERS",
-                                    _,
+                                    {},
                                     "Plant");
             }
         }

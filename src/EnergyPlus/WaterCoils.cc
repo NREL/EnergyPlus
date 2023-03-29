@@ -461,10 +461,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Heating Coil Source Side Heat Transfer Energy",
@@ -473,10 +473,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                            _,
+                            {},
                             "PLANTLOOPHEATINGDEMAND",
                             "HEATINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Heating Coil Heating Rate",
@@ -670,10 +670,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Coil Source Side Heat Transfer Energy",
@@ -682,10 +682,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                            _,
+                            {},
                             "PLANTLOOPCOOLINGDEMAND",
                             "COOLINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Energy",
@@ -725,10 +725,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "OnSiteWater",
                                 "Condensate",
-                                _,
+                                {},
                                 "System");
         }
     }
@@ -887,10 +887,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Coil Source Side Heat Transfer Energy",
@@ -899,10 +899,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                            _,
+                            {},
                             "PLANTLOOPCOOLINGDEMAND",
                             "COOLINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Energy",
@@ -949,10 +949,10 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataWaterCoils->WaterCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "OnSiteWater",
                                 "Condensate",
-                                _,
+                                {},
                                 "System");
         }
     }

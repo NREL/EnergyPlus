@@ -856,11 +856,11 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const EndUseSubKey = {},         // Meter End Use Sub Key (General Lights, Task Lights, etc)
                          std::string_view const GroupKey = {},             // Meter Super Group Key (Building, System, Plant)
                          std::string_view const ZoneKey = {},              // Meter Zone Key (zone name)
-                         int const ZoneMult = 1,           // Zone Multiplier, defaults to 1
-                         int const ZoneListMult = 1,       // Zone List Multiplier, defaults to 1
-                         ObjexxFCL::Optional_int_const indexGroupKey = _,  // Group identifier for SQL output
-                         std::string_view const customUnitName = {},  // the custom name for the units from EMS definition of units
-                         ObjexxFCL::Optional_string_const SpaceType = _        // Space type (applicable for Building group only)
+                         int const ZoneMult = 1,                           // Zone Multiplier, defaults to 1
+                         int const ZoneListMult = 1,                       // Zone List Multiplier, defaults to 1
+                         int const indexGroupKey = -999,                   // Group identifier for SQL output
+                         std::string_view const customUnitName = {},       // the custom name for the units from EMS definition of units
+                         std::string_view const SpaceType = {}             // Space type (applicable for Building group only)
 );
 
 void SetupOutputVariable(EnergyPlusData &state,

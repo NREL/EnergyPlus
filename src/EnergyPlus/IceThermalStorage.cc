@@ -1281,10 +1281,10 @@ namespace IceThermalStorage {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ELECTRICITY",
-                            _,
-                            _,
+                            {},
+                            {},
                             "System");
     }
 

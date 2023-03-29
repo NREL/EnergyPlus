@@ -4733,10 +4733,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrfTU.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "COOLING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Total Cooling Rate",
@@ -4796,10 +4796,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrfTU.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Total Heating Rate",
@@ -4892,10 +4892,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisVrf.Name,
-                            _,
+                            {},
                             thisVrf.FuelType,
                             "COOLING",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "VRF Heat Pump Heating " + thisVrf.FuelType + " Rate",
@@ -4911,10 +4911,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisVrf.Name,
-                            _,
+                            {},
                             thisVrf.FuelType,
                             "HEATING",
-                            _,
+                            {},
                             "System");
 
         SetupOutputVariable(state,
@@ -5068,10 +5068,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
         } else { // defrost energy applied to fuel type
             SetupOutputVariable(state,
@@ -5088,10 +5088,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
-                                _,
+                                {},
                                 thisVrf.FuelType,
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
         }
 
@@ -5146,10 +5146,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisVrf.Name,
-                            _,
+                            {},
                             "Electricity",
                             "COOLING",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "VRF Heat Pump Terminal Unit Cooling Load Rate",
@@ -5194,10 +5194,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
         }
 
@@ -5209,10 +5209,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
-                                _,
+                                {},
                                 "Water",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "VRF Heat Pump Evaporative Condenser Pump Electricity Rate",
@@ -5228,10 +5228,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "COOLING",
-                                _,
+                                {},
                                 "System");
 
             if (thisVrf.BasinHeaterPowerFTempDiff > 0.0) {
@@ -5249,10 +5249,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     thisVrf.Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "COOLING",
-                                    _,
+                                    {},
                                     "System");
             }
 

@@ -482,10 +482,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "Water",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "SYSTEM");
                 SetupOutputVariable(state,
                                     "Humidifier Starved Storage Tank Water Volume Flow Rate",
@@ -501,10 +501,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "Water",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "SYSTEM");
                 SetupOutputVariable(state,
                                     "Humidifier Mains Water Volume",
@@ -513,10 +513,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "SYSTEM");
 
             } else {
@@ -534,10 +534,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "WATER",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Humidifier Mains Water Volume",
@@ -546,10 +546,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "MAINSWATER",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
             }
             if (Humidifier(HumNum).HumType == HumidType::Electric) {
@@ -567,10 +567,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "ELECTRICITY",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
             } else if (Humidifier(HumNum).HumType == HumidType::Gas) {
                 SetupOutputVariable(state,
@@ -594,10 +594,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "NATURALGAS",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Humidifier Auxiliary Electricity Rate",
@@ -613,10 +613,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "ELECTRICITY",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
             }
         }

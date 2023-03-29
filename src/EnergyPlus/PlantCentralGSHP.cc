@@ -807,10 +807,10 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -820,10 +820,10 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Heating",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -849,10 +849,10 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -862,10 +862,10 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "BOILER",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -875,10 +875,10 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,

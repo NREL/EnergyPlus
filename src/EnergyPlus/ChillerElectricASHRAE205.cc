@@ -1016,7 +1016,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Cooling",
                         this->EndUseSubcategory,
@@ -1037,10 +1037,10 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -1082,10 +1082,10 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,

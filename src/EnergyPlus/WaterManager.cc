@@ -789,7 +789,7 @@ namespace WaterManager {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataWaterData->WaterStorage(Item).Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "WaterSystem",
                                     state.dataWaterData->WaterStorage(Item).QualitySubCategoryName,
@@ -873,10 +873,10 @@ namespace WaterManager {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataWaterData->RainCollector(Item).Name,
-                                    _,
+                                    {},
                                     "OnSiteWater",
                                     "Rainwater",
-                                    _,
+                                    {},
                                     "System");
             }
 
@@ -902,10 +902,10 @@ namespace WaterManager {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataWaterData->GroundwaterWell(Item).Name,
-                                    _,
+                                    {},
                                     "OnSiteWater",
                                     "Wellwater",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Water System Groundwater Well Pump Electricity Rate",
@@ -921,10 +921,10 @@ namespace WaterManager {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataWaterData->GroundwaterWell(Item).Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "WaterSystems",
-                                    _,
+                                    {},
                                     "System");
             }
 

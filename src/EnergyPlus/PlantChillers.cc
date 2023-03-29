@@ -633,7 +633,7 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ELECTRICITY",
                             "Cooling",
                             this->EndUseSubcategory,
@@ -653,10 +653,10 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "CHILLERS",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
@@ -693,10 +693,10 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATREJECTION",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Chiller COP",
@@ -746,10 +746,10 @@ namespace PlantChillers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "CHILLERS",
-                                    _,
+                                    {},
                                     "Plant");
             }
         }
@@ -770,10 +770,10 @@ namespace PlantChillers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Inlet Temperature",
@@ -2624,10 +2624,10 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "CHILLERS",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
@@ -2664,10 +2664,10 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATREJECTION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -2711,10 +2711,10 @@ namespace PlantChillers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "CHILLERS",
-                                    _,
+                                    {},
                                     "Plant");
             }
         }
@@ -2733,10 +2733,10 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             this->FuelType,
                             "Cooling",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -2784,10 +2784,10 @@ namespace PlantChillers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -2804,10 +2804,10 @@ namespace PlantChillers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -2824,10 +2824,10 @@ namespace PlantChillers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -4605,10 +4605,10 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "CHILLERS",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
@@ -4645,10 +4645,10 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATREJECTION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -4692,10 +4692,10 @@ namespace PlantChillers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "CHILLERS",
-                                    _,
+                                    {},
                                     "Plant");
             }
         }
@@ -4714,10 +4714,10 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HeatRecovery",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -4735,10 +4735,10 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             this->FuelType,
                             "Cooling",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -6375,10 +6375,10 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ELECTRICITY",
                             "Cooling",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Rate",
@@ -6394,10 +6394,10 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "CHILLERS",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
@@ -6441,10 +6441,10 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATREJECTION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -6488,10 +6488,10 @@ namespace PlantChillers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "CHILLERS",
-                                    _,
+                                    {},
                                     "Plant");
             }
         }

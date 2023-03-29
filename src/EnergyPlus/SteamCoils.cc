@@ -396,10 +396,10 @@ namespace SteamCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataSteamCoils->SteamCoil(CoilNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",

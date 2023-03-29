@@ -439,10 +439,10 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
@@ -451,10 +451,10 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
@@ -477,10 +477,10 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // create predefined report entries
@@ -612,10 +612,10 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
@@ -624,10 +624,10 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
@@ -636,10 +636,10 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // create predefined report entries

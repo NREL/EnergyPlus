@@ -328,10 +328,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityPurchased",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -348,10 +348,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricitySurplusSold",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -368,10 +368,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityNet",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -2685,10 +2685,10 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "POWERCONVERSION",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Inverter Thermal Loss Rate",
@@ -2718,7 +2718,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "Electricity",
                             "Cogeneration",
                             "DCtoACInverter Ancillary",
@@ -3145,10 +3145,10 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "POWERCONVERSION",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Converter Thermal Loss Rate",
@@ -3178,7 +3178,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "Electricity",
                             "Cogeneration",
                             "ACtoDCConverter Ancillary",
@@ -3722,10 +3722,10 @@ ElectricStorage::ElectricStorage( // main constructor
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "ELECTRICSTORAGE",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Electric Storage Discharge Power",
@@ -3741,10 +3741,10 @@ ElectricStorage::ElectricStorage( // main constructor
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "ELECTRICSTORAGE",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Electric Storage Thermal Loss Rate",
@@ -4923,7 +4923,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
-                                _,
+                                {},
                                 "Electricity",
                                 "ExteriorEquipment",
                                 "Transformer",
@@ -4937,10 +4937,10 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "POWERCONVERSION",
-                                _,
+                                {},
                                 "System");
         }
         if (usageMode_ == TransformerUse::PowerBetweenLoadCenterAndBldg) {
@@ -4951,10 +4951,10 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "POWERCONVERSION",
-                                _,
+                                {},
                                 "System");
         }
 

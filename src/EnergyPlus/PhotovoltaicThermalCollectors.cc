@@ -544,10 +544,10 @@ namespace PhotovoltaicThermalCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
@@ -558,10 +558,10 @@ namespace PhotovoltaicThermalCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarAir",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,

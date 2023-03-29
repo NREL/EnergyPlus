@@ -4494,11 +4494,11 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const EndUseSubKey,                    // Meter End Use Sub Key (General Lights, Task Lights, etc)
                          std::string_view const GroupKey,                        // Meter Super Group Key (Building, System, Plant)
                          std::string_view const ZoneKey,                         // Meter Zone Key (zone name)
-                         int const ZoneMult,                 // Zone Multiplier, defaults to 1
-                         int const ZoneListMult,             // Zone List Multiplier, defaults to 1
-                         ObjexxFCL::Optional_int_const indexGroupKey,            // Group identifier for SQL output
-                         std::string_view const customUnitName,        // the custom name for the units from EMS definition of units
-                         ObjexxFCL::Optional_string_const SpaceType              // Space type (applicable for Building group only)
+                         int const ZoneMult,                                     // Zone Multiplier, defaults to 1
+                         int const ZoneListMult,                                 // Zone List Multiplier, defaults to 1
+                         int const indexGroupKey,                                // Group identifier for SQL output
+                         std::string_view const customUnitName,                  // the custom name for the units from EMS definition of units
+                         std::string_view const SpaceType                        // Space type (applicable for Building group only)
 )
 {
 
@@ -4531,7 +4531,6 @@ void SetupOutputVariable(EnergyPlusData &state,
     std::string Group;        // Will hold value of GroupKey
     std::string zoneName;     // Will hold value of ZoneKey
     std::string spaceType;    // Will hold value of SpaceType
-    int localIndexGroupKey;
     auto &op = state.dataOutputProcessor;
 
     if (!op->OutputInitialized) InitializeOutput(state);
@@ -4600,7 +4599,7 @@ void SetupOutputVariable(EnergyPlusData &state,
             } else {
                 zoneName = "";
             }
-            if (present(SpaceType)) {
+            if (!SpaceType.empty()) {
                 spaceType = SpaceType;
                 OnMeter = true;
             } else {
@@ -4694,18 +4693,12 @@ void SetupOutputVariable(EnergyPlusData &state,
         }
 
         if (thisVarPtr.Report) {
-            if (present(indexGroupKey)) {
-                localIndexGroupKey = indexGroupKey;
-            } else {
-                localIndexGroupKey = -999; // Unknown Group
-            }
-
             if (thisVarPtr.SchedPtr != 0) {
                 WriteReportVariableDictionaryItem(state,
                                                   thisVarPtr.frequency,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
-                                                  localIndexGroupKey,
+                                                  indexGroupKey,
                                                   std::string(sovTimeStepTypeStrings[(int)TimeStepTypeKey]),
                                                   thisVarPtr.ReportIDChr,
                                                   KeyedValue,
@@ -4719,7 +4712,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                                                   thisVarPtr.frequency,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
-                                                  localIndexGroupKey,
+                                                  indexGroupKey,
                                                   std::string(sovTimeStepTypeStrings[(int)TimeStepTypeKey]),
                                                   thisVarPtr.ReportIDChr,
                                                   KeyedValue,
