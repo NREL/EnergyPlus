@@ -209,7 +209,7 @@ namespace AirLoopHVACDOAS {
     void AirLoopMixer::getAirLoopMixer(EnergyPlusData &state)
     {
 
-        std::string const &cCurrentModuleObject = "AirLoopHVAC:Mixer";
+        std::string const cCurrentModuleObject = "AirLoopHVAC:Mixer";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -363,7 +363,7 @@ namespace AirLoopHVACDOAS {
     void AirLoopSplitter::getAirLoopSplitter(EnergyPlusData &state)
     {
 
-        std::string const &cCurrentModuleObject = "AirLoopHVAC:Splitter";
+        std::string const cCurrentModuleObject = "AirLoopHVAC:Splitter";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -415,7 +415,7 @@ namespace AirLoopHVACDOAS {
     void AirLoopDOAS::getAirLoopDOASInput(EnergyPlusData &state)
     {
 
-        std::string const &cCurrentModuleObject = "AirLoopHVAC:DedicatedOutdoorAirSystem";
+        std::string const cCurrentModuleObject = "AirLoopHVAC:DedicatedOutdoorAirSystem";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {

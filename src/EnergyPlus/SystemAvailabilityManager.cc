@@ -1303,7 +1303,7 @@ namespace SystemAvailabilityManager {
         }
 
         bool ErrorsFound = false;
-        std::string const &cCurrentModuleObject = "AvailabilityManagerAssignmentList";
+        std::string const cCurrentModuleObject = "AvailabilityManagerAssignmentList";
         auto &ip = state.dataInputProcessing->inputProcessor;
 
         state.dataSystemAvailabilityManager->NumAvailManagerLists = ip->getNumObjectsFound(state, cCurrentModuleObject);

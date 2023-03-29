@@ -1489,10 +1489,7 @@ namespace AirflowNetwork {
         // Add window multiplier with window open
         if (Fact > 0.0) {
             if (state.afn->MultizoneSurfaceData(IL).Multiplier > 1.0) ActLw *= state.afn->MultizoneSurfaceData(IL).Multiplier;
-        }
-
-        // Add recurring warnings
-        if (Fact > 0.0) {
+            // Add recurring warnings
             if (ActLw == 0.0) {
                 ++WidthErrCount;
                 if (WidthErrCount < 2) {
@@ -1723,13 +1720,13 @@ namespace AirflowNetwork {
             if (Cs > 0.0) {
                 // get the average Rho for this closed window
                 for (i = 2; i <= NrInt + 1; ++i) {
-                    rholink = 0.0;
-                    if (DpProfNew(i) > 0) {
-                        rholink = state.afn->dos.RhoProfF(Loc + i);
-                    } else {
-                        rholink = state.afn->dos.RhoProfT(Loc + i);
-                    }
-                    rholink /= NrInt;
+                    // rholink = 0.0;
+                    // if (DpProfNew(i) > 0) {
+                    //    rholink = state.afn->dos.RhoProfF(Loc + i);
+                    //} else {
+                    //    rholink = state.afn->dos.RhoProfT(Loc + i);
+                    //}
+                    // rholink /= NrInt;
                     rholink = 1.2;
                 }
                 FvVeloc = (fma21 + fma12) * std::pow(2.0, expn) * sqrt_1_2 / (rholink * Cs);
@@ -1909,18 +1906,15 @@ namespace AirflowNetwork {
         //       MODIFIED       Lixing Gu, 2/1/04
         //                      Revised the subroutine to meet E+ needs
         //       MODIFIED       Lixing Gu, 6/8/05
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine solves airflow for a Constant pressure drop component
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 Co;
-        int k;
+        // Real64 Co;
 
         int n = state.afn->AirflowNetworkLinkageData(i).NodeNums[0];
         int m = state.afn->AirflowNetworkLinkageData(i).NodeNums[1];
-        auto &solver = state.afn;
 
         // Get component properties
         // A  = Cross section area [m2]
@@ -1930,14 +1924,14 @@ namespace AirflowNetwork {
             F[0] = std::sqrt(2.0 * propN.density) * A * std::sqrt(DP);
             DF[0] = 0.5 * F[0] / DP;
         } else {
-            for (k = 1; k <= state.afn->ActualNumOfLinks; ++k) {
+            for (int k = 1; k <= state.afn->ActualNumOfLinks; ++k) {
                 if (state.afn->AirflowNetworkLinkageData(k).NodeNums[1] == n) {
-                    F[0] = solver->AFLOW(k);
+                    F[0] = state.afn->AFLOW(k);
                     break;
                 }
             }
-            solver->PZ(m) = solver->PZ(n) - DP;
-            Co = F[0] / DP;
+            state.afn->PZ(m) = state.afn->PZ(n) - DP;
+            // Co = F[0] / DP; // can be deleted since it is not used
             DF[0] = 10.e10;
         }
         return 1;
@@ -3500,7 +3494,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    void generic_crack(Real64 &coefficient,      // Flow coefficient
+    void generic_crack(Real64 const coefficient, // Flow coefficient
                        Real64 const exponent,    // Flow exponent
                        bool const linear,        // Initialization flag. If true, use linear relationship
                        Real64 const pdrop,       // Total pressure drop across a component (P1 - P2) [Pa]
@@ -3926,9 +3920,7 @@ namespace AirflowNetwork {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //      REAL(r64) RhoOut ! air density outside [kg/m3]
-        Real64 G;     // gravity field strength [N/kg]
-        Real64 RhoL1; // Air density [kg/m3]
-        Real64 RhoL2;
+        Real64 G;                                                  // gravity field strength [N/kg]
         Real64 Pbz;                                                // Pbarom at entrance level [Pa]
         Array2D<Real64> RhoDrL(state.afn->NumOfLinksMultiZone, 2); // dry air density on both sides of the link [kg/m3]
         Real64 TempL1;                                             // Temp in From and To zone at link level [C]
@@ -3963,17 +3955,12 @@ namespace AirflowNetwork {
         Real64 PzTo;
         Array1D<Real64> RhoLd(2);
         Real64 RhoStd;
-        int From;
-        int To;
         int Fromz;
         int Toz;
         iComponentTypeNum Ltyp;
         int i;
         int ll;
-        int j;
-        int k;
         int Pprof;
-        int ilayptr;
         int OpenNum;
 
         Real64 RhoREF;
@@ -4001,8 +3988,8 @@ namespace AirflowNetwork {
                 }
             }
             // Initialisation
-            From = state.afn->AirflowNetworkLinkageData(i).NodeNums[0];
-            To = state.afn->AirflowNetworkLinkageData(i).NodeNums[1];
+            int From = state.afn->AirflowNetworkLinkageData(i).NodeNums[0];
+            int To = state.afn->AirflowNetworkLinkageData(i).NodeNums[1];
             if (state.afn->AirflowNetworkNodeData(From).EPlusZoneNum > 0 && state.afn->AirflowNetworkNodeData(To).EPlusZoneNum > 0) {
                 ll = 0;
             } else if (state.afn->AirflowNetworkNodeData(From).EPlusZoneNum == 0 && state.afn->AirflowNetworkNodeData(To).EPlusZoneNum > 0) {
@@ -4024,7 +4011,7 @@ namespace AirflowNetwork {
             Xhl1 = props[From].humidity_ratio;
             TzFrom = props[From].temperature;
             XhzFrom = props[From].humidity_ratio;
-            RhoL1 = props[From].density;
+            // RhoL1 = props[From].density;
             if (ll == 0 || ll == 3) {
                 PzFrom = pz(From);
             } else {
@@ -4032,7 +4019,7 @@ namespace AirflowNetwork {
                 From = 0;
             }
 
-            ilayptr = 0;
+            int ilayptr = 0;
             if (From == 0) ilayptr = 1;
             if (ilayptr == 0) {
                 Fromz = 0;
@@ -4044,7 +4031,7 @@ namespace AirflowNetwork {
             Xhl2 = props[To].humidity_ratio;
             TzTo = props[To].temperature;
             XhzTo = props[To].humidity_ratio;
-            RhoL2 = props[To].density;
+            // RhoL2 = props[To].density;
 
             if (ll < 3) {
                 PzTo = pz(To);
@@ -4069,10 +4056,10 @@ namespace AirflowNetwork {
             // calculate DpF the difference between Pz and P at Node 1 height
             ilayptr = 0;
             if (Fromz == 0) ilayptr = 1;
-            j = ilayptr;
-            k = 1;
+            int j = ilayptr;
+            int k = 1;
             lclimb(state, G, RhoLd(1), state.afn->AirflowNetworkLinkageData(i).NodeHeights[0], TempL1, Xhl1, DpF(k), Toz, PzTo, Pbz, RhoDrL(i, 1));
-            RhoL1 = RhoLd(1);
+            Real64 RhoL1 = RhoLd(1);
             // For large openings calculate the stack pressure difference profile and the
             // density profile within the the top- and the bottom- height of the large opening
             if (ActLOwnh > 0.0) {
@@ -4129,7 +4116,7 @@ namespace AirflowNetwork {
             // Calculate Rho at link height only if we have large openings or layered zones.
             k = 1;
             lclimb(state, G, RhoLd(2), state.afn->AirflowNetworkLinkageData(i).NodeHeights[1], TempL2, Xhl2, DpT(k), Toz, PzTo, Pbz, RhoDrL(i, 2));
-            RhoL2 = RhoLd(2);
+            Real64 RhoL2 = RhoLd(2);
 
             // For large openings calculate the stack pressure difference profile and the
             // density profile within the the top- and the bottom- height of the large opening
