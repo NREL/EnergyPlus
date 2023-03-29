@@ -862,12 +862,12 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Real64 const QdotSource,                    // Source/sink term, e.g. electricity exported from solar cell [W]
                                   Real64 &TsBaffle,                           // Temperature of baffle (both sides) use lagged value on input [C]
                                   Real64 &TaGap,                              // Temperature of air gap (assumed mixed) use lagged value on input [C]
-                                  ObjexxFCL::Optional<Real64> HcGapRpt,
-                                  ObjexxFCL::Optional<Real64> HrGapRpt,
-                                  ObjexxFCL::Optional<Real64> IscRpt,
-                                  ObjexxFCL::Optional<Real64> MdotVentRpt,
-                                  ObjexxFCL::Optional<Real64> VdotWindRpt,
-                                  ObjexxFCL::Optional<Real64> VdotBuoyRpt)
+                                  Real64 &HcGapRpt,
+                                  Real64 &HrGapRpt,
+                                  Real64 &IscRpt,
+                                  Real64 &MdotVentRpt,
+                                  Real64 &VdotWindRpt,
+                                  Real64 &VdotBuoyRpt)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1103,12 +1103,12 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
 
     TaGap = (HcPlen * A * Tso + MdotVent * CpAir * Tamb + HcPlen * A * TsBaffle) / (HcPlen * A + MdotVent * CpAir + HcPlen * A);
 
-    if (present(HcGapRpt)) HcGapRpt = HcPlen;
-    if (present(HrGapRpt)) HrGapRpt = HrPlen;
-    if (present(IscRpt)) IscRpt = Isc;
-    if (present(MdotVentRpt)) MdotVentRpt = MdotVent;
-    if (present(VdotWindRpt)) VdotWindRpt = VdotWind;
-    if (present(VdotBuoyRpt)) VdotBuoyRpt = VdotThermal;
+    HcGapRpt = HcPlen;
+    HrGapRpt = HrPlen;
+    IscRpt = Isc;
+    MdotVentRpt = MdotVent;
+    VdotWindRpt = VdotWind;
+    VdotBuoyRpt = VdotThermal;
 }
 
 //****************************************************************************

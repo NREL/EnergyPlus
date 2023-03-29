@@ -659,7 +659,7 @@ void SimOAComponent(EnergyPlusData &state,
                 }
             }
             if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) {
-                HeatRecovery::SimHeatRecovery(state, CompName, FirstHVACIteration, CompIndex, FanOpMode, AirloopPLR, _, _, _, _, _);
+                HeatRecovery::SimHeatRecovery(state, CompName, FirstHVACIteration, CompIndex, FanOpMode, AirloopPLR);
             } else {
                 HeatRecovery::SimHeatRecovery(state,
                                               CompName,
@@ -667,9 +667,9 @@ void SimOAComponent(EnergyPlusData &state,
                                               CompIndex,
                                               FanOpMode,
                                               AirloopPLR,
-                                              _,
-                                              _,
-                                              _,
+                                              {},
+                                              0,
+                                              false,
                                               state.dataAirLoop->AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass,
                                               state.dataAirLoop->AirLoopControlInfo(AirLoopNum).HighHumCtrlActive);
             }

@@ -1709,10 +1709,10 @@ void CalcStandAloneERV(EnergyPlusData &state,
                     FirstHVACIteration,
                     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerIndex,
                     ContFanCycCoil,
-                    _,
+                    1.0,
                     HXUnitOn,
-                    _,
-                    _,
+                    0,
+                    false,
                     EconomizerFlag,
                     HighHumCtrlFlag);
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate = state.dataHVACGlobal->AirToAirHXElecPower;

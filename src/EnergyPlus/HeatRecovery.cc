@@ -108,17 +108,17 @@ namespace HeatRecovery {
         "NONE", "EXHAUSTONLY", "EXHAUSTAIRRECIRCULATION", "MINIMUMEXHAUSTTEMPERATURE"};
 
     void SimHeatRecovery(EnergyPlusData &state,
-                         std::string_view CompName,                          // name of the heat exchanger unit
-                         bool const FirstHVACIteration,                      // TRUE if 1st HVAC simulation of system timestep
-                         int &CompIndex,                                     // Pointer to Component
-                         int const FanOpMode,                                // Supply air fan operating mode
-                         ObjexxFCL::Optional<Real64 const> HXPartLoadRatio,  // Part load ratio requested of DX compressor
-                         ObjexxFCL::Optional_bool_const HXUnitEnable,        // Flag to operate heat exchanger
-                         ObjexxFCL::Optional_int_const CompanionCoilIndex,   // index of companion cooling coil
-                         ObjexxFCL::Optional_bool_const RegenInletIsOANode,  // flag to determine if supply inlet is OA node, if so air flow cycles
-                         ObjexxFCL::Optional_bool_const EconomizerFlag,      // economizer operation flag passed by airloop or OA sys
-                         ObjexxFCL::Optional_bool_const HighHumCtrlFlag,     // high humidity control flag passed by airloop or OA sys
-                         ObjexxFCL::Optional_int_const CompanionCoilType_Num // cooling coil type of coil
+                         std::string_view CompName,              // name of the heat exchanger unit
+                         bool const FirstHVACIteration,          // TRUE if 1st HVAC simulation of system timestep
+                         int &CompIndex,                         // Pointer to Component
+                         int const FanOpMode,                    // Supply air fan operating mode
+                         Real64 const HXPartLoadRatio,           // Part load ratio requested of DX compressor
+                         std::optional<bool> const HXUnitEnable, // Flag to operate heat exchanger
+                         int const CompanionCoilIndex,           // index of companion cooling coil
+                         bool const RegenInletIsOANode,          // flag to determine if supply inlet is OA node, if so air flow cycles
+                         bool const EconomizerFlag,              // economizer operation flag passed by airloop or OA sys
+                         bool const HighHumCtrlFlag,             // high humidity control flag passed by airloop or OA sys
+                         int const CompanionCoilType_Num         // cooling coil type of coil
     )
     {
 
@@ -165,12 +165,12 @@ namespace HeatRecovery {
             }
         }
 
-        int CompanionCoilNum = present(CompanionCoilIndex) ? int(CompanionCoilIndex) : 0; // Index to companion cooling coil
-        int companionCoilType = present(CompanionCoilType_Num) ? int(CompanionCoilType_Num) : 0;
+        //int CompanionCoilNum = present(CompanionCoilIndex) ? int(CompanionCoilIndex) : 0; // Index to companion cooling coil
+        //int companionCoilType = present(CompanionCoilType_Num) ? int(CompanionCoilType_Num) : 0;
 
         bool HXUnitOn; // flag to enable heat exchanger
-        if (present(HXUnitEnable)) {
-            HXUnitOn = HXUnitEnable;
+        if (HXUnitEnable) {
+            HXUnitOn = *HXUnitEnable;
             //   When state.dataHeatRecovery->CalledFromParentObject is TRUE, this SIM routine was called by a parent object that passed in
             //   HXUnitEnable. HX will use the DX coil part-load ratio (optional CompanionCoilIndex must be present) or PLR passed in if not used with
             //   DX coil (optional CompanionCoilIndex must not be present).
@@ -184,7 +184,7 @@ namespace HeatRecovery {
 
         auto &thisExch = state.dataHeatRecovery->ExchCond(HeatExchNum);
 
-        thisExch.initialize(state, CompanionCoilNum, companionCoilType);
+        thisExch.initialize(state, CompanionCoilIndex, CompanionCoilType_Num);
 
         // call the correct heat exchanger calculation routine
         switch (state.dataHeatRecovery->ExchCond(HeatExchNum).ExchType) {
@@ -197,10 +197,15 @@ namespace HeatRecovery {
             break;
 
         case DataHVACGlobals::HX_DESICCANT_BALANCED:
-            Real64 PartLoadRatio = present(HXPartLoadRatio) ? Real64(HXPartLoadRatio) : 1.0; // Part load ratio requested of DX compressor
-            bool RegInIsOANode = present(RegenInletIsOANode) && bool(RegenInletIsOANode);
-            thisExch.CalcDesiccantBalancedHeatExch(
-                state, HXUnitOn, FirstHVACIteration, FanOpMode, PartLoadRatio, CompanionCoilNum, RegInIsOANode, EconomizerFlag, HighHumCtrlFlag);
+            thisExch.CalcDesiccantBalancedHeatExch(state,
+                                                   HXUnitOn,
+                                                   FirstHVACIteration,
+                                                   FanOpMode,
+                                                   HXPartLoadRatio,
+                                                   CompanionCoilIndex,
+                                                   RegenInletIsOANode,
+                                                   EconomizerFlag,
+                                                   HighHumCtrlFlag);
             break;
         }
 
