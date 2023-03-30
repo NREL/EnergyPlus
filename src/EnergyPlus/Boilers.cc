@@ -100,12 +100,12 @@ PlantComponent *BoilerSpecs::factory(EnergyPlusData &state, std::string const &o
         GetBoilerInput(state);
         state.dataBoilers->getBoilerInputFlag = false;
     }
-    // Now look for this particular pipe in the list
-    for (auto &boiler : state.dataBoilers->Boiler) {
-        if (boiler.Name == objectName) {
-            return &boiler;
-        }
-    }
+    // Now look for this particular boiler in the list
+    auto myBoiler = std::find_if(state.dataBoilers->Boiler.begin(), state.dataBoilers->Boiler.end(), [&objectName](const BoilerSpecs &boiler) {
+        return boiler.Name == objectName;
+    });
+    if (myBoiler->Name == objectName) return myBoiler;
+
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalBoilerFactory: Error getting inputs for boiler named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler

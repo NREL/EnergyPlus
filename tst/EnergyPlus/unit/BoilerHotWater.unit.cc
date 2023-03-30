@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -281,4 +282,35 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     EXPECT_NEAR(thisBoiler.BoilerPLR, 0.24, 0.01);
     Real64 ExpectedBoilerEff = (0.5887682 + 0.7888184 * thisBoiler.BoilerPLR - 0.3862498 * pow(thisBoiler.BoilerPLR, 2)) * thisBoiler.NomEffic;
     EXPECT_NEAR(thisBoiler.BoilerEff, ExpectedBoilerEff, 0.01);
+}
+
+TEST_F(EnergyPlusFixture, Boiler_HotWater_Factory)
+{
+    state->dataBoilers->Boiler.allocate(3);
+    state->dataBoilers->Boiler(1).Name = "Boiler1";
+    state->dataBoilers->Boiler(2).Name = "Boiler2";
+    state->dataBoilers->Boiler(3).Name = "Boiler3";
+
+    state->dataBoilers->Boiler(3).NomCap = 1000.0;
+    state->dataBoilers->Boiler(3).MinPartLoadRat = 0.1;
+    state->dataBoilers->Boiler(3).MaxPartLoadRat = 1.1;
+    state->dataBoilers->Boiler(3).OptPartLoadRat = 1.0;
+
+    state->dataBoilers->getBoilerInputFlag = false;
+    state->dataBoilers->Boiler(1).Name = "Boiler1";
+    state->dataBoilers->Boiler(2).Name = "Boiler2";
+    state->dataBoilers->Boiler(3).Name = "Boiler3";
+
+    PlantComponent *compPtr = Boilers::BoilerSpecs::factory(*state, state->dataBoilers->Boiler(3).Name);
+
+    PlantLocation Location;
+    Real64 MaxLoad;
+    Real64 MinLoad;
+    Real64 OptLoad;
+    compPtr->getDesignCapacities(*state, Location, MaxLoad, MinLoad, OptLoad);
+
+    // EXPECT_EQ(compPtr->Name, state->dataBoilers->Boiler(3).Name);
+    EXPECT_EQ(MinLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).MinPartLoadRat);
+    EXPECT_EQ(MaxLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).MaxPartLoadRat);
+    EXPECT_EQ(OptLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).OptPartLoadRat);
 }
