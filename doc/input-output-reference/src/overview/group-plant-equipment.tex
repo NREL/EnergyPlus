@@ -2649,11 +2649,11 @@ One of the following blocks will be applicable based on fuel type:
 
 \begin{itemize}
     \item
-    HVAC,Average,Chiller Gas Rate {[}W{]}
+    HVAC,Average,Chiller NaturalGas Rate {[}W{]}
     \item
-    HVAC,Sum,Chiller Gas Energy {[}J{]}
+    HVAC,Sum,Chiller NaturalGas Energy {[}J{]}
     \item
-    HVAC,Average,Chiller Gas Mass Flow Rate {[}kg/s{]}
+    HVAC,Average,Chiller NaturalGas Mass Flow Rate {[}kg/s{]}
     \item
     HVAC,Average,Chiller Propane Rate {[}W{]}
     \item
@@ -4256,13 +4256,17 @@ Electric:
     HVAC,Sum,Boiler Electricity Energy {[}J{]}
 \end{itemize}
 
-Gas:
+NaturalGas:
 
 \begin{itemize}
     \item
-    HVAC,Average,Boiler Gas Rate {[}W{]}
+    HVAC,Average,Boiler NaturalGas Rate {[}W{]}
     \item
-    HVAC,Sum,Boiler Gas Energy {[}J{]}
+    HVAC,Sum,Boiler NaturalGas Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary NaturalGas Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary NaturalGas Energy {[}J{]}
 \end{itemize}
 
 Propane:
@@ -4272,6 +4276,10 @@ Propane:
     HVAC,Average,Boiler Propane Rate {[}W{]}
     \item
     HVAC,Sum,Boiler Propane Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary Propane Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary Propane Energy {[}J{]}
 \end{itemize}
 
 FuelOilNo1:
@@ -4281,6 +4289,10 @@ FuelOilNo1:
     HVAC,Average,Boiler FuelOilNo1 Rate {[}W{]}
     \item
     HVAC,Sum,Boiler FuelOilNo1 Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary FuelOilNo1 Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary FuelOilNo1 Energy {[}J{]}
 \end{itemize}
 
 FuelOilNo2:
@@ -4290,6 +4302,10 @@ FuelOilNo2:
     HVAC,Average,Boiler FuelOilNo2 Rate {[}W{]}
     \item
     HVAC,Sum,Boiler FuelOilNo2 Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary FuelOilNo2 Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary FuelOilNo2 Energy {[}J{]}
 \end{itemize}
 
 Coal:
@@ -4299,6 +4315,10 @@ Coal:
     HVAC,Average,Boiler Coal Rate {[}W{]}
     \item
     HVAC,Sum,Boiler Coal Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary Coal Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary Coal Energy {[}J{]}
 \end{itemize}
 
 Diesel:
@@ -4308,6 +4328,10 @@ Diesel:
     HVAC,Average,Boiler Diesel Rate {[}W{]}
     \item
     HVAC,Sum,Boiler Diesel Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary Diesel Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary Diesel Energy {[}J{]}
 \end{itemize}
 
 Gasoline:
@@ -4317,6 +4341,10 @@ Gasoline:
     HVAC,Average,Boiler Gasoline Rate {[}W{]}
     \item
     HVAC,Sum,Boiler Gasoline Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary Gasoline Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary Gasoline Energy {[}J{]}
 \end{itemize}
 
 OtherFuel1:
@@ -4326,6 +4354,10 @@ OtherFuel1:
     HVAC,Average,Boiler OtherFuel1 Rate {[}W{]}
     \item
     HVAC,Sum,Boiler OtherFuel1 Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary OtherFuel1 Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary OtherFuel1 Energy {[}J{]}
 \end{itemize}
 
 OtherFuel2:
@@ -4335,6 +4367,10 @@ OtherFuel2:
     HVAC,Average,Boiler OtherFuel2 Rate {[}W{]}
     \item
     HVAC,Sum,Boiler OtherFuel2 Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary OtherFuel2 Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary OtherFuel2 Energy {[}J{]}
 \end{itemize}
 
 \paragraph{Boiler Heating Rate {[}W{]}}\label{boiler-heating-rate-w}
@@ -4518,13 +4554,13 @@ Electric:
     HVAC,Sum,Boiler Electricity Energy {[}J{]}
 \end{itemize}
 
-Gas:
+NaturalGas:
 
 \begin{itemize}
     \item
-    HVAC,Average,Boiler Gas Rate {[}W{]}
+    HVAC,Average,Boiler NaturalGas Rate {[}W{]}
     \item
-    HVAC,Sum,Boiler Gas Energy {[}J{]}
+    HVAC,Sum,Boiler NaturalGas Energy {[}J{]}
 \end{itemize}
 
 Propane:

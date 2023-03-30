@@ -219,7 +219,7 @@ void GetBoilerInput(EnergyPlusData &state)
             ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
             // Set to Electric to avoid errors when setting up output variables
             thisBoiler.BoilerFuelTypeForOutputVariable = "Electricity";
-            thisBoiler.FuelType = Constant::AssignResourceTypeNum("ELECTRICITY");
+            thisBoiler.FuelType = Constant::ResourceType::Electricity;
             ErrorsFound = true;
         }
 
@@ -315,9 +315,13 @@ void GetBoilerInput(EnergyPlusData &state)
 
         thisBoiler.ParasiticElecLoad = state.dataIPShortCut->rNumericArgs(8);
         thisBoiler.ParasiticFuelCapacity = state.dataIPShortCut->rNumericArgs(10);
-        // FIXME: Need to handle electric boiler
-        // 1. Give error if parasitic fuel provided
-        // 2. Exclude output variables
+        if (thisBoiler.FuelType == Constant::ResourceType::Electricity)
+        {
+            ShowWarningError(state,fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state, format("{} should be zero when the fuel type is electricity.", state.dataIPShortCut->cNumericFieldNames(10)));
+            ShowContinueError(state, "It will be ignored and the simulation continues.");
+            thisBoiler.ParasiticFuelCapacity = 0.0;
+        }
 
         thisBoiler.SizFac = state.dataIPShortCut->rNumericArgs(9);
         if (thisBoiler.SizFac == 0.0) thisBoiler.SizFac = 1.0;
@@ -456,25 +460,27 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         "Heating",
                         "Boiler Parasitic",
                         "Plant");
-    SetupOutputVariable(state,
-                        "Boiler Ancillary " + this->BoilerFuelTypeForOutputVariable + " Rate",
-                        OutputProcessor::Unit::W,
-                        this->ParasiticFuelRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
-                        this->Name);
-    SetupOutputVariable(state,
-                        "Boiler Ancillary " + this->BoilerFuelTypeForOutputVariable + " Energy",
-                        OutputProcessor::Unit::J,
-                        this->ParasiticFuelLoad,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
-                        this->Name,
-                        _,
-                        this->BoilerFuelTypeForOutputVariable,
-                        "Heating",
-                        "Boiler Parasitic",
-                        "Plant");
+    if (this->FuelType != Constant::ResourceType::Electricity) {
+        SetupOutputVariable(state,
+                            "Boiler Ancillary " + this->BoilerFuelTypeForOutputVariable + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->ParasiticFuelRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Boiler Ancillary " + this->BoilerFuelTypeForOutputVariable + " Energy",
+                            OutputProcessor::Unit::J,
+                            this->ParasiticFuelLoad,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name,
+                            _,
+                            this->BoilerFuelTypeForOutputVariable,
+                            "Heating",
+                            "Boiler Parasitic",
+                            "Plant");
+    }
     SetupOutputVariable(state,
                         "Boiler Part Load Ratio",
                         OutputProcessor::Unit::None,
