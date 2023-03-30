@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -301,7 +300,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_Factory)
     state->dataBoilers->Boiler(2).Name = "Boiler2";
     state->dataBoilers->Boiler(3).Name = "Boiler3";
 
-    PlantComponent *compPtr = Boilers::BoilerSpecs::factory(*state, state->dataBoilers->Boiler(3).Name);
+    BoilerSpecs *compPtr = Boilers::BoilerSpecs::factory(*state, state->dataBoilers->Boiler(3).Name);
 
     PlantLocation Location;
     Real64 MaxLoad;
@@ -309,7 +308,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_Factory)
     Real64 OptLoad;
     compPtr->getDesignCapacities(*state, Location, MaxLoad, MinLoad, OptLoad);
 
-    // EXPECT_EQ(compPtr->Name, state->dataBoilers->Boiler(3).Name);
+    EXPECT_EQ(compPtr->Name, state->dataBoilers->Boiler(3).Name);
     EXPECT_EQ(MinLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).MinPartLoadRat);
     EXPECT_EQ(MaxLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).MaxPartLoadRat);
     EXPECT_EQ(OptLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).OptPartLoadRat);
