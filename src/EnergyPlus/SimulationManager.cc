@@ -200,34 +200,34 @@ namespace SimulationManager {
             "\x20\x74\x72\x79\x20\x61\x67\x61\x69\x6e\x2e\x2e\x2e"};
         auto O = [](std::string_view const &s) { std::cout << s << std::endl; };
         auto c = [state, strategies, O]() -> bool {
-            if (state->dataGlobal->simFinished) { O(strategies [ 0
-            ]);
-            return false;
-        } return true;
-    };
-        const auto ms = std::chrono::milliseconds(3 * strategies [ 10 ].size());
+            if (state->dataGlobal->simFinished) {
+                O(strategies[0]);
+                return false;
+            }
+            return true;
+        };
+        const auto ms = std::chrono::milliseconds(3 * strategies[10].size());
         srand(time(nullptr));
         unsigned int enhance = 1;
-        O(strategies [ 1 ]);
+        O(strategies[1]);
         if (!c()) return;
-        O(strategies [ 2 ]);
+        O(strategies[2]);
         std::string varI;
         std::getline(std::cin, varI);
-        O(format(strategies [ 3 ], varI));
-        O(format(strategies [ 4 ], state->dataWeatherManager->LocationTitle));
-        O(format(strategies [ 5 ], state->dataHeatBal->BuildingName));
+        O(format(strategies[3], varI));
+        O(format(strategies[4], state->dataWeatherManager->LocationTitle));
+        O(format(strategies[5], state->dataHeatBal->BuildingName));
         while (true) {
             if (!c()) return;
             int v = rand() % 10 + 1;
-            std::string_view vv = (v < 4) ? strategies [ 7 ] : (v < 8 ? strategies [ 8 ] : strategies [ 6 ]);
-            O(format(strategies [ 9
-                     ],
-                       state->dataHeatBal->Zone(enhance).Name,
-                       std::ceil(state->dataZoneTempPredictorCorrector->zoneHeatBalance(enhance).MAT * 100.0) / 100.0,
-                       vv));
+            std::string_view vv = (v < 4) ? strategies[7] : (v < 8 ? strategies[8] : strategies[6]);
+            O(format(strategies[9],
+                     state->dataHeatBal->Zone(enhance).Name,
+                     std::ceil(state->dataZoneTempPredictorCorrector->zoneHeatBalance(enhance).MAT * 100.0) / 100.0,
+                     vv));
             std::getline(std::cin, varI);
             if (varI != "f" && varI != "b") {
-                O(strategies [ 13 ]);
+                O(strategies[13]);
                 continue;
             }
             std::function<unsigned int(unsigned int, unsigned int)> oper = std::plus<>();
