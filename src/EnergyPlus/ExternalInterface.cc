@@ -118,7 +118,7 @@ void ExternalInterfaceExchangeVariables(EnergyPlusData &state)
         // Exchange data only after sizing and after warm-up.
         // Note that checking for ZoneSizingCalc SysSizingCalc does not work here, hence we
         // use the KindOfSim flag
-        if (!state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
+        if (!state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) {
             CalcExternalInterface(state);
         }
     }
@@ -449,7 +449,7 @@ void InitExternalInterface(EnergyPlusData &state)
         StopExternalInterfaceIfError(state);
 
         // make a single length here for all strings to be passed to getepvariables
-        size_t lenXmlStr(maxVar * DataGlobalConstants::MaxNameLength); // Length of strings being passed to getepvariables
+        size_t lenXmlStr(maxVar * Constant::MaxNameLength); // Length of strings being passed to getepvariables
 
         // initialize all the strings to this length with blanks
         xmlStrOut = std::string(lenXmlStr, ' ');
@@ -2040,14 +2040,13 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
     Array1D_string NamesOfKeys(1); // Specific key name
 
     if (state.dataGlobal->WarmupFlag &&
-        (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // No data exchange during design days
+        (state.dataGlobal->KindOfSim != Constant::KindOfSim::RunPeriodWeather)) { // No data exchange during design days
         if (state.dataExternalInterface->FirstCallDesignDays) {
             ShowWarningError(state, "ExternalInterface/CalcExternalInterfaceFMUImport: ExternalInterface does not exchange data during design days.");
         }
         state.dataExternalInterface->FirstCallDesignDays = false;
     }
-    if (state.dataGlobal->WarmupFlag &&
-        (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // Data exchange after design days
+    if (state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) { // Data exchange after design days
         if (state.dataExternalInterface->FirstCallWUp) {
             // set the report during warmup to true so that variables are also updated during the warmup
             // UpdateDataDuringWarmupExternalInterface = true;
@@ -2188,7 +2187,7 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
         }
     }
     // BeginSimulation
-    if (!state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
+    if (!state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) {
 
         if (state.dataExternalInterface->FirstCallTStep) {
             // reset the UpdateDataDuringWarmupExternalInterface to be false.

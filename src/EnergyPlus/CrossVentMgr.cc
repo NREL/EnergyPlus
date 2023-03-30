@@ -409,7 +409,7 @@ namespace CrossVentMgr {
 
         // Check if wind direction is within +/- 90 degrees of the outward normal of the dominant surface
         SurfNorm = thisSurface.Azimuth;
-        CosPhi = std::cos((state.dataEnvrn->WindDir - SurfNorm) * DataGlobalConstants::DegToRadians);
+        CosPhi = std::cos((state.dataEnvrn->WindDir - SurfNorm) * Constant::DegToRadians);
         if (CosPhi <= 0) {
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
             auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)

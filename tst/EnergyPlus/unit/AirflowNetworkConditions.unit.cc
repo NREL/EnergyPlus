@@ -5076,7 +5076,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     HeatBalanceManager::GetHeatBalanceInput(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
-    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     Curve::GetCurveInput(*state);
     EXPECT_EQ(state->dataCurveManager->NumCurves, 2);

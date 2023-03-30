@@ -60,7 +60,8 @@ jobs:
       run: |
         set -x
         echo "Using brew to install mactex and adding it to PATH"
-        brew install --cask mactex
+        brew update
+        brew install --cask mactex-no-gui
         echo "/Library/TeX/texbin" >> $GITHUB_PATH
         # The MACOSX_DEPLOYMENT_TARGET environment variable sets the default value for the CMAKE_OSX_DEPLOYMENT_TARGET variable.
         # We use cmake commands to build some subprojects, so setting it globally

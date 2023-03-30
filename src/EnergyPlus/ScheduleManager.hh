@@ -68,6 +68,8 @@ struct EnergyPlusData;
 
 namespace ScheduleManager {
 
+    constexpr int ScheduleAlwaysOn = -1;
+
     enum class DayType
     {
         Invalid = -1,

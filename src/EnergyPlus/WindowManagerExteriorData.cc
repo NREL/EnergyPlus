@@ -82,8 +82,8 @@ namespace WindowManager {
         Real64 Phi = 0;
 
         // get window tilt and azimuth
-        Real64 Gamma = DataGlobalConstants::DegToRadians * state.dataSurface->Surface(t_SurfNum).Tilt;
-        Real64 Alpha = DataGlobalConstants::DegToRadians * state.dataSurface->Surface(t_SurfNum).Azimuth;
+        Real64 Gamma = Constant::DegToRadians * state.dataSurface->Surface(t_SurfNum).Tilt;
+        Real64 Alpha = Constant::DegToRadians * state.dataSurface->Surface(t_SurfNum).Azimuth;
 
         RayIdentificationType RadType = RayIdentificationType::Front_Incident;
 
@@ -94,8 +94,8 @@ namespace WindowManager {
         // get the corresponding local Theta, Phi for ray
         W6CoordsFromWorldVect(state, t_Ray, RadType, Gamma, Alpha, Theta, Phi);
 
-        Theta = 180 / DataGlobalConstants::Pi * Theta;
-        Phi = 180 / DataGlobalConstants::Pi * Phi;
+        Theta = 180 / Constant::Pi * Theta;
+        Phi = 180 / Constant::Pi * Phi;
 
         return std::make_pair(Theta, Phi);
     }
