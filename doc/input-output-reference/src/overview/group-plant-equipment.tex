@@ -193,7 +193,7 @@ The following output is applicable only for indirect absorption chillersHVAC,Ave
 
 \subsubsection{Chiller Electricity Energy {[}J{]}}\label{chiller-electric-energy-j}
 
-These outputs are the electric power input to the chiller. In the case of steam or fuel-powered chillers, this repesents the internal chiller pumps and other electric power consumption. Consumption is metered on Cooling:Electricity, Electricity:Plant, and Electricity:Facility.
+These outputs are the electric power input to the chiller. In the case of steam or fuel-powered chillers, this represents the internal chiller pumps and other electric power consumption. Consumption is metered on Cooling:Electricity, Electricity:Plant, and Electricity:Facility.
 
 \subsubsection{Chiller Evaporator Cooling Rate {[}W{]}}\label{chiller-evaporator-cooling-rate-w}
 
@@ -3004,7 +3004,7 @@ This numeric field contains the second (exponential) coefficient for the overall
 
 \paragraph{Field: Gas Turbine Engine Capacity}\label{field-gas-turbine-engine-capacity}
 
-This numeric field contains the capacity of the gas turbine engine in watts. This field is autosizable. When autosized the field below called Turbine Engine Effciency can be used to scale the resulting size.
+This numeric field contains the capacity of the gas turbine engine in watts. This field is autosizable. When autosized the field below called Turbine Engine Efficiency can be used to scale the resulting size.
 
 \paragraph{Field: Maximum Exhaust Flow per Unit of Power Output}\label{field-maximum-exhaust-flow-per-unit-of-power-output-1-000}
 
@@ -3256,7 +3256,7 @@ A positive fraction that represents the ratio of the instantaneous electricity u
 
 \paragraph{Field: Electric Input to Heating Output Ratio}\label{field-electric-input-to-heating-output-ratio}
 
-A positive fraction that represents the ratio of the instantaneous electricity used divided by the nominal heating capacity. If the chiller is both heating and cooling, the greater of the cooling electricity and heating eletricity is used. The default is 0.0.
+A positive fraction that represents the ratio of the instantaneous electricity used divided by the nominal heating capacity. If the chiller is both heating and cooling, the greater of the cooling electricity and heating electricity is used. The default is 0.0.
 
 \paragraph{Field: Chilled Water Inlet Node Name}\label{field-chilled-water-inlet-node-name-7}
 
@@ -3354,7 +3354,7 @@ The ElecCoolFPLR curve represents the fraction of the electricity to the chiller
 
 \paragraph{Field: Heating Capacity Function of Cooling Capacity Curve Name}\label{field-heating-capacity-function-of-cooling-capacity-curve-name}
 
-The HeatCapFCool curve represents how the heating capacity of the chiller varies with cooling capacity when the chiller is simultaeous heating and cooling. The curve is normalized so an input of 1.0 represents the nominal cooling capacity and an output of 1.0 represents the full heating capacity (see the Heating to Cooling Capacity Ratio input)~ The curve is usually linear or quadratic. The available heating capacity is computed as follows:
+The HeatCapFCool curve represents how the heating capacity of the chiller varies with cooling capacity when the chiller is simultaneous heating and cooling. The curve is normalized so an input of 1.0 represents the nominal cooling capacity and an output of 1.0 represents the full heating capacity (see the Heating to Cooling Capacity Ratio input)~ The curve is usually linear or quadratic. The available heating capacity is computed as follows:
 
 \begin{equation}
     HeatFuelInput = AvailHeatCap \cdot HFIR \cdot HFIRfHPLR(HPLR)
@@ -3655,7 +3655,7 @@ A positive fraction that represents the ratio of the instantaneous electricity u
 
 \paragraph{Field: Electric Input to Heating Output Ratio}\label{field-electric-input-to-heating-output-ratio-1}
 
-A positive fraction that represents the ratio of the instantaneous electricity used divided by the nominal heating capacity. If the chiller is both heating and cooling, the greater of the cooling electricity and heating eletricity is used. The default is 0.0.
+A positive fraction that represents the ratio of the instantaneous electricity used divided by the nominal heating capacity. If the chiller is both heating and cooling, the greater of the cooling electricity and heating electricity is used. The default is 0.0.
 
 \paragraph{Field: Chilled Water Inlet Node Name}\label{field-chilled-water-inlet-node-name-8}
 
@@ -4059,7 +4059,7 @@ The exhaust temperature from~ the Micro Turbine
 
 \subsection{Boiler:HotWater}\label{boilerhotwater}
 
-The boiler model calculates the performance of fuel oil, gas and electric boilers. Boiler performance is based on nominal thermal efficiency. A normailized efficiency performance curve may be used to more accurately represent the performance of non-electric boilers but is not considered a required input. When using the normalized efficiency performance curve, if all coefficients are not required simply set the unused coefficients to 0. For example, an electric boiler could be modeled by setting the nominal thermal efficiency to a value in the range of 0.96 to 1.0. Coefficient A0 in the normalized efficiency performance curve would equal 1 and all other coefficients would be set to 0. Coefficients for other types of non-electric boilers would set a combination of the available coefficents to non-zero values.
+The boiler model calculates the performance of fuel oil, gas and electric boilers. Boiler performance is based on nominal thermal efficiency. A normalized efficiency performance curve may be used to more accurately represent the performance of non-electric boilers but is not considered a required input. When using the normalized efficiency performance curve, if all coefficients are not required simply set the unused coefficients to 0. For example, an electric boiler could be modeled by setting the nominal thermal efficiency to a value in the range of 0.96 to 1.0. Coefficient A0 in the normalized efficiency performance curve would equal 1 and all other coefficients would be set to 0. Coefficients for other types of non-electric boilers would set a combination of the available coefficients to non-zero values.
 
 \subsubsection{Inputs}\label{inputs-10-013}
 
@@ -4089,7 +4089,7 @@ The model is based the following two equations:
 
 \paragraph{Field: Nominal Thermal Efficiency}\label{field-nominal-thermal-efficiency}
 
-This required numeric field contains the heating efficiency (as a fraction between 0 and 1) of the boiler's burner.~ This is the efficiency relative to the higher heating value (HHV) of fuel at a part load ratio of 1.0. Manufacturers typically specify the efficiency of a boiler using the higher heating value of the fuel. For the rare occurences when a manufacturers (or particular data set) thermal efficiency is based on the lower heating value (LHV) of the fuel, multiply the thermal efficiency by the lower-to-higher heating value ratio. For example, assume a fuel's lower and higher heating values are approximately 45,450 and 50,000 kJ/kg, respectively. For a manuracturers thermal effiency rating of 0.90 (based on the LHV), the nominal thermal efficiency entered here is 0.82 (i.e.~0.9 multiplied by 45,450/50,000).
+This required numeric field contains the heating efficiency (as a fraction between 0 and 1) of the boiler's burner.~ This is the efficiency relative to the higher heating value (HHV) of fuel at a part load ratio of 1.0. Manufacturers typically specify the efficiency of a boiler using the higher heating value of the fuel. For the rare occurrences when a manufacturers (or particular data set) thermal efficiency is based on the lower heating value (LHV) of the fuel, multiply the thermal efficiency by the lower-to-higher heating value ratio. For example, assume a fuel's lower and higher heating values are approximately 45,450 and 50,000 kJ/kg, respectively. For a manufacturers thermal efficiency rating of 0.90 (based on the LHV), the nominal thermal efficiency entered here is 0.82 (i.e.~0.9 multiplied by 45,450/50,000).
 
 \paragraph{Field: Efficiency Curve Temperature Evaluation Variable}\label{field-efficiency-curve-temperature-evaluation-variable}
 
@@ -4177,6 +4177,10 @@ This optional numeric field allows the user to specify a sizing factor for this 
 \paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-10}
 
 This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the boiler will be assigned to the ``General'' end-use subcategory.
+
+\paragraph{Field: Parasitic Fuel Load}\label{field-boiler-parasitic-fuel-load}
+
+This optional field is the parasitic fuel load associated with the boiler's operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the boiler is not operating.
 
 An example of this statement in an IDF is:
 
@@ -4710,7 +4714,7 @@ This numeric field contains the design cooling capacity of the heat pump in W. T
 
 \paragraph{Field: Reference Cooling Power Consumption}\label{field-rated-cooling-power-consumption}
 
-This numeric field is the design electric power consumption for cooling, in W. This corresponds to the electic power use at the Reference Cooling Capacity. This field is autosizable. When autosized, the field called Reference Coefficient of Performance must be used.
+This numeric field is the design electric power consumption for cooling, in W. This corresponds to the electric power use at the Reference Cooling Capacity. This field is autosizable. When autosized, the field called Reference Coefficient of Performance must be used.
 
 \paragraph{Fields: Cooling Capacity Curve Name}\label{fields-cooling-capacity-curve-name}
 
@@ -4910,7 +4914,7 @@ This numeric field contains the design heating capacity of the heat pump in W. T
 
 \paragraph{Field: Reference Heating Power Consumption}\label{field-rated-heating-power-consumption}
 
-This numeric field contains the design electric power consumption for heating, in W. This corresponds to the electic power use at the Reference Heating Capacity. This field is autosizable. When autosized, the field called Reference Coefficient of Performance must be used.
+This numeric field contains the design electric power consumption for heating, in W. This corresponds to the electric power use at the Reference Heating Capacity. This field is autosizable. When autosized, the field called Reference Coefficient of Performance must be used.
 
 \paragraph{Fields: Heating Capacity Curve Name}\label{fields-heating-capacity-curve-name}
 
@@ -5420,7 +5424,7 @@ An idf example for a water-source application:
     EIRCurveFuncPLR2;        !- Electric Input to Heating Output Ratio Modifier Function of Part Load Ratio Curve Name
 \end{lstlisting}
 
-An idf example for an air-source applicaiton:
+An idf example for an air-source application:
 
 \begin{lstlisting}
 HeatPump:PlantLoop:EIR:Heating,
@@ -5581,9 +5585,9 @@ For the HeatPump:AirToWater:FuelFired:Cooling object, this field name is ``Nomin
 
 \paragraph{Field: Nominal COP}
 
-The nominal COP (Coefficient of Performance) in [W/W], which is the fuel based COP of the heat pump in the rating conditions. This is a require-field. The default value is set to 1.0 in case the input filed is accidently left blank.
+The nominal COP (Coefficient of Performance) in [W/W], which is the fuel based COP of the heat pump in the rating conditions. This is a require-field. The default value is set to 1.0 in case the input filed is accidentally left blank.
 
-For the HeatPump:AirToWater:FuelFired:Heating object, this is the fuel based nominal heatinging COP; and for the HeatPump:AirToWater:FuelFired:Cooling object, this is the fuel based nominal cooling COP.
+For the HeatPump:AirToWater:FuelFired:Heating object, this is the fuel based nominal heating COP; and for the HeatPump:AirToWater:FuelFired:Cooling object, this is the fuel based nominal cooling COP.
 
 \paragraph{Field: Design Flow Rate}
 
@@ -5736,7 +5740,7 @@ The output variables for the fuel-fired (or gas-fired) absorption heat pump syst
 This is the load side heat transfer rate for the fuel-fired absorption heat pump. The value will be positive for the heating mode, and negative for the cooling mode.
 
 \paragraph{Fuel-fired Absorption HeatPump Load Side Heating Transfer Energy [J]}
-This is the accumulated value fo the load side heat transfer energy for the fuel-fired absorption heat pump. The value will be positive for the heating mode, and negative for the cooling mode.
+This is the accumulated value for the load side heat transfer energy for the fuel-fired absorption heat pump. The value will be positive for the heating mode, and negative for the cooling mode.
 
 \paragraph{Fuel-fired Absorption HeatPump Fuel Rate [W]}
 This is the fuel consumption rate in [W] of the fuel-fired absorption heat pump. 

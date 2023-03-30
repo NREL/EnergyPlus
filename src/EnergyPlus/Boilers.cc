@@ -314,6 +314,11 @@ void GetBoilerInput(EnergyPlusData &state)
         }
 
         thisBoiler.ParasiticElecLoad = state.dataIPShortCut->rNumericArgs(8);
+        thisBoiler.ParasiticFuelCapacity = state.dataIPShortCut->rNumericArgs(10);
+        // FIXME: Need to handle electric boiler
+        // 1. Give error if parasitic fuel provided
+        // 2. Exclude output variables
+
         thisBoiler.SizFac = state.dataIPShortCut->rNumericArgs(9);
         if (thisBoiler.SizFac == 0.0) thisBoiler.SizFac = 1.0;
 
@@ -448,6 +453,25 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         this->Name,
                         _,
                         "ELECTRICITY",
+                        "Heating",
+                        "Boiler Parasitic",
+                        "Plant");
+    SetupOutputVariable(state,
+                        "Boiler Ancillary " + this->BoilerFuelTypeForOutputVariable + " Rate",
+                        OutputProcessor::Unit::W,
+                        this->ParasiticFuelRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Ancillary " + this->BoilerFuelTypeForOutputVariable + " Energy",
+                        OutputProcessor::Unit::J,
+                        this->ParasiticFuelLoad,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name,
+                        _,
+                        this->BoilerFuelTypeForOutputVariable,
                         "Heating",
                         "Boiler Parasitic",
                         "Plant");
@@ -963,6 +987,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
     this->FuelUsed = TheorFuelUse / EffCurveOutput;
     if (this->BoilerLoad > 0.0) this->ParasiticElecPower = this->ParasiticElecLoad * this->BoilerPLR;
+    this->ParasiticFuelRate = this->ParasiticFuelCapacity * (1.0 - this->BoilerPLR);
 }
 
 void BoilerSpecs::UpdateBoilerRecords(EnergyPlusData &state,
@@ -988,7 +1013,6 @@ void BoilerSpecs::UpdateBoilerRecords(EnergyPlusData &state,
         this->BoilerLoad = 0.0;
         this->FuelUsed = 0.0;
         this->ParasiticElecPower = 0.0;
-        this->BoilerPLR = 0.0;
         this->BoilerEff = 0.0;
     } else {
         PlantUtilities::SafeCopyPlantNode(state, BoilerInletNode, BoilerOutletNode);
@@ -1000,6 +1024,7 @@ void BoilerSpecs::UpdateBoilerRecords(EnergyPlusData &state,
     this->BoilerEnergy = this->BoilerLoad * ReportingConstant;
     this->FuelConsumed = this->FuelUsed * ReportingConstant;
     this->ParasiticElecConsumption = this->ParasiticElecPower * ReportingConstant;
+    this->ParasiticFuelLoad = this->ParasiticFuelRate * ReportingConstant;
 }
 
 } // namespace EnergyPlus::Boilers
