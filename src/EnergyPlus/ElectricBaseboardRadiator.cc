@@ -189,11 +189,8 @@ namespace ElectricBaseboardRadiator {
             3); // get input index to HW baseboard heating capacity sizing as fraction of autosized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 AllFracsSummed; // Sum of the fractions radiant
-        int BaseboardNum;
         int NumAlphas;
         int NumNumbers;
-        int SurfNum; // surface number that radiant heat delivered
         int IOStat;
         bool ErrorsFound(false); // If errors detected in input
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -205,16 +202,16 @@ namespace ElectricBaseboardRadiator {
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // object is extensible, no max args needed as IPShortCuts being used
-        auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
         auto &CheckEquipName = state.dataElectBaseboardRad->CheckEquipName;
         auto &ElecBaseboardNumericFields = state.dataElectBaseboardRad->ElecBaseboardNumericFields;
 
-        ElecBaseboard.allocate(NumElecBaseboards);
+        state.dataElectBaseboardRad->ElecBaseboard.allocate(NumElecBaseboards);
         CheckEquipName.allocate(NumElecBaseboards);
         ElecBaseboardNumericFields.allocate(NumElecBaseboards);
         CheckEquipName = true;
 
-        for (BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum) {
+        for (int BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum) {
+            auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -239,13 +236,13 @@ namespace ElectricBaseboardRadiator {
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueBaseboardName(state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
 
-            ElecBaseboard(BaseboardNum).EquipName = state.dataIPShortCut->cAlphaArgs(1); // name of this baseboard
-            ElecBaseboard(BaseboardNum).Schedule = state.dataIPShortCut->cAlphaArgs(2);
+            elecBaseboard.EquipName = state.dataIPShortCut->cAlphaArgs(1); // name of this baseboard
+            elecBaseboard.Schedule = state.dataIPShortCut->cAlphaArgs(2);
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                ElecBaseboard(BaseboardNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
+                elecBaseboard.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                ElecBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
-                if (ElecBaseboard(BaseboardNum).SchedPtr == 0) {
+                elecBaseboard.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+                if (elecBaseboard.SchedPtr == 0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                         " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
@@ -256,12 +253,12 @@ namespace ElectricBaseboardRadiator {
 
             // Determine HW radiant baseboard heating design capacity sizing method
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                ElecBaseboard(BaseboardNum).HeatingCapMethod = HeatingDesignCapacity;
+                elecBaseboard.HeatingCapMethod = HeatingDesignCapacity;
 
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
-                    ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
-                    if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0 && ElecBaseboard(BaseboardNum).ScaledHeatingCapacity != AutoSize) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
+                    elecBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
+                    if (elecBaseboard.ScaledHeatingCapacity < 0.0 && elecBaseboard.ScaledHeatingCapacity != AutoSize) {
+                        ShowSevereError(state, cCurrentModuleObject + " = " + elecBaseboard.EquipName);
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum),
@@ -269,7 +266,7 @@ namespace ElectricBaseboardRadiator {
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
+                    ShowSevereError(state, cCurrentModuleObject + " = " + elecBaseboard.EquipName);
                     ShowContinueError(state,
                                       "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
                                           state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
@@ -278,11 +275,11 @@ namespace ElectricBaseboardRadiator {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                ElecBaseboard(BaseboardNum).HeatingCapMethod = CapacityPerFloorArea;
+                elecBaseboard.HeatingCapMethod = CapacityPerFloorArea;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
-                    ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
-                    if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity <= 0.0) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
+                    elecBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
+                    if (elecBaseboard.ScaledHeatingCapacity <= 0.0) {
+                        ShowSevereError(state, cCurrentModuleObject + " = " + elecBaseboard.EquipName);
                         ShowContinueError(state,
                                           "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
                                               state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
@@ -291,8 +288,8 @@ namespace ElectricBaseboardRadiator {
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
                                                  state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
-                    } else if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
+                    } else if (elecBaseboard.ScaledHeatingCapacity == AutoSize) {
+                        ShowSevereError(state, cCurrentModuleObject + " = " + elecBaseboard.EquipName);
                         ShowContinueError(state,
                                           "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
                                               state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
@@ -301,7 +298,7 @@ namespace ElectricBaseboardRadiator {
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
+                    ShowSevereError(state, cCurrentModuleObject + " = " + elecBaseboard.EquipName);
                     ShowContinueError(state,
                                       "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
                                           state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
@@ -310,11 +307,11 @@ namespace ElectricBaseboardRadiator {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                ElecBaseboard(BaseboardNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+                elecBaseboard.HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
-                    ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
-                    if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
+                    elecBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
+                    if (elecBaseboard.ScaledHeatingCapacity < 0.0) {
+                        ShowSevereError(state, cCurrentModuleObject + " = " + elecBaseboard.EquipName);
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
@@ -322,7 +319,7 @@ namespace ElectricBaseboardRadiator {
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
+                    ShowSevereError(state, cCurrentModuleObject + " = " + elecBaseboard.EquipName);
                     ShowContinueError(state,
                                       "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
                                           state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
@@ -331,109 +328,109 @@ namespace ElectricBaseboardRadiator {
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
+                ShowSevereError(state, cCurrentModuleObject + " = " + elecBaseboard.EquipName);
                 ShowContinueError(state,
                                   "Illegal " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
                                       state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
                 ErrorsFound = true;
             }
 
-            ElecBaseboard(BaseboardNum).BaseboardEfficiency = state.dataIPShortCut->rNumericArgs(4);
-            ElecBaseboard(BaseboardNum).FracRadiant = state.dataIPShortCut->rNumericArgs(5);
-            if (ElecBaseboard(BaseboardNum).FracRadiant < MinFraction) {
+            elecBaseboard.BaseboardEfficiency = state.dataIPShortCut->rNumericArgs(4);
+            elecBaseboard.FracRadiant = state.dataIPShortCut->rNumericArgs(5);
+            if (elecBaseboard.FracRadiant < MinFraction) {
                 ShowWarningError(state,
                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
                                      state.dataIPShortCut->cNumericFieldNames(5) + " was lower than the allowable minimum.");
                 ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinFraction));
-                ElecBaseboard(BaseboardNum).FracRadiant = MinFraction;
+                elecBaseboard.FracRadiant = MinFraction;
             }
-            if (ElecBaseboard(BaseboardNum).FracRadiant > MaxFraction) {
+            if (elecBaseboard.FracRadiant > MaxFraction) {
                 ShowWarningError(state,
                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
                                      state.dataIPShortCut->cNumericFieldNames(5) + " was higher than the allowable maximum.");
                 ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxFraction));
-                ElecBaseboard(BaseboardNum).FracRadiant = MaxFraction;
+                elecBaseboard.FracRadiant = MaxFraction;
             }
 
             // Remaining fraction is added to the zone as convective heat transfer
-            AllFracsSummed = ElecBaseboard(BaseboardNum).FracRadiant;
+            Real64 AllFracsSummed = elecBaseboard.FracRadiant;
             if (AllFracsSummed > MaxFraction) {
                 ShowWarningError(state,
                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                      "\", Fraction Radiant was higher than the allowable maximum.");
-                ElecBaseboard(BaseboardNum).FracRadiant = MaxFraction;
-                ElecBaseboard(BaseboardNum).FracConvect = 0.0;
+                elecBaseboard.FracRadiant = MaxFraction;
+                elecBaseboard.FracConvect = 0.0;
             } else {
-                ElecBaseboard(BaseboardNum).FracConvect = 1.0 - AllFracsSummed;
+                elecBaseboard.FracConvect = 1.0 - AllFracsSummed;
             }
 
-            ElecBaseboard(BaseboardNum).FracDistribPerson = state.dataIPShortCut->rNumericArgs(6);
-            if (ElecBaseboard(BaseboardNum).FracDistribPerson < MinFraction) {
+            elecBaseboard.FracDistribPerson = state.dataIPShortCut->rNumericArgs(6);
+            if (elecBaseboard.FracDistribPerson < MinFraction) {
                 ShowWarningError(state,
                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
                                      state.dataIPShortCut->cNumericFieldNames(6) + " was lower than the allowable minimum.");
                 ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinFraction));
-                ElecBaseboard(BaseboardNum).FracDistribPerson = MinFraction;
+                elecBaseboard.FracDistribPerson = MinFraction;
             }
-            if (ElecBaseboard(BaseboardNum).FracDistribPerson > MaxFraction) {
+            if (elecBaseboard.FracDistribPerson > MaxFraction) {
                 ShowWarningError(state,
                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
                                      state.dataIPShortCut->cNumericFieldNames(6) + " was higher than the allowable maximum.");
                 ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxFraction));
-                ElecBaseboard(BaseboardNum).FracDistribPerson = MaxFraction;
+                elecBaseboard.FracDistribPerson = MaxFraction;
             }
 
-            ElecBaseboard(BaseboardNum).TotSurfToDistrib = NumNumbers - 6;
+            elecBaseboard.TotSurfToDistrib = NumNumbers - 6;
 
-            if ((ElecBaseboard(BaseboardNum).TotSurfToDistrib < MinDistribSurfaces) && (ElecBaseboard(BaseboardNum).FracRadiant > MinFraction)) {
+            if ((elecBaseboard.TotSurfToDistrib < MinDistribSurfaces) && (elecBaseboard.FracRadiant > MinFraction)) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\", the number of surface/radiant fraction groups entered was less than the allowable minimum.");
                 ShowContinueError(state, format("...the minimum that must be entered=[{}].", MinDistribSurfaces));
                 ErrorsFound = true;
-                ElecBaseboard(BaseboardNum).TotSurfToDistrib = 0; // error
+                elecBaseboard.TotSurfToDistrib = 0; // error
             }
 
-            ElecBaseboard(BaseboardNum).SurfaceName.allocate(ElecBaseboard(BaseboardNum).TotSurfToDistrib);
-            ElecBaseboard(BaseboardNum).SurfaceName = "";
-            ElecBaseboard(BaseboardNum).SurfacePtr.allocate(ElecBaseboard(BaseboardNum).TotSurfToDistrib);
-            ElecBaseboard(BaseboardNum).SurfacePtr = 0;
-            ElecBaseboard(BaseboardNum).FracDistribToSurf.allocate(ElecBaseboard(BaseboardNum).TotSurfToDistrib);
-            ElecBaseboard(BaseboardNum).FracDistribToSurf = 0.0;
+            elecBaseboard.SurfaceName.allocate(elecBaseboard.TotSurfToDistrib);
+            elecBaseboard.SurfaceName = "";
+            elecBaseboard.SurfacePtr.allocate(elecBaseboard.TotSurfToDistrib);
+            elecBaseboard.SurfacePtr = 0;
+            elecBaseboard.FracDistribToSurf.allocate(elecBaseboard.TotSurfToDistrib);
+            elecBaseboard.FracDistribToSurf = 0.0;
 
-            ElecBaseboard(BaseboardNum).ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
-                state, DataZoneEquipment::ZoneEquip::BBElectric, ElecBaseboard(BaseboardNum).EquipName);
+            elecBaseboard.ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
+                state, DataZoneEquipment::ZoneEquip::BBElectric, elecBaseboard.EquipName);
 
-            AllFracsSummed = ElecBaseboard(BaseboardNum).FracDistribPerson;
-            for (SurfNum = 1; SurfNum <= ElecBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
-                ElecBaseboard(BaseboardNum).SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 3);
-                ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum) =
+            AllFracsSummed = elecBaseboard.FracDistribPerson;
+            for (int SurfNum = 1; SurfNum <= elecBaseboard.TotSurfToDistrib; ++SurfNum) {
+                elecBaseboard.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 3);
+                elecBaseboard.SurfacePtr(SurfNum) =
                     HeatBalanceIntRadExchange::GetRadiantSystemSurface(state,
                                                                        cCurrentModuleObject,
-                                                                       ElecBaseboard(BaseboardNum).EquipName,
-                                                                       ElecBaseboard(BaseboardNum).ZonePtr,
-                                                                       ElecBaseboard(BaseboardNum).SurfaceName(SurfNum),
+                                                                       elecBaseboard.EquipName,
+                                                                       elecBaseboard.ZonePtr,
+                                                                       elecBaseboard.SurfaceName(SurfNum),
                                                                        ErrorsFound);
-                ElecBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) = state.dataIPShortCut->rNumericArgs(SurfNum + 6);
-                if (ElecBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) > MaxFraction) {
+                elecBaseboard.FracDistribToSurf(SurfNum) = state.dataIPShortCut->rNumericArgs(SurfNum + 6);
+                if (elecBaseboard.FracDistribToSurf(SurfNum) > MaxFraction) {
                     ShowWarningError(state,
                                      std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
                                          state.dataIPShortCut->cNumericFieldNames(SurfNum + 6) + "was greater than the allowable maximum.");
                     ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxFraction));
-                    ElecBaseboard(BaseboardNum).TotSurfToDistrib = MaxFraction;
+                    elecBaseboard.TotSurfToDistrib = MaxFraction;
                 }
-                if (ElecBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) < MinFraction) {
+                if (elecBaseboard.FracDistribToSurf(SurfNum) < MinFraction) {
                     ShowWarningError(state,
                                      std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", " +
                                          state.dataIPShortCut->cNumericFieldNames(SurfNum + 6) + "was less than the allowable minimum.");
                     ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MinFraction));
-                    ElecBaseboard(BaseboardNum).TotSurfToDistrib = MinFraction;
+                    elecBaseboard.TotSurfToDistrib = MinFraction;
                 }
-                if (ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum)) = true;
+                if (elecBaseboard.SurfacePtr(SurfNum) != 0) {
+                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(elecBaseboard.SurfacePtr(SurfNum)) = true;
                 }
 
-                AllFracsSummed += ElecBaseboard(BaseboardNum).FracDistribToSurf(SurfNum);
+                AllFracsSummed += elecBaseboard.FracDistribToSurf(SurfNum);
             } // Surfaces
 
             if (AllFracsSummed > (MaxFraction + 0.01)) {
@@ -443,7 +440,7 @@ namespace ElectricBaseboardRadiator {
                 ErrorsFound = true;
             }
             if ((AllFracsSummed < (MaxFraction - 0.01)) &&
-                (ElecBaseboard(BaseboardNum).FracRadiant >
+                (elecBaseboard.FracRadiant >
                  MinFraction)) { // User didn't distribute all of the | radiation warn that some will be lost
                 ShowWarningError(state,
                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -456,40 +453,41 @@ namespace ElectricBaseboardRadiator {
             ShowFatalError(state, std::string{RoutineName} + cCurrentModuleObject + "Errors found getting input. Program terminates.");
         }
 
-        for (BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum) {
+        for (int BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum) {
+            auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
 
             // Setup Report variables for the Electric Baseboards
             // CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Electric'
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Rate",
                                 OutputProcessor::Unit::W,
-                                ElecBaseboard(BaseboardNum).TotPower,
+                                elecBaseboard.TotPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                ElecBaseboard(BaseboardNum).EquipName);
+                                elecBaseboard.EquipName);
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Rate",
                                 OutputProcessor::Unit::W,
-                                ElecBaseboard(BaseboardNum).ConvPower,
+                                elecBaseboard.ConvPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                ElecBaseboard(BaseboardNum).EquipName);
+                                elecBaseboard.EquipName);
             SetupOutputVariable(state,
                                 "Baseboard Radiant Heating Rate",
                                 OutputProcessor::Unit::W,
-                                ElecBaseboard(BaseboardNum).RadPower,
+                                elecBaseboard.RadPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                ElecBaseboard(BaseboardNum).EquipName);
+                                elecBaseboard.EquipName);
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                ElecBaseboard(BaseboardNum).ElecUseLoad,
+                                elecBaseboard.ElecUseLoad,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                ElecBaseboard(BaseboardNum).EquipName,
+                                elecBaseboard.EquipName,
                                 _,
                                 "Electricity",
                                 "HEATING",
@@ -498,17 +496,17 @@ namespace ElectricBaseboardRadiator {
             SetupOutputVariable(state,
                                 "Baseboard Electricity Rate",
                                 OutputProcessor::Unit::W,
-                                ElecBaseboard(BaseboardNum).ElecUseRate,
+                                elecBaseboard.ElecUseRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                ElecBaseboard(BaseboardNum).EquipName);
+                                elecBaseboard.EquipName);
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                ElecBaseboard(BaseboardNum).TotEnergy,
+                                elecBaseboard.TotEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                ElecBaseboard(BaseboardNum).EquipName,
+                                elecBaseboard.EquipName,
                                 _,
                                 "ENERGYTRANSFER",
                                 "BASEBOARD",
@@ -518,17 +516,17 @@ namespace ElectricBaseboardRadiator {
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Energy",
                                 OutputProcessor::Unit::J,
-                                ElecBaseboard(BaseboardNum).ConvEnergy,
+                                elecBaseboard.ConvEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                ElecBaseboard(BaseboardNum).EquipName);
+                                elecBaseboard.EquipName);
             SetupOutputVariable(state,
                                 "Baseboard Radiant Heating Energy",
                                 OutputProcessor::Unit::J,
-                                ElecBaseboard(BaseboardNum).RadEnergy,
+                                elecBaseboard.RadEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                ElecBaseboard(BaseboardNum).EquipName);
+                                elecBaseboard.EquipName);
         }
     }
 
@@ -543,7 +541,7 @@ namespace ElectricBaseboardRadiator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the Baseboard units during simulation.
 
-        auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
+        auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
         int NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
         auto &ZeroSourceSumHATsurf = state.dataElectBaseboardRad->ZeroSourceSumHATsurf;
         auto &QBBElecRadSource = state.dataElectBaseboardRad->QBBElecRadSource;
@@ -600,20 +598,20 @@ namespace ElectricBaseboardRadiator {
 
         // Do the every time step initializations
         int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-        ElecBaseboard(BaseboardNum).AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
-        ElecBaseboard(BaseboardNum).AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
+        elecBaseboard.AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
+        elecBaseboard.AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
 
         // Set the reporting variables to zero at each timestep.
-        ElecBaseboard(BaseboardNum).TotPower = 0.0;
-        ElecBaseboard(BaseboardNum).Power = 0.0;
-        ElecBaseboard(BaseboardNum).ConvPower = 0.0;
-        ElecBaseboard(BaseboardNum).RadPower = 0.0;
-        ElecBaseboard(BaseboardNum).TotEnergy = 0.0;
-        ElecBaseboard(BaseboardNum).Energy = 0.0;
-        ElecBaseboard(BaseboardNum).ConvEnergy = 0.0;
-        ElecBaseboard(BaseboardNum).RadEnergy = 0.0;
-        ElecBaseboard(BaseboardNum).ElecUseLoad = 0.0;
-        ElecBaseboard(BaseboardNum).ElecUseRate = 0.0;
+        elecBaseboard.TotPower = 0.0;
+        elecBaseboard.Power = 0.0;
+        elecBaseboard.ConvPower = 0.0;
+        elecBaseboard.RadPower = 0.0;
+        elecBaseboard.TotEnergy = 0.0;
+        elecBaseboard.Energy = 0.0;
+        elecBaseboard.ConvEnergy = 0.0;
+        elecBaseboard.RadEnergy = 0.0;
+        elecBaseboard.ElecUseLoad = 0.0;
+        elecBaseboard.ElecUseRate = 0.0;
     }
 
     void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum)
