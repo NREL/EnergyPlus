@@ -296,9 +296,6 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_Factory)
     state->dataBoilers->Boiler(3).OptPartLoadRat = 1.0;
 
     state->dataBoilers->getBoilerInputFlag = false;
-    state->dataBoilers->Boiler(1).Name = "Boiler1";
-    state->dataBoilers->Boiler(2).Name = "Boiler2";
-    state->dataBoilers->Boiler(3).Name = "Boiler3";
 
     BoilerSpecs *compPtr = Boilers::BoilerSpecs::factory(*state, state->dataBoilers->Boiler(3).Name);
 
@@ -309,7 +306,17 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_Factory)
     compPtr->getDesignCapacities(*state, Location, MaxLoad, MinLoad, OptLoad);
 
     EXPECT_EQ(compPtr->Name, state->dataBoilers->Boiler(3).Name);
+    EXPECT_EQ(MinLoad, compPtr->NomCap * compPtr->MinPartLoadRat);
     EXPECT_EQ(MinLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).MinPartLoadRat);
+    EXPECT_EQ(100.0, MinLoad);
+    EXPECT_EQ(MaxLoad, compPtr->NomCap * compPtr->MaxPartLoadRat);
     EXPECT_EQ(MaxLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).MaxPartLoadRat);
+    EXPECT_EQ(1100.0, MaxLoad);
+    EXPECT_EQ(OptLoad, compPtr->NomCap * compPtr->OptPartLoadRat);
     EXPECT_EQ(OptLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).OptPartLoadRat);
+    EXPECT_EQ(1000.0, OptLoad);
+
+    EXPECT_EQ(0.0, state->dataBoilers->Boiler(1).NomCap);
+    EXPECT_EQ(0.0, state->dataBoilers->Boiler(2).NomCap);
+    EXPECT_EQ(1000.0, state->dataBoilers->Boiler(3).NomCap);
 }
