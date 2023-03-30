@@ -629,13 +629,13 @@ namespace ElectricBaseboardRadiator {
             state.dataSize->DataZoneNumber = elecBaseboard.ZonePtr;
             int SizingMethod = DataHVACGlobals::HeatingCapacitySizing; // Integer representation of sizing method name (e.g., CoolingAirflowSizing)
             int FieldNum = 1;                                          // IDD numeric field number where input field description is found
-            bool PrintFlag = true;                                     // TRUE when sizing information is reported in the eio file
             std::string SizingString = state.dataElectBaseboardRad->ElecBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
             // capacity sizing methods (e.g., HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity)
             int CapSizingMethod = elecBaseboard.HeatingCapMethod;
             zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
                 CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
+                bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
                 if (CapSizingMethod == DataSizing::HeatingDesignCapacity) {
                     if (elecBaseboard.ScaledHeatingCapacity == DataSizing::AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
