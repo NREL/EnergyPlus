@@ -1943,8 +1943,8 @@ void therm1d(EnergyPlusData &state,
         k = 2 * i - 1;
         Rf(i) = Radiation(k);
         Rb(i) = Radiation(k + 1);
-        Ebf(i) = DataGlobalConstants::StefanBoltzmann * pow_4(theta(k));
-        Ebb(i) = DataGlobalConstants::StefanBoltzmann * pow_4(theta(k + 1));
+        Ebf(i) = Constant::StefanBoltzmann * pow_4(theta(k));
+        Ebb(i) = Constant::StefanBoltzmann * pow_4(theta(k + 1));
     }
     // end if
 
@@ -1959,7 +1959,7 @@ void therm1d(EnergyPlusData &state,
         qr_gap_in = Rf(nlayer) - Rb(nlayer - 1);
 
         if (IsShadingLayer(LayerType(1))) {
-            ShadeEmisRatioOut = qr_gap_out / (emis(3) * DataGlobalConstants::StefanBoltzmann * (pow_4(theta(3)) - pow_4(trmout)));
+            ShadeEmisRatioOut = qr_gap_out / (emis(3) * Constant::StefanBoltzmann * (pow_4(theta(3)) - pow_4(trmout)));
             // qc_gap_out = qprim(3) - qr_gap_out
             // qcgapout2 = qcgas(1)
             // Hc_modified_out = (qc_gap_out / (theta(3) - tout))
@@ -1967,8 +1967,7 @@ void therm1d(EnergyPlusData &state,
         }
 
         if (IsShadingLayer(LayerType(nlayer))) {
-            ShadeEmisRatioIn =
-                qr_gap_in / (emis(2 * nlayer - 2) * DataGlobalConstants::StefanBoltzmann * (pow_4(trmin) - pow_4(theta(2 * nlayer - 2))));
+            ShadeEmisRatioIn = qr_gap_in / (emis(2 * nlayer - 2) * Constant::StefanBoltzmann * (pow_4(trmin) - pow_4(theta(2 * nlayer - 2))));
             qc_gap_in = q(2 * nlayer - 1) - qr_gap_in;
             hc_modified_in = (qc_gap_in / (tind - theta(2 * nlayer - 2)));
             ShadeHcModifiedIn = hc_modified_in;
@@ -2043,8 +2042,8 @@ void guess(Real64 const tout,
         j = 2 * i;
         theta(j - 1) = tout + x(j - 1) * delta;
         theta(j) = tout + x(j) * delta;
-        Ebf(i) = DataGlobalConstants::StefanBoltzmann * pow_4(theta(j - 1));
-        Ebb(i) = DataGlobalConstants::StefanBoltzmann * pow_4(theta(j));
+        Ebf(i) = Constant::StefanBoltzmann * pow_4(theta(j - 1));
+        Ebb(i) = Constant::StefanBoltzmann * pow_4(theta(j));
     }
 
     for (i = 1; i <= nlayer + 1; ++i) {
@@ -2535,8 +2534,8 @@ void filmi(EnergyPlusData &state,
         default:
             break;
         }
-    } else {                                                  // main IF - else
-        tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0; // convert tilt in degrees to radians
+    } else {                                       // main IF - else
+        tiltr = tilt * 2.0 * Constant::Pi / 360.0; // convert tilt in degrees to radians
         tmean = tair + 0.25 * (t - tair);
         delt = std::abs(tair - t);
 
@@ -2566,7 +2565,7 @@ void filmi(EnergyPlusData &state,
 
         //   Calculate grashoff number:
         //   The grashoff number is the Rayleigh Number (equation 5.29) in SPC142 divided by the Prandtl Number (prand):
-        gr = DataGlobalConstants::GravityConstant * pow_3(height) * delt * pow_2(dens) / (tmean * pow_2(visc));
+        gr = Constant::GravityConstant * pow_3(height) * delt * pow_2(dens) / (tmean * pow_2(visc));
 
         RaL = gr * pr;
         //   write(*,*)' RaCrit,RaL,gr,pr '
@@ -2721,7 +2720,7 @@ void filmg(EnergyPlusData &state,
 
             // Calculate grashoff number:
             // The grashoff number is the Rayleigh Number (equation 5.29) in SPC142 divided by the Prandtl Number (prand):
-            ra = DataGlobalConstants::GravityConstant * pow_3(gap(i)) * delt * cp * pow_2(dens) / (tmean * visc * con);
+            ra = Constant::GravityConstant * pow_3(gap(i)) * delt * cp * pow_2(dens) / (tmean * visc * con);
             Rayleigh(i) = ra;
             // write(*,*) 'height,gap(i),asp',height,gap(i),asp
             // asp = 1
@@ -2782,11 +2781,10 @@ void filmPillar(EnergyPlusData &state,
             state.dataThermalISO15099Calc->aveGlassConductivity =
                 (scon(state.dataThermalISO15099Calc->iFP) + scon(state.dataThermalISO15099Calc->iFP + 1)) / 2;
 
-            state.dataThermalISO15099Calc->cpa = 2.0 * state.dataThermalISO15099Calc->aveGlassConductivity *
-                                                 PillarRadius(state.dataThermalISO15099Calc->iFP) /
-                                                 (pow_2(PillarSpacing(state.dataThermalISO15099Calc->iFP)) *
-                                                  (1.0 + 2.0 * gap(state.dataThermalISO15099Calc->iFP) /
-                                                             (DataGlobalConstants::Pi * PillarRadius(state.dataThermalISO15099Calc->iFP))));
+            state.dataThermalISO15099Calc->cpa =
+                2.0 * state.dataThermalISO15099Calc->aveGlassConductivity * PillarRadius(state.dataThermalISO15099Calc->iFP) /
+                (pow_2(PillarSpacing(state.dataThermalISO15099Calc->iFP)) *
+                 (1.0 + 2.0 * gap(state.dataThermalISO15099Calc->iFP) / (Constant::Pi * PillarRadius(state.dataThermalISO15099Calc->iFP))));
 
             // It is important to add on prevoius values caluculated for gas
             hcgas(state.dataThermalISO15099Calc->iFP + 1) += state.dataThermalISO15099Calc->cpa;
@@ -2827,8 +2825,8 @@ void nusselt(Real64 const tilt, Real64 const ra, Real64 const asp, Real64 &gnu, 
     Nu90 = 0.0;
     Nu60 = 0.0;
     G = 0.0;
-    tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0; // convert tilt in degrees to radians
-    if ((tilt >= 0.0) && (tilt < 60.0)) {                 // ISO/DIS 15099 - chapter 5.3.3.1
+    tiltr = tilt * 2.0 * Constant::Pi / 360.0; // convert tilt in degrees to radians
+    if ((tilt >= 0.0) && (tilt < 60.0)) {      // ISO/DIS 15099 - chapter 5.3.3.1
         subNu1 = 1.0 - 1708.0 / (ra * std::cos(tiltr));
         subNu1 = pos(subNu1);
         subNu2 = 1.0 - (1708.0 * std::pow(std::sin(1.8 * tiltr), 1.6)) / (ra * std::cos(tiltr));
@@ -2957,10 +2955,10 @@ void storeIterationResults(EnergyPlusData &state,
     print(files.TarcogIterationsFile, "*************************************************************************************************\n");
     print(files.TarcogIterationsFile, "Iteration number: {:5}\n", index);
 
-    print(files.TarcogIterationsFile, "Trmin = {:8.4F}\n", trmin - DataGlobalConstants::KelvinConv);
-    print(files.TarcogIterationsFile, "Troom = {:12.6F}\n", troom - DataGlobalConstants::KelvinConv);
-    print(files.TarcogIterationsFile, "Trmout = {:8.4F}\n", trmout - DataGlobalConstants::KelvinConv);
-    print(files.TarcogIterationsFile, "Tamb = {:12.6F}\n", tamb - DataGlobalConstants::KelvinConv);
+    print(files.TarcogIterationsFile, "Trmin = {:8.4F}\n", trmin - Constant::KelvinConv);
+    print(files.TarcogIterationsFile, "Troom = {:12.6F}\n", troom - Constant::KelvinConv);
+    print(files.TarcogIterationsFile, "Trmout = {:8.4F}\n", trmout - Constant::KelvinConv);
+    print(files.TarcogIterationsFile, "Tamb = {:12.6F}\n", tamb - Constant::KelvinConv);
 
     print(files.TarcogIterationsFile, "Ebsky = {:8.4F}\n", ebsky);
     print(files.TarcogIterationsFile, "Ebroom = {:8.4F}\n", ebroom);
@@ -3035,9 +3033,9 @@ void storeIterationResults(EnergyPlusData &state,
     print(files.TarcogIterationsFile, "\n");
 
     // write temperatures
-    print(files.TarcogIterationsFile, "{:16.8F}   \n", theta(1) - DataGlobalConstants::KelvinConv);
+    print(files.TarcogIterationsFile, "{:16.8F}   \n", theta(1) - Constant::KelvinConv);
     for (i = 2; i <= 2 * nlayer; ++i) {
-        print(files.TarcogIterationsFile, "   {:16.8F}   \n", theta(i) - DataGlobalConstants::KelvinConv);
+        print(files.TarcogIterationsFile, "   {:16.8F}   \n", theta(i) - Constant::KelvinConv);
     }
     print(files.TarcogIterationsFile, "\n");
 
@@ -3057,9 +3055,9 @@ void storeIterationResults(EnergyPlusData &state,
         print(files.IterationCSVFile, dynFormat);
         print(files.IterationCSVFile, "\n");
     }
-    print(files.IterationCSVFile, "{:16.8F}   \n", theta(1) - DataGlobalConstants::KelvinConv);
+    print(files.IterationCSVFile, "{:16.8F}   \n", theta(1) - Constant::KelvinConv);
     for (i = 2; i <= 2 * nlayer; ++i) {
-        print(files.IterationCSVFile, "   {:16.8F}   \n", theta(i) - DataGlobalConstants::KelvinConv);
+        print(files.IterationCSVFile, "   {:16.8F}   \n", theta(i) - Constant::KelvinConv);
     }
     print(files.IterationCSVFile, "\n");
 

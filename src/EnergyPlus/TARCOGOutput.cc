@@ -297,9 +297,9 @@ void WriteInputArguments(EnergyPlusData &state,
     print(InArgumentsFile, Format_1000);
     print(InArgumentsFile, "\n");
     print(InArgumentsFile, Format_1005);
-    print(InArgumentsFile, Format_1010, tout, tout - DataGlobalConstants::KelvinConv);
-    print(InArgumentsFile, Format_1015, tind, tind - DataGlobalConstants::KelvinConv);
-    print(InArgumentsFile, Format_1020, trmin, trmin - DataGlobalConstants::KelvinConv);
+    print(InArgumentsFile, Format_1010, tout, tout - Constant::KelvinConv);
+    print(InArgumentsFile, Format_1015, tind, tind - Constant::KelvinConv);
+    print(InArgumentsFile, Format_1020, trmin, trmin - Constant::KelvinConv);
     print(InArgumentsFile, Format_1030, wso);
     if (iwd == 0) print(InArgumentsFile, Format_1032); // windward
     if (iwd == 1) print(InArgumentsFile, Format_1033); // leeward
@@ -307,7 +307,7 @@ void WriteInputArguments(EnergyPlusData &state,
     print(InArgumentsFile, Format_1040, dir);
     print(InArgumentsFile, Format_1041, outir);
     print(InArgumentsFile, Format_1045, isky);
-    print(InArgumentsFile, Format_1050, tsky, tsky - DataGlobalConstants::KelvinConv);
+    print(InArgumentsFile, Format_1050, tsky, tsky - Constant::KelvinConv);
     print(InArgumentsFile, Format_1055, esky);
     print(InArgumentsFile, Format_1060, fclr);
     print(InArgumentsFile, Format_1061, VacuumPressure);
@@ -507,8 +507,8 @@ void WriteModifiedArguments(InputOutputFile &InArgumentsFile,
     print(InArgumentsFile, Format_1014);
     print(InArgumentsFile, "\n");
     print(InArgumentsFile, Format_1055, esky);
-    print(InArgumentsFile, Format_1016, trmout, trmout - DataGlobalConstants::KelvinConv);
-    print(InArgumentsFile, Format_1020, trmin, trmin - DataGlobalConstants::KelvinConv);
+    print(InArgumentsFile, Format_1016, trmout, trmout - Constant::KelvinConv);
+    print(InArgumentsFile, Format_1020, trmin, trmin - Constant::KelvinConv);
     print(InArgumentsFile, Format_1019, ebsky);
     print(InArgumentsFile, Format_10191, ebroom);
     print(InArgumentsFile, Format_1017, Gout);
@@ -678,37 +678,37 @@ void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
     print(OutArgumentsFile, "\n");
     print(OutArgumentsFile, Format_2350);
     print(OutArgumentsFile, "\n");
-    print(OutArgumentsFile, Format_2105, tamb, tamb - DataGlobalConstants::KelvinConv);
+    print(OutArgumentsFile, Format_2105, tamb, tamb - Constant::KelvinConv);
     print(OutArgumentsFile, Format_2180, q(1));
 
     // bi  Write out layer properties:
     for (i = 1; i <= nlayer; ++i) {
         switch (LayerType(i)) {
         case TARCOGLayerType::SPECULAR: { // Specular layer
-            print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - Constant::KelvinConv);
             print(OutArgumentsFile, Format_2190, i, q(2 * i));
-            print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - Constant::KelvinConv);
         } break;
         case TARCOGLayerType::VENETBLIND_HORIZ:
         case TARCOGLayerType::VENETBLIND_VERT: { // Venetian blind
-            print(OutArgumentsFile, Format_2111, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2111, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - Constant::KelvinConv);
             print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
-            print(OutArgumentsFile, Format_2111, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2111, 2 * i, theta(2 * i), theta(2 * i) - Constant::KelvinConv);
         } break;
         case TARCOGLayerType::WOVSHADE: { // Venetian blind
-            print(OutArgumentsFile, Format_2112, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2112, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - Constant::KelvinConv);
             print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
-            print(OutArgumentsFile, Format_2112, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2112, 2 * i, theta(2 * i), theta(2 * i) - Constant::KelvinConv);
         } break;
         case TARCOGLayerType::DIFFSHADE: { // Venetian blind
-            print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - Constant::KelvinConv);
             print(OutArgumentsFile, Format_2190, i, q(2 * i));
-            print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - Constant::KelvinConv);
         } break;
         default: {
-            print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - Constant::KelvinConv);
             print(OutArgumentsFile, Format_2199, i, q(2 * i));
-            print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
+            print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - Constant::KelvinConv);
         } break;
         }
 
@@ -730,7 +730,7 @@ void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
         }
     } // i - layers
 
-    print(OutArgumentsFile, Format_2115, troom, troom - DataGlobalConstants::KelvinConv);
+    print(OutArgumentsFile, Format_2115, troom, troom - Constant::KelvinConv);
 
     print(OutArgumentsFile, "\n");
 

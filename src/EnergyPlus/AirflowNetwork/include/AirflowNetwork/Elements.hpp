@@ -220,7 +220,7 @@ namespace AirflowNetwork {
     // Link simulation variable in air distribution system
     // Sensible and latent exchange variable in air distribution system
 
-    void generic_crack(Real64 &coef,             // Flow coefficient
+    void generic_crack(Real64 const coef,        // Flow coefficient
                        Real64 const expn,        // Flow exponent
                        bool const LFLAG,         // Initialization flag.If = 1, use laminar relationship
                        Real64 const PDROP,       // Total pressure drop across a component (P1 - P2) [Pa]

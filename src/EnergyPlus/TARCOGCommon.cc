@@ -88,10 +88,10 @@ namespace TARCOGCommon {
 
         LDSumMax = 0.0;
         for (i = 1; i <= TARCOGParams::MMax; i += 2) {
-            Real64 const sin_i(std::sin(i * DataGlobalConstants::PiOvr2));
+            Real64 const sin_i(std::sin(i * Constant::PiOvr2));
             Real64 const pow_i_W(pow_2(i / Width));
             for (j = 1; j <= TARCOGParams::NMax; j += 2) {
-                LDSumMax += (sin_i * std::sin(j * DataGlobalConstants::PiOvr2)) / (i * j * pow_2(pow_i_W + pow_2(j / Height)));
+                LDSumMax += (sin_i * std::sin(j * Constant::PiOvr2)) / (i * j * pow_2(pow_i_W + pow_2(j / Height)));
             } // do j = 1, DeflectionParameters::NMax, 2
         }     // do i = 1, DeflectionParameters::MMax, 2
 
@@ -111,7 +111,7 @@ namespace TARCOGCommon {
         Real64 LDSumMean;
 
         // Locals
-        Real64 constexpr Pi_squared(DataGlobalConstants::Pi * DataGlobalConstants::Pi);
+        Real64 constexpr Pi_squared(Constant::Pi * Constant::Pi);
         int i;
         int j;
 
@@ -208,7 +208,7 @@ namespace TARCOGCommon {
             }
 
             // second row
-            a(k, k + 1) = emis(front) * DataGlobalConstants::StefanBoltzmann * pow_3(theta(front));
+            a(k, k + 1) = emis(front) * Constant::StefanBoltzmann * pow_3(theta(front));
             a(k + 1, k + 1) = -1.0;
             if (i != 1) {
                 a(k - 2, k + 1) = rir(front);
@@ -219,7 +219,7 @@ namespace TARCOGCommon {
 
             // third row
             a(k + 2, k + 2) = -1.0;
-            a(k + 3, k + 2) = emis(back) * DataGlobalConstants::StefanBoltzmann * pow_3(theta(back));
+            a(k + 3, k + 2) = emis(back) * Constant::StefanBoltzmann * pow_3(theta(back));
             if (i != 1) {
                 a(k - 2, k + 2) = tir(front);
             }
