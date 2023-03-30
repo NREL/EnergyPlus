@@ -875,7 +875,7 @@ void AddVariableSlatBlind(EnergyPlusData &state,
             MinSlatAngGeom = std::asin(state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatThickness /
                                        (state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatThickness +
                                         state.dataMaterial->Blind(state.dataHeatBal->TotBlinds).SlatSeparation)) /
-                             DataGlobalConstants::DegToRadians;
+                             Constant::DegToRadians;
         } else {
             MinSlatAngGeom = 0.0;
         }
@@ -1044,22 +1044,22 @@ void CalcScreenTransmittance(EnergyPlusData &state,
 
     if (present(Theta)) {
         SunAzimuthToScreenNormal = std::abs(Theta);
-        if (SunAzimuthToScreenNormal > DataGlobalConstants::Pi) {
+        if (SunAzimuthToScreenNormal > Constant::Pi) {
             SunAzimuthToScreenNormal = 0.0;
         } else {
-            if (SunAzimuthToScreenNormal > DataGlobalConstants::PiOvr2) {
-                SunAzimuthToScreenNormal = DataGlobalConstants::Pi - SunAzimuthToScreenNormal;
+            if (SunAzimuthToScreenNormal > Constant::PiOvr2) {
+                SunAzimuthToScreenNormal = Constant::Pi - SunAzimuthToScreenNormal;
             }
         }
         NormalAzimuth = SunAzimuthToScreenNormal;
     } else {
         SunAzimuth = std::atan2(state.dataEnvrn->SOLCOS(1), state.dataEnvrn->SOLCOS(2));
-        if (SunAzimuth < 0.0) SunAzimuth += 2.0 * DataGlobalConstants::Pi;
-        SurfaceAzimuth = state.dataSurface->Surface(SurfaceNum).Azimuth * DataGlobalConstants::DegToRadians;
+        if (SunAzimuth < 0.0) SunAzimuth += 2.0 * Constant::Pi;
+        SurfaceAzimuth = state.dataSurface->Surface(SurfaceNum).Azimuth * Constant::DegToRadians;
         NormalAzimuth = SunAzimuth - SurfaceAzimuth;
         //   Calculate the transmittance whether sun is in front of or behind screen, place result in BmBmTrans or BmBmTransBack
-        if (std::abs(SunAzimuth - SurfaceAzimuth) > DataGlobalConstants::PiOvr2) {
-            SunAzimuthToScreenNormal = std::abs(SunAzimuth - SurfaceAzimuth) - DataGlobalConstants::PiOvr2;
+        if (std::abs(SunAzimuth - SurfaceAzimuth) > Constant::PiOvr2) {
+            SunAzimuthToScreenNormal = std::abs(SunAzimuth - SurfaceAzimuth) - Constant::PiOvr2;
         } else {
             SunAzimuthToScreenNormal = std::abs(SunAzimuth - SurfaceAzimuth);
         }
@@ -1067,23 +1067,23 @@ void CalcScreenTransmittance(EnergyPlusData &state,
 
     if (present(Phi)) {
         SunAltitudeToScreenNormal = std::abs(Phi);
-        if (SunAltitudeToScreenNormal > DataGlobalConstants::PiOvr2) {
-            SunAltitudeToScreenNormal = DataGlobalConstants::Pi - SunAltitudeToScreenNormal;
+        if (SunAltitudeToScreenNormal > Constant::PiOvr2) {
+            SunAltitudeToScreenNormal = Constant::Pi - SunAltitudeToScreenNormal;
         }
         SunAltitude = SunAltitudeToScreenNormal;
     } else {
-        SunAltitude = (DataGlobalConstants::PiOvr2 - std::acos(state.dataEnvrn->SOLCOS(3)));
-        SurfaceTilt = state.dataSurface->Surface(SurfaceNum).Tilt * DataGlobalConstants::DegToRadians;
-        SunAltitudeToScreenNormal = std::abs(SunAltitude + (SurfaceTilt - DataGlobalConstants::PiOvr2));
-        if (SunAltitudeToScreenNormal > DataGlobalConstants::PiOvr2) {
-            SunAltitudeToScreenNormal -= DataGlobalConstants::PiOvr2;
+        SunAltitude = (Constant::PiOvr2 - std::acos(state.dataEnvrn->SOLCOS(3)));
+        SurfaceTilt = state.dataSurface->Surface(SurfaceNum).Tilt * Constant::DegToRadians;
+        SunAltitudeToScreenNormal = std::abs(SunAltitude + (SurfaceTilt - Constant::PiOvr2));
+        if (SunAltitudeToScreenNormal > Constant::PiOvr2) {
+            SunAltitudeToScreenNormal -= Constant::PiOvr2;
         }
     }
 
     if (SurfaceNum == 0 || !present(ScreenNumber)) {
         NormalAltitude = SunAltitude;
     } else {
-        NormalAltitude = SunAltitude + (SurfaceTilt - DataGlobalConstants::PiOvr2);
+        NormalAltitude = SunAltitude + (SurfaceTilt - Constant::PiOvr2);
     }
 
     if (NormalAltitude != 0.0 && NormalAzimuth != 0.0) {
@@ -1106,11 +1106,11 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     // ************************************************************************************************
 
     // calculate compliment of relative solar azimuth
-    Beta = DataGlobalConstants::PiOvr2 - SunAzimuthToScreenNormal;
+    Beta = Constant::PiOvr2 - SunAzimuthToScreenNormal;
 
     // Catch all divide by zero instances
     if (Beta > Small) {
-        if (std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2) > Small) {
+        if (std::abs(SunAltitudeToScreenNormal - Constant::PiOvr2) > Small) {
             AlphaDblPrime = std::atan(std::tan(SunAltitudeToScreenNormal) / std::cos(SunAzimuthToScreenNormal));
             TransYDir = 1.0 - Gamma * (std::cos(AlphaDblPrime) +
                                        std::sin(AlphaDblPrime) * std::tan(SunAltitudeToScreenNormal) * std::sqrt(1.0 + pow_2(1.0 / std::tan(Beta))));
@@ -1126,7 +1126,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
                       pow_2(std::sin(SunAltitudeToScreenNormal)));
     if (COSMu > Small) {
         Epsilon = std::acos(std::cos(SunAltitudeToScreenNormal) * std::cos(SunAzimuthToScreenNormal) / COSMu);
-        Eta = DataGlobalConstants::PiOvr2 - Epsilon;
+        Eta = Constant::PiOvr2 - Epsilon;
         if (std::cos(Epsilon) != 0.0) {
             MuPrime = std::atan(std::tan(std::acos(COSMu)) / std::cos(Epsilon));
             if (Eta != 0.0) {
@@ -1151,15 +1151,13 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     ReflectCyl = thisScreen.ReflectCylinder;
     ReflectCylVis = thisScreen.ReflectCylinderVis;
 
-    if (std::abs(SunAzimuthToScreenNormal - DataGlobalConstants::PiOvr2) < Small ||
-        std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2) < Small) {
+    if (std::abs(SunAzimuthToScreenNormal - Constant::PiOvr2) < Small || std::abs(SunAltitudeToScreenNormal - Constant::PiOvr2) < Small) {
         Tscattered = 0.0;
         TscatteredVis = 0.0;
     } else {
         //   DeltaMax and Delta are in degrees
         DeltaMax = 89.7 - (10.0 * Gamma / 0.16);
-        Delta = std::sqrt(pow_2(SunAzimuthToScreenNormal / DataGlobalConstants::DegToRadians) +
-                          pow_2(SunAltitudeToScreenNormal / DataGlobalConstants::DegToRadians));
+        Delta = std::sqrt(pow_2(SunAzimuthToScreenNormal / Constant::DegToRadians) + pow_2(SunAltitudeToScreenNormal / Constant::DegToRadians));
 
         //   Use empirical model to determine maximum (peak) scattering
         Tscattermax = 0.0229 * Gamma + 0.2971 * ReflectCyl - 0.03624 * pow_2(Gamma) + 0.04763 * pow_2(ReflectCyl) - 0.44416 * Gamma * ReflectCyl;
@@ -1191,7 +1189,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     TscatteredVis = max(0.0, TscatteredVis);
 
     if (thisScreen.screenBeamReflectanceModel == Material::ScreenBeamReflectanceModel::DoNotModel) {
-        if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
+        if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
             thisScreen.BmBmTrans = Tdirect;
             thisScreen.BmBmTransVis = Tdirect;
             thisScreen.BmBmTransBack = 0.0;
@@ -1203,7 +1201,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         Tscattered = 0.0;
         TscatteredVis = 0.0;
     } else if (thisScreen.screenBeamReflectanceModel == Material::ScreenBeamReflectanceModel::DirectBeam) {
-        if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
+        if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
             thisScreen.BmBmTrans = Tdirect + Tscattered;
             thisScreen.BmBmTransVis = Tdirect + TscatteredVis;
             thisScreen.BmBmTransBack = 0.0;
@@ -1215,7 +1213,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         Tscattered = 0.0;
         TscatteredVis = 0.0;
     } else if (thisScreen.screenBeamReflectanceModel == Material::ScreenBeamReflectanceModel::Diffuse) {
-        if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
+        if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
             thisScreen.BmBmTrans = Tdirect;
             thisScreen.BmBmTransVis = Tdirect;
             thisScreen.BmBmTransBack = 0.0;
@@ -1226,7 +1224,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
     }
 
-    if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
+    if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
         thisScreen.BmDifTrans = Tscattered;
         thisScreen.BmDifTransVis = TscatteredVis;
         thisScreen.BmDifTransBack = 0.0;

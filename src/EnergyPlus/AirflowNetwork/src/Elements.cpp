@@ -1645,7 +1645,7 @@ namespace AirflowNetwork {
             DpZeroOffset = DifLim * 1e-3;
             // New definition for opening factors for LVO type 2: opening angle = 90 degrees --> opening factor = 1.0
             // should be PIOvr2 in below?
-            alpha = Fact * DataGlobalConstants::PiOvr2;
+            alpha = Fact * Constant::PiOvr2;
             Real64 const cos_alpha(std::cos(alpha));
             Real64 const tan_alpha(std::tan(alpha));
             h2 = Axishght * (1.0 - cos_alpha);
@@ -2154,7 +2154,7 @@ namespace AirflowNetwork {
         // ed = Rough / DisSysCompCoilData(CompNum).hydraulicDiameter;
         ed = Rough / hydraulicDiameter;
 
-        area = square(hydraulicDiameter) * DataGlobalConstants::Pi;
+        area = square(hydraulicDiameter) * Constant::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -2306,7 +2306,7 @@ namespace AirflowNetwork {
         // ed = Rough / DisSysCompCoilData(CompNum).hydraulicDiameter;
         ed = Rough / hydraulicDiameter;
 
-        area = square(hydraulicDiameter) * DataGlobalConstants::Pi;
+        area = square(hydraulicDiameter) * Constant::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -2448,7 +2448,7 @@ namespace AirflowNetwork {
 
         // Get component properties
         ed = Rough / hydraulicDiameter;
-        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi;
+        area = pow_2(hydraulicDiameter) * Constant::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -2606,7 +2606,7 @@ namespace AirflowNetwork {
 
         // Get component properties
         ed = Rough / hydraulicDiameter;
-        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi;
+        area = pow_2(hydraulicDiameter) * Constant::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -2746,7 +2746,7 @@ namespace AirflowNetwork {
 
         // Get component properties
         ed = Rough / hydraulicDiameter;
-        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi;
+        area = pow_2(hydraulicDiameter) * Constant::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -3115,8 +3115,7 @@ namespace AirflowNetwork {
         // Slope = MultizoneCompHorOpeningData(CompNum).Slope;
         // DischCoeff = MultizoneCompHorOpeningData(CompNum).DischCoeff;
         Cshape = 0.942 * Width / Height;
-        OpenArea =
-            Width * Height * Fact * std::sin(Slope * DataGlobalConstants::Pi / 180.0) * (1.0 + std::cos(Slope * DataGlobalConstants::Pi / 180.0));
+        OpenArea = Width * Height * Fact * std::sin(Slope * Constant::Pi / 180.0) * (1.0 + std::cos(Slope * Constant::Pi / 180.0));
         DH = 4.0 * (Width * Height) / 2.0 / (Width + Height) * Fact;
 
         // Check which zone is higher
@@ -3611,7 +3610,7 @@ namespace AirflowNetwork {
 
         // Get component properties
         Real64 ed = Rough / Diameter;
-        Real64 area = Diameter * Diameter * DataGlobalConstants::Pi / 4.0;
+        Real64 area = Diameter * Diameter * Constant::Pi / 4.0;
         Real64 ld = Length / Diameter;
         Real64 g = 1.14 - 0.868589 * std::log(ed);
         Real64 AA1 = g;
@@ -3968,7 +3967,7 @@ namespace AirflowNetwork {
 
         RhoREF = state.afn->properties.density(PSea, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
 
-        CONV = state.dataEnvrn->Latitude * 2.0 * DataGlobalConstants::Pi / 360.0;
+        CONV = state.dataEnvrn->Latitude * 2.0 * Constant::Pi / 360.0;
         G = 9.780373 * (1.0 + 0.0052891 * pow_2(std::sin(CONV)) - 0.0000059 * pow_2(std::sin(2.0 * CONV)));
 
         Hfl = 1.0;

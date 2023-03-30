@@ -263,7 +263,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             // get optional  availability schedule
             PurchAir(PurchAirNum).AvailSched = state.dataIPShortCut->cAlphaArgs(2);
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                PurchAir(PurchAirNum).AvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                PurchAir(PurchAirNum).AvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 PurchAir(PurchAirNum).AvailSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (PurchAir(PurchAirNum).AvailSchedPtr == 0) {
@@ -409,7 +409,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             // get optional heating availability schedule
             PurchAir(PurchAirNum).HeatSched = state.dataIPShortCut->cAlphaArgs(8);
             if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                PurchAir(PurchAirNum).HeatSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                PurchAir(PurchAirNum).HeatSchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 PurchAir(PurchAirNum).HeatSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
                 if (PurchAir(PurchAirNum).HeatSchedPtr == 0) {
@@ -423,7 +423,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             // get optional cooling availability schedule
             PurchAir(PurchAirNum).CoolSched = state.dataIPShortCut->cAlphaArgs(9);
             if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                PurchAir(PurchAirNum).CoolSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                PurchAir(PurchAirNum).CoolSchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 PurchAir(PurchAirNum).CoolSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
                 if (PurchAir(PurchAirNum).CoolSchedPtr == 0) {
@@ -486,8 +486,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             if (PurchAir(PurchAirNum).OutdoorAir) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                     // If there is outdoor air and outdoor air inlet node is blank, then create one
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 23) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 23) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(13) = state.dataIPShortCut->cAlphaArgs(1) + " OUTDOOR AIR INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(13) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 75) + " OUTDOOR AIR INLET NODE";

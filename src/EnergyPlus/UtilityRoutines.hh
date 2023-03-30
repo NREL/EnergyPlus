@@ -652,7 +652,7 @@ namespace UtilityRoutines {
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
-                                                   DataGlobalConstants::ResourceType &FuelTypeNum,
+                                                   Constant::ResourceType &FuelTypeNum,
                                                    bool &FuelTypeErrorsFound);
 
 } // namespace UtilityRoutines

@@ -237,7 +237,7 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
         if (this->FluidType == PlantLoopFluidType::Water) {
             FluidDensityInit = FluidProperties::GetDensityGlycol(state,
                                                                  state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                 DataGlobalConstants::InitConvTemp,
+                                                                 Constant::InitConvTemp,
                                                                  state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                  RoutineName);
         } else { //(this->FluidType == PlantLoopFluidType::Steam)
