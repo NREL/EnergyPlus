@@ -4577,7 +4577,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
 
     state->dataZoneEquipmentManager->SizeZoneEquipmentOneTimeFlag = false;
     SizeZoneEquipment(*state);
-    UpdateZoneSizing(*state, DataGlobalConstants::CallIndicator::BeginDay);
+    UpdateZoneSizing(*state, Constant::CallIndicator::BeginDay);
     state->dataSize->ZoneSizThermSetPtHi.allocate(state->dataGlobal->NumOfZones);
     state->dataSize->ZoneSizThermSetPtLo.allocate(state->dataGlobal->NumOfZones);
     state->dataSize->ZoneSizThermSetPtHi(1) = 24;
@@ -4599,10 +4599,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataSize->CalcFinalZoneSizing(1).allocateMemberArrays(1);
     state->dataSize->FinalZoneSizing(1).allocateMemberArrays(1);
 
-    UpdateZoneSizing(*state, DataGlobalConstants::CallIndicator::DuringDay);
-    UpdateZoneSizing(*state, DataGlobalConstants::CallIndicator::EndDay);
+    UpdateZoneSizing(*state, Constant::CallIndicator::DuringDay);
+    UpdateZoneSizing(*state, Constant::CallIndicator::EndDay);
     state->dataGlobal->isPulseZoneSizing = true;
-    UpdateZoneSizing(*state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
+    UpdateZoneSizing(*state, Constant::CallIndicator::EndZoneSizingCalc);
 
     // verify no heating or cooling load
     EXPECT_DOUBLE_EQ(0.0, state->dataSize->CalcZoneSizing(1, 1).HeatLoad);
@@ -4725,7 +4725,7 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_WindAndStackArea)
     auto &thisVentilation = state->dataHeatBal->Ventilation(1);
     // Parameters we really care about
     thisVentilation.ModelType = DataHeatBalance::VentilationModelType::WindAndStack;
-    thisVentilation.OpenEff = DataGlobalConstants::AutoCalculate;
+    thisVentilation.OpenEff = Constant::AutoCalculate;
     thisVentilation.EffAngle = 135; // Effective angle
     thisVentilation.OpenArea = 1.0;
     thisVentilation.OpenAreaSchedPtr = -1; // Always on

@@ -1079,14 +1079,14 @@ namespace RoomAirModelAirflowNetwork {
                             if (state.dataSurface->SurfWinHeatGain(SurfNum) >= 0.0) {
                                 state.dataSurface->SurfWinHeatGainRep(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
                                 state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) =
-                                    state.dataSurface->SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                                    state.dataSurface->SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZone * Constant::SecInHour;
                             } else {
                                 state.dataSurface->SurfWinHeatLossRep(SurfNum) = -state.dataSurface->SurfWinHeatGain(SurfNum);
                                 state.dataSurface->SurfWinHeatLossRepEnergy(SurfNum) =
-                                    state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                                    state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZone * Constant::SecInHour;
                             }
                             state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) =
-                                state.dataSurface->SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                                state.dataSurface->SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZone * Constant::SecInHour;
                         }
                     }
 

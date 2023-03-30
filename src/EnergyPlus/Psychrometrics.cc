@@ -742,14 +742,14 @@ namespace Psychrometrics {
 #endif
 
         // Convert temperature from Centigrade to Kelvin.
-        Real64 const Tkel(T + DataGlobalConstants::KelvinConv); // Dry-bulb in REAL(r64) for function passing
+        Real64 const Tkel(T + Constant::KelvinConv); // Dry-bulb in REAL(r64) for function passing
 
         // If below -100C,set value of Pressure corresponding to Saturation Temperature of -100C.
         if (Tkel < 173.15) {
             Pascal = 0.001405102123874164;
 
             // If below freezing, calculate saturation pressure over ice.
-        } else if (Tkel < DataGlobalConstants::TriplePointOfWaterTempKelvin) { // Tkel >= 173.15, Tkel < 273.16 (0.01°C)
+        } else if (Tkel < Constant::TriplePointOfWaterTempKelvin) { // Tkel >= 173.15, Tkel < 273.16 (0.01°C)
             Real64 constexpr C1(-5674.5359);
             Real64 constexpr C2(6.3925247);
             Real64 constexpr C3(-0.9677843e-2);

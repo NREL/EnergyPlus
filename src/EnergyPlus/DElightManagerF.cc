@@ -232,8 +232,8 @@ namespace DElightManagerF {
               state.dataEnvrn->TimeZoneNumber);
 
         // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
-        CosBldgRelNorth = std::cos(-state.dataHeatBal->BuildingAzimuth * DataGlobalConstants::DegToRadians);
-        SinBldgRelNorth = std::sin(-state.dataHeatBal->BuildingAzimuth * DataGlobalConstants::DegToRadians);
+        CosBldgRelNorth = std::cos(-state.dataHeatBal->BuildingAzimuth * Constant::DegToRadians);
+        SinBldgRelNorth = std::sin(-state.dataHeatBal->BuildingAzimuth * Constant::DegToRadians);
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
         for (auto &znDayl : state.dataDaylightingData->daylightControl) {
@@ -302,8 +302,8 @@ namespace DElightManagerF {
                           znDayl.DElightGriddingResolution * M22FT2);
 
                     // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-                    CosZoneRelNorth = std::cos(-zn.RelNorth * DataGlobalConstants::DegToRadians);
-                    SinZoneRelNorth = std::sin(-zn.RelNorth * DataGlobalConstants::DegToRadians);
+                    CosZoneRelNorth = std::cos(-zn.RelNorth * Constant::DegToRadians);
+                    SinZoneRelNorth = std::sin(-zn.RelNorth * Constant::DegToRadians);
 
                     // Zone Lighting Schedule Data Section
                     // NOTE: Schedules are not required since hourly values are retrieved from EnergyPlus as needed

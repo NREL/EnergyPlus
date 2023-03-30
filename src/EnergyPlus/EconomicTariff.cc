@@ -110,7 +110,7 @@ void UpdateUtilityBills(EnergyPlusData &state)
         state.dataEconTariff->Update_GetInput = false;
         if (ErrorsFound) ShowFatalError(state, "UpdateUtilityBills: Preceding errors cause termination.");
     }
-    if (state.dataGlobal->DoOutputReporting && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
+    if (state.dataGlobal->DoOutputReporting && (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) {
         GatherForEconomics(state);
     }
 }
@@ -665,7 +665,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // associate the resource number with each tariff
         if (tariff(iInObj).reportMeterIndx >= 1) {
             tariff(iInObj).resourceNum =
-                DataGlobalConstants::AssignResourceTypeNum(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType);
+                Constant::AssignResourceTypeNum(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType);
         }
     }
 }
@@ -2580,7 +2580,7 @@ void GatherForEconomics(EnergyPlusData &state)
             tariff.collectEnergy += curInstantValue;
             tariff.collectTime += state.dataGlobal->TimeStepZoneSec;
             // added *SecInHour when adding RTP support August 2008
-            if (tariff.collectTime >= tariff.demWinTime * DataGlobalConstants::SecInHour) {
+            if (tariff.collectTime >= tariff.demWinTime * Constant::SecInHour) {
                 int curSeason;
                 int curMonth;
                 int curPeriod;
@@ -4883,7 +4883,7 @@ void selectTariff(EnergyPlusData &state)
     MinTariffIndex.deallocate();
 }
 
-void GetMonthlyCostForResource(EnergyPlusData &state, DataGlobalConstants::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts)
+void GetMonthlyCostForResource(EnergyPlusData &state, Constant::ResourceType const inResourceNumber, Array1A<Real64> outMonthlyCosts)
 {
     //       AUTHOR         Jason Glazer
     //       DATE WRITTEN   May 2010

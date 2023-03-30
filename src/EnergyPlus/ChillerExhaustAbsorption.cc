@@ -964,11 +964,11 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
             if (this->CDPlantLoc.loopNum > 0) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
             } else {
-                rho = Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
+                rho = Psychrometrics::RhoH2O(Constant::InitConvTemp);
             }
 
             this->DesCondMassFlowRate = rho * this->CondVolFlowRate;
@@ -978,11 +978,11 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
         if (this->HWPlantLoc.loopNum > 0) {
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
-                                                    DataGlobalConstants::HWInitConvTemp,
+                                                    Constant::HWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
                                                     RoutineName);
         } else {
-            rho = Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
+            rho = Psychrometrics::RhoH2O(Constant::InitConvTemp);
         }
         this->DesHeatMassFlowRate = rho * this->HeatVolFlowRate;
         // init available hot water flow rate
@@ -991,11 +991,11 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
         if (this->CWPlantLoc.loopNum > 0) {
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                    DataGlobalConstants::CWInitConvTemp,
+                                                    Constant::CWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                     RoutineName);
         } else {
-            rho = Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
+            rho = Psychrometrics::RhoH2O(Constant::InitConvTemp);
         }
         this->DesEvapMassFlowRate = rho * this->EvapVolFlowRate;
         // init available hot water flow rate
@@ -1081,12 +1081,12 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
         if (state.dataSize->PlantSizData(PltSizCoolNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
             Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                    DataGlobalConstants::CWInitConvTemp,
+                                                    Constant::CWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                     RoutineName);
             tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizCoolNum).DeltaT * state.dataSize->PlantSizData(PltSizCoolNum).DesVolFlowRate *
@@ -2042,7 +2042,7 @@ void ExhaustAbsorberSpecs::updateCoolRecords(EnergyPlusData &state, Real64 MyLoa
     }
 
     // convert power to energy and instantaneous use to use over the time step
-    Real64 RptConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 RptConstant = state.dataHVACGlobal->TimeStepSysSec;
     this->CoolingEnergy = this->CoolingLoad * RptConstant;
     this->TowerEnergy = this->TowerLoad * RptConstant;
     this->ThermalEnergy = this->ThermalEnergyUseRate * RptConstant;
@@ -2070,7 +2070,7 @@ void ExhaustAbsorberSpecs::updateHeatRecords(EnergyPlusData &state, Real64 MyLoa
     }
 
     // convert power to energy and instantaneous use to use over the time step
-    Real64 RptConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 RptConstant = state.dataHVACGlobal->TimeStepSysSec;
     this->HeatingEnergy = this->HeatingLoad * RptConstant;
     this->ThermalEnergy = this->ThermalEnergyUseRate * RptConstant;
     this->HeatThermalEnergy = this->HeatThermalEnergyUseRate * RptConstant;

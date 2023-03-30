@@ -826,7 +826,7 @@ namespace IceThermalStorage {
             state.dataIceThermalStorage->DetailedIceStorage(iceNum).ScheduleName =
                 state.dataIPShortCut->cAlphaArgs(2); // Detailed ice storage availability schedule name
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                state.dataIceThermalStorage->DetailedIceStorage(iceNum).ScheduleIndex = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataIceThermalStorage->DetailedIceStorage(iceNum).ScheduleIndex = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataIceThermalStorage->DetailedIceStorage(iceNum).ScheduleIndex =
                     ScheduleManager::GetScheduleIndex(state, state.dataIceThermalStorage->DetailedIceStorage(iceNum).ScheduleName);
@@ -842,7 +842,7 @@ namespace IceThermalStorage {
             // Convert GJ to J by multiplying by 10^9
             // Convert J to W-hr by dividing by number of seconds in an hour (3600)
             state.dataIceThermalStorage->DetailedIceStorage(iceNum).NomCapacity =
-                state.dataIPShortCut->rNumericArgs(1) * (1.e+09) / (DataGlobalConstants::SecInHour);
+                state.dataIPShortCut->rNumericArgs(1) * (1.e+09) / (Constant::SecInHour);
 
             if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) {
                 ShowSevereError(state,
@@ -1596,7 +1596,7 @@ namespace IceThermalStorage {
 
         this->Urate = Uact;
         this->ITSCoolingRate = -Qice;
-        this->ITSCoolingEnergy = this->ITSCoolingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ITSCoolingEnergy = this->ITSCoolingRate * state.dataHVACGlobal->TimeStepSysSec;
     }
 
     //******************************************************************************
@@ -1741,7 +1741,7 @@ namespace IceThermalStorage {
         this->Urate = Uact;
         // Calculate ITSCoolingEnergy [J]
         this->ITSCoolingRate = -Qice;
-        this->ITSCoolingEnergy = this->ITSCoolingRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ITSCoolingEnergy = this->ITSCoolingRate * state.dataHVACGlobal->TimeStepSysSec;
     }
 
     void SimpleIceStorageData::CalcQiceDischageMax(EnergyPlusData &state, Real64 &QiceMin)
@@ -2033,7 +2033,7 @@ namespace IceThermalStorage {
             if (this->InletTemp < this->OutletTemp) { // Charging Mode
 
                 this->ChargingRate = this->CompLoad;
-                this->ChargingEnergy = this->CompLoad * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+                this->ChargingEnergy = this->CompLoad * (state.dataHVACGlobal->TimeStepSysSec);
                 this->IceFracChange = this->CompLoad * state.dataHVACGlobal->TimeStepSys / this->NomCapacity;
                 this->DischargingRate = 0.0;
                 this->DischargingEnergy = 0.0;
@@ -2043,7 +2043,7 @@ namespace IceThermalStorage {
             } else { // (DetailedIceStorage(IceNum)%InletTemp < DetailedIceStorage(IceNum)%OutletTemp) Discharging Mode
 
                 this->DischargingRate = this->CompLoad;
-                this->DischargingEnergy = this->CompLoad * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+                this->DischargingEnergy = this->CompLoad * (state.dataHVACGlobal->TimeStepSysSec);
                 this->IceFracChange = -this->CompLoad * state.dataHVACGlobal->TimeStepSys / this->NomCapacity;
                 this->ChargingRate = 0.0;
                 this->ChargingEnergy = 0.0;
