@@ -54,6 +54,8 @@
 
 #include <ObjexxFCL/Optional.hh>
 
+#include <EnergyPlus/ScheduleManager.hh>
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -66,7 +68,7 @@ namespace ExhaustAirSystemManager {
         // Members
         std::string Name = "";
 
-        int AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
+        int AvailScheduleNum = ScheduleManager::ScheduleAlwaysOn;
         std::string ZoneMixerName = "";
         int ZoneMixerIndex = 0;
         int CentralFanTypeNum = 0;
@@ -98,7 +100,7 @@ namespace ExhaustAirSystemManager {
 
         std::string Name = "";
 
-        int AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
+        int AvailScheduleNum = ScheduleManager::ScheduleAlwaysOn;
 
         std::string ZoneName = "";
         int ZoneNum = 0;

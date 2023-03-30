@@ -2085,7 +2085,7 @@ void SQLite::createZoneExtendedOutput()
 
 void SQLite::createSQLiteEnvironmentPeriodRecord(const int curEnvirNum,
                                                  const std::string &environmentName,
-                                                 const DataGlobalConstants::KindOfSim kindOfSim,
+                                                 const Constant::KindOfSim kindOfSim,
                                                  const int simulationIndex)
 {
     if (m_writeOutputToSQLite) {

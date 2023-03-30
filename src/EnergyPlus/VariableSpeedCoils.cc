@@ -2525,7 +2525,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(7);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate = NumArray(8);
 
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate != DataGlobalConstants::AutoCalculate) {
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate != Constant::AutoCalculate) {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate <= 0.0) {
                     ShowSevereError(
                         state,
@@ -2535,7 +2535,7 @@ namespace VariableSpeedCoils {
                 }
             }
 
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate != DataGlobalConstants::AutoCalculate) {
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate != Constant::AutoCalculate) {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate <= 0.0) {
                     ShowSevereError(
                         state,
@@ -4428,13 +4428,13 @@ namespace VariableSpeedCoils {
 
                 rho = GetDensityGlycol(state,
                                        state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc.loopNum).FluidName,
-                                       DataGlobalConstants::CWInitConvTemp,
+                                       Constant::CWInitConvTemp,
                                        state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc.loopNum).FluidIndex,
                                        RoutineNameSimpleWatertoAirHP);
                 Cp = GetSpecificHeatGlycol(
                     state,
                     state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc.loopNum).FluidName,
-                    DataGlobalConstants::CWInitConvTemp,
+                    Constant::CWInitConvTemp,
                     state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc.loopNum).FluidIndex,
                     RoutineNameSimpleWatertoAirHP);
 
@@ -4712,7 +4712,7 @@ namespace VariableSpeedCoils {
         }
 
         if (varSpeedCoil.VSCoilType == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterVariableSpeed) {
-            if (varSpeedCoil.RatedAirVolFlowRate == DataGlobalConstants::AutoCalculate) {
+            if (varSpeedCoil.RatedAirVolFlowRate == Constant::AutoCalculate) {
                 varSpeedCoil.RatedAirVolFlowRate =
                     varSpeedCoil.RatedCapWH * varSpeedCoil.MSRatedAirVolFlowRate(NormSpeed) / varSpeedCoil.MSRatedTotCap(NormSpeed); // 0.00005035;
                 varSpeedCoil.AirVolFlowAutoSized = true;
@@ -4720,7 +4720,7 @@ namespace VariableSpeedCoils {
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilAirFlow(
                 state, varSpeedCoil.Name, varSpeedCoil.VarSpeedCoilType, varSpeedCoil.RatedAirVolFlowRate, varSpeedCoil.AirVolFlowAutoSized);
 
-            if (varSpeedCoil.RatedWaterVolFlowRate == DataGlobalConstants::AutoCalculate) {
+            if (varSpeedCoil.RatedWaterVolFlowRate == Constant::AutoCalculate) {
                 varSpeedCoil.RatedHPWHCondWaterFlow = varSpeedCoil.RatedCapWH * varSpeedCoil.MSRatedWaterVolFlowRate(NormSpeed) /
                                                       varSpeedCoil.MSRatedTotCap(NormSpeed); // 0.00000004487;
                 varSpeedCoil.RatedWaterVolFlowRate = varSpeedCoil.RatedHPWHCondWaterFlow;

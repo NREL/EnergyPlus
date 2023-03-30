@@ -826,7 +826,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, state->dataWeatherManager->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::DesignDay));
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, Constant::KindOfSim::DesignDay));
 }
 
 // Test for https://github.com/NREL/EnergyPlus/issues/7550
@@ -1606,7 +1606,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
     state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * Constant::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
@@ -1872,7 +1872,7 @@ TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_OK)
 
     EXPECT_TRUE(compare_err_stream("", true));
     EXPECT_EQ(1, state->dataWeatherManager->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::RunPeriodWeather));
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather));
 }
 
 TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_Missing)
@@ -1937,7 +1937,7 @@ TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_Missing)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, state->dataWeatherManager->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::RunPeriodWeather));
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather));
 }
 
 TEST_F(EnergyPlusFixture, epwHeaderTest)

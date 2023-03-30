@@ -108,7 +108,7 @@ namespace ExhaustAirSystemManager {
         bool ErrorsFound = false;
 
         constexpr std::string_view RoutineName("GetExhaustAirSystemInput: ");
-        std::string const &cCurrentModuleObject = "AirLoopHVAC:ExhaustSystem";
+        std::string const cCurrentModuleObject = "AirLoopHVAC:ExhaustSystem";
         auto &ip = state.dataInputProcessing->inputProcessor;
         auto const instances = ip->epJSON.find(cCurrentModuleObject);
         if (instances != ip->epJSON.end()) {
@@ -389,7 +389,7 @@ namespace ExhaustAirSystemManager {
 
             thisExhSys.centralFan_Power = state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->fanPower();
 
-            thisExhSys.centralFan_Energy = thisExhSys.centralFan_Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            thisExhSys.centralFan_Energy = thisExhSys.centralFan_Power * state.dataHVACGlobal->TimeStepSysSec;
 
         } else if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
             Fans::SimulateFanComponents(state, thisExhSys.CentralFanName, FirstHVACIteration,
@@ -466,7 +466,7 @@ namespace ExhaustAirSystemManager {
 
         // Use the json helper to process input
         constexpr std::string_view RoutineName("GetZoneExhaustControlInput: ");
-        std::string const &cCurrentModuleObject = "ZoneHVAC:ExhaustControl";
+        std::string const cCurrentModuleObject = "ZoneHVAC:ExhaustControl";
         auto &ip = state.dataInputProcessing->inputProcessor;
         auto const instances = ip->epJSON.find(cCurrentModuleObject);
         if (instances != ip->epJSON.end()) {
@@ -489,12 +489,12 @@ namespace ExhaustAirSystemManager {
                 std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
                 if (availSchName == "") {
                     // blank
-                    thisExhCtrl.AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisExhCtrl.AvailScheduleNum = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisExhCtrl.AvailScheduleNum = ScheduleManager::GetScheduleIndex(state, availSchName);
                     if (thisExhCtrl.AvailScheduleNum == 0) {
                         // mismatch, reset to always on
-                        thisExhCtrl.AvailScheduleNum = DataGlobalConstants::ScheduleAlwaysOn;
+                        thisExhCtrl.AvailScheduleNum = ScheduleManager::ScheduleAlwaysOn;
                         ShowWarningError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhCtrl.Name));
                         ShowContinueError(state, format("Avaiability Schedule Name = {} not found.", availSchName));
                         ShowContinueError(state, "Availability Schedule is reset to Always ON.");

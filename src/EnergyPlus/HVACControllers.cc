@@ -1100,7 +1100,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
 
         Real64 rho = GetDensityGlycol(state,
                                       state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoc.loopNum).FluidName,
-                                      DataGlobalConstants::CWInitConvTemp,
+                                      Constant::CWInitConvTemp,
                                       state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoc.loopNum).FluidIndex,
                                       RoutineName);
 
@@ -2546,7 +2546,7 @@ Real64 GetCurrentHVACTime(EnergyPlusData &state)
     // as real.
     Real64 const CurrentHVACTime =
         (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + state.dataHVACGlobal->SysTimeElapsed + state.dataHVACGlobal->TimeStepSys;
-    return CurrentHVACTime * DataGlobalConstants::SecInHour;
+    return CurrentHVACTime * Constant::SecInHour;
 }
 
 Real64 GetPreviousHVACTime(EnergyPlusData &state)
@@ -2563,7 +2563,7 @@ Real64 GetPreviousHVACTime(EnergyPlusData &state)
     // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
     // erronously truncate all sub-minute system time steps down to the closest full minute.
     Real64 const PreviousHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + state.dataHVACGlobal->SysTimeElapsed;
-    return PreviousHVACTime * DataGlobalConstants::SecInHour;
+    return PreviousHVACTime * Constant::SecInHour;
 }
 
 std::string CreateHVACTimeString(EnergyPlusData &state)

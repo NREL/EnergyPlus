@@ -271,7 +271,7 @@ Real64 OutBaroPressAt(EnergyPlusData &state, Real64 const Z) // Height above gro
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 BaseTemp; // Base temperature at Z
 
-    BaseTemp = OutDryBulbTempAt(state, Z) + DataGlobalConstants::KelvinConv;
+    BaseTemp = OutDryBulbTempAt(state, Z) + Constant::KelvinConv;
 
     if (Z <= 0.0) {
         LocalAirPressure = 0.0;
