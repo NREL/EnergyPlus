@@ -1019,6 +1019,7 @@ void BoilerSpecs::UpdateBoilerRecords(EnergyPlusData &state,
         this->BoilerLoad = 0.0;
         this->FuelUsed = 0.0;
         this->ParasiticElecPower = 0.0;
+        this->BoilerPLR = 0.0;
         this->BoilerEff = 0.0;
     } else {
         PlantUtilities::SafeCopyPlantNode(state, BoilerInletNode, BoilerOutletNode);
