@@ -75,6 +75,7 @@ namespace DataSystemVariables {
     // This data-only module is a repository for system (such as environment) variables that are set
     // before a run or set of runs.
 
+    constexpr const char *AssistantEnvVar("ASSISTANT"); // Only run design days
     constexpr const char *DDOnlyEnvVar("DDONLY");       // Only run design days
     constexpr const char *ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
     constexpr const char *DisableGLHECachingEnvVar("DISABLEGLHECACHING");
@@ -216,6 +217,9 @@ namespace DataSystemVariables {
     {
 
         std::string cEnvValue;
+
+        get_environment_variable(AssistantEnvVar, cEnvValue);
+        state.dataSysVars->Assistant = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(DDOnlyEnvVar, cEnvValue);
         state.dataSysVars->DDOnly = env_var_on(cEnvValue); // Yes or True

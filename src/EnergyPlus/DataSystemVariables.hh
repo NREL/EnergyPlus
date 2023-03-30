@@ -96,6 +96,7 @@ struct SystemVarsData : BaseGlobalStruct
 
     DataSystemVariables::ShadingMethod shadingMethod = DataSystemVariables::ShadingMethod::PolygonClipping; // defines the shading method used
 
+    bool Assistant = false;          // TRUE for assistant mode
     bool DDOnly = false;             // TRUE if design days (sizingperiod:*) only are to be run.
     bool ReverseDD = false;          // TRUE if reverse design days (reordering sizingperiod:*) are to be run.
     bool DisableGLHECaching = false; // TRUE if caching is to be disabled, for example, during unit tests.
@@ -150,6 +151,7 @@ struct SystemVarsData : BaseGlobalStruct
     void clear_state() override
     {
         shadingMethod = DataSystemVariables::ShadingMethod::PolygonClipping;
+        Assistant = false;
         DDOnly = false;
         ReverseDD = false;
         DisableGLHECaching = false;
