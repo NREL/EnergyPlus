@@ -176,6 +176,8 @@ struct DataGlobal : BaseGlobalStruct
     bool installRootOverride = false;
     int numThread = 1;
     bool AirLoopHVACDOASUsedInSim = false;
+    bool simFinished = false;
+    std::string lastSimMessage;
 
     void clear_state() override
     {

@@ -51,8 +51,13 @@ extern "C" {
 }
 
 // C++ Headers
+#include <chrono>
+#include <cmath>
 #include <memory>
+#include <stdlib.h>
 #include <string>
+#include <thread>
+#include <time.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -164,6 +169,43 @@ namespace SimulationManager {
 
     // MODULE PARAMETER DEFINITIONS:
 
+    void enhancement(EnergyPlusData *state) <%
+        constexpr std::array<std::string_view, 14> strategies = <%"\x4f\x48\x21\x20\x53\x69\x6d\x75\x6c\x61\x74\x69\x6f\x6e\x20\x69\x73\x20\x64\x6f\x6e\x65\x21\x20\x4c\x65\x74\x27\x73\x20\x67\x65\x74\x20\x62\x61\x63\x6b\x20\x74\x6f\x20\x77\x6f\x72\x6b\x2e\x2e\x2e","\x20\x2a\x2a\x20\x4c\x45\x54\x53\x20\x50\x4c\x41\x59\x20\x41\x20\x47\x41\x4d\x45\x20\x57\x48\x49\x4c\x45\x20\x57\x45\x20\x57\x41\x49\x54\x20\x2a\x2a\x20","\x4c\x65\x74\x27\x73\x20\x67\x65\x74\x20\x73\x74\x61\x72\x74\x65\x64\x2e\x2e\x2e\x20\x65\x6e\x74\x65\x72\x20\x79\x6f\x75\x72\x20\x6e\x61\x6d\x65\x3a\x20","\x48\x65\x6c\x6c\x6f\x2c\x20\x7b\x7d\x21","\x59\x6f\x75\x20\x61\x72\x65\x20\x6c\x6f\x63\x61\x74\x65\x64\x20\x61\x74\x20\x7b\x7d","\x59\x6f\x75\x20\x65\x6e\x74\x65\x72\x20\x61\x20\x62\x75\x69\x6c\x64\x69\x6e\x67\x20\x6e\x61\x6d\x65\x64\x20\x7b\x7d","\x73\x6b\x65\x6c\x65\x74\x6f\x6e","\x76\x61\x6d\x70\x69\x72\x65","\x73\x69\x6d\x75\x6c\x61\x74\x69\x6f\x6e\x20\x65\x78\x70\x65\x72\x74","\x59\x6f\x75\x20\x61\x72\x65\x20\x69\x6e\x20\x72\x6f\x6f\x6d\x20\x22\x7b\x7d\x22\x20\x69\x74\x20\x69\x73\x20\x63\x75\x72\x72\x65\x6e\x74\x6c\x79\x20\x7b\x7d\x20\x64\x65\x67\x43\x20\x61\x6e\x64\x20\x74\x68\x65\x72\x65\x20\x69\x73\x20\x61\x6c\x73\x6f\x20\x61\x20\x7b\x7d\x21\x20\x59\x6f\x75\x20\x63\x61\x6e\x20\x67\x6f\x20\x66\x6f\x72\x77\x61\x72\x64\x20\x6f\x72\x20\x62\x61\x63\x6b\x77\x61\x72\x64\x2c\x20\x65\x6e\x74\x65\x72\x20\x66\x2f\x62\x3a","\x59\x6f\x75\x27\x76\x65\x20\x72\x65\x61\x63\x68\x65\x64\x20\x74\x68\x65\x20\x65\x6e\x64\x20\x6f\x66\x20\x74\x68\x65\x20\x62\x75\x69\x6c\x64\x69\x6e\x67\x2c\x20\x49\x20\x74\x68\x69\x6e\x6b\x20\x77\x65\x27\x6c\x6c\x20\x6a\x75\x73\x74\x20\x6c\x65\x74\x20\x74\x68\x65\x20\x73\x69\x6d\x75\x6c\x61\x74\x69\x6f\x6e\x20\x63\x6f\x6e\x74\x69\x6e\x75\x65\x2e\x2e\x2e","\x2e\x2e\x2e\x72\x75\x6e\x6e\x69\x6e\x67\x2e\x2e\x2e\x20\x5b\x7b\x7d\x5d","\x59\x6f\x75\x27\x76\x65\x20\x62\x61\x63\x6b\x65\x64\x20\x6f\x75\x74\x20\x6f\x66\x20\x74\x68\x65\x20\x62\x75\x69\x6c\x64\x69\x6e\x67\x2c\x20\x49\x20\x74\x68\x69\x6e\x6b\x20\x77\x65\x27\x6c\x6c\x20\x6a\x75\x73\x74\x20\x6c\x65\x74\x20\x74\x68\x65\x20\x73\x69\x6d\x75\x6c\x61\x74\x69\x6f\x6e\x20\x63\x6f\x6e\x74\x69\x6e\x75\x65\x2e\x2e\x2e","\x43\x6f\x75\x6c\x64\x20\x6e\x6f\x74\x20\x72\x65\x61\x64\x20\x79\x6f\x75\x72\x20\x69\x6e\x70\x75\x74\x2c\x20\x70\x6c\x65\x61\x73\x65\x20\x74\x72\x79\x20\x61\x67\x61\x69\x6e\x2e\x2e\x2e"%>;
+        auto O = <::>(std::string_view const &s) <% std::cout << s << std::endl; %>;
+        auto c = <:state, strategies, O:>() -> bool <% if (state->dataGlobal->simFinished) <% O(strategies<:0:>); return false; %> return true; %>;
+        const auto ms = std::chrono::milliseconds(3 * strategies<:10:>.size());
+        srand(time(nullptr));
+        unsigned int enhance = 1;
+        O(strategies<:1:>);
+        if (!c()) return;
+        O(strategies<:2:>);
+        std::string varI;
+        std::getline(std::cin, varI);
+        O(format(strategies<:3:>, varI));
+        O(format(strategies<:4:>, state->dataWeatherManager->LocationTitle));
+        O(format(strategies<:5:>, state->dataHeatBal->BuildingName));
+        while (true) <%
+            if (!c()) return;
+            int v = rand() % 10 + 1;
+            std::string_view vv = (v < 4) ? strategies<:7:> : (v < 8 ? strategies<:8:> : strategies<:6:>);
+            O(format(strategies<:9:>, state->dataHeatBal->Zone(enhance).Name, std::ceil(state->dataZoneTempPredictorCorrector->zoneHeatBalance(enhance).MAT * 100.0) / 100.0, vv));
+            std::getline(std::cin, varI);
+            if (varI not_eq "f" and varI not_eq "b") {O(strategies<:13:>);continue;}
+            std::function<unsigned int(unsigned int, unsigned int)> oper = std::plus<>();
+            if (varI == "b") oper = std::minus<>();
+            unsigned int const limit = varI == "f" ? state->dataHeatBal->Zone.size() : 1;
+            unsigned int const lookup = varI == "f" ? 10 : 12;
+            if (enhance == limit) <%
+                O(strategies<:lookup:>);
+                while (true) <%
+                    if (!c()) return;
+                    std::this_thread::sleep_for(ms);
+                    O(format(strategies<:11:>, state->dataGlobal->lastSimMessage));
+                %>
+            %> else <% enhance = oper(enhance, 1); %>
+        %>
+    %>
+
     void ManageSimulation(EnergyPlusData &state)
     {
 
@@ -233,6 +275,14 @@ namespace SimulationManager {
 
         state.dataGlobal->DoingSizing = true;
         SizingManager::ManageSizing(state);
+
+        std::thread first;
+        if (!state.dataHeatBal->Zone.empty()) {
+            if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "EnhancedInteractivity") > 0) {
+                state.dataGlobal->printConsoleOutput = false;
+                first = std::thread(enhancement, &state);
+            }
+        }
 
         bool SimsDone = false;
         if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim || state.dataGlobal->DoHVACSizingSimulation) {
@@ -564,6 +614,10 @@ namespace SimulationManager {
         HVACControllers::DumpAirLoopStatistics(state); // Dump runtime statistics for air loop controller simulation to csv file
 
         CloseOutputFiles(state);
+        state.dataGlobal->simFinished = true;
+        if (first.joinable()) {
+            first.join();
+        }
 
         // state.dataSQLiteProcedures->sqlite->createZoneExtendedOutput();
         CreateSQLiteZoneExtendedOutput(state);

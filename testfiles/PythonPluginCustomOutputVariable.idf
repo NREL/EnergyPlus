@@ -6173,3 +6173,4 @@
 
   Output:Variable,Averaged Building Temperature,PythonPlugin:OutputVariable,Timestep;
 
+  EnhancedInteractivity;

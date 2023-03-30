@@ -74,6 +74,7 @@ void DisplayString(EnergyPlusData &state, std::string const &String) // String t
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // na
+    state.dataGlobal->lastSimMessage = String;
     if (state.dataGlobal->fMessagePtr) state.dataGlobal->fMessagePtr(String);
     if (state.dataGlobal->messageCallback) state.dataGlobal->messageCallback(String.c_str());
 
@@ -93,7 +94,7 @@ void DisplayString(EnergyPlusData &state, char const *String) // String to be di
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine provides a call to display strings during program execution.
-
+    state.dataGlobal->lastSimMessage = String;
     if (state.dataGlobal->fMessagePtr) state.dataGlobal->fMessagePtr(String);
     if (state.dataGlobal->messageCallback) state.dataGlobal->messageCallback(String);
 
