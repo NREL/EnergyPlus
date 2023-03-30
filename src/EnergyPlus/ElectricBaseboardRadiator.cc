@@ -530,24 +530,18 @@ namespace ElectricBaseboardRadiator {
 
         auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
         int NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
-        auto &ZeroSourceSumHATsurf = state.dataElectBaseboardRad->ZeroSourceSumHATsurf;
-        auto &QBBElecRadSource = state.dataElectBaseboardRad->QBBElecRadSource;
-        auto &QBBElecRadSrcAvg = state.dataElectBaseboardRad->QBBElecRadSrcAvg;
-        auto &LastQBBElecRadSrc = state.dataElectBaseboardRad->LastQBBElecRadSrc;
-        auto &LastSysTimeElapsed = state.dataElectBaseboardRad->LastSysTimeElapsed;
-        auto &LastTimeStepSys = state.dataElectBaseboardRad->LastTimeStepSys;
 
         // Do the one time initializations
         if (state.dataElectBaseboardRad->MyOneTimeFlag) {
             // initialize the environment and sizing flags
             state.dataElectBaseboardRad->MyEnvrnFlag.dimension(NumElecBaseboards, true);
             state.dataElectBaseboardRad->MySizeFlag.dimension(NumElecBaseboards, true);
-            ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            QBBElecRadSource.dimension(NumElecBaseboards, 0.0);
-            QBBElecRadSrcAvg.dimension(NumElecBaseboards, 0.0);
-            LastQBBElecRadSrc.dimension(NumElecBaseboards, 0.0);
-            LastSysTimeElapsed.dimension(NumElecBaseboards, 0.0);
-            LastTimeStepSys.dimension(NumElecBaseboards, 0.0);
+            state.dataElectBaseboardRad->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataElectBaseboardRad->QBBElecRadSource.dimension(NumElecBaseboards, 0.0);
+            state.dataElectBaseboardRad->QBBElecRadSrcAvg.dimension(NumElecBaseboards, 0.0);
+            state.dataElectBaseboardRad->LastQBBElecRadSrc.dimension(NumElecBaseboards, 0.0);
+            state.dataElectBaseboardRad->LastSysTimeElapsed.dimension(NumElecBaseboards, 0.0);
+            state.dataElectBaseboardRad->LastTimeStepSys.dimension(NumElecBaseboards, 0.0);
 
             state.dataElectBaseboardRad->MyOneTimeFlag = false;
         }
@@ -561,12 +555,12 @@ namespace ElectricBaseboardRadiator {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && state.dataElectBaseboardRad->MyEnvrnFlag(BaseboardNum)) {
             // Initialize
-            ZeroSourceSumHATsurf = 0.0;
-            QBBElecRadSource = 0.0;
-            QBBElecRadSrcAvg = 0.0;
-            LastQBBElecRadSrc = 0.0;
-            LastSysTimeElapsed = 0.0;
-            LastTimeStepSys = 0.0;
+            state.dataElectBaseboardRad->ZeroSourceSumHATsurf = 0.0;
+            state.dataElectBaseboardRad->QBBElecRadSource = 0.0;
+            state.dataElectBaseboardRad->QBBElecRadSrcAvg = 0.0;
+            state.dataElectBaseboardRad->LastQBBElecRadSrc = 0.0;
+            state.dataElectBaseboardRad->LastSysTimeElapsed = 0.0;
+            state.dataElectBaseboardRad->LastTimeStepSys = 0.0;
 
             state.dataElectBaseboardRad->MyEnvrnFlag(BaseboardNum) = false;
         }
@@ -576,11 +570,11 @@ namespace ElectricBaseboardRadiator {
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-            ZeroSourceSumHATsurf(ControlledZoneNum) = state.dataHeatBal->Zone(ControlledZoneNum).sumHATsurf(state);
-            QBBElecRadSrcAvg(BaseboardNum) = 0.0;
-            LastQBBElecRadSrc(BaseboardNum) = 0.0;
-            LastSysTimeElapsed(BaseboardNum) = 0.0;
-            LastTimeStepSys(BaseboardNum) = 0.0;
+            state.dataElectBaseboardRad->ZeroSourceSumHATsurf(ControlledZoneNum) = state.dataHeatBal->Zone(ControlledZoneNum).sumHATsurf(state);
+            state.dataElectBaseboardRad->QBBElecRadSrcAvg(BaseboardNum) = 0.0;
+            state.dataElectBaseboardRad->LastQBBElecRadSrc(BaseboardNum) = 0.0;
+            state.dataElectBaseboardRad->LastSysTimeElapsed(BaseboardNum) = 0.0;
+            state.dataElectBaseboardRad->LastTimeStepSys(BaseboardNum) = 0.0;
         }
 
         // Do the every time step initializations
@@ -634,8 +628,8 @@ namespace ElectricBaseboardRadiator {
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = elecBaseboard.ZonePtr;
             int SizingMethod = DataHVACGlobals::HeatingCapacitySizing; // Integer representation of sizing method name (e.g., CoolingAirflowSizing)
-            int FieldNum = 1;                         // IDD numeric field number where input field description is found
-            bool PrintFlag = true;                    // TRUE when sizing information is reported in the eio file
+            int FieldNum = 1;                                          // IDD numeric field number where input field description is found
+            bool PrintFlag = true;                                     // TRUE when sizing information is reported in the eio file
             std::string SizingString = state.dataElectBaseboardRad->ElecBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
             // capacity sizing methods (e.g., HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity)
             int CapSizingMethod = elecBaseboard.HeatingCapMethod;
