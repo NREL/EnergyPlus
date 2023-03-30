@@ -515,18 +515,6 @@ namespace Furnaces {
                         ObjexxFCL::Optional<Real64 const> SpeedRatio = _ // Speed ratio
     );
 
-    void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
-                                    int const FurnaceNum,          // index to furnace
-                                    int const ZoneNum,             // index to zone
-                                    bool const FirstHVACIteration, // Flag for 1st HVAC iteration
-                                    int const AirLoopNum,          // index to air loop !unused1208
-                                    Real64 &OnOffAirFlowRatio,     // ratio of coil on to coil off air flow rate
-                                    int const OpMode,              // fan operating mode
-                                    Real64 const QZnReq,           // sensible load to be met (W) !unused1208
-                                    Real64 const MoistureLoad,     // moisture load to be met (W)
-                                    Real64 &PartLoadRatio          // coil part-load ratio
-    );
-
     void SetMinOATCompressor(EnergyPlusData &state,
                              int const FurnaceNum,                    // index to furnace
                              std::string const &cCurrentModuleObject, // type of furnace
