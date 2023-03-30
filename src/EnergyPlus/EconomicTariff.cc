@@ -3891,9 +3891,9 @@ void LEEDtariffReporting(EnergyPlusData &state)
     auto const &tariff = state.dataEconTariff->tariff;
 
     if (state.dataEconTariff->numTariff > 0) {
-        distCoolFacilMeter = GetMeterIndex(state, "DISTRICTCOOLING:FACILITY");
-        distHeatWaterFacilMeter = GetMeterIndex(state, "DISTRICTHEATINGWATER:FACILITY");
-        distHeatSteamFacilMeter = GetMeterIndex(state, "DISTRICTHEATINGSTEAM:FACILITY");
+        int distCoolFacilMeter = GetMeterIndex(state, "DISTRICTCOOLING:FACILITY");
+        int distHeatWaterFacilMeter = GetMeterIndex(state, "DISTRICTHEATINGWATER:FACILITY");
+        int distHeatSteamFacilMeter = GetMeterIndex(state, "DISTRICTHEATINGSTEAM:FACILITY");
         elecTotalEne = 0.0;
         gasTotalEne = 0.0;
         distCoolTotalEne = 0.0;
