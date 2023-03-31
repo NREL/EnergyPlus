@@ -1192,6 +1192,15 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
     EXPECT_FALSE(state->dataFurnaces->CoolingLoad);
     // check if the air-to-air heat pump outlet temperature is capped at 45.0C
     EXPECT_NEAR(45.0, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(1).FurnaceOutletNodeNum).Temp, 0.000001);
+    EXPECT_NEAR(0.3326, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(1).FurnaceOutletNodeNum).MassFlowRate, 0.0001);
+    EXPECT_NEAR(121.06458, state->dataFurnaces->Furnace(1).SensibleLoadMet, 0.001);
+
+    // Test airflow when fan is forced off
+    state->dataHVACGlobal->TurnFansOn = false;
+    state->dataHVACGlobal->TurnFansOff = true;
+    SimFurnace(*state, state->dataFurnaces->Furnace(1).Name, FirstHVACIteration, AirLoopNum, CompIndex);
+    EXPECT_NEAR(0.0, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(1).FurnaceOutletNodeNum).MassFlowRate, 0.000001);
+    EXPECT_NEAR(0.0, state->dataFurnaces->Furnace(1).SensibleLoadMet, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, Furnaces_SetMinOATCompressor)
