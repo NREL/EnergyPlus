@@ -6217,7 +6217,6 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     int ISky;   // Sky type index
     int ISky1;  // Sky type index values for averaging two sky types
     int ISky2;
-    auto &DFSUHR = state.dataDaylightingManager->DFSUHR; // Sun daylight factor for bare/shaded window
     auto &SetPnt = state.dataDaylightingManager->SetPnt; // Illuminance setpoint at reference points (lux)
     auto &GLRNDX = state.dataDaylightingManager->GLRNDX; // Glare index at reference point
     auto &GLRNEW = state.dataDaylightingManager->GLRNEW; // New glare index at reference point
@@ -6333,7 +6332,8 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                      state.dataGlobal->WeightPreviousHour * thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
 
                 if (ISky == 1)
-                    DFSUHR(1) =
+                    // Sun daylight factor for bare/shaded window
+                    state.dataDaylightingManager->DFSUHR(1) =
                         VTRatio *
                         (state.dataGlobal->WeightNow * (thisDaylightControl.DaylIllFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
                                                         thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 1, IL, loop)) +
@@ -6383,16 +6383,17 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                  thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
 
                         if (ISky == 1) {
-                            DFSUHR(2) =
+                            state.dataDaylightingManager->DFSUHR(2) =
                                 VTRatio * (state.dataGlobal->WeightNow * thisDaylightControl.DaylIllFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
                                            state.dataGlobal->WeightPreviousHour *
                                                thisDaylightControl.DaylIllFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
 
                             if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin))
-                                DFSUHR(2) += VTRatio * (state.dataGlobal->WeightNow *
-                                                            thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
-                                                        state.dataGlobal->WeightPreviousHour *
-                                                            thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                state.dataDaylightingManager->DFSUHR(2) +=
+                                    VTRatio *
+                                    (state.dataGlobal->WeightNow * thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                     state.dataGlobal->WeightPreviousHour *
+                                         thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                         }
 
                         state.dataDaylightingManager->BFSKHR(2, ISky) =
@@ -6404,16 +6405,15 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                         if (ISky == 1) {
                             state.dataDaylightingManager->BFSUHR(2) =
                                 VTRatio *
-                                        (state.dataGlobal->WeightNow * thisDaylightControl.DaylBackFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
-                                         state.dataGlobal->WeightPreviousHour *
-                                             thisDaylightControl.DaylBackFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                (state.dataGlobal->WeightNow * thisDaylightControl.DaylBackFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                 state.dataGlobal->WeightPreviousHour *
+                                     thisDaylightControl.DaylBackFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
                             if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin))
                                 state.dataDaylightingManager->BFSUHR(2) +=
                                     VTRatio *
-                                    (state.dataGlobal->WeightNow *
-                                                            thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
-                                                        state.dataGlobal->WeightPreviousHour *
-                                                            thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                    (state.dataGlobal->WeightNow * thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                     state.dataGlobal->WeightPreviousHour *
+                                         thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                         }
 
                         state.dataDaylightingManager->SFSKHR(2, ISky) =
@@ -6508,10 +6508,10 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                 thisDaylightControl.DaylSourceFacSun(
                                     state.dataGlobal->PreviousHour, std::min(Material::MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                 SurfWinSlatsAngInterpFac);
-                            DFSUHR(2) =
+                            state.dataDaylightingManager->DFSUHR(2) =
                                 VTRatio * (state.dataGlobal->WeightNow * DaylIllFacSunNow + state.dataGlobal->WeightPreviousHour * DaylIllFacSunPrev);
-                            state.dataDaylightingManager->BFSUHR(2) = VTRatio *
-                                        (state.dataGlobal->WeightNow * DaylBackFacSunNow + state.dataGlobal->WeightPreviousHour * DaylBackFacSunPrev);
+                            state.dataDaylightingManager->BFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * DaylBackFacSunNow +
+                                                                                 state.dataGlobal->WeightPreviousHour * DaylBackFacSunPrev);
                             state.dataDaylightingManager->SFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * DaylSourceFacSunNow +
                                                                                  state.dataGlobal->WeightPreviousHour * DaylSourceFacSunPrev);
 
@@ -6548,10 +6548,10 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                     thisDaylightControl.DaylSourceFacSunDisk(
                                         state.dataGlobal->PreviousHour, std::min(Material::MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                     SurfWinSlatsAngInterpFac);
-                                DFSUHR(2) += VTRatio * (state.dataGlobal->WeightNow * DaylIllFacSunDiskNow +
-                                                        state.dataGlobal->WeightPreviousHour * DaylIllFacSunDiskPrev);
+                                state.dataDaylightingManager->DFSUHR(2) += VTRatio * (state.dataGlobal->WeightNow * DaylIllFacSunDiskNow +
+                                                                                      state.dataGlobal->WeightPreviousHour * DaylIllFacSunDiskPrev);
                                 state.dataDaylightingManager->BFSUHR(2) += VTRatio * (state.dataGlobal->WeightNow * DaylBackFacSunDiskNow +
-                                                        state.dataGlobal->WeightPreviousHour * DaylBackFacSunDiskPrev);
+                                                                                      state.dataGlobal->WeightPreviousHour * DaylBackFacSunDiskPrev);
                                 state.dataDaylightingManager->SFSUHR(2) +=
                                     VTRatio * (state.dataGlobal->WeightNow * DaylSourceFacSunDiskNow +
                                                state.dataGlobal->WeightPreviousHour * DaylSourceFacSunDiskPrev);
@@ -6585,7 +6585,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                 if (IS == 2 && !ShadedOrDiffusingGlassWin) break;
 
                 thisDaylightControl.IllumFromWinAtRefPt(loop, IS, IL) =
-                    DFSUHR(IS) * state.dataEnvrn->HISUNF +
+                    state.dataDaylightingManager->DFSUHR(IS) * state.dataEnvrn->HISUNF +
                     HorIllSkyFac *
                         (state.dataDaylightingManager->DFSKHR(IS, ISky1) * SkyWeight * state.dataDaylightingManager->HorIllSky(ISky1) +
                          state.dataDaylightingManager->DFSKHR(IS, ISky2) * (1.0 - SkyWeight) * state.dataDaylightingManager->HorIllSky(ISky2));
