@@ -212,7 +212,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr NumPipeSections(20);
     int constexpr NumberOfDepthNodes(8); // Number of nodes in the cartesian grid-Should be an even # for now
-    Real64 const SecondsInHour(DataGlobalConstants::SecInHour);
+    Real64 const SecondsInHour(Constant::SecInHour);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool ErrorsFound(false); // Set to true if errors in input,
@@ -673,7 +673,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
             state.dataPipeHT->PipeHT(Item).SoilDiffusivity = state.dataPipeHT->PipeHT(Item).SoilConductivity /
                                                              (state.dataPipeHT->PipeHT(Item).SoilDensity * state.dataPipeHT->PipeHT(Item).SoilCp);
             state.dataPipeHT->PipeHT(Item).SoilDiffusivityPerDay =
-                state.dataPipeHT->PipeHT(Item).SoilDiffusivity * SecondsInHour * DataGlobalConstants::HoursInDay;
+                state.dataPipeHT->PipeHT(Item).SoilDiffusivity * SecondsInHour * Constant::HoursInDay;
 
             // Mesh the cartesian domain
             state.dataPipeHT->PipeHT(Item).NumDepthNodes = NumberOfDepthNodes;
@@ -732,18 +732,18 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         // work out heat transfer areas (area per section)
         state.dataPipeHT->PipeHT(Item).InsideArea =
-            DataGlobalConstants::Pi * state.dataPipeHT->PipeHT(Item).PipeID * state.dataPipeHT->PipeHT(Item).Length / NumSections;
+            Constant::Pi * state.dataPipeHT->PipeHT(Item).PipeID * state.dataPipeHT->PipeHT(Item).Length / NumSections;
         state.dataPipeHT->PipeHT(Item).OutsideArea =
-            DataGlobalConstants::Pi * (state.dataPipeHT->PipeHT(Item).PipeOD + 2 * state.dataPipeHT->PipeHT(Item).InsulationThickness) *
+            Constant::Pi * (state.dataPipeHT->PipeHT(Item).PipeOD + 2 * state.dataPipeHT->PipeHT(Item).InsulationThickness) *
             state.dataPipeHT->PipeHT(Item).Length / NumSections;
 
         // cross sectional area
-        state.dataPipeHT->PipeHT(Item).SectionArea = DataGlobalConstants::Pi * 0.25 * pow_2(state.dataPipeHT->PipeHT(Item).PipeID);
+        state.dataPipeHT->PipeHT(Item).SectionArea = Constant::Pi * 0.25 * pow_2(state.dataPipeHT->PipeHT(Item).PipeID);
 
         // pipe & insulation mass
-        state.dataPipeHT->PipeHT(Item).PipeHeatCapacity = state.dataPipeHT->PipeHT(Item).PipeCp * state.dataPipeHT->PipeHT(Item).PipeDensity *
-                                                          (DataGlobalConstants::Pi * 0.25 * pow_2(state.dataPipeHT->PipeHT(Item).PipeOD) -
-                                                           state.dataPipeHT->PipeHT(Item).SectionArea); // the metal component
+        state.dataPipeHT->PipeHT(Item).PipeHeatCapacity =
+            state.dataPipeHT->PipeHT(Item).PipeCp * state.dataPipeHT->PipeHT(Item).PipeDensity *
+            (Constant::Pi * 0.25 * pow_2(state.dataPipeHT->PipeHT(Item).PipeOD) - state.dataPipeHT->PipeHT(Item).SectionArea); // the metal component
     }
 
     // final error check
@@ -1416,8 +1416,8 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
 
                         // If on soil boundary, load up local variables and perform calculations
                         NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Previous);
-                        PastNodeTempAbs = NodePast + DataGlobalConstants::KelvinConv;
-                        SkyTempAbs = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv;
+                        PastNodeTempAbs = NodePast + Constant::KelvinConv;
+                        SkyTempAbs = state.dataEnvrn->SkyTemp + Constant::KelvinConv;
                         TopRoughness = this->SoilRoughness;
                         TopThermAbs = this->SoilThermAbs;
                         TopSolarAbs = this->SoilSolarAbs;
@@ -1431,7 +1431,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                         ConvCoef = this->OutdoorConvCoef;
 
                         // thermal radiation coefficient using surf temp from past time step
-                        if (std::abs(PastNodeTempAbs - SkyTempAbs) > DataGlobalConstants::rTinyValue) {
+                        if (std::abs(PastNodeTempAbs - SkyTempAbs) > Constant::rTinyValue) {
                             RadCoef = StefBoltzmann * TopThermAbs * (pow_4(PastNodeTempAbs) - pow_4(SkyTempAbs)) / (PastNodeTempAbs - SkyTempAbs);
                         } else {
                             RadCoef = 0.0;
@@ -1775,7 +1775,7 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
         1000.0; // Note fluid properties routine returns mPa-s, we need Pa-s
 
     // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter) - as RadiantSysLowTemp
-    ReD = 4.0 * MassFlowRate / (DataGlobalConstants::Pi * MUactual * Diameter);
+    ReD = 4.0 * MassFlowRate / (Constant::Pi * MUactual * Diameter);
 
     if (ReD == 0.0) { // No flow
 
@@ -1961,7 +1961,7 @@ Real64 PipeHTData::TBND(EnergyPlusData &state,
     // REFERENCES: See Module Level Description
 
     // Using/Aliasing
-    Real64 curSimTime = state.dataGlobal->DayOfSim * DataGlobalConstants::SecsInDay;
+    Real64 curSimTime = state.dataGlobal->DayOfSim * Constant::SecsInDay;
     Real64 TBND;
 
     TBND = this->groundTempModel->getGroundTempAtTimeInSeconds(state, z, curSimTime);

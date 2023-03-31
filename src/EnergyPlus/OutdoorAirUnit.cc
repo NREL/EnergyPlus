@@ -325,7 +325,7 @@ namespace OutdoorAirUnit {
             // A2
             OutAirUnit(OAUnitNum).SchedName = state.dataIPShortCut->cAlphaArgs(2);
             if (lAlphaBlanks(2)) {
-                OutAirUnit(OAUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                OutAirUnit(OAUnitNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 OutAirUnit(OAUnitNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
                 if (OutAirUnit(OAUnitNum).SchedPtr == 0) {
@@ -1329,7 +1329,7 @@ namespace OutdoorAirUnit {
                                                                 errFlag);
                         rho = GetDensityGlycol(state,
                                                state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidName,
-                                               DataGlobalConstants::CWInitConvTemp,
+                                               Constant::CWInitConvTemp,
                                                state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
@@ -1349,7 +1349,7 @@ namespace OutdoorAirUnit {
                                                                 errFlag);
                         rho = GetDensityGlycol(state,
                                                state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidName,
-                                               DataGlobalConstants::HWInitConvTemp,
+                                               Constant::HWInitConvTemp,
                                                state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
@@ -1366,7 +1366,7 @@ namespace OutdoorAirUnit {
                         Real64 rho =
                             GetSatDensityRefrig(state,
                                                 state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidName,
-                                                DataGlobalConstants::SteamInitConvTemp,
+                                                Constant::SteamInitConvTemp,
                                                 1.0,
                                                 state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidIndex,
                                                 RoutineName);
@@ -1386,7 +1386,7 @@ namespace OutdoorAirUnit {
                                                                 errFlag);
                         rho = GetDensityGlycol(state,
                                                state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidName,
-                                               DataGlobalConstants::CWInitConvTemp,
+                                               Constant::CWInitConvTemp,
                                                state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
