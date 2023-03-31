@@ -108,7 +108,7 @@ int constexpr waterIndex = 1;
 static constexpr std::string_view fluidNameSteam = "STEAM";
 static constexpr std::string_view fluidNameWater = "WATER";
 
-PlantComponent *IndirectAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+IndirectAbsorberSpecs *IndirectAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data
     if (state.dataChillerIndirectAbsorption->GetInput) {
@@ -116,11 +116,10 @@ PlantComponent *IndirectAbsorberSpecs::factory(EnergyPlusData &state, std::strin
         state.dataChillerIndirectAbsorption->GetInput = false;
     }
     // Now look for this particular object
-    for (auto &thisAbs : state.dataChillerIndirectAbsorption->IndirectAbsorber) {
-        if (thisAbs.Name == objectName) {
-            return &thisAbs;
-        }
-    }
+    auto thisObj = std::find_if(state.dataChillerIndirectAbsorption->IndirectAbsorber.begin(),
+                                state.dataChillerIndirectAbsorption->IndirectAbsorber.end(),
+                                [&objectName](const IndirectAbsorberSpecs &myObj) { return myObj.Name == objectName; });
+    if (thisObj->Name == objectName) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalIndirectAbsorptionChillerFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler

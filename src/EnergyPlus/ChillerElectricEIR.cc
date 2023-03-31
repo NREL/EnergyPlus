@@ -112,7 +112,7 @@ namespace EnergyPlus::ChillerElectricEIR {
 // REFERENCES:
 // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-PlantComponent *ElectricEIRChillerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+ElectricEIRChillerSpecs *ElectricEIRChillerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data if it hasn't been done already
     if (state.dataChillerElectricEIR->getInputFlag) {
@@ -120,11 +120,10 @@ PlantComponent *ElectricEIRChillerSpecs::factory(EnergyPlusData &state, std::str
         state.dataChillerElectricEIR->getInputFlag = false;
     }
     // Now look for this particular object in the list
-    for (auto &obj : state.dataChillerElectricEIR->ElectricEIRChiller) {
-        if (obj.Name == objectName) {
-            return &obj;
-        }
-    }
+    auto thisObj = std::find_if(state.dataChillerElectricEIR->ElectricEIRChiller.begin(),
+                                state.dataChillerElectricEIR->ElectricEIRChiller.end(),
+                                [&objectName](const ElectricEIRChillerSpecs &myObj) { return myObj.Name == objectName; });
+    if (thisObj->Name == objectName) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalElectEIRChillerFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler

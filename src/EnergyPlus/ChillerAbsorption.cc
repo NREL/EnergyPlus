@@ -109,7 +109,7 @@ const char *moduleObjectType("Chiller:Absorption");
 const char *fluidNameWater = "WATER";
 const char *fluidNameSteam = "STEAM";
 
-PlantComponent *BLASTAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+BLASTAbsorberSpecs *BLASTAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data
     if (state.dataChillerAbsorber->getInput) {
@@ -117,11 +117,10 @@ PlantComponent *BLASTAbsorberSpecs::factory(EnergyPlusData &state, std::string c
         state.dataChillerAbsorber->getInput = false;
     }
     // Now look for this particular object
-    for (auto &thisAbs : state.dataChillerAbsorber->absorptionChillers) {
-        if (thisAbs.Name == objectName) {
-            return &thisAbs;
-        }
-    }
+    auto thisAbs = std::find_if(state.dataChillerAbsorber->absorptionChillers.begin(),
+                                state.dataChillerAbsorber->absorptionChillers.end(),
+                                [&objectName](const BLASTAbsorberSpecs &myAbs) { return myAbs.Name == objectName; });
+    if (thisAbs->Name == objectName) return thisAbs;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalBlastAbsorberFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
