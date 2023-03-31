@@ -98,11 +98,11 @@ namespace BoilerSteam {
         }
 
         // Now look for this particular pipe in the list
-        for (auto &boiler : state.dataBoilerSteam->Boiler) {
-            if (boiler.Name == objectName) {
-                return &boiler;
-            }
-        }
+        auto myBoiler = std::find_if(state.dataBoilerSteam->Boiler.begin(),
+                                     state.dataBoilerSteam->Boiler.end(),
+                                     [&objectName](const BoilerSpecs &boiler) { return boiler.Name == objectName; });
+        if (myBoiler->Name == objectName) return myBoiler;
+
         // If we didn't find it, fatal
         ShowFatalError(state, format("LocalBoilerSteamFactory: Error getting inputs for steam boiler named: {}", objectName)); // LCOV_EXCL_LINE
         // Shut up the compiler

@@ -297,7 +297,9 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_Factory)
 
     state->dataBoilers->getBoilerInputFlag = false;
 
-    BoilerSpecs *compPtr = Boilers::BoilerSpecs::factory(*state, state->dataBoilers->Boiler(3).Name);
+    // the pointer to plant equipment is declared as PlantComponent *compPtr;
+    // this unit test creates that pointer to a boiler to test that the boiler factory returns the correct reference
+    PlantComponent *compPtr = Boilers::BoilerSpecs::factory(*state, state->dataBoilers->Boiler(3).Name);
 
     PlantLocation Location;
     Real64 MaxLoad;
@@ -305,14 +307,12 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_Factory)
     Real64 OptLoad;
     compPtr->getDesignCapacities(*state, Location, MaxLoad, MinLoad, OptLoad);
 
-    EXPECT_EQ(compPtr->Name, state->dataBoilers->Boiler(3).Name);
-    EXPECT_EQ(MinLoad, compPtr->NomCap * compPtr->MinPartLoadRat);
     EXPECT_EQ(MinLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).MinPartLoadRat);
     EXPECT_EQ(100.0, MinLoad);
-    EXPECT_EQ(MaxLoad, compPtr->NomCap * compPtr->MaxPartLoadRat);
+
     EXPECT_EQ(MaxLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).MaxPartLoadRat);
     EXPECT_EQ(1100.0, MaxLoad);
-    EXPECT_EQ(OptLoad, compPtr->NomCap * compPtr->OptPartLoadRat);
+
     EXPECT_EQ(OptLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).OptPartLoadRat);
     EXPECT_EQ(1000.0, OptLoad);
 

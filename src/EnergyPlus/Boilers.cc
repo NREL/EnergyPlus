@@ -93,7 +93,7 @@ namespace EnergyPlus::Boilers {
 // METHODOLOGY EMPLOYED:
 // The BLAST/DOE-2 empirical model based on mfg. data
 
-BoilerSpecs *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+PlantComponent *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data for boilers if it hasn't been done already
     if (state.dataBoilers->getBoilerInputFlag) {
