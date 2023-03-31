@@ -5608,9 +5608,6 @@ void DayltgExtHorizIllum(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int IPH; // Altitude index for sky integration
     int ITH; // Azimuth index for sky integration
-    auto &PH = state.dataDaylightingManager->PH;
-    auto &TH = state.dataDaylightingManager->TH;
-    auto &SPHCPH = state.dataDaylightingManager->SPHCPH;
     int ISky; // Sky type index
 
     // Integrate to obtain illuminance from sky.
@@ -5620,11 +5617,12 @@ void DayltgExtHorizIllum(EnergyPlusData &state,
     //  Init
     if (state.dataDaylightingManager->DayltgExtHorizIllum_firstTime) {
         for (IPH = 1; IPH <= NPH; ++IPH) {
-            PH(IPH) = (IPH - 0.5) * DPH;
-            SPHCPH(IPH) = std::sin(PH(IPH)) * std::cos(PH(IPH)); // DA = COS(PH)*DTH*DPH
+            state.dataDaylightingManager->PH(IPH) = (IPH - 0.5) * DPH;
+            state.dataDaylightingManager->SPHCPH(IPH) =
+                std::sin(state.dataDaylightingManager->PH(IPH)) * std::cos(state.dataDaylightingManager->PH(IPH)); // DA = COS(PH)*DTH*DPH
         }
         for (ITH = 1; ITH <= NTH; ++ITH) {
-            TH(ITH) = (ITH - 0.5) * DTH;
+            state.dataDaylightingManager->TH(ITH) = (ITH - 0.5) * DTH;
         }
         state.dataDaylightingManager->DayltgExtHorizIllum_firstTime = false;
     }
@@ -5633,10 +5631,10 @@ void DayltgExtHorizIllum(EnergyPlusData &state,
 
     // Sky integration
     for (IPH = 1; IPH <= NPH; ++IPH) {
-        Real64 const PH_IPH(PH(IPH));
-        Real64 const SPHCPH_IPH(SPHCPH(IPH));
+        Real64 const PH_IPH(state.dataDaylightingManager->PH(IPH));
+        Real64 const SPHCPH_IPH(state.dataDaylightingManager->SPHCPH(IPH));
         for (ITH = 1; ITH <= NTH; ++ITH) {
-            Real64 const TH_ITH(TH(ITH));
+            Real64 const TH_ITH(state.dataDaylightingManager->TH(ITH));
             for (ISky = 1; ISky <= 4; ++ISky) {
                 HISK(ISky) += DayltgSkyLuminance(state, ISky, TH_ITH, PH_IPH) * SPHCPH_IPH;
             }
