@@ -534,7 +534,7 @@ namespace ElectricBaseboardRadiator {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && elecBaseboard.MyEnvrnFlag) {
             // Initialize
-            state.dataHeatBal->Zone(ControlledZoneNum).ZeroSourceSumHATsurf = 0.0;
+            state.dataHeatBal->Zone(ControlledZoneNum).ZeroBBSourceSumHATsurf = 0.0;
             elecBaseboard.QBBElecRadSource = 0.0;
             elecBaseboard.QBBElecRadSrcAvg = 0.0;
             elecBaseboard.LastQBBElecRadSrc = 0.0;
@@ -549,7 +549,7 @@ namespace ElectricBaseboardRadiator {
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-            state.dataHeatBal->Zone(ControlledZoneNum).ZeroSourceSumHATsurf = state.dataHeatBal->Zone(ControlledZoneNum).sumHATsurf(state);
+            state.dataHeatBal->Zone(ControlledZoneNum).ZeroBBSourceSumHATsurf = state.dataHeatBal->Zone(ControlledZoneNum).sumHATsurf(state);
             elecBaseboard.QBBElecRadSrcAvg = 0.0;
             elecBaseboard.LastQBBElecRadSrc = 0.0;
             elecBaseboard.LastSysTimeElapsed = 0.0;
@@ -722,11 +722,11 @@ namespace ElectricBaseboardRadiator {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
-                LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf) +
+                LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataHeatBal->Zone(ZoneNum).ZeroBBSourceSumHATsurf) +
                           (QBBCap * elecBaseboard.FracConvect) + (RadHeat * elecBaseboard.FracDistribPerson);
 
                 if (LoadMet < 0.0) {
-                    // This basically means that SumHATsurf is LESS than ZeroSourceSumHATsurf which
+                    // This basically means that SumHATsurf is LESS than ZeroBBSourceSumHATsurf which
                     // should not happen unless something unusual is happening like a fast change
                     // in temperature or some sort of change in internal load.  This is not a problem
                     // normally, but when LoadMet goes negative the choice is to either zero out
@@ -734,19 +734,19 @@ namespace ElectricBaseboardRadiator {
                     // what is happening in the zone.  If it is still predicting a negative heating
                     // load, then zero everything out.
                     // First, turn off the baseboard:
-                    Real64 TempZeroSourceSumHATsurf;
+                    Real64 TempZeroBBSourceSumHATsurf;
                     elecBaseboard.QBBElecRadSource = 0.0;
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
-                    TempZeroSourceSumHATsurf = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
+                    TempZeroBBSourceSumHATsurf = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
                     // Now, turn it back on:
                     elecBaseboard.QBBElecRadSource = RadHeat;
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Recalculate LoadMet with new ZeroSource... term and see if it is positive now.  If not, shut it down.
-                    LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - TempZeroSourceSumHATsurf) + (QBBCap * elecBaseboard.FracConvect) +
+                    LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - TempZeroBBSourceSumHATsurf) + (QBBCap * elecBaseboard.FracConvect) +
                               (RadHeat * elecBaseboard.FracDistribPerson);
                     if (LoadMet < 0.0) {
                         // LoadMet is still less than zero so shut everything down
@@ -874,8 +874,7 @@ namespace ElectricBaseboardRadiator {
         if (state.dataElectBaseboardRad->NumElecBaseboards == 0) return;
 
         // If it was allocated, then we have to check to see if this was running at all...
-        for (int BaseboardNum = 1; BaseboardNum <= state.dataElectBaseboardRad->NumElecBaseboards; ++BaseboardNum) {
-            auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
+        for (auto &elecBaseboard : state.dataElectBaseboardRad->ElecBaseboard) {
             elecBaseboard.QBBElecRadSource = elecBaseboard.QBBElecRadSrcAvg;
             if (elecBaseboard.QBBElecRadSrcAvg != 0.0) {
                 ElecBaseboardSysOn = true;
@@ -913,9 +912,7 @@ namespace ElectricBaseboardRadiator {
         state.dataHeatBalFanSys->SurfQElecBaseboard = 0.0;
         state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson = 0.0;
 
-        for (int BaseboardNum = 1; BaseboardNum <= state.dataElectBaseboardRad->NumElecBaseboards; ++BaseboardNum) {
-            auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
-
+        for (auto &elecBaseboard : state.dataElectBaseboardRad->ElecBaseboard) {
             if (elecBaseboard.ZonePtr > 0) { // issue 5806 can be zero during first calls to baseboards, will be set after all are modeled
                 int ZoneNum = elecBaseboard.ZonePtr;
                 state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson(ZoneNum) += elecBaseboard.QBBElecRadSource * elecBaseboard.FracDistribPerson;
