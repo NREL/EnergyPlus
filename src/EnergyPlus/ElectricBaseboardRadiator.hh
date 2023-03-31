@@ -154,12 +154,10 @@ struct ElectricBaseboardRadiatorData : BaseGlobalStruct
 
     // Object Data
     int NumElecBaseboards = 0;
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
     // Record keeping variables used to calculate QBBRadSrcAvg locally
     Array1D<ElectricBaseboardRadiator::ElecBaseboardParams> ElecBaseboard;
     Array1D<ElectricBaseboardRadiator::ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
     bool GetInputFlag = true; // One time get input flag
-    bool MyOneTimeFlag = true;
 
     void clear_state() override
     {

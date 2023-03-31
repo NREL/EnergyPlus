@@ -525,13 +525,6 @@ namespace ElectricBaseboardRadiator {
 
         auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
 
-        // Do the one time initializations
-        if (state.dataElectBaseboardRad->MyOneTimeFlag) {
-            // initialize the environment and sizing flags
-            state.dataElectBaseboardRad->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            state.dataElectBaseboardRad->MyOneTimeFlag = false;
-        }
-
         if (!state.dataGlobal->SysSizingCalc && elecBaseboard.MySizeFlag) {
             // for each coil, do the sizing once.
             SizeElectricBaseboard(state, BaseboardNum);
@@ -541,7 +534,7 @@ namespace ElectricBaseboardRadiator {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && elecBaseboard.MyEnvrnFlag) {
             // Initialize
-            state.dataElectBaseboardRad->ZeroSourceSumHATsurf = 0.0;
+            state.dataHeatBal->Zone(ControlledZoneNum).ZeroSourceSumHATsurf = 0.0;
             elecBaseboard.QBBElecRadSource = 0.0;
             elecBaseboard.QBBElecRadSrcAvg = 0.0;
             elecBaseboard.LastQBBElecRadSrc = 0.0;
@@ -556,7 +549,7 @@ namespace ElectricBaseboardRadiator {
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-            state.dataElectBaseboardRad->ZeroSourceSumHATsurf(ControlledZoneNum) = state.dataHeatBal->Zone(ControlledZoneNum).sumHATsurf(state);
+            state.dataHeatBal->Zone(ControlledZoneNum).ZeroSourceSumHATsurf = state.dataHeatBal->Zone(ControlledZoneNum).sumHATsurf(state);
             elecBaseboard.QBBElecRadSrcAvg = 0.0;
             elecBaseboard.LastQBBElecRadSrc = 0.0;
             elecBaseboard.LastSysTimeElapsed = 0.0;
@@ -729,7 +722,7 @@ namespace ElectricBaseboardRadiator {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
-                LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataElectBaseboardRad->ZeroSourceSumHATsurf(ZoneNum)) +
+                LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf) +
                           (QBBCap * elecBaseboard.FracConvect) + (RadHeat * elecBaseboard.FracDistribPerson);
 
                 if (LoadMet < 0.0) {

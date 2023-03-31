@@ -695,6 +695,7 @@ namespace DataHeatBalance {
         Real64 ZeroSourceSumHATsurf = 0.0; // From Chilled Ceiling Panel, equal to the SumHATsurf for all the walls in a zone with no source
         bool zoneOAQuadratureSum = false;  // True when zone OA balance method is Quadrature
         int zoneOABalanceIndex = 0;        // Index to ZoneAirBalance for this zone, if any
+        Real64 ZeroSourceSumHATsurf = 0.0; // used in baseboards in energy balance
 
         // Spaces
         bool anySurfacesWithoutSpace = false; // True if any surfaces in a zone do not have a space assigned in input
