@@ -10806,9 +10806,9 @@
     central ac and furnace unitary system Cooling Coil - Heating Coil Node,  !- Air Inlet Node Name
     Node 4,                  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
-    0,                       !- Parasitic Electric Load {W}
+    0,                       !- On Cycle Parasitic Electric Load {W}
     ,                        !- Part Load Fraction Correlation Curve Name
-    0;                       !- Parasitic Fuel Load {W}
+    0;                       !- Off Cycle Parasitic Fuel Load {W}
 
   Curve:Biquadratic,
     Cool-Cap-fT1,            !- Name

@@ -521,9 +521,9 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
         "  Air Loop HVAC Unitary Heat Cool VAVChangeover Bypass 1 Cooling Coil Outlet Node, !- Air Inlet Node Name",
         "  Air Loop HVAC Unitary Heat Cool VAVChangeover Bypass 1 Heating Coil Outlet Node, !- Air Outlet Node Name",
         "  ,                                       !- Temperature Setpoint Node Name",
-        "  0,                                      !- Parasitic Electric Load {W}",
+        "  0,                                      !- On Cycle Parasitic Electric Load {W}",
         "  ,                                       !- Part Load Fraction Correlation Curve Name",
-        "  0;                                      !- Parasitic Fuel Load {W}",
+        "  0;                                      !- Off Cycle Parasitic Fuel Load {W}",
 
         "Curve:Biquadratic,",
         "  Curve Biquadratic 1,                    !- Name",

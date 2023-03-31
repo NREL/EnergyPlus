@@ -11633,7 +11633,7 @@
     HeatSys1 Supply Equipment Outlet Node,  !- Boiler Water Outlet Node Name
     95.0,                    !- Water Outlet Upper Temperature Limit {C}
     LeavingSetpointModulated,!- Boiler Flow Mode
-    0.0000,                  !- Parasitic Electric Load {W}
+    0.0000,                  !- On Cycle Parasitic Electric Load {W}
     1.0000;                  !- Sizing Factor
 
   SetpointManager:Scheduled,

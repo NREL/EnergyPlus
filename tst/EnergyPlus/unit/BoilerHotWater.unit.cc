@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
         "  Node boiler 1 outlet,    !- Boiler Water Outlet Node Name",
         "  99.9,                    !- Water Outlet Upper Temperature Limit {C}",
         "  NotModulated,            !- Boiler Flow Mode",
-        "  ,                        !- Parasitic Electric Load {W}",
+        "  ,                        !- On Cycle Parasitic Electric Load {W}",
         "  1;                       !- Sizing Factor",
     });
 
@@ -224,7 +224,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
         "  Node boiler 1 outlet,    !- Boiler Water Outlet Node Name",
         "  99.9,                    !- Water Outlet Upper Temperature Limit {C}",
         "  NotModulated,            !- Boiler Flow Mode",
-        "  ,                        !- Parasitic Electric Load {W}",
+        "  ,                        !- On Cycle Parasitic Electric Load {W}",
         "  1;                       !- Sizing Factor",
 
         "Curve:Quadratic,",

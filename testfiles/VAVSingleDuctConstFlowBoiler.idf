@@ -2061,7 +2061,7 @@
     Boiler Outlet Node,      !- Boiler Water Outlet Node Name
     100,                     !- Water Outlet Upper Temperature Limit {C}
     ConstantFlow,            !- Boiler Flow Mode
-    75.0;                    !- Parasitic Electric Load {W}
+    75.0;                    !- On Cycle Parasitic Electric Load {W}
 
   Curve:Quadratic,
     BoilerEfficiency,        !- Name

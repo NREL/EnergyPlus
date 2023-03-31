@@ -2699,7 +2699,7 @@
     Coil:Cooling:DX,  !- Heating Source Object Type
     Main Cooling Coil 1,     !- Heating Source Name
     ,                        !- Temperature Setpoint Node Name
-    5.0;                     !- Parasitic Electric Load {W}
+    5.0;                     !- On Cycle Parasitic Electric Load {W}
 
   SetpointManager:Scheduled,
     Supply Air HumRat Manager 1,  !- Name

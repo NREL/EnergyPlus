@@ -1380,11 +1380,11 @@
     SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
     ,                        !- Part Load Fraction Correlation Curve Name
-    10,                      !- Parasitic Gas Load {W}
+    10,                      !- Off Cycle Parasitic Gas Load {W}
     1,                       !- Number of Stages
     0.90,                    !- Stage 1 Gas Burner Efficiency {W/W}
     45000,                   !- Stage 1 Nominal Capacity {W}
-    ;                        !- Stage 1 Parasitic Electric Load {W}
+    ;                        !- Stage 1 On Cycle Parasitic Electric Load {W}
 
   Curve:Cubic,
     HPACHeatCapFT Speed 1,   !- Name
