@@ -534,7 +534,7 @@ namespace ElectricBaseboardRadiator {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && elecBaseboard.MyEnvrnFlag) {
             // Initialize
-            state.dataHeatBal->Zone(ControlledZoneNum).ZeroBBSourceSumHATsurf = 0.0;
+            elecBaseboard.ZeroBBSourceSumHATsurf = 0.0;
             elecBaseboard.QBBElecRadSource = 0.0;
             elecBaseboard.QBBElecRadSrcAvg = 0.0;
             elecBaseboard.LastQBBElecRadSrc = 0.0;
@@ -549,7 +549,7 @@ namespace ElectricBaseboardRadiator {
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-            state.dataHeatBal->Zone(ControlledZoneNum).ZeroBBSourceSumHATsurf = state.dataHeatBal->Zone(ControlledZoneNum).sumHATsurf(state);
+            elecBaseboard.ZeroBBSourceSumHATsurf = state.dataHeatBal->Zone(ControlledZoneNum).sumHATsurf(state);
             elecBaseboard.QBBElecRadSrcAvg = 0.0;
             elecBaseboard.LastQBBElecRadSrc = 0.0;
             elecBaseboard.LastSysTimeElapsed = 0.0;
@@ -722,7 +722,7 @@ namespace ElectricBaseboardRadiator {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
-                LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataHeatBal->Zone(ZoneNum).ZeroBBSourceSumHATsurf) +
+                LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - elecBaseboard.ZeroBBSourceSumHATsurf) +
                           (QBBCap * elecBaseboard.FracConvect) + (RadHeat * elecBaseboard.FracDistribPerson);
 
                 if (LoadMet < 0.0) {

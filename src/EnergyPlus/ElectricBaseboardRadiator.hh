@@ -98,6 +98,7 @@ namespace ElectricBaseboardRadiator {
         bool MySizeFlag = true;
         bool MyEnvrnFlag = true;
         bool CheckEquipName = true;
+        Real64 ZeroBBSourceSumHATsurf = 0.0; // used in baseboard energy balance
         // Record keeping variables used to calculate QBBRadSrcAvg locally
         Real64 QBBElecRadSource = 0.0;   // Need to keep the last value in case we are still iterating
         Real64 QBBElecRadSrcAvg = 0.0;   // Need to keep the last value in case we are still iterating
