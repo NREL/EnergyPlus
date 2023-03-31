@@ -136,7 +136,7 @@ namespace ElectricBaseboardRadiator {
                                       NumElecBaseboards,
                                       EquipName));
             }
-            if (state.dataElectBaseboardRad->CheckEquipName(BaseboardNum)) {
+            if (state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum).CheckEquipName) {
                 if (EquipName != state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum).EquipName) {
                     ShowFatalError(state,
                                    format("SimElectricBaseboard: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
@@ -144,7 +144,7 @@ namespace ElectricBaseboardRadiator {
                                           EquipName,
                                           state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum).EquipName));
                 }
-                state.dataElectBaseboardRad->CheckEquipName(BaseboardNum) = false;
+                state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum).CheckEquipName = false;
             }
         }
 
@@ -194,13 +194,10 @@ namespace ElectricBaseboardRadiator {
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // object is extensible, no max args needed as IPShortCuts being used
-        auto &CheckEquipName = state.dataElectBaseboardRad->CheckEquipName;
         auto &ElecBaseboardNumericFields = state.dataElectBaseboardRad->ElecBaseboardNumericFields;
 
         state.dataElectBaseboardRad->ElecBaseboard.allocate(NumElecBaseboards);
-        CheckEquipName.allocate(NumElecBaseboards);
         ElecBaseboardNumericFields.allocate(NumElecBaseboards);
-        CheckEquipName = true;
 
         for (int BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum) {
             auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
@@ -534,47 +531,39 @@ namespace ElectricBaseboardRadiator {
         // Do the one time initializations
         if (state.dataElectBaseboardRad->MyOneTimeFlag) {
             // initialize the environment and sizing flags
-            state.dataElectBaseboardRad->MyEnvrnFlag.dimension(NumElecBaseboards, true);
-            state.dataElectBaseboardRad->MySizeFlag.dimension(NumElecBaseboards, true);
             state.dataElectBaseboardRad->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            state.dataElectBaseboardRad->QBBElecRadSource.dimension(NumElecBaseboards, 0.0);
-            state.dataElectBaseboardRad->QBBElecRadSrcAvg.dimension(NumElecBaseboards, 0.0);
-            state.dataElectBaseboardRad->LastQBBElecRadSrc.dimension(NumElecBaseboards, 0.0);
-            state.dataElectBaseboardRad->LastSysTimeElapsed.dimension(NumElecBaseboards, 0.0);
-            state.dataElectBaseboardRad->LastTimeStepSys.dimension(NumElecBaseboards, 0.0);
-
             state.dataElectBaseboardRad->MyOneTimeFlag = false;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && state.dataElectBaseboardRad->MySizeFlag(BaseboardNum)) {
+        if (!state.dataGlobal->SysSizingCalc && elecBaseboard.MySizeFlag) {
             // for each coil, do the sizing once.
             SizeElectricBaseboard(state, BaseboardNum);
-            state.dataElectBaseboardRad->MySizeFlag(BaseboardNum) = false;
+            elecBaseboard.MySizeFlag = false;
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && state.dataElectBaseboardRad->MyEnvrnFlag(BaseboardNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && elecBaseboard.MyEnvrnFlag) {
             // Initialize
             state.dataElectBaseboardRad->ZeroSourceSumHATsurf = 0.0;
-            state.dataElectBaseboardRad->QBBElecRadSource = 0.0;
-            state.dataElectBaseboardRad->QBBElecRadSrcAvg = 0.0;
-            state.dataElectBaseboardRad->LastQBBElecRadSrc = 0.0;
-            state.dataElectBaseboardRad->LastSysTimeElapsed = 0.0;
-            state.dataElectBaseboardRad->LastTimeStepSys = 0.0;
+            elecBaseboard.QBBElecRadSource = 0.0;
+            elecBaseboard.QBBElecRadSrcAvg = 0.0;
+            elecBaseboard.LastQBBElecRadSrc = 0.0;
+            elecBaseboard.LastSysTimeElapsed = 0.0;
+            elecBaseboard.LastTimeStepSys = 0.0;
 
-            state.dataElectBaseboardRad->MyEnvrnFlag(BaseboardNum) = false;
+            elecBaseboard.MyEnvrnFlag = false;
         }
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            state.dataElectBaseboardRad->MyEnvrnFlag(BaseboardNum) = true;
+            elecBaseboard.MyEnvrnFlag = true;
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             state.dataElectBaseboardRad->ZeroSourceSumHATsurf(ControlledZoneNum) = state.dataHeatBal->Zone(ControlledZoneNum).sumHATsurf(state);
-            state.dataElectBaseboardRad->QBBElecRadSrcAvg(BaseboardNum) = 0.0;
-            state.dataElectBaseboardRad->LastQBBElecRadSrc(BaseboardNum) = 0.0;
-            state.dataElectBaseboardRad->LastSysTimeElapsed(BaseboardNum) = 0.0;
-            state.dataElectBaseboardRad->LastTimeStepSys(BaseboardNum) = 0.0;
+            elecBaseboard.QBBElecRadSrcAvg = 0.0;
+            elecBaseboard.LastQBBElecRadSrc = 0.0;
+            elecBaseboard.LastSysTimeElapsed = 0.0;
+            elecBaseboard.LastTimeStepSys = 0.0;
         }
 
         // Do the every time step initializations
@@ -727,7 +716,7 @@ namespace ElectricBaseboardRadiator {
                 QBBCap = QZnReq;
             }
             RadHeat = QBBCap * elecBaseboard.FracRadiant;
-            state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum) = RadHeat;
+            elecBaseboard.QBBElecRadSource = RadHeat;
 
             if (elecBaseboard.FracRadiant > 0.0) { // User defines radiant heat addition
                 // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
@@ -756,13 +745,13 @@ namespace ElectricBaseboardRadiator {
                     // load, then zero everything out.
                     // First, turn off the baseboard:
                     Real64 TempZeroSourceSumHATsurf;
-                    state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum) = 0.0;
+                    elecBaseboard.QBBElecRadSource = 0.0;
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     TempZeroSourceSumHATsurf = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
                     // Now, turn it back on:
-                    state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum) = RadHeat;
+                    elecBaseboard.QBBElecRadSource = RadHeat;
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
@@ -771,13 +760,8 @@ namespace ElectricBaseboardRadiator {
                               (RadHeat * elecBaseboard.FracDistribPerson);
                     if (LoadMet < 0.0) {
                         // LoadMet is still less than zero so shut everything down
-                        UpdateElectricBaseboardOff(LoadMet,
-                                                   QBBCap,
-                                                   RadHeat,
-                                                   state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum),
-                                                   elecBaseboard.ElecUseRate,
-                                                   AirOutletTemp,
-                                                   AirInletTemp);
+                        UpdateElectricBaseboardOff(
+                            LoadMet, QBBCap, RadHeat, elecBaseboard.QBBElecRadSource, elecBaseboard.ElecUseRate, AirOutletTemp, AirInletTemp);
                     } else {
                         // Corrected LoadMet is now positive so use this and move forward with system operating
                         UpdateElectricBaseboardOn(AirOutletTemp, elecBaseboard.ElecUseRate, AirInletTemp, QBBCap, CapacitanceAir, Effic);
@@ -795,13 +779,8 @@ namespace ElectricBaseboardRadiator {
 
         } else { // If there is an off condition the BB does nothing.
 
-            UpdateElectricBaseboardOff(LoadMet,
-                                       QBBCap,
-                                       RadHeat,
-                                       state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum),
-                                       elecBaseboard.ElecUseRate,
-                                       AirOutletTemp,
-                                       AirInletTemp);
+            UpdateElectricBaseboardOff(
+                LoadMet, QBBCap, RadHeat, elecBaseboard.QBBElecRadSource, elecBaseboard.ElecUseRate, AirOutletTemp, AirInletTemp);
         }
 
         // Assign calculated ones
@@ -864,20 +843,18 @@ namespace ElectricBaseboardRadiator {
         // Using/Aliasing
         Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
 
         // First, update the running average if necessary...
-        if (state.dataElectBaseboardRad->LastSysTimeElapsed(BaseboardNum) == SysTimeElapsed) {
-            state.dataElectBaseboardRad->QBBElecRadSrcAvg(BaseboardNum) -= state.dataElectBaseboardRad->LastQBBElecRadSrc(BaseboardNum) *
-                                                                           state.dataElectBaseboardRad->LastTimeStepSys(BaseboardNum) /
-                                                                           state.dataGlobal->TimeStepZone;
+        if (elecBaseboard.LastSysTimeElapsed == SysTimeElapsed) {
+            elecBaseboard.QBBElecRadSrcAvg -= elecBaseboard.LastQBBElecRadSrc * elecBaseboard.LastTimeStepSys / state.dataGlobal->TimeStepZone;
         }
         // Update the running average and the "last" values with the current values of the appropriate variables
-        state.dataElectBaseboardRad->QBBElecRadSrcAvg(BaseboardNum) +=
-            state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
+        elecBaseboard.QBBElecRadSrcAvg += elecBaseboard.QBBElecRadSource * TimeStepSys / state.dataGlobal->TimeStepZone;
 
-        state.dataElectBaseboardRad->LastQBBElecRadSrc(BaseboardNum) = state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum);
-        state.dataElectBaseboardRad->LastSysTimeElapsed(BaseboardNum) = SysTimeElapsed;
-        state.dataElectBaseboardRad->LastTimeStepSys(BaseboardNum) = TimeStepSys;
+        elecBaseboard.LastQBBElecRadSrc = elecBaseboard.QBBElecRadSource;
+        elecBaseboard.LastSysTimeElapsed = SysTimeElapsed;
+        elecBaseboard.LastTimeStepSys = TimeStepSys;
     }
 
     void UpdateBBElecRadSourceValAvg(EnergyPlusData &state, bool &ElecBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step
@@ -904,20 +881,18 @@ namespace ElectricBaseboardRadiator {
         ElecBaseboardSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
-        if (!allocated(state.dataElectBaseboardRad->QBBElecRadSrcAvg)) return;
+        if (state.dataElectBaseboardRad->NumElecBaseboards == 0) return;
 
         // If it was allocated, then we have to check to see if this was running at all...
         for (int BaseboardNum = 1; BaseboardNum <= state.dataElectBaseboardRad->NumElecBaseboards; ++BaseboardNum) {
-            if (state.dataElectBaseboardRad->QBBElecRadSrcAvg(BaseboardNum) != 0.0) {
+            auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
+            elecBaseboard.QBBElecRadSource = elecBaseboard.QBBElecRadSrcAvg;
+            if (elecBaseboard.QBBElecRadSrcAvg != 0.0) {
                 ElecBaseboardSysOn = true;
-                break; // DO loop
             }
         }
 
-        state.dataElectBaseboardRad->QBBElecRadSource = state.dataElectBaseboardRad->QBBElecRadSrcAvg;
-
         // QBBElecRadSource has been modified so we need to redistribute gains
-
         DistributeBBElecRadGains(state);
     }
 
@@ -953,14 +928,13 @@ namespace ElectricBaseboardRadiator {
 
             if (elecBaseboard.ZonePtr > 0) { // issue 5806 can be zero during first calls to baseboards, will be set after all are modeled
                 int ZoneNum = elecBaseboard.ZonePtr;
-                state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson(ZoneNum) +=
-                    state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum) * elecBaseboard.FracDistribPerson;
+                state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson(ZoneNum) += elecBaseboard.QBBElecRadSource * elecBaseboard.FracDistribPerson;
 
                 for (int RadSurfNum = 1; RadSurfNum <= elecBaseboard.TotSurfToDistrib; ++RadSurfNum) {
                     int SurfNum = elecBaseboard.SurfacePtr(RadSurfNum);
                     if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
-                        Real64 ThisSurfIntensity = (state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum) *
-                                                    elecBaseboard.FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
+                        Real64 ThisSurfIntensity =
+                            (elecBaseboard.QBBElecRadSource * elecBaseboard.FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
                         state.dataHeatBalFanSys->SurfQElecBaseboard(SurfNum) += ThisSurfIntensity;
                         state.dataHeatBalSurf->AnyRadiantSystems = true;
                         if (ThisSurfIntensity > DataHeatBalFanSys::MaxRadHeatFlux) {
