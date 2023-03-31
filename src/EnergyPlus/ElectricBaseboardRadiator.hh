@@ -97,12 +97,13 @@ namespace ElectricBaseboardRadiator {
         Real64 ScaledHeatingCapacity = 0.0; // - scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
         bool MySizeFlag = true;
         bool MyEnvrnFlag = true;
-        Real64 LastSysTimeElapsed = 0.0; // Need to keep the last value in case we are still iterating
-        Real64 LastTimeStepSys = 0.0;    // Need to keep the last value in case we are still iterating
+        bool CheckEquipName = true;
+        // Record keeping variables used to calculate QBBRadSrcAvg locally
         Real64 QBBElecRadSource = 0.0;   // Need to keep the last value in case we are still iterating
         Real64 QBBElecRadSrcAvg = 0.0;   // Need to keep the last value in case we are still iterating
+        Real64 LastSysTimeElapsed = 0.0; // Need to keep the last value in case we are still iterating
+        Real64 LastTimeStepSys = 0.0;    // Need to keep the last value in case we are still iterating
         Real64 LastQBBElecRadSrc = 0.0;  // Need to keep the last value in case we are still iterating
-        bool CheckEquipName = true;
     };
 
     struct ElecBaseboardNumericFieldData
@@ -154,7 +155,6 @@ struct ElectricBaseboardRadiatorData : BaseGlobalStruct
 
     // Object Data
     int NumElecBaseboards = 0;
-    // Record keeping variables used to calculate QBBRadSrcAvg locally
     Array1D<ElectricBaseboardRadiator::ElecBaseboardParams> ElecBaseboard;
     Array1D<ElectricBaseboardRadiator::ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
     bool GetInputFlag = true; // One time get input flag
@@ -163,8 +163,6 @@ struct ElectricBaseboardRadiatorData : BaseGlobalStruct
     {
         this->NumElecBaseboards = 0;
         this->GetInputFlag = true;
-        this->MyOneTimeFlag = true;
-        this->ZeroSourceSumHATsurf.clear(); // Equal to the SumHATsurf for all the walls in a zone with no source
         this->ElecBaseboard.clear();
         this->ElecBaseboardNumericFields.clear();
     }
