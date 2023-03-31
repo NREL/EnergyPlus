@@ -2059,7 +2059,7 @@ namespace ThermalComfort {
         auto &thisAngFacList(state.dataThermalComforts->AngleFactorList(AngleFacNum));
 
         for (int SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
-            Real64 SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv;
+            Real64 SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(thisAngFacList.SurfacePtr(SurfNum)) + Constant::KelvinConv;
             Real64 SurfEAF =
                 state.dataConstruction->Construct(state.dataSurface->Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal *
                 thisAngFacList.AngleFactor(SurfNum);
@@ -2067,7 +2067,7 @@ namespace ThermalComfort {
             SumSurfaceEmissAngleFactor += SurfEAF;
         }
 
-        CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed / SumSurfaceEmissAngleFactor) - DataGlobalConstants::KelvinConv;
+        CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed / SumSurfaceEmissAngleFactor) - Constant::KelvinConv;
 
         return CalcAngleFactorMRT;
     }
@@ -2258,11 +2258,11 @@ namespace ThermalComfort {
             state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
             state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson(state.dataThermalComforts->ZoneNum);
         if (state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) > 0.0) {
-            state.dataThermalComforts->RadTemp += DataGlobalConstants::KelvinConv; // Convert to Kelvin
+            state.dataThermalComforts->RadTemp += Constant::KelvinConv; // Convert to Kelvin
             state.dataThermalComforts->RadTemp =
                 root_4(pow_4(state.dataThermalComforts->RadTemp) +
                        (state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) / AreaEff / StefanBoltzmannConst));
-            state.dataThermalComforts->RadTemp -= DataGlobalConstants::KelvinConv; // Convert back to Celsius
+            state.dataThermalComforts->RadTemp -= Constant::KelvinConv; // Convert back to Celsius
         }
 
         CalcRadTemp = state.dataThermalComforts->RadTemp;
@@ -2460,13 +2460,13 @@ namespace ThermalComfort {
             state.dataThermalComforts->TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
             // report how the aggregation is conducted
             switch (state.dataGlobal->KindOfSim) {
-            case DataGlobalConstants::KindOfSim::DesignDay: {
+            case Constant::KindOfSim::DesignDay: {
                 addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the Design Days");
             } break;
-            case DataGlobalConstants::KindOfSim::RunPeriodDesign: {
+            case Constant::KindOfSim::RunPeriodDesign: {
                 addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the RunPeriods for Design");
             } break;
-            case DataGlobalConstants::KindOfSim::RunPeriodWeather: {
+            case Constant::KindOfSim::RunPeriodWeather: {
                 addFootNoteSubTable(state, state.dataOutRptPredefined->pdstSimpleComfort, "Aggregated over the RunPeriods for Weather");
             } break;
             default:
@@ -2646,13 +2646,13 @@ namespace ThermalComfort {
             state.dataThermalComforts->TotalAnyZoneNotMetOccupied = 0.0;
             // report how the aggregation is conducted
             switch (state.dataGlobal->KindOfSim) {
-            case DataGlobalConstants::KindOfSim::DesignDay: {
+            case Constant::KindOfSim::DesignDay: {
                 addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the Design Days");
             } break;
-            case DataGlobalConstants::KindOfSim::RunPeriodDesign: {
+            case Constant::KindOfSim::RunPeriodDesign: {
                 addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the RunPeriods for Design");
             } break;
-            case DataGlobalConstants::KindOfSim::RunPeriodWeather: {
+            case Constant::KindOfSim::RunPeriodWeather: {
                 addFootNoteSubTable(state, state.dataOutRptPredefined->pdstUnmetLoads, "Aggregated over the RunPeriods for Weather");
             } break;
             default:

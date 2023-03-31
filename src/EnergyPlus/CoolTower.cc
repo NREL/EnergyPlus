@@ -188,7 +188,7 @@ namespace CoolTower {
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name = state.dataIPShortCut->cAlphaArgs(1);     // Name of cooltower
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Schedule = state.dataIPShortCut->cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr =
                     ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
@@ -787,7 +787,7 @@ namespace CoolTower {
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   Aut 2008
 
-        Real64 const TSMult = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const TSMult = state.dataHVACGlobal->TimeStepSysSec;
 
         for (int CoolTowerNum = 1; CoolTowerNum <= (int)state.dataCoolTower->CoolTowerSys.size(); ++CoolTowerNum) {
 

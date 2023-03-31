@@ -248,7 +248,7 @@ namespace PlantPipingSystemsManager {
         // Get the XY cross sectional area of the radial cell
         Real64 inline XY_CrossSectArea() const
         {
-            return DataGlobalConstants::Pi * (pow_2(this->OuterRadius) - pow_2(this->InnerRadius));
+            return Constant::Pi * (pow_2(this->OuterRadius) - pow_2(this->InnerRadius));
         }
     };
 
@@ -264,7 +264,7 @@ namespace PlantPipingSystemsManager {
         // Member Constructor
         FluidCellInformation(Real64 const m_PipeInnerRadius, Real64 const m_CellDepth)
         {
-            this->Volume = DataGlobalConstants::Pi * pow_2(m_PipeInnerRadius) * m_CellDepth;
+            this->Volume = Constant::Pi * pow_2(m_PipeInnerRadius) * m_CellDepth;
         }
     };
 

@@ -185,7 +185,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataHeatBal->Zone(1).Volume = 1061.88;
     state->dataGlobal->TimeStepZone = 10.0 / 60.0; // Zone timestep in hours
     state->dataHVACGlobal->TimeStepSys = 10.0 / 60.0;
-    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     Real64 ZoneTempChange;
 
@@ -558,7 +558,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBal->Zone(1).Volume = 4000;
     state->dataGlobal->TimeStepZone = 10.0 / 60.0; // Zone timestep in hours
     state->dataHVACGlobal->TimeStepSys = 10.0 / 60.0;
-    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     // Hybrid modeling trigger
     state->dataHybridModel->FlagHybridModel_TM = false;

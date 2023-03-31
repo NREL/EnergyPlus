@@ -997,8 +997,8 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         AbsThermSurf =
             dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
                 ->AbsorpThermal;
-        TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + DataGlobalConstants::KelvinConv;
-        TsBaffK = TmpTsBaf + DataGlobalConstants::KelvinConv;
+        TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + Constant::KelvinConv;
+        TsBaffK = TmpTsBaf + Constant::KelvinConv;
         if (TsBaffK == TsoK) {        // avoid divide by zero
             HPlenARR(ThisSurf) = 0.0; // no net heat transfer if same temperature
         } else {
@@ -1064,7 +1064,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) /
           A; // Autodesk:F2C++ Functions handle array subscript usage
 
-    TmeanK = 0.5 * (TmpTsBaf + Tso) + DataGlobalConstants::KelvinConv;
+    TmeanK = 0.5 * (TmpTsBaf + Tso) + Constant::KelvinConv;
 
     Gr = g * pow_3(GapThick) * std::abs(Tso - TmpTsBaf) * pow_2(RhoAir) / (TmeanK * pow_2(nu));
 
@@ -1076,14 +1076,14 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     VdotWind = Cv * (VentArea / 2.0) * Vwind;
 
     if (TaGap > Tamb) {
-        VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (TaGap - Tamb) / (TaGap + DataGlobalConstants::KelvinConv));
+        VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (TaGap - Tamb) / (TaGap + Constant::KelvinConv));
     } else if (TaGap == Tamb) {
         VdotThermal = 0.0;
     } else {
         if ((std::abs(Tilt) < 5.0) || (std::abs(Tilt - 180.0) < 5.0)) {
             VdotThermal = 0.0; // stable buoyancy situation
         } else {
-            VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (Tamb - TaGap) / (Tamb + DataGlobalConstants::KelvinConv));
+            VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (Tamb - TaGap) / (Tamb + Constant::KelvinConv));
         }
     }
 
@@ -1168,7 +1168,7 @@ void PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height 
     Real64 ang;
     Real64 tiltr;
 
-    tiltr = Tilt * DataGlobalConstants::DegToRadians;
+    tiltr = Tilt * Constant::DegToRadians;
     Ra = Gr * Pr;
 
     if (Ra > 2.0e6) {
