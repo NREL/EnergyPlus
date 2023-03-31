@@ -319,4 +319,9 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_Factory)
     EXPECT_EQ(0.0, state->dataBoilers->Boiler(1).NomCap);
     EXPECT_EQ(0.0, state->dataBoilers->Boiler(2).NomCap);
     EXPECT_EQ(1000.0, state->dataBoilers->Boiler(3).NomCap);
+
+    // and the boiler factory now returns a boiler class pointer
+    BoilerSpecs *thisBoiler = Boilers::BoilerSpecs::factory(*state, state->dataBoilers->Boiler(2).Name);
+    EXPECT_EQ(0.0, thisBoiler->NomCap);
+    EXPECT_EQ(thisBoiler->Name, state->dataBoilers->Boiler(2).Name);
 }
