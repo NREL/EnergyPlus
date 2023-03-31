@@ -437,9 +437,7 @@ namespace ElectricBaseboardRadiator {
             ShowFatalError(state, std::string{RoutineName} + cCurrentModuleObject + "Errors found getting input. Program terminates.");
         }
 
-        for (int BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum) {
-            auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
-
+        for (auto &elecBaseboard : state.dataElectBaseboardRad->ElecBaseboard) {
             // Setup Report variables for the Electric Baseboards
             // CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Electric'
             SetupOutputVariable(state,
@@ -526,7 +524,6 @@ namespace ElectricBaseboardRadiator {
         // This subroutine initializes the Baseboard units during simulation.
 
         auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
-        int NumElecBaseboards = state.dataElectBaseboardRad->NumElecBaseboards;
 
         // Do the one time initializations
         if (state.dataElectBaseboardRad->MyOneTimeFlag) {
