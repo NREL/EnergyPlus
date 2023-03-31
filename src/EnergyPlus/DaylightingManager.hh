@@ -416,7 +416,7 @@ namespace DaylightingManager {
                                                 DataDaylighting::CalledFor const CalledFrom, // indicate  which type of routine called this routine
                                                 int const MapNum = 0);
 
-    Real64 DayltgSkyLuminance(EnergyPlusData &state,
+    Real64 DayltgSkyLuminance(EnergyPlusData const &state,
                               int const ISky,     // Sky type: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
                               Real64 const THSKY, // Azimuth and altitude of sky element (radians)
                               Real64 const PHSKY);

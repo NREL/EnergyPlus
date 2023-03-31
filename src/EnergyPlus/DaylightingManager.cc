@@ -6837,10 +6837,6 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     }
 
     if (GlareFlag) {
-        auto &WDAYIL = state.dataDaylightingManager->WDAYIL;
-        auto &WBACLU = state.dataDaylightingManager->WBACLU;
-        auto &RDAYIL = state.dataDaylightingManager->RDAYIL;
-        auto &RBACLU = state.dataDaylightingManager->RBACLU;
         bool &blnCycle = state.dataDaylightingManager->blnCycle;
         bool &GlareOK = state.dataDaylightingManager->GlareOK;
         Real64 &tmpMult = state.dataDaylightingManager->tmpMult;
@@ -6884,8 +6880,8 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                         //  For switchable windows, this may be partially switched rather than fully dark
                         for (int IL = 1; IL <= NREFPT; ++IL) {
                             for (int IS = 1; IS <= 2; ++IS) {
-                                WDAYIL(IS, IL, igroup) = thisDaylightControl.IllumFromWinAtRefPt(loop, IS, IL);
-                                WBACLU(IS, IL, igroup) = thisDaylightControl.BackLumFromWinAtRefPt(loop, IS, IL);
+                                state.dataDaylightingManager->WDAYIL(IS, IL, igroup) = thisDaylightControl.IllumFromWinAtRefPt(loop, IS, IL);
+                                state.dataDaylightingManager->WBACLU(IS, IL, igroup) = thisDaylightControl.BackLumFromWinAtRefPt(loop, IS, IL);
                             }
                         }
 
@@ -6895,13 +6891,20 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                             if (state.dataSurface->SurfWinShadingFlag(IWin) != WinShadingType::SwitchableGlazing) {
                                 // for non switchable glazings or switchable glazings not switched yet (still in clear state)
                                 //  SurfaceWindow(IWin)%ShadingFlag = WinShadingFlag::GlassConditionallyLightened
-                                RDAYIL(IL, igroup) = state.dataDaylightingManager->DaylIllum(IL) - WDAYIL(1, IL, igroup) + WDAYIL(2, IL, igroup);
-                                RBACLU(IL, igroup) = thisDaylightControl.BacLum(IL) - WBACLU(1, IL, igroup) + WBACLU(2, IL, igroup);
+                                state.dataDaylightingManager->RDAYIL(IL, igroup) = state.dataDaylightingManager->DaylIllum(IL) -
+                                                                                   state.dataDaylightingManager->WDAYIL(1, IL, igroup) +
+                                                                                   state.dataDaylightingManager->WDAYIL(2, IL, igroup);
+                                state.dataDaylightingManager->RBACLU(IL, igroup) = thisDaylightControl.BacLum(IL) -
+                                                                                   state.dataDaylightingManager->WBACLU(1, IL, igroup) +
+                                                                                   state.dataDaylightingManager->WBACLU(2, IL, igroup);
                             } else {
                                 // switchable glazings already in partially switched state when calc the RDAYIL(IL) & RBACLU(IL)
-                                RDAYIL(IL, igroup) =
-                                    state.dataDaylightingManager->DaylIllum(IL) - WDAYIL(2, IL, igroup) + tmpIllumFromWinAtRefPt(loop, 2, IL);
-                                RBACLU(IL, igroup) = thisDaylightControl.BacLum(IL) - WBACLU(2, IL, igroup) + tmpBackLumFromWinAtRefPt(loop, 2, IL);
+                                state.dataDaylightingManager->RDAYIL(IL, igroup) = state.dataDaylightingManager->DaylIllum(IL) -
+                                                                                   state.dataDaylightingManager->WDAYIL(2, IL, igroup) +
+                                                                                   tmpIllumFromWinAtRefPt(loop, 2, IL);
+                                state.dataDaylightingManager->RBACLU(IL, igroup) = thisDaylightControl.BacLum(IL) -
+                                                                                   state.dataDaylightingManager->WBACLU(2, IL, igroup) +
+                                                                                   tmpBackLumFromWinAtRefPt(loop, 2, IL);
                             }
                         }
 
@@ -6948,7 +6951,8 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
                 // Re-calc daylight and glare at shaded state. For switchable glazings, it is the fully dark state.
                 for (int IL = 1; IL <= NREFPT; ++IL) {
-                    BACL = max(SetPnt(IL) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi, RBACLU(IL, igroup));
+                    BACL = max(SetPnt(IL) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi,
+                               state.dataDaylightingManager->RBACLU(IL, igroup));
                     // DayltgGlare uses ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for shaded state
                     DayltgGlare(state, IL, BACL, GLRNEW(IL), daylightCtrlNum);
                 }
@@ -7029,9 +7033,9 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                         // Reset background luminance, glare index, and daylight illuminance at each ref pt.
                         // For switchable glazings, this is fully switched, dark state
                         for (int IL = 1; IL <= NREFPT; ++IL) {
-                            thisDaylightControl.BacLum(IL) = RBACLU(IL, igroup);
+                            thisDaylightControl.BacLum(IL) = state.dataDaylightingManager->RBACLU(IL, igroup);
                             GLRNDX(IL) = GLRNEW(IL);
-                            state.dataDaylightingManager->DaylIllum(IL) = RDAYIL(IL, igroup);
+                            state.dataDaylightingManager->DaylIllum(IL) = state.dataDaylightingManager->RDAYIL(IL, igroup);
                         }
 
                         // TH comments (5/22/2009): seems for EC windows, if the calculated glare exceeds the max setpoint,
@@ -7051,8 +7055,8 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
                             // restore fully dark values
                             for (int IL = 1; IL <= NREFPT; ++IL) {
-                                WDAYIL(2, IL, igroup) = tmpIllumFromWinAtRefPt(loop, 2, IL);
-                                WBACLU(2, IL, igroup) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
+                                state.dataDaylightingManager->WDAYIL(2, IL, igroup) = tmpIllumFromWinAtRefPt(loop, 2, IL);
+                                state.dataDaylightingManager->WBACLU(2, IL, igroup) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
                                 thisDaylightControl.IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
                                 thisDaylightControl.BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL);
                                 thisDaylightControl.SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSourceLumFromWinAtRefPt(loop, 2, IL);
@@ -7088,12 +7092,16 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                 while (tmpSWFactor > 0) {
                                     // calc new glare at new switching state
                                     for (int IL = 1; IL <= NREFPT; ++IL) {
-                                        RDAYIL(IL, igroup) = state.dataDaylightingManager->DaylIllum(IL) +
-                                                             (WDAYIL(1, IL, igroup) - WDAYIL(2, IL, igroup)) * (1.0 - tmpSWFactor);
-                                        RBACLU(IL, igroup) =
-                                            thisDaylightControl.BacLum(IL) + (WBACLU(1, IL, igroup) - WBACLU(2, IL, igroup)) * (1.0 - tmpSWFactor);
+                                        state.dataDaylightingManager->RDAYIL(IL, igroup) =
+                                            state.dataDaylightingManager->DaylIllum(IL) + (state.dataDaylightingManager->WDAYIL(1, IL, igroup) -
+                                                                                           state.dataDaylightingManager->WDAYIL(2, IL, igroup)) *
+                                                                                              (1.0 - tmpSWFactor);
+                                        state.dataDaylightingManager->RBACLU(IL, igroup) =
+                                            thisDaylightControl.BacLum(IL) + (state.dataDaylightingManager->WBACLU(1, IL, igroup) -
+                                                                              state.dataDaylightingManager->WBACLU(2, IL, igroup)) *
+                                                                                 (1.0 - tmpSWFactor);
                                         BACL = max(SetPnt(IL) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi,
-                                                   RBACLU(IL, igroup));
+                                                   state.dataDaylightingManager->RBACLU(IL, igroup));
                                         // needs to update SourceLumFromWinAtRefPt(IL,2,loop) before re-calc DayltgGlare
                                         tmpMult = (thisTVIS1 - (thisTVIS1 - thisTVIS2) * tmpSWFactor) / thisTVIS2;
                                         if (IL == 1) {
@@ -7136,12 +7144,16 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                 if (!GlareOK) {
                                     // Glare too high, use previous state and re-calc
                                     for (int IL = 1; IL <= NREFPT; ++IL) {
-                                        RDAYIL(IL, igroup) = state.dataDaylightingManager->DaylIllum(IL) +
-                                                             (WDAYIL(1, IL, igroup) - WDAYIL(2, IL, igroup)) * (1.0 - tmpSWFactor);
-                                        RBACLU(IL, igroup) =
-                                            thisDaylightControl.BacLum(IL) + (WBACLU(1, IL, igroup) - WBACLU(2, IL, igroup)) * (1.0 - tmpSWFactor);
+                                        state.dataDaylightingManager->RDAYIL(IL, igroup) =
+                                            state.dataDaylightingManager->DaylIllum(IL) + (state.dataDaylightingManager->WDAYIL(1, IL, igroup) -
+                                                                                           state.dataDaylightingManager->WDAYIL(2, IL, igroup)) *
+                                                                                              (1.0 - tmpSWFactor);
+                                        state.dataDaylightingManager->RBACLU(IL, igroup) =
+                                            thisDaylightControl.BacLum(IL) + (state.dataDaylightingManager->WBACLU(1, IL, igroup) -
+                                                                              state.dataDaylightingManager->WBACLU(2, IL, igroup)) *
+                                                                                 (1.0 - tmpSWFactor);
                                         BACL = max(SetPnt(IL) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi,
-                                                   RBACLU(IL, igroup));
+                                                   state.dataDaylightingManager->RBACLU(IL, igroup));
 
                                         // needs to update SourceLumFromWinAtRefPt(IL,2,IWin) before re-calc DayltgGlare
                                         tmpMult = (thisTVIS1 - (thisTVIS1 - thisTVIS2) * tmpSWFactor) / thisTVIS2;
@@ -7156,9 +7168,9 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
                                 // Update final results
                                 for (int IL = 1; IL <= NREFPT; ++IL) {
-                                    thisDaylightControl.BacLum(IL) = RBACLU(IL, igroup);
+                                    thisDaylightControl.BacLum(IL) = state.dataDaylightingManager->RBACLU(IL, igroup);
                                     GLRNDX(IL) = GLRNEW(IL);
-                                    state.dataDaylightingManager->DaylIllum(IL) = RDAYIL(IL, igroup);
+                                    state.dataDaylightingManager->DaylIllum(IL) = state.dataDaylightingManager->RDAYIL(IL, igroup);
 
                                     tmpMult = (thisTVIS1 - (thisTVIS1 - thisTVIS2) * tmpSWFactor) / thisTVIS2;
                                     // update report variables
@@ -8923,9 +8935,7 @@ void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
     Real64 WinLumSunDisk; // window luminance from sun disk
     Real64 ELumSunDisk;   // window illuminance from sun disk
     Real64 TransBeam;     // transmittance of the beam for given direction
-    auto &DayltgDirectSunDiskComplexFenestrationV = state.dataDaylightingManager->DayltgDirectSunDiskComplexFenestrationV;       // temporary vector
-    auto &DayltgDirectSunDiskComplexFenestrationRWin = state.dataDaylightingManager->DayltgDirectSunDiskComplexFenestrationRWin; // Window center
-    Real64 RayZ; // z component of unit vector for outgoing direction
+    Real64 RayZ;          // z component of unit vector for outgoing direction
     bool refPointIntersect;
 
     CurCplxFenState = state.dataSurface->SurfaceWindow(iWin).ComplexFen.CurrentState;
@@ -8985,17 +8995,26 @@ void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
                 }
                 LambdaTrn = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).Trn.Lamda(iTrnElem);
 
-                DayltgDirectSunDiskComplexFenestrationV(1) = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).x;
-                DayltgDirectSunDiskComplexFenestrationV(2) = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).y;
-                DayltgDirectSunDiskComplexFenestrationV(3) = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).z;
-                DayltgDirectSunDiskComplexFenestrationV = -DayltgDirectSunDiskComplexFenestrationV;
+                state.dataDaylightingManager->DayltgDirectSunDiskComplexFenestrationV(1) =
+                    state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).x;
+                state.dataDaylightingManager->DayltgDirectSunDiskComplexFenestrationV(2) =
+                    state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).y;
+                state.dataDaylightingManager->DayltgDirectSunDiskComplexFenestrationV(3) =
+                    state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).z;
+                state.dataDaylightingManager->DayltgDirectSunDiskComplexFenestrationV =
+                    -state.dataDaylightingManager->DayltgDirectSunDiskComplexFenestrationV;
 
-                DayltgDirectSunDiskComplexFenestrationRWin(1) = state.dataSurface->Surface(iWin).Centroid.x;
-                DayltgDirectSunDiskComplexFenestrationRWin(2) = state.dataSurface->Surface(iWin).Centroid.y;
-                DayltgDirectSunDiskComplexFenestrationRWin(3) = state.dataSurface->Surface(iWin).Centroid.z;
+                // Window center
+                state.dataDaylightingManager->DayltgDirectSunDiskComplexFenestrationRWin(1) = state.dataSurface->Surface(iWin).Centroid.x;
+                state.dataDaylightingManager->DayltgDirectSunDiskComplexFenestrationRWin(2) = state.dataSurface->Surface(iWin).Centroid.y;
+                state.dataDaylightingManager->DayltgDirectSunDiskComplexFenestrationRWin(3) = state.dataSurface->Surface(iWin).Centroid.z;
 
-                DayltgHitObstruction(
-                    state, iHour, iWin, DayltgDirectSunDiskComplexFenestrationRWin, DayltgDirectSunDiskComplexFenestrationV, TransBeam);
+                DayltgHitObstruction(state,
+                                     iHour,
+                                     iWin,
+                                     state.dataDaylightingManager->DayltgDirectSunDiskComplexFenestrationRWin,
+                                     state.dataDaylightingManager->DayltgDirectSunDiskComplexFenestrationV,
+                                     TransBeam);
 
                 WinLumSunDisk += (14700.0 * std::sqrt(0.000068 * PosFac) * double(NumEl) / std::pow(WindowSolidAngleDaylightPoint, 0.8)) * dirTrans *
                                  LambdaTrn * TransBeam;
@@ -9009,7 +9028,7 @@ void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
     state.dataDaylightingManager->EDIRSUdisk(iHour, 1) = ELumSunDisk;
 }
 
-Real64 DayltgSkyLuminance(EnergyPlusData &state,
+Real64 DayltgSkyLuminance(EnergyPlusData const &state,
                           int const ISky,     // Sky type: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
                           Real64 const THSKY, // Azimuth and altitude of sky element (radians)
                           Real64 const PHSKY)
