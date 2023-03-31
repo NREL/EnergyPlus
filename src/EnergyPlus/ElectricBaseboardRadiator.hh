@@ -67,43 +67,34 @@ namespace ElectricBaseboardRadiator {
     {
         // Members
         std::string EquipName;
-        int EquipType;
+        int EquipType = 0;
         std::string Schedule;
         Array1D_string SurfaceName;
         Array1D_int SurfacePtr;
-        int ZonePtr;
-        int SchedPtr;
-        int TotSurfToDistrib;
-        Real64 NominalCapacity;
-        Real64 BaseboardEfficiency;
-        Real64 AirInletTemp;
-        Real64 AirInletHumRat;
-        Real64 AirOutletTemp;
-        Real64 ElecUseLoad;
-        Real64 ElecUseRate;
-        Real64 FracRadiant;
-        Real64 FracConvect;
-        Real64 FracDistribPerson;
-        Real64 TotPower;
-        Real64 Power;
-        Real64 ConvPower;
-        Real64 RadPower;
-        Real64 TotEnergy;
-        Real64 Energy;
-        Real64 ConvEnergy;
-        Real64 RadEnergy;
+        int ZonePtr = 0;
+        int SchedPtr = 0;
+        int TotSurfToDistrib = 0;
+        Real64 NominalCapacity = 0.0;
+        Real64 BaseboardEfficiency = 0.0;
+        Real64 AirInletTemp = 0.0;
+        Real64 AirInletHumRat = 0.0;
+        Real64 AirOutletTemp = 0.0;
+        Real64 ElecUseLoad = 0.0;
+        Real64 ElecUseRate = 0.0;
+        Real64 FracRadiant = 0.0;
+        Real64 FracConvect = 0.0;
+        Real64 FracDistribPerson = 0.0;
+        Real64 TotPower = 0.0;
+        Real64 Power = 0.0;
+        Real64 ConvPower = 0.0;
+        Real64 RadPower = 0.0;
+        Real64 TotEnergy = 0.0;
+        Real64 Energy = 0.0;
+        Real64 ConvEnergy = 0.0;
+        Real64 RadEnergy = 0.0;
         Array1D<Real64> FracDistribToSurf;
-        int HeatingCapMethod;         // - Method for electric baseboard heating capacity scalable sizing calculation
-        Real64 ScaledHeatingCapacity; // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
-
-        // Default Constructor
-        ElecBaseboardParams()
-            : EquipType(0), ZonePtr(0), SchedPtr(0), TotSurfToDistrib(0), NominalCapacity(0.0), BaseboardEfficiency(0.0), AirInletTemp(0.0),
-              AirInletHumRat(0.0), AirOutletTemp(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0),
-              TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0),
-              HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
-        {
-        }
+        int HeatingCapMethod = 0;           // - Method for electric baseboard heating capacity scalable sizing calculation
+        Real64 ScaledHeatingCapacity = 0.0; // - scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
     };
 
     struct ElecBaseboardNumericFieldData
