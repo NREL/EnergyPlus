@@ -734,12 +734,11 @@ namespace ElectricBaseboardRadiator {
                     // what is happening in the zone.  If it is still predicting a negative heating
                     // load, then zero everything out.
                     // First, turn off the baseboard:
-                    Real64 TempZeroBBSourceSumHATsurf;
                     elecBaseboard.QBBElecRadSource = 0.0;
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
-                    TempZeroBBSourceSumHATsurf = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
+                    Real64 TempZeroBBSourceSumHATsurf = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
                     // Now, turn it back on:
                     elecBaseboard.QBBElecRadSource = RadHeat;
                     DistributeBBElecRadGains(state);
