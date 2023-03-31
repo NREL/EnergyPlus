@@ -6224,10 +6224,6 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     auto &SetPnt = state.dataDaylightingManager->SetPnt;       // Illuminance setpoint at reference points (lux)
     auto &GLRNDX = state.dataDaylightingManager->GLRNDX;       // Glare index at reference point
     auto &GLRNEW = state.dataDaylightingManager->GLRNEW;       // New glare index at reference point
-    auto &SFSKHR = state.dataDaylightingManager->SFSKHR; // Sky source luminance factor for sky type (second index), bare/shaded window (first index)
-    auto &DFSKHR = state.dataDaylightingManager->DFSKHR; // Sky daylight factor for sky type (second index), bare/shaded window (first index)
-    auto &BFSKHR =
-        state.dataDaylightingManager->BFSKHR; // Sky background luminance factor for sky type (second index), bare/shaded window (first index)
 
     auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
     int enclNum = thisDaylightControl.enclIndex;
@@ -6333,7 +6329,8 @@ void DayltgInteriorIllum(EnergyPlusData &state,
             for (ISky = 1; ISky <= 4; ++ISky) {
 
                 // ===Bare window===
-                DFSKHR(1, ISky) =
+                // Sky daylight factor for sky type (second index), bare/shaded window (first index)
+                state.dataDaylightingManager->DFSKHR(1, ISky) =
                     VTRatio *
                     (state.dataGlobal->WeightNow * thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
                      state.dataGlobal->WeightPreviousHour * thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
@@ -6346,7 +6343,8 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                          state.dataGlobal->WeightPreviousHour * (thisDaylightControl.DaylIllFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
                                                                  thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 1, IL, loop)));
 
-                BFSKHR(1, ISky) =
+                // Sky background luminance factor for sky type (second index), bare/shaded window (first index)
+                state.dataDaylightingManager->BFSKHR(1, ISky) =
                     VTRatio *
                     (state.dataGlobal->WeightNow * thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
                      state.dataGlobal->WeightPreviousHour * thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
@@ -6358,8 +6356,9 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                    state.dataGlobal->WeightPreviousHour *
                                        (thisDaylightControl.DaylBackFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
                                         thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 1, IL, loop)));
-
-                SFSKHR(1, ISky) =
+                
+                // Sky source luminance factor for sky type (second index), bare/shaded window (first index)
+                state.dataDaylightingManager->SFSKHR(1, ISky) =
                     VTRatio *
                     (state.dataGlobal->WeightNow * thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
                      state.dataGlobal->WeightPreviousHour * thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
@@ -6377,7 +6376,9 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                     // ===Shaded window or window with diffusing glass===
                     if (!state.dataSurface->SurfWinMovableSlats(IWin)) {
                         // Shade, screen, blind with fixed slats, or diffusing glass
-                        DFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow *
+                        state.dataDaylightingManager->DFSKHR(2, ISky) =
+                            VTRatio *
+                            (state.dataGlobal->WeightNow *
                                                          thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
                                                      state.dataGlobal->WeightPreviousHour *
                                                          thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
@@ -6395,7 +6396,9 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                                             thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                         }
 
-                        BFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow *
+                        state.dataDaylightingManager->BFSKHR(2, ISky) =
+                            VTRatio *
+                            (state.dataGlobal->WeightNow *
                                                          thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
                                                      state.dataGlobal->WeightPreviousHour *
                                                          thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
@@ -6412,7 +6415,9 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                                             thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                         }
 
-                        SFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow *
+                        state.dataDaylightingManager->SFSKHR(2, ISky) =
+                            VTRatio *
+                            (state.dataGlobal->WeightNow *
                                                          thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
                                                      state.dataGlobal->WeightPreviousHour *
                                                          thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
@@ -6463,11 +6468,11 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                 state.dataGlobal->PreviousHour, std::min(Material::MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, IL, loop),
                             SurfWinSlatsAngInterpFac);
 
-                        DFSKHR(2, ISky) =
+                        state.dataDaylightingManager->DFSKHR(2, ISky) =
                             VTRatio * (state.dataGlobal->WeightNow * DaylIllFacSkyNow + state.dataGlobal->WeightPreviousHour * DaylIllFacSkyPrev);
-                        BFSKHR(2, ISky) =
+                        state.dataDaylightingManager->BFSKHR(2, ISky) =
                             VTRatio * (state.dataGlobal->WeightNow * DaylBackFacSkyNow + state.dataGlobal->WeightPreviousHour * DaylBackFacSkyPrev);
-                        SFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow * DaylSourceFacSkyNow +
+                        state.dataDaylightingManager->SFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow * DaylSourceFacSkyNow +
                                                      state.dataGlobal->WeightPreviousHour * DaylSourceFacSkyPrev);
 
                         if (ISky == 1) {
@@ -6576,14 +6581,17 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
                 thisDaylightControl.IllumFromWinAtRefPt(loop, IS, IL) =
                     DFSUHR(IS) * state.dataEnvrn->HISUNF +
-                    HorIllSkyFac * (DFSKHR(IS, ISky1) * SkyWeight * HorIllSky(ISky1) + DFSKHR(IS, ISky2) * (1.0 - SkyWeight) * HorIllSky(ISky2));
+                    HorIllSkyFac * (state.dataDaylightingManager->DFSKHR(IS, ISky1) * SkyWeight * HorIllSky(ISky1) +
+                                    state.dataDaylightingManager->DFSKHR(IS, ISky2) * (1.0 - SkyWeight) * HorIllSky(ISky2));
                 thisDaylightControl.BackLumFromWinAtRefPt(loop, IS, IL) =
                     BFSUHR(IS) * state.dataEnvrn->HISUNF +
-                    HorIllSkyFac * (BFSKHR(IS, ISky1) * SkyWeight * HorIllSky(ISky1) + BFSKHR(IS, ISky2) * (1.0 - SkyWeight) * HorIllSky(ISky2));
+                    HorIllSkyFac * (state.dataDaylightingManager->BFSKHR(IS, ISky1) * SkyWeight * HorIllSky(ISky1) +
+                                    state.dataDaylightingManager->BFSKHR(IS, ISky2) * (1.0 - SkyWeight) * HorIllSky(ISky2));
 
                 thisDaylightControl.SourceLumFromWinAtRefPt(loop, IS, IL) =
                     SFSUHR(IS) * state.dataEnvrn->HISUNF +
-                    HorIllSkyFac * (SFSKHR(IS, ISky1) * SkyWeight * HorIllSky(ISky1) + SFSKHR(IS, ISky2) * (1.0 - SkyWeight) * HorIllSky(ISky2));
+                    HorIllSkyFac * (state.dataDaylightingManager->SFSKHR(IS, ISky1) * SkyWeight * HorIllSky(ISky1) +
+                                    state.dataDaylightingManager->SFSKHR(IS, ISky2) * (1.0 - SkyWeight) * HorIllSky(ISky2));
 
                 thisDaylightControl.SourceLumFromWinAtRefPt(loop, IS, IL) = max(thisDaylightControl.SourceLumFromWinAtRefPt(loop, IS, IL), 0.0);
 
