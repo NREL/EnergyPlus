@@ -2230,7 +2230,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (state.dataMaterial->Blind(Loop).SlatWidth > state.dataMaterial->Blind(Loop).SlatSeparation) {
             MinSlatAngGeom = std::asin(state.dataMaterial->Blind(Loop).SlatThickness /
                                        (state.dataMaterial->Blind(Loop).SlatThickness + state.dataMaterial->Blind(Loop).SlatSeparation)) /
-                             DataGlobalConstants::DegToRadians;
+                             Constant::DegToRadians;
         } else {
             MinSlatAngGeom = 0.0;
         }

@@ -348,7 +348,7 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).FanType = cCurrentModuleObject;
         Fan(FanNum).AvailSchedName = cAlphaArgs(2);
         if (lAlphaFieldBlanks(2)) {
-            Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -433,7 +433,7 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).FanType = cCurrentModuleObject;
         Fan(FanNum).AvailSchedName = cAlphaArgs(2);
         if (lAlphaFieldBlanks(2)) {
-            Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -538,7 +538,7 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).FanType = cCurrentModuleObject;
         Fan(FanNum).AvailSchedName = cAlphaArgs(2);
         if (lAlphaFieldBlanks(2)) {
-            Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -632,7 +632,7 @@ void GetFanInput(EnergyPlusData &state)
                 }
             }
         } else {
-            Fan(FanNum).FlowFractSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
+            Fan(FanNum).FlowFractSchedNum = ScheduleManager::ScheduleAlwaysOn;
         }
 
         if (NumAlphas > 6 && !lAlphaFieldBlanks(7)) {
@@ -742,7 +742,7 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).FanType = cCurrentModuleObject;
         Fan(FanNum).AvailSchedName = cAlphaArgs(2);
         if (lAlphaFieldBlanks(2)) {
-            Fan(FanNum).AvailSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
@@ -1369,7 +1369,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         //   StdRhoAir=PsyRhoAirFnPbTdbW(StdBaroPress,20,0)
         // From PsychRoutines:
         //   w=MAX(dw,1.0d-5)
-        //   rhoair = pb/(287.d0*(tdb+DataGlobalConstants::KelvinConv())*(1.0d0+1.6077687d0*w))
+        //   rhoair = pb/(287.d0*(tdb+Constant::KelvinConv())*(1.0d0+1.6077687d0*w))
         RhoAir = state.dataEnvrn->StdRhoAir;
 
         // Adjust max fan volumetric airflow using fan sizing factor
@@ -2304,7 +2304,7 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
     //   StdRhoAir=PsyRhoAirFnPbTdbW(StdBaroPress,20,0)
     // From PsychRoutines:
     //   w=MAX(dw,1.0d-5)
-    //   rhoair = pb/(287.d0*(tdb+DataGlobalConstants::KelvinConv())*(1.0d0+1.6077687d0*w))
+    //   rhoair = pb/(287.d0*(tdb+Constant::KelvinConv())*(1.0d0+1.6077687d0*w))
     RhoAir = Fan(FanNum).RhoAirStdInit;
     MassFlow = min(Fan(FanNum).InletAirMassFlowRate, Fan(FanNum).MaxAirMassFlowRate);
 

@@ -219,7 +219,7 @@ void GetBoilerInput(EnergyPlusData &state)
             ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
             // Set to Electric to avoid errors when setting up output variables
             thisBoiler.BoilerFuelTypeForOutputVariable = "Electricity";
-            thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
+            thisBoiler.FuelType = Constant::AssignResourceTypeNum("ELECTRICITY");
             ErrorsFound = true;
         }
 
@@ -491,7 +491,7 @@ void BoilerSpecs::initEachEnvironment(EnergyPlusData &state)
     static constexpr std::string_view RoutineName("BoilerSpecs::initEachEnvironment");
     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                         DataGlobalConstants::HWInitConvTemp,
+                                                         Constant::HWInitConvTemp,
                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                          RoutineName);
     this->DesMassFlowRate = this->VolFlowRate * rho;
@@ -611,12 +611,12 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
 
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                 DataGlobalConstants::HWInitConvTemp,
+                                                                 Constant::HWInitConvTemp,
                                                                  state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                  RoutineName);
             Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                      state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                     DataGlobalConstants::HWInitConvTemp,
+                                                                     Constant::HWInitConvTemp,
                                                                      state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                      RoutineName);
             tmpNomCap =
@@ -977,7 +977,7 @@ void BoilerSpecs::UpdateBoilerRecords(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // boiler simulation reporting
 
-    Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
     int const BoilerInletNode = this->BoilerInletNodeNum;
     int const BoilerOutletNode = this->BoilerOutletNodeNum;
 

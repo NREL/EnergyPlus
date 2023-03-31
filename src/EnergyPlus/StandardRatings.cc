@@ -4024,7 +4024,7 @@ namespace StandardRatings {
                        Real64 const LowHeatingCapVal,  // Low Temperature Heating Standard (Net) Rating Capacity
                        Real64 const HSPFValueIP,       // IEER value in IP units {Btu/W-h}
                        int const RegionNum,            // Region Number for which HSPF is calculated
-                       ObjexxFCL::Optional_bool_const AHRI2023StandardRatings) // True if required AHRI/ANSI 210/240 Std. 2023 SEER2,HSPF2 Ratings.
+                       bool const AHRI2023StandardRatings) // True if required AHRI/ANSI 210/240 Std. 2023 SEER2,HSPF2 Ratings.
     {
 
         // SUBROUTINE INFORMATION:

@@ -528,7 +528,7 @@ namespace InternalHeatGains {
                     if (IHGNumNumbers >= 5 && !IHGNumericFieldBlanks(5)) {
                         thisPeople.UserSpecSensFrac = IHGNumbers(5);
                     } else {
-                        thisPeople.UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
+                        thisPeople.UserSpecSensFrac = Constant::AutoCalculate;
                     }
 
                     if (IHGNumNumbers >= 6 && !IHGNumericFieldBlanks(6)) {
@@ -3048,7 +3048,7 @@ namespace InternalHeatGains {
                         }
 
                         if (IHGAlphaFieldBlanks(5)) {
-                            thisZoneITEq.OperSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                            thisZoneITEq.OperSchedPtr = ScheduleManager::ScheduleAlwaysOn;
                         } else {
                             thisZoneITEq.OperSchedPtr = GetScheduleIndex(state, IHGAlphas(5));
                         }
@@ -3089,7 +3089,7 @@ namespace InternalHeatGains {
                         }
 
                         if (IHGAlphaFieldBlanks(6)) {
-                            thisZoneITEq.CPULoadSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                            thisZoneITEq.CPULoadSchedPtr = ScheduleManager::ScheduleAlwaysOn;
                         } else {
                             thisZoneITEq.CPULoadSchedPtr = GetScheduleIndex(state, IHGAlphas(6));
                         }
@@ -3755,7 +3755,7 @@ namespace InternalHeatGains {
 
             print(state.files.eio, "{:.3R},", state.dataHeatBal->People(Loop).FractionRadiant);
             print(state.files.eio, "{:.3R},", state.dataHeatBal->People(Loop).FractionConvected);
-            if (state.dataHeatBal->People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate) {
+            if (state.dataHeatBal->People(Loop).UserSpecSensFrac == Constant::AutoCalculate) {
                 print(state.files.eio, "AutoCalculate,");
             } else {
                 print(state.files.eio, "{:.3R},", state.dataHeatBal->People(Loop).UserSpecSensFrac);
@@ -7339,7 +7339,7 @@ namespace InternalHeatGains {
                 ActivityLevel_WperPerson = GetCurrentScheduleValue(state, state.dataHeatBal->People(Loop).ActivityLevelPtr);
                 TotalPeopleGain = NumberOccupants * ActivityLevel_WperPerson;
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
-                if (state.dataHeatBal->People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate) {
+                if (state.dataHeatBal->People(Loop).UserSpecSensFrac == Constant::AutoCalculate) {
                     Real64 airTemp = thisZoneHB.MAT;
                     if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
                         if (state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ)) {
@@ -8233,7 +8233,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->Lights(Loop).TotGainEnergy = state.dataHeatBal->Lights(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
             if (!state.dataGlobal->WarmupFlag) {
                 if (state.dataGlobal->DoOutputReporting && state.dataOutRptTab->WriteTabularFiles &&
-                    (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
+                    (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumulate the total electricity used for each Light object
                     state.dataHeatBal->Lights(Loop).SumConsumption += state.dataHeatBal->Lights(Loop).Consumption;
                     // for tabular report, accumulate the time when each Light has consumption (using a very small threshold instead of zero)

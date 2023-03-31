@@ -363,12 +363,11 @@ namespace SimulationManager {
 
             if (!Available) break;
             if (ErrorsFound) break;
-            if ((!state.dataGlobal->DoDesDaySim) && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
-            if ((!state.dataGlobal->DoWeathSim) && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay)
-                continue; // don't run these here, only for sizing simulations
+            if ((!state.dataGlobal->DoDesDaySim) && (state.dataGlobal->KindOfSim != Constant::KindOfSim::RunPeriodWeather)) continue;
+            if ((!state.dataGlobal->DoWeathSim) && (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) continue;
+            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
 
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign)
+            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeRunPeriodDesign)
                 continue; // don't run these here, only for sizing simulations
 
             ++EnvCount;
@@ -427,7 +426,7 @@ namespace SimulationManager {
                     state.dataReportFlag->cWarmupDay = fmt::to_string(state.dataReportFlag->NumOfWarmupDays);
                     DisplayString(state, "Warming up {" + state.dataReportFlag->cWarmupDay + '}');
                 } else if (state.dataGlobal->DayOfSim == 1) {
-                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                    if (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
                         DisplayString(state, "Starting Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
                     } else {
                         DisplayString(state, "Starting Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
@@ -436,7 +435,7 @@ namespace SimulationManager {
                     print(state.files.eio, Format_700, state.dataReportFlag->NumOfWarmupDays);
                     OutputProcessor::ResetAccumulationWhenWarmupComplete(state);
                 } else if (state.dataReportFlag->DisplayPerfSimulationFlag) {
-                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                    if (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
                         DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
                     } else {
                         DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
@@ -820,7 +819,7 @@ namespace SimulationManager {
 
         state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
         state.dataGlobal->MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
-        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * Constant::SecInHour;
 
         CurrentModuleObject = "ConvergenceLimits";
         Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -1186,7 +1185,7 @@ namespace SimulationManager {
                         state.dataGlobal->NumOfTimeStepInHour = 1;
                         state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
                         state.dataGlobal->MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
-                        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * Constant::SecInHour;
                         state.dataGlobal->OverrideTimestep = true;
                     }
                     if (overrideZoneAirHeatBalAlg) {

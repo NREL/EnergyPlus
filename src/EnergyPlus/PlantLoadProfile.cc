@@ -202,7 +202,7 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
 
         FluidDensityInit = GetDensityGlycol(state,
                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                            DataGlobalConstants::InitConvTemp,
+                                            Constant::InitConvTemp,
                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                             RoutineName);
 

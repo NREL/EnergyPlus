@@ -201,7 +201,7 @@ namespace BaseboardRadiator {
         }
 
         UpdateBaseboard(state, CompIndex);
-        thisBaseboard.Energy = thisBaseboard.Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        thisBaseboard.Energy = thisBaseboard.Power * state.dataHVACGlobal->TimeStepSysSec;
     }
 
     void GetBaseboardInput(EnergyPlusData &state)
@@ -279,7 +279,7 @@ namespace BaseboardRadiator {
                 thisBaseboard.EquipType = DataPlant::PlantEquipmentType::Baseboard_Conv_Water;
                 thisBaseboard.Schedule = state.dataIPShortCut->cAlphaArgs(2);
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    thisBaseboard.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisBaseboard.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisBaseboard.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                     if (thisBaseboard.SchedPtr == 0) {
@@ -553,12 +553,12 @@ namespace BaseboardRadiator {
             int WaterInletNode = this->WaterInletNode;
             Real64 rho = GetDensityGlycol(state,
                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                          DataGlobalConstants::HWInitConvTemp,
+                                          Constant::HWInitConvTemp,
                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                           RoutineName);
             this->WaterMassFlowRateMax = rho * this->WaterVolFlowRateMax;
             PlantUtilities::InitComponentNodes(state, 0.0, this->WaterMassFlowRateMax, this->WaterInletNode, this->WaterOutletNode);
-            state.dataLoopNodes->Node(WaterInletNode).Temp = DataGlobalConstants::HWInitConvTemp;
+            state.dataLoopNodes->Node(WaterInletNode).Temp = Constant::HWInitConvTemp;
             Real64 Cp = GetSpecificHeatGlycol(state,
                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                               state.dataLoopNodes->Node(WaterInletNode).Temp,
@@ -698,12 +698,12 @@ namespace BaseboardRadiator {
                     if (DesCoilLoad >= SmallLoad) {
                         Cp = GetSpecificHeatGlycol(state,
                                                    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                   DataGlobalConstants::HWInitConvTemp,
+                                                   Constant::HWInitConvTemp,
                                                    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                    RoutineName);
                         rho = GetDensityGlycol(state,
                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                               DataGlobalConstants::HWInitConvTemp,
+                                               Constant::HWInitConvTemp,
                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         WaterVolFlowRateMaxDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -764,7 +764,7 @@ namespace BaseboardRadiator {
                     this->AirInletHumRat = finalZoneSizing.ZoneHumRatAtHeatPeak;
                     rho = GetDensityGlycol(state,
                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                           DataGlobalConstants::HWInitConvTemp,
+                                           Constant::HWInitConvTemp,
                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                            RoutineName);
                     state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = rho * this->WaterVolFlowRateMax;

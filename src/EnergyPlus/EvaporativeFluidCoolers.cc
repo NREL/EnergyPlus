@@ -1292,7 +1292,7 @@ namespace EvaporativeFluidCoolers {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp,
+                                                           Constant::InitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
@@ -1421,7 +1421,7 @@ namespace EvaporativeFluidCoolers {
             if (PltSizCondNum > 0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::InitConvTemp,
+                                                               Constant::InitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                CalledFrom);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1496,7 +1496,7 @@ namespace EvaporativeFluidCoolers {
                     if (state.dataSize->PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                       DataGlobalConstants::InitConvTemp,
+                                                                       Constant::InitConvTemp,
                                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                        CalledFrom);
                         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1601,7 +1601,7 @@ namespace EvaporativeFluidCoolers {
                     }
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::InitConvTemp,
+                                                                   Constant::InitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                    CalledFrom);
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1729,7 +1729,7 @@ namespace EvaporativeFluidCoolers {
                 // predefined factor was 1.25 W heat rejection per W of delivered cooling, now a user input with 1.25 default
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::InitConvTemp,
+                                                               Constant::InitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                CalledFrom);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1807,7 +1807,7 @@ namespace EvaporativeFluidCoolers {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::InitConvTemp,
+                                                               Constant::InitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                CalledFrom);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1967,7 +1967,7 @@ namespace EvaporativeFluidCoolers {
                 // predefined factor was 1.25 W heat rejection per W of delivered cooling, now user input with default 1.25
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::InitConvTemp,
+                                                               Constant::InitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                CalledFrom);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -2029,7 +2029,7 @@ namespace EvaporativeFluidCoolers {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->LowSpeedUserSpecifiedDesignCapacity > 0.0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::InitConvTemp,
+                                                               Constant::InitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                CalledFrom);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -2511,9 +2511,9 @@ namespace EvaporativeFluidCoolers {
             OutletAirWetBulb = InletAirWetBulb + qActual / AirCapacity;
             // Check error tolerance and exit if satisfied
             DeltaTwb = std::abs(OutletAirWetBulb - InletAirWetBulb);
-            // Add DataGlobalConstants::KelvinConv() to denominator below convert OutletAirWetBulbLast to Kelvin to avoid divide by zero.
+            // Add Constant::KelvinConv() to denominator below convert OutletAirWetBulbLast to Kelvin to avoid divide by zero.
             // Wet bulb error units are delta K/K
-            WetBulbError = std::abs((OutletAirWetBulb - OutletAirWetBulbLast) / (OutletAirWetBulbLast + DataGlobalConstants::KelvinConv));
+            WetBulbError = std::abs((OutletAirWetBulb - OutletAirWetBulbLast) / (OutletAirWetBulbLast + Constant::KelvinConv));
         }
 
         if (qActual >= 0.0) {
@@ -2643,12 +2643,12 @@ namespace EvaporativeFluidCoolers {
 
         //   total water usage
         // update report variables
-        this->EvaporationVol = this->EvaporationVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-        this->DriftVol = this->DriftVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-        this->BlowdownVol = this->BlowdownVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-        this->MakeUpVol = this->MakeUpVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-        this->TankSupplyVol = this->TankSupplyVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-        this->StarvedMakeUpVol = this->StarvedMakeUpVdot * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        this->EvaporationVol = this->EvaporationVdot * (state.dataHVACGlobal->TimeStepSysSec);
+        this->DriftVol = this->DriftVdot * (state.dataHVACGlobal->TimeStepSysSec);
+        this->BlowdownVol = this->BlowdownVdot * (state.dataHVACGlobal->TimeStepSysSec);
+        this->MakeUpVol = this->MakeUpVdot * (state.dataHVACGlobal->TimeStepSysSec);
+        this->TankSupplyVol = this->TankSupplyVdot * (state.dataHVACGlobal->TimeStepSysSec);
+        this->StarvedMakeUpVol = this->StarvedMakeUpVdot * (state.dataHVACGlobal->TimeStepSysSec);
     }
 
     void EvapFluidCoolerSpecs::UpdateEvapFluidCooler(EnergyPlusData &state)
@@ -2751,7 +2751,7 @@ namespace EvaporativeFluidCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the evaporative fluid cooler.
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         if (!RunFlag) {
             this->fluidCoolerInletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;

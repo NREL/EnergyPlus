@@ -4358,10 +4358,10 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
     state->dataWeatherManager->Environment(1).DesignDayNum = 1; // Environment(3) & (4) will be = 0
     state->dataWeatherManager->Environment(2).DesignDayNum = 2;
 
-    state->dataWeatherManager->Environment(1).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
-    state->dataWeatherManager->Environment(2).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
-    state->dataWeatherManager->Environment(3).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodDesign;
-    state->dataWeatherManager->Environment(4).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodDesign;
+    state->dataWeatherManager->Environment(1).KindOfEnvrn = Constant::KindOfSim::DesignDay;
+    state->dataWeatherManager->Environment(2).KindOfEnvrn = Constant::KindOfSim::DesignDay;
+    state->dataWeatherManager->Environment(3).KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
+    state->dataWeatherManager->Environment(4).KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
 
     // set up environments such that day 2 is cooling peak and day 4 is heating peak
     state->dataWeatherManager->Environment(1).maxCoolingOATSizing = 27.0;

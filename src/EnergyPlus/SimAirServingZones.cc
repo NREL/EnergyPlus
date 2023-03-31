@@ -5001,7 +5001,7 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
     // have moved std 62.1 table report writing to ManageSystemVentilationAdjustments in SizingManager
 }
 
-void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator)
+void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIndicator)
 {
 
     // SUBROUTINE INFORMATION:
@@ -5112,7 +5112,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
     }
 
     switch (CallIndicator) {
-    case DataGlobalConstants::CallIndicator::BeginDay: {
+    case Constant::CallIndicator::BeginDay: {
         // Correct the zone return temperature in ZoneSizing for the case of induction units. The calc in
         // ZoneEquipmentManager assumes all the air entering the zone goes into the return node.
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
@@ -5201,7 +5201,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
 
         } // End of begin day loop over primary air systems
     } break;
-    case DataGlobalConstants::CallIndicator::DuringDay: {
+    case Constant::CallIndicator::DuringDay: {
         TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour +
                         state.dataGlobal->TimeStep; // calculate current zone time step index
 
@@ -5553,7 +5553,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
 
         } // end of loop over primary air systems
     } break;
-    case DataGlobalConstants::CallIndicator::EndDay: {
+    case Constant::CallIndicator::EndDay: {
         // the entire set of std. 62.1 code here seems misplaced, should have been placed in EndSysSizCalc block
         // Get design flows
         SysCoolingEv = 1.0;
@@ -6236,7 +6236,7 @@ void UpdateSysSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator c
             }
         }
     } break;
-    case DataGlobalConstants::CallIndicator::EndSysSizingCalc: {
+    case Constant::CallIndicator::EndSysSizingCalc: {
         // Correct the zone return temperature in FinalZoneSizing for the case of induction units. The calc in
         // ZoneEquipmentManager assumes all the air entering the zone goes into the return node.
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
