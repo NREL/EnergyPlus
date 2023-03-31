@@ -104,7 +104,6 @@ namespace EnergyPlus::DaylightingManager {
 //       DATE WRITTEN   July 1997, December 1998
 //       MODIFIED       Oct 2004; LKL -- Efficiencies and code restructure
 //                      Aug 2012: BG -- Added availability schedule
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // Manages the daylighting calculations for each thermal zone that has an associated
@@ -5606,8 +5605,8 @@ void DayltgExtHorizIllum(EnergyPlusData &state,
     Real64 const DPH(Constant::PiOvr2 / double(NPH));     // Sky integration altitude stepsize (radians)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int IPH; // Altitude index for sky integration
-    int ITH; // Azimuth index for sky integration
+    int IPH;  // Altitude index for sky integration
+    int ITH;  // Azimuth index for sky integration
     int ISky; // Sky type index
 
     // Integrate to obtain illuminance from sky.
