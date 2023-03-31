@@ -395,7 +395,7 @@ Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature 
 
 The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watts, of heat transferred to the zone air from all types of internal gains from energyplus objects (e.g., people, lights, devices, appliances, equipment) listed in Tables \ref{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-constituents} and \ref{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-from-fenestration}. In addition to the convective heat gains listed in these tables, if a zone or a space is served by a zone HVAC equipment, i.e., the zone has no return air node, or served by an AirloopHVAC system that has cycling fan operating mode, then the convective heat gain specified to the return air is re-directed to the space or the zone air heat balance as convective internal heat gain. This and the following provide results on the load components of the zone air heat balance. This field is not multiplied by zone or group multipliers.
 
-\begin{longtable}[c]{@{}lcc@{}}
+\begin{longtable}[c]{@{}lc@{}}
 	\caption{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain Constituents} \label{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-constituents} \tabularnewline
 	\toprule
 	EnergyPlus Object &  Convective Heat Gain Type \tabularnewline
@@ -433,11 +433,11 @@ The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watt
 	ThermalStorage:ChilledWater:Mixed     &     ThermalStorageChilledWaterMixed    \tabularnewline
 	ThermalStorage:ChilledWater:Stratified     &     ThermalStorageChilledWaterStratified    \tabularnewline
 	Pipe:Indoor     &     PipeIndoor    \tabularnewline
-	Pump:VariableSpeed     &     Pump_VarSpeed    \tabularnewline
-	Pump:ConstantSpeed     &     Pump_ConSpeed    \tabularnewline
-	Pump:VariableSpeed:Condensate     &     Pump_Cond    \tabularnewline
-	HeaderedPumps:VariableSpeed     &     PumpBank_VarSpeed    \tabularnewline
-	HeaderedPumps:ConstantSpeed     &     PumpBank_ConSpeed    \tabularnewline
+	Pump:VariableSpeed     &     Pump\textunderscore VarSpeed    \tabularnewline
+	Pump:ConstantSpeed     &     Pump\textunderscore ConSpeed    \tabularnewline
+	Pump:VariableSpeed:Condensate     &     Pump\textunderscore Cond    \tabularnewline
+	HeaderedPumps:VariableSpeed     &     PumpBank\textunderscore VarSpeed    \tabularnewline
+	HeaderedPumps:ConstantSpeed     &     PumpBank\textunderscore ConSpeed    \tabularnewline
 	PlantComponent:UserDefined     &     PlantComponentUserDefined    \tabularnewline
 	Coil:UserDefined     &     CoilUserDefined    \tabularnewline
 	ZoneHVAC:ForcedAir:UserDefined     &     ZoneHVACForcedAirUserDefined    \tabularnewline
