@@ -140,8 +140,7 @@ namespace ExteriorEnergyUse {
         state.dataExteriorEnergyUse->NumExteriorEqs = 0;
 
         // =================================  Get Exterior Lights
-        std::string_view cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-        cCurrentModuleObject = "Exterior:Lights";
+        std::string_view cCurrentModuleObject = "Exterior:Lights";
         for (Item = 1; Item <= state.dataExteriorEnergyUse->NumExteriorLights; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,

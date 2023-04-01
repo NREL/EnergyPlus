@@ -104,7 +104,6 @@ namespace ExhaustAirSystemManager {
         // state.dataExhAirSystemMrg->GetInputFlag = false;
 
         // Locals
-        bool IsNotOK; // Flag to verify name
         bool ErrorsFound = false;
 
         constexpr std::string_view RoutineName("GetExhaustAirSystemInput: ");
@@ -138,6 +137,7 @@ namespace ExhaustAirSystemManager {
                     MixerComponent::InitAirMixer(state, zoneMixerIndex); // Initialize all Mixer related parameters
 
                     // See if need to do the zone mixer's CheckEquipName() function
+                    bool IsNotOK = false; // Flag to verify name
                     ValidateComponent(state, "AirLoopHVAC:ZoneMixer", zoneMixerName, IsNotOK, "AirLoopHVAC:ExhaustSystem");
                     if (IsNotOK) {
                         ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
@@ -334,10 +334,6 @@ namespace ExhaustAirSystemManager {
         }
     }
 
-    void InitExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
-    {
-    }
-
     void CalcExhaustAirSystem(EnergyPlusData &state, int const ExhaustAirSystemNum, bool FirstHVACIteration)
     {
         auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum);
@@ -451,17 +447,11 @@ namespace ExhaustAirSystemManager {
         }
     }
 
-    void ReportExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
-    {
-    }
-
     void GetZoneExhaustControlInput(EnergyPlusData &state)
     {
         // Process ZoneExhaust Control inputs
 
         // Locals
-        int NumAlphas;
-        int NumNums;
         bool ErrorsFound = false;
 
         // Use the json helper to process input
@@ -474,6 +464,8 @@ namespace ExhaustAirSystemManager {
             auto &instancesValue = instances.value();
             int numZoneExhaustControls = instancesValue.size();
             int exhCtrlNum = 0;
+            int NumAlphas;
+            int NumNums;
 
             if (numZoneExhaustControls > 0) {
                 state.dataZoneEquip->ZoneExhaustControlSystem.allocate(numZoneExhaustControls);
@@ -678,15 +670,12 @@ namespace ExhaustAirSystemManager {
 
     void SimZoneHVACExhaustControls(EnergyPlusData &state)
     {
-        // Locals
-        int ExhaustControlNum;
-
         if (state.dataExhCtrlSystemMrg->GetInputFlag) { // First time subroutine has been entered
             GetZoneExhaustControlInput(state);
             state.dataExhCtrlSystemMrg->GetInputFlag = false;
         }
 
-        for (ExhaustControlNum = 1; ExhaustControlNum <= state.dataZoneEquip->NumZoneExhaustControls; ++ExhaustControlNum) {
+        for (int ExhaustControlNum = 1; ExhaustControlNum <= state.dataZoneEquip->NumZoneExhaustControls; ++ExhaustControlNum) {
             CalcZoneHVACExhaustControl(state, ExhaustControlNum, _);
         }
 
@@ -883,8 +872,8 @@ namespace ExhaustAirSystemManager {
         auto &thisExhCtrl = state.dataZoneEquip->ZoneExhaustControlSystem(ExhCtrlNum);
 
         // check a node is a zone inlet node.
-        std::string_view RoutineName = "GetExhaustControlInput: ";
-        std::string_view CurrentModuleObject = "ZoneHVAC:ExhaustControl";
+        std::string_view constexpr RoutineName = "GetExhaustControlInput: ";
+        std::string_view constexpr CurrentModuleObject = "ZoneHVAC:ExhaustControl";
 
         bool ZoneNodeNotFound = true;
         bool ErrorsFound = false;
