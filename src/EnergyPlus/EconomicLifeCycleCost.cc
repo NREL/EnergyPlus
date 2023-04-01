@@ -1210,14 +1210,14 @@ void ExpressAsCashFlows(EnergyPlusData &state)
         if (resourceCostNotZero[iResource]) {
             ++cashFlowCounter;
 
+            switch (static_cast<Constant::eResource>(iResource)) {
             case Constant::eResource::Water:
             case Constant::eResource::OnSiteWater:
             case Constant::eResource::MainsWater:
             case Constant::eResource::RainWater:
             case Constant::eResource::WellWater:
             case Constant::eResource::Condensate:
-                elcc->CashFelow[cashCounter].Category = CostCategory::Water;
-            switch (static_cast<Constant::eResource>(iResource)) {
+                elcc->CashFlow[cashFlowCounter].Category = CostCategory::Water;
                 break;
             case Constant::eResource::Electricity:
             case Constant::eResource::NaturalGas:
