@@ -4291,7 +4291,7 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
     Real64 FullFlowSensibleOutput; // full flow sensible cooling output
     Real64 FullFlowLatentOutput;   // full flow sensible cooling output
 
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+    auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
     // get full flow sensible cooling output
     PartLoadRatio = 1.0;
@@ -4308,9 +4308,8 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
         };
         General::SolveRoot(state, Tol, MaxIte, SolFla, PartLoadRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
-            if (ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex == 0) {
-                ShowWarningError(state,
-                                 format("Iteration limit exceeded calculating evap unit part load ratio, for unit={}", ZoneEvapUnit(UnitNum).Name));
+            if (zoneEvapUnit.UnitLoadControlMaxIterErrorIndex == 0) {
+                ShowWarningError(state, format("Iteration limit exceeded calculating evap unit part load ratio, for unit={}", zoneEvapUnit.Name));
                 ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError(state, format("Unit part load ratio returned={:.2R}", PartLoadRatio));
                 ShowContinueError(state, "Check input for Fan Placement.");
@@ -4319,14 +4318,14 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
                 state,
                 format("Zone Evaporative Cooler unit part load ratio control failed (iteration limit [{}]) for ZoneHVAC:EvaporativeCoolerUnit =\"{}",
                        MaxIte,
-                       ZoneEvapUnit(UnitNum).Name),
-                ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex);
+                       zoneEvapUnit.Name),
+                zoneEvapUnit.UnitLoadControlMaxIterErrorIndex);
 
         } else if (SolFla == -2) {
-            if (ZoneEvapUnit(UnitNum).UnitLoadControlLimitsErrorIndex == 0) {
+            if (zoneEvapUnit.UnitLoadControlLimitsErrorIndex == 0) {
                 ShowWarningError(state,
                                  format("Zone Evaporative Cooler unit calculation failed: unit part load ratio limits exceeded, for unit = {}",
-                                        ZoneEvapUnit(UnitNum).Name));
+                                        zoneEvapUnit.Name));
                 ShowContinueError(state, "Check input for Fan Placement.");
                 ShowContinueErrorTimeStamp(state, "");
                 if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
@@ -4334,14 +4333,14 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
             ShowRecurringWarningErrorAtEnd(
                 state,
                 "Zone Evaporative Cooler unit part load ratio control failed (limits exceeded) for ZoneHVAC:EvaporativeCoolerUnit =\"" +
-                    ZoneEvapUnit(UnitNum).Name,
-                ZoneEvapUnit(UnitNum).UnitLoadControlLimitsErrorIndex);
+                    zoneEvapUnit.Name,
+                zoneEvapUnit.UnitLoadControlLimitsErrorIndex);
         }
 
     } else {
         PartLoadRatio = 1.0;
     }
-    ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
+    zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
 }
 
 void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
@@ -4356,12 +4355,9 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr MaxIte(500); // maximum number of iterations
-
     auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
     // first get full load result
-    Real64 ErrorToler = 0.01;
-
     zoneEvapUnit.FanSpeedRatio = 1.0;
     state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate = zoneEvapUnit.DesignAirMassFlowRate;
     state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
@@ -4457,6 +4453,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
             return SensibleOutputProvided - ZoneCoolingLoad;
         };
         int SolFla = 0; // Flag of RegulaFalsi solver
+        Real64 ErrorToler = 0.01;
         General::SolveRoot(state, ErrorToler, MaxIte, SolFla, FanSpeedRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
             if (zoneEvapUnit.UnitVSControlMaxIterErrorIndex == 0) {
