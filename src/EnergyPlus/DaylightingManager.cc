@@ -952,10 +952,9 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     NRF = thisDaylightControl.TotalDaylRefPoints;
     BRef = 0;
 
-    auto &RREF = state.dataDaylightingManager->RREF;
     for (IL = 1; IL <= NRF; ++IL) {
         // Reference point in absolute coordinate system
-        RREF = thisDaylightControl.DaylRefPtAbsCoord({1, 3}, IL); // ( x, y, z )
+        state.dataDaylightingManager->RREF = thisDaylightControl.DaylRefPtAbsCoord({1, 3}, IL); // ( x, y, z )
 
         //           -------------
         // ---------- WINDOW LOOP ----------
@@ -967,7 +966,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
                                                      IL,
                                                      loopwin,
                                                      DataDaylighting::CalledFor::RefPoint,
-                                                     RREF,
+                                                     state.dataDaylightingManager->RREF,
                                                      VIEWVC,
                                                      IWin,
                                                      IWin2,
@@ -1026,7 +1025,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
                                                                 W2,
                                                                 W21,
                                                                 W23,
-                                                                RREF,
+                                                                state.dataDaylightingManager->RREF,
                                                                 NWYlim,
                                                                 VIEWVC2,
                                                                 DWX,
@@ -1308,10 +1307,9 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
             0.0;
     }
 
-    auto &RREF = state.dataDaylightingManager->RREF;
     for (IL = 1; IL <= numRefPts; ++IL) {
 
-        RREF = state.dataDaylightingData->IllumMapCalc(mapNum).MapRefPtAbsCoord({1, 3}, IL); // (x, y, z)
+        state.dataDaylightingManager->RREF = state.dataDaylightingData->IllumMapCalc(mapNum).MapRefPtAbsCoord({1, 3}, IL); // (x, y, z)
 
         //           -------------
         // ---------- WINDOW LOOP ----------
@@ -1325,7 +1323,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
                                                      IL,
                                                      loopwin,
                                                      DataDaylighting::CalledFor::MapPoint,
-                                                     RREF,
+                                                     state.dataDaylightingManager->RREF,
                                                      VIEWVC,
                                                      IWin,
                                                      IWin2,
@@ -1385,7 +1383,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
                                                                 W2,
                                                                 W21,
                                                                 W23,
-                                                                RREF,
+                                                                state.dataDaylightingManager->RREF,
                                                                 NWYlim,
                                                                 VIEWVC2,
                                                                 DWX,
@@ -2795,7 +2793,6 @@ void CFSRefPointSolidAngle(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLES
     auto &Ray = state.dataDaylightingManager->Ray;
     auto &RayNorm = state.dataDaylightingManager->RayNorm;
-    auto &V = state.dataDaylightingManager->V;
     Real64 BestMatch;
     int iTrnRay;
     Real64 temp;
@@ -2808,8 +2805,8 @@ void CFSRefPointSolidAngle(EnergyPlusData &state,
     // figure out outgoing beam direction from current reference point
     BestMatch = 0.0;
     for (iTrnRay = 1; iTrnRay <= NTrnBasis; ++iTrnRay) {
-        V = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sTrn(iTrnRay);
-        temp = dot(Ray, V);
+        state.dataDaylightingManager->V = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sTrn(iTrnRay);
+        temp = dot(Ray, state.dataDaylightingManager->V);
         if (temp > BestMatch) {
             BestMatch = temp;
             RefPointMap.RefPointIndex(curWinEl) = iTrnRay;
@@ -2840,25 +2837,22 @@ void CFSRefPointPosFactor(EnergyPlusData &state,
     // Calculate position factor for given reference point.
 
     // SUBROUTINE LOCAL VARIABLES
-    int iTrnRay;
     Real64 XR;
     Real64 YR;
-    auto &V = state.dataDaylightingManager->V;
-    auto &InterPoint = state.dataDaylightingManager->InterPoint;
     bool hit;
 
     // Object Data
     DataBSDFWindow::BSDFDaylghtPosition elPos; // altitude and azimuth of intersection element
 
     auto const &sTrn(state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sTrn);
-    for (iTrnRay = 1; iTrnRay <= NTrnBasis; ++iTrnRay) {
-        V = sTrn(iTrnRay);
-        V.negate();
-        PierceSurface(state, iWin, RefPoint, V, InterPoint, hit);
+    for (int iTrnRay = 1; iTrnRay <= NTrnBasis; ++iTrnRay) {
+        state.dataDaylightingManager->V = sTrn(iTrnRay);
+        state.dataDaylightingManager->V.negate();
+        PierceSurface(state, iWin, RefPoint, state.dataDaylightingManager->V, state.dataDaylightingManager->InterPoint, hit);
         if (hit) {
             RefPointMap.RefPointIntersection(iTrnRay) = true;
 
-            elPos = WindowComplexManager::DaylghtAltAndAzimuth(V);
+            elPos = WindowComplexManager::DaylghtAltAndAzimuth(state.dataDaylightingManager->V);
 
             XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - elPos.Azimuth) + 0.001);
             YR = std::tan(elPos.Altitude + 0.001);
@@ -2908,10 +2902,6 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
     auto &URay = state.dataDaylightingManager->URay;                   // Unit vector in (Phi,Theta) direction
     auto &ObsHitPt = state.dataDaylightingManager->ObsHitPt;           // Unit vector in (Phi,Theta) direction
     auto &AltSteps_last = state.dataDaylightingManager->AltSteps_last; // Unit vector in (Phi,Theta) direction
-    auto &cos_Phi = state.dataDaylightingManager->cos_Phi;             // Unit vector in (Phi,Theta) direction
-    auto &sin_Phi = state.dataDaylightingManager->sin_Phi;             // Unit vector in (Phi,Theta) direction
-    auto &cos_Theta = state.dataDaylightingManager->cos_Theta;         // Unit vector in (Phi,Theta) direction
-    auto &sin_Theta = state.dataDaylightingManager->sin_Theta;         // Unit vector in (Phi,Theta) direction
     auto &AzimSteps_last = state.dataDaylightingManager->AzimSteps_last;
 
     assert(AzimSteps <= DataSurfaces::AzimAngStepsForSolReflCalc);
@@ -2925,8 +2915,8 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
     if (AltSteps != AltSteps_last) {
         for (int IPhi = 1, IPhi_end = (AltSteps / 2); IPhi <= IPhi_end; ++IPhi) {
             Phi = (IPhi - 0.5) * DPhi;
-            cos_Phi(IPhi) = std::cos(Phi);
-            sin_Phi(IPhi) = std::sin(Phi);
+            state.dataDaylightingManager->cos_Phi(IPhi) = std::cos(Phi);
+            state.dataDaylightingManager->sin_Phi(IPhi) = std::sin(Phi);
         }
         AltSteps_last = AltSteps;
     }
@@ -2934,16 +2924,16 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
     if (AzimSteps != AzimSteps_last) {
         for (int ITheta = 1; ITheta <= 2 * AzimSteps; ++ITheta) {
             Theta = (ITheta - 0.5) * DTheta;
-            cos_Theta(ITheta) = std::cos(Theta);
-            sin_Theta(ITheta) = std::sin(Theta);
+            state.dataDaylightingManager->cos_Theta(ITheta) = std::cos(Theta);
+            state.dataDaylightingManager->sin_Theta(ITheta) = std::sin(Theta);
         }
         AzimSteps_last = AzimSteps;
     }
 
     // Altitude loop
     for (int IPhi = 1, IPhi_end = (AltSteps / 2); IPhi <= IPhi_end; ++IPhi) {
-        SPhi = sin_Phi(IPhi);
-        CPhi = cos_Phi(IPhi);
+        SPhi = state.dataDaylightingManager->sin_Phi(IPhi);
+        CPhi = state.dataDaylightingManager->cos_Phi(IPhi);
 
         // Third component of ground ray unit vector in (Theta,Phi) direction
         URay(3) = SPhi;
@@ -2953,8 +2943,8 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
         IncAngSolidAngFac = CosIncAngURay * dOmegaGnd / Constant::Pi;
         // Azimuth loop
         for (int ITheta = 1; ITheta <= 2 * AzimSteps; ++ITheta) {
-            URay(1) = CPhi * cos_Theta(ITheta);
-            URay(2) = CPhi * sin_Theta(ITheta);
+            URay(1) = CPhi * state.dataDaylightingManager->cos_Theta(ITheta);
+            URay(2) = CPhi * state.dataDaylightingManager->sin_Theta(ITheta);
             SkyGndUnObs += IncAngSolidAngFac;
             // Does this ground ray hit an obstruction?
             hitObs = false;
@@ -9651,7 +9641,6 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     std::string MapNoString;
-    int linelen;
 
     if (state.dataDaylightingManager->ReportIllumMap_firstTime) {
         state.dataDaylightingManager->ReportIllumMap_firstTime = false;
@@ -9727,6 +9716,7 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
     if (!state.dataGlobal->WarmupFlag) {
         if (state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) { // Report only hourly
 
+            int linelen = 0;
             // Write X scale column header
             std::string mapLine = format(" {} {:02}:00", state.dataDaylightingManager->SavedMnDy(MapNum), state.dataGlobal->HourOfDay);
             if (state.dataDaylightingData->IllumMap(MapNum).HeaderXLineLengthNeeded) linelen = int(len(mapLine));
