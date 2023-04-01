@@ -3960,24 +3960,24 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
     int SAFMethod(0);         // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
                               // FractionOfAutosizedHeatingAirflow ...)
 
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+    auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
     state.dataSize->DataScalableSizingON = false;
     state.dataSize->ZoneHeatingOnlyFan = false;
     state.dataSize->ZoneCoolingOnlyFan = false;
 
     CompType = "ZoneHVAC:EvaporativeCoolerUnit";
-    CompName = ZoneEvapUnit(UnitNum).Name;
-    state.dataSize->DataZoneNumber = ZoneEvapUnit(UnitNum).ZonePtr;
+    CompName = zoneEvapUnit.Name;
+    state.dataSize->DataZoneNumber = zoneEvapUnit.ZonePtr;
     PrintFlag = true;
     bool errorsFound = false;
 
     if (state.dataSize->CurZoneEqNum > 0) {
         auto &zoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
 
-        if (ZoneEvapUnit(UnitNum).HVACSizingIndex > 0) {
+        if (zoneEvapUnit.HVACSizingIndex > 0) {
             state.dataSize->ZoneCoolingOnlyFan = true;
-            zoneHVACIndex = ZoneEvapUnit(UnitNum).HVACSizingIndex;
+            zoneHVACIndex = zoneEvapUnit.HVACSizingIndex;
             SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
             SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
             zoneEqSizing.SizingMethod(SizingMethod) = SAFMethod;
@@ -4015,7 +4015,7 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
                 if (state.dataGlobal->isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
                 sizingCoolingAirFlow.overrideSizingString(stringOverride);
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
+                zoneEvapUnit.DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
             } else if (SAFMethod == DataSizing::FlowPerCoolingCapacity) {
                 SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
@@ -4039,7 +4039,7 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
                 if (state.dataGlobal->isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
                 sizingCoolingAirFlow.overrideSizingString(stringOverride);
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
+                zoneEvapUnit.DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
             }
             state.dataSize->DataScalableSizingON = false;
             state.dataSize->ZoneCoolingOnlyFan = false;
@@ -4048,16 +4048,16 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
             // specified in the zoneHVAC object
             // N1 , \field Maximum Supply Air Flow Rate
             state.dataSize->ZoneCoolingOnlyFan = true;
-            if (ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate > 0.0) {
+            if (zoneEvapUnit.DesignAirVolumeFlowRate > 0.0) {
                 PrintFlag = false;
             }
-            TempSize = ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
+            TempSize = zoneEvapUnit.DesignAirVolumeFlowRate;
             CoolingAirFlowSizer sizingCoolingAirFlow;
             std::string stringOverride = "Design Supply Air Flow Rate [m3/s]";
             if (state.dataGlobal->isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
             sizingCoolingAirFlow.overrideSizingString(stringOverride);
             sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
+            zoneEvapUnit.DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
             state.dataSize->ZoneCoolingOnlyFan = false;
         }
     }
