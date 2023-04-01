@@ -3740,7 +3740,6 @@ namespace ScheduleManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0); // For total minimum
         Real64 MaxValue(0.0); // For total maximum
-        bool MinValueOk(true);
 
         if (ScheduleIndex == -1) {
             MinValue = 1.0;

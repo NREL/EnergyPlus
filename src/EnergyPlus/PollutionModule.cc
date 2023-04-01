@@ -4376,7 +4376,7 @@ void CheckFFSchedule(EnergyPlusData &state,
     if (SchedulePtr == 0) {
         ShowSevereError(state, format("{}: {}, invalid {}=\"{}\" not found.", currentModuleObject, resourceType, fieldName, ScheduleName));
         ErrorsFound = true;
-    } else if (!CheckScheduleValueMinMax(state, SchedulePtr, ScheduleManager::MinimumMode::GreaterOrEqual, 0.0)) {
+    } else if (!CheckScheduleValueMinMax(state, SchedulePtr, true, 0.0)) {
         ShowSevereError(state, format("{}: {}, invalid {}=\"{}\" invalid values.", currentModuleObject, resourceType, fieldName, ScheduleName));
         ShowContinueError(state, "Schedule values must be (>=0.).");
         ErrorsFound = true;
