@@ -1043,9 +1043,6 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     // Using/Aliasing
     bool DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool localSetPointCheck(false);
-
     auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
     // Check that setpoint is active
@@ -1064,7 +1061,7 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                         ShowSevereError(state, format("Missing temperature setpoint for Evap Cooler unit {}", EvapCond(EvapCoolNum).Name));
                         ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
                     } else {
-                        localSetPointCheck = false;
+                        bool localSetPointCheck = false;
                         CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, localSetPointCheck);
                         state.dataLoopNodes->NodeSetpointCheck(ControlNode).needsSetpointChecking = false;
                         // Let it slide apparently
