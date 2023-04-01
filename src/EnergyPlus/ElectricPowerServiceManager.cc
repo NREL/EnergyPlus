@@ -84,12 +84,12 @@
 
 namespace EnergyPlus {
 
-void createFacilityElectricPowerServiceObject(EnergyPlusData &state)
+void createFacilityElectricPowerServiceObject(const EnergyPlusData &state)
 {
     state.dataElectPwrSvcMgr->facilityElectricServiceObj = std::make_unique<ElectricPowerServiceManager>();
 }
 
-void initializeElectricPowerServiceZoneGains(EnergyPlusData &state) // namespace routine for handling call from InternalHeatGains
+void initializeElectricPowerServiceZoneGains(const EnergyPlusData &state) // namespace routine for handling call from InternalHeatGains
 {
     // internal zone gains need to be re initialized for begin new environment earlier than the main call into manage electric power service
     if (state.dataElectPwrSvcMgr->facilityElectricServiceObj->newEnvironmentInternalGainsFlag && state.dataGlobal->BeginEnvrnFlag) {
@@ -1650,7 +1650,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state,
     // sum up generator production
     genElectProdRate = 0.0;
     genElectricProd = 0.0;
-    for (auto &g : elecGenCntrlObj) {
+    for (auto const &g : elecGenCntrlObj) {
         genElectProdRate += g->electProdRate;
         g->electricityProd = g->electProdRate * (state.dataHVACGlobal->TimeStepSysSec);
         genElectricProd += g->electricityProd;
