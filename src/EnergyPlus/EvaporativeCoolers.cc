@@ -4086,82 +4086,82 @@ void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state,
     Real64 PartLoadRatio;
 
     {
-        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+        auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
-        if (ZoneEvapUnit(UnitNum).ControlSchemeType == ControlType::ZoneTemperatureDeadBandOnOffCycling) {
-            ZoneTemp = state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).Temp;
-            CoolSetLowThrottle = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - (0.5 * ZoneEvapUnit(UnitNum).ThrottlingRange);
-            CoolSetHiThrottle = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + (0.5 * ZoneEvapUnit(UnitNum).ThrottlingRange);
+        if (zoneEvapUnit.ControlSchemeType == ControlType::ZoneTemperatureDeadBandOnOffCycling) {
+            ZoneTemp = state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).Temp;
+            CoolSetLowThrottle = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - (0.5 * zoneEvapUnit.ThrottlingRange);
+            CoolSetHiThrottle = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + (0.5 * zoneEvapUnit.ThrottlingRange);
 
-            if ((ZoneTemp < CoolSetLowThrottle) || !ZoneEvapUnit(UnitNum).UnitIsAvailable) {
-                ZoneEvapUnit(UnitNum).IsOnThisTimestep = false;
+            if ((ZoneTemp < CoolSetLowThrottle) || !zoneEvapUnit.UnitIsAvailable) {
+                zoneEvapUnit.IsOnThisTimestep = false;
             } else if (ZoneTemp > CoolSetHiThrottle) {
-                ZoneEvapUnit(UnitNum).IsOnThisTimestep = true;
+                zoneEvapUnit.IsOnThisTimestep = true;
             } else {
-                if (ZoneEvapUnit(UnitNum).WasOnLastTimestep) {
-                    ZoneEvapUnit(UnitNum).IsOnThisTimestep = true;
+                if (zoneEvapUnit.WasOnLastTimestep) {
+                    zoneEvapUnit.IsOnThisTimestep = true;
                 } else {
-                    ZoneEvapUnit(UnitNum).IsOnThisTimestep = false;
+                    zoneEvapUnit.IsOnThisTimestep = false;
                 }
             }
 
-            if (ZoneEvapUnit(UnitNum).IsOnThisTimestep) {
+            if (zoneEvapUnit.IsOnThisTimestep) {
 
-                if (ZoneEvapUnit(UnitNum).OpMode == DataHVACGlobals::ContFanCycCoil) {
+                if (zoneEvapUnit.OpMode == DataHVACGlobals::ContFanCycCoil) {
                     PartLoadRatio = 1.0;
-                    ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
+                    zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 } else {
                     ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                     // calculate part load ratio for cycling fan/unit first
                     ControlZoneEvapUnitOutput(state, UnitNum, ZoneCoolingLoad);
-                    PartLoadRatio = ZoneEvapUnit(UnitNum).UnitPartLoadRatio;
+                    PartLoadRatio = zoneEvapUnit.UnitPartLoadRatio;
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 }
 
             } else { // not running
 
                 PartLoadRatio = 0.0;
-                ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
+                zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
                 CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
             }
 
-        } else if (ZoneEvapUnit(UnitNum).ControlSchemeType == ControlType::ZoneCoolingLoadOnOffCycling) {
+        } else if (zoneEvapUnit.ControlSchemeType == ControlType::ZoneCoolingLoadOnOffCycling) {
 
             // get zone loads
             ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-            CoolingLoadThreashold = -1.0 * ZoneEvapUnit(UnitNum).ThresholdCoolingLoad;
+            CoolingLoadThreashold = -1.0 * zoneEvapUnit.ThresholdCoolingLoad;
 
-            if ((ZoneCoolingLoad < CoolingLoadThreashold) && ZoneEvapUnit(UnitNum).UnitIsAvailable) {
+            if ((ZoneCoolingLoad < CoolingLoadThreashold) && zoneEvapUnit.UnitIsAvailable) {
 
-                if (ZoneEvapUnit(UnitNum).OpMode == DataHVACGlobals::ContFanCycCoil) {
+                if (zoneEvapUnit.OpMode == DataHVACGlobals::ContFanCycCoil) {
                     PartLoadRatio = 1.0;
-                    ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
+                    zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 } else {
                     // calculate part load ratio for cycling fan/unit first
                     ControlZoneEvapUnitOutput(state, UnitNum, ZoneCoolingLoad);
-                    PartLoadRatio = ZoneEvapUnit(UnitNum).UnitPartLoadRatio;
+                    PartLoadRatio = zoneEvapUnit.UnitPartLoadRatio;
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 }
 
             } else {
                 // unit is off
                 PartLoadRatio = 0.0;
-                ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
+                zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
                 CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
             }
 
-        } else if (ZoneEvapUnit(UnitNum).ControlSchemeType == ControlType::ZoneCoolingLoadVariableSpeedFan) {
+        } else if (zoneEvapUnit.ControlSchemeType == ControlType::ZoneCoolingLoadVariableSpeedFan) {
             // get zone loads
             ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-            CoolingLoadThreashold = -1.0 * ZoneEvapUnit(UnitNum).ThresholdCoolingLoad;
-            if ((ZoneCoolingLoad < CoolingLoadThreashold) && ZoneEvapUnit(UnitNum).UnitIsAvailable) {
+            CoolingLoadThreashold = -1.0 * zoneEvapUnit.ThresholdCoolingLoad;
+            if ((ZoneCoolingLoad < CoolingLoadThreashold) && zoneEvapUnit.UnitIsAvailable) {
 
                 // determine fan speed to meet load
                 ControlVSEvapUnitToMeetLoad(state, UnitNum, ZoneCoolingLoad);
                 // variable speed fan used fan speed ratio instead of partload ratio
-                CalcZoneEvapUnitOutput(state, UnitNum, ZoneEvapUnit(UnitNum).FanSpeedRatio, SensibleOutputProvided, LatentOutputProvided);
+                CalcZoneEvapUnitOutput(state, UnitNum, zoneEvapUnit.FanSpeedRatio, SensibleOutputProvided, LatentOutputProvided);
 
             } else {
                 // unit is off
