@@ -258,7 +258,6 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
         int numAlphas; // Number of elements in the alpha array
         int numNums;   // Number of elements in the numeric array
         int iOStat;    // IO Status when calling get input subroutine
-        int facilityPowerInTransformerIDFObjNum = 0;
         bool foundInFromGridTransformer = false;
 
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
@@ -279,7 +278,6 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerInFromGrid")) {
                 if (!foundInFromGridTransformer) {
                     foundInFromGridTransformer = true;
-                    facilityPowerInTransformerIDFObjNum = loopTransformer;
                     facilityPowerInTransformerName_ = state.dataIPShortCut->cAlphaArgs(1);
                     facilityPowerInTransformerPresent_ = true;
                 } else {
@@ -1042,7 +1040,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         // issue #5299 check for non-zero values in thermal electric ratio if gen op scheme is ThermalFollow*
         if (genOperationScheme_ == GeneratorOpScheme::ThermalFollow || genOperationScheme_ == GeneratorOpScheme::ThermalFollowLimitElectrical) {
             // check to make sure the user didn't input zeros for thermalToElectricControlRatio
-            for (auto &g : elecGenCntrlObj) {
+            for (auto const &g : elecGenCntrlObj) {
                 if (g->nominalThermElectRatio <= 0.0) {
                     ShowWarningError(state,
                                      format("Generator operation needs to be based on following thermal loads and needs values for Rated Thermal to "
@@ -2041,7 +2039,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::ACBuss: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2057,7 +2055,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::ACBussStorage: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2075,7 +2073,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::DCBussInverter: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2093,7 +2091,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::DCBussInverterDCStorage: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2113,7 +2111,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::DCBussInverterACStorage: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2137,7 +2135,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     } // end switch
     thermalProdRate = 0.0;
     thermalProd = 0.0;
-    for (auto &gc : elecGenCntrlObj) {
+    for (auto const &gc : elecGenCntrlObj) {
         thermalProdRate += gc->thermProdRate;
         thermalProd += gc->thermalProd;
     }
@@ -3317,9 +3315,6 @@ ElectricStorage::ElectricStorage( // main constructor
 {
 
     static constexpr std::string_view routineName = "ElectricStorage constructor ";
-    int numAlphas; // Number of elements in the alpha array
-    int numNums;   // Number of elements in the numeric array
-    int iOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     // if/when add object class name to input object this can be simplified. for now search all possible types
     bool foundStorage = false;
@@ -3342,6 +3337,9 @@ ElectricStorage::ElectricStorage( // main constructor
     }
 
     if (foundStorage) {
+        int numAlphas; // Number of elements in the alpha array
+        int numNums;   // Number of elements in the numeric array
+        int iOStat;    // IO Status when calling get input subroutine
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                  storageIDFObjectNum,
@@ -4127,21 +4125,15 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
     Real64 Volt = 0.0;
 
     Real64 T0 = 0.0;
-    Real64 E0c = 0.0;
-    Real64 k = 0.0;
-    Real64 c = 0.0;
     Real64 qmaxf = 0.0;
     Real64 Ef = 0.0;
-    Real64 qmax = 0.0;
-    Real64 Pactual = 0.0;
     Real64 q0 = 0.0;
-    Real64 E0d = 0.0;
 
-    qmax = maxAhCapacity_;
-    E0c = chargedOCV_;
-    E0d = dischargedOCV_;
-    k = chargeConversionRate_;
-    c = availableFrac_;
+    Real64 qmax = maxAhCapacity_;
+    Real64 E0c = chargedOCV_;
+    Real64 E0d = dischargedOCV_;
+    Real64 k = chargeConversionRate_;
+    Real64 c = availableFrac_;
 
     if (charging) {
 
@@ -4202,7 +4194,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
 
         if (std::abs(I0) <= std::abs(Imax)) {
             I0 = Pw / Volt;
-            Pactual = I0 * Volt;
+            // Pactual = I0 * Volt;
         } else {
             I0 = Imax;
             qmaxf = 80.0; // Initial assumption to solve the equation using iterative method
@@ -4256,7 +4248,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
         Imax = min(Imax, maxDischargeI_);
         if (std::abs(I0) <= Imax) {
             I0 = Pw / Volt;
-            Pactual = I0 * Volt;
+            // Pactual = I0 * Volt;
         } else {
             I0 = Imax;
             qmaxf = 10.0;        // Initial assumption to solve the equation using iterative method
@@ -4292,7 +4284,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
         thisTimeStepBound_ = max(0.0, newBound);
     }
 
-    Pactual = I0 * Volt;
+    // Pactual = I0 * Volt;
     Real64 TotalSOC = thisTimeStepAvailable_ + thisTimeStepBound_;
 
     // output1
