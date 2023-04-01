@@ -718,9 +718,9 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
                             state.dataHeatBal
                                 ->Zone(
                                     state.dataSurface
-                                     ->Surface(
-                                         state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
-                                     .Zone)
+                                        ->Surface(
+                                            state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
+                                        .Zone)
                                 .OriginZ -
                             zone.OriginZ <
                         0.8 &&
@@ -732,9 +732,9 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
                             state.dataHeatBal
                                 ->Zone(
                                     state.dataSurface
-                                     ->Surface(
-                                         state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
-                                     .Zone)
+                                        ->Surface(
+                                            state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
+                                        .Zone)
                                 .OriginZ -
                             zone.OriginZ >
                         1.8 &&
@@ -746,9 +746,9 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
                              state.dataHeatBal
                                  ->Zone(
                                      state.dataSurface
-                                      ->Surface(
-                                          state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
-                                      .Zone)
+                                         ->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum))
+                                                       .SurfNum)
+                                         .Zone)
                                  .OriginZ -
                              zone.OriginZ >
                          0.8 &&
@@ -756,9 +756,9 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
                              state.dataHeatBal
                                  ->Zone(
                                      state.dataSurface
-                                      ->Surface(
-                                          state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
-                                      .Zone)
+                                         ->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum))
+                                                       .SurfNum)
+                                         .Zone)
                                  .OriginZ -
                              zone.OriginZ <
                          1.8) ||
@@ -766,9 +766,9 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
                              state.dataHeatBal
                                  ->Zone(
                                      state.dataSurface
-                                      ->Surface(
-                                          state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
-                                      .Zone)
+                                         ->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum))
+                                                       .SurfNum)
+                                         .Zone)
                                  .OriginZ -
                              zone.OriginZ >
                          0.8 &&
@@ -776,9 +776,9 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
                              state.dataHeatBal
                                  ->Zone(
                                      state.dataSurface
-                                      ->Surface(
-                                          state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum)
-                                      .Zone)
+                                         ->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum))
+                                                       .SurfNum)
+                                         .Zone)
                                  .OriginZ -
                              zone.OriginZ <
                          1.8)) {
@@ -1072,8 +1072,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
         } else if (HeightThermostat >= HeightMixedSubzoneAve && HeightThermostat <= CeilingHeight) {
             state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
         } else {
-            ShowFatalError(state,
-                           format("Displacement ventilation thermostat height is above ceiling or below floor in Zone: {}", zone.Name));
+            ShowFatalError(state, format("Displacement ventilation thermostat height is above ceiling or below floor in Zone: {}", zone.Name));
         }
     }
 
