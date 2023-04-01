@@ -1041,12 +1041,10 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     // Uses the status flags to trigger events.
 
     // Using/Aliasing
-    bool DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
-
     auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
     // Check that setpoint is active
-    if (!state.dataGlobal->SysSizingCalc && state.dataEvapCoolers->MySetPointCheckFlag && DoSetPointTest) {
+    if (!state.dataGlobal->SysSizingCalc && state.dataEvapCoolers->MySetPointCheckFlag && state.dataHVACGlobal->DoSetPointTest) {
         for (int EvapUnitNum = 1; EvapUnitNum <= state.dataEvapCoolers->NumEvapCool; ++EvapUnitNum) {
 
             // only check evap coolers that are supposed to have a control node
