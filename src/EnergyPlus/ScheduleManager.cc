@@ -3717,9 +3717,9 @@ namespace ScheduleManager {
     }
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex,        // Which Schedule being tested
-                                  MinimumMode const &minimumMode, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum            // Minimum desired value
+                                  int const ScheduleIndex,    // Which Schedule being tested
+                                  bool const includeOrEquals, // Minimum indicator ('>', '>=')
+                                  Real64 const Minimum        // Minimum desired value
     )
     {
         // FUNCTION INFORMATION:
@@ -3783,10 +3783,10 @@ namespace ScheduleManager {
         }
 
         //  Min/max for schedule has been set.  Test.
-        if (minimumMode == MinimumMode::Greater) {
-            return state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue > Minimum;
-        } else {
+        if (includeOrEquals) {
             return FLT_EPSILON >= Minimum - state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue;
+        } else {
+            return state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue > Minimum;
         }
     }
 

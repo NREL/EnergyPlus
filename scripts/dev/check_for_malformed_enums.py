@@ -112,7 +112,6 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
             "OutputProcessor.hh:ReportingFrequency",
             "HVACInterfaceManager.cc:UpdateType",
             "DataHeatBalance.hh:PERptVars",
-            "ScheduleManager.hh:MinimumMode",
         ]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tMissing 'Invalid' at position 0\n"
@@ -132,7 +131,6 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
         exceptions = [
             "HVACInterfaceManager.cc:UpdateType",
             "IdfParser.hh:Token",
-            "ScheduleManager.hh:MinimumMode",
         ]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tMissing 'Num' at position N\n"

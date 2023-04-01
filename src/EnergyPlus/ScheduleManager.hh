@@ -265,16 +265,10 @@ namespace ScheduleManager {
                             bool &ErrorsFound               // Will be true if error found.
     );
 
-    enum class MinimumMode
-    {
-        Greater,
-        GreaterOrEqual
-    };
-
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex,        // Which Schedule being tested
-                                  MinimumMode const &minimumMode, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum            // Minimum desired value
+                                  int const ScheduleIndex, // Which Schedule being tested
+                                  bool includeOrEquals,    // Minimum indicator ('>', '>=')
+                                  Real64 const Minimum     // Minimum desired value
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
