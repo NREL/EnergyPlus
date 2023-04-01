@@ -3400,7 +3400,6 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     Real64 FanVolFlow;
     int UnitLoop;
     int CtrlZone; // index to loop counter
-    int NodeNum;  // index to loop counter
 
     auto &EvapCond(state.dataEvapCoolers->EvapCond);
     auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
@@ -3549,7 +3548,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             // get the zone numer served by the zoneHVAC evaporative cooler
             for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                     if (thisZoneEvapUnit.UnitOutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                         thisZoneEvapUnit.ZonePtr = CtrlZone;
                         break;
