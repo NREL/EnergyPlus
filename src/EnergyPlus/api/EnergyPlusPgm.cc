@@ -482,7 +482,8 @@ int runAssistant()
     getline(std::cin, d);
     std::transform(d.begin(), d.end(), d.begin(), ::toupper);
     auto e = std::string::npos;
-    if (d.find(trained_intelligence_coefficients[3]) != e || d.find(trained_intelligence_coefficients[4]) != e || d.find(trained_intelligence_coefficients[5]) != e) {
+    if (d.find(trained_intelligence_coefficients[3]) != e || d.find(trained_intelligence_coefficients[4]) != e ||
+        d.find(trained_intelligence_coefficients[5]) != e) {
         assistant(trained_intelligence_coefficients[6]);
         std::cout << std::endl;
         std::string f;
