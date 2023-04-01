@@ -697,10 +697,9 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     int numAlphas; // Number of elements in the alpha array
     int numNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
-    bool errorsFound;
 
     state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Distribution";
-    errorsFound = false;
+    bool errorsFound = false;
     if (objectNum > 0) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
