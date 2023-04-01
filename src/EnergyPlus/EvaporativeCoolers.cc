@@ -4357,62 +4357,55 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr MaxIte(500); // maximum number of iterations
 
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+    auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
     // first get full load result
     Real64 ErrorToler = 0.01;
 
-    ZoneEvapUnit(UnitNum).FanSpeedRatio = 1.0;
-    state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
-    state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMaxAvail =
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-    state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRate =
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-    state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRateMaxAvail =
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRate;
+    zoneEvapUnit.FanSpeedRatio = 1.0;
+    state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate = zoneEvapUnit.DesignAirMassFlowRate;
+    state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
+    state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
+    state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRateMaxAvail =
+        state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRate;
 
-    if (ZoneEvapUnit(UnitNum).UnitReliefNodeNum > 0) {
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRate =
-            state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
+    if (zoneEvapUnit.UnitReliefNodeNum > 0) {
+        state.dataLoopNodes->Node(zoneEvapUnit.UnitReliefNodeNum).MassFlowRate = state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(zoneEvapUnit.UnitReliefNodeNum).MassFlowRateMaxAvail =
+            state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
     }
-    if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::BlowThruFan) {
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRate =
-            state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-        if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(
-                state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+    if (zoneEvapUnit.FanLocation == FanPlacement::BlowThruFan) {
+        state.dataLoopNodes->Node(zoneEvapUnit.FanOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(zoneEvapUnit.FanOutletNodeNum).MassFlowRateMaxAvail =
+            state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
+        if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
         } else {
-            state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
         }
     }
 
-    if (ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus) {
-        SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index);
+    if (zoneEvapUnit.EvapCooler_1_AvailStatus) {
+        SimEvapCooler(state, zoneEvapUnit.EvapCooler_1_Name, zoneEvapUnit.EvapCooler_1_Index);
     }
 
-    if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
-        SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index);
+    if ((zoneEvapUnit.EvapCooler_2_Index > 0) && zoneEvapUnit.EvapCooler_2_AvailStatus) {
+        SimEvapCooler(state, zoneEvapUnit.EvapCooler_2_Name, zoneEvapUnit.EvapCooler_2_Index);
     }
-    if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::DrawThruFan) {
-        if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(
-                state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+    if (zoneEvapUnit.FanLocation == FanPlacement::DrawThruFan) {
+        if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
         } else {
-            state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
         }
     }
 
     // calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio)
-    Real64 MinHumRat = min(state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).HumRat,
-                           state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).HumRat);
-    Real64 FullFlowSensibleOutputProvided =
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRate *
-        (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).Temp, MinHumRat) -
-         Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).Temp, MinHumRat));
+    Real64 MinHumRat =
+        min(state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).HumRat, state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).HumRat);
+    Real64 FullFlowSensibleOutputProvided = state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRate *
+                                            (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).Temp, MinHumRat) -
+                                             Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).Temp, MinHumRat));
 
     if (FullFlowSensibleOutputProvided < ZoneCoolingLoad) { // find speed ratio by regula falsi numerical method
         Real64 FanSpeedRatio = 1.0;
@@ -4466,10 +4459,9 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
         int SolFla = 0; // Flag of RegulaFalsi solver
         General::SolveRoot(state, ErrorToler, MaxIte, SolFla, FanSpeedRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
-            if (ZoneEvapUnit(UnitNum).UnitVSControlMaxIterErrorIndex == 0) {
+            if (zoneEvapUnit.UnitVSControlMaxIterErrorIndex == 0) {
                 ShowWarningError(
-                    state,
-                    format("Iteration limit exceeded calculating variable speed evap unit fan speed ratio, for unit={}", ZoneEvapUnit(UnitNum).Name));
+                    state, format("Iteration limit exceeded calculating variable speed evap unit fan speed ratio, for unit={}", zoneEvapUnit.Name));
                 ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError(state, format("Fan speed ratio returned={:.2R}", FanSpeedRatio));
                 ShowContinueError(state, "Check input for Fan Placement.");
@@ -4478,24 +4470,24 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
                 state,
                 format("Zone Evaporative Cooler unit control failed (iteration limit [{}]) for ZoneHVAC:EvaporativeCoolerUnit =\"{}",
                        MaxIte,
-                       ZoneEvapUnit(UnitNum).Name),
-                ZoneEvapUnit(UnitNum).UnitVSControlMaxIterErrorIndex);
+                       zoneEvapUnit.Name),
+                zoneEvapUnit.UnitVSControlMaxIterErrorIndex);
 
         } else if (SolFla == -2) {
-            if (ZoneEvapUnit(UnitNum).UnitVSControlLimitsErrorIndex == 0) {
+            if (zoneEvapUnit.UnitVSControlLimitsErrorIndex == 0) {
                 ShowWarningError(state,
                                  format("Variable speed evaporative cooler unit calculation failed: fan speed ratio limits exceeded, for unit = {}",
-                                        ZoneEvapUnit(UnitNum).Name));
+                                        zoneEvapUnit.Name));
                 ShowContinueError(state, "Check input for Fan Placement.");
                 ShowContinueErrorTimeStamp(state, "");
                 if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
             }
             ShowRecurringWarningErrorAtEnd(state,
                                            "Zone Evaporative Cooler unit control failed (limits exceeded) for ZoneHVAC:EvaporativeCoolerUnit =\"" +
-                                               ZoneEvapUnit(UnitNum).Name,
-                                           ZoneEvapUnit(UnitNum).UnitVSControlLimitsErrorIndex);
+                                               zoneEvapUnit.Name,
+                                           zoneEvapUnit.UnitVSControlLimitsErrorIndex);
         }
-        ZoneEvapUnit(UnitNum).FanSpeedRatio = FanSpeedRatio;
+        zoneEvapUnit.FanSpeedRatio = FanSpeedRatio;
     }
 }
 
