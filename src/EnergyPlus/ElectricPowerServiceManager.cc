@@ -526,9 +526,9 @@ void ElectricPowerServiceManager::reportPVandWindCapacity(EnergyPlusData &state)
     // LEED report
     pvTotalCapacity_ = 0.0;
     windTotalCapacity_ = 0.0;
-    for (auto &lc : elecLoadCenterObjs) {
+    for (auto const &lc : elecLoadCenterObjs) {
         if (lc->numGenerators > 0) {
-            for (auto &g : lc->elecGenCntrlObj) {
+            for (auto const &g : lc->elecGenCntrlObj) {
                 if (g->generatorType == GeneratorType::PV) {
                     pvTotalCapacity_ += g->maxPowerOut;
                 }
@@ -550,7 +550,7 @@ void ElectricPowerServiceManager::reportPVandWindCapacity(EnergyPlusData &state)
 void ElectricPowerServiceManager::sumUpNumberOfStorageDevices()
 {
     numElecStorageDevices = 0;
-    for (auto &e : elecLoadCenterObjs) {
+    for (auto const &e : elecLoadCenterObjs) {
         if (e->storageObj != nullptr) {
             ++numElecStorageDevices;
         }
@@ -1095,8 +1095,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
         int transformerItemNum =
             state.dataInputProcessing->inputProcessor->getObjectItemNum(state, state.dataIPShortCut->cCurrentModuleObject, transformerName_);
-        int iOStat;
         if (transformerItemNum > 0) {
+            int iOStat;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      transformerItemNum,
@@ -2146,9 +2146,8 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
 Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
 {
     if (myCoGenSetupFlag_) {
-        bool plantNotFound = false;
         for (auto &g : elecGenCntrlObj) {
-            plantNotFound = false;
+            bool plantNotFound = false;
             PlantUtilities::ScanPlantLoopsForObject(state, g->compPlantName, g->compPlantType, g->cogenLocation, plantNotFound, _, _, _, _, _);
             if (!plantNotFound) g->plantInfoFound = true;
         }
@@ -2477,9 +2476,6 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
     nomVoltEfficiencyARR_.resize(6, 0.0);
 
     static constexpr std::string_view routineName = "DCtoACInverter constructor ";
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     // if/when add object class name to input object this can be simplified. for now search all possible types
     bool foundInverter = false;
@@ -2516,6 +2512,9 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
     }
 
     if (foundInverter) {
+        int NumAlphas; // Number of elements in the alpha array
+        int NumNums;   // Number of elements in the numeric array
+        int IOStat;    // IO Status when calling get input subroutine
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
@@ -2987,15 +2986,15 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
 {
 
     static constexpr std::string_view routineName = "ACtoDCConverter constructor ";
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     // if/when add object class name to input object this can be simplified. for now search all possible types
 
     int testConvertIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Storage:Converter", objectName);
 
     if (testConvertIndex > 0) {
+        int NumAlphas; // Number of elements in the alpha array
+        int NumNums;   // Number of elements in the numeric array
+        int IOStat;    // IO Status when calling get input subroutine
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Storage:Converter";
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -3324,7 +3323,6 @@ ElectricStorage::ElectricStorage( // main constructor
     bool errorsFound = false;
     // if/when add object class name to input object this can be simplified. for now search all possible types
     bool foundStorage = false;
-    int testStorageIndex = 0;
     int storageIDFObjectNum = 0;
 
     const std::array<std::pair<std::string, StorageModelType>, 3> storageTypes{
@@ -3333,7 +3331,7 @@ ElectricStorage::ElectricStorage( // main constructor
          {"ElectricLoadCenter:Storage:LiIonNMCBattery", StorageModelType::LiIonNmcBattery}}};
 
     for (auto &item : storageTypes) {
-        testStorageIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, item.first, objectName);
+        int testStorageIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, item.first, objectName);
         if (testStorageIndex > 0) {
             foundStorage = true;
             storageIDFObjectNum = testStorageIndex;
@@ -4663,15 +4661,15 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
       thermalLossEnergy_(0.0), elecUseMeteredUtilityLosses_(0.0), powerConversionMeteredLosses_(0.0), qdotConvZone_(0.0), qdotRadZone_(0.0)
 {
     static constexpr std::string_view routineName = "ElectricTransformer constructor ";
-    int numAlphas; // Number of elements in the alpha array
-    int numNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     int transformerIDFObjectNum = 0;
     state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
 
     transformerIDFObjectNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Transformer", objectName);
     if (transformerIDFObjectNum > 0) {
+        int numAlphas; // Number of elements in the alpha array
+        int numNums;   // Number of elements in the numeric array
+        int IOStat;    // IO Status when calling get input subroutine
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                  transformerIDFObjectNum,
