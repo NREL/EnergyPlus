@@ -461,7 +461,7 @@ ASHRAE205ChillerSpecs *ASHRAE205ChillerSpecs::factory(EnergyPlusData &state, std
     auto thisObj = std::find_if(state.dataChillerElectricASHRAE205->Electric205Chiller.begin(),
                                 state.dataChillerElectricASHRAE205->Electric205Chiller.end(),
                                 [&objectName](const ASHRAE205ChillerSpecs &myObj) { return myObj.Name == objectName; });
-    if (thisObj->Name == objectName) return thisObj;
+    if (thisObj != state.dataChillerElectricASHRAE205->Electric205Chiller.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("ASHRAE205ChillerSpecs::factory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     return nullptr;                                                                                                         // LCOV_EXCL_LINE

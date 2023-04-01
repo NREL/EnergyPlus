@@ -81,12 +81,9 @@ namespace EnergyPlus::ChillerAbsorption {
 // MODULE INFORMATION:
 //       AUTHOR         Dan Fisher
 //       DATE WRITTEN   Nov. 2000
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
-// This module simulates the performance of the BLAST
-// absorbers.
+// This module simulates the performance of the BLAST absorbers.
 
 // METHODOLOGY EMPLOYED:
 // Once the PlantLoopManager determines that the BLAST absorber
@@ -120,7 +117,7 @@ BLASTAbsorberSpecs *BLASTAbsorberSpecs::factory(EnergyPlusData &state, std::stri
     auto thisAbs = std::find_if(state.dataChillerAbsorber->absorptionChillers.begin(),
                                 state.dataChillerAbsorber->absorptionChillers.end(),
                                 [&objectName](const BLASTAbsorberSpecs &myAbs) { return myAbs.Name == objectName; });
-    if (thisAbs->Name == objectName) return thisAbs;
+    if (thisAbs != state.dataChillerAbsorber->absorptionChillers.end()) return thisAbs;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalBlastAbsorberFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
@@ -844,8 +841,6 @@ void BLASTAbsorberSpecs::initialize(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   September 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for initializations of the Electric Chiller components
@@ -906,7 +901,6 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     //       DATE WRITTEN   March 2008
     //       MODIFIED:      R. Raustad May 2008 - added generator node sizing
     //                      November 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for sizing Constant COP Chiller Components for which capacities and flow rates
@@ -1424,7 +1418,6 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
     //       MODIFIED       Apr. 1999, May 2000- Taecheol Kim
     //                      May. 2008, R. Raustad, Added generator nodes
     //                      Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // simulate a vapor compression Absorber using the BLAST model

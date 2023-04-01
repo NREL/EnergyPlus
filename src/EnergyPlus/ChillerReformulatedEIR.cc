@@ -92,8 +92,6 @@ namespace EnergyPlus::ChillerReformulatedEIR {
 // MODULE INFORMATION:
 //       AUTHOR         Lixing Gu
 //       DATE WRITTEN   August 2006
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 //       MODIFIED
 //       Aug.  2014, Rongpeng Zhang, added An additional part-load performance curve type
@@ -124,7 +122,7 @@ ReformulatedEIRChillerSpecs *ReformulatedEIRChillerSpecs::factory(EnergyPlusData
     auto thisObj = std::find_if(state.dataChillerReformulatedEIR->ElecReformEIRChiller.begin(),
                                 state.dataChillerReformulatedEIR->ElecReformEIRChiller.end(),
                                 [&objectName](const ReformulatedEIRChillerSpecs &myObj) { return myObj.Name == objectName; });
-    if (thisObj->Name == objectName) return thisObj;
+    if (thisObj != state.dataChillerReformulatedEIR->ElecReformEIRChiller.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalReformulatedElectEIRChillerFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
@@ -173,8 +171,6 @@ void ReformulatedEIRChillerSpecs::simulate(
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Lixing Gu
     //       DATE WRITTEN   July 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  This is the reformulated EIR chiller model driver. It gets the input for the
@@ -218,7 +214,6 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Lixing Gu, FSEC
     //       DATE WRITTEN:    July 2006
-
     //       MODIFIED
     //       Aug.  2014, Rongpeng Zhang, added an additional part-load performance curve type
 
@@ -992,8 +987,6 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Lixing Gu, FSEC
     //       DATE WRITTEN   July 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  This subroutine is for initializations of the Reformulated Electric EIR Chiller variables
@@ -1117,7 +1110,6 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
     //       DATE WRITTEN   June 2004
     //       MODIFIED       July 2006, L. Gu, modified for reformulated EIR chiller
     //                      November 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  This subroutine is for sizing Reformulated Electric EIR Chiller Components for which capacities and flow rates
@@ -1638,8 +1630,6 @@ void ReformulatedEIRChillerSpecs::control(EnergyPlusData &state, Real64 &MyLoad,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Lixing Gu, FSEC
     //       DATE WRITTEN   July 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Simulate a vapor compression chiller using the reformulated model developed by Mark Hydeman
@@ -1772,7 +1762,6 @@ void ReformulatedEIRChillerSpecs::calcHeatRecovery(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Lixing Gu, FSEC
     //       DATE WRITTEN:    July 2006
-    //       MODIFIED:        na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  Calculate the heat recovered from the chiller condenser
@@ -1924,8 +1913,6 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Lixing Gu, FSEC
     //       DATE WRITTEN   July 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     //       MODIFIED
     //       Aug. 2014, Rongpeng Zhang, added an additional part-load performance curve type

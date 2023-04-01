@@ -85,7 +85,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
 //                   for Gas Research Institute
 //    DATE WRITTEN   March 2001
 //    MODIFIED       Brent Griffith, Nov 2010 plant upgrades, generalize fluid properties
-//    RE-ENGINEERED  na
+
 // PURPOSE OF THIS MODULE:
 //    This module simulates the performance of the direct fired
 //    absorption chiller.
@@ -118,7 +118,7 @@ GasAbsorberSpecs *GasAbsorberSpecs::factory(EnergyPlusData &state, std::string c
     auto thisObj = std::find_if(state.dataChillerGasAbsorption->GasAbsorber.begin(),
                                 state.dataChillerGasAbsorption->GasAbsorber.end(),
                                 [&objectName](const GasAbsorberSpecs &myObj) { return myObj.Name == objectName; });
-    if (thisObj->Name == objectName) return thisObj;
+    if (thisObj != state.dataChillerGasAbsorption->GasAbsorber.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalGasAbsorberFactory: Error getting inputs for comp named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler

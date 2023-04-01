@@ -97,7 +97,6 @@ namespace EnergyPlus::ChillerElectricEIR {
 //       MODIFIED       Chandan Sharma, FSEC, February 2010, Added basin heater
 //                      Brent Griffith, NREL, Sept 2010, revised for plant changes
 //                      generalized fluid properties
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 //  This module simulates the performance of the electric vapor
@@ -123,7 +122,7 @@ ElectricEIRChillerSpecs *ElectricEIRChillerSpecs::factory(EnergyPlusData &state,
     auto thisObj = std::find_if(state.dataChillerElectricEIR->ElectricEIRChiller.begin(),
                                 state.dataChillerElectricEIR->ElectricEIRChiller.end(),
                                 [&objectName](const ElectricEIRChillerSpecs &myObj) { return myObj.Name == objectName; });
-    if (thisObj->Name == objectName) return thisObj;
+    if (thisObj != state.dataChillerElectricEIR->ElectricEIRChiller.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalElectEIRChillerFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
@@ -136,8 +135,6 @@ void ElectricEIRChillerSpecs::simulate(
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   June 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  This is the electric EIR chiller model driver. It gets the input for the
@@ -1282,8 +1279,6 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Raustad, FSEC
     //       DATE WRITTEN   June 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  This subroutine is for initializations of the Electric EIR Chiller variables
@@ -1346,7 +1341,6 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
     //       AUTHOR         Richard Raustad, FSEC
     //       DATE WRITTEN   June 2004
     //       MODIFIED       October 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  This subroutine is for sizing Electric EIR Chiller Components for which capacities and flow rates
@@ -1690,7 +1684,6 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
     //       MODIFIED       Feb. 2010, Chandan Sharma, FSEC, Added basin heater
     //                      Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
     //                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  Simulate a vapor compression chiller using the DOE-2 model
