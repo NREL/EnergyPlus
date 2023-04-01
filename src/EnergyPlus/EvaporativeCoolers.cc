@@ -2167,7 +2167,6 @@ void CalcIndirectResearchSpecialEvapCooler(EnergyPlusData &state, int const Evap
     Real64 RhoWater;
     Real64 RhoAir; // Density of the primary side air
     Real64 CFMAir;
-    int TertNode;     // inlet node for relief (from bulding) to mix for purge
     Real64 BoundTemp; // temperature limit for outlet
     Real64 PartLoad;
     Real64 TotalVolFlow;
@@ -2212,7 +2211,7 @@ void CalcIndirectResearchSpecialEvapCooler(EnergyPlusData &state, int const Evap
         //  and the remainder will be made up with outside air from the secondary node
         //*********************************************
 
-        TertNode = thisEvapCond.TertiaryInletNode;
+        int TertNode = thisEvapCond.TertiaryInletNode;
         if (TertNode == 0) {
             SecondaryInletDryBulbTemp = thisEvapCond.SecInletTemp;
             SecondaryInletWetBulbTemp =
@@ -2407,7 +2406,6 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     Real64 FlowRatioSecWet;                 // current secondary air mass flow ratio in wet mode
     Real64 EvapCoolerTotalElectricPowerDry; // evaporative cooler current total electric power drawn
     Real64 EvapCoolerTotalElectricPowerWet; // evaporative cooler current total electric power drawn
-    int SolFla;                             // Flag of solver
     Real64 QHXLatent;                       // evaporative cooler latent heat transfer rate
     Real64 hfg;                             // latent heat of vaporization of water at the secondary air inlet condition
 
@@ -2443,6 +2441,7 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     MassFlowRateSecMin = 0.0;
     AirMassFlowSec = MassFlowRateSecMax;
     PartLoad = thisEvapCond.PartLoadFract;
+    int SolFla = 0; // Flag of solver
     {
         if (thisEvapCond.EvapCoolerRDDOperatingMode == OperatingMode::DryModulated) {
             auto f = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
@@ -3094,7 +3093,6 @@ void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCo
     Real64 FlowRatio(0);           // primary air flow frcation (current flow divided by the design flow rate)
     Real64 MassFlowRateSysDesign;  // primary air design mass flow rate
     Real64 MassFlowRateSys;        // primary air current mass flow rate
-    int InletNode;                 // inlet node number
     Real64 BlowDownVdot(0.0);
     Real64 DriftVdot(0.0);
     Real64 EvapVdot(0.0);
@@ -3124,10 +3122,9 @@ void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCo
         //   ACROSS A DIRECT EVAPORATION COOLER.
         TEWB = thisEvapCond.InletWetBulbTemp;
         TEDB = thisEvapCond.InletTemp;
-        InletNode = thisEvapCond.InletNode;
 
         MassFlowRateSys = thisEvapCond.InletMassFlowRate;
-        MassFlowRateSysDesign = state.dataLoopNodes->Node(InletNode).MassFlowRateMax;
+        MassFlowRateSysDesign = state.dataLoopNodes->Node(thisEvapCond.InletNode).MassFlowRateMax;
         if (MassFlowRateSysDesign > 0.0) {
             if (MassFlowRateSys > 0.0) {
                 FlowRatio = MassFlowRateSys / MassFlowRateSysDesign;
@@ -3923,7 +3920,7 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
     static constexpr std::string_view RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 TempSize;          // autosized value of coil input field
+    Real64 TempSize; // autosized value of coil input field
 
     auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
