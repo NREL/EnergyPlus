@@ -1041,22 +1041,21 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     // Uses the status flags to trigger events.
 
     // Using/Aliasing
-    auto &EvapCond(state.dataEvapCoolers->EvapCond);
+    auto &evapCond = state.dataEvapCoolers->EvapCond(EvapCoolNum);
 
     // Check that setpoint is active
     if (!state.dataGlobal->SysSizingCalc && state.dataEvapCoolers->MySetPointCheckFlag && state.dataHVACGlobal->DoSetPointTest) {
         for (int EvapUnitNum = 1; EvapUnitNum <= state.dataEvapCoolers->NumEvapCool; ++EvapUnitNum) {
 
             // only check evap coolers that are supposed to have a control node
-            if ((EvapCond(EvapCoolNum).evapCoolerType != EvapCoolerType::IndirectRDDSpecial) &&
-                (EvapCond(EvapCoolNum).evapCoolerType != EvapCoolerType::DirectResearchSpecial))
+            if ((evapCond.evapCoolerType != EvapCoolerType::IndirectRDDSpecial) && (evapCond.evapCoolerType != EvapCoolerType::DirectResearchSpecial))
                 continue;
 
-            int ControlNode = EvapCond(EvapUnitNum).EvapControlNodeNum;
+            int ControlNode = state.dataEvapCoolers->EvapCond(EvapUnitNum).EvapControlNodeNum;
             if (ControlNode > 0) {
                 if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        ShowSevereError(state, format("Missing temperature setpoint for Evap Cooler unit {}", EvapCond(EvapCoolNum).Name));
+                        ShowSevereError(state, format("Missing temperature setpoint for Evap Cooler unit {}", evapCond.Name));
                         ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
                     } else {
                         bool localSetPointCheck = false;
@@ -1064,7 +1063,7 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                         state.dataLoopNodes->NodeSetpointCheck(ControlNode).needsSetpointChecking = false;
                         // Let it slide apparently
                         if (localSetPointCheck) {
-                            ShowSevereError(state, format("Missing temperature setpoint for Evap Cooler unit {}", EvapCond(EvapCoolNum).Name));
+                            ShowSevereError(state, format("Missing temperature setpoint for Evap Cooler unit {}", evapCond.Name));
                             ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
                             ShowContinueError(state, " or use an EMS actuator to establish a setpoint at the unit control node.");
                         }
@@ -1075,92 +1074,90 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         state.dataEvapCoolers->MySetPointCheckFlag = false;
     }
 
-    auto &thisEvapCond = EvapCond(EvapCoolNum);
-    if (!state.dataGlobal->SysSizingCalc && thisEvapCond.MySizeFlag) {
+    if (!state.dataGlobal->SysSizingCalc && evapCond.MySizeFlag) {
         // for each cooler, do the sizing once.
         SizeEvapCooler(state, EvapCoolNum);
-
-        thisEvapCond.MySizeFlag = false;
+        evapCond.MySizeFlag = false;
     }
 
     // Do the following initializations (every time step): This should be the info from
     // the previous components outlets or the node data in this section.
 
     // Transfer the node data to EvapCond data structure
-    auto &thisInletNode = state.dataLoopNodes->Node(thisEvapCond.InletNode);
+    auto &thisInletNode = state.dataLoopNodes->Node(evapCond.InletNode);
 
     Real64 const RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisInletNode.Temp, thisInletNode.HumRat);
 
     // set the volume flow rates from the input mass flow rates
-    thisEvapCond.VolFlowRate = thisInletNode.MassFlowRate / RhoAir;
+    evapCond.VolFlowRate = thisInletNode.MassFlowRate / RhoAir;
 
     // Calculate the entering wet bulb temperature for inlet conditions
-    thisEvapCond.InletWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, thisInletNode.Temp, thisInletNode.HumRat, state.dataEnvrn->OutBaroPress);
+    evapCond.InletWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, thisInletNode.Temp, thisInletNode.HumRat, state.dataEnvrn->OutBaroPress);
 
     // Set all of the inlet mass flow variables from the nodes
-    thisEvapCond.InletMassFlowRate = thisInletNode.MassFlowRate;
-    thisEvapCond.InletMassFlowRateMaxAvail = thisInletNode.MassFlowRateMaxAvail;
-    thisEvapCond.InletMassFlowRateMinAvail = thisInletNode.MassFlowRateMinAvail;
+    evapCond.InletMassFlowRate = thisInletNode.MassFlowRate;
+    evapCond.InletMassFlowRateMaxAvail = thisInletNode.MassFlowRateMaxAvail;
+    evapCond.InletMassFlowRateMinAvail = thisInletNode.MassFlowRateMinAvail;
     // Set all of the inlet state variables from the inlet nodes
-    thisEvapCond.InletTemp = thisInletNode.Temp;
-    thisEvapCond.InletHumRat = thisInletNode.HumRat;
-    thisEvapCond.InletEnthalpy = thisInletNode.Enthalpy;
-    thisEvapCond.InletPressure = thisInletNode.Press;
+    evapCond.InletTemp = thisInletNode.Temp;
+    evapCond.InletHumRat = thisInletNode.HumRat;
+    evapCond.InletEnthalpy = thisInletNode.Enthalpy;
+    evapCond.InletPressure = thisInletNode.Press;
     // Set default outlet state to inlet states(?)
-    thisEvapCond.OutletTemp = thisEvapCond.InletTemp;
-    thisEvapCond.OutletHumRat = thisEvapCond.InletHumRat;
-    thisEvapCond.OutletEnthalpy = thisEvapCond.InletEnthalpy;
-    thisEvapCond.OutletPressure = thisEvapCond.InletPressure;
+    evapCond.OutletTemp = evapCond.InletTemp;
+    evapCond.OutletHumRat = evapCond.InletHumRat;
+    evapCond.OutletEnthalpy = evapCond.InletEnthalpy;
+    evapCond.OutletPressure = evapCond.InletPressure;
 
-    thisEvapCond.OutletMassFlowRate = thisEvapCond.InletMassFlowRate;
-    thisEvapCond.OutletMassFlowRateMaxAvail = thisEvapCond.InletMassFlowRateMaxAvail;
-    thisEvapCond.OutletMassFlowRateMinAvail = thisEvapCond.InletMassFlowRateMinAvail;
+    evapCond.OutletMassFlowRate = evapCond.InletMassFlowRate;
+    evapCond.OutletMassFlowRateMaxAvail = evapCond.InletMassFlowRateMaxAvail;
+    evapCond.OutletMassFlowRateMinAvail = evapCond.InletMassFlowRateMinAvail;
 
     // Set all of the secondary inlet mass flow variables from the nodes
-    if (thisEvapCond.SecondaryInletNode != 0) {
-        auto const &thisSecInletNode = state.dataLoopNodes->Node(thisEvapCond.SecondaryInletNode);
-        thisEvapCond.SecInletMassFlowRate = thisSecInletNode.MassFlowRate;
-        thisEvapCond.SecInletMassFlowRateMaxAvail = thisSecInletNode.MassFlowRateMaxAvail;
-        thisEvapCond.SecInletMassFlowRateMinAvail = thisSecInletNode.MassFlowRateMinAvail;
-        thisEvapCond.SecInletTemp = thisSecInletNode.Temp;
-        thisEvapCond.SecInletHumRat = thisSecInletNode.HumRat;
-        thisEvapCond.SecInletEnthalpy = thisSecInletNode.Enthalpy;
-        thisEvapCond.SecInletPressure = thisSecInletNode.Press;
+    if (evapCond.SecondaryInletNode != 0) {
+        auto const &thisSecInletNode = state.dataLoopNodes->Node(evapCond.SecondaryInletNode);
+        evapCond.SecInletMassFlowRate = thisSecInletNode.MassFlowRate;
+        evapCond.SecInletMassFlowRateMaxAvail = thisSecInletNode.MassFlowRateMaxAvail;
+        evapCond.SecInletMassFlowRateMinAvail = thisSecInletNode.MassFlowRateMinAvail;
+        evapCond.SecInletTemp = thisSecInletNode.Temp;
+        evapCond.SecInletHumRat = thisSecInletNode.HumRat;
+        evapCond.SecInletEnthalpy = thisSecInletNode.Enthalpy;
+        evapCond.SecInletPressure = thisSecInletNode.Press;
     } else {
-        thisEvapCond.SecInletMassFlowRate = thisEvapCond.IndirectVolFlowRate * state.dataEnvrn->OutAirDensity;
-        thisEvapCond.SecInletMassFlowRateMaxAvail = thisEvapCond.IndirectVolFlowRate * state.dataEnvrn->OutAirDensity;
-        thisEvapCond.SecInletMassFlowRateMinAvail = 0.0;
-        thisEvapCond.SecInletTemp = state.dataEnvrn->OutDryBulbTemp;
-        thisEvapCond.SecInletHumRat =
+        evapCond.SecInletMassFlowRate = evapCond.IndirectVolFlowRate * state.dataEnvrn->OutAirDensity;
+        evapCond.SecInletMassFlowRateMaxAvail = evapCond.IndirectVolFlowRate * state.dataEnvrn->OutAirDensity;
+        evapCond.SecInletMassFlowRateMinAvail = 0.0;
+        evapCond.SecInletTemp = state.dataEnvrn->OutDryBulbTemp;
+        evapCond.SecInletHumRat =
             Psychrometrics::PsyWFnTdbTwbPb(state, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
-        thisEvapCond.SecInletEnthalpy = state.dataEnvrn->OutEnthalpy;
-        thisEvapCond.SecInletPressure = state.dataEnvrn->OutBaroPress;
+        evapCond.SecInletEnthalpy = state.dataEnvrn->OutEnthalpy;
+        evapCond.SecInletPressure = state.dataEnvrn->OutBaroPress;
     }
     // Set the energy consumption to zero each time through for reporting
-    thisEvapCond.EvapCoolerEnergy = 0.0;
-    thisEvapCond.EvapCoolerPower = 0.0;
-    thisEvapCond.DewPointBoundFlag = 0;
+    evapCond.EvapCoolerEnergy = 0.0;
+    evapCond.EvapCoolerPower = 0.0;
+    evapCond.DewPointBoundFlag = 0;
     // Set the water consumption to zero each time through for reporting
-    thisEvapCond.EvapWaterConsumpRate = 0.0;
-    thisEvapCond.EvapWaterConsump = 0.0;
-    thisEvapCond.EvapWaterStarvMakup = 0.0;
+    evapCond.EvapWaterConsumpRate = 0.0;
+    evapCond.EvapWaterConsump = 0.0;
+    evapCond.EvapWaterStarvMakup = 0.0;
 
     // Set the Saturation and Stage Efficiency to zero each time through for reporting
-    thisEvapCond.StageEff = 0.0;
-    thisEvapCond.SatEff = 0.0;
+    evapCond.StageEff = 0.0;
+    evapCond.SatEff = 0.0;
 
     // These initializations are done every iteration
-    int OutNode = thisEvapCond.OutletNode;
-    int ControlNode = thisEvapCond.EvapControlNodeNum;
-    thisEvapCond.IECOperatingStatus = 0;
+    int OutNode = evapCond.OutletNode;
+    int ControlNode = evapCond.EvapControlNodeNum;
+    evapCond.IECOperatingStatus = 0;
 
     if (ControlNode == 0) {
-        thisEvapCond.DesiredOutletTemp = 0.0;
+        evapCond.DesiredOutletTemp = 0.0;
     } else if (ControlNode == OutNode) {
-        thisEvapCond.DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
+        evapCond.DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
     } else {
-        thisEvapCond.DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint -
-                                         (state.dataLoopNodes->Node(ControlNode).Temp - state.dataLoopNodes->Node(OutNode).Temp);
+        evapCond.DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint -
+                                     (state.dataLoopNodes->Node(ControlNode).Temp - state.dataLoopNodes->Node(OutNode).Temp);
     }
 }
 
