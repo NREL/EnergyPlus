@@ -3795,144 +3795,141 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
     // Using/Aliasing
     Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 TimeElapsed;
 
     auto &EvapCond(state.dataEvapCoolers->EvapCond);
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+    auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
-    if (allocated(ZoneComp)) {
-        if (ZoneEvapUnit(UnitNum).MyZoneEq) { // initialize the name of each availability manager list and zone number
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
-                ZoneEvapUnit(UnitNum).AvailManagerListName;
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
-            ZoneEvapUnit(UnitNum).MyZoneEq = false;
+    if (allocated(state.dataHVACGlobal->ZoneComp)) {
+        if (zoneEvapUnit.MyZoneEq) { // initialize the name of each availability manager list and zone number
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
+                zoneEvapUnit.AvailManagerListName;
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
+            zoneEvapUnit.MyZoneEq = false;
         }
-        ZoneEvapUnit(UnitNum).FanAvailStatus =
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailStatus;
+        zoneEvapUnit.FanAvailStatus =
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailStatus;
     }
 
     if (!state.dataEvapCoolers->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataEvapCoolers->ZoneEquipmentListChecked = true;
         for (int Loop = 1; Loop <= state.dataEvapCoolers->NumZoneEvapUnits; ++Loop) {
-            if (DataZoneEquipment::CheckZoneEquipmentList(state, "ZoneHVAC:EvaporativeCoolerUnit", ZoneEvapUnit(Loop).Name)) {
-                ZoneEvapUnit(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
+            if (DataZoneEquipment::CheckZoneEquipmentList(state, "ZoneHVAC:EvaporativeCoolerUnit", state.dataEvapCoolers->ZoneEvapUnit(Loop).Name)) {
+                state.dataEvapCoolers->ZoneEvapUnit(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
             } else {
                 ShowSevereError(state,
                                 format("InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = {}, is not on any ZoneHVAC:EquipmentList.  "
                                        "It will not be simulated.",
-                                       ZoneEvapUnit(Loop).Name));
+                                       state.dataEvapCoolers->ZoneEvapUnit(Loop).Name));
             }
         }
     }
 
-    if (!state.dataGlobal->SysSizingCalc && ZoneEvapUnit(UnitNum).MySize) {
+    if (!state.dataGlobal->SysSizingCalc && zoneEvapUnit.MySize) {
         SizeZoneEvaporativeCoolerUnit(state, UnitNum);
-        ZoneEvapUnit(UnitNum).MySize = false;
+        zoneEvapUnit.MySize = false;
     }
 
-    if (ZoneEvapUnit(UnitNum).MyFan) {
-        if (ZoneEvapUnit(UnitNum).ActualFanVolFlowRate != DataSizing::AutoSize) {
+    if (zoneEvapUnit.MyFan) {
+        if (zoneEvapUnit.ActualFanVolFlowRate != DataSizing::AutoSize) {
 
-            if (ZoneEvapUnit(UnitNum).ActualFanVolFlowRate < ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate) {
-                ShowSevereError(state, format("InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = {}", ZoneEvapUnit(UnitNum).Name));
+            if (zoneEvapUnit.ActualFanVolFlowRate < zoneEvapUnit.DesignAirVolumeFlowRate) {
+                ShowSevereError(state, format("InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = {}", zoneEvapUnit.Name));
                 ShowContinueError(state, "...unit fan volumetric flow rate less than evaporative cooler unit design supply air flow rate.");
-                ShowContinueError(state, format("...fan volumetric flow rate = {:.5T} m3/s.", ZoneEvapUnit(UnitNum).ActualFanVolFlowRate));
-                ShowContinueError(state,
-                                  format("...evap cooler unit volumetric flow rate = {:.5T} m3/s.", ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate));
-                ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = ZoneEvapUnit(UnitNum).ActualFanVolFlowRate;
+                ShowContinueError(state, format("...fan volumetric flow rate = {:.5T} m3/s.", zoneEvapUnit.ActualFanVolFlowRate));
+                ShowContinueError(state, format("...evap cooler unit volumetric flow rate = {:.5T} m3/s.", zoneEvapUnit.DesignAirVolumeFlowRate));
+                zoneEvapUnit.DesignAirVolumeFlowRate = zoneEvapUnit.ActualFanVolFlowRate;
                 ShowContinueError(state, "...evaporative cooler unit design supply air flow rate will match fan flow rate and simulation continues.");
-                ZoneEvapUnit(UnitNum).MyEnvrn = true; // re-initialize to set mass flow rate and max mass flow rate
+                zoneEvapUnit.MyEnvrn = true; // re-initialize to set mass flow rate and max mass flow rate
             }
 
-            if (ZoneEvapUnit(UnitNum).ActualFanVolFlowRate > 0.0) {
-                ZoneEvapUnit(UnitNum).DesignFanSpeedRatio =
-                    ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate / ZoneEvapUnit(UnitNum).ActualFanVolFlowRate;
+            if (zoneEvapUnit.ActualFanVolFlowRate > 0.0) {
+                zoneEvapUnit.DesignFanSpeedRatio = zoneEvapUnit.DesignAirVolumeFlowRate / zoneEvapUnit.ActualFanVolFlowRate;
             }
 
-            ZoneEvapUnit(UnitNum).MyFan = false;
+            zoneEvapUnit.MyFan = false;
         } else {
-            if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::GetFanVolFlow(state, ZoneEvapUnit(UnitNum).FanIndex, ZoneEvapUnit(UnitNum).ActualFanVolFlowRate);
+            if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                Fans::GetFanVolFlow(state, zoneEvapUnit.FanIndex, zoneEvapUnit.ActualFanVolFlowRate);
             } else {
-                ZoneEvapUnit(UnitNum).ActualFanVolFlowRate = state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->designAirVolFlowRate;
+                zoneEvapUnit.ActualFanVolFlowRate = state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->designAirVolFlowRate;
             }
         }
     }
 
-    if (ZoneEvapUnit(UnitNum).FanAvailSchedPtr > 0) {
+    if (zoneEvapUnit.FanAvailSchedPtr > 0) {
         // include fan is not available, then unit is not available
-        ZoneEvapUnit(UnitNum).UnitIsAvailable = ((ScheduleManager::GetCurrentScheduleValue(state, ZoneEvapUnit(UnitNum).FanAvailSchedPtr) > 0.0) &&
-                                                 (ScheduleManager::GetCurrentScheduleValue(state, ZoneEvapUnit(UnitNum).AvailSchedIndex) > 0.0));
+        zoneEvapUnit.UnitIsAvailable = ((ScheduleManager::GetCurrentScheduleValue(state, zoneEvapUnit.FanAvailSchedPtr) > 0.0) &&
+                                        (ScheduleManager::GetCurrentScheduleValue(state, zoneEvapUnit.AvailSchedIndex) > 0.0));
     } else {
-        ZoneEvapUnit(UnitNum).UnitIsAvailable = (ScheduleManager::GetCurrentScheduleValue(state, ZoneEvapUnit(UnitNum).AvailSchedIndex) > 0.0);
+        zoneEvapUnit.UnitIsAvailable = (ScheduleManager::GetCurrentScheduleValue(state, zoneEvapUnit.AvailSchedIndex) > 0.0);
     }
 
-    ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus =
-        (ScheduleManager::GetCurrentScheduleValue(state, EvapCond(ZoneEvapUnit(UnitNum).EvapCooler_1_Index).SchedPtr) > 0.0);
+    zoneEvapUnit.EvapCooler_1_AvailStatus =
+        (ScheduleManager::GetCurrentScheduleValue(state, EvapCond(zoneEvapUnit.EvapCooler_1_Index).SchedPtr) > 0.0);
 
-    if (ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) {
-        ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus =
-            (ScheduleManager::GetCurrentScheduleValue(state, EvapCond(ZoneEvapUnit(UnitNum).EvapCooler_2_Index).SchedPtr) > 0.0);
+    if (zoneEvapUnit.EvapCooler_2_Index > 0) {
+        zoneEvapUnit.EvapCooler_2_AvailStatus =
+            (ScheduleManager::GetCurrentScheduleValue(state, EvapCond(zoneEvapUnit.EvapCooler_2_Index).SchedPtr) > 0.0);
     }
     // Do the Begin Environment initializations
-    if (state.dataGlobal->BeginEnvrnFlag && ZoneEvapUnit(UnitNum).MyEnvrn) {
+    if (state.dataGlobal->BeginEnvrnFlag && zoneEvapUnit.MyEnvrn) {
 
-        ZoneEvapUnit(UnitNum).DesignAirMassFlowRate = state.dataEnvrn->StdRhoAir * ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMax = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMin = 0.0;
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMinAvail = 0.0;
+        zoneEvapUnit.DesignAirMassFlowRate = state.dataEnvrn->StdRhoAir * zoneEvapUnit.DesignAirVolumeFlowRate;
+        state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRateMax = zoneEvapUnit.DesignAirMassFlowRate;
+        state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRateMin = 0.0;
+        state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRateMinAvail = 0.0;
 
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRateMax = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRateMin = 0.0;
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRateMinAvail = 0.0;
+        state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRateMax = zoneEvapUnit.DesignAirMassFlowRate;
+        state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRateMin = 0.0;
+        state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRateMinAvail = 0.0;
 
-        if (ZoneEvapUnit(UnitNum).UnitReliefNodeNum > 0) {
-            state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRateMax = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
-            state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRateMin = 0.0;
-            state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRateMinAvail = 0.0;
+        if (zoneEvapUnit.UnitReliefNodeNum > 0) {
+            state.dataLoopNodes->Node(zoneEvapUnit.UnitReliefNodeNum).MassFlowRateMax = zoneEvapUnit.DesignAirMassFlowRate;
+            state.dataLoopNodes->Node(zoneEvapUnit.UnitReliefNodeNum).MassFlowRateMin = 0.0;
+            state.dataLoopNodes->Node(zoneEvapUnit.UnitReliefNodeNum).MassFlowRateMinAvail = 0.0;
         }
-        ZoneEvapUnit(UnitNum).WasOnLastTimestep = false;
-        ZoneEvapUnit(UnitNum).IsOnThisTimestep = false;
-        ZoneEvapUnit(UnitNum).FanSpeedRatio = 0.0;
-        ZoneEvapUnit(UnitNum).UnitFanSpeedRatio = 0.0;
-        ZoneEvapUnit(UnitNum).UnitTotalCoolingRate = 0.0;
-        ZoneEvapUnit(UnitNum).UnitTotalCoolingEnergy = 0.0;
-        ZoneEvapUnit(UnitNum).UnitSensibleCoolingRate = 0.0;
-        ZoneEvapUnit(UnitNum).UnitSensibleCoolingEnergy = 0.0;
-        ZoneEvapUnit(UnitNum).UnitLatentHeatingRate = 0.0;
-        ZoneEvapUnit(UnitNum).UnitLatentHeatingEnergy = 0.0;
-        ZoneEvapUnit(UnitNum).UnitLatentCoolingRate = 0.0;
-        ZoneEvapUnit(UnitNum).UnitLatentCoolingEnergy = 0.0;
-        ZoneEvapUnit(UnitNum).FanAvailStatus = 0.0;
+        zoneEvapUnit.WasOnLastTimestep = false;
+        zoneEvapUnit.IsOnThisTimestep = false;
+        zoneEvapUnit.FanSpeedRatio = 0.0;
+        zoneEvapUnit.UnitFanSpeedRatio = 0.0;
+        zoneEvapUnit.UnitTotalCoolingRate = 0.0;
+        zoneEvapUnit.UnitTotalCoolingEnergy = 0.0;
+        zoneEvapUnit.UnitSensibleCoolingRate = 0.0;
+        zoneEvapUnit.UnitSensibleCoolingEnergy = 0.0;
+        zoneEvapUnit.UnitLatentHeatingRate = 0.0;
+        zoneEvapUnit.UnitLatentHeatingEnergy = 0.0;
+        zoneEvapUnit.UnitLatentCoolingRate = 0.0;
+        zoneEvapUnit.UnitLatentCoolingEnergy = 0.0;
+        zoneEvapUnit.FanAvailStatus = 0.0;
 
         // place default cold setpoints on control nodes of select evap coolers
-        if ((ZoneEvapUnit(UnitNum).EvapCooler_1_Type_Num == EvapCoolerType::DirectResearchSpecial) ||
-            (ZoneEvapUnit(UnitNum).EvapCooler_1_Type_Num == EvapCoolerType::IndirectRDDSpecial)) {
-            if (EvapCond(ZoneEvapUnit(UnitNum).EvapCooler_1_Index).EvapControlNodeNum > 0) {
-                state.dataLoopNodes->Node(EvapCond(ZoneEvapUnit(UnitNum).EvapCooler_1_Index).EvapControlNodeNum).TempSetPoint = -20.0;
+        if ((zoneEvapUnit.EvapCooler_1_Type_Num == EvapCoolerType::DirectResearchSpecial) ||
+            (zoneEvapUnit.EvapCooler_1_Type_Num == EvapCoolerType::IndirectRDDSpecial)) {
+            if (EvapCond(zoneEvapUnit.EvapCooler_1_Index).EvapControlNodeNum > 0) {
+                state.dataLoopNodes->Node(EvapCond(zoneEvapUnit.EvapCooler_1_Index).EvapControlNodeNum).TempSetPoint = -20.0;
             }
         }
-        if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Type_Num == EvapCoolerType::DirectResearchSpecial) ||
-            (ZoneEvapUnit(UnitNum).EvapCooler_2_Type_Num == EvapCoolerType::IndirectRDDSpecial)) {
-            if (EvapCond(ZoneEvapUnit(UnitNum).EvapCooler_2_Index).EvapControlNodeNum > 0) {
-                state.dataLoopNodes->Node(EvapCond(ZoneEvapUnit(UnitNum).EvapCooler_2_Index).EvapControlNodeNum).TempSetPoint = -20.0;
+        if ((zoneEvapUnit.EvapCooler_2_Type_Num == EvapCoolerType::DirectResearchSpecial) ||
+            (zoneEvapUnit.EvapCooler_2_Type_Num == EvapCoolerType::IndirectRDDSpecial)) {
+            if (EvapCond(zoneEvapUnit.EvapCooler_2_Index).EvapControlNodeNum > 0) {
+                state.dataLoopNodes->Node(EvapCond(zoneEvapUnit.EvapCooler_2_Index).EvapControlNodeNum).TempSetPoint = -20.0;
             }
         }
 
-        ZoneEvapUnit(UnitNum).MyEnvrn = false;
+        zoneEvapUnit.MyEnvrn = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        ZoneEvapUnit(UnitNum).MyEnvrn = true;
+        zoneEvapUnit.MyEnvrn = true;
     }
 
     TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
-    if (ZoneEvapUnit(UnitNum).TimeElapsed != TimeElapsed) {
-        ZoneEvapUnit(UnitNum).WasOnLastTimestep = ZoneEvapUnit(UnitNum).IsOnThisTimestep;
+    if (zoneEvapUnit.TimeElapsed != TimeElapsed) {
+        zoneEvapUnit.WasOnLastTimestep = zoneEvapUnit.IsOnThisTimestep;
 
-        ZoneEvapUnit(UnitNum).TimeElapsed = TimeElapsed;
+        zoneEvapUnit.TimeElapsed = TimeElapsed;
     }
 }
 
