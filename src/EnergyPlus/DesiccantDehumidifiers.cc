@@ -3164,58 +3164,6 @@ namespace DesiccantDehumidifiers {
         }
     }
 
-    int GetRegAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Lixing Gu
-        //       DATE WRITTEN   May 2019
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function looks up the given Desiccant Dehumidifier and returns the regeneration air inlet node number.
-        // If incorrect Desiccant Dehumidifier name is given, ErrorsFound is returned as true and node number as zero.
-
-        // Obtains and Allocates heat exchanger related parameters from input file
-        if (state.dataDesiccantDehumidifiers->GetInputDesiccantDehumidifier) {
-            GetDesiccantDehumidifierInput(state);
-            state.dataDesiccantDehumidifiers->GetInputDesiccantDehumidifier = false;
-        }
-
-        int WhichDesicDehum = UtilityRoutines::FindItemInList(DesicDehumName, state.dataDesiccantDehumidifiers->DesicDehum);
-        if (WhichDesicDehum != 0) {
-            return state.dataDesiccantDehumidifiers->DesicDehum(WhichDesicDehum).RegenAirInNode;
-        } else {
-            ShowSevereError(state, format("GetRegAirInletNodeNum: Could not find Desciccant Dehumidifier = \"{}\"", DesicDehumName));
-            ErrorsFound = true;
-            return 0;
-        }
-    }
-
-    int GetRegAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Lixing Gu
-        //       DATE WRITTEN   May 2019
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function looks up the given Desiccant Dehumidifier and returns the regeneration air outlet node number.
-        // If incorrect Desiccant Dehumidifier name is given, ErrorsFound is returned as true and node number as zero.
-
-        // Obtains and Allocates heat exchanger related parameters from input file
-        if (state.dataDesiccantDehumidifiers->GetInputDesiccantDehumidifier) {
-            GetDesiccantDehumidifierInput(state);
-            state.dataDesiccantDehumidifiers->GetInputDesiccantDehumidifier = false;
-        }
-
-        int WhichDesicDehum = UtilityRoutines::FindItemInList(DesicDehumName, state.dataDesiccantDehumidifiers->DesicDehum);
-        if (WhichDesicDehum != 0) {
-            return state.dataDesiccantDehumidifiers->DesicDehum(WhichDesicDehum).RegenAirOutNode;
-        } else {
-            ShowSevereError(state, format("GetRegAirOutletNodeNum: Could not find Desciccant Dehumidifier = \"{}\"", DesicDehumName));
-            ErrorsFound = true;
-            return 0;
-        }
-    }
-
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************
 

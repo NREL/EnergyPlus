@@ -2844,7 +2844,7 @@ void CFSRefPointPosFactor(EnergyPlusData &state,
     // Object Data
     DataBSDFWindow::BSDFDaylghtPosition elPos; // altitude and azimuth of intersection element
 
-    auto const &sTrn(state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sTrn);
+    auto const &sTrn = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sTrn;
     for (int iTrnRay = 1; iTrnRay <= NTrnBasis; ++iTrnRay) {
         state.dataDaylightingManager->V = sTrn(iTrnRay);
         state.dataDaylightingManager->V.negate();
