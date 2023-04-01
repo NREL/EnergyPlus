@@ -1123,7 +1123,7 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
 
     // Set all of the secondary inlet mass flow variables from the nodes
     if (thisEvapCond.SecondaryInletNode != 0) {
-        auto &thisSecInletNode = state.dataLoopNodes->Node(thisEvapCond.SecondaryInletNode);
+        auto const &thisSecInletNode = state.dataLoopNodes->Node(thisEvapCond.SecondaryInletNode);
         thisEvapCond.SecInletMassFlowRate = thisSecInletNode.MassFlowRate;
         thisEvapCond.SecInletMassFlowRateMaxAvail = thisSecInletNode.MassFlowRateMaxAvail;
         thisEvapCond.SecInletMassFlowRateMinAvail = thisSecInletNode.MassFlowRateMinAvail;
