@@ -784,11 +784,8 @@ namespace ExhaustAirSystemManager {
         thisExhOutlet.Quality = thisExhInlet.Quality;
         thisExhOutlet.Press = thisExhInlet.Press;
 
-        // More node elements
-        thisExhOutlet.MassFlowRateMax = thisExhInlet.MassFlowRateMax;
-        thisExhOutlet.MassFlowRateMaxAvail = thisExhInlet.MassFlowRateMaxAvail;
-
         // Set the Node Flow Control Variables from the Fan Control Variables
+        thisExhOutlet.MassFlowRateMax = thisExhInlet.MassFlowRateMax;
         thisExhOutlet.MassFlowRateMaxAvail = thisExhInlet.MassFlowRateMaxAvail;
         thisExhOutlet.MassFlowRateMinAvail = thisExhInlet.MassFlowRateMinAvail;
 
@@ -812,9 +809,8 @@ namespace ExhaustAirSystemManager {
 
         // mixer outlet sizing:
         Real64 outletFlowMaxAvail = 0.0;
-        int inletNode_index = 0;
         for (int i = 1; i <= state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).NumInletNodes; ++i) {
-            inletNode_index = state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).InletNode(i);
+            int inletNode_index = state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).InletNode(i);
             outletFlowMaxAvail += state.dataLoopNodes->Node(inletNode_index).MassFlowRateMaxAvail;
         }
 
