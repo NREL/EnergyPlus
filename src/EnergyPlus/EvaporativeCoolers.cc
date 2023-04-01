@@ -125,8 +125,6 @@ void SimEvapCooler(EnergyPlusData &state, std::string_view CompName, int &CompIn
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   October 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine manages EvapCooler component simulation.
@@ -210,7 +208,6 @@ void GetEvapInput(EnergyPlusData &state)
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   Oct 2000
     //       MODIFIED       BTG,  adding in EVAPCOOLER:INDIRECT:RDDSPECIAL
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is the main routine to call other input routines and Get routines
@@ -1036,7 +1033,6 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   October 2000
     //       MODIFIED       B. Griffith, May 2009, added EMS setpoint check
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for  initializations of the EvapCooler Components.
@@ -1180,7 +1176,6 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   March 2009
     //       MODIFIED       March 2014 Daeho Kang, Add sizing additional fields
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Size calculations for Evap coolers
@@ -1708,8 +1703,6 @@ void CalcDirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 const P
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   October 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 PadDepth; // EvapCooler Pad Depth in Meters as input by the User
@@ -1809,7 +1802,6 @@ void CalcDryIndirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 co
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   October 2000
     //       MODIFIED       BG Feb. 2007 secondary air inlet node
-    //       RE-ENGINEERED  na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 PadDepth;  // EvapCooler Pad Depth in Meters as input by the User
@@ -1949,7 +1941,6 @@ void CalcWetIndirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 co
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   October 2000
-    //       MODIFIED       na
     //       RE-ENGINEERED  Jan. 2017, Rongpeng Zhang, added fouling fault for evaporative coolers
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2077,8 +2068,6 @@ void CalcResearchSpecialPartLoad(EnergyPlusData &state, int EvapCoolNum)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // REFERENCES:
     // copied CalcWetIndirectEvapCooler as template for new cooler
@@ -2167,7 +2156,6 @@ void CalcIndirectResearchSpecialEvapCooler(EnergyPlusData &state, int const Evap
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2003
-    //       MODIFIED       na
     //       RE-ENGINEERED  October 2014, B Nigusse, added dry and wet operating modes
     //                      and secondary air flow control
 
@@ -2402,8 +2390,6 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Bigusse
     //       DATE WRITTEN   October 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Subroutine models indirect evaporative cooler with variable effectiveness for wet and dry
@@ -2885,8 +2871,6 @@ void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Nigusse
     //       DATE WRITTEN   Sep 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Indirect research special evaporative cooler perfomance:
@@ -2996,8 +2980,6 @@ void CalcSecondaryAirOutletCondition(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Nigusse
     //       DATE WRITTEN   Oct 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Indirect research special evaporative cooler: determines the secondary air outlet conditions
@@ -3062,8 +3044,6 @@ Real64 IndEvapCoolerPower(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Nigusse
     //       DATE WRITTEN   Sep 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the Indirect Evaporative Cooler Total Electric Power
@@ -3109,8 +3089,6 @@ void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCo
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   March 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // calculate model for direct evaporative cooler that is simple and controllable
@@ -3263,8 +3241,6 @@ void UpdateEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   October 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     auto &thisEvapCond = state.dataEvapCoolers->EvapCond(EvapCoolNum);
     auto &thisOutletNode = state.dataLoopNodes->Node(thisEvapCond.OutletNode);
@@ -3326,8 +3302,6 @@ void ReportEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   Oct 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     auto &thisEvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
@@ -3410,8 +3384,6 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // get input for zone evap cooler unit
@@ -3820,8 +3792,6 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // Using/Aliasing
     Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
@@ -3974,7 +3944,6 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
     //       DATE WRITTEN   July 2013
     //       MODIFIED       August 2014 Bereket Nigusse, added scalable sizing
     //       MODIFIED       January 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
@@ -4107,8 +4076,6 @@ void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneCoolingLoad;
@@ -4383,12 +4350,6 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
 )
 {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         <author>
-    //       DATE WRITTEN   <date_written>
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
     // Using/Aliasing
     auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
     auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
@@ -4542,8 +4503,6 @@ void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) /
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // update output variables for the zone evap unit
@@ -4551,33 +4510,25 @@ void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) /
     // Using/Aliasing
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNodeNum;
-    int UnitOutletNodeNum;
-    Real64 AirMassFlow;
-    Real64 MinHumRat;
-    Real64 QTotUnitOut;
-    Real64 QSensUnitOut;
+    auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+    int ZoneNodeNum = zoneEvapUnit.ZoneNodeNum;
+    int UnitOutletNodeNum = zoneEvapUnit.UnitOutletNodeNum;
+    Real64 AirMassFlow = state.dataLoopNodes->Node(UnitOutletNodeNum).MassFlowRate;
+    Real64 QTotUnitOut = AirMassFlow * (state.dataLoopNodes->Node(UnitOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy);
+    Real64 MinHumRat = min(state.dataLoopNodes->Node(ZoneNodeNum).HumRat, state.dataLoopNodes->Node(UnitOutletNodeNum).HumRat);
+    Real64 QSensUnitOut = AirMassFlow * (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(UnitOutletNodeNum).Temp, MinHumRat) -
+                                         Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNodeNum).Temp, MinHumRat));
 
-    ZoneNodeNum = ZoneEvapUnit(UnitNum).ZoneNodeNum;
-    UnitOutletNodeNum = ZoneEvapUnit(UnitNum).UnitOutletNodeNum;
-    AirMassFlow = state.dataLoopNodes->Node(UnitOutletNodeNum).MassFlowRate;
-    QTotUnitOut = AirMassFlow * (state.dataLoopNodes->Node(UnitOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy);
-    MinHumRat = min(state.dataLoopNodes->Node(ZoneNodeNum).HumRat, state.dataLoopNodes->Node(UnitOutletNodeNum).HumRat);
-    QSensUnitOut = AirMassFlow * (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(UnitOutletNodeNum).Temp, MinHumRat) -
-                                  Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNodeNum).Temp, MinHumRat));
-
-    ZoneEvapUnit(UnitNum).UnitTotalCoolingRate = std::abs(min(0.0, QTotUnitOut));
-    ZoneEvapUnit(UnitNum).UnitTotalCoolingEnergy = ZoneEvapUnit(UnitNum).UnitTotalCoolingRate * TimeStepSysSec;
-    ZoneEvapUnit(UnitNum).UnitSensibleCoolingRate = std::abs(min(0.0, QSensUnitOut));
-    ZoneEvapUnit(UnitNum).UnitSensibleCoolingEnergy = ZoneEvapUnit(UnitNum).UnitSensibleCoolingRate * TimeStepSysSec;
-    ZoneEvapUnit(UnitNum).UnitLatentHeatingRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
-    ZoneEvapUnit(UnitNum).UnitLatentHeatingEnergy = ZoneEvapUnit(UnitNum).UnitLatentHeatingRate * TimeStepSysSec;
-    ZoneEvapUnit(UnitNum).UnitLatentCoolingRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
-    ZoneEvapUnit(UnitNum).UnitLatentCoolingEnergy = ZoneEvapUnit(UnitNum).UnitLatentCoolingRate * TimeStepSysSec;
-    ZoneEvapUnit(UnitNum).UnitFanSpeedRatio = ZoneEvapUnit(UnitNum).FanSpeedRatio;
+    zoneEvapUnit.UnitTotalCoolingRate = std::abs(min(0.0, QTotUnitOut));
+    zoneEvapUnit.UnitTotalCoolingEnergy = zoneEvapUnit.UnitTotalCoolingRate * TimeStepSysSec;
+    zoneEvapUnit.UnitSensibleCoolingRate = std::abs(min(0.0, QSensUnitOut));
+    zoneEvapUnit.UnitSensibleCoolingEnergy = zoneEvapUnit.UnitSensibleCoolingRate * TimeStepSysSec;
+    zoneEvapUnit.UnitLatentHeatingRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
+    zoneEvapUnit.UnitLatentHeatingEnergy = zoneEvapUnit.UnitLatentHeatingRate * TimeStepSysSec;
+    zoneEvapUnit.UnitLatentCoolingRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
+    zoneEvapUnit.UnitLatentCoolingEnergy = zoneEvapUnit.UnitLatentCoolingRate * TimeStepSysSec;
+    zoneEvapUnit.UnitFanSpeedRatio = zoneEvapUnit.FanSpeedRatio;
 }
 
 int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool &ErrorsFound)
@@ -4585,8 +4536,6 @@ int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool
     // FUNCTION INFORMATION:
     //       AUTHOR         Lixing Gu
     //       DATE WRITTEN   May 2019
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given EvapCond and returns the air inlet node number.
@@ -4613,8 +4562,6 @@ int GetOutletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, boo
     // FUNCTION INFORMATION:
     //       AUTHOR         Lixing Gu
     //       DATE WRITTEN   May 2019
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given EvapCond and returns the air outlet node number.
