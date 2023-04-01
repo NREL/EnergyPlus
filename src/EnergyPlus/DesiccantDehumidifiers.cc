@@ -224,29 +224,31 @@ namespace DesiccantDehumidifiers {
         static std::string const dehumidifierDesiccantNoFans("Dehumidifier:Desiccant:NoFans");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumAlphas;                      // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                     // Number of Numbers for each GetObjectItem call
-        int IOStatus;                       // Used in GetObjectItem
-        bool ErrorsFound(false);            // Set to true if errors in input, fatal at end of routine
-        bool ErrorsFound2(false);           // Set to true if errors in input, fatal at end of routine
-        bool ErrorsFoundGeneric(false);     // Set to true if errors in input, fatal at end of routine
-        bool IsNotOK;                       // Flag to verify name
-        bool OANodeError;                   // Flag for check on outside air node
-        std::string RegenCoilInlet;         // Desiccant system regeneration air heater inlet node
-        std::string RegenCoilOutlet;        // Desiccant system regeneration air heater outlet node
-        int DesuperHeaterIndex;             // Index of desuperheater heating coil
-        int RegenCoilControlNodeNum;        // Control node number of regen heating coil
-        Real64 CoilBypassedFlowFrac;        // Bypass air fraction for multimode DX coils
-        Array1D_string Alphas;              // Alpha input items for object
-        Array1D_string cAlphaFields;        // Alpha field names
-        Array1D_string cNumericFields;      // Numeric field names
-        Array1D<Real64> Numbers;            // Numeric input items for object
-        Array1D_bool lAlphaBlanks;          // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;        // Logical array, numeric field input BLANK = .TRUE.
-        bool errFlag;                       // local error flag
-        std::string RegenCoilType;          // Regen heating coil type
-        std::string RegenCoilName;          // Regen heating coil name
-        int SteamIndex;                     // steam coil Index
+        int DesicDehumIndex;               // Loop index
+        int DesicDehumNum;                 // Current desiccant dehumidifier number
+        int NumAlphas;                     // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                    // Number of Numbers for each GetObjectItem call
+        int IOStatus;                      // Used in GetObjectItem
+        bool ErrorsFound(false);           // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound2(false);          // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFoundGeneric(false);    // Set to true if errors in input, fatal at end of routine
+        bool IsNotOK;                      // Flag to verify name
+        bool OANodeError;                  // Flag for check on outside air node
+        std::string RegenCoilInlet;        // Desiccant system regeneration air heater inlet node
+        std::string RegenCoilOutlet;       // Desiccant system regeneration air heater outlet node
+        int DesuperHeaterIndex;            // Index of desuperheater heating coil
+        int RegenCoilControlNodeNum;       // Control node number of regen heating coil
+        Real64 CoilBypassedFlowFrac;       // Bypass air fraction for multimode DX coils
+        Array1D_string Alphas;             // Alpha input items for object
+        Array1D_string cAlphaFields;       // Alpha field names
+        Array1D_string cNumericFields;     // Numeric field names
+        Array1D<Real64> Numbers;           // Numeric input items for object
+        Array1D_bool lAlphaBlanks;         // Logical array, alpha field input BLANK = .TRUE.
+        Array1D_bool lNumericBlanks;       // Logical array, numeric field input BLANK = .TRUE.
+        bool errFlag;                      // local error flag
+        std::string RegenCoilType;         // Regen heating coil type
+        std::string RegenCoilName;         // Regen heating coil name
+        int SteamIndex;                    // steam coil Index
         bool RegairHeatingCoilFlag = false; // local error flag
 
         auto &MaxNums(state.dataDesiccantDehumidifiers->MaxNums);
@@ -281,7 +283,7 @@ namespace DesiccantDehumidifiers {
 
         // loop over solid desiccant dehumidifiers and load the input data
         std::string CurrentModuleObject = dehumidifierDesiccantNoFans;
-        for (int DesicDehumIndex = 1; DesicDehumIndex <= state.dataDesiccantDehumidifiers->NumSolidDesicDehums; ++DesicDehumIndex) {
+        for (DesicDehumIndex = 1; DesicDehumIndex <= state.dataDesiccantDehumidifiers->NumSolidDesicDehums; ++DesicDehumIndex) {
             auto &desicDehum = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumIndex);
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -296,7 +298,7 @@ namespace DesiccantDehumidifiers {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            int DesicDehumNum = DesicDehumIndex;
+            DesicDehumNum = DesicDehumIndex;
 
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataDesiccantDehumidifiers->UniqueDesicDehumNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
@@ -648,11 +650,11 @@ namespace DesiccantDehumidifiers {
             }
         }
 
-        for (int DesicDehumIndex = 1; DesicDehumIndex <= state.dataDesiccantDehumidifiers->NumGenericDesicDehums; ++DesicDehumIndex) {
+        for (DesicDehumIndex = 1; DesicDehumIndex <= state.dataDesiccantDehumidifiers->NumGenericDesicDehums; ++DesicDehumIndex) {
 
             CurrentModuleObject = "Dehumidifier:Desiccant:System";
 
-            int DesicDehumNum = DesicDehumIndex + state.dataDesiccantDehumidifiers->NumSolidDesicDehums;
+            DesicDehumNum = DesicDehumIndex + state.dataDesiccantDehumidifiers->NumSolidDesicDehums;
             auto &desicDehum = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum);
 
             desicDehum.DehumType = CurrentModuleObject;
@@ -960,6 +962,7 @@ namespace DesiccantDehumidifiers {
                             ErrorsFound = true;
                         }
 
+                        RegairHeatingCoilFlag = true;
                         WaterCoils::SetWaterCoilData(state, desicDehum.RegenCoilIndex, ErrorsFound2, RegairHeatingCoilFlag, DesicDehumNum);
                         if (ErrorsFound2) {
                             ShowContinueError(state, format("...occurs in {} \"{}\"", desicDehum.DehumType, desicDehum.Name));
@@ -1450,7 +1453,7 @@ namespace DesiccantDehumidifiers {
         }
 
         // SET UP OUTPUTS
-        for (int DesicDehumNum = 1; DesicDehumNum <= state.dataDesiccantDehumidifiers->NumSolidDesicDehums; ++DesicDehumNum) {
+        for (DesicDehumNum = 1; DesicDehumNum <= state.dataDesiccantDehumidifiers->NumSolidDesicDehums; ++DesicDehumNum) {
             auto &desicDehum = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum);
             // Setup Report variables for the Desiccant Dehumidifiers
             SetupOutputVariable(state,
@@ -1537,7 +1540,7 @@ namespace DesiccantDehumidifiers {
                                 desicDehum.Name);
         }
 
-        for (int DesicDehumIndex = 1; DesicDehumIndex <= state.dataDesiccantDehumidifiers->NumGenericDesicDehums; ++DesicDehumIndex) {
+        for (DesicDehumIndex = 1; DesicDehumIndex <= state.dataDesiccantDehumidifiers->NumGenericDesicDehums; ++DesicDehumIndex) {
             // this is wrong, should be a loop from (state.dataDesiccantDehumidifiers->NumSolidDesicDehums + 1) to
             // (state.dataDesiccantDehumidifiers->NumDesicDehums = NumSolidDesicDehums + NumGenericDesicDehums)
             // DesicDehumNum = DesicDehumIndex + state.dataDesiccantDehumidifiers->NumSolidDesicDehums;
