@@ -586,8 +586,8 @@ namespace ExhaustAirSystemManager {
                                               DataLoopNode::ObjectIsNotParent); // , // _, // supplyNodeOrNodelistName);
 
                 // Verify these nodes are indeed supply nodes:
-                bool nodeNotFound = false;
                 if (thisExhCtrl.FlowControlOption == ZoneExhaustControl::FlowControlType::FollowSupply) { // FollowSupply
+                    bool nodeNotFound = false;
                     for (size_t i = 1; i <= thisExhCtrl.SuppNodeNums.size(); ++i) {
                         CheckForSupplyNode(state, exhCtrlNum, nodeNotFound);
                         if (nodeNotFound) {
