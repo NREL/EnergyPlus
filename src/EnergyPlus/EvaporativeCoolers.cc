@@ -4195,8 +4195,6 @@ void CalcZoneEvapUnitOutput(EnergyPlusData &state,
     int const EvapCooler_1_Index = ZoneEvapUnit(UnitNum).EvapCooler_1_Index;
     int const EvapCooler_2_Index = ZoneEvapUnit(UnitNum).EvapCooler_2_Index;
 
-    auto &EvapCond(state.dataEvapCoolers->EvapCond);
-
     // calculate unit sensible cooling output
     if (PartLoadRatio > 0) {
         Node(OAInletNodeNum).MassFlowRate = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate * PartLoadRatio;
@@ -4213,16 +4211,16 @@ void CalcZoneEvapUnitOutput(EnergyPlusData &state,
         Node(OutletNodeNum).MassFlowRate = 0.0;
         Node(OutletNodeNum).MassFlowRateMaxAvail = 0.0;
 
-        Node(EvapCond(EvapCooler_1_Index).InletNode).MassFlowRate = 0.0;
-        Node(EvapCond(EvapCooler_1_Index).InletNode).MassFlowRateMaxAvail = 0.0;
-        Node(EvapCond(EvapCooler_1_Index).OutletNode).MassFlowRate = 0.0;
-        Node(EvapCond(EvapCooler_1_Index).OutletNode).MassFlowRateMaxAvail = 0.0;
+        Node(state.dataEvapCoolers->EvapCond(EvapCooler_1_Index).InletNode).MassFlowRate = 0.0;
+        Node(state.dataEvapCoolers->EvapCond(EvapCooler_1_Index).InletNode).MassFlowRateMaxAvail = 0.0;
+        Node(state.dataEvapCoolers->EvapCond(EvapCooler_1_Index).OutletNode).MassFlowRate = 0.0;
+        Node(state.dataEvapCoolers->EvapCond(EvapCooler_1_Index).OutletNode).MassFlowRateMaxAvail = 0.0;
 
         if (EvapCooler_2_Index > 0) {
-            Node(EvapCond(EvapCooler_2_Index).InletNode).MassFlowRate = 0.0;
-            Node(EvapCond(EvapCooler_2_Index).InletNode).MassFlowRateMaxAvail = 0.0;
-            Node(EvapCond(EvapCooler_2_Index).OutletNode).MassFlowRate = 0.0;
-            Node(EvapCond(EvapCooler_2_Index).OutletNode).MassFlowRateMaxAvail = 0.0;
+            Node(state.dataEvapCoolers->EvapCond(EvapCooler_2_Index).InletNode).MassFlowRate = 0.0;
+            Node(state.dataEvapCoolers->EvapCond(EvapCooler_2_Index).InletNode).MassFlowRateMaxAvail = 0.0;
+            Node(state.dataEvapCoolers->EvapCond(EvapCooler_2_Index).OutletNode).MassFlowRate = 0.0;
+            Node(state.dataEvapCoolers->EvapCond(EvapCooler_2_Index).OutletNode).MassFlowRateMaxAvail = 0.0;
         }
     }
     if (ReliefNodeNum > 0) {
