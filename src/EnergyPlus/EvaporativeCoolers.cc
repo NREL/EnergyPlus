@@ -3391,15 +3391,9 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
     int NumAlphas;                   // Number of Alphas for each GetObjectItem call
     int NumNumbers;                  // Number of Numbers for each GetObjectItem call
-    int MaxAlphas;                   // Maximum number of alpha fields in all objects
-    int MaxNumbers;                  // Maximum number of numeric fields in all objects
     int NumFields;                   // Total number of fields in object
-    int IOStatus;                    // Used in GetObjectItem
     bool ErrorsFound(false);         // Set to true if errors in input, fatal at end of routine
-    bool errFlag;
     Real64 FanVolFlow;
-    int UnitLoop;
-    int CtrlZone; // index to loop counter
 
     auto &EvapCond(state.dataEvapCoolers->EvapCond);
     auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
@@ -3410,8 +3404,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     }
 
     state.dataEvapCoolers->GetInputZoneEvapUnit = false;
-    MaxNumbers = 0;
-    MaxAlphas = 0;
+    int MaxNumbers = 0;
+    int MaxAlphas = 0;
 
     CurrentModuleObject = "ZoneHVAC:EvaporativeCoolerUnit";
     state.dataEvapCoolers->NumZoneEvapUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -3426,10 +3420,11 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     lNumericBlanks.dimension(MaxNumbers, true);
 
     if (state.dataEvapCoolers->NumZoneEvapUnits > 0) {
+        int IOStatus; // Used in GetObjectItem
         state.dataEvapCoolers->CheckZoneEvapUnitName.dimension(state.dataEvapCoolers->NumZoneEvapUnits, true);
         ZoneEvapUnit.allocate(state.dataEvapCoolers->NumZoneEvapUnits);
 
-        for (UnitLoop = 1; UnitLoop <= state.dataEvapCoolers->NumZoneEvapUnits; ++UnitLoop) {
+        for (int UnitLoop = 1; UnitLoop <= state.dataEvapCoolers->NumZoneEvapUnits; ++UnitLoop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      UnitLoop,
@@ -3497,7 +3492,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
 
             thisZoneEvapUnit.FanObjectClassName = Alphas(7);
             thisZoneEvapUnit.FanName = Alphas(8);
-            errFlag = false;
+            bool errFlag = false;
             if (!UtilityRoutines::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
                 Fans::GetFanType(state, thisZoneEvapUnit.FanName, thisZoneEvapUnit.FanType_Num, errFlag, CurrentModuleObject, thisZoneEvapUnit.Name);
                 Fans::GetFanIndex(state, thisZoneEvapUnit.FanName, thisZoneEvapUnit.FanIndex, errFlag, CurrentModuleObject);
@@ -3546,7 +3541,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             }
 
             // get the zone numer served by the zoneHVAC evaporative cooler
-            for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
+            for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
                 for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                     if (thisZoneEvapUnit.UnitOutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
@@ -3683,7 +3678,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     }
 
     // setup output variables
-    for (UnitLoop = 1; UnitLoop <= state.dataEvapCoolers->NumZoneEvapUnits; ++UnitLoop) {
+    for (int UnitLoop = 1; UnitLoop <= state.dataEvapCoolers->NumZoneEvapUnits; ++UnitLoop) {
         auto &thisZoneEvapUnit = ZoneEvapUnit(UnitLoop);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Total Cooling Rate",
