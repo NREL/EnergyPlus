@@ -3972,24 +3972,22 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
     PrintFlag = true;
     bool errorsFound = false;
 
-    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
-    auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
-
-    if (CurZoneEqNum > 0) {
+    if (state.dataSize->CurZoneEqNum > 0) {
+        auto &zoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
 
         if (ZoneEvapUnit(UnitNum).HVACSizingIndex > 0) {
             state.dataSize->ZoneCoolingOnlyFan = true;
             zoneHVACIndex = ZoneEvapUnit(UnitNum).HVACSizingIndex;
             SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
             SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
-            ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
+            zoneEqSizing.SizingMethod(SizingMethod) = SAFMethod;
             if (SAFMethod == DataSizing::None || SAFMethod == DataSizing::SupplyAirFlowRate || SAFMethod == DataSizing::FlowPerFloorArea ||
                 SAFMethod == DataSizing::FractionOfAutosizedCoolingAirflow) {
                 switch (SAFMethod) {
                 case DataSizing::SupplyAirFlowRate:
                     if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                        ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
+                        zoneEqSizing.AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                        zoneEqSizing.SystemAirFlow = true;
                     }
                     TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
@@ -3997,10 +3995,10 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
                     }
                     break;
                 case DataSizing::FlowPerFloorArea:
-                    ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                    ZoneEqSizing(CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow *
-                                                            state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
-                    TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
+                    zoneEqSizing.SystemAirFlow = true;
+                    zoneEqSizing.AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow *
+                                              state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    TempSize = zoneEqSizing.AirVolFlow;
                     state.dataSize->DataScalableSizingON = true;
                     break;
                 case DataSizing::FractionOfAutosizedCoolingAirflow:
@@ -4024,7 +4022,7 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
                 TempSize = DataSizing::AutoSize;
                 PrintFlag = false;
                 state.dataSize->DataScalableSizingON = true;
-                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
+                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                 if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == DataSizing::FractionOfAutosizedCoolingCapacity) {
                     state.dataSize->DataFracOfAutosizedCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                 }
