@@ -171,7 +171,7 @@ void ZoneData::SetOutBulbTempAt(EnergyPlusData &state)
     }
 }
 
-void ZoneData::SetWindSpeedAt(EnergyPlusData &state, Real64 const fac)
+void ZoneData::SetWindSpeedAt(EnergyPlusData const &state, Real64 const fac)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
