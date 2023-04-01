@@ -682,9 +682,9 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             thisConstruct.InsideAbsorpThermal = thisMaterialInside->AbsorpThermalBack;
         }
         if (InsideMaterNum != 0) {
-            auto const *thisMaterialInside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(InsideMaterNum));
-            thisConstruct.InsideAbsorpVis = thisMaterialInside->AbsorpVisible;
-            thisConstruct.InsideAbsorpSolar = thisMaterialInside->AbsorpSolar;
+            auto const *thisInsideMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(InsideMaterNum));
+            thisConstruct.InsideAbsorpVis = thisInsideMaterial->AbsorpVisible;
+            thisConstruct.InsideAbsorpSolar = thisInsideMaterial->AbsorpSolar;
         }
 
         if ((thisMaterialOutside->group == Material::Group::WindowGlass) ||
