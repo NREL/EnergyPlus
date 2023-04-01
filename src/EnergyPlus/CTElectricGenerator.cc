@@ -321,9 +321,8 @@ namespace CTElectricGenerator {
             }
 
             // Validate fuel type input
-            state.dataCTElectricGenerator->CTGenerator(genNum).FuelType = static_cast<DataGlobalConstants::eResource>(
-                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
-            if (state.dataCTElectricGenerator->CTGenerator(genNum).FuelType == DataGlobalConstants::eResource::Invalid) {
+            state.dataCTElectricGenerator->CTGenerator(genNum).FuelType = static_cast<Constant::eResource>(getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
+            if (state.dataCTElectricGenerator->CTGenerator(genNum).FuelType == Constant::eResource::Invalid) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), AlphArray(11)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
@@ -364,7 +363,7 @@ namespace CTElectricGenerator {
 
     void CTGeneratorData::setupOutputVars(EnergyPlusData &state)
     {
-        std::string_view const sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)];
+        std::string_view const sFuelType = Constant::ResourceTypeNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Rate",
                             OutputProcessor::Unit::W,
@@ -708,16 +707,16 @@ namespace CTElectricGenerator {
 
         // Calculate Energy
         // Generator output (J)
-        Real64 ElectricEnergyGen = elecPowerGenerated * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ElectricEnergyGen = elecPowerGenerated * state.dataHVACGlobal->TimeStepSysSec;
 
         // Amount of Fuel Energy Required to run COMBUSTION turbine (J)
-        Real64 FuelEnergyUsed = FuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 FuelEnergyUsed = FuelUseRate * state.dataHVACGlobal->TimeStepSysSec;
 
         // recovered lube oil heat (J)
-        Real64 lubeOilEnergyRec = QLubeOilRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 lubeOilEnergyRec = QLubeOilRec * state.dataHVACGlobal->TimeStepSysSec;
 
         // recovered exhaust heat (J)
-        Real64 exhaustEnergyRec = QExhaustRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 exhaustEnergyRec = QExhaustRec * state.dataHVACGlobal->TimeStepSysSec;
 
         this->ElecPowerGenerated = elecPowerGenerated;
         this->ElecEnergyGenerated = ElectricEnergyGen;
@@ -827,7 +826,7 @@ namespace CTElectricGenerator {
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp,
+                                                           Constant::InitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 

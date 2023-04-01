@@ -58,7 +58,7 @@
 #define AIRDYNAMICVISCOSITY_CONSTEXPR(T) air_dynamic_viscosity(T)
 #ifndef TOKELVIN
 #include "../../../DataGlobals.hh"
-#define TOKELVIN(T) (T + DataGlobalConstants::KelvinConv)
+#define TOKELVIN(T) (T + Constant::KelvinConv)
 #endif
 
 namespace EnergyPlus {

@@ -318,7 +318,7 @@ namespace SystemReports {
                              bool const CompLoadFlag,
                              int const AirLoopNum,
                              std::string const &CompType,
-                             DataGlobalConstants::eResource const EnergyType,
+                             Constant::eResource const EnergyType,
                              Real64 const CompLoad,
                              Real64 const CompEnergy);
 

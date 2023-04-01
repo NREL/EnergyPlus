@@ -78,7 +78,7 @@ namespace ChillerGasAbsorption {
         bool InHeatingMode = false;
         // Part of Type that directly corresponds with IDD definition
         std::string Name;                         // user identifier
-        DataGlobalConstants::eResource FuelType;  // Type of Fuel - DIESEL, GASOLINE, GAS
+        Constant::eResource FuelType;             // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 NomCoolingCap = 0.0;               // W - design nominal capacity of Absorber
         bool NomCoolingCapWasAutoSized = false;   // true if nominal capacity was autosize on input
         Real64 NomHeatCoolRatio = 0.0;            // ratio of heating to cooling capacity

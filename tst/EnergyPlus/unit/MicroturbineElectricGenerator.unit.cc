@@ -127,7 +127,7 @@ TEST_F(EnergyPlusFixture, MicroturbineElectricGenerator_Fueltype)
     state->dataIPShortCut->cCurrentModuleObject = "Generator:MicroTurbine";
     GetMTGeneratorInput(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataMircoturbElectGen->MTGenerator(1).FuelType, DataGlobalConstants::eResource::NaturalGas));
+    EXPECT_TRUE(compare_enums(state->dataMircoturbElectGen->MTGenerator(1).FuelType, Constant::eResource::NaturalGas));
 }
 
 } // namespace EnergyPlus

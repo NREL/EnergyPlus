@@ -236,7 +236,7 @@ namespace EIRPlantLoopHeatPumps {
         };
 
         // New additions for GAHP only
-        DataGlobalConstants::eResource fuelType = DataGlobalConstants::eResource::Invalid; // resource type assignment
+        Constant::eResource fuelType = Constant::eResource::Invalid; // resource type assignment
         std::string endUseSubcat = "";
         DataPlant::FlowMode flowMode = DataPlant::FlowMode::Invalid;
         Real64 desSupplyTemp = 60.0;

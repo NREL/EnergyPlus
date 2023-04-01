@@ -231,7 +231,7 @@ void ManageHVAC(EnergyPlusData &state)
 
     state.dataHVACGlobal->SysTimeElapsed = 0.0;
     state.dataHVACGlobal->TimeStepSys = state.dataGlobal->TimeStepZone;
-    state.dataHVACGlobal->TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state.dataHVACGlobal->TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     state.dataHVACGlobal->FirstTimeStepSysFlag = true;
     state.dataHVACGlobal->ShortenTimeStepSys = false;
     state.dataHVACGlobal->UseZoneTimeStepHistory = true;
@@ -339,7 +339,7 @@ void ManageHVAC(EnergyPlusData &state)
             state.dataHVACGlobal->TimeStepSys = state.dataGlobal->TimeStepZone / state.dataHVACGlobal->NumOfSysTimeSteps;
         }
         state.dataHVACGlobal->TimeStepSys = max(state.dataHVACGlobal->TimeStepSys, state.dataConvergeParams->MinTimeStepSys);
-        state.dataHVACGlobal->TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataHVACGlobal->TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         state.dataHVACGlobal->UseZoneTimeStepHistory = false;
         state.dataHVACGlobal->ShortenTimeStepSys = true;
 
@@ -478,16 +478,16 @@ void ManageHVAC(EnergyPlusData &state)
             if (state.dataGlobal->DoOutputReporting) {
                 SystemReports::ReportVentilationLoads(state);
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
-                if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
-                    state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
+                if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay ||
+                    state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeRunPeriodDesign) {
                     if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
                         state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                 }
                 UpdateTabularReports(state, OutputProcessor::TimeStepType::System);
             }
             if (state.dataGlobal->ZoneSizingCalc) {
-                UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::DuringDay);
-                UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::DuringDay);
+                UpdateZoneSizing(state, Constant::CallIndicator::DuringDay);
+                UpdateFacilitySizing(state, Constant::CallIndicator::DuringDay);
             }
             EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation(state);
         } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && state.dataSysVars->ReportDuringWarmup) {
@@ -528,8 +528,8 @@ void ManageHVAC(EnergyPlusData &state)
                 CalcMoreNodeInfo(state);
             }
             UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
-                state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
+            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay ||
+                state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
                     state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
             }
@@ -2618,7 +2618,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
             if (Ventilation(VentNum).ZonePtr == ZoneLoop) {
                 // moved into CalcAirFlowSimple
                 //        ZnAirRpt(ZoneLoop)%VentilFanElec  =
-                //        ZnAirRpt(ZoneLoop)%VentilFanElec+Ventilation(VentNum)%FanPower*TimeStepSys*DataGlobalConstants::SecInHour()
+                //        ZnAirRpt(ZoneLoop)%VentilFanElec+Ventilation(VentNum)%FanPower*TimeStepSys*Constant::SecInHour()
                 //        &
                 //          *ADSCorrectionFactor
                 if (ADSCorrectionFactor > 0) {

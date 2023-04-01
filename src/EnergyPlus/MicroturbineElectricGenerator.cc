@@ -347,9 +347,8 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         }
 
         // Validate fuel type input
-        state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType = static_cast<DataGlobalConstants::eResource>(
-            getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(5))));
-        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType == DataGlobalConstants::eResource::Invalid) {
+        state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType = static_cast<Constant::eResource>(getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(5))));
+        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType == Constant::eResource::Invalid) {
             ShowSevereError(
                 state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
             ShowSevereError(state, format("Invalid {}  = {}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
@@ -899,7 +898,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
 void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
 {
-    std::string_view const sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)];
+    std::string_view const sFuelType = Constant::ResourceTypeNames[static_cast<int>(this->FuelType)];
     SetupOutputVariable(state,
                         "Generator Produced AC Electricity Rate",
                         OutputProcessor::Unit::W,
@@ -1928,9 +1927,9 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
             state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).MassFlowRateMinAvail;
     }
 
-    this->EnergyGen = this->ElecPowerGenerated * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->ExhaustEnergyRec = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->EnergyGen = this->ElecPowerGenerated * state.dataHVACGlobal->TimeStepSysSec;
+    this->ExhaustEnergyRec = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSysSec;
+    this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * state.dataHVACGlobal->TimeStepSysSec;
     if (this->FuelEnergyUseRateLHV > 0.0) {
         this->ElectricEfficiencyLHV = this->ElecPowerGenerated / this->FuelEnergyUseRateLHV;
         this->ThermalEfficiencyLHV = this->QHeatRecovered / this->FuelEnergyUseRateLHV;
@@ -1938,8 +1937,8 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
         this->ElectricEfficiencyLHV = 0.0;
         this->ThermalEfficiencyLHV = 0.0;
     }
-    this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSysSec;
 }
 void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
 {
@@ -1968,7 +1967,7 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
         // size mass flow rate
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::InitConvTemp,
+                                                       Constant::InitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 

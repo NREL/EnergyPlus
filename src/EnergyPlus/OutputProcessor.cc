@@ -195,37 +195,37 @@ namespace OutputProcessor {
         op->NumExtraVars = 0;
 
         // Initialize end use category names - the indices must match up with endUseNames in OutputReportTabular
-        op->EndUseCategory.allocate(state.dataGlobalConst->iEndUse.size());
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)).Name = "Heating";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling)).Name = "Cooling";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)).Name = "InteriorLights";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)).Name = "ExteriorLights";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)).Name = "InteriorEquipment";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)).Name = "ExteriorEquipment";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans)).Name = "Fans";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps)).Name = "Pumps";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)).Name = "HeatRejection";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification)).Name = "Humidifier";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)).Name = "HeatRecovery";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)).Name = "WaterSystems";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)).Name = "Refrigeration";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)).Name = "Cogeneration";
+        op->EndUseCategory.allocate(static_cast<int>(Constant::EndUse::Num));
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Heating) + 1).Name = "Heating";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Cooling) + 1).Name = "Cooling";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::InteriorLights) + 1).Name = "InteriorLights";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::ExteriorLights) + 1).Name = "ExteriorLights";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::InteriorEquipment) + 1).Name = "InteriorEquipment";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1).Name = "ExteriorEquipment";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Fans) + 1).Name = "Fans";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Pumps) + 1).Name = "Pumps";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::HeatRejection) + 1).Name = "HeatRejection";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Humidification) + 1).Name = "Humidifier";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::HeatRecovery) + 1).Name = "HeatRecovery";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::WaterSystem) + 1).Name = "WaterSystems";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Refrigeration) + 1).Name = "Refrigeration";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Cogeneration) + 1).Name = "Cogeneration";
 
         // Initialize display names for output table - this could go away if end use key names are changed to match
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)).DisplayName = "Heating";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling)).DisplayName = "Cooling";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)).DisplayName = "Interior Lighting";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)).DisplayName = "Exterior Lighting";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)).DisplayName = "Interior Equipment";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)).DisplayName = "Exterior Equipment";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans)).DisplayName = "Fans";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps)).DisplayName = "Pumps";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)).DisplayName = "Heat Rejection";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification)).DisplayName = "Humidification";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)).DisplayName = "Heat Recovery";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)).DisplayName = "Water Systems";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)).DisplayName = "Refrigeration";
-        op->EndUseCategory(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)).DisplayName = "Generators";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Heating) + 1).DisplayName = "Heating";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Cooling) + 1).DisplayName = "Cooling";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::InteriorLights) + 1).DisplayName = "Interior Lighting";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::ExteriorLights) + 1).DisplayName = "Exterior Lighting";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::InteriorEquipment) + 1).DisplayName = "Interior Equipment";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1).DisplayName = "Exterior Equipment";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Fans) + 1).DisplayName = "Fans";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Pumps) + 1).DisplayName = "Pumps";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::HeatRejection) + 1).DisplayName = "Heat Rejection";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Humidification) + 1).DisplayName = "Humidification";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::HeatRecovery) + 1).DisplayName = "Heat Recovery";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::WaterSystem) + 1).DisplayName = "Water Systems";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Refrigeration) + 1).DisplayName = "Refrigeration";
+        op->EndUseCategory(static_cast<int>(Constant::EndUse::Cogeneration) + 1).DisplayName = "Generators";
 
         op->OutputInitialized = true;
 
@@ -2935,7 +2935,7 @@ namespace OutputProcessor {
             OutputProcessor::RT_IPUnits const RT_forIPUnits(m.RT_forIPUnits);
             if (RT_forIPUnits == RT_IPUnits::Electricity) {
                 OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchEMelecannual, m.Name, m.FinYrSMValue * DataGlobalConstants::convertJtoGJ);
+                    state, state.dataOutRptPredefined->pdchEMelecannual, m.Name, m.FinYrSMValue * Constant::convertJtoGJ);
                 OutputReportPredefined::PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchEMelecminvalue, m.Name, m.FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 OutputReportPredefined::PreDefTableEntry(
@@ -2946,7 +2946,7 @@ namespace OutputProcessor {
                     state, state.dataOutRptPredefined->pdchEMelecmaxvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits::Gas) {
                 OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchEMgasannual, m.Name, m.FinYrSMValue * DataGlobalConstants::convertJtoGJ);
+                    state, state.dataOutRptPredefined->pdchEMgasannual, m.Name, m.FinYrSMValue * Constant::convertJtoGJ);
                 OutputReportPredefined::PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchEMgasminvalue, m.Name, m.FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 OutputReportPredefined::PreDefTableEntry(
@@ -2957,7 +2957,7 @@ namespace OutputProcessor {
                     state, state.dataOutRptPredefined->pdchEMgasmaxvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMaxValDate));
             } else if (RT_forIPUnits == RT_IPUnits::Cooling) {
                 OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchEMcoolannual, m.Name, m.FinYrSMValue * DataGlobalConstants::convertJtoGJ);
+                    state, state.dataOutRptPredefined->pdchEMcoolannual, m.Name, m.FinYrSMValue * Constant::convertJtoGJ);
                 OutputReportPredefined::PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchEMcoolminvalue, m.Name, m.FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 OutputReportPredefined::PreDefTableEntry(
@@ -3008,7 +3008,7 @@ namespace OutputProcessor {
                     state, state.dataOutRptPredefined->pdchEMotherLmaxvaluetime, m.Name, DateToStringWithMonth(m.FinYrSMMaxValDate));
             } else {
                 OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchEMotherJannual, m.Name, m.FinYrSMValue * DataGlobalConstants::convertJtoGJ);
+                    state, state.dataOutRptPredefined->pdchEMotherJannual, m.Name, m.FinYrSMValue * Constant::convertJtoGJ);
                 OutputReportPredefined::PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchEMotherJminvalue, m.Name, m.FinYrSMMinVal / state.dataGlobal->TimeStepZoneSec);
                 OutputReportPredefined::PreDefTableEntry(
@@ -3232,7 +3232,7 @@ namespace OutputProcessor {
         auto &op = state.dataOutputProcessor;
 
         bool Found = false;
-        for (size_t EndUseNum = 1; EndUseNum <= state.dataGlobalConst->iEndUse.size(); ++EndUseNum) {
+        for (size_t EndUseNum = 1; EndUseNum <= static_cast<size_t>(Constant::EndUse::Num); ++EndUseNum) {
             if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
 
                 for (EndUseSubNum = 1; EndUseSubNum <= op->EndUseCategory(EndUseNum).NumSubcategories; ++EndUseSubNum) {
@@ -3271,7 +3271,7 @@ namespace OutputProcessor {
         auto &op = state.dataOutputProcessor;
 
         bool Found = false;
-        for (size_t EndUseNum = 1; EndUseNum <= state.dataGlobalConst->iEndUse.size(); ++EndUseNum) {
+        for (size_t EndUseNum = 1; EndUseNum <= static_cast<size_t>(Constant::EndUse::Num); ++EndUseNum) {
             if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
 
                 for (int endUseSpTypeNum = 1; endUseSpTypeNum <= op->EndUseCategory(EndUseNum).numSpaceTypes; ++endUseSpTypeNum) {
@@ -6864,17 +6864,17 @@ int GetNumMeteredVariables(EnergyPlusData &state,
 }
 
 void GetMeteredVariables(EnergyPlusData &state,
-                         std::string const &ComponentType,                             // Given Component Type
-                         std::string const &ComponentName,                             // Given Component Name (user defined)
-                         Array1D_int &VarIndexes,                                      // Variable Numbers
-                         Array1D<OutputProcessor::VariableType> &VarTypes,             // Variable Types (1=integer, 2=real, 3=meter)
-                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,        // Variable Index Types (1=Zone,2=HVAC)
-                         Array1D<OutputProcessor::Unit> &unitsForVar,                  // units from enum for each variable
-                         std::map<int, DataGlobalConstants::eResource> &ResourceTypes, // ResourceTypes for each variable
-                         Array1D_string &EndUses,                                      // EndUses for each variable
-                         Array1D_string &Groups,                                       // Groups for each variable
-                         Array1D_string &Names,                                        // Variable Names for each variable
-                         int &NumFound                                                 // Number Found
+                         std::string const &ComponentType,                      // Given Component Type
+                         std::string const &ComponentName,                      // Given Component Name (user defined)
+                         Array1D_int &VarIndexes,                               // Variable Numbers
+                         Array1D<OutputProcessor::VariableType> &VarTypes,      // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
+                         Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
+                         std::map<int, Constant::eResource> &ResourceTypes,     // ResourceTypes for each variable
+                         Array1D_string &EndUses,                               // EndUses for each variable
+                         Array1D_string &Groups,                                // Groups for each variable
+                         Array1D_string &Names,                                 // Variable Names for each variable
+                         int &NumFound                                          // Number Found
 )
 {
 
@@ -6889,7 +6889,6 @@ void GetMeteredVariables(EnergyPlusData &state,
     // for metered variables associated with the given ComponentType/Name.
 
     // Using/Aliasing
-    using namespace DataGlobalConstants;
     using namespace OutputProcessor;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -6917,8 +6916,8 @@ void GetMeteredVariables(EnergyPlusData &state,
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
-            ResourceTypes.at(NumVariables) = static_cast<DataGlobalConstants::eResource>(getEnumerationValue(
-                DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType)));
+            ResourceTypes.at(NumVariables) = static_cast<Constant::eResource>(getEnumerationValue(
+                Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType)));
 
             Names(NumVariables) = op->RVariableTypes(Loop).VarNameUC;
 
@@ -6948,17 +6947,17 @@ void GetMeteredVariables(EnergyPlusData &state,
 }
 
 void GetMeteredVariables(EnergyPlusData &state,
-                         std::string const &ComponentType,                             // Given Component Type
-                         std::string const &ComponentName,                             // Given Component Name (user defined)
-                         Array1D_int &VarIndexes,                                      // Variable Numbers
-                         Array1D<OutputProcessor::VariableType> &VarTypes,             // Variable Types (1=integer, 2=real, 3=meter)
-                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,        // Variable Index Types (1=Zone,2=HVAC)
-                         Array1D<OutputProcessor::Unit> &unitsForVar,                  // units from enum for each variable
-                         std::map<int, DataGlobalConstants::eResource> &ResourceTypes, // ResourceTypes for each variable
-                         Array1D_string &EndUses,                                      // EndUses for each variable
-                         Array1D_string &Groups,                                       // Groups for each variable
-                         Array1D_string &Names,                                        // Variable Names for each variable
-                         Array1D_int &VarIDs                                           // Variable Report Numbers
+                         std::string const &ComponentType,                      // Given Component Type
+                         std::string const &ComponentName,                      // Given Component Name (user defined)
+                         Array1D_int &VarIndexes,                               // Variable Numbers
+                         Array1D<OutputProcessor::VariableType> &VarTypes,      // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
+                         Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
+                         std::map<int, Constant::eResource> &ResourceTypes,  // ResourceTypes for each variable
+                         Array1D_string &EndUses,                               // EndUses for each variable
+                         Array1D_string &Groups,                                // Groups for each variable
+                         Array1D_string &Names,                                 // Variable Names for each variable
+                         Array1D_int &VarIDs                                    // Variable Report Numbers
 )
 {
 
@@ -6973,7 +6972,6 @@ void GetMeteredVariables(EnergyPlusData &state,
     // for metered variables associated with the given ComponentType/Name.
 
     // Using/Aliasing
-    using namespace DataGlobalConstants;
     using namespace OutputProcessor;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -7001,8 +6999,8 @@ void GetMeteredVariables(EnergyPlusData &state,
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
-            ResourceTypes.at(NumVariables) = static_cast<DataGlobalConstants::eResource>(getEnumerationValue(
-                DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType)));
+            ResourceTypes.at(NumVariables) = static_cast<Constant::eResource>(getEnumerationValue(
+                Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType)));
             Names(NumVariables) = op->RVariableTypes(Loop).VarNameUC;
 
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {

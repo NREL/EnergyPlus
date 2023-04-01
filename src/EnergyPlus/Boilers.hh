@@ -84,7 +84,7 @@ namespace Boilers {
     {
         // Members
         std::string Name;                                                                  // user identifier
-        DataGlobalConstants::eResource FuelType = DataGlobalConstants::eResource::Invalid; // resource type assignment
+        Constant::eResource FuelType = Constant::eResource::Invalid;                       // resource type assignment
         DataPlant::PlantEquipmentType Type = DataPlant::PlantEquipmentType::Invalid;       // plant loop type identifier
         PlantLocation plantLoc{};
         bool Available = false;                                      // TRUE if machine available in current time step

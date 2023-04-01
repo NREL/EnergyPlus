@@ -266,7 +266,7 @@ namespace PlantChillers {
     struct EngineDrivenChillerSpecs : BaseChillerSpecs
     {
         // temperature at the chiller evaporator side outlet
-        DataGlobalConstants::eResource FuelType;
+        Constant::eResource FuelType;
         Array1D<Real64> CapRatCoef;                // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef;              // (EngineDriven ADJEC() ) coeff of power rat poly fit
         Array1D<Real64> FullLoadCoef;              // (EngineDriven RPWRC() ) coeff of full load poly. fit
@@ -366,7 +366,7 @@ namespace PlantChillers {
     struct GTChillerSpecs : BaseChillerSpecs
     {
         // Members
-        DataGlobalConstants::eResource FuelType;
+        Constant::eResource FuelType;
         Array1D<Real64> CapRatCoef;   // (GT RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef; // (GT ADJEC() ) coeff of power rat poly fit
         Array1D<Real64> FullLoadCoef; // (GT RPWRC() ) coeff of full load poly. fit

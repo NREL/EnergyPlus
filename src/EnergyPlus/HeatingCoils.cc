@@ -101,7 +101,6 @@ namespace HeatingCoils {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
-    using namespace DataGlobalConstants;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -352,7 +351,7 @@ namespace HeatingCoils {
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
 
             CurrentModuleObject = "Coil:Heating:Electric";
-            heatingCoil.ResourceType = DataGlobalConstants::eResource::Electricity;
+            heatingCoil.ResourceType = Constant::eResource::Electricity;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -379,7 +378,7 @@ namespace HeatingCoils {
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -488,7 +487,7 @@ namespace HeatingCoils {
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
 
             CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
-            heatingCoil.ResourceType = DataGlobalConstants::eResource::Electricity;
+            heatingCoil.ResourceType = Constant::eResource::Electricity;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -513,7 +512,7 @@ namespace HeatingCoils {
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -655,7 +654,7 @@ namespace HeatingCoils {
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -675,18 +674,18 @@ namespace HeatingCoils {
             heatingCoil.HeatingCoilModel = "Fuel";
             heatingCoil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
-            heatingCoil.ResourceType = static_cast<DataGlobalConstants::eResource>(
-                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(3))));
-            if (!(heatingCoil.ResourceType == DataGlobalConstants::eResource::NaturalGas ||
-                  heatingCoil.ResourceType == DataGlobalConstants::eResource::Propane ||
-                  heatingCoil.ResourceType == DataGlobalConstants::eResource::Diesel ||
-                  heatingCoil.ResourceType == DataGlobalConstants::eResource::Gasoline ||
-                  heatingCoil.ResourceType == DataGlobalConstants::eResource::FuelOilNo1 ||
-                  heatingCoil.ResourceType == DataGlobalConstants::eResource::FuelOilNo2 ||
-                  heatingCoil.ResourceType == DataGlobalConstants::eResource::OtherFuel1 ||
-                  heatingCoil.ResourceType == DataGlobalConstants::eResource::OtherFuel2 ||
-                  heatingCoil.ResourceType == DataGlobalConstants::eResource::Coal) ||
-                heatingCoil.ResourceType == DataGlobalConstants::eResource::Invalid) {
+            heatingCoil.ResourceType = static_cast<Constant::eResource>(
+                getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(3))));
+            if (!(heatingCoil.ResourceType == Constant::eResource::NaturalGas ||
+                  heatingCoil.ResourceType == Constant::eResource::Propane ||
+                  heatingCoil.ResourceType == Constant::eResource::Diesel ||
+                  heatingCoil.ResourceType == Constant::eResource::Gasoline ||
+                  heatingCoil.ResourceType == Constant::eResource::FuelOilNo1 ||
+                  heatingCoil.ResourceType == Constant::eResource::FuelOilNo2 ||
+                  heatingCoil.ResourceType == Constant::eResource::OtherFuel1 ||
+                  heatingCoil.ResourceType == Constant::eResource::OtherFuel2 ||
+                  heatingCoil.ResourceType == Constant::eResource::Coal) ||
+                heatingCoil.ResourceType == Constant::eResource::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}: Invalid {} entered ={} for {}={}",
                                        RoutineName,
@@ -697,7 +696,7 @@ namespace HeatingCoils {
                                        Alphas(1)));
                 state.dataHeatingCoils->InputErrorsFound = true;
             }
-            std::string const FuelType(DataGlobalConstants::ResourceTypeNames[static_cast<int>(heatingCoil.ResourceType)]);
+            std::string const FuelType(Constant::ResourceTypeNames[static_cast<int>(heatingCoil.ResourceType)]);
 
             heatingCoil.Efficiency = Numbers(1);
             heatingCoil.NominalCapacity = Numbers(2);
@@ -842,7 +841,7 @@ namespace HeatingCoils {
             auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
             CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
-            heatingCoil.ResourceType = DataGlobalConstants::eResource::NaturalGas;
+            heatingCoil.ResourceType = Constant::eResource::NaturalGas;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -867,7 +866,7 @@ namespace HeatingCoils {
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -1041,7 +1040,7 @@ namespace HeatingCoils {
             auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
             CurrentModuleObject = "Coil:Heating:Desuperheater";
-            heatingCoil.ResourceType = DataGlobalConstants::eResource::Electricity;
+            heatingCoil.ResourceType = Constant::eResource::Electricity;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -1066,7 +1065,7 @@ namespace HeatingCoils {
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {

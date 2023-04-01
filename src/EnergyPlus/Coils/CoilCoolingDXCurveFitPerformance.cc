@@ -89,7 +89,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     this->evapCondBasinHeatCap = input_data.basin_heater_capacity;
     this->evapCondBasinHeatSetpoint = input_data.basin_heater_setpoint_temperature;
     if (input_data.basin_heater_operating_schedule_name.empty()) {
-        this->evapCondBasinHeatSchedulIndex = DataGlobalConstants::ScheduleAlwaysOn;
+        this->evapCondBasinHeatSchedulIndex = ScheduleManager::ScheduleAlwaysOn;
     } else {
         this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(state, input_data.basin_heater_operating_schedule_name);
     }
@@ -106,9 +106,9 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
         this->alternateMode.oneTimeInit(state); // oneTimeInit does not need to be delayed in this use case
     }
     // Validate fuel type input
-    this->compressorFuelType = static_cast<DataGlobalConstants::eResource>(
-        getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(input_data.compressor_fuel_type)));
-    if (this->compressorFuelType == DataGlobalConstants::eResource::Invalid) {
+    this->compressorFuelType = static_cast<Constant::eResource>(
+        getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(input_data.compressor_fuel_type)));
+    if (this->compressorFuelType == Constant::eResource::Invalid) {
         ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Compressor Fuel Type=\"" + input_data.compressor_fuel_type + "\".");
         errorsFound = true;
@@ -202,7 +202,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                                                 Real64 LoadSHR)
 {
     static constexpr std::string_view RoutineName = "CoilCoolingDXCurveFitPerformance::simulate";
-    Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     this->recoveredEnergyRate = 0.0;
     this->NormalSHR = 0.0;
 
@@ -372,7 +372,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
     this->basinHeaterPower *= (1.0 - this->RTF);
     this->electricityConsumption = this->powerUse * reportingConstant;
 
-    if (this->compressorFuelType != DataGlobalConstants::eResource::Electricity) {
+    if (this->compressorFuelType != Constant::eResource::Electricity) {
         this->compressorFuelRate = this->powerUse;
         this->compressorFuelConsumption = this->electricityConsumption;
 

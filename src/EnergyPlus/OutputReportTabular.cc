@@ -169,7 +169,6 @@ namespace EnergyPlus::OutputReportTabular {
 //                                      |--> MonthlyTable --> MonthlyColumns
 
 // Using/Aliasing
-using namespace DataGlobalConstants;
 using namespace OutputReportPredefined;
 using namespace DataHeatBalance;
 using namespace HybridModel;
@@ -257,8 +256,7 @@ void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t
         ort->UpdateTabularReportsGetInput = false;
         date_and_time(_, _, _, ort->td);
     }
-    if (state.dataGlobal->DoOutputReporting && ort->WriteTabularFiles &&
-        (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
+    if (state.dataGlobal->DoOutputReporting && ort->WriteTabularFiles && (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) {
         if (t_timeStepType == OutputProcessor::TimeStepType::Zone) {
             ort->gatherElapsedTimeBEPS += state.dataGlobal->TimeStepZone;
         }
@@ -769,12 +767,12 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             if (KeyCount == 0) {
                 ++state.dataOutRptTab->ErrCount1;
                 if (state.dataOutRptTab->ErrCount1 == 1 && !state.dataGlobal->DisplayExtraWarnings &&
-                    state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                    state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
                     ShowWarningError(state, "Processing Monthly Tabular Reports: Variable names not valid for this simulation");
                     ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.");
                 }
                 // fixing CR5878 removed the showing of the warning once about a specific variable.
-                if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
                     ShowWarningError(state, format("Processing Monthly Tabular Reports: {}", ort->MonthlyInput(TabNum).name));
                     ShowContinueError(state, format("..Variable name={} not valid for this simulation.", curVariMeter));
                     if (state.dataOutRptTab->VarWarning) {
@@ -941,7 +939,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     }
                 } else { // if no key corresponds to this instance of the report
                     // fixing CR5878 removed the showing of the warning once about a specific variable.
-                    if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                    if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
                         ShowWarningError(state, format("Processing Monthly Tabular Reports: {}", ort->MonthlyInput(TabNum).name));
                         ShowContinueError(state, format("..Variable name={} not valid for this simulation.", curVariMeter));
                         ShowContinueError(
@@ -1805,26 +1803,27 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->sourceTypeNames(12) = "OtherFuel2";
 
         // initialize the end use names
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)) = "Heating";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling)) = "Cooling";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) = "InteriorLights";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)) = "ExteriorLights";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) = "InteriorEquipment";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) = "ExteriorEquipment";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans)) = "Fans";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps)) = "Pumps";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) = "HeatRejection";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification)) = "Humidifier";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) = "HeatRecovery";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)) = "WaterSystems";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)) = "Refrigeration";
-        ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) = "Cogeneration";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Heating) + 1) = "Heating";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Cooling) + 1) = "Cooling";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::InteriorLights) + 1) = "InteriorLights";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::ExteriorLights) + 1) = "ExteriorLights";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::InteriorEquipment) + 1) = "InteriorEquipment";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1) = "ExteriorEquipment";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Fans) + 1) = "Fans";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Pumps) + 1) = "Pumps";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::HeatRejection) + 1) = "HeatRejection";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Humidification) + 1) = "Humidifier";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::HeatRecovery) + 1) = "HeatRecovery";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::WaterSystem) + 1) = "WaterSystems";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Refrigeration) + 1) = "Refrigeration";
+        ort->endUseNames(static_cast<int>(Constant::EndUse::Cogeneration) + 1) = "Cogeneration";
 
         // End use subs must be dynamically allocated to accomodate the end use with the most subcategories
-        ort->meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, numResourceTypes);
+        ort->meterNumEndUseSubBEPS.allocate(
+            state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->meterNumEndUseSpTypeBEPS.allocate(
-            state.dataOutputProcessor->maxNumEndUseSpaceTypes, DataGlobalConstantsData::iEndUseSize, numResourceTypes);
-        for (int endUse = 1; endUse <= DataGlobalConstantsData::iEndUseSize; ++endUse) {
+            state.dataOutputProcessor->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
+        for (int endUse = 1; endUse <= static_cast<int>(Constant::EndUse::Num); ++endUse) {
             for (int resType = 1; resType <= numResourceTypes; ++resType) {
                 for (int subCat = 1; subCat <= state.dataOutputProcessor->MaxNumSubcategories; ++subCat) {
                     ort->meterNumEndUseSubBEPS(subCat, endUse, resType) = 0;
@@ -1841,7 +1840,7 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
             meterNumber = GetMeterIndex(state, meterName);
             ort->meterNumTotalsBEPS(iResource) = meterNumber;
 
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 meterName = ort->endUseNames(jEndUse) + ':' + ort->resourceTypeNames(iResource); //// ':FACILITY'
                 meterNumber = GetMeterIndex(state, meterName);
                 ort->meterNumEndUseBEPS(iResource, jEndUse) = meterNumber;
@@ -1874,15 +1873,16 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->gatherEndUseBEPS = 0.0;
         ort->gatherEndUseBySourceBEPS = 0.0;
         // End use subs must be dynamically allocated to accommodate the end use with the most subcategories
-        ort->gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, numResourceTypes);
+        ort->gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->gatherEndUseSubBEPS = 0.0;
         ort->gatherEndUseSpTypeBEPS.allocate(
-            state.dataOutputProcessor->maxNumEndUseSpaceTypes, DataGlobalConstantsData::iEndUseSize, numResourceTypes);
+            state.dataOutputProcessor->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->gatherEndUseSpTypeBEPS = 0.0;
-        ort->gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, numResourceTypes);
+        ort->gatherDemandEndUseSub.allocate(
+            state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->gatherDemandEndUseSub = 0.0;
         ort->gatherDemandIndEndUseSub.allocate(
-            state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, numResourceTypes);
+            state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->gatherDemandIndEndUseSub = 0.0;
 
         // get meter numbers for other meters relating to electric load components
@@ -3556,7 +3556,7 @@ void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
                         elapsedTime = state.dataGlobal->TimeStepZone;
                     }
                     if (ort->OutputTableBinned(iInObj).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                        curValue /= (elapsedTime * DataGlobalConstants::SecInHour);
+                        curValue /= (elapsedTime * Constant::SecInHour);
                     }
                     // round the value to the number of signficant digits used in the final output report
                     if (curIntervalSize < 1) {
@@ -4004,7 +4004,7 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
                 ort->gatherTotalsBEPS(iResource) += curResMeterValue;
             }
 
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 int curEndUseMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                 if (curEndUseMeterNumber > 0) {
                     Real64 curEndUseMeterValue = GetCurrentMeterValue(state, curEndUseMeterNumber);
@@ -4170,7 +4170,7 @@ void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state,
                 }
             }
 
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 if (ort->ffSchedUsed(iResource)) {
                     curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                     if (curMeterNumber > 0) {
@@ -4289,7 +4289,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
                     ort->gatherDemandTimeStamp(iResource) = timestepTimeStamp;
                     // if new peak demand is set, then gather all of the end use values at this particular
                     // time to find the components of the peak demand
-                    for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+                    for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                         curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                         if (curMeterNumber > 0) {
                             curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
@@ -4312,7 +4312,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     if ((ort->displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::Zone)) {
         // loop through all of the resources and end uses for the entire facility
         for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                 if (curMeterNumber > 0) {
                     curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
@@ -4350,15 +4350,15 @@ void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepTy
 
     // Only gather zone report at zone time steps
     if (t_timeStepType == OutputProcessor::TimeStepType::Zone) {
-        state.dataHeatBal->BuildingPreDefRep.emiEnvelopConv += state.dataHeatBalSurf->SumSurfaceHeatEmission * DataGlobalConstants::convertJtoGJ;
+        state.dataHeatBal->BuildingPreDefRep.emiEnvelopConv += state.dataHeatBalSurf->SumSurfaceHeatEmission * Constant::convertJtoGJ;
         return;
     }
 
     CalcHeatEmissionReport(state);
-    state.dataHeatBal->BuildingPreDefRep.emiZoneExfiltration += state.dataHeatBal->ZoneTotalExfiltrationHeatLoss * DataGlobalConstants::convertJtoGJ;
-    state.dataHeatBal->BuildingPreDefRep.emiZoneExhaust += state.dataHeatBal->ZoneTotalExhaustHeatLoss * DataGlobalConstants::convertJtoGJ;
-    state.dataHeatBal->BuildingPreDefRep.emiHVACRelief += state.dataHeatBal->SysTotalHVACReliefHeatLoss * DataGlobalConstants::convertJtoGJ;
-    state.dataHeatBal->BuildingPreDefRep.emiHVACReject += state.dataHeatBal->SysTotalHVACRejectHeatLoss * DataGlobalConstants::convertJtoGJ;
+    state.dataHeatBal->BuildingPreDefRep.emiZoneExfiltration += state.dataHeatBal->ZoneTotalExfiltrationHeatLoss * Constant::convertJtoGJ;
+    state.dataHeatBal->BuildingPreDefRep.emiZoneExhaust += state.dataHeatBal->ZoneTotalExhaustHeatLoss * Constant::convertJtoGJ;
+    state.dataHeatBal->BuildingPreDefRep.emiHVACRelief += state.dataHeatBal->SysTotalHVACReliefHeatLoss * Constant::convertJtoGJ;
+    state.dataHeatBal->BuildingPreDefRep.emiHVACReject += state.dataHeatBal->SysTotalHVACRejectHeatLoss * Constant::convertJtoGJ;
 
     state.dataHeatBal->BuildingPreDefRep.emiTotHeat =
         state.dataHeatBal->BuildingPreDefRep.emiEnvelopConv + state.dataHeatBal->BuildingPreDefRep.emiZoneExfiltration +
@@ -4464,7 +4464,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).EvapCondPumpElecConsumption + DXCoil(iCoil).BasinHeaterConsumption +
                                                                  DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
             }
-            if (DXCoil(iCoil).FuelTypeNum != DataGlobalConstants::eResource::Electricity) {
+            if (DXCoil(iCoil).FuelTypeNum != Constant::eResource::Electricity) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
             }
         } else if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
@@ -6312,9 +6312,8 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         }
         // full load hours per week
         if ((state.dataHeatBal->Lights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS) > 0) {
-            state.dataOutRptTab->HrsPerWeek =
-                24 * 7 * state.dataHeatBal->Lights(iLight).SumConsumption /
-                (state.dataHeatBal->Lights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour);
+            state.dataOutRptTab->HrsPerWeek = 24 * 7 * state.dataHeatBal->Lights(iLight).SumConsumption /
+                                              (state.dataHeatBal->Lights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS * Constant::SecInHour);
             PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchInLtFullLoadHrs, state.dataHeatBal->Lights(iLight).Name, state.dataOutRptTab->HrsPerWeek);
         }
@@ -6351,7 +6350,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         if ((state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS) > 0) {
             state.dataOutRptTab->HrsPerWeek =
                 24 * 7 * state.dataExteriorEnergyUse->ExteriorLights(iLight).SumConsumption /
-                (state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS * DataGlobalConstants::SecInHour);
+                (state.dataExteriorEnergyUse->ExteriorLights(iLight).DesignLevel * ort->gatherElapsedTimeBEPS * Constant::SecInHour);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchExLtFullLoadHrs,
                              state.dataExteriorEnergyUse->ExteriorLights(iLight).Name,
@@ -6538,7 +6537,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                     state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, Zone(iZone).Name, ZonePreDefRep(iZone).TotVentTimeNonZeroUnocc);
 
                 if (Zone(iZone).isNominalOccupied && (ZonePreDefRep(iZone).TotTimeOcc > 0.0)) {
-                    Real64 totTimeOccSec = ZonePreDefRep(iZone).TotTimeOcc * SecInHour;
+                    Real64 totTimeOccSec = ZonePreDefRep(iZone).TotTimeOcc * Constant::SecInHour;
                     // Mechanical ventilation
                     Real64 mechVent = ZonePreDefRep(iZone).MechVentVolTotalOccStdDen / totTimeOccSec;
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzMechVent, Zone(iZone).Name, mechVent, 4);
@@ -6653,7 +6652,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
 
         if (state.dataSysRpts->SysPreDefRep(iSys).TimeOccupiedTotal > 0.0) {
             // Average Outdoor Air During Occupancy by Airloop
-            Real64 totTimeOccSec = state.dataSysRpts->SysPreDefRep(iSys).TimeOccupiedTotal * SecInHour;
+            Real64 totTimeOccSec = state.dataSysRpts->SysPreDefRep(iSys).TimeOccupiedTotal * Constant::SecInHour;
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaOccAlMechVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
@@ -6694,7 +6693,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                 Real64 avgFlow = 0.0;
                 int time = state.dataSysRpts->SysPreDefRep(sysNum).TimeAtOALimitOcc[limitingFactorType];
                 if (time > 0) {
-                    avgFlow = state.dataSysRpts->SysPreDefRep(sysNum).MechVentTotAtLimitOcc[limitingFactorType] / (time * SecInHour);
+                    avgFlow = state.dataSysRpts->SysPreDefRep(sysNum).MechVentTotAtLimitOcc[limitingFactorType] / (time * Constant::SecInHour);
                 } else {
                     avgFlow = 0.0;
                 }
@@ -6823,96 +6822,48 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         // annual
         // PreDefTableEntry(state,  pdchSHGSAnHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacHt * convertJtoGJ, 3 );
         // PreDefTableEntry(state,  pdchSHGSAnHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacCl * convertJtoGJ, 3 );
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnZoneEqHt,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnZoneEqHt * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnZoneEqCl,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnZoneEqCl * DataGlobalConstants::convertJtoGJ,
-                         3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnZoneEqHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqHt * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnZoneEqCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqCl * Constant::convertJtoGJ, 3);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchSHGSAnHvacATUHt,
                          Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnHvacATUHt * DataGlobalConstants::convertJtoGJ,
+                         ZonePreDefRep(iZone).SHGSAnHvacATUHt * Constant::convertJtoGJ,
                          3);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchSHGSAnHvacATUCl,
                          Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnHvacATUCl * DataGlobalConstants::convertJtoGJ,
+                         ZonePreDefRep(iZone).SHGSAnHvacATUCl * Constant::convertJtoGJ,
                          3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnSurfHt,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnSurfHt * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnSurfCl,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnSurfCl * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnPeoplAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnPeoplAdd * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnLiteAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnLiteAdd * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnEquipAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnEquipAdd * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnWindAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnWindAdd * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnIzaAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnIzaAdd * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnInfilAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnInfilAdd * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnOtherAdd,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnOtherAdd * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnEquipRem,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnEquipRem * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnWindRem,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnWindRem * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnIzaRem,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnIzaRem * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnInfilRem,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnInfilRem * DataGlobalConstants::convertJtoGJ,
-                         3);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchSHGSAnOtherRem,
-                         Zone(iZone).Name,
-                         ZonePreDefRep(iZone).SHGSAnOtherRem * DataGlobalConstants::convertJtoGJ,
-                         3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnSurfHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfHt * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnSurfCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfCl * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnPeoplAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnPeoplAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnLiteAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnLiteAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnEquipAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnEquipAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnWindAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnWindAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnIzaAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnIzaAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnInfilAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnInfilAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnOtherAdd, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnOtherAdd * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnEquipRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnEquipRem * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnWindRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnWindRem * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnIzaRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnIzaRem * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnInfilRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnInfilRem * Constant::convertJtoGJ, 3);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchSHGSAnOtherRem, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnOtherRem * Constant::convertJtoGJ, 3);
         // peak cooling
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchSHGSClTimePeak, Zone(iZone).Name, DateToString(ZonePreDefRep(iZone).clPtTimeStamp));
         // PreDefTableEntry(state,  pdchSHGSClHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSClHvacHt );
@@ -6993,96 +6944,42 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
     }
     // PreDefTableEntry(state,  pdchSHGSAnHvacHt, "Total Facility", totalHvacHt * convertJtoGJ, 3 );
     // PreDefTableEntry(state,  pdchSHGSAnHvacCl, "Total Facility", totalHvacCl * convertJtoGJ, 3 );
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnZoneEqHt,
-                     "Total Facility",
-                     state.dataOutRptTab->totalZoneEqHt * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnZoneEqCl,
-                     "Total Facility",
-                     state.dataOutRptTab->totalZoneEqCl * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnHvacATUHt,
-                     "Total Facility",
-                     state.dataOutRptTab->totalHvacATUHt * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnHvacATUCl,
-                     "Total Facility",
-                     state.dataOutRptTab->totalHvacATUCl * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnSurfHt,
-                     "Total Facility",
-                     state.dataOutRptTab->totalSurfHt * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnSurfCl,
-                     "Total Facility",
-                     state.dataOutRptTab->totalSurfCl * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnPeoplAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalPeoplAdd * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnLiteAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalLiteAdd * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnEquipAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalEquipAdd * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnWindAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalWindAdd * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnIzaAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalIzaAdd * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnInfilAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalInfilAdd * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnOtherAdd,
-                     "Total Facility",
-                     state.dataOutRptTab->totalOtherAdd * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnEquipRem,
-                     "Total Facility",
-                     state.dataOutRptTab->totalEquipRem * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnWindRem,
-                     "Total Facility",
-                     state.dataOutRptTab->totalWindRem * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnIzaRem,
-                     "Total Facility",
-                     state.dataOutRptTab->totalIzaRem * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnInfilRem,
-                     "Total Facility",
-                     state.dataOutRptTab->totalInfilRem * DataGlobalConstants::convertJtoGJ,
-                     3);
-    PreDefTableEntry(state,
-                     state.dataOutRptPredefined->pdchSHGSAnOtherRem,
-                     "Total Facility",
-                     state.dataOutRptTab->totalOtherRem * DataGlobalConstants::convertJtoGJ,
-                     3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnZoneEqHt, "Total Facility", state.dataOutRptTab->totalZoneEqHt * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnZoneEqCl, "Total Facility", state.dataOutRptTab->totalZoneEqCl * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnHvacATUHt, "Total Facility", state.dataOutRptTab->totalHvacATUHt * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnHvacATUCl, "Total Facility", state.dataOutRptTab->totalHvacATUCl * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnSurfHt, "Total Facility", state.dataOutRptTab->totalSurfHt * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnSurfCl, "Total Facility", state.dataOutRptTab->totalSurfCl * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnPeoplAdd, "Total Facility", state.dataOutRptTab->totalPeoplAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnLiteAdd, "Total Facility", state.dataOutRptTab->totalLiteAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnEquipAdd, "Total Facility", state.dataOutRptTab->totalEquipAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnWindAdd, "Total Facility", state.dataOutRptTab->totalWindAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnIzaAdd, "Total Facility", state.dataOutRptTab->totalIzaAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnInfilAdd, "Total Facility", state.dataOutRptTab->totalInfilAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnOtherAdd, "Total Facility", state.dataOutRptTab->totalOtherAdd * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnEquipRem, "Total Facility", state.dataOutRptTab->totalEquipRem * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnWindRem, "Total Facility", state.dataOutRptTab->totalWindRem * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnIzaRem, "Total Facility", state.dataOutRptTab->totalIzaRem * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnInfilRem, "Total Facility", state.dataOutRptTab->totalInfilRem * Constant::convertJtoGJ, 3);
+    PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchSHGSAnOtherRem, "Total Facility", state.dataOutRptTab->totalOtherRem * Constant::convertJtoGJ, 3);
     // building level results for peak cooling
     PreDefTableEntry(
         state, state.dataOutRptPredefined->pdchSHGSClTimePeak, "Total Facility", DateToString(state.dataHeatBal->BuildingPreDefRep.clPtTimeStamp));
@@ -7937,10 +7834,10 @@ void WriteBEPSTable(EnergyPlusData &state)
     Array2D<Real64> useVal(13, 15);
     Array2D<Real64> normalVal(13, 4);
     Array1D<Real64> collapsedTotal(13);
-    Array2D<Real64> collapsedEndUse(13, DataGlobalConstantsData::iEndUseSize);
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 13);
-    Array2D<Real64> endUseSubOther(13, DataGlobalConstantsData::iEndUseSize);
-    Array3D<Real64> collapsedEndUseSpType(state.dataOutputProcessor->maxNumEndUseSpaceTypes, DataGlobalConstantsData::iEndUseSize, 13);
+    Array2D<Real64> collapsedEndUse(13, static_cast<int>(Constant::EndUse::Num));
+    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
+    Array2D<Real64> endUseSubOther(13, static_cast<int>(Constant::EndUse::Num));
+    Array3D<Real64> collapsedEndUseSpType(state.dataOutputProcessor->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), 13);
     Real64 totalOnsiteHeat;
     Real64 totalOnsiteWater;
     Real64 totalWater;
@@ -8016,7 +7913,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             // determine building floor areas
             DetermineBuildingFloorArea(state);
             // collapse the gatherEndUseBEPS array to the resource groups displayed
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 collapsedEndUse(1, jEndUse) = ort->gatherEndUseBEPS(1, jEndUse);   // electricity
                 collapsedEndUse(2, jEndUse) = ort->gatherEndUseBEPS(2, jEndUse);   // natural gas
                 collapsedEndUse(3, jEndUse) = ort->gatherEndUseBEPS(6, jEndUse);   // gasoline
@@ -8074,7 +7971,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                                                    format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
                 }
             }
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1);   // electricity
                     collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 2);   // natural gas
@@ -8141,7 +8038,7 @@ void WriteBEPSTable(EnergyPlusData &state)
 
             // convert units into GJ (divide by 1,000,000,000) if J otherwise kWh
             for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                     collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
                     for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         collapsedEndUseSub(kEndUseSub, jEndUse, iResource) /= largeConversionFactor;
@@ -8153,7 +8050,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 collapsedTotal(iResource) /= largeConversionFactor;
             }
             // do water
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 collapsedEndUse(13, jEndUse) /= waterConversionFactor;
                 for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 13) /= waterConversionFactor;
@@ -8207,9 +8104,9 @@ void WriteBEPSTable(EnergyPlusData &state)
             // determine which resource is the primary heating resourse
             resourcePrimaryHeating = 0;
             heatingMaximum = 0.0;
-            for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                if (collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)) > heatingMaximum) {
-                    heatingMaximum = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
+            for (iResource = 1; iResource <= 12; ++iResource) {                                                     // don't do water
+                if (collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating) + 1) > heatingMaximum) { // +1 because enum is 0-based
+                    heatingMaximum = collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating) + 1);
                     resourcePrimaryHeating = iResource;
                 }
             }
@@ -8683,38 +8580,26 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth = 10; // array assignment - same for all columns
             tableBody.allocate(13, 16);
             for (iResource = 1; iResource <= 13; ++iResource) {
-                useVal(iResource, 1) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                useVal(iResource, 2) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                useVal(iResource, 3) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                useVal(iResource, 4) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
-                useVal(iResource, 5) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
-                useVal(iResource, 6) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                useVal(iResource, 7) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                useVal(iResource, 8) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                useVal(iResource, 9) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                useVal(iResource, 10) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                useVal(iResource, 11) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                useVal(iResource, 12) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                useVal(iResource, 13) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                useVal(iResource, 14) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
-
+                for (int iEndUse = 0; iEndUse < static_cast<int>(Constant::EndUse::Num); ++iEndUse) {
+                    useVal(iResource, iEndUse + 1) = collapsedEndUse(iResource, iEndUse + 1);
+                }
                 useVal(iResource, 15) = collapsedTotal(iResource); // totals
             }
 
-            rowHead(1) = "Heating";
-            rowHead(2) = "Cooling";
-            rowHead(3) = "Interior Lighting";
-            rowHead(4) = "Exterior Lighting";
-            rowHead(5) = "Interior Equipment";
-            rowHead(6) = "Exterior Equipment";
-            rowHead(7) = "Fans";
-            rowHead(8) = "Pumps";
-            rowHead(9) = "Heat Rejection";
-            rowHead(10) = "Humidification";
-            rowHead(11) = "Heat Recovery";
-            rowHead(12) = "Water Systems";
-            rowHead(13) = "Refrigeration";
-            rowHead(14) = "Generators";
+            rowHead(static_cast<int>(Constant::EndUse::Heating) + 1) = "Heating";
+            rowHead(static_cast<int>(Constant::EndUse::Cooling) + 1) = "Cooling";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorLights) + 1) = "Interior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorLights) + 1) = "Exterior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorEquipment) + 1) = "Interior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1) = "Exterior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::Fans) + 1) = "Fans";
+            rowHead(static_cast<int>(Constant::EndUse::Pumps) + 1) = "Pumps";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRejection) + 1) = "Heat Rejection";
+            rowHead(static_cast<int>(Constant::EndUse::Humidification) + 1) = "Humidification";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRecovery) + 1) = "Heat Recovery";
+            rowHead(static_cast<int>(Constant::EndUse::WaterSystem) + 1) = "Water Systems";
+            rowHead(static_cast<int>(Constant::EndUse::Refrigeration) + 1) = "Refrigeration";
+            rowHead(static_cast<int>(Constant::EndUse::Cogeneration) + 1) = "Generators";
             rowHead(15) = "";
             rowHead(16) = "Total End Uses";
 
@@ -9111,7 +8996,7 @@ void WriteBEPSTable(EnergyPlusData &state)
 
             for (iResource = 1; iResource <= 12; ++iResource) {
                 i = 1;
-                for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             if (produceTabular) {
@@ -9153,35 +9038,26 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth = 7; // array assignment - same for all columns
             tableBody.allocate(13, 4);
             for (iResource = 1; iResource <= 13; ++iResource) {
-                normalVal(iResource, 1) =
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) +
-                    collapsedEndUse(iResource,
-                                    state.dataGlobalConst->iEndUse.at(
-                                        DataGlobalConstants::EndUse::ExteriorLights)); // Lights     <- InteriorLights | <- ExteriorLights
+                // Lights     <- InteriorLights | <- ExteriorLights
+                normalVal(iResource, 1) = collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::InteriorLights) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::ExteriorLights) + 1);
 
-                normalVal(iResource, 2) =
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification)) +
-                    collapsedEndUse(iResource,
-                                    state.dataGlobalConst->iEndUse.at(
-                                        DataGlobalConstants::EndUse::WaterSystem)); // HVAC       <- fans | <- pumps | <- heating | <- cooling |
-                                                                                    // <- heat rejection | <- humidification | <- water system
-                                                                                    // domestic hot water
+                // HVAC       <- fans | <- pumps | <- heating | <- cooling | <- heat rejection | <- humidification | <- water system | <- domestic hot
+                // water
+                normalVal(iResource, 2) = collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Fans) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Pumps) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Cooling) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::HeatRejection) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Humidification) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::WaterSystem) + 1);
 
-                normalVal(iResource, 3) =
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) +
-                    collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) +
-                    collapsedEndUse(iResource,
-                                    state.dataGlobalConst->iEndUse.at(
-                                        DataGlobalConstants::EndUse::Refrigeration)); // Other      <- InteriorEquipment | <- ExteriorEquipment |
-                                                                                      // <- generator fuel | <- Heat Recovery (parasitics) | <-
-                                                                                      // Refrigeration
+                // Other <- InteriorEquipment | <- ExteriorEquipment | <- generator fuel | <- Heat Recovery (parasitics) | <- Refrigeration
+                normalVal(iResource, 3) = collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::InteriorEquipment) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Cogeneration) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::HeatRecovery) + 1) +
+                                          collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Refrigeration) + 1);
 
                 normalVal(iResource, 4) = collapsedTotal(iResource); // totals
             }
@@ -9837,11 +9713,11 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
 
     // determine number of rows and if subcategories add up to the total
     // if not, determine the difference for the 'other' row
-    for (int i = 1; i <= DataGlobalConstantsData::iEndUseSize; ++i) {
+    for (int i = 1; i <= static_cast<int>(Constant::EndUse::Num); ++i) {
         needOtherRow(i) = false; // set array to all false assuming no other rows are needed
     }
     for (int iResource = 1; iResource <= 13; ++iResource) {
-        for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+        for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
             if (tableType == EndUseSubTableType::BySubCategory) {
                 numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
             } else if (tableType == EndUseSubTableType::BySpaceType) {
@@ -9866,7 +9742,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
         }
     }
 
-    for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+    for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
         if (tableType == EndUseSubTableType::BySubCategory) {
             numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
         } else if (tableType == EndUseSubTableType::BySpaceType) {
@@ -9897,7 +9773,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
 
     // Build row head and subcategories columns
     int i = 1;
-    for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+    for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
         if (tableType == EndUseSubTableType::BySubCategory) {
             numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
         } else if (tableType == EndUseSubTableType::BySpaceType) {
@@ -9930,7 +9806,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
 
     for (int iResource = 1; iResource <= 13; ++iResource) {
         i = 1;
-        for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+        for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
             if (tableType == EndUseSubTableType::BySubCategory) {
                 numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
             } else if (tableType == EndUseSubTableType::BySpaceType) {
@@ -10018,8 +9894,8 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
     // all arrays are in the format: (row, columnm)
     Array2D<Real64> useVal(13, 15);
     Array1D<Real64> collapsedTotal(13);
-    Array2D<Real64> collapsedEndUse(13, DataGlobalConstantsData::iEndUseSize);
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 13);
+    Array2D<Real64> collapsedEndUse(13, static_cast<int>(Constant::EndUse::Num));
+    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
     int iResource;
     Real64 largeConversionFactor;
     Real64 areaConversionFactor;
@@ -10046,7 +9922,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
             if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
             // collapse the gatherEndUseBEPS array to the resource groups displayed
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 collapsedEndUse(1, jEndUse) = ort->gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
                 collapsedEndUse(2, jEndUse) = ort->gatherEndUseBySourceBEPS(2, jEndUse);   // natural gas
                 collapsedEndUse(3, jEndUse) = ort->gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
@@ -10097,7 +9973,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
             // convert units into MJ (divide by 1,000,000) if J otherwise kWh
             for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                     collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
                 }
                 collapsedTotal(iResource) /= largeConversionFactor;
@@ -10109,38 +9985,26 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
             columnWidth = 10; // array assignment - same for all columns
             tableBody.allocate(12, 16);
             for (iResource = 1; iResource <= 13; ++iResource) {
-                useVal(iResource, 1) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                useVal(iResource, 2) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                useVal(iResource, 3) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                useVal(iResource, 4) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
-                useVal(iResource, 5) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
-                useVal(iResource, 6) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                useVal(iResource, 7) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                useVal(iResource, 8) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                useVal(iResource, 9) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                useVal(iResource, 10) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                useVal(iResource, 11) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                useVal(iResource, 12) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                useVal(iResource, 13) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                useVal(iResource, 14) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
-
+                for (int iEndUse = 0; iEndUse < static_cast<int>(Constant::EndUse::Num); ++iEndUse) {
+                    useVal(iResource, iEndUse + 1) = collapsedEndUse(iResource, iEndUse + 1);
+                }
                 useVal(iResource, 15) = collapsedTotal(iResource); // totals
             }
 
-            rowHead(1) = "Heating";
-            rowHead(2) = "Cooling";
-            rowHead(3) = "Interior Lighting";
-            rowHead(4) = "Exterior Lighting";
-            rowHead(5) = "Interior Equipment";
-            rowHead(6) = "Exterior Equipment";
-            rowHead(7) = "Fans";
-            rowHead(8) = "Pumps";
-            rowHead(9) = "Heat Rejection";
-            rowHead(10) = "Humidification";
-            rowHead(11) = "Heat Recovery";
-            rowHead(12) = "Water Systems";
-            rowHead(13) = "Refrigeration";
-            rowHead(14) = "Generators";
+            rowHead(static_cast<int>(Constant::EndUse::Heating) + 1) = "Heating";
+            rowHead(static_cast<int>(Constant::EndUse::Cooling) + 1) = "Cooling";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorLights) + 1) = "Interior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorLights) + 1) = "Exterior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorEquipment) + 1) = "Interior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1) = "Exterior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::Fans) + 1) = "Fans";
+            rowHead(static_cast<int>(Constant::EndUse::Pumps) + 1) = "Pumps";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRejection) + 1) = "Heat Rejection";
+            rowHead(static_cast<int>(Constant::EndUse::Humidification) + 1) = "Humidification";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRecovery) + 1) = "Heat Recovery";
+            rowHead(static_cast<int>(Constant::EndUse::WaterSystem) + 1) = "Water Systems";
+            rowHead(static_cast<int>(Constant::EndUse::Refrigeration) + 1) = "Refrigeration";
+            rowHead(static_cast<int>(Constant::EndUse::Cogeneration) + 1) = "Generators";
             rowHead(15) = "";
             rowHead(16) = "Total Source Energy End Use Components";
 
@@ -10196,7 +10060,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
             tableBody = "";
             for (iResource = 1; iResource <= 12; ++iResource) {
-                for (int jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                     tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / largeConversionFactor, 2);
                 }
                 tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / largeConversionFactor, 2);
@@ -10394,12 +10258,12 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
     // all arrays are in the format: (row, column)
     Array2D<Real64> useVal(13, 15);
     Array1D<Real64> collapsedTotal(13);
-    Array2D<Real64> collapsedEndUse(13, DataGlobalConstantsData::iEndUseSize);
-    Array2D<Real64> collapsedIndEndUse(13, DataGlobalConstantsData::iEndUseSize);
+    Array2D<Real64> collapsedEndUse(13, static_cast<int>(Constant::EndUse::Num));
+    Array2D<Real64> collapsedIndEndUse(13, static_cast<int>(Constant::EndUse::Num));
     Array1D_int collapsedTimeStep(13);
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 13);
-    Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 13);
-    Array2D<Real64> endUseSubOther(13, DataGlobalConstantsData::iEndUseSize);
+    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
+    Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
+    Array2D<Real64> endUseSubOther(13, static_cast<int>(Constant::EndUse::Num));
     int iResource;
     int kEndUseSub;
     int i;
@@ -10479,7 +10343,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
             // collapse the gatherEndUseBEPS array to the resource groups displayed
             collapsedEndUse = 0.0;
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 collapsedEndUse(1, jEndUse) = ort->gatherDemandEndUse(1, jEndUse) * powerConversion;                  // electricity
                 collapsedEndUse(2, jEndUse) = ort->gatherDemandEndUse(2, jEndUse) * powerConversion;                  // natural gas
                 collapsedEndUse(3, jEndUse) = ort->gatherDemandEndUse(6, jEndUse) * powerConversion;                  // gasoline
@@ -10494,7 +10358,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 collapsedEndUse(12, jEndUse) = ort->gatherDemandEndUse(distrHeatSelected, jEndUse) * powerConversion; // district heating
                 collapsedEndUse(13, jEndUse) = ort->gatherDemandEndUse(7, jEndUse) * flowConversion;                  // water
             }
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion; // electricity
                     collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 2) * powerConversion; // natural gas
@@ -10519,7 +10383,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             // collapse the gatherEndUseBEPS array to the resource groups displayed
             // no unit conversion, it is done at the reporting stage if necessary
             collapsedIndEndUse = 0.0;
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 collapsedIndEndUse(1, jEndUse) = ort->gatherDemandIndEndUse(1, jEndUse);                  // electricity
                 collapsedIndEndUse(2, jEndUse) = ort->gatherDemandIndEndUse(2, jEndUse);                  // natural gas
                 collapsedIndEndUse(3, jEndUse) = ort->gatherDemandIndEndUse(6, jEndUse);                  // gasoline
@@ -10534,7 +10398,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 collapsedIndEndUse(12, jEndUse) = ort->gatherDemandIndEndUse(distrHeatSelected, jEndUse); // district heating
                 collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);                 // water
             }
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
                     collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
@@ -10574,38 +10438,27 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             columnWidth = 10; // array assignment - same for all columns
             tableBody.allocate(13, 17);
             for (iResource = 1; iResource <= 13; ++iResource) {
-                useVal(iResource, 1) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                useVal(iResource, 2) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                useVal(iResource, 3) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                useVal(iResource, 4) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
-                useVal(iResource, 5) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
-                useVal(iResource, 6) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                useVal(iResource, 7) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                useVal(iResource, 8) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                useVal(iResource, 9) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                useVal(iResource, 10) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                useVal(iResource, 11) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                useVal(iResource, 12) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                useVal(iResource, 13) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                useVal(iResource, 14) = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+                for (int iEndUse = 0; iEndUse < static_cast<int>(Constant::EndUse::Num); ++iEndUse) {
+                    useVal(iResource, iEndUse + 1) = collapsedEndUse(iResource, iEndUse + 1);
+                }
                 useVal(iResource, 15) = collapsedTotal(iResource); // totals
             }
 
             rowHead(1) = "Time of Peak";
-            rowHead(2) = "Heating";
-            rowHead(3) = "Cooling";
-            rowHead(4) = "Interior Lighting";
-            rowHead(5) = "Exterior Lighting";
-            rowHead(6) = "Interior Equipment";
-            rowHead(7) = "Exterior Equipment";
-            rowHead(8) = "Fans";
-            rowHead(9) = "Pumps";
-            rowHead(10) = "Heat Rejection";
-            rowHead(11) = "Humidification";
-            rowHead(12) = "Heat Recovery";
-            rowHead(13) = "Water Systems";
-            rowHead(14) = "Refrigeration";
-            rowHead(15) = "Generators";
+            rowHead(static_cast<int>(Constant::EndUse::Heating) + 2) = "Heating";
+            rowHead(static_cast<int>(Constant::EndUse::Cooling) + 2) = "Cooling";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorLights) + 2) = "Interior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorLights) + 2) = "Exterior Lighting";
+            rowHead(static_cast<int>(Constant::EndUse::InteriorEquipment) + 2) = "Interior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::ExteriorEquipment) + 2) = "Exterior Equipment";
+            rowHead(static_cast<int>(Constant::EndUse::Fans) + 2) = "Fans";
+            rowHead(static_cast<int>(Constant::EndUse::Pumps) + 2) = "Pumps";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRejection) + 2) = "Heat Rejection";
+            rowHead(static_cast<int>(Constant::EndUse::Humidification) + 2) = "Humidification";
+            rowHead(static_cast<int>(Constant::EndUse::HeatRecovery) + 2) = "Heat Recovery";
+            rowHead(static_cast<int>(Constant::EndUse::WaterSystem) + 2) = "Water Systems";
+            rowHead(static_cast<int>(Constant::EndUse::Refrigeration) + 2) = "Refrigeration";
+            rowHead(static_cast<int>(Constant::EndUse::Cogeneration) + 2) = "Generators";
             rowHead(16) = "";
             rowHead(17) = "Total End Uses";
 
@@ -10682,7 +10535,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
             //---- End Uses By Subcategory Sub-Table
             numRows = 0;
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         ++numRows;
@@ -10703,7 +10556,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
             // Build row head and subcategories columns
             i = 1;
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
                 if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
@@ -10762,7 +10615,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
             for (iResource = 1; iResource <= 13; ++iResource) {
                 i = 1;
-                for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
@@ -10814,7 +10667,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
         // EAp2-4/5. Performance Rating Method Compliance
         for (iResource = 1; iResource <= 13; ++iResource) {
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 if (ort->needOtherRowLEED45(jEndUse)) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories == 0) {
                         endUseSubOther(iResource, jEndUse) =
@@ -10850,7 +10703,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
         for (iResource = 1; iResource <= 12; ++iResource) {
             i = 1;
-            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         PreDefTableEntry(state,

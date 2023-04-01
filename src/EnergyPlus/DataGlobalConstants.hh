@@ -48,16 +48,13 @@
 #ifndef DataGlobalConstants_hh_INCLUDED
 #define DataGlobalConstants_hh_INCLUDED
 
-// C++ Headers
-#include <map>
-
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-namespace DataGlobalConstants {
+namespace Constant {
 
     enum class EndUse
     {
@@ -345,85 +342,8 @@ namespace DataGlobalConstants {
     Real64 constexpr StefanBoltzmann = 5.6697E-8;           // Stefan-Boltzmann constant in W/(m2*K4)
     Real64 constexpr UniversalGasConst = 8314.462175;       // Universal Gas Constant (J/mol*K)
     Real64 constexpr convertJtoGJ = 1.0E-9;                 // Conversion factor for J to GJ
-    int constexpr MaxSpeedLevels = 10;                      // Maximum number of speed that supports
-    int constexpr ScheduleAlwaysOn = -1;                    // Value when passed to schedule routines gives back 1.0 (on)
-    int constexpr MaxCTFTerms = 19; // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
 
-} // namespace DataGlobalConstants
-
-struct DataGlobalConstantsData : BaseGlobalStruct
-{
-    std::map<DataGlobalConstants::EndUse, int> iEndUse = {
-        {DataGlobalConstants::EndUse::Heating, 1},
-        {DataGlobalConstants::EndUse::Cooling, 2},
-        {DataGlobalConstants::EndUse::InteriorLights, 3},
-        {DataGlobalConstants::EndUse::ExteriorLights, 4},
-        {DataGlobalConstants::EndUse::InteriorEquipment, 5},
-        {DataGlobalConstants::EndUse::ExteriorEquipment, 6},
-        {DataGlobalConstants::EndUse::Fans, 7},
-        {DataGlobalConstants::EndUse::Pumps, 8},
-        {DataGlobalConstants::EndUse::HeatRejection, 9},
-        {DataGlobalConstants::EndUse::Humidification, 10},
-        {DataGlobalConstants::EndUse::HeatRecovery, 11},
-        {DataGlobalConstants::EndUse::WaterSystem, 12},
-        {DataGlobalConstants::EndUse::Refrigeration, 13},
-        {DataGlobalConstants::EndUse::Cogeneration, 14},
-    };
-    static int constexpr iEndUseSize = 14;
-
-    std::vector<DataGlobalConstants::eResource> AllResourceTypes = {DataGlobalConstants::eResource::Invalid,
-                                                                    DataGlobalConstants::eResource::Electricity,
-                                                                    DataGlobalConstants::eResource::NaturalGas,
-                                                                    DataGlobalConstants::eResource::Gasoline,
-                                                                    DataGlobalConstants::eResource::Diesel,
-                                                                    DataGlobalConstants::eResource::Coal,
-                                                                    DataGlobalConstants::eResource::Propane,
-                                                                    DataGlobalConstants::eResource::FuelOilNo1,
-                                                                    DataGlobalConstants::eResource::FuelOilNo2,
-                                                                    DataGlobalConstants::eResource::OtherFuel1,
-                                                                    DataGlobalConstants::eResource::OtherFuel2,
-                                                                    DataGlobalConstants::eResource::DistrictCooling,
-                                                                    DataGlobalConstants::eResource::DistrictHeating,
-                                                                    DataGlobalConstants::eResource::Water,
-                                                                    DataGlobalConstants::eResource::EnergyTransfer,
-                                                                    DataGlobalConstants::eResource::Steam,
-                                                                    DataGlobalConstants::eResource::ElectricityProduced,
-                                                                    DataGlobalConstants::eResource::ElectricityPurchased,
-                                                                    DataGlobalConstants::eResource::ElectricitySurplusSold,
-                                                                    DataGlobalConstants::eResource::ElectricityNet,
-                                                                    DataGlobalConstants::eResource::SolarWater,
-                                                                    DataGlobalConstants::eResource::SolarAir,
-                                                                    DataGlobalConstants::eResource::CarbonEquivalent,
-                                                                    DataGlobalConstants::eResource::PlantLoopHeatingDemand,
-                                                                    DataGlobalConstants::eResource::PlantLoopCoolingDemand,
-                                                                    DataGlobalConstants::eResource::OnSiteWater,
-                                                                    DataGlobalConstants::eResource::MainsWater,
-                                                                    DataGlobalConstants::eResource::RainWater,
-                                                                    DataGlobalConstants::eResource::WellWater,
-                                                                    DataGlobalConstants::eResource::Condensate,
-                                                                    DataGlobalConstants::eResource::WaterEnvironmentalFactors,
-                                                                    DataGlobalConstants::eResource::Source,
-                                                                    DataGlobalConstants::eResource::SO2,
-                                                                    DataGlobalConstants::eResource::NOx,
-                                                                    DataGlobalConstants::eResource::N2O,
-                                                                    DataGlobalConstants::eResource::PM,
-                                                                    DataGlobalConstants::eResource::PM2_5,
-                                                                    DataGlobalConstants::eResource::PM10,
-                                                                    DataGlobalConstants::eResource::CO,
-                                                                    DataGlobalConstants::eResource::CO2,
-                                                                    DataGlobalConstants::eResource::CH4,
-                                                                    DataGlobalConstants::eResource::NH3,
-                                                                    DataGlobalConstants::eResource::NMVOC,
-                                                                    DataGlobalConstants::eResource::Hg,
-                                                                    DataGlobalConstants::eResource::Pb,
-                                                                    DataGlobalConstants::eResource::NuclearHigh,
-                                                                    DataGlobalConstants::eResource::NuclearLow};
-
-    void clear_state() override
-    {
-        // nothing to clear
-    }
-};
+} // namespace Constant
 
 } // namespace EnergyPlus
 

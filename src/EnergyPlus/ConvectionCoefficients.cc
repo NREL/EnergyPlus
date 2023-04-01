@@ -458,8 +458,8 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
         state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
     }
 
-    Real64 TAir = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + DataGlobalConstants::KelvinConv;
-    Real64 TSurf = TempExt + DataGlobalConstants::KelvinConv;
+    Real64 TAir = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::KelvinConv;
+    Real64 TSurf = TempExt + Constant::KelvinConv;
     Real64 TSky = state.dataEnvrn->SkyTempKelvin;
     Real64 TGround = TAir;
 
@@ -467,12 +467,12 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
         int SrdSurfsNum = surface.SurfSurroundingSurfacesNum;
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
             TSky = ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) +
-                   DataGlobalConstants::KelvinConv;
+                   Constant::KelvinConv;
         }
     }
     if (surface.UseSurfPropertyGndSurfTemp) {
         int gndSurfsNum = surface.SurfPropertyGndSurfIndex;
-        TGround = state.dataSurface->GroundSurfsProperty(gndSurfsNum).SurfsTempAvg + DataGlobalConstants::KelvinConv;
+        TGround = state.dataSurface->GroundSurfsProperty(gndSurfsNum).SurfsTempAvg + Constant::KelvinConv;
     }
 
     int BaseSurf = surface.BaseSurf; // If this is a base surface, BaseSurf = SurfNum
@@ -682,7 +682,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
         HSky = 0.0;
     } else {
         // Compute sky radiation coefficient
-        HSky = DataGlobalConstants::StefanBoltzmann * AbsExt * surface.ViewFactorSkyIR * state.dataSurface->SurfAirSkyRadSplit(SurfNum) *
+        HSky = Constant::StefanBoltzmann * AbsExt * surface.ViewFactorSkyIR * state.dataSurface->SurfAirSkyRadSplit(SurfNum) *
                (pow_4(TSurf) - pow_4(TSky)) / (TSurf - TSky);
     }
 
@@ -691,10 +691,10 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
         HAir = 0.0;
     } else {
         // Compute ground radiation coefficient
-        HGround = DataGlobalConstants::StefanBoltzmann * AbsExt * surface.ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
+        HGround = Constant::StefanBoltzmann * AbsExt * surface.ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
 
         // Compute air radiation coefficient
-        HAir = DataGlobalConstants::StefanBoltzmann * AbsExt * surface.ViewFactorSkyIR * (1.0 - state.dataSurface->SurfAirSkyRadSplit(SurfNum)) *
+        HAir = Constant::StefanBoltzmann * AbsExt * surface.ViewFactorSkyIR * (1.0 - state.dataSurface->SurfAirSkyRadSplit(SurfNum)) *
                (pow_4(TSurf) - pow_4(TAir)) / (TSurf - TAir);
     }
 }
@@ -3354,7 +3354,7 @@ Real64 CalcZoneSystemACH(EnergyPlusData &state, int const ZoneNum)
         Real64 ZoneVolFlowRate = CalcZoneSystemVolFlowRate(state, ZoneNum);
 
         // Calculate ACH
-        return ZoneVolFlowRate / ZoneVolume * DataGlobalConstants::SecInHour;
+        return ZoneVolFlowRate / ZoneVolume * Constant::SecInHour;
     }
 }
 
@@ -3582,7 +3582,7 @@ void CalcCeilingDiffuserInletCorr(EnergyPlusData &state,
             ACH = 0.0;
         } else {
             // Calculate ACH
-            ACH = ZoneMassFlowRate / AirDensity / ZoneVolume * DataGlobalConstants::SecInHour;
+            ACH = ZoneMassFlowRate / AirDensity / ZoneVolume * Constant::SecInHour;
             // Limit ACH to range of correlation
             ACH = min(ACH, MaxACH);
             ACH = max(ACH, 0.0);
@@ -3722,11 +3722,11 @@ void CalcTrombeWallIntConvCoeff(EnergyPlusData &state,
         // make sure inside surface is hot, outside is cold
         // NOTE: this is not ideal.  could have circumstances that reverse this?
         if (SurfaceTemperatures(Surf1) > SurfaceTemperatures(Surf2)) {
-            Tsi = SurfaceTemperatures(Surf1) + DataGlobalConstants::KelvinConv;
-            Tso = SurfaceTemperatures(Surf2) + DataGlobalConstants::KelvinConv;
+            Tsi = SurfaceTemperatures(Surf1) + Constant::KelvinConv;
+            Tso = SurfaceTemperatures(Surf2) + Constant::KelvinConv;
         } else {
-            Tso = SurfaceTemperatures(Surf1) + DataGlobalConstants::KelvinConv;
-            Tsi = SurfaceTemperatures(Surf2) + DataGlobalConstants::KelvinConv;
+            Tso = SurfaceTemperatures(Surf1) + Constant::KelvinConv;
+            Tsi = SurfaceTemperatures(Surf2) + Constant::KelvinConv;
         }
 
         beta = 2.0 / (Tso + Tsi);
@@ -3819,7 +3819,7 @@ void CalcNusselt(EnergyPlusData &state,
     auto const &surface = state.dataSurface->Surface(SurfNum);
 
     tilt = surface.Tilt;
-    tiltr = tilt * DataGlobalConstants::DegToRadians;
+    tiltr = tilt * Constant::DegToRadians;
     costilt = surface.CosTilt;
     sintilt = surface.SinTilt;
     ra = gr * pr;
@@ -5167,7 +5167,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcFohannoPolidoriVerticalWall(Tsurf - Tamb,
                                                        WallHeight,
-                                                       Tsurf - DataGlobalConstants::KelvinConv, // Kiva already uses Kelvin, but algorithm expects C
+                                                       Tsurf - Constant::KelvinConv, // Kiva already uses Kelvin, but algorithm expects C
                                                        QdotConvection);
             };
         } else {
@@ -5978,7 +5978,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             }
         }
         GrH = (g * (Tmax - Tmin) * pow_3(Zone(ZoneNum).CeilingHeight)) /
-              ((state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + DataGlobalConstants::KelvinConv) * pow_2(v));
+              ((state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + Constant::KelvinConv) * pow_2(v));
 
         // Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
         if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
@@ -6824,7 +6824,7 @@ void CalcUserDefinedInsideHcModel(EnergyPlusData &state, int const SurfNum, int 
             state.dataEnvrn->OutBaroPress,
             state.dataLoopNodes->Node(ZoneNode).Temp,
             Psychrometrics::PsyWFnTdpPb(state, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
-        AirChangeRate = (state.dataLoopNodes->Node(ZoneNode).MassFlowRate * DataGlobalConstants::SecInHour) / (AirDensity * Zone(ZoneNum).Volume);
+        AirChangeRate = (state.dataLoopNodes->Node(ZoneNode).MassFlowRate * Constant::SecInHour) / (AirDensity * Zone(ZoneNum).Volume);
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex > 0) {
             for (int EquipNum = 1;
                  EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes;
@@ -6941,12 +6941,12 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
     case ConvectionConstants::RefWind::ParallelComp:
         // WindSpeed , WindDir, surface Azimuth
         Theta = CalcWindSurfaceTheta(state.dataEnvrn->WindDir, surface.Azimuth);
-        ThetaRad = Theta * DataGlobalConstants::DegToRadians;
+        ThetaRad = Theta * Constant::DegToRadians;
         break;
     case ConvectionConstants::RefWind::ParallelCompAtZ:
         // Surface WindSpeed , Surface WindDir, surface Azimuth
         Theta = CalcWindSurfaceTheta(state.dataSurface->SurfOutWindDir(SurfNum), surface.Azimuth);
-        ThetaRad = Theta * DataGlobalConstants::DegToRadians;
+        ThetaRad = Theta * Constant::DegToRadians;
         windVel = std::cos(ThetaRad) * state.dataSurface->SurfOutWindSpeed(SurfNum);
         break;
     default:
@@ -7999,7 +7999,7 @@ Real64 CalcFohannoPolidoriVerticalWall(Real64 const DeltaTemp, // [C] temperatur
     Real64 RaH(0.0);
     Real64 BetaFilm(0.0);
 
-    BetaFilm = 1.0 / (DataGlobalConstants::KelvinConv + SurfTemp + 0.5 * DeltaTemp); // TODO check sign on DeltaTemp
+    BetaFilm = 1.0 / (Constant::KelvinConv + SurfTemp + 0.5 * DeltaTemp); // TODO check sign on DeltaTemp
     RaH = (g * BetaFilm * QdotConv * pow_4(Height) * Pr) / (k * pow_2(v));
 
     if (RaH <= 6.3e09) {
@@ -8773,7 +8773,7 @@ Real64 CalcClearRoof(EnergyPlusData &state,
         Ln = std::sqrt(RoofArea);
     }
     DeltaTemp = SurfTemp - AirTemp;
-    BetaFilm = 1.0 / (DataGlobalConstants::KelvinConv + SurfTemp + 0.5 * DeltaTemp);
+    BetaFilm = 1.0 / (Constant::KelvinConv + SurfTemp + 0.5 * DeltaTemp);
     AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, AirTemp, state.dataEnvrn->OutHumRat);
 
     GrLn = g * pow_2(AirDensity) * pow_3(Ln) * std::abs(DeltaTemp) * BetaFilm / pow_2(v);
@@ -8884,10 +8884,10 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
     Real64 visc; // Kinematic viscosity of air, m2/s
     Real64 k_SI_n;
     Real64 k_SI_d;
-    Real64 k_SI;                                               // Thermal conductivity of air, W/m.K
-    Real64 Ra;                                                 // Rayleigh number
-    Real64 Re;                                                 // Reynolds number
-    constexpr Real64 g = DataGlobalConstants::GravityConstant; // Acceleration of gravity, m/s2
+    Real64 k_SI;                                    // Thermal conductivity of air, W/m.K
+    Real64 Ra;                                      // Rayleigh number
+    Real64 Re;                                      // Reynolds number
+    constexpr Real64 g = Constant::GravityConstant; // Acceleration of gravity, m/s2
 
     auto const &surface = state.dataSurface->Surface(SurfNum);
 
@@ -8933,7 +8933,7 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
             if (Tilt < 2) {
                 Nun = 0.58 * std::pow(Ra, 0.2);
             } else {
-                Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+                Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * Constant::DegToRadians)), 0.25);
             }
         } else { // heat flow up
             if (Tilt < 15) {
@@ -8947,7 +8947,7 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
                 Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * 3.14159 / 180)), 0.25);
             } else {
                 Nun = 0.14 * (std::pow(Ra, ConvectionConstants::OneThird) - std::pow(Grc * Pr, ConvectionConstants::OneThird)) +
-                      0.56 * std::pow(Grc * Pr * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+                      0.56 * std::pow(Grc * Pr * (std::sin(Tilt * Constant::DegToRadians)), 0.25);
             }
         }
     } else if (Tilt == 180) { // Horizontal surface: Floor
@@ -8963,7 +8963,7 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
             if (Tilt > 178) {
                 Nun = 0.58 * std::pow(Ra, 0.2);
             } else {
-                Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+                Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * Constant::DegToRadians)), 0.25);
             }
         } else { // heat flow up
             if (Tilt > 165) {
@@ -8974,10 +8974,10 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
                 Grc = 5000000000;
             }
             if ((Ra / Pr) <= Grc) {
-                Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+                Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * Constant::DegToRadians)), 0.25);
             } else {
                 Nun = 0.14 * (std::pow(Ra, ConvectionConstants::OneThird) - std::pow(Grc * Pr, ConvectionConstants::OneThird)) +
-                      0.56 * std::pow(Grc * Pr * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+                      0.56 * std::pow(Grc * Pr * (std::sin(Tilt * Constant::DegToRadians)), 0.25);
             }
         }
     } else { // Vertical wall (Tilt = 90)

@@ -74,7 +74,7 @@ namespace CTElectricGenerator {
         std::string Name;                                   // user identifier
         std::string TypeOf = "Generator:CombustionTurbine"; // Type of Generator
         GeneratorType CompType_Num = GeneratorType::CombTurbine;
-        DataGlobalConstants::eResource FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
+        Constant::eResource FuelType;            // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 RatedPowerOutput = 0.0;           // W - design nominal capacity of Generator
         int ElectricCircuitNode = 0;             // Electric Circuit Node
         Real64 MinPartLoadRat = 0.0;             // (CT MIN) min allowed operating frac full load

@@ -200,9 +200,9 @@ namespace BoilerSteam {
             thisBoiler.Name = state.dataIPShortCut->cAlphaArgs(1);
 
             // Validate fuel type input
-            thisBoiler.FuelType = static_cast<DataGlobalConstants::eResource>(
-                getEnumerationValue(DataGlobalConstants::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
-            if (thisBoiler.FuelType == DataGlobalConstants::eResource::Invalid) {
+            thisBoiler.FuelType = static_cast<Constant::eResource>(
+                getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+            if (thisBoiler.FuelType == Constant::eResource::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -420,7 +420,7 @@ namespace BoilerSteam {
 
     void BoilerSpecs::setupOutputVars(EnergyPlusData &state)
     {
-        std::string_view sFuelType = DataGlobalConstants::ResourceTypeNames[static_cast<int>(this->FuelType)];
+        std::string_view sFuelType = Constant::ResourceTypeNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Boiler Heating Rate",
                             OutputProcessor::Unit::W,
@@ -829,7 +829,7 @@ namespace BoilerSteam {
         // PURPOSE OF THIS SUBROUTINE:
         // Boiler simulation reporting
 
-        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
         int BoilerInletNode = this->BoilerInletNodeNum;
         int BoilerOutletNode = this->BoilerOutletNodeNum;
 
