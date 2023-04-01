@@ -3929,16 +3929,7 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
     static constexpr std::string_view RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string CompName;     // component name
-    std::string CompType;     // component type
-    std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
     Real64 TempSize;          // autosized value of coil input field
-    int SizingMethod;         // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing,
-                              // CoolingCapacitySizing, HeatingCapacitySizing, etc.)
-    bool PrintFlag;           // TRUE when sizing information is reported in the eio file
-    int zoneHVACIndex;        // index of zoneHVAC equipment sizing specification
-    int SAFMethod(0);         // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
-                              // FractionOfAutosizedHeatingAirflow ...)
 
     auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
@@ -3946,20 +3937,25 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
     state.dataSize->ZoneHeatingOnlyFan = false;
     state.dataSize->ZoneCoolingOnlyFan = false;
 
-    CompType = "ZoneHVAC:EvaporativeCoolerUnit";
-    CompName = zoneEvapUnit.Name;
+    std::string CompType = "ZoneHVAC:EvaporativeCoolerUnit";
+    std::string CompName = zoneEvapUnit.Name;
     state.dataSize->DataZoneNumber = zoneEvapUnit.ZonePtr;
-    PrintFlag = true;
-    bool errorsFound = false;
+    bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
 
     if (state.dataSize->CurZoneEqNum > 0) {
+        bool errorsFound = false;
         auto &zoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
 
         if (zoneEvapUnit.HVACSizingIndex > 0) {
             state.dataSize->ZoneCoolingOnlyFan = true;
-            zoneHVACIndex = zoneEvapUnit.HVACSizingIndex;
-            SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
-            SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
+            // index of zoneHVAC equipment sizing specification
+            int zoneHVACIndex = zoneEvapUnit.HVACSizingIndex;
+            // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing,
+            // CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+            int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+            // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
+            // FractionOfAutosizedHeatingAirflow ...)
+            int SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
             zoneEqSizing.SizingMethod(SizingMethod) = SAFMethod;
             if (SAFMethod == DataSizing::None || SAFMethod == DataSizing::SupplyAirFlowRate || SAFMethod == DataSizing::FlowPerFloorArea ||
                 SAFMethod == DataSizing::FractionOfAutosizedCoolingAirflow) {
@@ -4007,7 +4003,6 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
                     state.dataSize->DataFracOfAutosizedCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                 }
                 CoolingCapacitySizer sizerCoolingCapacity;
-                sizerCoolingCapacity.overrideSizingString(SizingString);
                 sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 state.dataSize->DataCapacityUsedForSizing = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                 state.dataSize->DataFlowPerCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
@@ -4263,7 +4258,6 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
     // local variables
     int constexpr MaxIte(50);      // maximum number of iterations
     Real64 constexpr Tol(0.01);    // error tolerance
-    int SolFla;                    // Flag of root solver
     Real64 PartLoadRatio;          // cooling part load ratio
     Real64 FullFlowSensibleOutput; // full flow sensible cooling output
     Real64 FullFlowLatentOutput;   // full flow sensible cooling output
@@ -4283,6 +4277,7 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
             CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, QSensOutputProvided, QLatOutputProvided);
             return QSensOutputProvided - ZoneCoolingLoad;
         };
+        int SolFla; // Flag of root solver
         General::SolveRoot(state, Tol, MaxIte, SolFla, PartLoadRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
             if (zoneEvapUnit.UnitLoadControlMaxIterErrorIndex == 0) {
