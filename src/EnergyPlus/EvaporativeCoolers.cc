@@ -2075,28 +2075,24 @@ void CalcResearchSpecialPartLoad(EnergyPlusData &state, int EvapCoolNum)
     Real64 constexpr MinAirMassFlow(0.001);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 FullOutput(0.0);
-    Real64 ReqOutput(0.0);
-    int InletNode;
-    int OutletNode;
-    int ControlNode;
-    Real64 PartLoadFrac;
-    Real64 DesOutTemp;
+    Real64 FullOutput = 0.0;
+    Real64 ReqOutput = 0.0;
     // Set local variables
 
-    auto &thisEvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
-    auto &Node(state.dataLoopNodes->Node);
+    auto &thisEvapCond = state.dataEvapCoolers->EvapCond(EvapCoolNum);
 
     // Retrieve the load on the controlled zone
-    OutletNode = thisEvapCond.OutletNode;
-    InletNode = thisEvapCond.InletNode;
-    ControlNode = thisEvapCond.EvapControlNodeNum;
-    DesOutTemp = thisEvapCond.DesiredOutletTemp;
-    PartLoadFrac = 0.0;
+    int OutletNode = thisEvapCond.OutletNode;
+    int InletNode = thisEvapCond.InletNode;
+    int ControlNode = thisEvapCond.EvapControlNodeNum;
+    Real64 DesOutTemp = thisEvapCond.DesiredOutletTemp;
+    Real64 PartLoadFrac = 0.0;
 
     // If Evap Cooler runs with a cooling load then set PartLoadFrac on Cooling System and the Mass Flow
-    if ((ScheduleManager::GetCurrentScheduleValue(state, thisEvapCond.SchedPtr) > 0.0) && (Node(InletNode).MassFlowRate > MinAirMassFlow) &&
-        (Node(InletNode).Temp > Node(ControlNode).TempSetPoint) && (std::abs(Node(InletNode).Temp - DesOutTemp) > DataHVACGlobals::TempControlTol)) {
+    if ((ScheduleManager::GetCurrentScheduleValue(state, thisEvapCond.SchedPtr) > 0.0) &&
+        (state.dataLoopNodes->Node(InletNode).MassFlowRate > MinAirMassFlow) &&
+        (state.dataLoopNodes->Node(InletNode).Temp > state.dataLoopNodes->Node(ControlNode).TempSetPoint) &&
+        (std::abs(state.dataLoopNodes->Node(InletNode).Temp - DesOutTemp) > DataHVACGlobals::TempControlTol)) {
 
         // Get full load result, depending on model
         thisEvapCond.PartLoadFract = 1.0;
@@ -2104,11 +2100,13 @@ void CalcResearchSpecialPartLoad(EnergyPlusData &state, int EvapCoolNum)
         case EvapCoolerType::IndirectRDDSpecial: {
             CalcIndirectResearchSpecialEvapCooler(state, EvapCoolNum);
             UpdateEvapCooler(state, EvapCoolNum);
-            FullOutput = Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) -
-                                                         Psychrometrics::PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
+            FullOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
+                         (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
+                          Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
-            ReqOutput = Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(thisEvapCond.DesiredOutletTemp, Node(InletNode).HumRat) -
-                                                        Psychrometrics::PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
+            ReqOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
+                        (Psychrometrics::PsyHFnTdbW(thisEvapCond.DesiredOutletTemp, state.dataLoopNodes->Node(InletNode).HumRat) -
+                         Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
             // now reinit after test call
             InitEvapCooler(state, EvapCoolNum);
@@ -2117,8 +2115,8 @@ void CalcResearchSpecialPartLoad(EnergyPlusData &state, int EvapCoolNum)
         case EvapCoolerType::DirectResearchSpecial: {
             CalcDirectResearchSpecialEvapCooler(state, EvapCoolNum);
             UpdateEvapCooler(state, EvapCoolNum);
-            FullOutput = Node(OutletNode).Temp - Node(InletNode).Temp;
-            ReqOutput = thisEvapCond.DesiredOutletTemp - Node(InletNode).Temp;
+            FullOutput = state.dataLoopNodes->Node(OutletNode).Temp - state.dataLoopNodes->Node(InletNode).Temp;
+            ReqOutput = thisEvapCond.DesiredOutletTemp - state.dataLoopNodes->Node(InletNode).Temp;
 
             // now reinit after test call
             InitEvapCooler(state, EvapCoolNum);
