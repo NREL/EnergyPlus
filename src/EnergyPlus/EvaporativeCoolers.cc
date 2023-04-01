@@ -3793,13 +3793,7 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2013
 
-    // Using/Aliasing
-    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 TimeElapsed;
-
-    auto &EvapCond(state.dataEvapCoolers->EvapCond);
     auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
     if (allocated(state.dataHVACGlobal->ZoneComp)) {
@@ -3868,15 +3862,14 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
     }
 
     zoneEvapUnit.EvapCooler_1_AvailStatus =
-        (ScheduleManager::GetCurrentScheduleValue(state, EvapCond(zoneEvapUnit.EvapCooler_1_Index).SchedPtr) > 0.0);
+        (ScheduleManager::GetCurrentScheduleValue(state, state.dataEvapCoolers->EvapCond(zoneEvapUnit.EvapCooler_1_Index).SchedPtr) > 0.0);
 
     if (zoneEvapUnit.EvapCooler_2_Index > 0) {
         zoneEvapUnit.EvapCooler_2_AvailStatus =
-            (ScheduleManager::GetCurrentScheduleValue(state, EvapCond(zoneEvapUnit.EvapCooler_2_Index).SchedPtr) > 0.0);
+            (ScheduleManager::GetCurrentScheduleValue(state, state.dataEvapCoolers->EvapCond(zoneEvapUnit.EvapCooler_2_Index).SchedPtr) > 0.0);
     }
     // Do the Begin Environment initializations
     if (state.dataGlobal->BeginEnvrnFlag && zoneEvapUnit.MyEnvrn) {
-
         zoneEvapUnit.DesignAirMassFlowRate = state.dataEnvrn->StdRhoAir * zoneEvapUnit.DesignAirVolumeFlowRate;
         state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRateMax = zoneEvapUnit.DesignAirMassFlowRate;
         state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRateMin = 0.0;
@@ -3908,14 +3901,14 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
         // place default cold setpoints on control nodes of select evap coolers
         if ((zoneEvapUnit.EvapCooler_1_Type_Num == EvapCoolerType::DirectResearchSpecial) ||
             (zoneEvapUnit.EvapCooler_1_Type_Num == EvapCoolerType::IndirectRDDSpecial)) {
-            if (EvapCond(zoneEvapUnit.EvapCooler_1_Index).EvapControlNodeNum > 0) {
-                state.dataLoopNodes->Node(EvapCond(zoneEvapUnit.EvapCooler_1_Index).EvapControlNodeNum).TempSetPoint = -20.0;
+            if (state.dataEvapCoolers->EvapCond(zoneEvapUnit.EvapCooler_1_Index).EvapControlNodeNum > 0) {
+                state.dataLoopNodes->Node(state.dataEvapCoolers->EvapCond(zoneEvapUnit.EvapCooler_1_Index).EvapControlNodeNum).TempSetPoint = -20.0;
             }
         }
         if ((zoneEvapUnit.EvapCooler_2_Type_Num == EvapCoolerType::DirectResearchSpecial) ||
             (zoneEvapUnit.EvapCooler_2_Type_Num == EvapCoolerType::IndirectRDDSpecial)) {
-            if (EvapCond(zoneEvapUnit.EvapCooler_2_Index).EvapControlNodeNum > 0) {
-                state.dataLoopNodes->Node(EvapCond(zoneEvapUnit.EvapCooler_2_Index).EvapControlNodeNum).TempSetPoint = -20.0;
+            if (state.dataEvapCoolers->EvapCond(zoneEvapUnit.EvapCooler_2_Index).EvapControlNodeNum > 0) {
+                state.dataLoopNodes->Node(state.dataEvapCoolers->EvapCond(zoneEvapUnit.EvapCooler_2_Index).EvapControlNodeNum).TempSetPoint = -20.0;
             }
         }
 
@@ -3925,10 +3918,10 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
         zoneEvapUnit.MyEnvrn = true;
     }
 
-    TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
+    Real64 TimeElapsed =
+        state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
     if (zoneEvapUnit.TimeElapsed != TimeElapsed) {
         zoneEvapUnit.WasOnLastTimestep = zoneEvapUnit.IsOnThisTimestep;
-
         zoneEvapUnit.TimeElapsed = TimeElapsed;
     }
 }
