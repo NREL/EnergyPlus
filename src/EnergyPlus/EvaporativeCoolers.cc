@@ -2831,7 +2831,7 @@ OperatingMode IndirectResearchSpecialEvapCoolerOperatingMode(EnergyPlusData &sta
     Real64 SysTempSetPoint;      // evaporative cooler outlet setpoint temperature, drybulb
     OperatingMode OperatingMode; // current operating mode of indrect evaporative cooler
 
-    auto &thisEvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+    auto const &thisEvapCond = state.dataEvapCoolers->EvapCond(EvapCoolNum);
 
     InletDryBulbTempPri = thisEvapCond.InletTemp;
     SysTempSetPoint = thisEvapCond.DesiredOutletTemp;
