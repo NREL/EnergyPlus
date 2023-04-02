@@ -1174,9 +1174,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     //  currently just for secondary side of Research Special Indirect evap cooler
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool IsAutoSize;             // Indicator to autosize
-    bool SizingDesRunThisAirSys; // true if a particular air system had a Sizing:System object and system sizing done
-    bool SizingDesRunThisZone;   // true if a particular zone had a Sizing:Zone object and zone sizing was done
+    bool IsAutoSize; // Indicator to autosize
 
     Real64 volFlowRateDes; // Autosized volume flow rate for reporting
     std::string CompType;  // for ease in getting objects
@@ -1198,19 +1196,20 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     auto &thisEvapCond(EvapCond(EvapCoolNum));
 
     bool HardSizeNoDesRun = !((state.dataSize->SysSizingRunDone || state.dataSize->ZoneSizingRunDone));
+    bool SizingDesRunThisAirSys = false; // true if a particular air system had a Sizing:System object and system sizing done
+    bool SizingDesRunThisZone = false;   // true if a particular zone had a Sizing:Zone object and zone sizing was done
 
     if (CurSysNum > 0) {
         CheckThisAirSystemForSizing(state, CurSysNum, SizingDesRunThisAirSys);
-    } else {
-        SizingDesRunThisAirSys = false;
+        if (SizingDesRunThisAirSys) {
+            HardSizeNoDesRun = false; // Check if design infomation is available
+        }
     }
     if (CurZoneEqNum > 0) {
         CheckThisZoneForSizing(state, CurZoneEqNum, SizingDesRunThisZone);
-    } else {
-        SizingDesRunThisZone = false;
-    }
-    if (SizingDesRunThisAirSys) {
-        HardSizeNoDesRun = false; // Check if design infomation is available
+        if (SizingDesRunThisZone) {
+            HardSizeNoDesRun = false; // Check if design infomation is available
+        }
     }
 
     CompType = evapCoolerTypeNames[static_cast<int>(thisEvapCond.evapCoolerType)];
@@ -1263,7 +1262,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
             }
         }
     } else if (CurZoneEqNum > 0) { // zone equipment
-        if (!IsAutoSize && !SizingDesRunThisAirSys) {
+        if (!IsAutoSize && !SizingDesRunThisZone) {
             if (thisEvapCond.IndirectVolFlowRate > 0.0) {
                 // report for the indirect evap cooler types only
                 if (thisEvapCond.evapCoolerType == EvapCoolerType::IndirectCELDEKPAD ||

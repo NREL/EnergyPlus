@@ -1062,7 +1062,6 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         int NumFMUInputVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         // Determine the number of instances for each FMUs
         for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
-            std::string Name_NEW = "";
             std::string Name_OLD = "";
             int j = 1;
             int k = 1;
@@ -1082,7 +1081,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
-                    Name_NEW = state.dataIPShortCut->cAlphaArgs(4);
+                    std::string Name_NEW = state.dataIPShortCut->cAlphaArgs(4);
                     if (!UtilityRoutines::SameString(Name_OLD, Name_NEW)) {
                         int FOUND = UtilityRoutines::FindItem(Name_NEW, state.dataExternalInterface->checkInstanceName);
                         if (FOUND == 0) {

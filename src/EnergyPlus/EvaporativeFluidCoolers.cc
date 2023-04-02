@@ -111,11 +111,11 @@ namespace EvaporativeFluidCoolers {
         }
 
         // Now look for this particular object
-        for (auto &thisEFC : state.dataEvapFluidCoolers->SimpleEvapFluidCooler) {
-            if ((thisEFC.Type == objectType) && (thisEFC.Name == objectName)) {
-                return &thisEFC;
-            }
-        }
+        auto thisObj = std::find_if(
+            state.dataEvapFluidCoolers->SimpleEvapFluidCooler.begin(),
+            state.dataEvapFluidCoolers->SimpleEvapFluidCooler.end(),
+            [&objectType, &objectName](const EvapFluidCoolerSpecs &myObj) { return myObj.Type == objectType && myObj.Name == objectName; });
+        if (thisObj != state.dataEvapFluidCoolers->SimpleEvapFluidCooler.end()) return thisObj;
         // If we didn't find it, fatal
         ShowFatalError(state, format("LocalEvapFluidCoolerFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
         // Shut up the compiler
