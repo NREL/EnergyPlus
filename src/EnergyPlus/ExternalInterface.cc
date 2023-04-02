@@ -155,12 +155,11 @@ void GetExternalInterfaceInput(EnergyPlusData &state)
     int NumAlphas;  // Number of Alphas for each GetObjectItem call
     int NumNumbers; // Number of Numbers for each GetObjectItem call
     int IOStatus;   // Used in GetObjectItem
-    int Loop;       // Loop counter
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "ExternalInterface";
     state.dataExternalInterface->NumExternalInterfaces = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-    for (Loop = 1; Loop <= state.dataExternalInterface->NumExternalInterfaces;
+    for (int Loop = 1; Loop <= state.dataExternalInterface->NumExternalInterfaces;
          ++Loop) { // This loop determines whether the external interface is for FMU or BCVTB
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
