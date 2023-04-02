@@ -337,7 +337,6 @@ namespace ExhaustAirSystemManager {
     void CalcExhaustAirSystem(EnergyPlusData &state, int const ExhaustAirSystemNum, bool FirstHVACIteration)
     {
         auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(ExhaustAirSystemNum);
-
         constexpr std::string_view RoutineName = "CalExhaustAirSystem: ";
         constexpr std::string_view cCurrentModuleObject = "AirloopHVAC:ExhaustSystem";
         bool ErrorsFound = false;
@@ -392,7 +391,7 @@ namespace ExhaustAirSystemManager {
                                         thisExhSys.CentralFanIndex); //,
 
             // Update output variables
-            auto &fancomp = state.dataFans->Fan(thisExhSys.CentralFanIndex);
+            auto const &fancomp = state.dataFans->Fan(thisExhSys.CentralFanIndex);
 
             outletNode_Num = fancomp.OutletNodeNum;
 

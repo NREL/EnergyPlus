@@ -1176,7 +1176,6 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool CoolerOnOApath(false);
     bool CoolerOnMainAirLoop(false);
-    int AirSysBranchLoop(0);
     int BranchComp(0);
     bool HardSizeNoDesRun;          // Indicator to a hard-sized field with no design sizing data
     bool IsAutoSize;                // Indicator to autosize
@@ -1230,7 +1229,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     if (CurSysNum > 0) { // central system
         // where is this cooler located, is it on OA system or main loop?
         // search for this component in Air loop branches.
-        for (AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches; ++AirSysBranchLoop) {
+        for (int AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches; ++AirSysBranchLoop) {
             for (BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
                  ++BranchComp) {
 
@@ -1540,7 +1539,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         if (CurSysNum > 0) { // central system
             // where is this cooler located, is it on OA system or main loop?
             // search for this component in Air loop branches.
-            for (AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches; ++AirSysBranchLoop) {
+            for (int AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches;
+                 ++AirSysBranchLoop) {
                 for (BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
                      ++BranchComp) {
                     if (UtilityRoutines::SameString(
@@ -2389,21 +2389,14 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     Real64 constexpr TempTol(0.01); // convergence tollerance
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 TEDB;      // Entering Dry Bulb Temperature
-    Real64 TEWB;      // Entering Wet Bulb Temperature
     Real64 BoundTemp; // temperature limit for outlet
     Real64 PartLoad;
-    Real64 SecRho;
     Real64 TdbOutSysWetMin;                 // system( primary ) air drybulb outlet temperature minimum based on wet coil
     Real64 TdbOutSysDryMin;                 // system (primary) air drybulb outlet temperature minimum based on dry coil
-    Real64 SysTempSetPoint;                 // evaporative cooler outlet setpoint temperature, drybulb
-    Real64 MassFlowRateSecMax;              // Design secondary air mass flow rate
     Real64 AirMassFlowSec;                  // current secondary air mass flow rate
     Real64 AirMassFlowSecDry;               // current secondary air mass flow rate in dry mode
     Real64 AirMassFlowSecWet;               // current secondary air mass flow rate in wet mode
     Real64 FlowRatioSec;                    // secondary air flow ratio in dry and wet mode
-    Real64 FlowRatioSecDry;                 // current secondary air mass flow ratio in dry mode
-    Real64 FlowRatioSecWet;                 // current secondary air mass flow ratio in wet mode
     Real64 EvapCoolerTotalElectricPowerDry; // evaporative cooler current total electric power drawn
     Real64 EvapCoolerTotalElectricPowerWet; // evaporative cooler current total electric power drawn
     Real64 QHXLatent;                       // evaporative cooler latent heat transfer rate
@@ -2419,14 +2412,14 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
 
     auto &thisEvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
 
-    FlowRatioSecDry = 0.0;
-    FlowRatioSecWet = 0.0;
+    Real64 FlowRatioSecDry = 0.0; // current secondary air mass flow ratio in dry mode
+    Real64 FlowRatioSecWet = 0.0; // current secondary air mass flow ratio in wet mode
     thisEvapCond.EvapCoolerRDDOperatingMode = OperatingMode::None;
-    TEDB = thisEvapCond.InletTemp;
-    TEWB = thisEvapCond.InletWetBulbTemp;
-    SysTempSetPoint = thisEvapCond.DesiredOutletTemp;
-    SecRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, InletDryBulbTempSec, InletHumRatioSec);
-    MassFlowRateSecMax = SecRho * thisEvapCond.IndirectVolFlowRate;
+    Real64 TEDB = thisEvapCond.InletTemp;                    // Entering Dry Bulb Temperature
+    Real64 TEWB = thisEvapCond.InletWetBulbTemp;             // Entering Wet Bulb Temperature
+    Real64 SysTempSetPoint = thisEvapCond.DesiredOutletTemp; // evaporative cooler outlet setpoint temperature, drybulb
+    Real64 SecRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, InletDryBulbTempSec, InletHumRatioSec);
+    Real64 MassFlowRateSecMax = SecRho * thisEvapCond.IndirectVolFlowRate; // Design secondary air mass flow rate
     CalcIndirectRDDEvapCoolerOutletTemp(
         state, EvapCoolNum, OperatingMode::WetFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
     TdbOutSysWetMin = thisEvapCond.OutletTemp;
@@ -2441,7 +2434,6 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     MassFlowRateSecMin = 0.0;
     AirMassFlowSec = MassFlowRateSecMax;
     PartLoad = thisEvapCond.PartLoadFract;
-    int SolFla = 0; // Flag of solver
     {
         if (thisEvapCond.EvapCoolerRDDOperatingMode == OperatingMode::DryModulated) {
             auto f = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
@@ -2452,6 +2444,7 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                 Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
                 return SysTempSetPoint - OutletAirTemp;
             };
+            int SolFla = 0; // Flag of solver
             General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
@@ -2517,6 +2510,7 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                 Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
                 return SysTempSetPoint - OutletAirTemp;
             };
+            int SolFla = 0; // Flag of solver
             General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
@@ -2651,6 +2645,7 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                 Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
                 return SysTempSetPoint - OutletAirTemp;
             };
+            int SolFla = 0; // Flag of solver
             General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
@@ -3928,14 +3923,14 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
     state.dataSize->ZoneHeatingOnlyFan = false;
     state.dataSize->ZoneCoolingOnlyFan = false;
 
-    std::string CompType = "ZoneHVAC:EvaporativeCoolerUnit";
-    std::string CompName = zoneEvapUnit.Name;
     state.dataSize->DataZoneNumber = zoneEvapUnit.ZonePtr;
-    bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
 
     if (state.dataSize->CurZoneEqNum > 0) {
+        std::string CompName = zoneEvapUnit.Name;
+        std::string CompType = "ZoneHVAC:EvaporativeCoolerUnit";
         bool errorsFound = false;
         auto &zoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
+        bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
 
         if (zoneEvapUnit.HVACSizingIndex > 0) {
             state.dataSize->ZoneCoolingOnlyFan = true;
