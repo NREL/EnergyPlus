@@ -316,14 +316,10 @@ void CloseSocket(EnergyPlusData &state, int const FlagToWriteToSocket)
     // +1: E+ reached final time
     // -1: E+ had some error
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int retVal;     // Return value, needed to catch return value of function call
-    bool fileExist; // Set to true if file exists
-
     // Try to establish socket connection. This is needed if Ptolemy started E+,
     //  but E+ had an error before the call to InitExternalInterface.
 
-    fileExist = FileSystem::fileExists(state.dataExternalInterface->socCfgFilPath);
+    bool fileExist = FileSystem::fileExists(state.dataExternalInterface->socCfgFilPath);
 
     if ((state.dataExternalInterface->socketFD == -1) && fileExist) {
         state.dataExternalInterface->socketFD = establishclientsocket(state.dataExternalInterface->socCfgFilPath.string().c_str());
@@ -331,7 +327,7 @@ void CloseSocket(EnergyPlusData &state, int const FlagToWriteToSocket)
 
     if (state.dataExternalInterface->socketFD >= 0) {
         // TODO: use retVal?
-        retVal = sendclientmessage(&state.dataExternalInterface->socketFD, &FlagToWriteToSocket);
+        int retVal = sendclientmessage(&state.dataExternalInterface->socketFD, &FlagToWriteToSocket);
         // Don't close socket as this may give sometimes an IOException in Windows
         // This problem seems to affect only Windows but not Mac
         //     close(state.dataExternalInterface->socketFD)
@@ -384,11 +380,6 @@ void InitExternalInterface(EnergyPlusData &state)
     std::string const simCfgFilNam("variables.cfg");               // Configuration file
     std::string const xmlStrInKey("schedule,variable,actuator\0"); // xml values in string, separated by ','
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string xmlStrOut;    // xml values in string, separated by ';'
-    std::string xmlStrOutTyp; // xml values in string, separated by ';'
-    std::string xmlStrIn;     // xml values in string, separated by ';'
-
     if (state.dataExternalInterface->InitExternalInterfacefirstCall) {
         DisplayString(state, "ExternalInterface initializes.");
         // do one time initializations
@@ -428,9 +419,9 @@ void InitExternalInterface(EnergyPlusData &state)
         size_t lenXmlStr(maxVar * Constant::MaxNameLength); // Length of strings being passed to getepvariables
 
         // initialize all the strings to this length with blanks
-        xmlStrOut = std::string(lenXmlStr, ' ');
-        xmlStrOutTyp = std::string(lenXmlStr, ' ');
-        xmlStrIn = std::string(lenXmlStr, ' ');
+        std::string xmlStrOut = std::string(lenXmlStr, ' ');
+        std::string xmlStrOutTyp = std::string(lenXmlStr, ' ');
+        std::string xmlStrIn = std::string(lenXmlStr, ' ');
 
         // Get input and output variables for EnergyPlus in sequence
         // Check if simCfgFilNam exists.
