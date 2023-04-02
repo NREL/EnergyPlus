@@ -1995,20 +1995,7 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine organizes the data exchange between FMU and EnergyPlus.
 
-    // Using/Aliasing
-    using EMSManager::ManageEMS;
-
-    using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
-    using RuntimeLanguageProcessor::FindEMSVariable;
-    using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
-    using ScheduleManager::ExternalInterfaceSetSchedule;
-    using ScheduleManager::GetDayScheduleIndex;
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int i, j, k; // Loop counter
-
     Array1D_string Alphas(5);
     Array1D_int keyIndexes(1);     // Array index for
     Array1D_string NamesOfKeys(1); // Specific key name
@@ -2034,11 +2021,11 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
 
             // allocate memory for a temporary FMU that will be used at the end of the warmup
             state.dataExternalInterface->FMUTemp.allocate(state.dataExternalInterface->NumFMUObjects);
-            for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
+            for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
                 state.dataExternalInterface->FMUTemp(i).Instance.allocate(state.dataExternalInterface->FMU(i).NumInstances);
             }
-            for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
-                for (j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
+            for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
+                for (int j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
                     state.dataExternalInterface->FMUTemp(i).Instance(j).fmuInputVariable.allocate(
                         state.dataExternalInterface->FMU(i).Instance(j).NumInputVariablesInIDF);
                     state.dataExternalInterface->FMUTemp(i).Instance(j).eplusOutputVariable.allocate(
@@ -2062,12 +2049,12 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
                 // Advance the communication time step
                 state.dataExternalInterface->tComm += state.dataExternalInterface->hStep;
             } else {
-                for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
-                    for (j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
+                for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
+                    for (int j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
 
                         state.dataExternalInterface->FMUTemp(i).Instance(j).NumInputVariablesInIDF =
                             state.dataExternalInterface->FMU(i).Instance(j).NumInputVariablesInIDF;
-                        for (k = 1; k <= state.dataExternalInterface->FMU(i).Instance(j).NumInputVariablesInIDF; ++k) {
+                        for (int k = 1; k <= state.dataExternalInterface->FMU(i).Instance(j).NumInputVariablesInIDF; ++k) {
                             state.dataExternalInterface->FMUTemp(i).Instance(j).fmuInputVariable(k).ValueReference =
                                 state.dataExternalInterface->FMU(i).Instance(j).fmuInputVariable(k).ValueReference;
                             state.dataExternalInterface->FMUTemp(i).Instance(j).eplusOutputVariable(k).RTSValue =
@@ -2081,7 +2068,7 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
                         // save values that will be set in EnergyPlus (Schedule)
                         state.dataExternalInterface->FMUTemp(i).Instance(j).NumOutputVariablesSchedule =
                             state.dataExternalInterface->FMU(i).Instance(j).NumOutputVariablesSchedule;
-                        for (k = 1; k <= state.dataExternalInterface->FMU(i).Instance(j).NumOutputVariablesSchedule; ++k) {
+                        for (int k = 1; k <= state.dataExternalInterface->FMU(i).Instance(j).NumOutputVariablesSchedule; ++k) {
                             state.dataExternalInterface->FMUTemp(i).Instance(j).fmuOutputVariableSchedule(k).RealVarValue =
                                 state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableSchedule(k).RealVarValue;
                         }
@@ -2089,7 +2076,7 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
                         // save values that will be set in EnergyPlus (Variable)
                         state.dataExternalInterface->FMUTemp(i).Instance(j).NumOutputVariablesVariable =
                             state.dataExternalInterface->FMU(i).Instance(j).NumOutputVariablesVariable;
-                        for (k = 1; k <= state.dataExternalInterface->FMU(i).Instance(j).NumOutputVariablesVariable; ++k) {
+                        for (int k = 1; k <= state.dataExternalInterface->FMU(i).Instance(j).NumOutputVariablesVariable; ++k) {
                             state.dataExternalInterface->FMUTemp(i).Instance(j).fmuOutputVariableVariable(k).RealVarValue =
                                 state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableVariable(k).RealVarValue;
                         }
@@ -2097,7 +2084,7 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
                         // save values that will be set in EnergyPlus (Actuator)
                         state.dataExternalInterface->FMUTemp(i).Instance(j).NumOutputVariablesActuator =
                             state.dataExternalInterface->FMU(i).Instance(j).NumOutputVariablesActuator;
-                        for (k = 1; k <= state.dataExternalInterface->FMU(i).Instance(j).NumOutputVariablesActuator; ++k) {
+                        for (int k = 1; k <= state.dataExternalInterface->FMU(i).Instance(j).NumOutputVariablesActuator; ++k) {
                             state.dataExternalInterface->FMUTemp(i).Instance(j).fmuOutputVariableActuator(k).RealVarValue =
                                 state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableActuator(k).RealVarValue;
                         }
@@ -2116,8 +2103,8 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
                 InstantiateInitializeFMUImport(state);
 
                 // Set the values that have been saved in the FMUs-- saveFMUStateVariables ()
-                for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
-                    for (j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
+                for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
+                    for (int j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
 
                         std::vector<unsigned int> valRefVec;
                         for (unsigned long x = 1; x <= size(state.dataExternalInterface->FMU(i).Instance(j).fmuInputVariable); ++x) {
@@ -2179,8 +2166,8 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
             InstantiateInitializeFMUImport(state);
 
             // Set the values that have been saved in the FMUs-- saveFMUStateVariables ()
-            for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
-                for (j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
+            for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
+                for (int j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
 
                     // make vectors first
                     std::vector<unsigned int> valRefVec;
@@ -2228,8 +2215,8 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
                 // Terminate reset and free Slaves
                 state.dataExternalInterface->fmiEndSimulation = 1;
                 TerminateResetFreeFMUImport(state, state.dataExternalInterface->fmiEndSimulation);
-                for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
-                    for (j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
+                for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
+                    for (int j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
                         // Deallocate used objects
                         state.dataExternalInterface->FMUTemp(i).Instance(j).fmuInputVariable.deallocate();
                         state.dataExternalInterface->FMUTemp(i).Instance(j).eplusOutputVariable.deallocate();
@@ -2239,14 +2226,14 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
                     }
                 }
 
-                for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
+                for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
                     state.dataExternalInterface->FMUTemp(i).Instance.deallocate();
                 }
 
                 state.dataExternalInterface->FMUTemp.deallocate();
 
-                for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
-                    for (j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
+                for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
+                    for (int j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
                         state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableSchedule.deallocate();
                         state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableSchedule.deallocate();
                         state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableVariable.deallocate();
@@ -2258,7 +2245,7 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
                     }
                 }
 
-                for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
+                for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
                     state.dataExternalInterface->FMU(i).Instance.deallocate();
                 }
                 state.dataExternalInterface->FMU.deallocate();
@@ -2315,13 +2302,6 @@ void CalcExternalInterface(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael Wetter
     //       DATE WRITTEN   2Dec2007
-
-    // Using/Aliasing
-    using EMSManager::ManageEMS;
-
-    using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
-    using ScheduleManager::ExternalInterfaceSetSchedule;
-    // using DataPrecisionGlobals;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr nDblMax(1024); // Maximum number of doubles
@@ -2438,10 +2418,10 @@ void CalcExternalInterface(EnergyPlusData &state)
         if ((flaRea == 0) && continueSimulation) {
             for (int i = 1; i <= isize(state.dataExternalInterface->varInd); ++i) {
                 if (state.dataExternalInterface->inpVarTypes(i) == indexSchedule) {
-                    ExternalInterfaceSetSchedule(state, state.dataExternalInterface->varInd(i), dblValRea(i));
+                    ScheduleManager::ExternalInterfaceSetSchedule(state, state.dataExternalInterface->varInd(i), dblValRea(i));
                 } else if ((state.dataExternalInterface->inpVarTypes(i) == indexVariable) ||
                            (state.dataExternalInterface->inpVarTypes(i) == indexActuator)) {
-                    ExternalInterfaceSetErlVariable(state, state.dataExternalInterface->varInd(i), dblValRea(i));
+                    RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable(state, state.dataExternalInterface->varInd(i), dblValRea(i));
                 } else {
                     ShowContinueError(state, "ExternalInterface: Error in finding the type of the input variable for EnergyPlus");
                     ShowContinueError(state, format("variable index: {}. Variable will not be updated.", i));
@@ -2453,7 +2433,7 @@ void CalcExternalInterface(EnergyPlusData &state)
     // If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
     if (state.dataExternalInterface->useEMS) {
         bool anyRan;
-        ManageEMS(state, EMSManager::EMSCallFrom::ExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
+        EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::ExternalInterface, anyRan, ObjexxFCL::Optional_int_const());
     }
 
     state.dataExternalInterface->firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
