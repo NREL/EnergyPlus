@@ -1903,7 +1903,7 @@ std::string trim(std::string const &str)
     return str.substr(first, last - first + 1);
 }
 
-Real64 GetCurSimStartTimeSeconds(EnergyPlusData &state)
+Real64 GetCurSimStartTimeSeconds(const EnergyPlusData &state)
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
@@ -2369,7 +2369,6 @@ void CalcExternalInterface(EnergyPlusData &state)
 
     Array1D<Real64> dblValWri(nDblMax);
     Array1D<Real64> dblValRea(nDblMax);
-    bool continueSimulation; // Flag, true if simulation should continue
 
     if (state.dataExternalInterface->firstCall) {
         DisplayString(state, "ExternalInterface starts first data exchange.");
@@ -2433,7 +2432,7 @@ void CalcExternalInterface(EnergyPlusData &state)
                                                   dblValRea.data(),
                                                   &state.dataExternalInterface->FMUExportActivate);
         }
-        continueSimulation = true;
+        bool continueSimulation = true;
 
         // Check for errors, in which case we terminate the simulation loop
         // Added a check since the FMUExport is terminated with the flaRea set to 1.
