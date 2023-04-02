@@ -978,8 +978,6 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
     Array1D_int keyIndexes(1);                          // Array index for
     Array1D<OutputProcessor::VariableType> varTypes(1); // Array index for
     Array1D_string NamesOfKeys(1);                      // Specific key name
-    int retValfmiVersion;
-    int retValfmiPathLib;
     Array1D_string NameListInstances(5);
     fs::path tempFullFilePath;
 
@@ -1032,7 +1030,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 std::string::size_type pos = index(state.dataExternalInterface->FMU(Loop).Name, DataStringGlobals::pathChar, true); // look backwards
                 if (pos != std::string::npos) {
                     strippedFileName(Loop) = state.dataExternalInterface->FMU(Loop).Name.substr(pos + 1);
-                } else {                                                                         // pos == 0, look for alt path char
+                } else { // pos == 0, look for alt path char
                     pos = index(state.dataExternalInterface->FMU(Loop).Name, DataStringGlobals::altpathChar, true); // look backwards
                     if (pos != std::string::npos) {
                         strippedFileName(Loop) = state.dataExternalInterface->FMU(Loop).Name.substr(pos + 1);
@@ -1212,10 +1210,10 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                     std::vector<char> workingFolderWithLibArr(getCharArrayFromString(reservedString));
 
                     // make the library call
-                    retValfmiPathLib = addLibPathCurrentWorkingFolder(&workingFolderWithLibArr[0],
-                                                                      &workingFolderArr[0],
-                                                                      &state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder,
-                                                                      &state.dataExternalInterface->FMU(i).Instance(j).Index);
+                    int retValfmiPathLib = addLibPathCurrentWorkingFolder(&workingFolderWithLibArr[0],
+                                                                          &workingFolderArr[0],
+                                                                          &state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder,
+                                                                          &state.dataExternalInterface->FMU(i).Instance(j).Index);
 
                     // post process args in case they are used later
                     state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib =
@@ -1247,10 +1245,10 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                         getCharArrayFromString("    ")); // the version should only be 3 characters long, since for now we only handle "1.0"
 
                     // make the library call
-                    retValfmiVersion = getfmiEPlusVersion(&workingFolderWithLibArr[0],
-                                                          &state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder_wLib,
-                                                          &VersionNumArr[0],
-                                                          &state.dataExternalInterface->FMU(i).Instance(j).Index);
+                    int retValfmiVersion = getfmiEPlusVersion(&workingFolderWithLibArr[0],
+                                                              &state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder_wLib,
+                                                              &VersionNumArr[0],
+                                                              &state.dataExternalInterface->FMU(i).Instance(j).Index);
 
                     // post process in case args are used later
                     state.dataExternalInterface->FMU(i).Instance(j).fmiVersionNumber = getStringFromCharArray(VersionNumArr);
