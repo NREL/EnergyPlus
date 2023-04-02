@@ -958,8 +958,6 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
     // Locals
     int retVal;                  // Return value of function call, used for error handling
     int NumFMUInputVariables(0); // Number of FMU input variables
-    std::string Name_NEW;        // Units sting, may be blank
-    std::string Name_OLD;        // Units sting, may be blank
 
     Array1D_int keyIndexes(1);                          // Array index for
     Array1D<OutputProcessor::VariableType> varTypes(1); // Array index for
@@ -1068,8 +1066,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         NumFMUInputVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         // Determine the number of instances for each FMUs
         for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
-            Name_NEW = "";
-            Name_OLD = "";
+            std::string Name_NEW = "";
+            std::string Name_OLD = "";
             int j = 1;
             int k = 1;
             state.dataExternalInterface->FMU(i).Instance.allocate(NumFMUInputVariables);
