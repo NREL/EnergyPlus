@@ -385,12 +385,9 @@ void InitExternalInterface(EnergyPlusData &state)
     std::string const xmlStrInKey("schedule,variable,actuator\0"); // xml values in string, separated by ','
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int i;                    // loop counters
     std::string xmlStrOut;    // xml values in string, separated by ';'
     std::string xmlStrOutTyp; // xml values in string, separated by ';'
     std::string xmlStrIn;     // xml values in string, separated by ';'
-    int retVal;               // Return value of function call, used for error handling
-    int mainVersion;          // The version number
 
     if (state.dataExternalInterface->InitExternalInterfacefirstCall) {
         DisplayString(state, "ExternalInterface initializes.");
@@ -398,7 +395,7 @@ void InitExternalInterface(EnergyPlusData &state)
 
         if (state.dataExternalInterface->haveExternalInterfaceBCVTB) {
             // Check version number
-            mainVersion = getmainversionnumber();
+            int mainVersion = getmainversionnumber();
             if (mainVersion < 0) {
                 ShowSevereError(state, "ExternalInterface: BCVTB is not installed in this version.");
                 state.dataExternalInterface->ErrorsFound = true;
@@ -438,6 +435,7 @@ void InitExternalInterface(EnergyPlusData &state)
         // Get input and output variables for EnergyPlus in sequence
         // Check if simCfgFilNam exists.
         if (FileSystem::fileExists(simCfgFilNam)) {
+            int retVal; // Return value of function call, used for error handling
 
             // preprocess the strings into char vectors before making the library call
             std::vector<char> xmlStrOutTypArr(getCharArrayFromString(xmlStrOutTyp));
@@ -539,7 +537,7 @@ void InitExternalInterface(EnergyPlusData &state)
                              state.dataExternalInterface->keyVarIndexes,
                              state.dataExternalInterface->varTypes);
         state.dataExternalInterface->varInd.allocate(state.dataExternalInterface->nInpVar);
-        for (i = 1; i <= state.dataExternalInterface->nInpVar; ++i) {
+        for (int i = 1; i <= state.dataExternalInterface->nInpVar; ++i) {
             if (state.dataExternalInterface->inpVarTypes(i) == indexSchedule) {
                 state.dataExternalInterface->varInd(i) = ScheduleManager::GetDayScheduleIndex(state, state.dataExternalInterface->inpVarNames(i));
             } else if (state.dataExternalInterface->inpVarTypes(i) == indexVariable) {
@@ -560,7 +558,7 @@ void InitExternalInterface(EnergyPlusData &state)
         }
         StopExternalInterfaceIfError(state);
         // Configure Erl variables
-        for (i = 1; i <= state.dataExternalInterface->nInpVar; ++i) {
+        for (int i = 1; i <= state.dataExternalInterface->nInpVar; ++i) {
             if (state.dataExternalInterface->inpVarTypes(i) == indexVariable) { // ems-globalvariable
                 state.dataExternalInterface->useEMS = true;
                 if (!RuntimeLanguageProcessor::isExternalInterfaceErlVariable(state, state.dataExternalInterface->varInd(i))) {
