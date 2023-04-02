@@ -252,28 +252,26 @@ namespace FanCoilUnits {
         static constexpr std::string_view RoutineName("GetFanCoilUnits: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int FanCoilNum;                  // current fan coil number
-        int NumAlphas;                   // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                  // Number of Numbers for each GetObjectItem call
-        Array1D_int OANodeNums(4);       // Node numbers of Outdoor air mixer (OA, EA, RA, MA)
-        int IOStatus;                    // Used in GetObjectItem
-        bool IsNotOK;                    // Flag to verify name
-        std::string CurrentModuleObject; // Object type for getting and error messages
-        Array1D_string Alphas;           // Alpha input items for object
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        int NodeNum;                     // index to loop counter
+        int NumAlphas;                 // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                // Number of Numbers for each GetObjectItem call
+        Array1D_int OANodeNums(4);     // Node numbers of Outdoor air mixer (OA, EA, RA, MA)
+        int IOStatus;                  // Used in GetObjectItem
+        bool IsNotOK;                  // Flag to verify name
+        Array1D_string Alphas;         // Alpha input items for object
+        Array1D_string cAlphaFields;   // Alpha field names
+        Array1D_string cNumericFields; // Numeric field names
+        Array1D<Real64> Numbers;       // Numeric input items for object
+        Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
+        Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
+        int NodeNum;                   // index to loop counter
         std::string ATMixerName;
 
-        auto &ErrorsFound(state.dataFanCoilUnits->ErrorsFound);
-        bool errFlag(state.dataFanCoilUnits->errFlag); // What is this trying to do?
+        auto &ErrorsFound = state.dataFanCoilUnits->ErrorsFound;
+        bool &errFlag = state.dataFanCoilUnits->errFlag;
 
         // find the number of each type of fan coil unit
 
-        CurrentModuleObject = state.dataFanCoilUnits->cMO_FanCoil;
+        std::string CurrentModuleObject = state.dataFanCoilUnits->cMO_FanCoil;
         state.dataFanCoilUnits->Num4PipeFanCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataFanCoilUnits->NumFanCoils = state.dataFanCoilUnits->Num4PipeFanCoils;
         // allocate the data structures
@@ -292,6 +290,7 @@ namespace FanCoilUnits {
 
         // loop over 4 pipe fan coil units; get and load the input data
         for (int FanCoilIndex = 1; FanCoilIndex <= state.dataFanCoilUnits->Num4PipeFanCoils; ++FanCoilIndex) {
+            auto &fanCoil = state.dataFanCoilUnits->FanCoil(FanCoilIndex);
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -306,12 +305,9 @@ namespace FanCoilUnits {
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
-            FanCoilNum = FanCoilIndex;
-            auto &fanCoil = state.dataFanCoilUnits->FanCoil(FanCoilNum);
-
-            state.dataFanCoilUnits->FanCoilNumericFields(FanCoilNum).FieldNames.allocate(NumNumbers);
-            state.dataFanCoilUnits->FanCoilNumericFields(FanCoilNum).FieldNames = "";
-            state.dataFanCoilUnits->FanCoilNumericFields(FanCoilNum).FieldNames = cNumericFields;
+            state.dataFanCoilUnits->FanCoilNumericFields(FanCoilIndex).FieldNames.allocate(NumNumbers);
+            state.dataFanCoilUnits->FanCoilNumericFields(FanCoilIndex).FieldNames = "";
+            state.dataFanCoilUnits->FanCoilNumericFields(FanCoilIndex).FieldNames = cNumericFields;
 
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             fanCoil.Name = Alphas(1);
