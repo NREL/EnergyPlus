@@ -1394,9 +1394,6 @@ namespace FanCoilUnits {
                           // HeatingCapacitySizing, etc.)
         bool PrintFlag;   // TRUE when sizing information is reported in the eio file
                           // FractionOfAutosizedHeatingAirflow ...)
-        int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
-                                // FractionOfAutosizedHeatingCapacity )
-        bool DoWaterCoilSizing = false; // if TRUE do water coil sizing calculation
         Real64 WaterCoilSizDeltaT;      // water coil deltaT for design water flow rate autosizing
         int CoilNum;                    // index of water coil object
 
@@ -1456,7 +1453,7 @@ namespace FanCoilUnits {
                 zoneHVACIndex = fanCoil.HVACSizingIndex;
                 int FieldNum = 1; // IDD numeric field number where input field description is found
                 PrintFlag = true;
-                int SAFMethod = 0; // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
+                int SAFMethod; // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
                 SizingString = state.dataFanCoilUnits->FanCoilNumericFields(FanCoilNum).FieldNames(FieldNum) + " [m3/s]";
                 if (state.dataGlobal->isEpJSON) SizingString = "maximum_supply_air_flow_rate [m3/s]";
                 if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod > 0) {
@@ -1747,6 +1744,7 @@ namespace FanCoilUnits {
                                                                state.dataFanCoilUnits->CoilWaterOutletNode,
                                                                ErrorsFound);
                         CoilNum = WaterCoils::GetWaterCoilIndex(state, "COIL:HEATING:WATER", fanCoil.HCoilName, ErrorsFound);
+                        bool DoWaterCoilSizing; // if TRUE do water coil sizing calculation
                         if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                             WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
                             DoWaterCoilSizing = true;
@@ -1772,7 +1770,7 @@ namespace FanCoilUnits {
                             }
                             if (fanCoil.HVACSizingIndex > 0) {
                                 zoneHVACIndex = fanCoil.HVACSizingIndex;
-                                CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
+                                int CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
                                 zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
                                 if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                                     CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
@@ -1931,6 +1929,7 @@ namespace FanCoilUnits {
                                                            state.dataFanCoilUnits->CoilWaterOutletNode,
                                                            ErrorsFound);
                     CoilNum = WaterCoils::GetWaterCoilIndex(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
+                    bool DoWaterCoilSizing; // if TRUE do water coil sizing calculation
                     if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                         WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
                         DoWaterCoilSizing = true;
@@ -1957,7 +1956,7 @@ namespace FanCoilUnits {
                         }
                         if (fanCoil.HVACSizingIndex > 0) {
                             zoneHVACIndex = fanCoil.HVACSizingIndex;
-                            CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
+                            int CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
                             zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
                             if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                                 CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
