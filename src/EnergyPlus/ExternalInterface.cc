@@ -277,12 +277,12 @@ void StopExternalInterfaceIfError(EnergyPlusData &state)
     // and then calls a fatal error to stop EnergyPlus.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int retVal; // Return value, needed to catch return value of function call
     int constexpr flag1(-10);
     int constexpr flag2(-20);
 
     if ((state.dataExternalInterface->NumExternalInterfacesBCVTB != 0) || (state.dataExternalInterface->NumExternalInterfacesFMUExport != 0)) {
         if (state.dataExternalInterface->ErrorsFound) {
+            int retVal; // Return value, needed to catch return value of function call
             // Check if the socket is open
             if (state.dataExternalInterface->socketFD >= 0) {
                 // Socket is open
