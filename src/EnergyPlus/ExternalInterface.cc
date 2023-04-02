@@ -956,9 +956,6 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
     // This routine initializes the input and outputs variables used for the co-simulation with FMUs.
 
     // Locals
-    int retVal;                  // Return value of function call, used for error handling
-    int NumFMUInputVariables(0); // Number of FMU input variables
-
     Array1D_int keyIndexes(1);                          // Array index for
     Array1D<OutputProcessor::VariableType> varTypes(1); // Array index for
     Array1D_string NamesOfKeys(1);                      // Specific key name
@@ -1063,11 +1060,9 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         // get the names of the input variables each state.dataExternalInterface->FMU(and the names of the
         // corresponding output variables in EnergyPlus --).
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport:From:Variable";
-        NumFMUInputVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int NumFMUInputVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         // Determine the number of instances for each FMUs
         for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
-            std::string Name_NEW = "";
-            std::string Name_OLD = "";
             int j = 1;
             int k = 1;
             state.dataExternalInterface->FMU(i).Instance.allocate(NumFMUInputVariables);
@@ -1086,7 +1081,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
-                    Name_NEW = state.dataIPShortCut->cAlphaArgs(4);
+                    std::string Name_OLD = "";
+                    std::string Name_NEW = state.dataIPShortCut->cAlphaArgs(4);
                     if (!UtilityRoutines::SameString(Name_OLD, Name_NEW)) {
                         int FOUND = UtilityRoutines::FindItem(Name_NEW, state.dataExternalInterface->checkInstanceName);
                         if (FOUND == 0) {
@@ -1145,7 +1141,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                     int lenFileName(len(fullFileName(i)));
 
                     // make the library call
-                    retVal = fmiEPlusUnpack(
+                    int retVal = fmiEPlusUnpack(
                         &fullFileNameArr[0], &workingFolderArr[0], &lenFileName, &state.dataExternalInterface->FMU(i).Instance(j).LenWorkingFolder);
 
                     if (retVal != 0) {
