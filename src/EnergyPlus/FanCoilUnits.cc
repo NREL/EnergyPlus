@@ -3508,47 +3508,46 @@ namespace FanCoilUnits {
         Real64 PLR;      // operating part-load ratio
         Real64 QUnitOut; // fan coil delivered capacity [W]
 
-        auto &FanCoil(state.dataFanCoilUnits->FanCoil);
+        auto &fanCoil = state.dataFanCoilUnits->FanCoil(FanCoilNum);
 
         // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 100% of flow before iterating
         PLRMin = 0.0;
         PLRMax = 1.0;
         PLR = 1.0;
-        if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
-            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
-        } else if (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode && FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
-            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
+        if (WaterControlNode == fanCoil.CoolCoilFluidInletNode) {
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * fanCoil.MaxCoolCoilFluidFlow;
+        } else if (WaterControlNode == fanCoil.HeatCoilFluidInletNode && fanCoil.HCoilType_Num != HCoil::Electric) {
+            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * fanCoil.MaxHeatCoilFluidFlow;
         }
         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
         if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
             PLRMax = PLR;
             PLR *= 0.1;
             // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 10% of flow before iterating
-            if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
-                state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
-            } else if (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode && FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
-                state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
+            if (WaterControlNode == fanCoil.CoolCoilFluidInletNode) {
+                state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * fanCoil.MaxCoolCoilFluidFlow;
+            } else if (WaterControlNode == fanCoil.HeatCoilFluidInletNode && fanCoil.HCoilType_Num != HCoil::Electric) {
+                state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * fanCoil.MaxHeatCoilFluidFlow;
             }
             Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
             if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
                 PLRMax = PLR;
                 PLR *= 0.1;
                 // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 1% of flow before iterating
-                if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
-                    state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
-                } else if (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode && FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
-                    state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
+                if (WaterControlNode == fanCoil.CoolCoilFluidInletNode) {
+                    state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * fanCoil.MaxCoolCoilFluidFlow;
+                } else if (WaterControlNode == fanCoil.HeatCoilFluidInletNode && fanCoil.HCoilType_Num != HCoil::Electric) {
+                    state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * fanCoil.MaxHeatCoilFluidFlow;
                 }
                 Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                 if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
                     PLRMax = PLR;
                     PLR *= 0.1;
                     // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.1% of flow before iterating
-                    if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
-                        state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
-                    } else if (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode &&
-                               FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
-                        state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
+                    if (WaterControlNode == fanCoil.CoolCoilFluidInletNode) {
+                        state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * fanCoil.MaxCoolCoilFluidFlow;
+                    } else if (WaterControlNode == fanCoil.HeatCoilFluidInletNode && fanCoil.HCoilType_Num != HCoil::Electric) {
+                        state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * fanCoil.MaxHeatCoilFluidFlow;
                     }
                     Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                     if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
@@ -3556,11 +3555,10 @@ namespace FanCoilUnits {
                         PLR *= 0.1;
                         // RegulaFalsi can reach max iteration when low water flow rate is required to meet load. Test at 0.01% of flow before
                         // iterating
-                        if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
-                            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
-                        } else if (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode &&
-                                   FanCoil(FanCoilNum).HCoilType_Num != HCoil::Electric) {
-                            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
+                        if (WaterControlNode == fanCoil.CoolCoilFluidInletNode) {
+                            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * fanCoil.MaxCoolCoilFluidFlow;
+                        } else if (WaterControlNode == fanCoil.HeatCoilFluidInletNode && fanCoil.HCoilType_Num != HCoil::Electric) {
+                            state.dataLoopNodes->Node(WaterControlNode).MassFlowRate = PLR * fanCoil.MaxHeatCoilFluidFlow;
                         }
                         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                         if ((CoolingLoad && QUnitOut < QZnReq) || (HeatingLoad && QUnitOut > QZnReq)) {
@@ -3617,8 +3615,6 @@ namespace FanCoilUnits {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int OutletNode;                // unit air outlet node
-        int InletNode;                 // unit air inlet node
         Real64 AirMassFlow;            // total mass flow through the unit
         Real64 PartLoad;               // if PLR present PartLoad = PLR
         Real64 OASchedValue;           // value of OASchedValue, =1 if not schedule
@@ -3634,8 +3630,8 @@ namespace FanCoilUnits {
             PartLoad = 1.0;
         }
 
-        OutletNode = fanCoil.AirOutNode;
-        InletNode = fanCoil.AirInNode;
+        int OutletNode = fanCoil.AirOutNode;
+        int InletNode = fanCoil.AirInNode;
         state.dataFanCoilUnits->ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
 
         // Assume the unit is able to vary the flow. A cycling unit is treated as
