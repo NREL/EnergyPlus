@@ -1237,9 +1237,6 @@ namespace FanCoilUnits {
             int OutNode = FanCoil(FanCoilNum).AirOutNode;
             OutsideAirNode = FanCoil(FanCoilNum).OutsideAirNode;
             RhoAir = state.dataEnvrn->StdRhoAir;
-            // hot and cold water control node number in fan coil loop
-            int HotConNode = FanCoil(FanCoilNum).HeatCoilFluidInletNode;
-            int ColdConNode = FanCoil(FanCoilNum).CoolCoilFluidInletNode;
             // set the mass flow rates from the input volume flow rates
             FanCoil(FanCoilNum).MaxAirMassFlow = RhoAir * FanCoil(FanCoilNum).MaxAirVolFlow;
             FanCoil(FanCoilNum).OutAirMassFlow = RhoAir * FanCoil(FanCoilNum).OutAirVolFlow;
@@ -1559,7 +1556,6 @@ namespace FanCoilUnits {
                         }
                         state.dataSize->DataAutosizedHeatingCapacity = TempSize;
                         state.dataSize->DataFlowPerHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
-                        SizingMethod = HeatingAirflowSizing;
                         PrintFlag = true;
                         TempSize = AutoSize;
                         errorsFound = false;
