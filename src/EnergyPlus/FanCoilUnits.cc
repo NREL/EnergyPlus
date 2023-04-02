@@ -1394,8 +1394,8 @@ namespace FanCoilUnits {
                           // HeatingCapacitySizing, etc.)
         bool PrintFlag;   // TRUE when sizing information is reported in the eio file
                           // FractionOfAutosizedHeatingAirflow ...)
-        Real64 WaterCoilSizDeltaT;      // water coil deltaT for design water flow rate autosizing
-        int CoilNum;                    // index of water coil object
+        Real64 WaterCoilSizDeltaT; // water coil deltaT for design water flow rate autosizing
+        int CoilNum;               // index of water coil object
 
         bool ErrorsFound = false;             // TRUE if errors found during sizing
         bool IsAutoSize = false;              // Indicator to autosize for reporting
@@ -2232,7 +2232,6 @@ namespace FanCoilUnits {
         Real64 CWFlowBypass; // cold water bypassed mass flow rate [kg/s]
 
         auto &fanCoil = state.dataFanCoilUnits->FanCoil(FanCoilNum);
-        auto &Node = state.dataLoopNodes->Node;
 
         // initialize local variables
         bool UnitOn = true;         // TRUE if unit is on
@@ -2249,9 +2248,9 @@ namespace FanCoilUnits {
         Real64 MinWaterFlow = 0.0;  // minimum water flow for heating or cooling [kg/sec]
         int OutletNode = fanCoil.AirOutNode;
         int InletNode = fanCoil.AirInNode;
-        Real64 AirMassFlow = Node(InletNode).MassFlowRate; // air mass flow rate [kg/sec]
-        Real64 Error = 1.0;                                // Error between QZnReq and QUnitOut
-        Real64 AbsError = 2.0 * SmallLoad;                 // Absolute error between QZnReq and QUnitOut [W]   !FB
+        Real64 AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate; // air mass flow rate [kg/sec]
+        Real64 Error = 1.0;                                                     // Error between QZnReq and QUnitOut
+        Real64 AbsError = 2.0 * SmallLoad;                                      // Absolute error between QZnReq and QUnitOut [W]   !FB
         Real64 Relax = 1.0;
         Real64 ElectricHeaterControl = 0.0; // 1 or 0, enables or disables heating coil
         Real64 HWFlow = 0.0;                // hot water mass flow rate solution [kg/s]
@@ -2306,8 +2305,8 @@ namespace FanCoilUnits {
                 // On the first HVAC iteration the system values are given to the controller, but after that
                 // the demand limits are in place and there needs to be feedback to the Zone Equipment
                 if (!FirstHVACIteration) {
-                    MaxWaterFlow = Node(ControlNode).MassFlowRateMaxAvail;
-                    MinWaterFlow = Node(ControlNode).MassFlowRateMinAvail;
+                    MaxWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
+                    MinWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
                 }
                 // get full load result
                 mdot = MaxWaterFlow;
@@ -2347,7 +2346,7 @@ namespace FanCoilUnits {
                             if (fanCoil.ConvgErrCountC < 2) {
                                 ShowWarningError(state, format("Cold Water control failed in fan coil unit {}", fanCoil.Name));
                                 ShowContinueError(state, "  Iteration limit exceeded in calculating water flow rate ");
-                                Node(fanCoil.CoolCoilFluidInletNode).MassFlowRate = CWFlow;
+                                state.dataLoopNodes->Node(fanCoil.CoolCoilFluidInletNode).MassFlowRate = CWFlow;
                                 Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
                                 ShowContinueErrorTimeStamp(state, format("Load Request = {}, Final Capacity = {}", QZnReq, QUnitOut));
                                 ShowContinueErrorTimeStamp(
@@ -2399,27 +2398,32 @@ namespace FanCoilUnits {
                                          ControlledZoneNum,
                                          FirstHVACIteration,
                                          QUnitOut); // get QUnitOut with CWFlow; rest will be bypassed
-                        Node(fanCoil.CoolCoilFluidInletNode).MassFlowRate =
+                        state.dataLoopNodes->Node(fanCoil.CoolCoilFluidInletNode).MassFlowRate =
                             MdotLockC; // reset flow to locked value. Since lock is on, must do this by hand
-                        Node(fanCoil.CoolCoilFluidOutletNodeNum).MassFlowRate = MdotLockC;
+                        state.dataLoopNodes->Node(fanCoil.CoolCoilFluidOutletNodeNum).MassFlowRate = MdotLockC;
                         // Keep soln flow rate but reset outlet water temperature - i.e. bypass extra water
                         CWFlowBypass = MdotLockC - CWFlow;
                         // change water outlet temperature and enthalpy
-                        Node(fanCoil.CoolCoilFluidOutletNodeNum).Temp =
-                            (CWFlowBypass * Node(fanCoil.CoolCoilFluidInletNode).Temp + CWFlow * Node(fanCoil.CoolCoilFluidOutletNodeNum).Temp) /
+                        state.dataLoopNodes->Node(fanCoil.CoolCoilFluidOutletNodeNum).Temp =
+                            (CWFlowBypass * state.dataLoopNodes->Node(fanCoil.CoolCoilFluidInletNode).Temp +
+                             CWFlow * state.dataLoopNodes->Node(fanCoil.CoolCoilFluidOutletNodeNum).Temp) /
                             MdotLockC;
-                        Node(fanCoil.CoolCoilFluidOutletNodeNum).Enthalpy = (CWFlowBypass * Node(fanCoil.CoolCoilFluidInletNode).Enthalpy +
-                                                                             CWFlow * Node(fanCoil.CoolCoilFluidOutletNodeNum).Enthalpy) /
-                                                                            MdotLockC;
+                        state.dataLoopNodes->Node(fanCoil.CoolCoilFluidOutletNodeNum).Enthalpy =
+                            (CWFlowBypass * state.dataLoopNodes->Node(fanCoil.CoolCoilFluidInletNode).Enthalpy +
+                             CWFlow * state.dataLoopNodes->Node(fanCoil.CoolCoilFluidOutletNodeNum).Enthalpy) /
+                            MdotLockC;
                     } else {
                         // if MdotLockC <= CWFlow use MdotLockC as is
-                        Node(fanCoil.CoolCoilFluidInletNode).MassFlowRate =
+                        state.dataLoopNodes->Node(fanCoil.CoolCoilFluidInletNode).MassFlowRate =
                             MdotLockC; // reset flow to locked value. Since lock is on, must do this by hand
-                        Node(fanCoil.CoolCoilFluidOutletNodeNum).MassFlowRate = MdotLockC;
+                        state.dataLoopNodes->Node(fanCoil.CoolCoilFluidOutletNodeNum).MassFlowRate = MdotLockC;
                         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
                     }
                 }
-                QUnitOut = calcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat);
+                QUnitOut = calcZoneSensibleOutput(AirMassFlow,
+                                                  state.dataLoopNodes->Node(OutletNode).Temp,
+                                                  state.dataLoopNodes->Node(InletNode).Temp,
+                                                  state.dataLoopNodes->Node(InletNode).HumRat);
 
                 // if heating
             } else if (UnitOn && QCoilHeatSP > SmallLoad &&
@@ -2433,8 +2437,8 @@ namespace FanCoilUnits {
                     // On the first HVAC iteration the system values are given to the controller, but after that
                     // the demand limits are in place and there needs to be feedback to the Zone Equipment
                     if (!FirstHVACIteration) {
-                        MaxWaterFlow = Node(ControlNode).MassFlowRateMaxAvail;
-                        MinWaterFlow = Node(ControlNode).MassFlowRateMinAvail;
+                        MaxWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
+                        MinWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
                     }
                     mdot = MaxWaterFlow;
                     SetComponentFlowRate(state, mdot, fanCoil.HeatCoilFluidInletNode, fanCoil.HeatCoilFluidOutletNodeNum, fanCoil.HeatCoilPlantLoc);
@@ -2487,7 +2491,7 @@ namespace FanCoilUnits {
                                 if (fanCoil.ConvgErrCountH < 2) {
                                     ShowWarningError(state, format("Hot Water control failed in fan coil unit {}", fanCoil.Name));
                                     ShowContinueError(state, "  Iteration limit exceeded in calculating water flow rate ");
-                                    Node(fanCoil.HeatCoilFluidInletNode).MassFlowRate = HWFlow;
+                                    state.dataLoopNodes->Node(fanCoil.HeatCoilFluidInletNode).MassFlowRate = HWFlow;
                                     Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
                                     ShowContinueErrorTimeStamp(state, format("Load Request = {}, Final Capacity = {}", QZnReq, QUnitOut));
                                     ShowContinueErrorTimeStamp(
@@ -2551,38 +2555,43 @@ namespace FanCoilUnits {
                                              ControlledZoneNum,
                                              FirstHVACIteration,
                                              QUnitOut); // get QUnitOut with HWFlow; rest will be bypassed
-                            Node(fanCoil.HeatCoilFluidInletNode).MassFlowRate =
+                            state.dataLoopNodes->Node(fanCoil.HeatCoilFluidInletNode).MassFlowRate =
                                 MdotLockH; // reset flow to locked value. Since lock is on, must do this by hand
-                            Node(fanCoil.HeatCoilFluidOutletNodeNum).MassFlowRate = MdotLockH;
+                            state.dataLoopNodes->Node(fanCoil.HeatCoilFluidOutletNodeNum).MassFlowRate = MdotLockH;
                             // Keep soln flow rate but reset outlet water temperature - i.e. bypass extra water
                             HWFlowBypass = MdotLockH - HWFlow;
                             // change outlet water temperature and enthalpy
-                            Node(fanCoil.HeatCoilFluidOutletNodeNum).Temp =
-                                (HWFlowBypass * Node(fanCoil.HeatCoilFluidInletNode).Temp + HWFlow * Node(fanCoil.HeatCoilFluidOutletNodeNum).Temp) /
+                            state.dataLoopNodes->Node(fanCoil.HeatCoilFluidOutletNodeNum).Temp =
+                                (HWFlowBypass * state.dataLoopNodes->Node(fanCoil.HeatCoilFluidInletNode).Temp +
+                                 HWFlow * state.dataLoopNodes->Node(fanCoil.HeatCoilFluidOutletNodeNum).Temp) /
                                 MdotLockH;
-                            Node(fanCoil.HeatCoilFluidOutletNodeNum).Enthalpy = (HWFlowBypass * Node(fanCoil.HeatCoilFluidInletNode).Enthalpy +
-                                                                                 HWFlow * Node(fanCoil.HeatCoilFluidOutletNodeNum).Enthalpy) /
-                                                                                MdotLockH;
+                            state.dataLoopNodes->Node(fanCoil.HeatCoilFluidOutletNodeNum).Enthalpy =
+                                (HWFlowBypass * state.dataLoopNodes->Node(fanCoil.HeatCoilFluidInletNode).Enthalpy +
+                                 HWFlow * state.dataLoopNodes->Node(fanCoil.HeatCoilFluidOutletNodeNum).Enthalpy) /
+                                MdotLockH;
                         } else {
                             // if MdotLockH <= HWFlow use MdotLockH as is
-                            Node(fanCoil.HeatCoilFluidInletNode).MassFlowRate =
+                            state.dataLoopNodes->Node(fanCoil.HeatCoilFluidInletNode).MassFlowRate =
                                 MdotLockH; // reset flow to locked value. Since lock is on, must do this by hand
-                            Node(fanCoil.HeatCoilFluidOutletNodeNum).MassFlowRate = MdotLockH;
+                            state.dataLoopNodes->Node(fanCoil.HeatCoilFluidOutletNodeNum).MassFlowRate = MdotLockH;
                             Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
                         }
                     }
                 }
-                QUnitOut = calcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat);
+                QUnitOut = calcZoneSensibleOutput(AirMassFlow,
+                                                  state.dataLoopNodes->Node(OutletNode).Temp,
+                                                  state.dataLoopNodes->Node(InletNode).Temp,
+                                                  state.dataLoopNodes->Node(InletNode).HumRat);
             } else {
                 // no action
                 QUnitOut = QUnitOutNoHC;
             }
 
             // CR9155 Remove specific humidity calculations
-            SpecHumOut = Node(OutletNode).HumRat;
-            SpecHumIn = Node(InletNode).HumRat;
+            SpecHumOut = state.dataLoopNodes->Node(OutletNode).HumRat;
+            SpecHumIn = state.dataLoopNodes->Node(InletNode).HumRat;
             LatentOutput = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate (kg/s), dehumid = negative
-            QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
+            QTotUnitOut = AirMassFlow * (state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
             // report variables
             fanCoil.HeatPower = max(0.0, QUnitOut);
             fanCoil.SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QUnitOut));
@@ -2632,17 +2641,17 @@ namespace FanCoilUnits {
 
                 // set water side mass flow rate
                 if (QCoilCoolSP < 0) {
-                    Node(fanCoil.CoolCoilFluidInletNode).MassFlowRate = fanCoil.MaxCoolCoilFluidFlow;
+                    state.dataLoopNodes->Node(fanCoil.CoolCoilFluidInletNode).MassFlowRate = fanCoil.MaxCoolCoilFluidFlow;
                 } else if (QCoilHeatSP > 0 && fanCoil.HCoilType_Num != HCoil::Electric) {
-                    Node(fanCoil.HeatCoilFluidInletNode).MassFlowRate = fanCoil.MaxHeatCoilFluidFlow;
+                    state.dataLoopNodes->Node(fanCoil.HeatCoilFluidInletNode).MassFlowRate = fanCoil.MaxHeatCoilFluidFlow;
                 }
 
-                Node(InletNode).MassFlowRateMax = fanCoil.LowSpeedRatio * fanCoil.MaxAirMassFlow;
+                state.dataLoopNodes->Node(InletNode).MassFlowRateMax = fanCoil.LowSpeedRatio * fanCoil.MaxAirMassFlow;
                 fanCoil.SpeedFanSel = 1;
                 fanCoil.SpeedFanRatSel = fanCoil.LowSpeedRatio;
                 Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax);
                 if (std::abs(QUnitOutMax) < std::abs(QZnReq)) {
-                    Node(InletNode).MassFlowRateMax = fanCoil.MedSpeedRatio * fanCoil.MaxAirMassFlow;
+                    state.dataLoopNodes->Node(InletNode).MassFlowRateMax = fanCoil.MedSpeedRatio * fanCoil.MaxAirMassFlow;
                     fanCoil.SpeedFanSel = 2;
                     fanCoil.SpeedFanRatSel = fanCoil.MedSpeedRatio;
                     Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax);
@@ -2650,7 +2659,7 @@ namespace FanCoilUnits {
                 if (std::abs(QUnitOutMax) < std::abs(QZnReq)) {
                     fanCoil.SpeedFanSel = 3;
                     fanCoil.SpeedFanRatSel = 1.0;
-                    Node(InletNode).MassFlowRateMax = fanCoil.MaxAirMassFlow;
+                    state.dataLoopNodes->Node(InletNode).MassFlowRateMax = fanCoil.MaxAirMassFlow;
                 }
             } else {
                 fanCoil.SpeedFanSel = 0;
@@ -2702,7 +2711,7 @@ namespace FanCoilUnits {
                             if (fanCoil.ConvgErrCountC < 2) {
                                 ShowWarningError(state, format("Part-load ratio cooling control failed in fan coil unit {}", fanCoil.Name));
                                 ShowContinueError(state, "  Iteration limit exceeded in calculating FCU part-load ratio ");
-                                Node(fanCoil.CoolCoilFluidInletNode).MassFlowRate = PLR * fanCoil.MaxCoolCoilFluidFlow;
+                                state.dataLoopNodes->Node(fanCoil.CoolCoilFluidInletNode).MassFlowRate = PLR * fanCoil.MaxCoolCoilFluidFlow;
                                 Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                                 ShowContinueErrorTimeStamp(state, format("Load Request = {}, Final Capacity = {}", QZnReq, QUnitOut));
                                 ShowContinueErrorTimeStamp(
@@ -2797,7 +2806,7 @@ namespace FanCoilUnits {
                                 if (fanCoil.ConvgErrCountH < 2) {
                                     ShowWarningError(state, format("Part-load ratio heating control failed in fan coil unit {}", fanCoil.Name));
                                     ShowContinueError(state, "  Iteration limit exceeded in calculating FCU part-load ratio ");
-                                    Node(fanCoil.HeatCoilFluidInletNode).MassFlowRate = PLR * fanCoil.MaxHeatCoilFluidFlow;
+                                    state.dataLoopNodes->Node(fanCoil.HeatCoilFluidInletNode).MassFlowRate = PLR * fanCoil.MaxHeatCoilFluidFlow;
                                     Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                                     ShowContinueErrorTimeStamp(state, format("Load Request = {}, Final Capacity = {}", QZnReq, QUnitOut));
                                     ShowContinueErrorTimeStamp(
@@ -2860,19 +2869,19 @@ namespace FanCoilUnits {
 
             } else {
                 // no action, zero the air flow rate, the unit is off
-                Node(InletNode).MassFlowRate = 0.0;
-                Node(OutletNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRate = 0.0;
                 fanCoil.SpeedFanSel = 0;
                 PLR = 0.0;
                 Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
             }
 
-            AirMassFlow = Node(InletNode).MassFlowRate;
+            AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             // CR9155 Remove specific humidity calculations
-            SpecHumOut = Node(OutletNode).HumRat;
-            SpecHumIn = Node(InletNode).HumRat;
+            SpecHumOut = state.dataLoopNodes->Node(OutletNode).HumRat;
+            SpecHumIn = state.dataLoopNodes->Node(InletNode).HumRat;
             LatentOutput = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate (kg/s), dehumid = negative
-            QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
+            QTotUnitOut = AirMassFlow * (state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
             // report variables
             fanCoil.HeatPower = max(0.0, QUnitOut);
             fanCoil.SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QUnitOut));
@@ -2905,8 +2914,10 @@ namespace FanCoilUnits {
             // determine minimum outdoor air flow rate
             if (fanCoil.DSOAPtr > 0 && fanCoil.OutsideAirNode > 0) {
                 OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, fanCoil.DSOAPtr, ControlledZoneNum, true, true);
-                RhoAir = PsyRhoAirFnPbTdbW(
-                    state, Node(fanCoil.OutsideAirNode).Press, Node(fanCoil.OutsideAirNode).Temp, Node(fanCoil.OutsideAirNode).HumRat);
+                RhoAir = PsyRhoAirFnPbTdbW(state,
+                                           state.dataLoopNodes->Node(fanCoil.OutsideAirNode).Press,
+                                           state.dataLoopNodes->Node(fanCoil.OutsideAirNode).Temp,
+                                           state.dataLoopNodes->Node(fanCoil.OutsideAirNode).HumRat);
                 OAMassFlow = OAVolumeFlowRate * RhoAir;
             }
 
@@ -2915,7 +2926,7 @@ namespace FanCoilUnits {
             state.dataFanCoilUnits->HeatingLoad = false;
             state.dataFanCoilUnits->CoolingLoad = false;
             if (UnitOn) {
-                Node(InletNode).MassFlowRate = MinSAMassFlowRate;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = MinSAMassFlowRate;
                 fanCoil.MaxNoCoolHeatAirMassFlow = MinSAMassFlowRate;
                 fanCoil.MaxCoolAirMassFlow = MaxSAMassFlowRate;
                 fanCoil.MaxHeatAirMassFlow = MaxSAMassFlowRate;
@@ -2953,14 +2964,14 @@ namespace FanCoilUnits {
 
             if (state.dataFanCoilUnits->CoolingLoad) {
 
-                Node(InletNode).MassFlowRate = MaxSAMassFlowRate;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = MaxSAMassFlowRate;
 
                 mdot = fanCoil.MaxCoolCoilFluidFlow;
                 SetComponentFlowRate(state, mdot, fanCoil.CoolCoilFluidInletNode, fanCoil.CoolCoilFluidOutletNodeNum, fanCoil.CoolCoilPlantLoc);
 
             } else if (state.dataFanCoilUnits->HeatingLoad) {
 
-                Node(InletNode).MassFlowRate = MaxSAMassFlowRate;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = MaxSAMassFlowRate;
 
                 if (fanCoil.HCoilType_Num == HCoil::Water) {
                     mdot = fanCoil.MaxHeatCoilFluidFlow;
@@ -2974,8 +2985,9 @@ namespace FanCoilUnits {
                 if ((state.dataFanCoilUnits->CoolingLoad && QUnitOutNoHC < QZnReq) ||
                     (state.dataFanCoilUnits->HeatingLoad && QUnitOutNoHC > QZnReq)) {
                     PLR = 0.0;
-                    fanCoil.FanPartLoadRatio = 0.0;                   // set SZVAV model variable
-                    Node(InletNode).MassFlowRate = MinSAMassFlowRate; // = min air flow rate + ((max-min) air flow rate * FanPartLoadRatio)
+                    fanCoil.FanPartLoadRatio = 0.0; // set SZVAV model variable
+                    state.dataLoopNodes->Node(InletNode).MassFlowRate =
+                        MinSAMassFlowRate; // = min air flow rate + ((max-min) air flow rate * FanPartLoadRatio)
                     mdot = 0.0;
                     SetComponentFlowRate(state, mdot, fanCoil.CoolCoilFluidInletNode, fanCoil.CoolCoilFluidOutletNodeNum, fanCoil.CoolCoilPlantLoc);
 
@@ -3012,10 +3024,10 @@ namespace FanCoilUnits {
             }
             Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
             PowerMet = QUnitOut;
-            AirMassFlow = Node(InletNode).MassFlowRate;
+            AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             // CR9155 Remove specific humidity calculations
-            SpecHumOut = Node(OutletNode).HumRat;
-            SpecHumIn = Node(InletNode).HumRat;
+            SpecHumOut = state.dataLoopNodes->Node(OutletNode).HumRat;
+            SpecHumIn = state.dataLoopNodes->Node(InletNode).HumRat;
             // Latent rate (kg/s), dehumid = negative
             LatOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn);
             fanCoil.PLR = PLR;
@@ -3146,20 +3158,23 @@ namespace FanCoilUnits {
 
             } else {
                 // no action, zero the air flow rate, the unit is off
-                Node(InletNode).MassFlowRate = 0.0;
-                Node(OutletNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(OutletNode).MassFlowRate = 0.0;
                 fanCoil.SpeedFanSel = 0;
                 PLR = 0.0;
                 Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
             }
 
-            AirMassFlow = Node(InletNode).MassFlowRate;
+            AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             // CR9155 Remove specific humidity calculations
-            SpecHumOut = Node(OutletNode).HumRat;
-            SpecHumIn = Node(InletNode).HumRat;
+            SpecHumOut = state.dataLoopNodes->Node(OutletNode).HumRat;
+            SpecHumIn = state.dataLoopNodes->Node(InletNode).HumRat;
             LatentOutput = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate (kg/s), dehumid = negative
-            QSensUnitOutNoATM = calcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat);
-            QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
+            QSensUnitOutNoATM = calcZoneSensibleOutput(AirMassFlow,
+                                                       state.dataLoopNodes->Node(OutletNode).Temp,
+                                                       state.dataLoopNodes->Node(InletNode).Temp,
+                                                       state.dataLoopNodes->Node(InletNode).HumRat);
+            QTotUnitOut = AirMassFlow * (state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
             // report variables
             fanCoil.HeatPower = max(0.0, QSensUnitOutNoATM);
             fanCoil.SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QSensUnitOutNoATM));
@@ -3177,12 +3192,15 @@ namespace FanCoilUnits {
         case CCM::MultiSpeedFan: {
             // call multi-speed fan staging calculation
             SimMultiStage4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
-            AirMassFlow = Node(InletNode).MassFlowRate;
-            SpecHumOut = Node(OutletNode).HumRat;
-            SpecHumIn = Node(InletNode).HumRat;
+            AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+            SpecHumOut = state.dataLoopNodes->Node(OutletNode).HumRat;
+            SpecHumIn = state.dataLoopNodes->Node(InletNode).HumRat;
             LatentOutput = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate (kg/s), dehumid = negative
-            QSensUnitOutNoATM = calcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat);
-            QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
+            QSensUnitOutNoATM = calcZoneSensibleOutput(AirMassFlow,
+                                                       state.dataLoopNodes->Node(OutletNode).Temp,
+                                                       state.dataLoopNodes->Node(InletNode).Temp,
+                                                       state.dataLoopNodes->Node(InletNode).HumRat);
+            QTotUnitOut = AirMassFlow * (state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
             // report variables
             fanCoil.HeatPower = max(0.0, QSensUnitOutNoATM);
             fanCoil.SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QSensUnitOutNoATM));
