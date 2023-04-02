@@ -86,7 +86,6 @@ namespace EnergyPlus::ExternalInterface {
 //       DATE WRITTEN   2Dec2007
 //       MODIFIED       Rui Zhang July 2009
 //       MODIFIED       Thierry S. Nouidui 2011
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // To encapsulate the data and routines required to interface
@@ -102,8 +101,6 @@ void ExternalInterfaceExchangeVariables(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael Wetter
     //       DATE WRITTEN   2Dec2007
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Exchanges variables between EnergyPlus and the BCVTB socket.
@@ -147,8 +144,6 @@ void GetExternalInterfaceInput(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael Wetter
     //       DATE WRITTEN   2Dec2007
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for ExternalInterface
@@ -275,8 +270,6 @@ void StopExternalInterfaceIfError(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael Wetter
     //       DATE WRITTEN   9Jan2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gracefully stops the ExternalInterface if an error has been found.
@@ -314,8 +307,6 @@ void CloseSocket(EnergyPlusData &state, int const FlagToWriteToSocket)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael Wetter
     //       DATE WRITTEN   December 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine tries to write the optional error code to the
@@ -355,8 +346,6 @@ void ParseString(std::string const &str, // The string, with all elements separa
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael Wetter
     //       DATE WRITTEN   8Jan2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine parses the semicolon separated string xmlStr
@@ -389,7 +378,6 @@ void InitExternalInterface(EnergyPlusData &state)
     //       AUTHOR         Michael Wetter
     //       DATE WRITTEN   2Dec2007
     //       MODIFIED       Rui Zhang Aug 2009
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for initializations of the ExternalInterface
@@ -614,8 +602,6 @@ void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
     //       DATE WRITTEN   08Aug2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine gets, sets and does the time integration in FMUs.
@@ -866,8 +852,6 @@ void InstantiateInitializeFMUImport(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
     //       DATE WRITTEN   08Aug2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine instantiates and initializes FMUs.
@@ -930,8 +914,6 @@ void InitializeFMU(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
     //       DATE WRITTEN   08Aug2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine reinitializes FMUs.
@@ -970,8 +952,6 @@ void TerminateResetFreeFMUImport(EnergyPlusData &state, int fmiEndSimulation)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
     //       DATE WRITTEN   08Aug2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine terminates the FMUs instances
@@ -1009,8 +989,6 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
     //       DATE WRITTEN   08Aug2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine initializes the input and outputs variables used for the co-simulation with FMUs.
@@ -1908,8 +1886,6 @@ Real64 GetCurSimStartTimeSeconds(const EnergyPlusData &state)
     // FUNCTION INFORMATION:
     //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
     //       DATE WRITTEN   August 2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     //  Get the current month and day in the runperiod and convert
@@ -2015,8 +1991,6 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
     //       DATE WRITTEN   08Aug2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine organizes the data exchange between FMU and EnergyPlus.
@@ -2298,8 +2272,6 @@ void ValidateRunControl(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael Wetter
     //       DATE WRITTEN   December 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine ensures that the RunControl object is valid.
@@ -2308,14 +2280,14 @@ void ValidateRunControl(EnergyPlusData &state)
     // Use GetObjectItem from the Input Processor
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumAlphas(0);  // Number of Alphas for each GetObjectItem call
-    int NumNumbers(0); // Number of Numbers for each GetObjectItem call
-    int IOStatus(0);   // Used in GetObjectItem
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     cCurrentModuleObject = "SimulationControl";
     int const NumRunControl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (NumRunControl > 0) {
+        int NumAlphas = 0;  // Number of Alphas for each GetObjectItem call
+        int NumNumbers = 0; // Number of Numbers for each GetObjectItem call
+        int IOStatus = 0;   // Used in GetObjectItem
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  1,
@@ -2343,8 +2315,6 @@ void CalcExternalInterface(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael Wetter
     //       DATE WRITTEN   2Dec2007
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // Using/Aliasing
     using EMSManager::ManageEMS;
@@ -2357,9 +2327,6 @@ void CalcExternalInterface(EnergyPlusData &state)
     int constexpr nDblMax(1024); // Maximum number of doubles
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int i;      // Loop counter
-    int retVal; // Return value from socket
-
     int flaWri;       // flag to write to the socket
     int flaRea;       // flag read from the socket
     int nDblWri;      // number of doubles to write to socket
@@ -2396,19 +2363,19 @@ void CalcExternalInterface(EnergyPlusData &state)
 
         // Get EnergyPlus variables
         if (state.dataExternalInterface->firstCall) { // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
-            for (i = 1; i <= nDblWri; ++i) {
+            for (int i = 1; i <= nDblWri; ++i) {
                 dblValWri(i) =
                     GetInternalVariableValue(state, state.dataExternalInterface->varTypes(i), state.dataExternalInterface->keyVarIndexes(i));
             }
         } else {
-            for (i = 1; i <= nDblWri; ++i) {
+            for (int i = 1; i <= nDblWri; ++i) {
                 dblValWri(i) = GetInternalVariableValueExternalInterface(
                     state, state.dataExternalInterface->varTypes(i), state.dataExternalInterface->keyVarIndexes(i));
             }
         }
 
         // Exchange data with socket
-        retVal = 0;
+        int retVal = 0;
         flaRea = 0;
         if (state.dataExternalInterface->haveExternalInterfaceBCVTB) {
             retVal = exchangedoubleswithsocket(&state.dataExternalInterface->socketFD,
@@ -2473,7 +2440,7 @@ void CalcExternalInterface(EnergyPlusData &state)
 
         // No errors found. Assign exchanged variables
         if ((flaRea == 0) && continueSimulation) {
-            for (i = 1; i <= isize(state.dataExternalInterface->varInd); ++i) {
+            for (int i = 1; i <= isize(state.dataExternalInterface->varInd); ++i) {
                 if (state.dataExternalInterface->inpVarTypes(i) == indexSchedule) {
                     ExternalInterfaceSetSchedule(state, state.dataExternalInterface->varInd(i), dblValRea(i));
                 } else if ((state.dataExternalInterface->inpVarTypes(i) == indexVariable) ||
@@ -2508,8 +2475,6 @@ void GetReportVariableKey(
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael Wetter
     //       DATE WRITTEN   2Dec2007
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Gets the sensor key index and type for the specified variable key and name
@@ -2556,8 +2521,6 @@ void WarnIfExternalInterfaceObjectsAreUsed(EnergyPlusData &state, std::string co
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael Wetter
     //       DATE WRITTEN   December 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine writes a warning if ExternalInterface objects are used in the
@@ -2575,8 +2538,6 @@ void VerifyExternalInterfaceObject(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Michael Wetter
     //       DATE WRITTEN   12Dec2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine verifies the correctness of the fields of
