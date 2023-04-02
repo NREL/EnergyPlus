@@ -2035,8 +2035,6 @@ namespace FanCoilUnits {
                             MaxColdWaterVolFlowDes = 0.0;
                         }
                     }
-                }
-                if (IsAutoSize) {
                     fanCoil.MaxColdWaterVolFlow = MaxColdWaterVolFlowDes;
                     BaseSizer::reportSizerOutput(
                         state, fanCoil.UnitType, fanCoil.Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxColdWaterVolFlowDes);
