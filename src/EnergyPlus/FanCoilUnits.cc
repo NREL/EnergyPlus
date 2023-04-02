@@ -1210,17 +1210,6 @@ namespace FanCoilUnits {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::CoolingAirflowSizing;
-        using DataHVACGlobals::CoolingCapacitySizing;
-        using DataHVACGlobals::HeatingAirflowSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
-        using FluidProperties::GetSpecificHeatGlycol;
-
-        using HVACHXAssistedCoolingCoil::GetHXCoilType;
-        using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
-        using PlantUtilities::MyPlantSizingIndex;
-        using Psychrometrics::PsyCpAirFnW;
-        using Psychrometrics::PsyHFnTdbW;
         using WaterCoils::GetCoilWaterOutletNode;
         using WaterCoils::GetWaterCoilIndex;
         using WaterCoils::SetCoilDesFlow;
@@ -1305,7 +1294,7 @@ namespace FanCoilUnits {
                 SizingString = state.dataFanCoilUnits->FanCoilNumericFields(FanCoilNum).FieldNames(FieldNum) + " [m3/s]";
                 if (state.dataGlobal->isEpJSON) SizingString = "maximum_supply_air_flow_rate [m3/s]";
                 if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod > 0) {
-                    SizingMethod = CoolingAirflowSizing;
+                    SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
                     SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
                     zoneEqSizing.SizingMethod(SizingMethod) = SAFMethod;
                     if (SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow) {
@@ -1335,7 +1324,7 @@ namespace FanCoilUnits {
                         CoolingAirVolFlowDes = sizingCoolingAirFlow.size(state, TempSize, ErrorsFound);
 
                     } else if (SAFMethod == FlowPerCoolingCapacity) {
-                        SizingMethod = CoolingCapacitySizing;
+                        SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
                         TempSize = AutoSize;
                         PrintFlag = false;
                         CoolingCapacitySizer sizerCoolingCapacity;
@@ -1357,7 +1346,7 @@ namespace FanCoilUnits {
                     }
                 } else if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod > 0) {
                     // now do heating supply air flow rate sizing
-                    SizingMethod = HeatingAirflowSizing;
+                    SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
                     SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod;
                     zoneEqSizing.SizingMethod(SizingMethod) = SAFMethod;
                     if (SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow) {
@@ -1387,7 +1376,7 @@ namespace FanCoilUnits {
                         sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         HeatingAirVolFlowDes = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                     } else if (SAFMethod == FlowPerHeatingCapacity) {
-                        SizingMethod = HeatingCapacitySizing;
+                        SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                         TempSize = AutoSize;
                         PrintFlag = false;
                         state.dataSize->DataScalableSizingON = true;
@@ -1586,12 +1575,12 @@ namespace FanCoilUnits {
                     state.dataFanCoilUnits->CoilWaterOutletNode =
                         WaterCoils::GetCoilWaterOutletNode(state, "Coil:Heating:Water", fanCoil.HCoilName, ErrorsFound);
                     if (IsAutoSize) {
-                        int PltSizHeatNum = MyPlantSizingIndex(state,
-                                                               "Coil:Heating:Water",
-                                                               fanCoil.HCoilName,
-                                                               state.dataFanCoilUnits->CoilWaterInletNode,
-                                                               state.dataFanCoilUnits->CoilWaterOutletNode,
-                                                               ErrorsFound);
+                        int PltSizHeatNum = PlantUtilities::MyPlantSizingIndex(state,
+                                                                               "Coil:Heating:Water",
+                                                                               fanCoil.HCoilName,
+                                                                               state.dataFanCoilUnits->CoilWaterInletNode,
+                                                                               state.dataFanCoilUnits->CoilWaterOutletNode,
+                                                                               ErrorsFound);
                         CoilNum = WaterCoils::GetWaterCoilIndex(state, "COIL:HEATING:WATER", fanCoil.HCoilName, ErrorsFound);
                         bool DoWaterCoilSizing; // if TRUE do water coil sizing calculation
                         if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
@@ -1610,7 +1599,7 @@ namespace FanCoilUnits {
                             }
                         }
                         if (DoWaterCoilSizing) {
-                            SizingMethod = HeatingCapacitySizing;
+                            SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                             if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow > 0.0) {
                                 state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatOAFlowFrac =
                                     min(fanCoil.OutAirVolFlow / state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow, 1.0);
@@ -1688,11 +1677,11 @@ namespace FanCoilUnits {
                                                                         Constant::HWInitConvTemp,
                                                                         state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidIndex,
                                                                         RoutineNameNoSpace);
-                                Cp = GetSpecificHeatGlycol(state,
-                                                           state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidName,
-                                                           Constant::HWInitConvTemp,
-                                                           state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidIndex,
-                                                           RoutineNameNoSpace);
+                                Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                            state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidName,
+                                                                            Constant::HWInitConvTemp,
+                                                                            state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidIndex,
+                                                                            RoutineNameNoSpace);
 
                                 MaxHotWaterVolFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
                             } else {
@@ -1736,7 +1725,7 @@ namespace FanCoilUnits {
             if (fanCoil.DesignHeatingCapacity == AutoSize) {
                 CompName = fanCoil.HCoilName;
                 CompType = fanCoil.HCoilType;
-                SizingMethod = HeatingCapacitySizing;
+                SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                 PrintFlag = false;
                 TempSize = fanCoil.DesignHeatingCapacity;
                 SizingString = "Nominal Heating Capacity [W]";
@@ -1761,8 +1750,8 @@ namespace FanCoilUnits {
                 }
             } else {
                 if (UtilityRoutines::SameString(fanCoil.CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
-                    CoolingCoilName = GetHXDXCoilName(state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound);
-                    CoolingCoilType = GetHXCoilType(state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound);
+                    CoolingCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound);
+                    CoolingCoilType = HVACHXAssistedCoolingCoil::GetHXCoilType(state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound);
                 } else {
                     CoolingCoilName = fanCoil.CCoilName;
                     CoolingCoilType = fanCoil.CCoilType;
@@ -1771,12 +1760,12 @@ namespace FanCoilUnits {
                 state.dataFanCoilUnits->CoilWaterOutletNode =
                     WaterCoils::GetCoilWaterOutletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                 if (IsAutoSize) {
-                    int PltSizCoolNum = MyPlantSizingIndex(state,
-                                                           CoolingCoilType,
-                                                           CoolingCoilName,
-                                                           state.dataFanCoilUnits->CoilWaterInletNode,
-                                                           state.dataFanCoilUnits->CoilWaterOutletNode,
-                                                           ErrorsFound);
+                    int PltSizCoolNum = PlantUtilities::MyPlantSizingIndex(state,
+                                                                           CoolingCoilType,
+                                                                           CoolingCoilName,
+                                                                           state.dataFanCoilUnits->CoilWaterInletNode,
+                                                                           state.dataFanCoilUnits->CoilWaterOutletNode,
+                                                                           ErrorsFound);
                     CoilNum = WaterCoils::GetWaterCoilIndex(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                     bool DoWaterCoilSizing; // if TRUE do water coil sizing calculation
                     if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
@@ -1796,7 +1785,7 @@ namespace FanCoilUnits {
                     }
 
                     if (DoWaterCoilSizing) {
-                        SizingMethod = CoolingCapacitySizing;
+                        SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
                         if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow > 0.0) {
                             state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolOAFlowFrac =
                                 min(fanCoil.OutAirVolFlow / state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow, 1.0);
@@ -1873,11 +1862,11 @@ namespace FanCoilUnits {
                                                                     5.,
                                                                     state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidIndex,
                                                                     RoutineNameNoSpace);
-                            Cp = GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidName,
-                                                       5.,
-                                                       state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidIndex,
-                                                       RoutineNameNoSpace);
+                            Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                        state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidName,
+                                                                        5.,
+                                                                        state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidIndex,
+                                                                        RoutineNameNoSpace);
                             MaxColdWaterVolFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
                         } else {
                             MaxColdWaterVolFlowDes = 0.0;
@@ -1986,8 +1975,8 @@ namespace FanCoilUnits {
 
         // set the design air flow rates for the heating and cooling coils
         if (UtilityRoutines::SameString(fanCoil.CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
-            CoolingCoilName = GetHXDXCoilName(state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound);
-            CoolingCoilType = GetHXCoilType(state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound);
+            CoolingCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound);
+            CoolingCoilType = HVACHXAssistedCoolingCoil::GetHXCoilType(state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound);
         } else {
             CoolingCoilName = fanCoil.CCoilName;
             CoolingCoilType = fanCoil.CCoilType;
@@ -2052,7 +2041,6 @@ namespace FanCoilUnits {
         using namespace DataZoneEnergyDemands;
 
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyHFnTdbW;
         using namespace DataPlant;
         using namespace DataLoopNode;
 
@@ -3265,7 +3253,6 @@ namespace FanCoilUnits {
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
         using WaterCoils::SimulateWaterCoilComponents;
 
