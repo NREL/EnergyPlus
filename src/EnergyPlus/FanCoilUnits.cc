@@ -2325,7 +2325,6 @@ namespace FanCoilUnits {
         Real64 AirMassFlow = Node(InletNode).MassFlowRate; // air mass flow rate [kg/sec]
         Real64 Error = 1.0;                                // Error between QZnReq and QUnitOut
         Real64 AbsError = 2.0 * SmallLoad;                 // Absolute error between QZnReq and QUnitOut [W]   !FB
-        int Iter = 0;                                      // iteration counter
         Real64 Relax = 1.0;
         Real64 ElectricHeaterControl = 0.0; // 1 or 0, enables or disables heating coil
         Real64 HWFlow = 0.0;                // hot water mass flow rate solution [kg/s]
@@ -2373,7 +2372,7 @@ namespace FanCoilUnits {
             // if cooling
             if (UnitOn && QCoilCoolSP < (-1.0 * SmallLoad) &&
                 state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating) {
-                ControlNode = fanCoil.CoolCoilFluidInletNode;
+                int ControlNode = fanCoil.CoolCoilFluidInletNode;
                 ControlOffset = fanCoil.ColdControlOffset;
                 MaxWaterFlow = fanCoil.MaxCoolCoilFluidFlow;
                 MinWaterFlow = fanCoil.MinColdWaterFlow;
@@ -2500,7 +2499,7 @@ namespace FanCoilUnits {
                        state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling) {
                 // get full load result
                 if (fanCoil.HCoilType_Num == HCoil::Water) { // if HW Coil
-                    ControlNode = fanCoil.HeatCoilFluidInletNode;
+                    int ControlNode = fanCoil.HeatCoilFluidInletNode;
                     ControlOffset = fanCoil.HotControlOffset;
                     MaxWaterFlow = fanCoil.MaxHeatCoilFluidFlow;
                     MinWaterFlow = fanCoil.MinHotWaterFlow;
@@ -3117,6 +3116,7 @@ namespace FanCoilUnits {
                              QUnitOutNoHC,
                              0.0); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 
+            int Iter = 0;
             if (UnitOn && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToCoolSP < (-1.0 * SmallLoad) &&
                 state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating) {
                 // cooling coil action, maximum cold water flow
