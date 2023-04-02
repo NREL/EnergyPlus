@@ -1174,32 +1174,22 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     //  currently just for secondary side of Research Special Indirect evap cooler
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool CoolerOnOApath(false);
-    bool CoolerOnMainAirLoop(false);
-    int BranchComp(0);
-    bool HardSizeNoDesRun;          // Indicator to a hard-sized field with no design sizing data
-    bool IsAutoSize;                // Indicator to autosize
-    Real64 IndirectVolFlowRateDes;  // Autosized volume flow rate for reporting
-    Real64 IndirectVolFlowRateUser; // Hardsized volume flow rate for reporting
-    bool SizingDesRunThisAirSys;    // true if a particular air system had a Sizing:System object and system sizing done
-    bool SizingDesRunThisZone;      // true if a particular zone had a Sizing:Zone object and zone sizing was done
-    Real64 PadAreaDes;              // Autosized celdek pad area for reporting
-    Real64 PadAreaUser;             // Hardsized celdek pad area for reporting
-    Real64 PadDepthDes;             // Autosized celdek pad depth for reporting
-    Real64 PadDepthUser;            // Hardsized celdek pad depth for reporting
+    bool IsAutoSize;             // Indicator to autosize
+    bool SizingDesRunThisAirSys; // true if a particular air system had a Sizing:System object and system sizing done
+    bool SizingDesRunThisZone;   // true if a particular zone had a Sizing:Zone object and zone sizing was done
 
     Real64 volFlowRateDes; // Autosized volume flow rate for reporting
     std::string CompType;  // for ease in getting objects
 
     // inits
-    CoolerOnOApath = false;
-    CoolerOnMainAirLoop = false;
-    IndirectVolFlowRateDes = 0.0;
-    IndirectVolFlowRateUser = 0.0;
-    PadAreaDes = 0.0;
-    PadAreaUser = 0.0;
-    PadDepthDes = 0.0;
-    PadDepthUser = 0.0;
+    bool CoolerOnOApath = false;
+    bool CoolerOnMainAirLoop = false;
+    Real64 IndirectVolFlowRateDes = 0.0;  // Autosized volume flow rate for reporting
+    Real64 IndirectVolFlowRateUser = 0.0; // Hardsized volume flow rate for reporting
+    Real64 PadAreaDes = 0.0;              // Autosized celdek pad area for reporting
+    Real64 PadAreaUser = 0.0;             // Hardsized celdek pad area for reporting
+    Real64 PadDepthDes = 0.0;             // Autosized celdek pad depth for reporting
+    Real64 PadDepthUser = 0.0;            // Hardsized celdek pad depth for reporting
 
     auto &CurSysNum(state.dataSize->CurSysNum);
     auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
@@ -1207,7 +1197,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     auto &EvapCond(state.dataEvapCoolers->EvapCond);
     auto &thisEvapCond(EvapCond(EvapCoolNum));
 
-    HardSizeNoDesRun = !((state.dataSize->SysSizingRunDone || state.dataSize->ZoneSizingRunDone));
+    bool HardSizeNoDesRun = !((state.dataSize->SysSizingRunDone || state.dataSize->ZoneSizingRunDone));
 
     if (CurSysNum > 0) {
         CheckThisAirSystemForSizing(state, CurSysNum, SizingDesRunThisAirSys);
@@ -1230,7 +1220,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         // where is this cooler located, is it on OA system or main loop?
         // search for this component in Air loop branches.
         for (int AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches; ++AirSysBranchLoop) {
-            for (BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
+            for (int BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
                  ++BranchComp) {
 
                 if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
@@ -1541,7 +1531,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
             // search for this component in Air loop branches.
             for (int AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches;
                  ++AirSysBranchLoop) {
-                for (BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
+                for (int BranchComp = 1;
+                     BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
                      ++BranchComp) {
                     if (UtilityRoutines::SameString(
                             state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
