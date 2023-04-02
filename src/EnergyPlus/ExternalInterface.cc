@@ -282,9 +282,9 @@ void StopExternalInterfaceIfError(EnergyPlusData &state)
 
     if ((state.dataExternalInterface->NumExternalInterfacesBCVTB != 0) || (state.dataExternalInterface->NumExternalInterfacesFMUExport != 0)) {
         if (state.dataExternalInterface->ErrorsFound) {
-            int retVal; // Return value, needed to catch return value of function call
             // Check if the socket is open
             if (state.dataExternalInterface->socketFD >= 0) {
+                int retVal; // Return value, needed to catch return value of function call
                 // Socket is open
                 if (state.dataExternalInterface->simulationStatus == 1) {
                     retVal = sendclientmessage(&state.dataExternalInterface->socketFD, &flag1);
@@ -1063,6 +1063,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         int NumFMUInputVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         // Determine the number of instances for each FMUs
         for (int i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
+            std::string Name_NEW = "";
+            std::string Name_OLD = "";
             int j = 1;
             int k = 1;
             state.dataExternalInterface->FMU(i).Instance.allocate(NumFMUInputVariables);
@@ -1081,8 +1083,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
-                    std::string Name_OLD = "";
-                    std::string Name_NEW = state.dataIPShortCut->cAlphaArgs(4);
+                    Name_NEW = state.dataIPShortCut->cAlphaArgs(4);
                     if (!UtilityRoutines::SameString(Name_OLD, Name_NEW)) {
                         int FOUND = UtilityRoutines::FindItem(Name_NEW, state.dataExternalInterface->checkInstanceName);
                         if (FOUND == 0) {
