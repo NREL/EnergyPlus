@@ -1004,21 +1004,12 @@ namespace FanCoilUnits {
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   March 2000
         //       MODIFIED       July 2012, Chandan Sharma - FSEC: Added zone sys avail managers
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the Fan Coil Components.
 
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
-
-        // Using/Aliasing
-        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-        using DataZoneEquipment::CheckZoneEquipmentList;
-        using FluidProperties::GetDensityGlycol;
-        using PlantUtilities::InitComponentNodes;
-        using PlantUtilities::ScanPlantLoopsForObject;
-        using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("InitFanCoilUnits");
@@ -1039,20 +1030,22 @@ namespace FanCoilUnits {
             state.dataFanCoilUnits->InitFanCoilUnitsOneTimeFlag = false;
         }
 
-        if (allocated(ZoneComp)) {
+        if (allocated(state.dataHVACGlobal->ZoneComp)) {
             if (state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).AvailManagerListName =
+                state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).AvailManagerListName =
                     fanCoil.AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).ZoneNum = ControlledZoneNum;
+                state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).ZoneNum = ControlledZoneNum;
                 state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum) = false;
             }
-            fanCoil.AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).AvailStatus;
+            fanCoil.AvailStatus =
+                state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).AvailStatus;
         }
 
         if (state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             bool errFlag = false;
             if (fanCoil.HCoilType_Num == HCoil::Water) {
-                ScanPlantLoopsForObject(state, fanCoil.HCoilName, fanCoil.HCoilPlantTypeOf, fanCoil.HeatCoilPlantLoc, errFlag, _, _, _, _, _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, fanCoil.HCoilName, fanCoil.HCoilPlantTypeOf, fanCoil.HeatCoilPlantLoc, errFlag, _, _, _, _, _);
 
                 if (errFlag) {
                     ShowContinueError(state, format("Reference Unit=\"{}\", type={}", fanCoil.Name, fanCoil.UnitType));
@@ -1069,7 +1062,8 @@ namespace FanCoilUnits {
 
             if ((fanCoil.CCoilPlantType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
                 (fanCoil.CCoilPlantType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
-                ScanPlantLoopsForObject(state, fanCoil.CCoilPlantName, fanCoil.CCoilPlantType, fanCoil.CoolCoilPlantLoc, errFlag, _, _, _, _, _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, fanCoil.CCoilPlantName, fanCoil.CCoilPlantType, fanCoil.CoolCoilPlantLoc, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowContinueError(state, format("Reference Unit=\"{}\", type={}", fanCoil.Name, fanCoil.UnitType));
                     ShowFatalError(state, "InitFanCoilUnits: Program terminated for previous conditions.");
@@ -1085,7 +1079,8 @@ namespace FanCoilUnits {
         if (!state.dataFanCoilUnits->InitFanCoilUnitsCheckInZoneEquipmentListFlag && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataFanCoilUnits->InitFanCoilUnitsCheckInZoneEquipmentListFlag = true;
             for (int Loop = 1; Loop <= state.dataFanCoilUnits->NumFanCoils; ++Loop) {
-                if (CheckZoneEquipmentList(state, state.dataFanCoilUnits->FanCoil(Loop).UnitType, state.dataFanCoilUnits->FanCoil(Loop).Name))
+                if (DataZoneEquipment::CheckZoneEquipmentList(
+                        state, state.dataFanCoilUnits->FanCoil(Loop).UnitType, state.dataFanCoilUnits->FanCoil(Loop).Name))
                     continue;
                 ShowSevereError(state,
                                 format("InitFanCoil: FanCoil Unit=[{},{}] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.",
@@ -1111,30 +1106,30 @@ namespace FanCoilUnits {
             fanCoil.OutAirMassFlow = RhoAir * fanCoil.OutAirVolFlow;
 
             if (fanCoil.HCoilType_Num == HCoil::Water) {
-                Real64 rho = GetDensityGlycol(state,
-                                              state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidName,
-                                              Constant::HWInitConvTemp,
-                                              state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidIndex,
-                                              RoutineName);
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidName,
+                                                               Constant::HWInitConvTemp,
+                                                               state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidIndex,
+                                                               RoutineName);
                 fanCoil.MaxHeatCoilFluidFlow = rho * fanCoil.MaxHotWaterVolFlow;
                 fanCoil.MinHotWaterFlow = rho * fanCoil.MinHotWaterVolFlow;
             }
 
-            Real64 rho = GetDensityGlycol(state,
-                                          state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidName,
-                                          Constant::CWInitConvTemp,
-                                          state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidIndex,
-                                          RoutineName);
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidName,
+                                                           Constant::CWInitConvTemp,
+                                                           state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidIndex,
+                                                           RoutineName);
             fanCoil.MaxCoolCoilFluidFlow = rho * fanCoil.MaxColdWaterVolFlow;
             fanCoil.MinColdWaterFlow = rho * fanCoil.MinColdWaterVolFlow;
 
             // set the node max and min mass flow rates
             if (fanCoil.HCoilType_Num == HCoil::Water) {
-                InitComponentNodes(
+                PlantUtilities::InitComponentNodes(
                     state, fanCoil.MinHotWaterFlow, fanCoil.MaxHeatCoilFluidFlow, fanCoil.HeatCoilFluidInletNode, fanCoil.HeatCoilFluidOutletNodeNum);
             }
 
-            InitComponentNodes(
+            PlantUtilities::InitComponentNodes(
                 state, fanCoil.MinColdWaterFlow, fanCoil.MaxCoolCoilFluidFlow, fanCoil.CoolCoilFluidInletNode, fanCoil.CoolCoilFluidOutletNodeNum);
 
             if (fanCoil.OutsideAirNode > 0) {
@@ -1205,7 +1200,6 @@ namespace FanCoilUnits {
         //       DATE WRITTEN   January 2002
         //       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
         //                      July 2014, B. Nigusse, added scalable sizing
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for sizing Fan Coil Unit components for which flow rates have not been
@@ -1220,7 +1214,6 @@ namespace FanCoilUnits {
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
-        using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
         using HVACHXAssistedCoolingCoil::GetHXCoilType;
@@ -1690,11 +1683,11 @@ namespace FanCoilUnits {
                             }
                             fanCoil.DesHeatingLoad = DesCoilLoad;
                             if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
-                                rho = GetDensityGlycol(state,
-                                                       state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidName,
-                                                       Constant::HWInitConvTemp,
-                                                       state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidIndex,
-                                                       RoutineNameNoSpace);
+                                rho = FluidProperties::GetDensityGlycol(state,
+                                                                        state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidName,
+                                                                        Constant::HWInitConvTemp,
+                                                                        state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidIndex,
+                                                                        RoutineNameNoSpace);
                                 Cp = GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(fanCoil.HeatCoilPlantLoc.loopNum).FluidName,
                                                            Constant::HWInitConvTemp,
@@ -1875,11 +1868,11 @@ namespace FanCoilUnits {
                         }
                         fanCoil.DesCoolingLoad = DesCoilLoad;
                         if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
-                            rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidName,
-                                                   5.,
-                                                   state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidIndex,
-                                                   RoutineNameNoSpace);
+                            rho = FluidProperties::GetDensityGlycol(state,
+                                                                    state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidName,
+                                                                    5.,
+                                                                    state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidIndex,
+                                                                    RoutineNameNoSpace);
                             Cp = GetSpecificHeatGlycol(state,
                                                        state.dataPlnt->PlantLoop(fanCoil.CoolCoilPlantLoc.loopNum).FluidName,
                                                        5.,
@@ -2060,7 +2053,6 @@ namespace FanCoilUnits {
 
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyHFnTdbW;
-        using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataPlant;
         using namespace DataLoopNode;
 
@@ -2770,10 +2762,10 @@ namespace FanCoilUnits {
             // determine minimum outdoor air flow rate
             if (fanCoil.DSOAPtr > 0 && fanCoil.OutsideAirNode > 0) {
                 OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, fanCoil.DSOAPtr, ControlledZoneNum, true, true);
-                RhoAir = PsyRhoAirFnPbTdbW(state,
-                                           state.dataLoopNodes->Node(fanCoil.OutsideAirNode).Press,
-                                           state.dataLoopNodes->Node(fanCoil.OutsideAirNode).Temp,
-                                           state.dataLoopNodes->Node(fanCoil.OutsideAirNode).HumRat);
+                RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                                           state.dataLoopNodes->Node(fanCoil.OutsideAirNode).Press,
+                                                           state.dataLoopNodes->Node(fanCoil.OutsideAirNode).Temp,
+                                                           state.dataLoopNodes->Node(fanCoil.OutsideAirNode).HumRat);
                 OAMassFlow = OAVolumeFlowRate * RhoAir;
             }
 
