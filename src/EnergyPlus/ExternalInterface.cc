@@ -968,9 +968,6 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
 
     // Locals
     int retVal;                  // Return value of function call, used for error handling
-    int NumAlphas(0);            // Number of Alphas for each GetObjectItem call
-    int NumNumbers(0);           // Number of Numbers for each GetObjectItem call
-    int IOStatus(0);             // Used in GetObjectItem
     int NumFMUInputVariables(0); // Number of FMU input variables
     std::string Name_NEW;        // Units sting, may be blank
     std::string Name_OLD;        // Units sting, may be blank
@@ -1003,6 +1000,9 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
 
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
+        int NumAlphas = 0;  // Number of Alphas for each GetObjectItem call
+        int NumNumbers = 0; // Number of Numbers for each GetObjectItem call
+        int IOStatus = 0;   // Used in GetObjectItem
         for (int Loop = 1; Loop <= state.dataExternalInterface->NumFMUObjects; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
