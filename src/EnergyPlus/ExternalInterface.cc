@@ -2327,10 +2327,6 @@ void CalcExternalInterface(EnergyPlusData &state)
     int constexpr nDblMax(1024); // Maximum number of doubles
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int flaWri;       // flag to write to the socket
-    int flaRea;       // flag read from the socket
-    int nDblWri;      // number of doubles to write to socket
-    int nDblRea;      // number of doubles to read from socket
     Real64 curSimTim; // current simulation time
     Real64 preSimTim; // previous time step's simulation time
 
@@ -2357,9 +2353,9 @@ void CalcExternalInterface(EnergyPlusData &state)
     // Usual branch, control is configured and simulation should continue
     if (state.dataExternalInterface->configuredControlPoints && (!state.dataExternalInterface->noMoreValues)) {
         // Data to be exchanged
-        nDblWri = size(state.dataExternalInterface->varTypes);
-        nDblRea = 0;
-        flaWri = 0;
+        int nDblWri = size(state.dataExternalInterface->varTypes); // number of doubles to write to socket
+        int nDblRea = 0;                                           // number of doubles to read from socket
+        int flaWri = 0;                                            // flag to write to the socket
 
         // Get EnergyPlus variables
         if (state.dataExternalInterface->firstCall) { // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
@@ -2376,7 +2372,7 @@ void CalcExternalInterface(EnergyPlusData &state)
 
         // Exchange data with socket
         int retVal = 0;
-        flaRea = 0;
+        int flaRea = 0; // flag read from the socket
         if (state.dataExternalInterface->haveExternalInterfaceBCVTB) {
             retVal = exchangedoubleswithsocket(&state.dataExternalInterface->socketFD,
                                                &flaWri,
