@@ -417,7 +417,8 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                                  Real64 &HExt,                               // Convection coefficient to exterior air
                                  Real64 &HSky,                               // "Convection" coefficient to sky temperature
                                  Real64 &HGround,                            // "Convection" coefficient to ground temperature
-                                 Real64 &HAir                                // Radiation to Air Component
+                                 Real64 &HAir,                               // Radiation to Air Component
+                                 Real64 &HSrdSurf                            // Radiation to surrounding surfaces
 )
 {
 

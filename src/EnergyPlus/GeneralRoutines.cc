@@ -912,6 +912,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Array1D<Real64> HAirARR;
     Array1D<Real64> HPlenARR;
     Array1D<Real64> HExtARR;
+    Array1D<Real64> HSrdSurfsARR;
     Array1D<Real64> LocalWindArr;
 
     // local working variables
@@ -985,14 +986,24 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     LocalWindArr.dimension(NumSurfs, 0.0);
     HPlenARR.dimension(NumSurfs, 0.0);
     HExtARR.dimension(NumSurfs, 0.0);
+    HSrdSurfsARR.dimension(NumSurfs, 0.0);
 
     for (ThisSurf = 1; ThisSurf <= NumSurfs; ++ThisSurf) {
         SurfPtr = SurfPtrARR(ThisSurf);
         // Initializations for this surface
         HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
-        InitExteriorConvectionCoeff(
-            state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
+        InitExteriorConvectionCoeff(state,
+                                    SurfPtr,
+                                    HMovInsul,
+                                    Roughness,
+                                    AbsExt,
+                                    TmpTsBaf,
+                                    HExtARR(ThisSurf),
+                                    HSkyARR(ThisSurf),
+                                    HGroundARR(ThisSurf),
+                                    HAirARR(ThisSurf),
+                                    HSrdSurfsARR(ThisSurf));
         ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
         AbsThermSurf =
             dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))

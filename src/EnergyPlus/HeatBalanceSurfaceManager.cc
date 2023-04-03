@@ -7282,7 +7282,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                                     state.dataHeatBalSurf->SurfHcExt(SurfNum),
                                                     state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
                                                     state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
-                                                    state.dataHeatBalSurf->SurfHAirExt(SurfNum));
+                                                    state.dataHeatBalSurf->SurfHAirExt(SurfNum),
+                                                    state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum));
 
                         if (state.dataEnvrn->IsRain) { // Raining: since wind exposed, outside surface gets wet
 
@@ -7385,7 +7386,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                                     state.dataHeatBalSurf->SurfHcExt(SurfNum),
                                                     state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
                                                     state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
-                                                    state.dataHeatBalSurf->SurfHAirExt(SurfNum));
+                                                    state.dataHeatBalSurf->SurfHAirExt(SurfNum),
+                                                    state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum));
 
                         TempExt = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
 
@@ -7455,7 +7457,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                                 state.dataHeatBalSurf->SurfHcExt(SurfNum),
                                                 state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
                                                 state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
-                                                state.dataHeatBalSurf->SurfHAirExt(SurfNum));
+                                                state.dataHeatBalSurf->SurfHAirExt(SurfNum),
+                                                state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum));
                 } break;
                 default: { // for interior or other zone surfaces
 
@@ -8209,7 +8212,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                                                                 state.dataHeatBalSurf->SurfHcExt(SurfNum),
                                                                                 state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
                                                                                 state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
-                                                                                state.dataHeatBalSurf->SurfHAirExt(SurfNum));
+                                                                                state.dataHeatBalSurf->SurfHAirExt(SurfNum),
+                                                                                state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum));
 
                             if (state.dataEnvrn->IsRain) {                          // Raining: since wind exposed, outside window surface gets wet
                                 state.dataHeatBalSurf->SurfHcExt(SurfNum) = 1000.0; // Reset SurfHcExt because of wetness
@@ -8227,7 +8231,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                                                                 state.dataHeatBalSurf->SurfHcExt(SurfNum),
                                                                                 state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
                                                                                 state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
-                                                                                state.dataHeatBalSurf->SurfHAirExt(SurfNum));
+                                                                                state.dataHeatBalSurf->SurfHAirExt(SurfNum),
+                                                                                state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum));
                         }
                     } else { // Interior Surface
 
@@ -8907,7 +8912,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                                                                         state.dataHeatBalSurf->SurfHcExt(surfNum),
                                                                                         state.dataHeatBalSurf->SurfHSkyExt(surfNum),
                                                                                         state.dataHeatBalSurf->SurfHGrdExt(surfNum),
-                                                                                        state.dataHeatBalSurf->SurfHAirExt(surfNum));
+                                                                                        state.dataHeatBalSurf->SurfHAirExt(surfNum),
+                                                                                        state.dataHeatBalSurf->SurfHSrdSurfExt(surfNum));
 
                                     if (state.dataEnvrn->IsRain) { // Raining: since wind exposed, outside window surface gets wet
                                         state.dataHeatBalSurf->SurfHcExt(surfNum) = 1000.0; // Reset SurfHcExt because of wetness
@@ -8925,7 +8931,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                                                                         state.dataHeatBalSurf->SurfHcExt(surfNum),
                                                                                         state.dataHeatBalSurf->SurfHSkyExt(surfNum),
                                                                                         state.dataHeatBalSurf->SurfHGrdExt(surfNum),
-                                                                                        state.dataHeatBalSurf->SurfHAirExt(surfNum));
+                                                                                        state.dataHeatBalSurf->SurfHAirExt(surfNum),
+                                                                                        state.dataHeatBalSurf->SurfHSrdSurfExt(surfNum));
                                 }
 
                             } else { // Interior Surface
