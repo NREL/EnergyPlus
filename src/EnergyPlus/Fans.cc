@@ -1146,7 +1146,7 @@ void InitFan(EnergyPlusData &state,
     // Using/Aliasing
     using DataZoneEquipment::CheckZoneEquipmentList;
 
-    auto &Fan(state.dataFans->Fan);
+    auto &fan = state.dataFans->Fan(FanNum);
 
     if (state.dataFans->MyOneTimeFlag) {
         state.dataFans->MyEnvrnFlag.dimension(state.dataFans->NumFans, true);
@@ -1157,12 +1157,12 @@ void InitFan(EnergyPlusData &state,
     if (!state.dataFans->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataFans->ZoneEquipmentListChecked = true;
         for (int Loop = 1; Loop <= state.dataFans->NumFans; ++Loop) {
-            if (!UtilityRoutines::SameString(Fan(Loop).FanType, "Fan:ZoneExhaust")) continue;
-            if (CheckZoneEquipmentList(state, Fan(Loop).FanType, Fan(Loop).FanName)) continue;
+            if (!UtilityRoutines::SameString(state.dataFans->Fan(Loop).FanType, "Fan:ZoneExhaust")) continue;
+            if (CheckZoneEquipmentList(state, state.dataFans->Fan(Loop).FanType, state.dataFans->Fan(Loop).FanName)) continue;
             ShowSevereError(state,
                             format("InitFans: Fan=[{},{}] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.",
-                                   Fan(Loop).FanType,
-                                   Fan(Loop).FanName));
+                                   state.dataFans->Fan(Loop).FanType,
+                                   state.dataFans->Fan(Loop).FanName));
         }
     }
 
@@ -1170,7 +1170,7 @@ void InitFan(EnergyPlusData &state,
 
         SizeFan(state, FanNum);
         // Set the loop cycling flag
-        if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
+        if (fan.FanType_Num == FanType_SimpleOnOff) {
             if (state.dataSize->CurSysNum > 0) {
                 state.dataAirLoop->AirLoopControlInfo(state.dataSize->CurSysNum).CyclingFan = true;
             }
@@ -1183,36 +1183,36 @@ void InitFan(EnergyPlusData &state,
     if (state.dataGlobal->BeginEnvrnFlag && state.dataFans->MyEnvrnFlag(FanNum)) {
 
         // For all Fan inlet nodes convert the Volume flow to a mass flow
-        int OutNode = Fan(FanNum).OutletNodeNum;
-        Fan(FanNum).RhoAirStdInit = state.dataEnvrn->StdRhoAir;
+        int OutNode = fan.OutletNodeNum;
+        fan.RhoAirStdInit = state.dataEnvrn->StdRhoAir;
 
         // Change the Volume Flow Rates to Mass Flow Rates
 
-        Fan(FanNum).MaxAirMassFlowRate = Fan(FanNum).MaxAirFlowRate * Fan(FanNum).RhoAirStdInit;
-        if (Fan(FanNum).FanMinAirFracMethod == MinFrac) {
-            Fan(FanNum).MinAirFlowRate = Fan(FanNum).MaxAirFlowRate * Fan(FanNum).FanMinFrac;
-            Fan(FanNum).MinAirMassFlowRate = Fan(FanNum).MinAirFlowRate * Fan(FanNum).RhoAirStdInit;
-        } else if (Fan(FanNum).FanMinAirFracMethod == FixedMin) {
-            Fan(FanNum).MinAirFlowRate = Fan(FanNum).FanFixedMin;
-            Fan(FanNum).MinAirMassFlowRate = Fan(FanNum).MinAirFlowRate * Fan(FanNum).RhoAirStdInit;
+        fan.MaxAirMassFlowRate = fan.MaxAirFlowRate * fan.RhoAirStdInit;
+        if (fan.FanMinAirFracMethod == MinFrac) {
+            fan.MinAirFlowRate = fan.MaxAirFlowRate * fan.FanMinFrac;
+            fan.MinAirMassFlowRate = fan.MinAirFlowRate * fan.RhoAirStdInit;
+        } else if (fan.FanMinAirFracMethod == FixedMin) {
+            fan.MinAirFlowRate = fan.FanFixedMin;
+            fan.MinAirMassFlowRate = fan.MinAirFlowRate * fan.RhoAirStdInit;
         }
-        if (Fan(FanNum).NVPerfNum > 0) {
-            state.dataFans->NightVentPerf(Fan(FanNum).NVPerfNum).MaxAirMassFlowRate =
-                state.dataFans->NightVentPerf(Fan(FanNum).NVPerfNum).MaxAirFlowRate * Fan(FanNum).RhoAirStdInit;
+        if (fan.NVPerfNum > 0) {
+            state.dataFans->NightVentPerf(fan.NVPerfNum).MaxAirMassFlowRate =
+                state.dataFans->NightVentPerf(fan.NVPerfNum).MaxAirFlowRate * fan.RhoAirStdInit;
         }
 
         // Init the Node Control variables
-        state.dataLoopNodes->Node(OutNode).MassFlowRateMax = Fan(FanNum).MaxAirMassFlowRate;
+        state.dataLoopNodes->Node(OutNode).MassFlowRateMax = fan.MaxAirMassFlowRate;
         // According to the IO Ref guide:
         // "Note that this field is only used to calculate the fan power.
         // This field does not enforce the system air flow rate during simulation"
-        // Node(OutNode).MassFlowRateMin = Fan(FanNum).MinAirMassFlowRate;
+        // Node(OutNode).MassFlowRateMin = fan.MinAirMassFlowRate;
 
         // Initialize all report variables to a known state at beginning of simulation
-        Fan(FanNum).FanPower = 0.0;
-        Fan(FanNum).DeltaTemp = 0.0;
-        Fan(FanNum).PowerLossToAir = 0.0;
-        Fan(FanNum).FanEnergy = 0.0;
+        fan.FanPower = 0.0;
+        fan.DeltaTemp = 0.0;
+        fan.PowerLossToAir = 0.0;
+        fan.FanEnergy = 0.0;
 
         state.dataFans->MyEnvrnFlag(FanNum) = false;
     }
@@ -1233,37 +1233,37 @@ void InitFan(EnergyPlusData &state,
     // Do a check and make sure that the max and min available(control) flow is
     // between the physical max and min for the Fan while operating.
 
-    int InletNode = Fan(FanNum).InletNodeNum;
-    int OutletNode = Fan(FanNum).OutletNodeNum;
+    int InletNode = fan.InletNodeNum;
+    int OutletNode = fan.OutletNodeNum;
 
-    Fan(FanNum).MassFlowRateMaxAvail =
+    fan.MassFlowRateMaxAvail =
         min(state.dataLoopNodes->Node(OutletNode).MassFlowRateMax, state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
-    Fan(FanNum).MassFlowRateMinAvail =
+    fan.MassFlowRateMinAvail =
         min(max(state.dataLoopNodes->Node(OutletNode).MassFlowRateMin, state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail),
             state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
 
     // Load the node data in this section for the component simulation
     // First need to make sure that the MassFlowRate is between the max and min avail.
-    if (Fan(FanNum).FanType_Num != FanType_ZoneExhaust) {
-        Fan(FanNum).InletAirMassFlowRate = min(state.dataLoopNodes->Node(InletNode).MassFlowRate, Fan(FanNum).MassFlowRateMaxAvail);
-        Fan(FanNum).InletAirMassFlowRate = max(Fan(FanNum).InletAirMassFlowRate, Fan(FanNum).MassFlowRateMinAvail);
+    if (fan.FanType_Num != FanType_ZoneExhaust) {
+        fan.InletAirMassFlowRate = min(state.dataLoopNodes->Node(InletNode).MassFlowRate, fan.MassFlowRateMaxAvail);
+        fan.InletAirMassFlowRate = max(fan.InletAirMassFlowRate, fan.MassFlowRateMinAvail);
     } else { // zone exhaust fans
-        Fan(FanNum).MassFlowRateMaxAvail = Fan(FanNum).MaxAirMassFlowRate;
-        Fan(FanNum).MassFlowRateMinAvail = 0.0;
-        if (Fan(FanNum).FlowFractSchedNum > 0) { // modulate flow
-            Fan(FanNum).InletAirMassFlowRate = Fan(FanNum).MassFlowRateMaxAvail * GetCurrentScheduleValue(state, Fan(FanNum).FlowFractSchedNum);
-            Fan(FanNum).InletAirMassFlowRate = max(0.0, Fan(FanNum).InletAirMassFlowRate);
+        fan.MassFlowRateMaxAvail = fan.MaxAirMassFlowRate;
+        fan.MassFlowRateMinAvail = 0.0;
+        if (fan.FlowFractSchedNum > 0) { // modulate flow
+            fan.InletAirMassFlowRate = fan.MassFlowRateMaxAvail * GetCurrentScheduleValue(state, fan.FlowFractSchedNum);
+            fan.InletAirMassFlowRate = max(0.0, fan.InletAirMassFlowRate);
         } else { // always run at max
-            Fan(FanNum).InletAirMassFlowRate = Fan(FanNum).MassFlowRateMaxAvail;
+            fan.InletAirMassFlowRate = fan.MassFlowRateMaxAvail;
         }
-        if (Fan(FanNum).EMSMaxMassFlowOverrideOn)
-            Fan(FanNum).InletAirMassFlowRate = min(Fan(FanNum).EMSAirMassFlowValue, Fan(FanNum).MassFlowRateMaxAvail);
+        if (fan.EMSMaxMassFlowOverrideOn)
+            fan.InletAirMassFlowRate = min(fan.EMSAirMassFlowValue, fan.MassFlowRateMaxAvail);
     }
 
     // Then set the other conditions
-    Fan(FanNum).InletAirTemp = state.dataLoopNodes->Node(InletNode).Temp;
-    Fan(FanNum).InletAirHumRat = state.dataLoopNodes->Node(InletNode).HumRat;
-    Fan(FanNum).InletAirEnthalpy = state.dataLoopNodes->Node(InletNode).Enthalpy;
+    fan.InletAirTemp = state.dataLoopNodes->Node(InletNode).Temp;
+    fan.InletAirHumRat = state.dataLoopNodes->Node(InletNode).HumRat;
+    fan.InletAirEnthalpy = state.dataLoopNodes->Node(InletNode).Enthalpy;
 }
 
 void SizeFan(EnergyPlusData &state, int const FanNum)
