@@ -2835,6 +2835,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     HeatBalanceSurfaceManager::InitSurfacePropertyViewFactors(*state);
 
+    HeatBalanceSurfaceManager::GetSurroundingSurfacesTemperatureAverage(*state);
+
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBalSurf->SurfHConvInt(surfNum2), inSurfTemp, outSurfTemp);
 
     state->dataHeatBalSurf->SurfTempOut(surfNum2) = outSurfTemp;

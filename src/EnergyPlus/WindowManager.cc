@@ -2683,15 +2683,8 @@ namespace WindowManager {
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
                 int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-                //for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
-                //    SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                //    SrdSurfTempAbs = GetCurrentScheduleValue(
-                //                         state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                //                     Constant::KelvinConv;
-                //    rad_out_lw_srd_per_area += -emiss_sigma_product * SrdSurfViewFac * (Tsout_4 - pow_4(SrdSurfTempAbs));
-                //}
                 // check if the SurfHSrdSurfExt uses the same calculation if there is exterior shde or blind 
-                Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
+                state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) = ConvectionCoefficients::SurroundingSurfacesRadCoeffAverage(state, SurfNum, Tsout, SurfOutsideEmiss);
                 rad_out_lw_srd_per_area = state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) *
                                           (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurfsTempAvg - SurfOutsideTemp);
             }
