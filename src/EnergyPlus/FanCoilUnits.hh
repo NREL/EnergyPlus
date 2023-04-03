@@ -115,11 +115,7 @@ namespace FanCoilUnits {
         std::string SchedOutAir; // outside air schedule, multipliy maximum outdoor air flow rate
         int SchedOutAirPtr;      // index to outside air schedule
         int FanType_Num;         // index to fan type
-        std::string CapCtrlMeth; // type of capacity control method
-        // 'ConstantFanVariableFlow' or
-        // 'CyclingFan' or
-        // 'VariableFanVariableFlow'
-        int SpeedFanSel; // Speed fan selected
+        int SpeedFanSel;         // Speed fan selected
         CCM CapCtrlMeth_Num;
         Real64 PLR;               // Part Load Ratio, fraction of time step fancoil is on
         int MaxIterIndexH;        // Maximum iterations exceeded for heating

@@ -287,8 +287,8 @@ namespace FanCoilUnits {
                                                                                              "VARIABLEFANCONSTANTFLOW",
                                                                                              "MULTISPEEDFAN",
                                                                                              "ASHRAE90VARIABLEFAN"};
-            fanCoil.CapCtrlMeth = Alphas(3);
-            fanCoil.CapCtrlMeth_Num = static_cast<CCM>(getEnumerationValue(CapCtrlMethUC, fanCoil.CapCtrlMeth));
+            std::string capCtrlMeth = Alphas(3);
+            fanCoil.CapCtrlMeth_Num = static_cast<CCM>(getEnumerationValue(CapCtrlMethUC, capCtrlMeth));
             if (fanCoil.CapCtrlMeth_Num == CCM::ASHRAE) {
                 fanCoil.DesZoneCoolingLoad = DataSizing::AutoSize;
                 fanCoil.DesZoneHeatingLoad = DataSizing::AutoSize;
@@ -547,7 +547,7 @@ namespace FanCoilUnits {
                                               format("...the fan type of the object : {} does not match with the capacity control method selected : "
                                                      "{} please see I/O reference",
                                                      fanCoil.FanName,
-                                                     fanCoil.CapCtrlMeth));
+                                                     capCtrlMeth));
                             ShowContinueError(state, "...for ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid.");
                             ShowContinueError(state, "...for CyclingFan a Fan:OnOff is valid.");
                             ShowContinueError(state, "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid.");
@@ -586,7 +586,7 @@ namespace FanCoilUnits {
                                               format("...the fan type of the object : {} does not match with the capacity control method selected : "
                                                      "{} please see I/O reference",
                                                      fanCoil.FanName,
-                                                     fanCoil.CapCtrlMeth));
+                                                     capCtrlMeth));
                             ShowContinueError(
                                 state,
                                 "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:SystemModel should have Continuous speed control.");
@@ -761,7 +761,7 @@ namespace FanCoilUnits {
                     ErrorsFound = true;
                 }
             }
-            if (fanCoil.CapCtrlMeth == "MULTISPEEDFAN") {
+            if (fanCoil.CapCtrlMeth_Num == CCM::MultiSpeedFan) {
                 if (!lAlphaBlanks(17)) {
                     fanCoil.FanOpModeSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(17));
                     if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SimpleOnOff &&
