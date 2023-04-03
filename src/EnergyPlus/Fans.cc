@@ -1623,7 +1623,6 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
     //       MODIFIED       Brent Griffith, May 2009, added EMS override
     //                      Chandan Sharma, March 2011, FSEC: Added LocalTurnFansOn and LocalTurnFansOff
     //                      Rongpeng Zhang, April 2015, added faulty fan operations due to fouling air filters
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the simple constant volume fan.
@@ -1636,26 +1635,22 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
     // ASHRAE HVAC 2 Toolkit, page 2-3 (FANSIM)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 RhoAir;
     Real64 DeltaPress; // [N/m2]
     Real64 FanEff;
     Real64 MotInAirFrac;
     Real64 MotEff;
-    Real64 MassFlow;      // [kg/sec]
     Real64 FanShaftPower; // power delivered to fan shaft
 
-    int NVPerfNum;
-
     auto &Fan(state.dataFans->Fan);
-    auto &NightVentPerf(state.dataFans->NightVentPerf);
 
-    NVPerfNum = Fan(FanNum).NVPerfNum;
+    int NVPerfNum = Fan(FanNum).NVPerfNum;
 
     if (state.dataHVACGlobal->NightVentOn && NVPerfNum > 0) {
-        DeltaPress = NightVentPerf(NVPerfNum).DeltaPress;
-        FanEff = NightVentPerf(NVPerfNum).FanEff;
-        MotEff = NightVentPerf(NVPerfNum).MotEff;
-        MotInAirFrac = NightVentPerf(NVPerfNum).MotInAirFrac;
+        auto const &nightVentPerf = state.dataFans->NightVentPerf(NVPerfNum);
+        DeltaPress = nightVentPerf.DeltaPress;
+        FanEff = nightVentPerf.FanEff;
+        MotEff = nightVentPerf.MotEff;
+        MotInAirFrac = nightVentPerf.MotInAirFrac;
     } else {
         DeltaPress = Fan(FanNum).DeltaPress;
         FanEff = Fan(FanNum).FanEff;
@@ -1664,10 +1659,8 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
     }
 
     // For a Constant Volume Simple Fan the Max Flow Rate is the Flow Rate for the fan
-    // unused0909   Tin        = Fan(FanNum)%InletAirTemp
-    // unused0909   Win        = Fan(FanNum)%InletAirHumRat
-    RhoAir = Fan(FanNum).RhoAirStdInit;
-    MassFlow = Fan(FanNum).InletAirMassFlowRate;
+    Real64 RhoAir = Fan(FanNum).RhoAirStdInit;
+    Real64 MassFlow = Fan(FanNum).InletAirMassFlowRate;
 
     // Faulty fan operations
     // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
