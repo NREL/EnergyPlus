@@ -492,7 +492,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                 } else {
                     dxn = std::sqrt(2.0 * (rk(Layer) / rho(Layer) / cp(Layer)) * this->CTFTimeStep);
 
-                    ipts1 = int(dl(Layer) / dxn); // number of nodes=thickness/spacing
+                    int ipts1 = int(dl(Layer) / dxn); // number of nodes=thickness/spacing
 
                     // Limit the upper and lower bounds of the number of
                     // nodes to MaxCTFTerms and MinNodes respectively.
@@ -1299,7 +1299,7 @@ void ConstructionProps::calculateExponentialMatrix()
 
         // Use AMato to store the old values of AExp
         AMato = this->AExp;
-        bool Backup = true;
+        bool Backup = true; // Used when numerics get to small in Exponentiation
         this->AExp = 0.0;
 
         // Multiply the old value of AExp (AMato) by itself and store in AExp.

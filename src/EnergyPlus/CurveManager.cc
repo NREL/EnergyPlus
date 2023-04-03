@@ -628,8 +628,6 @@ namespace Curve {
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call
         int IOStatus;                    // Used in GetObjectItem
         std::string CurrentModuleObject; // for ease in renaming.
-        int MaxTableNums(0);             // Maximum number of numeric input fields in Tables
-        //   certain object in the input file
 
         // Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
@@ -2127,7 +2125,7 @@ namespace Curve {
                     format("GetCurveInput: Currently exactly one (\"1\") {} object per simulation is required when using the AirflowNetwork model.",
                            CurrentModuleObject));
                 ErrorsFound = true;
-            } else if (numOfCPArray == 1) {
+            } else {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          1,
@@ -2231,7 +2229,7 @@ namespace Curve {
                     thisCurve->outputLimits.max = 1.0;
                     thisCurve->outputLimits.maxPresent = true;
 
-                    MaxTableNums = NumNumbers;
+                    int MaxTableNums = NumNumbers;
                     if (NumNumbers != numWindDir) {
                         ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                         ShowContinueError(state,
