@@ -1960,24 +1960,15 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
     using Curve::CurveValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 RhoAir;
-    Real64 DeltaPress; // [N/m2]
-    Real64 FanEff;
-    Real64 MassFlow;             // [kg/sec]
-    Real64 MaxAirMassFlowRate;   // [kg/sec]
-    Real64 PartLoadRatio;        // Ratio of actual mass flow rate to max mass flow rate
-    Real64 FlowFrac;             // Actual Fan Flow Fraction = actual mass flow rate / max air mass flow rate
-    Real64 FanShaftPower;        // power delivered to fan shaft
-    Real64 SpeedRaisedToPower;   // Result of the speed ratio raised to the power of n (Curve object)
     Real64 EffRatioAtSpeedRatio; // Efficiency ratio at current speed ratio (Curve object)
 
     auto &Fan(state.dataFans->Fan);
 
-    MassFlow = Fan(FanNum).InletAirMassFlowRate;
-    MaxAirMassFlowRate = Fan(FanNum).MaxAirMassFlowRate;
-    DeltaPress = Fan(FanNum).DeltaPress;
-    FanEff = Fan(FanNum).FanEff;
-    RhoAir = Fan(FanNum).RhoAirStdInit;
+    Real64 MassFlow = Fan(FanNum).InletAirMassFlowRate;
+    Real64 MaxAirMassFlowRate = Fan(FanNum).MaxAirMassFlowRate;
+    Real64 DeltaPress = Fan(FanNum).DeltaPress; // [N/m2]
+    Real64 FanEff = Fan(FanNum).FanEff;
+    Real64 RhoAir = Fan(FanNum).RhoAirStdInit;
 
     // Faulty fan operations
     // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
@@ -2019,10 +2010,10 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
     if ((GetCurrentScheduleValue(state, Fan(FanNum).AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) &&
         !state.dataFans->LocalTurnFansOff && MassFlow > 0.0 && Fan(FanNum).MaxAirMassFlowRate > 0.0) {
         // The actual flow fraction is calculated from MassFlow and the MaxVolumeFlow * AirDensity
-        FlowFrac = MassFlow / MaxAirMassFlowRate;
+        Real64 FlowFrac = MassFlow / MaxAirMassFlowRate;
 
         // Calculate the part load ratio, can't be greater than 1
-        PartLoadRatio = min(1.0, FlowFrac);
+        Real64 PartLoadRatio = min(1.0, FlowFrac);
         // Fan is operating
         if (state.dataHVACGlobal->OnOffFanPartLoadFraction <= 0.0) {
             ShowRecurringWarningErrorAtEnd(state, "Fan:OnOff, OnOffFanPartLoadFraction <= 0.0, Reset to 1.0", state.dataFans->ErrCount);
@@ -2051,7 +2042,7 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
                 //      PLR = Mdot/MAXFlow => Mdot/(MAXFlow * SpeedRatio), RTF = PLR/PLF => PLR/SpeedRatio/PLF = RTF / SpeedRatio
                 if (SpeedRatio > 0.0) Fan(FanNum).FanRuntimeFraction = min(1.0, Fan(FanNum).FanRuntimeFraction / SpeedRatio);
 
-                SpeedRaisedToPower = CurveValue(state, Fan(FanNum).FanPowerRatAtSpeedRatCurveIndex, SpeedRatio);
+                Real64 SpeedRaisedToPower = CurveValue(state, Fan(FanNum).FanPowerRatAtSpeedRatCurveIndex, SpeedRatio);
                 if (SpeedRaisedToPower < 0.0) {
                     if (Fan(FanNum).OneTimePowerRatioCheck && !state.dataGlobal->WarmupFlag) {
                         ShowSevereError(state, format("{} = {}\"", cFanTypes(Fan(FanNum).FanType_Num), Fan(FanNum).FanName));
@@ -2090,7 +2081,7 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
         // OnOffFanPartLoadFraction is passed via DataHVACGlobals from the cooling or heating coil that is
         //   requesting the fan to operate in cycling fan/cycling coil mode
         state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;      // reset to 1 in case other on/off fan is called without a part load curve
-        FanShaftPower = Fan(FanNum).MotEff * Fan(FanNum).FanPower; // power delivered to shaft
+        Real64 FanShaftPower = Fan(FanNum).MotEff * Fan(FanNum).FanPower; // power delivered to shaft
         Fan(FanNum).PowerLossToAir = FanShaftPower + (Fan(FanNum).FanPower - FanShaftPower) * Fan(FanNum).MotInAirFrac;
         Fan(FanNum).OutletAirEnthalpy = Fan(FanNum).InletAirEnthalpy + Fan(FanNum).PowerLossToAir / MassFlow;
         // This fan does not change the moisture or Mass Flow across the component
@@ -2101,7 +2092,6 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
     } else {
         // Fan is off and not operating no power consumed and mass flow rate.
         Fan(FanNum).FanPower = 0.0;
-        FanShaftPower = 0.0;
         Fan(FanNum).PowerLossToAir = 0.0;
         Fan(FanNum).OutletAirMassFlowRate = 0.0;
         Fan(FanNum).OutletAirHumRat = Fan(FanNum).InletAirHumRat;
