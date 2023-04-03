@@ -281,28 +281,18 @@ namespace FanCoilUnits {
                     ErrorsFound = true;
                 }
             }
-
-            if (UtilityRoutines::SameString(Alphas(3), "ConstantFanVariableFlow") || UtilityRoutines::SameString(Alphas(3), "CyclingFan") ||
-                UtilityRoutines::SameString(Alphas(3), "VariableFanVariableFlow") ||
-                UtilityRoutines::SameString(Alphas(3), "VariableFanConstantFlow") || UtilityRoutines::SameString(Alphas(3), "MultiSpeedFan") ||
-                UtilityRoutines::SameString(Alphas(3), "ASHRAE90VariableFan")) {
-                fanCoil.CapCtrlMeth = Alphas(3);
-                if (UtilityRoutines::SameString(Alphas(3), "ConstantFanVariableFlow")) fanCoil.CapCtrlMeth_Num = CCM::ConsFanVarFlow;
-                if (UtilityRoutines::SameString(Alphas(3), "CyclingFan")) fanCoil.CapCtrlMeth_Num = CCM::CycFan;
-                if (UtilityRoutines::SameString(Alphas(3), "VariableFanVariableFlow")) fanCoil.CapCtrlMeth_Num = CCM::VarFanVarFlow;
-                ;
-                if (UtilityRoutines::SameString(Alphas(3), "VariableFanConstantFlow")) fanCoil.CapCtrlMeth_Num = CCM::VarFanConsFlow;
-                if (UtilityRoutines::SameString(Alphas(3), "MultiSpeedFan")) fanCoil.CapCtrlMeth_Num = CCM::MultiSpeedFan;
-                if (UtilityRoutines::SameString(Alphas(3), "ASHRAE90VariableFan")) {
-                    fanCoil.CapCtrlMeth_Num = CCM::ASHRAE;
-                    fanCoil.DesZoneCoolingLoad = DataSizing::AutoSize;
-                    fanCoil.DesZoneHeatingLoad = DataSizing::AutoSize;
-                    fanCoil.FanOpMode = DataHVACGlobals::ContFanCycCoil;
-                }
-            } else {
-                ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, fanCoil.Name));
-                ShowContinueError(state, format("illegal value: {}=\"{}\".", cAlphaFields(3), Alphas(3)));
-                ErrorsFound = true;
+            constexpr std::array<std::string_view, static_cast<int>(CCM::Num)> CapCtrlMethUC{"CONSTANTFANVARIABLEFLOW",
+                                                                                             "CYCLINGFAN",
+                                                                                             "VARIABLEFANVARIABLEFLOW",
+                                                                                             "VARIABLEFANCONSTANTFLOW",
+                                                                                             "MULTISPEEDFAN",
+                                                                                             "ASHRAE90VARIABLEFAN"};
+            fanCoil.CapCtrlMeth = Alphas(3);
+            fanCoil.CapCtrlMeth_Num = static_cast<CCM>(getEnumerationValue(CapCtrlMethUC, fanCoil.CapCtrlMeth));
+            if (fanCoil.CapCtrlMeth_Num == CCM::ASHRAE) {
+                fanCoil.DesZoneCoolingLoad = DataSizing::AutoSize;
+                fanCoil.DesZoneHeatingLoad = DataSizing::AutoSize;
+                fanCoil.FanOpMode = DataHVACGlobals::ContFanCycCoil;
             }
 
             fanCoil.SchedOutAir = Alphas(4);
