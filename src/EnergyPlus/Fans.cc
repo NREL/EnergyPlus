@@ -3008,7 +3008,7 @@ void SetFanData(EnergyPlusData &state,
     Real64 MotEff;       // fan design motor efficiency
     Real64 MotInAirFrac; // fraction of motor in the air stream
 
-    auto &Fan(state.dataFans->Fan);
+    auto const &Fan(state.dataFans->Fan);
 
     if (FanNum == 0) {
         DesignDeltaT = 0.0;
@@ -3040,23 +3040,19 @@ Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Rongpeng Zhang
     //       DATE WRITTEN   Apr. 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculate the decrease of the fan air flow rate, given the fan curve
     // and the increase of fan pressure rise due to fouling air filters
 
     // Using/Aliasing
-    using namespace Curve;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 FanFaultyAirFlowRate; // Fan Volume Flow Rate in the Faulty Case [m3/sec]
     Real64 FanCalDeltaPress;     // Calculated Fan Delta Pressure for temp use [Pa]
     Real64 FanCalDeltaPresstemp; // Calculated Fan Delta Pressure for temp use [Pa]
 
     // Check whether the fan curve covers the design operational point of the fan
-    FanCalDeltaPress = CurveValue(state, FanCurvePtr, FanDesignAirFlowRate);
+    FanCalDeltaPress = Curve::CurveValue(state, FanCurvePtr, FanDesignAirFlowRate);
     if ((FanCalDeltaPress < 0.9 * FanDesignDeltaPress) || (FanCalDeltaPress > 1.1 * FanDesignDeltaPress)) {
         ShowWarningError(state, format("The design operational point of the fan {} does not fall ", FanName));
         ShowContinueError(state, "on the fan curve provided in the FaultModel:Fouling:AirFilter object. ");
@@ -3065,12 +3061,12 @@ Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
 
     // Calculate the Fan Volume Flow Rate in the Faulty Case
     FanFaultyAirFlowRate = FanDesignAirFlowRate;
-    FanCalDeltaPresstemp = CurveValue(state, FanCurvePtr, FanFaultyAirFlowRate);
+    FanCalDeltaPresstemp = Curve::CurveValue(state, FanCurvePtr, FanFaultyAirFlowRate);
     FanCalDeltaPress = FanCalDeltaPresstemp;
 
     while (FanCalDeltaPress < (FanDesignDeltaPress + FanFaultyDeltaPressInc)) {
         FanFaultyAirFlowRate = FanFaultyAirFlowRate - 0.005;
-        FanCalDeltaPresstemp = CurveValue(state, FanCurvePtr, FanFaultyAirFlowRate);
+        FanCalDeltaPresstemp = Curve::CurveValue(state, FanCurvePtr, FanFaultyAirFlowRate);
 
         if ((FanCalDeltaPresstemp <= FanCalDeltaPress) ||
             (FanFaultyAirFlowRate <= state.dataCurveManager->PerfCurve(FanCurvePtr)->inputLimits[0].min)) {
@@ -3094,8 +3090,6 @@ Real64 FanDesHeatGain(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   August 2014
-    //       MODIFIED
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function calculates and returns the design fan heat gain from the fan input data
@@ -3104,11 +3098,6 @@ Real64 FanDesHeatGain(EnergyPlusData &state,
     // Simple fan:  Qdot,tot = (Vdot*deltaP)/Eff,tot
     //              Qdot,air = Eff,mot*Qdot,tot + (Qdot,tot - Eff,mot*Qdot,tot)*Frac,mot-in-airstream
 
-    // REFERENCES: EnergyPlus Engineering Reference
-
-    // Return value
-    Real64 DesignHeatGain; // returned heat gain of matched fan [W]
-
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 DeltaP;       // fan design pressure rise [N/m2]
     Real64 TotEff;       // fan design total efficiency
@@ -3116,27 +3105,25 @@ Real64 FanDesHeatGain(EnergyPlusData &state,
     Real64 MotInAirFrac; // fraction of motor in the air stream
     Real64 FanPowerTot;  // total fan power consumption [W]
 
-    auto &Fan(state.dataFans->Fan);
+    if (FanNum <= 0) {
+        return 0.0;
+    }
+    auto const &fan = state.dataFans->Fan(FanNum);
 
-    if (FanNum == 0) {
-        DesignHeatGain = 0.0;
-    } else if (Fan(FanNum).FanType_Num != FanType_ComponentModel) {
-        DeltaP = Fan(FanNum).DeltaPress;
-        TotEff = Fan(FanNum).FanEff;
-        MotEff = Fan(FanNum).MotEff;
-        MotInAirFrac = Fan(FanNum).MotInAirFrac;
+    if (fan.FanType_Num != FanType_ComponentModel) {
+        DeltaP = fan.DeltaPress;
+        TotEff = fan.FanEff;
+        MotEff = fan.MotEff;
+        MotInAirFrac = fan.MotInAirFrac;
         FanPowerTot = (FanVolFlow * DeltaP) / TotEff;
-        DesignHeatGain = MotEff * FanPowerTot + (FanPowerTot - MotEff * FanPowerTot) * MotInAirFrac;
+        return MotEff * FanPowerTot + (FanPowerTot - MotEff * FanPowerTot) * MotInAirFrac;
     } else {
         if (!state.dataGlobal->SysSizingCalc && state.dataFans->MySizeFlag(FanNum)) {
             SizeFan(state, FanNum);
             state.dataFans->MySizeFlag(FanNum) = false;
         }
-        DesignHeatGain = Fan(FanNum).FanShaftPower + (Fan(FanNum).MotorInputPower - Fan(FanNum).FanShaftPower) * Fan(FanNum).MotInAirFrac;
+        return fan.FanShaftPower + (fan.MotorInputPower - fan.FanShaftPower) * fan.MotInAirFrac;
     }
-
-    return DesignHeatGain;
-
 } // FanDesHeatGain
 
 void FanInputsForDesHeatGain(EnergyPlusData &state,
@@ -3157,24 +3144,25 @@ void FanInputsForDesHeatGain(EnergyPlusData &state,
     motInPower = 0.0;
     fanCompModel = false;
 
-    auto &Fan(state.dataFans->Fan);
-
     if (fanIndex <= 0) {
         return;
-    } else if (Fan(fanIndex).FanType_Num != FanType_ComponentModel) {
-        deltaP = Fan(fanIndex).DeltaPress;
-        motEff = Fan(fanIndex).MotEff;
-        totEff = Fan(fanIndex).FanEff;
-        motInAirFrac = Fan(fanIndex).MotInAirFrac;
+    }
+    auto const &fan = state.dataFans->Fan(fanIndex);
+
+    if (fan.FanType_Num != FanType_ComponentModel) {
+        deltaP = fan.DeltaPress;
+        motEff = fan.MotEff;
+        totEff = fan.FanEff;
+        motInAirFrac = fan.MotInAirFrac;
     } else {
         if (!state.dataGlobal->SysSizingCalc && state.dataFans->MySizeFlag(fanIndex)) {
             SizeFan(state, fanIndex);
             state.dataFans->MySizeFlag(fanIndex) = false;
         }
         fanCompModel = true;
-        fanShaftPow = Fan(fanIndex).FanShaftPower;
-        motInPower = Fan(fanIndex).MotorInputPower;
-        motInAirFrac = Fan(fanIndex).MotInAirFrac;
+        fanShaftPow = fan.FanShaftPower;
+        motInPower = fan.MotorInputPower;
+        motInAirFrac = fan.MotInAirFrac;
     }
 }
 
