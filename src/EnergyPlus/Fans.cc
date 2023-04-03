@@ -127,7 +127,6 @@ void SimulateFanComponents(EnergyPlusData &state,
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   February 1998
     //       MODIFIED       Chandan Sharma, March 2011 - FSEC: Added logic for ZoneHVAC sys avail managers
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine manages Fan component simulation.
@@ -220,7 +219,6 @@ void GetFanInput(EnergyPlusData &state)
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   April 1998
     //       MODIFIED       Shirey, May 2001
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for fans and stores it in fan data structures
@@ -241,7 +239,6 @@ void GetFanInput(EnergyPlusData &state)
     int VarVolFanNum;
     int ExhFanNum;
     int NVPerfNum;
-    bool NVPerfFanFound;
     int NumCompModelFan;
     int CompModelFanNum;
     int NumAlphas;
@@ -258,8 +255,6 @@ void GetFanInput(EnergyPlusData &state)
     Array1D<Real64> rNumericArgs;
     std::string cCurrentModuleObject;
     int NumParams;
-    int MaxAlphas;
-    int MaxNumbers;
 
     auto &Fan(state.dataFans->Fan);
     auto &FanNumericFields(state.dataFans->FanNumericFields);
@@ -268,8 +263,8 @@ void GetFanInput(EnergyPlusData &state)
 
     state.dataFans->GetFanInputFlag = false;
 
-    MaxAlphas = 0;
-    MaxNumbers = 0;
+    int MaxAlphas = 0;
+    int MaxNumbers = 0;
     NumSimpFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:ConstantVolume");
     if (NumSimpFan > 0) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Fan:ConstantVolume", NumParams, NumAlphas, NumNums);
@@ -852,7 +847,7 @@ void GetFanInput(EnergyPlusData &state)
         NightVentPerf(NVPerfNum).MotEff = rNumericArgs(4);
         NightVentPerf(NVPerfNum).MotInAirFrac = rNumericArgs(5);
         // find the corresponding fan
-        NVPerfFanFound = false;
+        bool NVPerfFanFound = false;
         for (FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
             if (NightVentPerf(NVPerfNum).FanName == Fan(FanNum).FanName) {
                 NVPerfFanFound = true;
@@ -1236,8 +1231,7 @@ void InitFan(EnergyPlusData &state,
     int InletNode = fan.InletNodeNum;
     int OutletNode = fan.OutletNodeNum;
 
-    fan.MassFlowRateMaxAvail =
-        min(state.dataLoopNodes->Node(OutletNode).MassFlowRateMax, state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
+    fan.MassFlowRateMaxAvail = min(state.dataLoopNodes->Node(OutletNode).MassFlowRateMax, state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
     fan.MassFlowRateMinAvail =
         min(max(state.dataLoopNodes->Node(OutletNode).MassFlowRateMin, state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail),
             state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
@@ -1256,8 +1250,7 @@ void InitFan(EnergyPlusData &state,
         } else { // always run at max
             fan.InletAirMassFlowRate = fan.MassFlowRateMaxAvail;
         }
-        if (fan.EMSMaxMassFlowOverrideOn)
-            fan.InletAirMassFlowRate = min(fan.EMSAirMassFlowValue, fan.MassFlowRateMaxAvail);
+        if (fan.EMSMaxMassFlowOverrideOn) fan.InletAirMassFlowRate = min(fan.EMSAirMassFlowValue, fan.MassFlowRateMaxAvail);
     }
 
     // Then set the other conditions
