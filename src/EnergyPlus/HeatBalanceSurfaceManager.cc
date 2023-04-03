@@ -7423,19 +7423,24 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
                         int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
                         // Absolute temperature of the outside surface of an exterior surface
-                        Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + Constant::KelvinConv;
-                        for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
-                             SrdSurfNum++) {
-                            // View factor of a surrounding surface
-                            Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            // Absolute temperature of a surrounding surface
-                            Real64 SrdSurfTempAbs =
-                                GetCurrentScheduleValue(
-                                    state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                Constant::KelvinConv;
-                            state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +=
-                                Constant::StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
-                        }
+                        // Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + Constant::KelvinConv;
+                        // for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
+                        //     SrdSurfNum++) {
+                        //    // View factor of a surrounding surface
+                        //    Real64 SrdSurfViewFac =
+                        //    state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
+                        //    // Absolute temperature of a surrounding surface
+                        //    Real64 SrdSurfTempAbs =
+                        //        GetCurrentScheduleValue(
+                        //            state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
+                        //        Constant::KelvinConv;
+                        //    state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +=
+                        //        Constant::StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
+                        //}
+                        Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
+                        state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) =
+                            state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) *
+                            (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurfsTempAvg - TSurf);
                     }
 
                     if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF ||
@@ -9349,15 +9354,18 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         // *SurfQsrcHist(1,SurfNum)                     &
         //+Construct(ConstrNum)%CTFSourceIn[0] &   TDDs cannot be radiant systems
         // *SurfQsrcHist(1,SurfNum)                &
-        TH11 = (state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, 1) / 2.0 + state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
+        TH11 = (state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, 1) / 2.0 +
                 (state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum)) * TempExt +
+                state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) *
+                    state.dataSurface->SurroundingSurfsProperty(state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum).SurfsTempAvg +
                 state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * TSky +
                 state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround +
                 F1 * (state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum2, 1) / 2.0 + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum2) +
                       state.dataHeatBalSurf->SurfHConvInt(SurfNum2) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum2).MAT +
                       state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum2))) /
                (Ueff + state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum) +
-                state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) -
+                state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) +
+                state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) -
                 F1 * Ueff); // Instead of SurfOpaqQRadSWOutAbs(SurfNum) | ODB used to approx ground surface temp | Use TDD:DIFFUSER surface | Use
                             // TDD:DIFFUSER surface | Use TDD:DIFFUSER surface and zone | Use TDD:DIFFUSER surface
 
@@ -9367,23 +9375,25 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         if (Surface(SurfNum).OSCMPtr == 0) {
             if (construct.SourceSinkPresent) {
                 TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) +
-                        state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
+                        state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) *
+                            state.dataSurface->SurroundingSurfsProperty(state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum).SurfsTempAvg +
                         (state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum)) * TempExt +
                         state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * TSky +
                         state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround + construct.CTFCross[0] * state.dataHeatBalSurf->SurfTempIn(SurfNum) +
                         construct.CTFSourceOut[0] * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1)) /
                        (construct.CTFOutside[0] + state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum) +
-                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum) +
-                        state.dataHeatBalSurf->SurfHGrdExt(SurfNum)); // ODB used to approx ground surface temp
+                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) +
+                        state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum)); // ODB used to approx ground surface temp
             } else {
                 TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) +
-                        state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
+                        state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) *
+                            state.dataSurface->SurroundingSurfsProperty(state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum).SurfsTempAvg +
                         (state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum)) * TempExt +
                         state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * TSky +
                         state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround + construct.CTFCross[0] * state.dataHeatBalSurf->SurfTempIn(SurfNum)) /
                        (construct.CTFOutside[0] + state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum) +
-                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum) +
-                        state.dataHeatBalSurf->SurfHGrdExt(SurfNum)); // ODB used to approx ground surface temp
+                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) +
+                        state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum)); // ODB used to approx ground surface temp
             }
             // Outside Heat Balance case: Other Side Conditions Model
         } else { //( Surface(SurfNum)%OSCMPtr > 0 ) THEN
@@ -9412,7 +9422,8 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         if (Surface(SurfNum).OSCMPtr == 0) {
             if (construct.SourceSinkPresent) {
                 TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) +
-                        state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
+                        state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) *
+                            state.dataSurface->SurroundingSurfsProperty(state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum).SurfsTempAvg +
                         (state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum)) * TempExt +
                         state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * TSky +
                         state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround +
@@ -9422,11 +9433,13 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
                               state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT +
                               state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum))) /
                        (construct.CTFOutside[0] + state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum) +
-                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) -
+                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) +
+                        state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) -
                         F1 * construct.CTFCross[0]); // ODB used to approx ground surface temp | MAT use here is problem for room air models
             } else {
                 TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) +
-                        state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
+                        state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) *
+                            state.dataSurface->SurroundingSurfsProperty(state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum).SurfsTempAvg +
                         (state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum)) * TempExt +
                         state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * TSky +
                         state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround +
@@ -9435,7 +9448,8 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
                               state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT +
                               state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum))) /
                        (construct.CTFOutside[0] + state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum) +
-                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) -
+                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) +
+                        state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) -
                         F1 * construct.CTFCross[0]); // ODB used to approx ground surface temp | MAT use here is problem for room air models
             }
             // Outside Heat Balance case: Other Side Conditions Model
@@ -9470,24 +9484,27 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     } else if ((MovInsulPresent) && (!QuickConductionSurf)) {
 
         F2 = HMovInsul / (HMovInsul + state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum) +
-                          state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum));
+                          state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) +
+                          state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum));
 
         TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) +
-                state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) + construct.CTFCross[0] * state.dataHeatBalSurf->SurfTempIn(SurfNum) +
+                construct.CTFCross[0] * state.dataHeatBalSurf->SurfTempIn(SurfNum) +
                 F2 * (state.dataHeatBalSurf->SurfQRadSWOutMvIns(SurfNum) +
                       (state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum)) * TempExt +
                       state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * TSky +
-                      state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround)) /
+                      state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround +
+                      state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) *
+                          state.dataSurface->SurroundingSurfsProperty(state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum).SurfsTempAvg)) /
                (construct.CTFOutside[0] + HMovInsul - F2 * HMovInsul); // ODB used to approx ground surface temp
 
         // Outside heat balance case: Movable insulation, quick conduction
     } else if ((MovInsulPresent) && (QuickConductionSurf)) {
 
         F2 = HMovInsul / (HMovInsul + state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum) +
-                          state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum));
+                          state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) +
+                          state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum));
 
         TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) +
-                state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
                 F1 * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
                       state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
                       state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT +
@@ -9495,7 +9512,9 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
                 F2 * (state.dataHeatBalSurf->SurfQRadSWOutMvIns(SurfNum) +
                       (state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum)) * TempExt +
                       state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) + state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * TSky +
-                      state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround)) /
+                      state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround +
+                      state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) *
+                          state.dataSurface->SurroundingSurfsProperty(state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum).SurfsTempAvg)) /
                (construct.CTFOutside[0] + HMovInsul - F2 * HMovInsul - F1 * construct.CTFCross[0]); // ODB used to approx ground surface temp
 
     } // ...end of outside heat balance cases IF-THEN block
@@ -9510,17 +9529,20 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     // Current exterior surf temp would be used for the next step LWR calculation.
     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
         int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-        for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
-            Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-            Real64 SrdSurfTempAbs =
-                GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                Constant::KelvinConv;
-            QRadLWOutSrdSurfsRep +=
-                Constant::StefanBoltzmann *
-                dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
-                    ->AbsorpThermal *
-                SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TH11 + Constant::KelvinConv));
-        }
+        // for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
+        //     Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
+        //     Real64 SrdSurfTempAbs =
+        //         GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
+        //         Constant::KelvinConv;
+        //     QRadLWOutSrdSurfsRep +=
+        //         Constant::StefanBoltzmann *
+        //         dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
+        //             ->AbsorpThermal *
+        //         SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TH11 + Constant::KelvinConv));
+        // }
+
+        QRadLWOutSrdSurfsRep =
+            state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) * (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurfsTempAvg - TH11);
     }
     state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(SurfNum) = HExtSurf_fac + QRadLWOutSrdSurfsRep;
 
@@ -9542,11 +9564,12 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         } else {
             Real64 const RadSysDiv(1.0 / (construct.CTFOutside[0] + state.dataHeatBalSurf->SurfHcExt(SurfNum) +
                                           state.dataHeatBalSurf->SurfHAirExt(SurfNum) + state.dataHeatBalSurf->SurfHSkyExt(SurfNum) +
-                                          state.dataHeatBalSurf->SurfHGrdExt(SurfNum)));
+                                          state.dataHeatBalSurf->SurfHGrdExt(SurfNum) + state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum)));
 
             state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) =
                 (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) +
-                 state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
+                 (state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) *
+                  state.dataSurface->SurroundingSurfsProperty(state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum).SurfsTempAvg) +
                  (state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum)) * TempExt +
                  state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * TSky + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * TGround) *
                 RadSysDiv; // ODB used to approx ground surface temp
@@ -9934,18 +9957,12 @@ void GetSurroundingSurfacesTemperatureAverage(EnergyPlusData &state)
         SrdSurfaceTemp = 0.0;
         SrdSurfViewFactor = 0.0;
         SrdSurfaceTempSum = 0.0;
-
-        // Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + Constant::KelvinConv;
-
         Real64 SrdSurfsViewFactorSum = 0.0;
         for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
-
             SrdSurfViewFactor = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-            // SrdSurfsViewFactorSum += SrdSurfViewFactor;
             SrdSurfaceTemp = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum);
             SrdSurfaceTempSum += SrdSurfViewFactor * pow_4(SrdSurfaceTemp + Constant::KelvinConv);
         }
-        // SrdSurfsProperty.SurfsViewFactorSum = SrdSurfsViewFactorSum;
         SrdSurfsProperty.SurfsTempAvg = root_4(SrdSurfaceTempSum / SrdSurfsProperty.SurfsViewFactorSum) - Constant::KelvinConv;
     }
 }
