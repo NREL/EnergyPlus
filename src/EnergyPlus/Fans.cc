@@ -2463,7 +2463,6 @@ void UpdateFan(EnergyPlusData &state, int const FanNum)
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   April 1998
     //       MODIFIED       L. Gu, Feb. 1, 2007, No unbalance airflow when Zone Exhaust Fans are used in the AirflowNetwork
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the fan outlet nodes.
@@ -2471,35 +2470,31 @@ void UpdateFan(EnergyPlusData &state, int const FanNum)
     // METHODOLOGY EMPLOYED:
     // Data is moved from the fan data structure to the fan outlet nodes.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int OutletNode;
-    int InletNode;
+    auto &fan = state.dataFans->Fan(FanNum);
 
-    auto &Fan(state.dataFans->Fan);
-
-    OutletNode = Fan(FanNum).OutletNodeNum;
-    InletNode = Fan(FanNum).InletNodeNum;
+    int OutletNode = fan.OutletNodeNum;
+    int InletNode = fan.InletNodeNum;
 
     // Set the outlet air nodes of the fan
-    state.dataLoopNodes->Node(OutletNode).MassFlowRate = Fan(FanNum).OutletAirMassFlowRate;
-    state.dataLoopNodes->Node(OutletNode).Temp = Fan(FanNum).OutletAirTemp;
-    state.dataLoopNodes->Node(OutletNode).HumRat = Fan(FanNum).OutletAirHumRat;
-    state.dataLoopNodes->Node(OutletNode).Enthalpy = Fan(FanNum).OutletAirEnthalpy;
+    state.dataLoopNodes->Node(OutletNode).MassFlowRate = fan.OutletAirMassFlowRate;
+    state.dataLoopNodes->Node(OutletNode).Temp = fan.OutletAirTemp;
+    state.dataLoopNodes->Node(OutletNode).HumRat = fan.OutletAirHumRat;
+    state.dataLoopNodes->Node(OutletNode).Enthalpy = fan.OutletAirEnthalpy;
     // Set the outlet nodes for properties that just pass through & not used
     state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
     state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
 
     // Set the Node Flow Control Variables from the Fan Control Variables
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = Fan(FanNum).MassFlowRateMaxAvail;
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = Fan(FanNum).MassFlowRateMinAvail;
+    state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = fan.MassFlowRateMaxAvail;
+    state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = fan.MassFlowRateMinAvail;
 
-    if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
-        state.dataLoopNodes->Node(InletNode).MassFlowRate = Fan(FanNum).InletAirMassFlowRate;
+    if (fan.FanType_Num == FanType_ZoneExhaust) {
+        state.dataLoopNodes->Node(InletNode).MassFlowRate = fan.InletAirMassFlowRate;
         if (state.afn->AirflowNetworkNumOfExhFan == 0) {
-            state.dataHVACGlobal->UnbalExhMassFlow = Fan(FanNum).InletAirMassFlowRate;
-            if (Fan(FanNum).BalancedFractSchedNum > 0) {
+            state.dataHVACGlobal->UnbalExhMassFlow = fan.InletAirMassFlowRate;
+            if (fan.BalancedFractSchedNum > 0) {
                 state.dataHVACGlobal->BalancedExhMassFlow =
-                    state.dataHVACGlobal->UnbalExhMassFlow * GetCurrentScheduleValue(state, Fan(FanNum).BalancedFractSchedNum);
+                    state.dataHVACGlobal->UnbalExhMassFlow * GetCurrentScheduleValue(state, fan.BalancedFractSchedNum);
                 state.dataHVACGlobal->UnbalExhMassFlow = state.dataHVACGlobal->UnbalExhMassFlow - state.dataHVACGlobal->BalancedExhMassFlow;
             } else {
                 state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
@@ -2508,8 +2503,8 @@ void UpdateFan(EnergyPlusData &state, int const FanNum)
             state.dataHVACGlobal->UnbalExhMassFlow = 0.0;
             state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
         }
-        Fan(FanNum).UnbalancedOutletMassFlowRate = state.dataHVACGlobal->UnbalExhMassFlow;
-        Fan(FanNum).BalancedOutletMassFlowRate = state.dataHVACGlobal->BalancedExhMassFlow;
+        fan.UnbalancedOutletMassFlowRate = state.dataHVACGlobal->UnbalExhMassFlow;
+        fan.BalancedOutletMassFlowRate = state.dataHVACGlobal->BalancedExhMassFlow;
     }
 
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
@@ -2527,23 +2522,18 @@ void ReportFan(EnergyPlusData &state, int const FanNum)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   April 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the report variables for the fans.
 
-    // Using/Aliasing
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
+    auto &fan = state.dataFans->Fan(FanNum);
 
-    auto &Fan(state.dataFans->Fan);
+    fan.FanEnergy = fan.FanPower * state.dataHVACGlobal->TimeStepSysSec;
+    fan.DeltaTemp = fan.OutletAirTemp - fan.InletAirTemp;
 
-    Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSysSec;
-    Fan(FanNum).DeltaTemp = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
-
-    if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
-        if (Fan(FanNum).AirLoopNum > 0) {
-            state.dataAirLoop->AirLoopAFNInfo(Fan(FanNum).AirLoopNum).AFNLoopOnOffFanRTF = Fan(FanNum).FanRuntimeFraction;
+    if (fan.FanType_Num == FanType_SimpleOnOff) {
+        if (fan.AirLoopNum > 0) {
+            state.dataAirLoop->AirLoopAFNInfo(fan.AirLoopNum).AFNLoopOnOffFanRTF = fan.FanRuntimeFraction;
         }
     }
 }
@@ -2721,21 +2711,11 @@ int GetFanInletNode(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   February 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given fan and returns the inlet node.  If
     // incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
     // as zero.
-
-    // Return value
-    int NodeNumber; // returned outlet node of matched fan
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichFan;
-
-    auto &Fan(state.dataFans->Fan);
 
     // Obtains and Allocates fan related parameters from input file
     if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -2743,16 +2723,14 @@ int GetFanInletNode(EnergyPlusData &state,
         state.dataFans->GetFanInputFlag = false;
     }
 
-    WhichFan = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
+    int WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     if (WhichFan != 0) {
-        NodeNumber = Fan(WhichFan).InletNodeNum;
+        return state.dataFans->Fan(WhichFan).InletNodeNum;
     } else {
         ShowSevereError(state, format("GetFanInletNode: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
         ErrorsFound = true;
-        NodeNumber = 0;
+        return 0;
     }
-
-    return NodeNumber;
 }
 
 int getFanInNodeIndex(EnergyPlusData &state,
@@ -2760,11 +2738,6 @@ int getFanInNodeIndex(EnergyPlusData &state,
                       bool &ErrorsFound   // set to true if problem
 )
 {
-
-    int NodeNumber = 0; // returned outlet node of matched fan
-
-    auto &Fan(state.dataFans->Fan);
-
     // Obtains and Allocates fan related parameters from input file
     if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
         GetFanInput(state);
@@ -2772,13 +2745,12 @@ int getFanInNodeIndex(EnergyPlusData &state,
     }
 
     if (FanIndex != 0) {
-        NodeNumber = Fan(FanIndex).InletNodeNum;
+        return state.dataFans->Fan(FanIndex).InletNodeNum;
     } else {
         ShowSevereError(state, "getFanInNodeIndex: Could not find Fan");
         ErrorsFound = true;
+        return 0;
     }
-
-    return NodeNumber;
 }
 
 int GetFanOutletNode(EnergyPlusData &state,
@@ -2791,21 +2763,11 @@ int GetFanOutletNode(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   February 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given fan and returns the outlet node.  If
     // incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
     // as zero.
-
-    // Return value
-    int NodeNumber; // returned outlet node of matched fan
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichFan;
-
-    auto &Fan(state.dataFans->Fan);
 
     // Obtains and Allocates fan related parameters from input file
     if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -2813,16 +2775,14 @@ int GetFanOutletNode(EnergyPlusData &state,
         state.dataFans->GetFanInputFlag = false;
     }
 
-    WhichFan = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
+    int WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     if (WhichFan != 0) {
-        NodeNumber = Fan(WhichFan).OutletNodeNum;
+        return state.dataFans->Fan(WhichFan).OutletNodeNum;
     } else {
         ShowSevereError(state, format("GetFanOutletNode: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
         ErrorsFound = true;
-        NodeNumber = 0;
+        return 0;
     }
-
-    return NodeNumber;
 }
 
 int GetFanAvailSchPtr(EnergyPlusData &state,
@@ -2835,8 +2795,6 @@ int GetFanAvailSchPtr(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   September 2007
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given fan and returns the availability schedule pointer.  If
@@ -2846,27 +2804,20 @@ int GetFanAvailSchPtr(EnergyPlusData &state,
     // Return value
     int FanAvailSchPtr; // returned availability schedule pointer of matched fan
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichFan;
-
-    auto &Fan(state.dataFans->Fan);
-
     // Obtains and Allocates fan related parameters from input file
     if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
         GetFanInput(state);
         state.dataFans->GetFanInputFlag = false;
     }
 
-    WhichFan = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
+    int WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     if (WhichFan != 0) {
-        FanAvailSchPtr = Fan(WhichFan).AvailSchedPtrNum;
+        return state.dataFans->Fan(WhichFan).AvailSchedPtrNum;
     } else {
         ShowSevereError(state, format("GetFanAvailSchPtr: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
         ErrorsFound = true;
-        FanAvailSchPtr = 0;
+        return 0;
     }
-
-    return FanAvailSchPtr;
 }
 
 int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
