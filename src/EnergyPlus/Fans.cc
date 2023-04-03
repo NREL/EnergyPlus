@@ -2135,18 +2135,18 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool FanIsRunning = false; // There seems to be a missing else case below unless false is assumed
 
-    auto &Fan(state.dataFans->Fan);
+    auto &fan = state.dataFans->Fan(FanNum);
 
-    Real64 DeltaPress = Fan(FanNum).DeltaPress; // [N/m2]
-    if (Fan(FanNum).EMSFanPressureOverrideOn) DeltaPress = Fan(FanNum).EMSFanPressureValue;
+    Real64 DeltaPress = fan.DeltaPress; // [N/m2]
+    if (fan.EMSFanPressureOverrideOn) DeltaPress = fan.EMSFanPressureValue;
 
-    Real64 FanEff = Fan(FanNum).FanEff;
-    if (Fan(FanNum).EMSFanEffOverrideOn) FanEff = Fan(FanNum).EMSFanEffValue;
+    Real64 FanEff = fan.FanEff;
+    if (fan.EMSFanEffOverrideOn) FanEff = fan.EMSFanEffValue;
 
     // For a Constant Volume Simple Fan the Max Flow Rate is the Flow Rate for the fan
-    Real64 Tin = Fan(FanNum).InletAirTemp;
-    Real64 RhoAir = Fan(FanNum).RhoAirStdInit;
-    Real64 MassFlow = Fan(FanNum).InletAirMassFlowRate;
+    Real64 Tin = fan.InletAirTemp;
+    Real64 RhoAir = fan.RhoAirStdInit;
+    Real64 MassFlow = fan.InletAirMassFlowRate;
 
     //  When the AvailManagerMode == ExhaustFanCoupledToAvailManagers then the
     //  Exhaust Fan is  interlocked with air loop availability via global TurnFansOn and TurnFansOff variables.
@@ -2157,11 +2157,11 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
     //  and TurnFansOff to LocalTurnFansOff in the IF statement below.
 
     // apply controls to determine if operating
-    if (Fan(FanNum).AvailManagerMode == AvailabilityManagerCoupling::Coupled) {
-        if (((GetCurrentScheduleValue(state, Fan(FanNum).AvailSchedPtrNum) > 0.0) || state.dataHVACGlobal->TurnFansOn) &&
+    if (fan.AvailManagerMode == AvailabilityManagerCoupling::Coupled) {
+        if (((GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0) || state.dataHVACGlobal->TurnFansOn) &&
             !state.dataHVACGlobal->TurnFansOff && MassFlow > 0.0) { // available
-            if (Fan(FanNum).MinTempLimitSchedNum > 0) {
-                if (Tin >= GetCurrentScheduleValue(state, Fan(FanNum).MinTempLimitSchedNum)) {
+            if (fan.MinTempLimitSchedNum > 0) {
+                if (Tin >= GetCurrentScheduleValue(state, fan.MinTempLimitSchedNum)) {
                     FanIsRunning = true;
                 } else {
                     FanIsRunning = false;
@@ -2173,10 +2173,10 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
             FanIsRunning = false;
         }
 
-    } else if (Fan(FanNum).AvailManagerMode == AvailabilityManagerCoupling::Decoupled) {
-        if (GetCurrentScheduleValue(state, Fan(FanNum).AvailSchedPtrNum) > 0.0 && MassFlow > 0.0) {
-            if (Fan(FanNum).MinTempLimitSchedNum > 0) {
-                if (Tin >= GetCurrentScheduleValue(state, Fan(FanNum).MinTempLimitSchedNum)) {
+    } else if (fan.AvailManagerMode == AvailabilityManagerCoupling::Decoupled) {
+        if (GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 && MassFlow > 0.0) {
+            if (fan.MinTempLimitSchedNum > 0) {
+                if (Tin >= GetCurrentScheduleValue(state, fan.MinTempLimitSchedNum)) {
                     FanIsRunning = true;
                 } else {
                     FanIsRunning = false;
@@ -2191,26 +2191,26 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
 
     if (FanIsRunning) {
         // Fan is operating
-        Fan(FanNum).FanPower = max(0.0, MassFlow * DeltaPress / (FanEff * RhoAir)); // total fan power
-        Fan(FanNum).PowerLossToAir = Fan(FanNum).FanPower;
-        Fan(FanNum).OutletAirEnthalpy = Fan(FanNum).InletAirEnthalpy + Fan(FanNum).PowerLossToAir / MassFlow;
+        fan.FanPower = max(0.0, MassFlow * DeltaPress / (FanEff * RhoAir)); // total fan power
+        fan.PowerLossToAir = fan.FanPower;
+        fan.OutletAirEnthalpy = fan.InletAirEnthalpy + fan.PowerLossToAir / MassFlow;
         // This fan does not change the moisture or Mass Flow across the component
-        Fan(FanNum).OutletAirHumRat = Fan(FanNum).InletAirHumRat;
-        Fan(FanNum).OutletAirMassFlowRate = MassFlow;
-        Fan(FanNum).OutletAirTemp = PsyTdbFnHW(Fan(FanNum).OutletAirEnthalpy, Fan(FanNum).OutletAirHumRat);
+        fan.OutletAirHumRat = fan.InletAirHumRat;
+        fan.OutletAirMassFlowRate = MassFlow;
+        fan.OutletAirTemp = PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
 
     } else {
         // Fan is off and not operating no power consumed and mass flow rate.
-        Fan(FanNum).FanPower = 0.0;
-        Fan(FanNum).PowerLossToAir = 0.0;
-        Fan(FanNum).OutletAirMassFlowRate = 0.0;
-        Fan(FanNum).OutletAirHumRat = Fan(FanNum).InletAirHumRat;
-        Fan(FanNum).OutletAirEnthalpy = Fan(FanNum).InletAirEnthalpy;
-        Fan(FanNum).OutletAirTemp = Fan(FanNum).InletAirTemp;
+        fan.FanPower = 0.0;
+        fan.PowerLossToAir = 0.0;
+        fan.OutletAirMassFlowRate = 0.0;
+        fan.OutletAirHumRat = fan.InletAirHumRat;
+        fan.OutletAirEnthalpy = fan.InletAirEnthalpy;
+        fan.OutletAirTemp = fan.InletAirTemp;
         // Set the Control Flow variables to 0.0 flow when OFF.
-        Fan(FanNum).MassFlowRateMaxAvail = 0.0;
-        Fan(FanNum).MassFlowRateMinAvail = 0.0;
-        Fan(FanNum).InletAirMassFlowRate = 0.0;
+        fan.MassFlowRateMaxAvail = 0.0;
+        fan.MassFlowRateMinAvail = 0.0;
+        fan.InletAirMassFlowRate = 0.0;
     }
 }
 
