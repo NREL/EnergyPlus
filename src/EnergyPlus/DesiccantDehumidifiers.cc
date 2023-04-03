@@ -224,32 +224,32 @@ namespace DesiccantDehumidifiers {
         static std::string const dehumidifierDesiccantNoFans("Dehumidifier:Desiccant:NoFans");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int DesicDehumIndex;               // Loop index
-        int DesicDehumNum;                 // Current desiccant dehumidifier number
-        int NumAlphas;                     // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                    // Number of Numbers for each GetObjectItem call
-        int IOStatus;                      // Used in GetObjectItem
-        bool ErrorsFound(false);           // Set to true if errors in input, fatal at end of routine
-        bool ErrorsFound2(false);          // Set to true if errors in input, fatal at end of routine
-        bool ErrorsFoundGeneric(false);    // Set to true if errors in input, fatal at end of routine
-        bool IsNotOK;                      // Flag to verify name
-        bool OANodeError;                  // Flag for check on outside air node
-        std::string RegenCoilInlet;        // Desiccant system regeneration air heater inlet node
-        std::string RegenCoilOutlet;       // Desiccant system regeneration air heater outlet node
-        int DesuperHeaterIndex;            // Index of desuperheater heating coil
-        int RegenCoilControlNodeNum;       // Control node number of regen heating coil
-        Real64 CoilBypassedFlowFrac;       // Bypass air fraction for multimode DX coils
-        Array1D_string Alphas;             // Alpha input items for object
-        Array1D_string cAlphaFields;       // Alpha field names
-        Array1D_string cNumericFields;     // Numeric field names
-        Array1D<Real64> Numbers;           // Numeric input items for object
-        Array1D_bool lAlphaBlanks;         // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;       // Logical array, numeric field input BLANK = .TRUE.
-        bool errFlag;                      // local error flag
-        std::string RegenCoilType;         // Regen heating coil type
-        std::string RegenCoilName;         // Regen heating coil name
-        int SteamIndex;                    // steam coil Index
-        bool RegairHeatingCoilFlag(false); // local error flag
+        int DesicDehumIndex;                // Loop index
+        int DesicDehumNum;                  // Current desiccant dehumidifier number
+        int NumAlphas;                      // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                     // Number of Numbers for each GetObjectItem call
+        int IOStatus;                       // Used in GetObjectItem
+        bool ErrorsFound(false);            // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound2(false);           // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFoundGeneric(false);     // Set to true if errors in input, fatal at end of routine
+        bool IsNotOK;                       // Flag to verify name
+        bool OANodeError;                   // Flag for check on outside air node
+        std::string RegenCoilInlet;         // Desiccant system regeneration air heater inlet node
+        std::string RegenCoilOutlet;        // Desiccant system regeneration air heater outlet node
+        int DesuperHeaterIndex;             // Index of desuperheater heating coil
+        int RegenCoilControlNodeNum;        // Control node number of regen heating coil
+        Real64 CoilBypassedFlowFrac;        // Bypass air fraction for multimode DX coils
+        Array1D_string Alphas;              // Alpha input items for object
+        Array1D_string cAlphaFields;        // Alpha field names
+        Array1D_string cNumericFields;      // Numeric field names
+        Array1D<Real64> Numbers;            // Numeric input items for object
+        Array1D_bool lAlphaBlanks;          // Logical array, alpha field input BLANK = .TRUE.
+        Array1D_bool lNumericBlanks;        // Logical array, numeric field input BLANK = .TRUE.
+        bool errFlag;                       // local error flag
+        std::string RegenCoilType;          // Regen heating coil type
+        std::string RegenCoilName;          // Regen heating coil name
+        int SteamIndex;                     // steam coil Index
+        bool RegairHeatingCoilFlag = false; // local error flag
 
         auto &MaxNums(state.dataDesiccantDehumidifiers->MaxNums);
         auto &MaxAlphas(state.dataDesiccantDehumidifiers->MaxAlphas);
@@ -3159,58 +3159,6 @@ namespace DesiccantDehumidifiers {
             return state.dataDesiccantDehumidifiers->DesicDehum(WhichDesicDehum).ProcAirOutNode;
         } else {
             ShowSevereError(state, format("GetProcAirInletNodeNum: Could not find Desciccant Dehumidifier = \"{}\"", DesicDehumName));
-            ErrorsFound = true;
-            return 0;
-        }
-    }
-
-    int GetRegAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Lixing Gu
-        //       DATE WRITTEN   May 2019
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function looks up the given Desiccant Dehumidifier and returns the regeneration air inlet node number.
-        // If incorrect Desiccant Dehumidifier name is given, ErrorsFound is returned as true and node number as zero.
-
-        // Obtains and Allocates heat exchanger related parameters from input file
-        if (state.dataDesiccantDehumidifiers->GetInputDesiccantDehumidifier) {
-            GetDesiccantDehumidifierInput(state);
-            state.dataDesiccantDehumidifiers->GetInputDesiccantDehumidifier = false;
-        }
-
-        int WhichDesicDehum = UtilityRoutines::FindItemInList(DesicDehumName, state.dataDesiccantDehumidifiers->DesicDehum);
-        if (WhichDesicDehum != 0) {
-            return state.dataDesiccantDehumidifiers->DesicDehum(WhichDesicDehum).RegenAirInNode;
-        } else {
-            ShowSevereError(state, format("GetRegAirInletNodeNum: Could not find Desciccant Dehumidifier = \"{}\"", DesicDehumName));
-            ErrorsFound = true;
-            return 0;
-        }
-    }
-
-    int GetRegAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Lixing Gu
-        //       DATE WRITTEN   May 2019
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function looks up the given Desiccant Dehumidifier and returns the regeneration air outlet node number.
-        // If incorrect Desiccant Dehumidifier name is given, ErrorsFound is returned as true and node number as zero.
-
-        // Obtains and Allocates heat exchanger related parameters from input file
-        if (state.dataDesiccantDehumidifiers->GetInputDesiccantDehumidifier) {
-            GetDesiccantDehumidifierInput(state);
-            state.dataDesiccantDehumidifiers->GetInputDesiccantDehumidifier = false;
-        }
-
-        int WhichDesicDehum = UtilityRoutines::FindItemInList(DesicDehumName, state.dataDesiccantDehumidifiers->DesicDehum);
-        if (WhichDesicDehum != 0) {
-            return state.dataDesiccantDehumidifiers->DesicDehum(WhichDesicDehum).RegenAirOutNode;
-        } else {
-            ShowSevereError(state, format("GetRegAirOutletNodeNum: Could not find Desciccant Dehumidifier = \"{}\"", DesicDehumName));
             ErrorsFound = true;
             return 0;
         }

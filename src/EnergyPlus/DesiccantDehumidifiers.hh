@@ -289,10 +289,6 @@ namespace DesiccantDehumidifiers {
 
     int GetProcAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
 
-    int GetRegAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
-
-    int GetRegAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
-
 } // namespace DesiccantDehumidifiers
 
 struct DesiccantDehumidifiersData : BaseGlobalStruct

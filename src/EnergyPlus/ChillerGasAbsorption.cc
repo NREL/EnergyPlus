@@ -85,7 +85,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
 //                   for Gas Research Institute
 //    DATE WRITTEN   March 2001
 //    MODIFIED       Brent Griffith, Nov 2010 plant upgrades, generalize fluid properties
-//    RE-ENGINEERED  na
+
 // PURPOSE OF THIS MODULE:
 //    This module simulates the performance of the direct fired
 //    absorption chiller.
@@ -107,7 +107,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
 //    Development of this module was funded by the Gas Research Institute.
 //    (Please see copyright and disclaimer information at end of module)
 
-PlantComponent *GasAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+GasAbsorberSpecs *GasAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data if it hasn't been done already
     if (state.dataChillerGasAbsorption->getGasAbsorberInputs) {
@@ -115,11 +115,10 @@ PlantComponent *GasAbsorberSpecs::factory(EnergyPlusData &state, std::string con
         state.dataChillerGasAbsorption->getGasAbsorberInputs = false;
     }
     // Now look for this particular pipe in the list
-    for (auto &comp : state.dataChillerGasAbsorption->GasAbsorber) {
-        if (comp.Name == objectName) {
-            return &comp;
-        }
-    }
+    auto thisObj = std::find_if(state.dataChillerGasAbsorption->GasAbsorber.begin(),
+                                state.dataChillerGasAbsorption->GasAbsorber.end(),
+                                [&objectName](const GasAbsorberSpecs &myObj) { return myObj.Name == objectName; });
+    if (thisObj != state.dataChillerGasAbsorption->GasAbsorber.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalGasAbsorberFactory: Error getting inputs for comp named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
@@ -286,7 +285,6 @@ void GetGasAbsorberInput(EnergyPlusData &state)
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
-    std::string ChillerName;
     bool Okay;
     bool Get_ErrorsFound(false);
     int NumGasAbsorbers(0); // number of Absorption Chillers specified in input
@@ -328,7 +326,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
 
         auto &thisChiller = state.dataChillerGasAbsorption->GasAbsorber(AbsorberNum);
         thisChiller.Name = state.dataIPShortCut->cAlphaArgs(1);
-        ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
+        std::string ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
 
         // Assign capacities
         thisChiller.NomCoolingCap = state.dataIPShortCut->rNumericArgs(1);

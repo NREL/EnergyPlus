@@ -423,7 +423,7 @@ namespace CondenserLoopTowers {
 
         void report(EnergyPlusData &state, bool RunFlag);
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string_view objectName);
+        static CoolingTower *factory(EnergyPlusData &state, std::string_view objectName);
     };
 
     void GetTowerInput(EnergyPlusData &state);
