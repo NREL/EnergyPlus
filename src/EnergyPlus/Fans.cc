@@ -2121,7 +2121,6 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
     //       DATE WRITTEN   Jan 2000
     //       MODIFIED       Brent Griffith, May 2009 for EMS
     //                      Brent Griffith, Feb 2013 controls upgrade
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the Zone Exhaust Fan
@@ -2134,25 +2133,20 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
     // ASHRAE HVAC 2 Toolkit, page 2-3 (FANSIM)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 RhoAir;
-    Real64 DeltaPress; // [N/m2]
-    Real64 FanEff;
-    Real64 MassFlow;           // [kg/sec]
-    Real64 Tin;                // [C]
     bool FanIsRunning = false; // There seems to be a missing else case below unless false is assumed
 
     auto &Fan(state.dataFans->Fan);
 
-    DeltaPress = Fan(FanNum).DeltaPress;
+    Real64 DeltaPress = Fan(FanNum).DeltaPress; // [N/m2]
     if (Fan(FanNum).EMSFanPressureOverrideOn) DeltaPress = Fan(FanNum).EMSFanPressureValue;
 
-    FanEff = Fan(FanNum).FanEff;
+    Real64 FanEff = Fan(FanNum).FanEff;
     if (Fan(FanNum).EMSFanEffOverrideOn) FanEff = Fan(FanNum).EMSFanEffValue;
 
     // For a Constant Volume Simple Fan the Max Flow Rate is the Flow Rate for the fan
-    Tin = Fan(FanNum).InletAirTemp;
-    RhoAir = Fan(FanNum).RhoAirStdInit;
-    MassFlow = Fan(FanNum).InletAirMassFlowRate;
+    Real64 Tin = Fan(FanNum).InletAirTemp;
+    Real64 RhoAir = Fan(FanNum).RhoAirStdInit;
+    Real64 MassFlow = Fan(FanNum).InletAirMassFlowRate;
 
     //  When the AvailManagerMode == ExhaustFanCoupledToAvailManagers then the
     //  Exhaust Fan is  interlocked with air loop availability via global TurnFansOn and TurnFansOff variables.
