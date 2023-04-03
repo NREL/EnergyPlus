@@ -1136,8 +1136,6 @@ void InitFan(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   February 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for initializations of the Fan Components.
@@ -1148,26 +1146,17 @@ void InitFan(EnergyPlusData &state,
     // Using/Aliasing
     using DataZoneEquipment::CheckZoneEquipmentList;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;
-    int OutletNode;
-    int OutNode;
-    int Loop;
-
     auto &Fan(state.dataFans->Fan);
-    auto &NightVentPerf(state.dataFans->NightVentPerf);
 
     if (state.dataFans->MyOneTimeFlag) {
-
         state.dataFans->MyEnvrnFlag.dimension(state.dataFans->NumFans, true);
-
         state.dataFans->MyOneTimeFlag = false;
     }
 
     // need to check all fans to see if they are on Zone Equipment List or issue warning
     if (!state.dataFans->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataFans->ZoneEquipmentListChecked = true;
-        for (Loop = 1; Loop <= state.dataFans->NumFans; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataFans->NumFans; ++Loop) {
             if (!UtilityRoutines::SameString(Fan(Loop).FanType, "Fan:ZoneExhaust")) continue;
             if (CheckZoneEquipmentList(state, Fan(Loop).FanType, Fan(Loop).FanName)) continue;
             ShowSevereError(state,
@@ -1194,8 +1183,7 @@ void InitFan(EnergyPlusData &state,
     if (state.dataGlobal->BeginEnvrnFlag && state.dataFans->MyEnvrnFlag(FanNum)) {
 
         // For all Fan inlet nodes convert the Volume flow to a mass flow
-        // unused0909    InNode = Fan(FanNum)%InletNodeNum
-        OutNode = Fan(FanNum).OutletNodeNum;
+        int OutNode = Fan(FanNum).OutletNodeNum;
         Fan(FanNum).RhoAirStdInit = state.dataEnvrn->StdRhoAir;
 
         // Change the Volume Flow Rates to Mass Flow Rates
@@ -1209,7 +1197,8 @@ void InitFan(EnergyPlusData &state,
             Fan(FanNum).MinAirMassFlowRate = Fan(FanNum).MinAirFlowRate * Fan(FanNum).RhoAirStdInit;
         }
         if (Fan(FanNum).NVPerfNum > 0) {
-            NightVentPerf(Fan(FanNum).NVPerfNum).MaxAirMassFlowRate = NightVentPerf(Fan(FanNum).NVPerfNum).MaxAirFlowRate * Fan(FanNum).RhoAirStdInit;
+            state.dataFans->NightVentPerf(Fan(FanNum).NVPerfNum).MaxAirMassFlowRate =
+                state.dataFans->NightVentPerf(Fan(FanNum).NVPerfNum).MaxAirFlowRate * Fan(FanNum).RhoAirStdInit;
         }
 
         // Init the Node Control variables
@@ -1244,8 +1233,8 @@ void InitFan(EnergyPlusData &state,
     // Do a check and make sure that the max and min available(control) flow is
     // between the physical max and min for the Fan while operating.
 
-    InletNode = Fan(FanNum).InletNodeNum;
-    OutletNode = Fan(FanNum).OutletNodeNum;
+    int InletNode = Fan(FanNum).InletNodeNum;
+    int OutletNode = Fan(FanNum).OutletNodeNum;
 
     Fan(FanNum).MassFlowRateMaxAvail =
         min(state.dataLoopNodes->Node(OutletNode).MassFlowRateMax, state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail);
