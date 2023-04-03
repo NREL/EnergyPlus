@@ -398,9 +398,9 @@ namespace FanCoilUnits {
                     fanCoil.CCoilPlantName = fanCoil.CCoilName;
                     fanCoil.CCoilPlantType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                 }
+                std::string CCoilType;
                 if (UtilityRoutines::SameString(Alphas(11), "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                     fanCoil.CCoilType_Num = CCoil::HXAssist;
-                    std::string CCoilType;
                     HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName(
                         state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound, CCoilType, fanCoil.CCoilPlantName);
                     if (UtilityRoutines::SameString(CCoilType, "Coil:Cooling:Water")) {
@@ -423,21 +423,28 @@ namespace FanCoilUnits {
                 } else {
                     if (fanCoil.CCoilType_Num != CCoil::HXAssist) {
                         // mine the cold water node from the coil object
-                        fanCoil.CoolCoilFluidInletNode = WaterCoils::GetCoilWaterInletNode(state, fanCoil.CCoilType, fanCoil.CCoilName, IsNotOK);
-                        fanCoil.CoolCoilInletNodeNum = WaterCoils::GetCoilInletNode(state, fanCoil.CCoilType, fanCoil.CCoilName, IsNotOK);
-                        fanCoil.CoolCoilOutletNodeNum = WaterCoils::GetCoilOutletNode(state, fanCoil.CCoilType, fanCoil.CCoilName, IsNotOK);
+                        int coilIndex = WaterCoils::GetWaterCoilIndex(state, fanCoil.CCoilType, fanCoil.CCoilName, IsNotOK);
+                        // Other error checks should trap before it gets to this point in the code, but including just in case.
+                        if (IsNotOK) {
+                            ShowContinueError(state, format("...specified in {}=\"{}\".", CurrentModuleObject, fanCoil.Name));
+                            ErrorsFound = true;
+                        } else {
+                            fanCoil.CoolCoilFluidInletNode = state.dataWaterCoils->WaterCoil(coilIndex).WaterInletNodeNum;
+                            fanCoil.CoolCoilInletNodeNum = state.dataWaterCoils->WaterCoil(coilIndex).AirInletNodeNum;
+                            fanCoil.CoolCoilOutletNodeNum = state.dataWaterCoils->WaterCoil(coilIndex).AirOutletNodeNum;
+                        }
                     } else {
-                        fanCoil.CoolCoilFluidInletNode =
-                            HVACHXAssistedCoolingCoil::GetCoilWaterInletNode(state, fanCoil.CCoilType, fanCoil.CCoilName, IsNotOK);
-                        fanCoil.CoolCoilInletNodeNum =
-                            HVACHXAssistedCoolingCoil::GetCoilInletNode(state, fanCoil.CCoilType, fanCoil.CCoilName, IsNotOK);
-                        fanCoil.CoolCoilOutletNodeNum =
-                            HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, fanCoil.CCoilType, fanCoil.CCoilName, IsNotOK);
-                    }
-                    // Other error checks should trap before it gets to this point in the code, but including just in case.
-                    if (IsNotOK) {
-                        ShowContinueError(state, format("...specified in {}=\"{}\".", CurrentModuleObject, fanCoil.Name));
-                        ErrorsFound = true;
+                        // mine the cold water node from the coil object
+                        int coilIndex = WaterCoils::GetWaterCoilIndex(state, CCoilType, fanCoil.CCoilPlantName, IsNotOK);
+                        // Other error checks should trap before it gets to this point in the code, but including just in case.
+                        if (IsNotOK) {
+                            ShowContinueError(state, format("...specified in {}=\"{}\".", CurrentModuleObject, fanCoil.Name));
+                            ErrorsFound = true;
+                        } else {
+                            fanCoil.CoolCoilFluidInletNode = state.dataWaterCoils->WaterCoil(coilIndex).WaterInletNodeNum;
+                            fanCoil.CoolCoilInletNodeNum = state.dataWaterCoils->WaterCoil(coilIndex).AirInletNodeNum;
+                            fanCoil.CoolCoilOutletNodeNum = state.dataWaterCoils->WaterCoil(coilIndex).AirOutletNodeNum;
+                        }
                     }
                 }
             } else {
@@ -456,12 +463,14 @@ namespace FanCoilUnits {
                     ErrorsFound = true;
                 } else {
                     // mine the hot water node from the coil object
-                    fanCoil.HeatCoilFluidInletNode = WaterCoils::GetCoilWaterInletNode(state, fanCoil.HCoilType, fanCoil.HCoilName, IsNotOK);
-                    fanCoil.HeatCoilInletNodeNum = WaterCoils::GetCoilInletNode(state, fanCoil.HCoilType, fanCoil.HCoilName, IsNotOK);
-                    fanCoil.HeatCoilOutletNodeNum = WaterCoils::GetCoilOutletNode(state, fanCoil.HCoilType, fanCoil.HCoilName, IsNotOK);
+                    int coilIndex = WaterCoils::GetWaterCoilIndex(state, fanCoil.HCoilType, fanCoil.HCoilName, IsNotOK);
                     if (IsNotOK) {
                         ShowContinueError(state, format("...specified in {}=\"{}\".", CurrentModuleObject, fanCoil.Name));
                         ErrorsFound = true;
+                    } else {
+                        fanCoil.HeatCoilFluidInletNode = state.dataWaterCoils->WaterCoil(coilIndex).WaterInletNodeNum;
+                        fanCoil.HeatCoilInletNodeNum = state.dataWaterCoils->WaterCoil(coilIndex).AirInletNodeNum;
+                        fanCoil.HeatCoilOutletNodeNum = state.dataWaterCoils->WaterCoil(coilIndex).AirOutletNodeNum;
                     }
                 }
             } else if (UtilityRoutines::SameString(Alphas(13), "Coil:Heating:Electric")) {
@@ -472,12 +481,15 @@ namespace FanCoilUnits {
                     ShowContinueError(state, format("...specified in {}=\"{}\".", CurrentModuleObject, fanCoil.Name));
                     ErrorsFound = true;
                 } else {
-                    fanCoil.DesignHeatingCapacity = HeatingCoils::GetCoilCapacity(state, fanCoil.HCoilType, fanCoil.HCoilName, errFlag);
-                    fanCoil.HeatCoilInletNodeNum = HeatingCoils::GetCoilInletNode(state, fanCoil.HCoilType, fanCoil.HCoilName, errFlag);
-                    fanCoil.HeatCoilOutletNodeNum = HeatingCoils::GetCoilOutletNode(state, fanCoil.HCoilType, fanCoil.HCoilName, errFlag);
-                    if (errFlag) {
+                    int coilIndex;
+                    HeatingCoils::GetCoilIndex(state, fanCoil.HCoilName, coilIndex, IsNotOK);
+                    if (IsNotOK) {
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, fanCoil.Name));
                         ErrorsFound = true;
+                    } else {
+                        fanCoil.DesignHeatingCapacity = state.dataHeatingCoils->HeatingCoil(coilIndex).NominalCapacity;
+                        fanCoil.HeatCoilInletNodeNum = state.dataHeatingCoils->HeatingCoil(coilIndex).AirInletNodeNum;
+                        fanCoil.HeatCoilOutletNodeNum = state.dataHeatingCoils->HeatingCoil(coilIndex).AirOutletNodeNum;
                     }
                 }
             } else {
