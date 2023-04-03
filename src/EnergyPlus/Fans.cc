@@ -2642,20 +2642,11 @@ Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   February 2006
     //       MODIFIED       R. Raustad, Aug 2007 - added optional fan index
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the design volume flow rate for the given fan and returns it.  If
     // incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
     // as negative.
-
-    // Return value
-    Real64 DesignVolumeFlowRate; // returned flow rate of matched fan
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichFan;
-
-    auto &Fan(state.dataFans->Fan);
 
     // Obtains and Allocates fan related parameters from input file
     if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -2664,20 +2655,18 @@ Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
     }
 
     if (present(FanIndex)) {
-        DesignVolumeFlowRate = Fan(FanIndex).MaxAirFlowRate;
+        return state.dataFans->Fan(FanIndex).MaxAirFlowRate;
     } else {
-        WhichFan = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
+        int WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
         if (WhichFan != 0) {
-            DesignVolumeFlowRate = Fan(WhichFan).MaxAirFlowRate;
+            return state.dataFans->Fan(WhichFan).MaxAirFlowRate;
         } else {
             ShowSevereError(state, format("GetFanDesignVolumeFlowRate: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
             ShowContinueError(state, "... Design Volume Flow rate returned as -1000.");
             ErrorsFound = true;
-            DesignVolumeFlowRate = -1000.0;
+            return -1000.0;
         }
     }
-
-    return DesignVolumeFlowRate;
 }
 
 int GetFanInletNode(EnergyPlusData &state,
@@ -2779,9 +2768,6 @@ int GetFanAvailSchPtr(EnergyPlusData &state,
     // This function looks up the given fan and returns the availability schedule pointer.  If
     // incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
     // as zero.
-
-    // Return value
-    int FanAvailSchPtr; // returned availability schedule pointer of matched fan
 
     // Obtains and Allocates fan related parameters from input file
     if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
