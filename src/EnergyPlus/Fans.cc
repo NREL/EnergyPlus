@@ -92,9 +92,6 @@ namespace EnergyPlus::Fans {
 // To encapsulate the data and algorithms required to
 // manage the Fan System Component
 
-// Using/Aliasing
-// using namespace DataLoopNode;
-
 constexpr std::array<std::string_view, static_cast<int>(AvailabilityManagerCoupling::Num)> couplingsUC = {"COUPLED", "DECOUPLED"};
 
 void SimulateFanComponents(EnergyPlusData &state,
@@ -207,11 +204,6 @@ void GetFanInput(EnergyPlusData &state)
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for fans and stores it in fan data structures
-
-    // Using/Aliasing
-    using BranchNodeConnections::TestCompSet;
-    using Curve::GetCurveIndex;
-    using NodeInputManager::GetOnlySingleNode;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int FanNum;       // The fan that you are currently loading input into
@@ -359,24 +351,24 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).MotInAirFrac = rNumericArgs(5);
         Fan(FanNum).MinAirFlowRate = 0.0;
 
-        Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                                                     cAlphaArgs(3),
-                                                     ErrorsFound,
-                                                     DataLoopNode::ConnectionObjectType::FanConstantVolume,
-                                                     cAlphaArgs(1),
-                                                     DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::ConnectionType::Inlet,
-                                                     NodeInputManager::CompFluidStream::Primary,
-                                                     DataLoopNode::ObjectIsNotParent);
-        Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                                                      cAlphaArgs(4),
-                                                      ErrorsFound,
-                                                      DataLoopNode::ConnectionObjectType::FanConstantVolume,
-                                                      cAlphaArgs(1),
-                                                      DataLoopNode::NodeFluidType::Air,
-                                                      DataLoopNode::ConnectionType::Outlet,
-                                                      NodeInputManager::CompFluidStream::Primary,
-                                                      DataLoopNode::ObjectIsNotParent);
+        Fan(FanNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                       cAlphaArgs(3),
+                                                                       ErrorsFound,
+                                                                       DataLoopNode::ConnectionObjectType::FanConstantVolume,
+                                                                       cAlphaArgs(1),
+                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                       DataLoopNode::ConnectionType::Inlet,
+                                                                       NodeInputManager::CompFluidStream::Primary,
+                                                                       DataLoopNode::ObjectIsNotParent);
+        Fan(FanNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                        cAlphaArgs(4),
+                                                                        ErrorsFound,
+                                                                        DataLoopNode::ConnectionObjectType::FanConstantVolume,
+                                                                        cAlphaArgs(1),
+                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                        DataLoopNode::ConnectionType::Outlet,
+                                                                        NodeInputManager::CompFluidStream::Primary,
+                                                                        DataLoopNode::ObjectIsNotParent);
 
         if (NumAlphas > 4) {
             Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(5);
@@ -384,7 +376,7 @@ void GetFanInput(EnergyPlusData &state)
             Fan(FanNum).EndUseSubcategoryName = "General";
         }
 
-        TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Air Nodes");
+        BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Air Nodes");
 
     } // end Number of Simple FAN Loop
 
@@ -464,24 +456,24 @@ void GetFanInput(EnergyPlusData &state)
             ShowWarningError(state, "Fan Coefficients are all zero.  No Fan power will be reported.");
             ShowContinueError(state, format("For {}, Fan={}", cCurrentModuleObject, cAlphaArgs(1)));
         }
-        Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                                                     cAlphaArgs(4),
-                                                     ErrorsFound,
-                                                     DataLoopNode::ConnectionObjectType::FanVariableVolume,
-                                                     cAlphaArgs(1),
-                                                     DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::ConnectionType::Inlet,
-                                                     NodeInputManager::CompFluidStream::Primary,
-                                                     DataLoopNode::ObjectIsNotParent);
-        Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                                                      cAlphaArgs(5),
-                                                      ErrorsFound,
-                                                      DataLoopNode::ConnectionObjectType::FanVariableVolume,
-                                                      cAlphaArgs(1),
-                                                      DataLoopNode::NodeFluidType::Air,
-                                                      DataLoopNode::ConnectionType::Outlet,
-                                                      NodeInputManager::CompFluidStream::Primary,
-                                                      DataLoopNode::ObjectIsNotParent);
+        Fan(FanNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                       cAlphaArgs(4),
+                                                                       ErrorsFound,
+                                                                       DataLoopNode::ConnectionObjectType::FanVariableVolume,
+                                                                       cAlphaArgs(1),
+                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                       DataLoopNode::ConnectionType::Inlet,
+                                                                       NodeInputManager::CompFluidStream::Primary,
+                                                                       DataLoopNode::ObjectIsNotParent);
+        Fan(FanNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                        cAlphaArgs(5),
+                                                                        ErrorsFound,
+                                                                        DataLoopNode::ConnectionObjectType::FanVariableVolume,
+                                                                        cAlphaArgs(1),
+                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                        DataLoopNode::ConnectionType::Outlet,
+                                                                        NodeInputManager::CompFluidStream::Primary,
+                                                                        DataLoopNode::ObjectIsNotParent);
 
         if (NumAlphas > 5) {
             Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(6);
@@ -489,7 +481,7 @@ void GetFanInput(EnergyPlusData &state)
             Fan(FanNum).EndUseSubcategoryName = "General";
         }
 
-        TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Air Nodes");
+        BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Air Nodes");
 
     } // end Number of Variable Volume FAN Loop
 
@@ -560,24 +552,24 @@ void GetFanInput(EnergyPlusData &state)
                                     Fan(FanNum).FanName));
         }
 
-        Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                                                     cAlphaArgs(3),
-                                                     ErrorsFound,
-                                                     DataLoopNode::ConnectionObjectType::FanZoneExhaust,
-                                                     cAlphaArgs(1),
-                                                     DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::ConnectionType::Inlet,
-                                                     NodeInputManager::CompFluidStream::Primary,
-                                                     DataLoopNode::ObjectIsNotParent);
-        Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                                                      cAlphaArgs(4),
-                                                      ErrorsFound,
-                                                      DataLoopNode::ConnectionObjectType::FanZoneExhaust,
-                                                      cAlphaArgs(1),
-                                                      DataLoopNode::NodeFluidType::Air,
-                                                      DataLoopNode::ConnectionType::Outlet,
-                                                      NodeInputManager::CompFluidStream::Primary,
-                                                      DataLoopNode::ObjectIsNotParent);
+        Fan(FanNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                       cAlphaArgs(3),
+                                                                       ErrorsFound,
+                                                                       DataLoopNode::ConnectionObjectType::FanZoneExhaust,
+                                                                       cAlphaArgs(1),
+                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                       DataLoopNode::ConnectionType::Inlet,
+                                                                       NodeInputManager::CompFluidStream::Primary,
+                                                                       DataLoopNode::ObjectIsNotParent);
+        Fan(FanNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                        cAlphaArgs(4),
+                                                                        ErrorsFound,
+                                                                        DataLoopNode::ConnectionObjectType::FanZoneExhaust,
+                                                                        cAlphaArgs(1),
+                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                        DataLoopNode::ConnectionType::Outlet,
+                                                                        NodeInputManager::CompFluidStream::Primary,
+                                                                        DataLoopNode::ObjectIsNotParent);
 
         if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
             Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(5);
@@ -758,31 +750,31 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).MotInAirFrac = rNumericArgs(5);
         Fan(FanNum).MinAirFlowRate = 0.0;
 
-        Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                                                     cAlphaArgs(3),
-                                                     ErrorsFound,
-                                                     DataLoopNode::ConnectionObjectType::FanOnOff,
-                                                     cAlphaArgs(1),
-                                                     DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::ConnectionType::Inlet,
-                                                     NodeInputManager::CompFluidStream::Primary,
-                                                     DataLoopNode::ObjectIsNotParent);
-        Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                                                      cAlphaArgs(4),
-                                                      ErrorsFound,
-                                                      DataLoopNode::ConnectionObjectType::FanOnOff,
-                                                      cAlphaArgs(1),
-                                                      DataLoopNode::NodeFluidType::Air,
-                                                      DataLoopNode::ConnectionType::Outlet,
-                                                      NodeInputManager::CompFluidStream::Primary,
-                                                      DataLoopNode::ObjectIsNotParent);
+        Fan(FanNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                       cAlphaArgs(3),
+                                                                       ErrorsFound,
+                                                                       DataLoopNode::ConnectionObjectType::FanOnOff,
+                                                                       cAlphaArgs(1),
+                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                       DataLoopNode::ConnectionType::Inlet,
+                                                                       NodeInputManager::CompFluidStream::Primary,
+                                                                       DataLoopNode::ObjectIsNotParent);
+        Fan(FanNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                        cAlphaArgs(4),
+                                                                        ErrorsFound,
+                                                                        DataLoopNode::ConnectionObjectType::FanOnOff,
+                                                                        cAlphaArgs(1),
+                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                        DataLoopNode::ConnectionType::Outlet,
+                                                                        NodeInputManager::CompFluidStream::Primary,
+                                                                        DataLoopNode::ObjectIsNotParent);
 
         if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
-            Fan(FanNum).FanPowerRatAtSpeedRatCurveIndex = GetCurveIndex(state, cAlphaArgs(5));
+            Fan(FanNum).FanPowerRatAtSpeedRatCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(5));
         }
 
         if (NumAlphas > 5 && !lAlphaFieldBlanks(6)) {
-            Fan(FanNum).FanEffRatioCurveIndex = GetCurveIndex(state, cAlphaArgs(6));
+            Fan(FanNum).FanEffRatioCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(6));
         }
 
         if (NumAlphas > 6 && !lAlphaFieldBlanks(7)) {
@@ -791,7 +783,7 @@ void GetFanInput(EnergyPlusData &state)
             Fan(FanNum).EndUseSubcategoryName = "General";
         }
 
-        TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Air Nodes");
+        BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Air Nodes");
 
     } // end Number of Simple  ON-OFF FAN Loop
 
@@ -871,26 +863,26 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).FanName = cAlphaArgs(1); // Fan name
         Fan(FanNum).FanType = cCurrentModuleObject;
 
-        Fan(FanNum).InletNodeNum = GetOnlySingleNode(state,
-                                                     cAlphaArgs(2),
-                                                     ErrorsFound,
-                                                     DataLoopNode::ConnectionObjectType::FanComponentModel,
-                                                     cAlphaArgs(1),
-                                                     DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::ConnectionType::Inlet,
-                                                     NodeInputManager::CompFluidStream::Primary,
-                                                     DataLoopNode::ObjectIsNotParent); // Air inlet node name
-        Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
-                                                      cAlphaArgs(3),
-                                                      ErrorsFound,
-                                                      DataLoopNode::ConnectionObjectType::FanComponentModel,
-                                                      cAlphaArgs(1),
-                                                      DataLoopNode::NodeFluidType::Air,
-                                                      DataLoopNode::ConnectionType::Outlet,
-                                                      NodeInputManager::CompFluidStream::Primary,
-                                                      DataLoopNode::ObjectIsNotParent); // Air outlet node name
+        Fan(FanNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                       cAlphaArgs(2),
+                                                                       ErrorsFound,
+                                                                       DataLoopNode::ConnectionObjectType::FanComponentModel,
+                                                                       cAlphaArgs(1),
+                                                                       DataLoopNode::NodeFluidType::Air,
+                                                                       DataLoopNode::ConnectionType::Inlet,
+                                                                       NodeInputManager::CompFluidStream::Primary,
+                                                                       DataLoopNode::ObjectIsNotParent); // Air inlet node name
+        Fan(FanNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                        cAlphaArgs(3),
+                                                                        ErrorsFound,
+                                                                        DataLoopNode::ConnectionObjectType::FanComponentModel,
+                                                                        cAlphaArgs(1),
+                                                                        DataLoopNode::NodeFluidType::Air,
+                                                                        DataLoopNode::ConnectionType::Outlet,
+                                                                        NodeInputManager::CompFluidStream::Primary,
+                                                                        DataLoopNode::ObjectIsNotParent); // Air outlet node name
 
-        TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
+        BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
 
         Fan(FanNum).AvailSchedName = cAlphaArgs(4); // Availability schedule name
         if (lAlphaFieldBlanks(4)) {
@@ -922,36 +914,36 @@ void GetFanInput(EnergyPlusData &state)
         Fan(FanNum).MaxAirFlowRateIsAutosizable = true;
         Fan(FanNum).MinAirFlowRate = rNumericArgs(2);
 
-        Fan(FanNum).FanSizingFactor = rNumericArgs(3);                              // Fan max airflow sizing factor [-]
-        Fan(FanNum).FanWheelDia = rNumericArgs(4);                                  // Fan wheel outer diameter [m]
-        Fan(FanNum).FanOutletArea = rNumericArgs(5);                                // Fan outlet area [m2]
-        Fan(FanNum).FanMaxEff = rNumericArgs(6);                                    // Fan maximum static efficiency [-]
-        Fan(FanNum).EuMaxEff = rNumericArgs(7);                                     // Euler number at Fan maximum static efficiency [-]
-        Fan(FanNum).FanMaxDimFlow = rNumericArgs(8);                                // Fan maximum dimensionless airflow [-]
-        Fan(FanNum).PulleyDiaRatio = rNumericArgs(9);                               // Motor/fan pulley diameter ratio [-]
-        Fan(FanNum).BeltMaxTorque = rNumericArgs(10);                               // Belt maximum torque [N-m, autosizable]
-        Fan(FanNum).BeltSizingFactor = rNumericArgs(11);                            // Belt sizing factor [-]
-        Fan(FanNum).BeltTorqueTrans = rNumericArgs(12);                             // Belt fractional torque transition Region 1-2 [-]
-        Fan(FanNum).MotorMaxSpd = rNumericArgs(13);                                 // Motor maximum speed [rpm]
-        Fan(FanNum).MotorMaxOutPwr = rNumericArgs(14);                              // Motor maximum output power [W, autosizable]
-        Fan(FanNum).MotorSizingFactor = rNumericArgs(15);                           // Motor sizing factor [-]
-        Fan(FanNum).MotInAirFrac = rNumericArgs(16);                                // Fraction of fan and motor losses to airstream [-]
-        Fan(FanNum).VFDEffType = cAlphaArgs(5);                                     // VFD efficiency type [Speed or Power]
-        Fan(FanNum).VFDMaxOutPwr = rNumericArgs(17);                                // VFD maximum output power [W, autosizable]
-        Fan(FanNum).VFDSizingFactor = rNumericArgs(18);                             // VFD sizing factor [-]
-        Fan(FanNum).PressRiseCurveIndex = GetCurveIndex(state, cAlphaArgs(6));      // Fan pressure rise curve
-        Fan(FanNum).PressResetCurveIndex = GetCurveIndex(state, cAlphaArgs(7));     // Duct static pressure reset curve
-        Fan(FanNum).PLFanEffNormCurveIndex = GetCurveIndex(state, cAlphaArgs(8));   // Fan part-load eff (normal) curve
-        Fan(FanNum).PLFanEffStallCurveIndex = GetCurveIndex(state, cAlphaArgs(9));  // Fan part-load eff (stall) curve
-        Fan(FanNum).DimFlowNormCurveIndex = GetCurveIndex(state, cAlphaArgs(10));   // Fan dim airflow (normal) curve
-        Fan(FanNum).DimFlowStallCurveIndex = GetCurveIndex(state, cAlphaArgs(11));  // Fan dim airflow (stall) curve
-        Fan(FanNum).BeltMaxEffCurveIndex = GetCurveIndex(state, cAlphaArgs(12));    // Belt max eff curve
-        Fan(FanNum).PLBeltEffReg1CurveIndex = GetCurveIndex(state, cAlphaArgs(13)); // Belt part-load eff Region 1 curve
-        Fan(FanNum).PLBeltEffReg2CurveIndex = GetCurveIndex(state, cAlphaArgs(14)); // Belt part-load eff Region 2 curve
-        Fan(FanNum).PLBeltEffReg3CurveIndex = GetCurveIndex(state, cAlphaArgs(15)); // Belt part-load eff Region 3 curve
-        Fan(FanNum).MotorMaxEffCurveIndex = GetCurveIndex(state, cAlphaArgs(16));   // Motor max eff curve
-        Fan(FanNum).PLMotorEffCurveIndex = GetCurveIndex(state, cAlphaArgs(17));    // Motor part-load eff curve
-        Fan(FanNum).VFDEffCurveIndex = GetCurveIndex(state, cAlphaArgs(18));        // VFD eff curve
+        Fan(FanNum).FanSizingFactor = rNumericArgs(3);                                     // Fan max airflow sizing factor [-]
+        Fan(FanNum).FanWheelDia = rNumericArgs(4);                                         // Fan wheel outer diameter [m]
+        Fan(FanNum).FanOutletArea = rNumericArgs(5);                                       // Fan outlet area [m2]
+        Fan(FanNum).FanMaxEff = rNumericArgs(6);                                           // Fan maximum static efficiency [-]
+        Fan(FanNum).EuMaxEff = rNumericArgs(7);                                            // Euler number at Fan maximum static efficiency [-]
+        Fan(FanNum).FanMaxDimFlow = rNumericArgs(8);                                       // Fan maximum dimensionless airflow [-]
+        Fan(FanNum).PulleyDiaRatio = rNumericArgs(9);                                      // Motor/fan pulley diameter ratio [-]
+        Fan(FanNum).BeltMaxTorque = rNumericArgs(10);                                      // Belt maximum torque [N-m, autosizable]
+        Fan(FanNum).BeltSizingFactor = rNumericArgs(11);                                   // Belt sizing factor [-]
+        Fan(FanNum).BeltTorqueTrans = rNumericArgs(12);                                    // Belt fractional torque transition Region 1-2 [-]
+        Fan(FanNum).MotorMaxSpd = rNumericArgs(13);                                        // Motor maximum speed [rpm]
+        Fan(FanNum).MotorMaxOutPwr = rNumericArgs(14);                                     // Motor maximum output power [W, autosizable]
+        Fan(FanNum).MotorSizingFactor = rNumericArgs(15);                                  // Motor sizing factor [-]
+        Fan(FanNum).MotInAirFrac = rNumericArgs(16);                                       // Fraction of fan and motor losses to airstream [-]
+        Fan(FanNum).VFDEffType = cAlphaArgs(5);                                            // VFD efficiency type [Speed or Power]
+        Fan(FanNum).VFDMaxOutPwr = rNumericArgs(17);                                       // VFD maximum output power [W, autosizable]
+        Fan(FanNum).VFDSizingFactor = rNumericArgs(18);                                    // VFD sizing factor [-]
+        Fan(FanNum).PressRiseCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(6));      // Fan pressure rise curve
+        Fan(FanNum).PressResetCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(7));     // Duct static pressure reset curve
+        Fan(FanNum).PLFanEffNormCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(8));   // Fan part-load eff (normal) curve
+        Fan(FanNum).PLFanEffStallCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(9));  // Fan part-load eff (stall) curve
+        Fan(FanNum).DimFlowNormCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(10));   // Fan dim airflow (normal) curve
+        Fan(FanNum).DimFlowStallCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(11));  // Fan dim airflow (stall) curve
+        Fan(FanNum).BeltMaxEffCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(12));    // Belt max eff curve
+        Fan(FanNum).PLBeltEffReg1CurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(13)); // Belt part-load eff Region 1 curve
+        Fan(FanNum).PLBeltEffReg2CurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(14)); // Belt part-load eff Region 2 curve
+        Fan(FanNum).PLBeltEffReg3CurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(15)); // Belt part-load eff Region 3 curve
+        Fan(FanNum).MotorMaxEffCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(16));   // Motor max eff curve
+        Fan(FanNum).PLMotorEffCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(17));    // Motor part-load eff curve
+        Fan(FanNum).VFDEffCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(18));        // VFD eff curve
 
         if (NumAlphas > 18) {
             Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(19);
@@ -1123,9 +1115,6 @@ void InitFan(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger initializations.
 
-    // Using/Aliasing
-    using DataZoneEquipment::CheckZoneEquipmentList;
-
     auto &fan = state.dataFans->Fan(FanNum);
 
     if (state.dataFans->MyOneTimeFlag) {
@@ -1138,7 +1127,7 @@ void InitFan(EnergyPlusData &state,
         state.dataFans->ZoneEquipmentListChecked = true;
         for (int Loop = 1; Loop <= state.dataFans->NumFans; ++Loop) {
             if (!UtilityRoutines::SameString(state.dataFans->Fan(Loop).FanType, "Fan:ZoneExhaust")) continue;
-            if (CheckZoneEquipmentList(state, state.dataFans->Fan(Loop).FanType, state.dataFans->Fan(Loop).FanName)) continue;
+            if (DataZoneEquipment::CheckZoneEquipmentList(state, state.dataFans->Fan(Loop).FanType, state.dataFans->Fan(Loop).FanName)) continue;
             ShowSevereError(state,
                             format("InitFans: Fan=[{},{}] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.",
                                    state.dataFans->Fan(Loop).FanType,
@@ -1261,12 +1250,6 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     // METHODOLOGY EMPLOYED:
     // Obtains flow rates from the zone or system sizing arrays.
 
-    // Using/Aliasing
-    using namespace DataSizing;
-    using namespace OutputReportPredefined;
-    using Curve::CurveValue;
-    using Curve::GetCurveIndex;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("SizeFan: "); // include trailing blank space
 
@@ -1331,8 +1314,8 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate max fan static pressure rise using max fan volumetric flow, std air density, air-handling system characteristics,
         //   and Sherman-Wray system curve model (assumes static pressure surrounding air distribution system is zero)
-        Real64 DuctStaticPress = CurveValue(state, fan.PressResetCurveIndex, FanVolFlow);        // Duct static pressure setpoint [Pa]
-        DeltaPressTot = CurveValue(state, fan.PressRiseCurveIndex, FanVolFlow, DuctStaticPress); // Max fan total pressure rise [Pa]
+        Real64 DuctStaticPress = Curve::CurveValue(state, fan.PressResetCurveIndex, FanVolFlow); // Duct static pressure setpoint [Pa]
+        DeltaPressTot = Curve::CurveValue(state, fan.PressRiseCurveIndex, FanVolFlow, DuctStaticPress); // Max fan total pressure rise [Pa]
         FanOutletVelPress = 0.5 * RhoAir * pow_2(FanVolFlow / fan.FanOutletArea);                // Max fan outlet velocity pressure [Pa]
         // Outlet velocity pressure cannot exceed total pressure rise
         FanOutletVelPress = min(FanOutletVelPress, DeltaPressTot);
@@ -1346,9 +1329,9 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         EulerNum = (fan.DeltaPress * pow_4(fan.FanWheelDia)) / (RhoAir * pow_2(FanVolFlow)); //[-]
         NormalizedEulerNum = std::log10(EulerNum / fan.EuMaxEff);
         if (NormalizedEulerNum <= 0.0) {
-            fan.FanWheelEff = CurveValue(state, fan.PLFanEffNormCurveIndex, NormalizedEulerNum);
+            fan.FanWheelEff = Curve::CurveValue(state, fan.PLFanEffNormCurveIndex, NormalizedEulerNum);
         } else {
-            fan.FanWheelEff = CurveValue(state, fan.PLFanEffStallCurveIndex, NormalizedEulerNum);
+            fan.FanWheelEff = Curve::CurveValue(state, fan.PLFanEffStallCurveIndex, NormalizedEulerNum);
         }
         fan.FanWheelEff *= fan.FanMaxEff;             // [-]
         fan.FanWheelEff = max(fan.FanWheelEff, 0.01); // Minimum efficiency is 1% to avoid numerical errors
@@ -1360,14 +1343,14 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate fan shaft speed, motor speed, and fan torque using Wray dimensionless fan airflow model
         if (NormalizedEulerNum <= 0.0) {
-            FanDimFlow = CurveValue(state, fan.DimFlowNormCurveIndex, NormalizedEulerNum); //[-]
+            FanDimFlow = Curve::CurveValue(state, fan.DimFlowNormCurveIndex, NormalizedEulerNum); //[-]
         } else {
-            FanDimFlow = CurveValue(state, fan.DimFlowStallCurveIndex, NormalizedEulerNum); //[-]
+            FanDimFlow = Curve::CurveValue(state, fan.DimFlowStallCurveIndex, NormalizedEulerNum); //[-]
         }
         Real64 FanSpdRadS = FanVolFlow / (FanDimFlow * fan.FanMaxDimFlow * pow_3(fan.FanWheelDia)); //[rad/s]
         fan.FanSpd = FanSpdRadS * 9.549296586;                                                      //[rpm, conversion factor is 30/PI]
 
-        if (fan.PulleyDiaRatio == AutoSize) {
+        if (fan.PulleyDiaRatio == DataSizing::AutoSize) {
             // WRITE(*,*) 'Autosizing pulley drive ratio'
             fan.PulleyDiaRatio = fan.FanSpd / fan.MotorMaxSpd; //[-]
         }
@@ -1386,7 +1369,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         fan.FanTrq = fan.FanShaftPower / FanSpdRadS; //[N-m]
 
-        if (fan.BeltMaxTorque == AutoSize) {
+        if (fan.BeltMaxTorque == DataSizing::AutoSize) {
             // WRITE(*,*) 'Autosizing fan belt'
             fan.BeltMaxTorque = fan.FanTrq; //[N-m]
         }
@@ -1403,7 +1386,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         // Direct-drive is represented using curve coefficients such that "belt" max eff and PL eff = 1.0
         XbeltMax = std::log(fan.FanShaftPwrMax / 746.0); // Natural log of belt output power in hp
         if (fan.BeltMaxEffCurveIndex != 0) {
-            fan.BeltMaxEff = std::exp(CurveValue(state, fan.BeltMaxEffCurveIndex, XbeltMax)); //[-]
+            fan.BeltMaxEff = std::exp(Curve::CurveValue(state, fan.BeltMaxEffCurveIndex, XbeltMax)); //[-]
         } else {
             fan.BeltMaxEff = 1.0; // No curve specified - use constant efficiency
         }
@@ -1412,13 +1395,13 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         FanTrqRatio = fan.FanTrq / fan.BeltMaxTorque; //[-]
         Real64 BeltPLEff;                             // Belt normalized (part-load) efficiency [-]
         if ((FanTrqRatio <= fan.BeltTorqueTrans) && (fan.PLBeltEffReg1CurveIndex != 0)) {
-            BeltPLEff = CurveValue(state, fan.PLBeltEffReg1CurveIndex, FanTrqRatio); //[-]
+            BeltPLEff = Curve::CurveValue(state, fan.PLBeltEffReg1CurveIndex, FanTrqRatio); //[-]
         } else {
             if ((FanTrqRatio > fan.BeltTorqueTrans) && (FanTrqRatio <= 1.0) && (fan.PLBeltEffReg2CurveIndex != 0)) {
-                BeltPLEff = CurveValue(state, fan.PLBeltEffReg2CurveIndex, FanTrqRatio); //[-]
+                BeltPLEff = Curve::CurveValue(state, fan.PLBeltEffReg2CurveIndex, FanTrqRatio); //[-]
             } else {
                 if ((FanTrqRatio > 1.0) && (fan.PLBeltEffReg3CurveIndex != 0)) {
-                    BeltPLEff = CurveValue(state, fan.PLBeltEffReg3CurveIndex, FanTrqRatio); //[-]
+                    BeltPLEff = Curve::CurveValue(state, fan.PLBeltEffReg3CurveIndex, FanTrqRatio); //[-]
                 } else {
                     BeltPLEff = 1.0; // Direct drive or no curve specified - use constant efficiency
                 }
@@ -1428,7 +1411,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         fan.BeltEff = max(fan.BeltEff, 0.01);                 // Minimum efficiency is 1% to avoid numerical errors
         fan.BeltInputPower = fan.FanShaftPower / fan.BeltEff; //[W]
 
-        if (fan.MotorMaxOutPwr == AutoSize) {
+        if (fan.MotorMaxOutPwr == DataSizing::AutoSize) {
             // WRITE(*,*) 'Autosizing fan motor'
             fan.MotorMaxOutPwr = fan.BeltInputPower;
         }
@@ -1444,7 +1427,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         // Calculate motor max efficiency using correlations and coefficients based on MotorMaster+ data
         Real64 XmotorMax = std::log(fan.MotorMaxOutPwr / 746.0); // Natural log of motor output power in hp
         if (fan.MotorMaxEffCurveIndex != 0) {
-            fan.MotorMaxEff = CurveValue(state, fan.MotorMaxEffCurveIndex, XmotorMax); //[-]
+            fan.MotorMaxEff = Curve::CurveValue(state, fan.MotorMaxEffCurveIndex, XmotorMax); //[-]
         } else {
             fan.MotorMaxEff = 1.0; // No curve specified - use constant efficiency
         }
@@ -1452,7 +1435,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         // Calculate motor part-load efficiency and input power using correlations and coefficients based on MotorMaster+ data
         MotorOutPwrRatio = fan.BeltInputPower / fan.MotorMaxOutPwr; //[-]
         if (fan.PLMotorEffCurveIndex != 0) {
-            MotorPLEff = CurveValue(state, fan.PLMotorEffCurveIndex, MotorOutPwrRatio); //[-]
+            MotorPLEff = Curve::CurveValue(state, fan.PLMotorEffCurveIndex, MotorOutPwrRatio); //[-]
         } else {
             MotorPLEff = 1.0; // No curve specified - use constant efficiency
         }
@@ -1465,10 +1448,10 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         // Calculate max VFD efficiency and input power using correlations and coefficients based on VFD type
         if ((fan.VFDEffType == "SPEED") && (fan.VFDEffCurveIndex != 0)) {
             VFDSpdRatio = MotorSpeed / fan.MotorMaxSpd;                        //[-]
-            fan.VFDEff = CurveValue(state, fan.VFDEffCurveIndex, VFDSpdRatio); //[-]
+            fan.VFDEff = Curve::CurveValue(state, fan.VFDEffCurveIndex, VFDSpdRatio); //[-]
         } else {
             if ((fan.VFDEffType == "POWER") && (fan.VFDEffCurveIndex != 0)) {
-                if (fan.VFDMaxOutPwr == AutoSize) {
+                if (fan.VFDMaxOutPwr == DataSizing::AutoSize) {
                     // WRITE(*,*) 'Autosizing fan VFD'
                     fan.VFDMaxOutPwr = fan.MotorInputPower;
                 }
@@ -1483,7 +1466,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
                 }
 
                 VFDOutPwrRatio = fan.MotorInputPower / fan.VFDMaxOutPwr;              //[-]
-                fan.VFDEff = CurveValue(state, fan.VFDEffCurveIndex, VFDOutPwrRatio); //[-]
+                fan.VFDEff = Curve::CurveValue(state, fan.VFDEffCurveIndex, VFDOutPwrRatio); //[-]
             } else {
                 // No curve specified - use constant efficiency
                 fan.VFDMaxOutPwr = 0.0;
@@ -1521,25 +1504,25 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
     // Rearrange order to match table and use FanVolFlow to calculate RatedPower
     // ALSO generates values if Component Model fan, for which DeltaPress and FanEff vary with flow
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, equipName, fan.FanType);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, equipName, fan.FanEff);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, equipName, fan.DeltaPress);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, equipName, FanVolFlow);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, equipName, fan.FanType);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, equipName, fan.FanEff);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, equipName, fan.DeltaPress);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, equipName, FanVolFlow);
     RatedPower = FanVolFlow * fan.DeltaPress / fan.FanEff; // total fan power
     if (fan.FanType_Num != DataHVACGlobals::FanType_ComponentModel) {
         fan.DesignPointFEI = HVACFan::FanSystem::report_fei(state, FanVolFlow, RatedPower, fan.DeltaPress, state.dataEnvrn->StdRhoAir);
     }
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwr, equipName, RatedPower);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwr, equipName, RatedPower);
     if (FanVolFlow != 0.0) {
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwrPerFlow, equipName, RatedPower / FanVolFlow);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwrPerFlow, equipName, RatedPower / FanVolFlow);
     }
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorIn, equipName, fan.MotInAirFrac);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEndUse, equipName, fan.EndUseSubcategoryName);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEnergyIndex, equipName, fan.DesignPointFEI);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorIn, equipName, fan.MotInAirFrac);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEndUse, equipName, fan.EndUseSubcategoryName);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEnergyIndex, equipName, fan.DesignPointFEI);
 
     NVPerfNum = fan.NVPerfNum;
     if (NVPerfNum > 0) {
-        if (state.dataFans->NightVentPerf(NVPerfNum).MaxAirFlowRate == AutoSize) {
+        if (state.dataFans->NightVentPerf(NVPerfNum).MaxAirFlowRate == DataSizing::AutoSize) {
             state.dataFans->NightVentPerf(NVPerfNum).MaxAirFlowRate = fan.MaxAirFlowRate;
         }
     }
@@ -1888,9 +1871,6 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
     // REFERENCES:
     // ASHRAE HVAC 2 Toolkit, page 2-3 (FANSIM)
 
-    // Using/Aliasing
-    using Curve::CurveValue;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 EffRatioAtSpeedRatio; // Efficiency ratio at current speed ratio (Curve object)
 
@@ -1977,7 +1957,7 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
                 //      PLR = Mdot/MAXFlow => Mdot/(MAXFlow * SpeedRatio), RTF = PLR/PLF => PLR/SpeedRatio/PLF = RTF / SpeedRatio
                 if (SpeedRatio > 0.0) fan.FanRuntimeFraction = min(1.0, fan.FanRuntimeFraction / SpeedRatio);
 
-                Real64 SpeedRaisedToPower = CurveValue(state, fan.FanPowerRatAtSpeedRatCurveIndex, SpeedRatio);
+                Real64 SpeedRaisedToPower = Curve::CurveValue(state, fan.FanPowerRatAtSpeedRatCurveIndex, SpeedRatio);
                 if (SpeedRaisedToPower < 0.0) {
                     if (fan.OneTimePowerRatioCheck && !state.dataGlobal->WarmupFlag) {
                         ShowSevereError(state, format("{} = {}\"", DataHVACGlobals::cFanTypes(fan.FanType_Num), fan.FanName));
@@ -1991,7 +1971,7 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
                     SpeedRaisedToPower = 0.0;
                 }
                 if (fan.FanEffRatioCurveIndex > 0 && !state.dataGlobal->WarmupFlag) {
-                    EffRatioAtSpeedRatio = CurveValue(state, fan.FanEffRatioCurveIndex, SpeedRatio);
+                    EffRatioAtSpeedRatio = Curve::CurveValue(state, fan.FanEffRatioCurveIndex, SpeedRatio);
                     if (EffRatioAtSpeedRatio < 0.01) {
                         if (fan.OneTimeEffRatioCheck && !state.dataGlobal->WarmupFlag) {
                             ShowSevereError(state, format("{} = {}\"", DataHVACGlobals::cFanTypes(fan.FanType_Num), fan.FanName));
@@ -2168,11 +2148,6 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
     // Calculate air temperature rise due to fan (and belt+motor if in airstream) power entering air-handler airflow
     // Calculate output node conditions
 
-    // Using/Aliasing
-    using Curve::CurveValue;
-    using Curve::GetCurveIndex;
-    using namespace OutputReportPredefined;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MaxAirMassFlowRate; // Fan Max mass airflow [kg/s]
     Real64 MotInAirFrac;       // Fraction of fan power input to airstream
@@ -2217,8 +2192,8 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
         // Calculate fan static pressure rise using fan volumetric flow, std air density, air-handling system characteristics,
         //   and Sherman-Wray system curve model (assumes static pressure surrounding air distribution system is zero)
         Real64 FanVolFlow = MassFlow / RhoAir;                                                          //[m3/s at standard conditions]
-        Real64 DuctStaticPress = CurveValue(state, fan.PressResetCurveIndex, FanVolFlow);               // Duct static pressure setpoint [Pa]
-        Real64 DeltaPressTot = CurveValue(state, fan.PressRiseCurveIndex, FanVolFlow, DuctStaticPress); // Fan total pressure rise [Pa]
+        Real64 DuctStaticPress = Curve::CurveValue(state, fan.PressResetCurveIndex, FanVolFlow);        // Duct static pressure setpoint [Pa]
+        Real64 DeltaPressTot = Curve::CurveValue(state, fan.PressRiseCurveIndex, FanVolFlow, DuctStaticPress); // Fan total pressure rise [Pa]
         Real64 FanOutletVelPress = 0.5 * RhoAir * pow_2(FanVolFlow / fan.FanOutletArea);                // Fan outlet velocity pressure [Pa]
         // Outlet velocity pressure cannot exceed total pressure rise
         FanOutletVelPress = min(FanOutletVelPress, DeltaPressTot);
@@ -2234,9 +2209,9 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
         Real64 EulerNum = (fan.DeltaPress * pow_4(fan.FanWheelDia)) / (RhoAir * pow_2(FanVolFlow)); //[-]
         Real64 NormalizedEulerNum = std::log10(EulerNum / fan.EuMaxEff);
         if (NormalizedEulerNum <= 0.0) {
-            fan.FanWheelEff = CurveValue(state, fan.PLFanEffNormCurveIndex, NormalizedEulerNum);
+            fan.FanWheelEff = Curve::CurveValue(state, fan.PLFanEffNormCurveIndex, NormalizedEulerNum);
         } else {
-            fan.FanWheelEff = CurveValue(state, fan.PLFanEffStallCurveIndex, NormalizedEulerNum);
+            fan.FanWheelEff = Curve::CurveValue(state, fan.PLFanEffStallCurveIndex, NormalizedEulerNum);
         }
         fan.FanWheelEff *= fan.FanMaxEff;             // [-]
         fan.FanWheelEff = max(fan.FanWheelEff, 0.01); // Minimum efficiency is 1% to avoid numerical errors
@@ -2246,9 +2221,9 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate fan shaft speed, fan torque, and motor speed using Wray dimensionless fan airflow model
         if (NormalizedEulerNum <= 0.0) {
-            FanDimFlow = CurveValue(state, fan.DimFlowNormCurveIndex, NormalizedEulerNum); //[-]
+            FanDimFlow = Curve::CurveValue(state, fan.DimFlowNormCurveIndex, NormalizedEulerNum); //[-]
         } else {
-            FanDimFlow = CurveValue(state, fan.DimFlowStallCurveIndex, NormalizedEulerNum); //[-]
+            FanDimFlow = Curve::CurveValue(state, fan.DimFlowStallCurveIndex, NormalizedEulerNum); //[-]
         }
         Real64 FanSpdRadS = FanVolFlow / (FanDimFlow * fan.FanMaxDimFlow * pow_3(fan.FanWheelDia)); //[rad/s]
         fan.FanTrq = fan.FanShaftPower / FanSpdRadS;                                                //[N-m]
@@ -2259,13 +2234,13 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
         // Direct-drive is represented using curve coefficients such that "belt" max eff and PL eff = 1.0
         Real64 FanTrqRatio = fan.FanTrq / fan.BeltMaxTorque; //[-]
         if ((FanTrqRatio <= fan.BeltTorqueTrans) && (fan.PLBeltEffReg1CurveIndex != 0)) {
-            BeltPLEff = CurveValue(state, fan.PLBeltEffReg1CurveIndex, FanTrqRatio); //[-]
+            BeltPLEff = Curve::CurveValue(state, fan.PLBeltEffReg1CurveIndex, FanTrqRatio); //[-]
         } else {
             if ((FanTrqRatio > fan.BeltTorqueTrans) && (FanTrqRatio <= 1.0) && (fan.PLBeltEffReg2CurveIndex != 0)) {
-                BeltPLEff = CurveValue(state, fan.PLBeltEffReg2CurveIndex, FanTrqRatio); //[-]
+                BeltPLEff = Curve::CurveValue(state, fan.PLBeltEffReg2CurveIndex, FanTrqRatio); //[-]
             } else {
                 if ((FanTrqRatio > 1.0) && (fan.PLBeltEffReg3CurveIndex != 0)) {
-                    BeltPLEff = CurveValue(state, fan.PLBeltEffReg3CurveIndex, FanTrqRatio); //[-]
+                    BeltPLEff = Curve::CurveValue(state, fan.PLBeltEffReg3CurveIndex, FanTrqRatio); //[-]
                 } else {
                     BeltPLEff = 1.0; // Direct drive or no curve specified - use constant efficiency
                 }
@@ -2280,7 +2255,7 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
         // Calculate motor part-load efficiency using correlations and coefficients based on MotorMaster+ data
         Real64 MotorOutPwrRatio = fan.BeltInputPower / fan.MotorMaxOutPwr; //[-]
         if (fan.PLMotorEffCurveIndex != 0) {
-            MotorPLEff = CurveValue(state, fan.PLMotorEffCurveIndex, MotorOutPwrRatio); //[-]
+            MotorPLEff = Curve::CurveValue(state, fan.PLMotorEffCurveIndex, MotorOutPwrRatio); //[-]
         } else {
             MotorPLEff = 1.0; // No curve specified - use constant efficiency
         }
@@ -2293,11 +2268,11 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
         // Calculate VFD efficiency using correlations and coefficients based on VFD type
         if ((fan.VFDEffType == "SPEED") && (fan.VFDEffCurveIndex != 0)) {
             VFDSpdRatio = MotorSpeed / fan.MotorMaxSpd;                        //[-]
-            fan.VFDEff = CurveValue(state, fan.VFDEffCurveIndex, VFDSpdRatio); //[-]
+            fan.VFDEff = Curve::CurveValue(state, fan.VFDEffCurveIndex, VFDSpdRatio); //[-]
         } else {
             if ((fan.VFDEffType == "POWER") && (fan.VFDEffCurveIndex != 0)) {
                 VFDOutPwrRatio = fan.MotorInputPower / fan.VFDMaxOutPwr;              //[-]
-                fan.VFDEff = CurveValue(state, fan.VFDEffCurveIndex, VFDOutPwrRatio); //[-]
+                fan.VFDEff = Curve::CurveValue(state, fan.VFDEffCurveIndex, VFDOutPwrRatio); //[-]
             } else {
                 // No curve specified - use constant efficiency
                 fan.VFDMaxOutPwr = 0.0;
