@@ -87,7 +87,7 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
 //    DATE WRITTEN   March 2001
 //    MODIFIED       Brent Griffith, Nov 2010 plant upgrades, generalize fluid properties
 //                   Mahabir Bhandari, ORNL, Aug 2011, modified to accomodate Exhaust Fired Absorption Chiller
-//    RE-ENGINEERED  na
+
 // PURPOSE OF THIS MODULE:
 //    This module simulates the performance of the Exhaust fired double effect
 //    absorption chiller.
@@ -110,7 +110,7 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
 //    Development of the original(GasAbsoptionChiller) module was funded by the Gas Research Institute.
 //    (Please see copyright and disclaimer information at end of module)
 
-PlantComponent *ExhaustAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+ExhaustAbsorberSpecs *ExhaustAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data if it hasn't been done already
     if (state.dataChillerExhaustAbsorption->Sim_GetInput) {
@@ -118,11 +118,10 @@ PlantComponent *ExhaustAbsorberSpecs::factory(EnergyPlusData &state, std::string
         state.dataChillerExhaustAbsorption->Sim_GetInput = false;
     }
     // Now look for this particular pipe in the list
-    for (auto &comp : state.dataChillerExhaustAbsorption->ExhaustAbsorber) {
-        if (comp.Name == objectName) {
-            return &comp;
-        }
-    }
+    auto thisObj = std::find_if(state.dataChillerExhaustAbsorption->ExhaustAbsorber.begin(),
+                                state.dataChillerExhaustAbsorption->ExhaustAbsorber.end(),
+                                [&objectName](const ExhaustAbsorberSpecs &myObj) { return myObj.Name == objectName; });
+    if (thisObj != state.dataChillerExhaustAbsorption->ExhaustAbsorber.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalExhaustAbsorberFactory: Error getting inputs for comp named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
@@ -277,7 +276,6 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
     //       AUTHOR:          Jason Glazer
     //       DATE WRITTEN:    March 2001
     //       MODIFIED         Mahabir Bhandari, ORNL, Aug 2011, modified to accommodate Exhaust Fired Double Effect Absorption Chiller
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine will get the input

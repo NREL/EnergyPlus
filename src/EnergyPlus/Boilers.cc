@@ -84,8 +84,6 @@ namespace EnergyPlus::Boilers {
 // MODULE INFORMATION:
 //       AUTHOR         Dan Fisher, Taecheol Kim
 //       DATE WRITTEN   1998, 2000
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // Perform boiler simulation for plant simulation
@@ -93,19 +91,19 @@ namespace EnergyPlus::Boilers {
 // METHODOLOGY EMPLOYED:
 // The BLAST/DOE-2 empirical model based on mfg. data
 
-PlantComponent *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+BoilerSpecs *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data for boilers if it hasn't been done already
     if (state.dataBoilers->getBoilerInputFlag) {
         GetBoilerInput(state);
         state.dataBoilers->getBoilerInputFlag = false;
     }
-    // Now look for this particular pipe in the list
-    for (auto &boiler : state.dataBoilers->Boiler) {
-        if (boiler.Name == objectName) {
-            return &boiler;
-        }
-    }
+    // Now look for this particular boiler in the list
+    auto myBoiler = std::find_if(state.dataBoilers->Boiler.begin(), state.dataBoilers->Boiler.end(), [&objectName](const BoilerSpecs &boiler) {
+        return boiler.Name == objectName;
+    });
+    if (myBoiler != state.dataBoilers->Boiler.end()) return myBoiler;
+
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalBoilerFactory: Error getting inputs for boiler named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
@@ -152,7 +150,6 @@ void GetBoilerInput(EnergyPlusData &state)
     //       AUTHOR:          Dan Fisher
     //       DATE WRITTEN:    April 1998
     //       MODIFIED:        R. Raustad - FSEC, June 2008: added boiler efficiency curve object
-    //       RE-ENGINEERED:   na
 
     // PURPOSE OF THIS SUBROUTINE:
     // get all boiler data from input file
@@ -537,7 +534,6 @@ void BoilerSpecs::InitBoiler(EnergyPlusData &state) // number of the current boi
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   April 2002
-    //       MODIFIED       na
     //       RE-ENGINEERED  Brent Griffith, rework for plant upgrade
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -584,7 +580,6 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   April 2002
     //       MODIFIED       November 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for sizing Boiler Components for which capacities and flow rates
@@ -751,7 +746,6 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     //                      Jun. 2008, R. Raustad, FSEC. Added boiler efficiency curve object
     //                      Aug. 2011, B. Griffith, NREL. Added switch for temperature to use in curve
     //                      Nov. 2016, R. Zhang, LBNL. Applied the boiler fouling fault model
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine calculates the boiler fuel consumption and the associated
