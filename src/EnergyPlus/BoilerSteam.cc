@@ -83,8 +83,7 @@ namespace BoilerSteam {
     // MODULE INFORMATION:
     //    AUTHOR         Rahul Chillar
     //    DATE WRITTEN   Dec 2004
-    //    MODIFIED       na
-    //    RE-ENGINEERED  na
+
     // PURPOSE OF THIS MODULE:
     // Performs steam boiler simulation for plant simulation
 
@@ -99,11 +98,11 @@ namespace BoilerSteam {
         }
 
         // Now look for this particular pipe in the list
-        for (auto &boiler : state.dataBoilerSteam->Boiler) {
-            if (boiler.Name == objectName) {
-                return &boiler;
-            }
-        }
+        auto myBoiler = std::find_if(state.dataBoilerSteam->Boiler.begin(),
+                                     state.dataBoilerSteam->Boiler.end(),
+                                     [&objectName](const BoilerSpecs &boiler) { return boiler.Name == objectName; });
+        if (myBoiler != state.dataBoilerSteam->Boiler.end()) return myBoiler;
+
         // If we didn't find it, fatal
         ShowFatalError(state, format("LocalBoilerSteamFactory: Error getting inputs for steam boiler named: {}", objectName)); // LCOV_EXCL_LINE
         // Shut up the compiler
@@ -143,8 +142,6 @@ namespace BoilerSteam {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Get all boiler data from input file
@@ -373,7 +370,6 @@ namespace BoilerSteam {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
-        //       MODIFIED       na
         //       RE-ENGINEERED  D. Shirey, rework for plant upgrade
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -496,7 +492,6 @@ namespace BoilerSteam {
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
         //       MODIFIED       November 2013 Daeho Kang, add component sizing table entries
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for sizing Boiler Components for which capacities and flow rates
@@ -593,8 +588,6 @@ namespace BoilerSteam {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the boiler fuel consumption and the associated
@@ -823,8 +816,6 @@ namespace BoilerSteam {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Boiler simulation reporting
