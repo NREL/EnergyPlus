@@ -184,12 +184,9 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
     Real64 dxn;        // Intermediate calculation of nodal spacing
     Real64 dxtmp;      // Intermediate calculation variable ( = 1/dx/cap)
     Real64 dyn;        // Nodal spacing in the direction perpendicular to the main direction
-    bool CTFConvrg;    // Set after CTFs are calculated, based on whether there are too many CTF terms
     Real64 SumXi;      // Summation of all of the Xi terms (inside CTFs) for a construction
     Real64 SumYi;      // Summation of all of the Xi terms (cross CTFs) for a construction
     Real64 SumZi;      // Summation of all of the Xi terms (outside CTFs) for a construction
-
-    int ipts1; // Intermediate calculation for number of nodes per layer
 
     Real64 DeltaTimestep; // zone timestep in seconds, for local check of properties
 
@@ -477,6 +474,8 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
             // Estimate number of nodes each layer of the construct will require
             // and calculate the nodal spacing from that
 
+            int ipts1 = 0.0; // Intermediate calculation for number of nodes per layer
+
             for (int Layer = 1; Layer <= LayersInConstruct; ++Layer) { // Begin loop thru layers ...
 
                 // The calculation of dxn used here is based on a standard stability
@@ -493,7 +492,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                 } else {
                     dxn = std::sqrt(2.0 * (rk(Layer) / rho(Layer) / cp(Layer)) * this->CTFTimeStep);
 
-                    ipts1 = int(dl(Layer) / dxn); // number of nodes=thickness/spacing
+                    int ipts1 = int(dl(Layer) / dxn); // number of nodes=thickness/spacing
 
                     // Limit the upper and lower bounds of the number of
                     // nodes to MaxCTFTerms and MinNodes respectively.
@@ -504,10 +503,6 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                         Nodes(Layer) = MinNodes;
                     } else { // Calculated number of nodes ok
                         Nodes(Layer) = ipts1;
-                    }
-
-                    if (this->SolutionDimensions > 1) {
-                        if (ipts1 > Construction::MaxCTFTerms / 2) ipts1 = Construction::MaxCTFTerms / 2;
                     }
 
                     dx(Layer) = dl(Layer) / double(Nodes(Layer)); // calc node spacing
@@ -621,7 +616,9 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
             // which characterizes the heat transfer inside the
             // building element.
 
-            CTFConvrg = false; // Initialize loop control logical
+            // Initialize loop control logical
+            // Set after CTFs are calculated, based on whether there are too many CTF terms
+            bool CTFConvrg = false;
 
             this->AExp.allocate(this->rcmax, this->rcmax);
             this->AExp = 0.0;
@@ -1124,7 +1121,6 @@ void ConstructionProps::calculateExponentialMatrix()
     Array2D<Real64> AMat1; // AMat factored by (delt/2^k)
     Array2D<Real64> AMato; // AMat raised to the previous power (power of AMat1-1)
     Array2D<Real64> AMatN; // Current value of AMat raised to power n (n = 1,2...)
-    bool Backup;           // Used when numerics get to small in Exponentiation
     Real64 CheckVal;       // Used to avoid possible overflow from Double->REAL(r64)->Integer
     Real64 fact;           // Intermediate calculation variable (delt/2^k)
     int i;                 // Loop counter
@@ -1303,7 +1299,7 @@ void ConstructionProps::calculateExponentialMatrix()
 
         // Use AMato to store the old values of AExp
         AMato = this->AExp;
-        Backup = true;
+        bool Backup = true; // Used when numerics get to small in Exponentiation
         this->AExp = 0.0;
 
         // Multiply the old value of AExp (AMato) by itself and store in AExp.

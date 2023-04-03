@@ -709,7 +709,7 @@ namespace DataHeatBalance {
 
         void SetOutBulbTempAt(EnergyPlusData &state);
 
-        void SetWindSpeedAt(EnergyPlusData &state, Real64 fac);
+        void SetWindSpeedAt(EnergyPlusData const &state, Real64 fac);
 
         void SetWindDirAt(Real64 fac);
 
