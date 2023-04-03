@@ -2879,21 +2879,14 @@ int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   September 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given fan and returns the fan speed curve pointer.  If
     // incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
     // as zero. If optional index argument is passed along with fan type and name, the index is set.
 
-    // Return value
-    int FanSpeedRatioCurveIndex; // index to fan speed ratio curve object
-
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int WhichFan;
-
-    auto &Fan(state.dataFans->Fan);
 
     // Obtains and Allocates fan related parameters from input file
     if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -2904,24 +2897,22 @@ int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
     if (present(IndexIn)) {
         if (IndexIn > 0) {
             WhichFan = IndexIn;
-            FanType = Fan(WhichFan).FanType;
-            FanName = Fan(WhichFan).FanName;
+            FanType = state.dataFans->Fan(WhichFan).FanType;
+            FanName = state.dataFans->Fan(WhichFan).FanName;
         } else {
-            WhichFan = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
+            WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
             IndexIn = WhichFan;
         }
     } else {
-        WhichFan = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
+        WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     }
 
     if (WhichFan != 0) {
-        FanSpeedRatioCurveIndex = Fan(WhichFan).FanPowerRatAtSpeedRatCurveIndex;
+        return state.dataFans->Fan(WhichFan).FanPowerRatAtSpeedRatCurveIndex;
     } else {
         ShowSevereError(state, format("GetFanSpeedRatioCurveIndex: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
-        FanSpeedRatioCurveIndex = 0;
+        return 0;
     }
-
-    return FanSpeedRatioCurveIndex;
 }
 
 void SetFanData(EnergyPlusData &state,
@@ -2936,8 +2927,6 @@ void SetFanData(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   October 2007
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine was designed for to autosize the HeatExchanger:AirToAir:SensibleAndLatent using
@@ -2947,8 +2936,6 @@ void SetFanData(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int WhichFan; // index to generic HX
 
-    auto &Fan(state.dataFans->Fan);
-
     // Obtains and Allocates fan related parameters from input file
     if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
         GetFanInput(state);
@@ -2956,7 +2943,7 @@ void SetFanData(EnergyPlusData &state,
     }
 
     if (FanNum == 0) {
-        WhichFan = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
+        WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     } else {
         WhichFan = FanNum;
     }
@@ -2967,12 +2954,14 @@ void SetFanData(EnergyPlusData &state,
         return;
     }
 
+    auto &fan = state.dataFans->Fan(WhichFan);
+
     if (present(MaxAirVolFlow)) {
-        Fan(WhichFan).MaxAirFlowRate = MaxAirVolFlow;
+        fan.MaxAirFlowRate = MaxAirVolFlow;
     }
 
     if (present(MinAirVolFlow)) {
-        Fan(WhichFan).MinAirFlowRate = MinAirVolFlow;
+        fan.MinAirFlowRate = MinAirVolFlow;
     }
 }
 
