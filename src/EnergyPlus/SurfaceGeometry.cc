@@ -8509,6 +8509,7 @@ namespace SurfaceGeometry {
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).Name = state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 2);
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).ViewFactor = state.dataIPShortCut->rNumericArgs(SurfLoop + 2);
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).TempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 3));
+                    SrdSurfsProp.SurfsViewFactorSum += SrdSurfsProp.SurroundingSurfs(SurfLoop).ViewFactor;
                 }
             }
         }

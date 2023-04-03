@@ -706,6 +706,7 @@ namespace DataSurfaces {
         int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node, zero if none
         Real64 AE = 0.0;                       // Product of area and emissivity for each surface
         Real64 enclAESum = 0.0;                // Sum of area times emissivity for all other surfaces in enclosure
+        bool UseSurfPropertySrdSurfTemp;       // true if at least one surrounding surface temperature schedules is specified
 
         // Default Constructor
         SurfaceData()
@@ -723,7 +724,7 @@ namespace DataSurfaces {
               SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false), ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid),
               IsSurfPropertyGndSurfacesDefined(false), SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false),
               UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0), SurfHasSurroundingSurfProperty(false), SurfSchedExternalShadingFrac(false),
-              SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0), SurfLinkedOutAirNode(0)
+              SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0), SurfLinkedOutAirNode(0), UseSurfPropertySrdSurfTemp(false)
         {
         }
 
@@ -1193,6 +1194,8 @@ namespace DataSurfaces {
         std::string Name;
         Real64 SkyViewFactor = 0.0;         // sky view factor
         Real64 GroundViewFactor = 0.0;      // ground view factor
+        Real64 SurfsViewFactorSum = 0.0;    // surrounding surfaces view factor sum
+        Real64 SurfsTempAvg = 0.0;          // view factor weighted surrounding surfaces average temperature {C}
         int SkyTempSchNum = 0;              // schedule pointer
         int GroundTempSchNum = 0;           // schedule pointer
         int TotSurroundingSurface = 0;      // Total number of surrounding surfaces defined for an exterior surface

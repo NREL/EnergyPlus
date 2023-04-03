@@ -470,6 +470,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
             TSky = ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) +
                    Constant::KelvinConv;
         }
+        HSrdSurf = SurroundingSurfacesRadCoeffAverage(state, SurfNum, TSurf, AbsExt);
     }
     if (surface.UseSurfPropertyGndSurfTemp) {
         int gndSurfsNum = surface.SurfPropertyGndSurfIndex;
@@ -9021,5 +9022,16 @@ ConvectionConstants::SurfConvOrientation GetSurfConvOrientation(Real64 const Til
     } else {
         return ConvectionConstants::SurfConvOrientation::Invalid;
     }
+}
+
+Real64 SurroundingSurfacesRadCoeffAverage(EnergyPlusData &state, int const SurfNum, Real64 const TempExtK, Real64 const AbsExt)
+{
+    // compute surrounding surfaces radiation coefficient (view factor weighted)
+    // SurfsTempAvg is already weighed by view factor
+    auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum);
+    Real64 SrdSurfsTempAvg = SrdSurfsProperty.SurfsTempAvg + Constant::KelvinConv;
+    Real64 HSrdSurfaccesAvg = Constant::StefanBoltzmann * AbsExt * SrdSurfsProperty.SurfsViewFactorSum * (pow_4(TempExtK) - pow_4(SrdSurfsTempAvg)) /
+                              (TempExtK - SrdSurfsTempAvg);
+    return HSrdSurfaccesAvg;
 }
 } // namespace EnergyPlus::ConvectionCoefficients

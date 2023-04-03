@@ -613,6 +613,7 @@ TEST_F(ConvectionCoefficientsFixture, initExtConvCoeffAdjRatio)
     Real64 HSky;
     Real64 HGround;
     Real64 HAir;
+    Real64 HSrdSurf;
 
     Real64 HExtAdj;
     Real64 adjRatio = 2.0;
@@ -620,10 +621,10 @@ TEST_F(ConvectionCoefficientsFixture, initExtConvCoeffAdjRatio)
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(1);
     // without adjust ratio
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio(1) = 1.0;
-    InitExteriorConvectionCoeff(*state, 1, HMovInsul, RoughSurf, AbsThermSurf, TempExt, HExt, HSky, HGround, HAir);
+    InitExteriorConvectionCoeff(*state, 1, HMovInsul, RoughSurf, AbsThermSurf, TempExt, HExt, HSky, HGround, HAir, HSrdSurf);
     // with adjust ratio
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio(1) = adjRatio;
-    InitExteriorConvectionCoeff(*state, 1, HMovInsul, RoughSurf, AbsThermSurf, TempExt, HExtAdj, HSky, HGround, HAir);
+    InitExteriorConvectionCoeff(*state, 1, HMovInsul, RoughSurf, AbsThermSurf, TempExt, HExtAdj, HSky, HGround, HAir, HSrdSurf);
     // adjust ratio scales the returned exterior convection coefficient
     EXPECT_EQ(HExtAdj, HExt * adjRatio);
 }

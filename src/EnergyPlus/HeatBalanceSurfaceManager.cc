@@ -1350,6 +1350,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataHeatBalSurf->SurfHAirExt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfHSkyExt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfHGrdExt.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfHSrdSurfExt.dimension(state.dataSurface->TotSurfaces, 0.0);
 
     state.dataHeatBalSurf->SurfTempIn.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfTempInsOld.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -2189,6 +2190,7 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
                 state.dataHeatBalSurf->SurfHAirExt(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfHSkyExt(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfHGrdExt(SurfNum) = 0.0;
+                state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfTempOut(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfTempInMovInsRep(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfQConvInReport(SurfNum) = 0.0;
@@ -6889,6 +6891,9 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
     // set ground surfaces average temperature
     GetGroundSurfacesTemperatureAverage(state);
 
+    // set surrounding surfaces average temperature
+    GetSurroundingSurfacesTemperatureAverage(state);
+
     auto &Surface = state.dataSurface->Surface;
 
     if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
@@ -9899,6 +9904,50 @@ void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum)
         return;
     }
     GndSurfsProperty.GndSurfs(1).ViewFactor = GndSurfsProperty.SurfsViewFactorSum;
+}
+
+void GetSurroundingSurfacesTemperatureAverage(EnergyPlusData &state)
+{
+    //  returns surrounding surfaces average temperature (deg C)
+    //  surrounding surfaces viewed by an exterior surface
+    //  surrounding surfaces temperature weighed using view factors
+
+    if (!state.dataGlobal->AnyLocalEnvironmentsInModel) {
+        return;
+    }
+
+    // local vars
+    Real64 SrdSurfaceTemp;
+    Real64 SrdSurfViewFactor;
+    Real64 SrdSurfaceTempSum;
+
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        if (!state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) continue;
+
+        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+        auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
+
+        if (SrdSurfsProperty.SurfsViewFactorSum == 0.0) {
+            state.dataSurface->Surface(SurfNum).UseSurfPropertySrdSurfTemp = false;
+            continue;
+        }
+        SrdSurfaceTemp = 0.0;
+        SrdSurfViewFactor = 0.0;
+        SrdSurfaceTempSum = 0.0;
+
+        // Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + Constant::KelvinConv;
+
+        Real64 SrdSurfsViewFactorSum = 0.0;
+        for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
+
+            SrdSurfViewFactor = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
+            // SrdSurfsViewFactorSum += SrdSurfViewFactor;
+            SrdSurfaceTemp = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum);
+            SrdSurfaceTempSum += SrdSurfViewFactor * pow_4(SrdSurfaceTemp + Constant::KelvinConv);
+        }
+        // SrdSurfsProperty.SurfsViewFactorSum = SrdSurfsViewFactorSum;
+        SrdSurfsProperty.SurfsTempAvg = root_4(SrdSurfaceTempSum / SrdSurfsProperty.SurfsViewFactorSum) - Constant::KelvinConv;
+    }
 }
 
 } // namespace EnergyPlus::HeatBalanceSurfaceManager
