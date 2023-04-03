@@ -1757,27 +1757,13 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
     // ASHRAE HVAC 2 Toolkit, page 2-3 (FANSIM)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 RhoAir;
     Real64 DeltaPress; // [N/m2 = Pa]
     Real64 FanEff;     // Total fan efficiency - combined efficiency of fan, drive train,
-    // motor and variable speed controller (if any)
-    Real64 MaxAirFlowRate;
     Real64 MaxAirMassFlowRate;
     Real64 MotInAirFrac;
     Real64 MotEff;
-    Real64 MassFlow; // [kg/sec]
     Real64 PartLoadFrac;
-    Real64 MinFlowFrac;           // Variable Volume Fan Min Flow Fraction [-]
-    Real64 FlowFracForPower(0.0); // Variable Volume Fan Flow Fraction for power calcs[-]
-    Real64 FlowFracActual(0.0);   // actual VAV fan flow fraction
-    Real64 FanShaftPower;         // power delivered to fan shaft
-    int NVPerfNum;
 
-    // added to address the fan heat issue during low air flow conditions
-    Real64 MinFlowFracLimitFanHeat; // Minimum Fan Flow Fraction Limit for Fan Heat at Low Airflow [-]
-    Real64 FanPoweratLowMinimum;    // Fan Power at Low Minimum Airflow [W]
-    Real64 PartLoadFracatLowMin;
-    Real64 DeltaTAcrossFan; // Air temperature rise across the fan due to fan heat [C]
 
     // Simple Variable Volume Fan - default values from DOE-2
     // Type of Fan          Coeff1       Coeff2       Coeff3        Coeff4      Coeff5
@@ -1786,17 +1772,17 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
     // VARIABLE SPEED MOTOR 0.0015302446 0.0052080574  1.1086242   -0.11635563  0.000
 
     auto &Fan(state.dataFans->Fan);
-    auto &NightVentPerf(state.dataFans->NightVentPerf);
 
-    NVPerfNum = Fan(FanNum).NVPerfNum;
-    MaxAirFlowRate = Fan(FanNum).MaxAirFlowRate;
+    int NVPerfNum = Fan(FanNum).NVPerfNum;
+    Real64 MaxAirFlowRate = Fan(FanNum).MaxAirFlowRate;
 
     if (state.dataHVACGlobal->NightVentOn && NVPerfNum > 0) {
-        DeltaPress = NightVentPerf(NVPerfNum).DeltaPress;
-        FanEff = NightVentPerf(NVPerfNum).FanEff;
-        MotEff = NightVentPerf(NVPerfNum).MotEff;
-        MotInAirFrac = NightVentPerf(NVPerfNum).MotInAirFrac;
-        MaxAirMassFlowRate = NightVentPerf(NVPerfNum).MaxAirMassFlowRate;
+        auto const &nightVentPerf = state.dataFans->NightVentPerf(NVPerfNum);
+        DeltaPress = nightVentPerf.DeltaPress;
+        FanEff = nightVentPerf.FanEff;
+        MotEff = nightVentPerf.MotEff;
+        MotInAirFrac = nightVentPerf.MotInAirFrac;
+        MaxAirMassFlowRate = nightVentPerf.MaxAirMassFlowRate;
     } else {
         if (present(PressureRise)) {
             DeltaPress = PressureRise;
@@ -1809,10 +1795,8 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
         MaxAirMassFlowRate = Fan(FanNum).MaxAirMassFlowRate;
     }
 
-    // unused0909  Tin         = Fan(FanNum)%InletAirTemp
-    // unused0909  Win         = Fan(FanNum)%InletAirHumRat
-    RhoAir = Fan(FanNum).RhoAirStdInit;
-    MassFlow = Fan(FanNum).InletAirMassFlowRate;
+    Real64 RhoAir = Fan(FanNum).RhoAirStdInit;
+    Real64 MassFlow = Fan(FanNum).InletAirMassFlowRate;
 
     // Faulty fan operations
     // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
@@ -1857,13 +1841,13 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
         // Calculate and check limits on fraction of system flow
         // unused0909    MaxFlowFrac = 1.0
         // MinFlowFrac is calculated from the ration of the volume flows and is non-dimensional
-        MinFlowFrac = Fan(FanNum).MinAirFlowRate / MaxAirFlowRate;
+        Real64 MinFlowFrac = Fan(FanNum).MinAirFlowRate / MaxAirFlowRate;
         // The actual flow fraction is calculated from MassFlow and the MaxVolumeFlow * AirDensity
-        FlowFracActual = MassFlow / MaxAirMassFlowRate;
+        Real64 FlowFracActual = MassFlow / MaxAirMassFlowRate;
 
         // Calculate the part Load Fraction             (PH 7/13/03)
 
-        FlowFracForPower = max(MinFlowFrac, min(FlowFracActual, 1.0)); // limit flow fraction to allowed range
+        Real64 FlowFracForPower = max(MinFlowFrac, min(FlowFracActual, 1.0)); // limit flow fraction to allowed range
         if (state.dataHVACGlobal->NightVentOn && NVPerfNum > 0) {
             PartLoadFrac = 1.0;
         } else {
@@ -1873,7 +1857,7 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
 
         Fan(FanNum).FanPower = max(0.0, PartLoadFrac * MaxAirMassFlowRate * DeltaPress / (FanEff * RhoAir)); // total fan power (PH 7/13/03)
 
-        FanShaftPower = MotEff * Fan(FanNum).FanPower; // power delivered to shaft
+        Real64 FanShaftPower = MotEff * Fan(FanNum).FanPower; // power delivered to shaft
         Fan(FanNum).PowerLossToAir = FanShaftPower + (Fan(FanNum).FanPower - FanShaftPower) * MotInAirFrac;
         Fan(FanNum).OutletAirEnthalpy = Fan(FanNum).InletAirEnthalpy + Fan(FanNum).PowerLossToAir / MassFlow;
         // This fan does not change the moisture or Mass Flow across the component
@@ -1888,9 +1872,12 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
         // This change caused diffs for VAV systems when fan runs at less than 10% flow conditions.
         //  A potential way to improve is to check the temperature rise across the fan first,
         //  if it is too high (say > 20C) then applies the code.
-        DeltaTAcrossFan = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
+        Real64 DeltaTAcrossFan = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
         if (DeltaTAcrossFan > 20.0) {
-            MinFlowFracLimitFanHeat = 0.10;
+            // added to address the fan heat issue during low air flow conditions
+            Real64 FanPoweratLowMinimum; // Fan Power at Low Minimum Airflow [W]
+            Real64 PartLoadFracatLowMin;
+            Real64 MinFlowFracLimitFanHeat = 0.10;
             if (FlowFracForPower < MinFlowFracLimitFanHeat) {
                 PartLoadFracatLowMin = Fan(FanNum).FanCoeff(1) + Fan(FanNum).FanCoeff(2) * MinFlowFracLimitFanHeat +
                                        Fan(FanNum).FanCoeff(3) * pow_2(MinFlowFracLimitFanHeat) +
@@ -1918,7 +1905,6 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
     } else {
         // Fan is off and not operating no power consumed and mass flow rate.
         Fan(FanNum).FanPower = 0.0;
-        FanShaftPower = 0.0;
         Fan(FanNum).PowerLossToAir = 0.0;
         Fan(FanNum).OutletAirMassFlowRate = 0.0;
         Fan(FanNum).OutletAirHumRat = Fan(FanNum).InletAirHumRat;
