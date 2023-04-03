@@ -267,7 +267,6 @@ namespace FanCoilUnits {
             state.dataFanCoilUnits->FanCoilNumericFields(FanCoilIndex).FieldNames = "";
             state.dataFanCoilUnits->FanCoilNumericFields(FanCoilIndex).FieldNames = cNumericFields;
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
             fanCoil.Name = Alphas(1);
             fanCoil.UnitType = CurrentModuleObject;
             fanCoil.UnitType_Num = FanCoilUnit_4Pipe;
