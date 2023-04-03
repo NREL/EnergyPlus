@@ -87,19 +87,13 @@ namespace EnergyPlus::Fans {
 //       MODIFIED       Shirey, May 2001
 //                      Griffith, May 2009, EMS changes
 //                      Craig Wray 22Aug2010 Added Fan Component Model
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // To encapsulate the data and algorithms required to
 // manage the Fan System Component
 
 // Using/Aliasing
-using namespace DataLoopNode;
-using EMSManager::ManageEMS;
-using Psychrometrics::PsyCpAirFnW;
-using Psychrometrics::PsyRhoAirFnPbTdbW;
-using Psychrometrics::PsyTdbFnHW;
-using namespace ScheduleManager;
+// using namespace DataLoopNode;
 
 constexpr std::array<std::string_view, static_cast<int>(AvailabilityManagerCoupling::Num)> couplingsUC = {"COUPLED", "DECOUPLED"};
 
@@ -336,7 +330,7 @@ void GetFanInput(EnergyPlusData &state)
         if (lAlphaFieldBlanks(2)) {
             Fan(FanNum).AvailSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
-            Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
                 ShowSevereError(state,
                                 format("{}{}: invalid {} entered ={} for {}={}",
@@ -373,7 +367,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      DataLoopNode::NodeFluidType::Air,
                                                      DataLoopNode::ConnectionType::Inlet,
                                                      NodeInputManager::CompFluidStream::Primary,
-                                                     ObjectIsNotParent);
+                                                     DataLoopNode::ObjectIsNotParent);
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                                                       cAlphaArgs(4),
                                                       ErrorsFound,
@@ -382,7 +376,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       DataLoopNode::NodeFluidType::Air,
                                                       DataLoopNode::ConnectionType::Outlet,
                                                       NodeInputManager::CompFluidStream::Primary,
-                                                      ObjectIsNotParent);
+                                                      DataLoopNode::ObjectIsNotParent);
 
         if (NumAlphas > 4) {
             Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(5);
@@ -421,7 +415,7 @@ void GetFanInput(EnergyPlusData &state)
         if (lAlphaFieldBlanks(2)) {
             Fan(FanNum).AvailSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
-            Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
                 ShowSevereError(state,
                                 format("{}{}: invalid {} entered ={} for {}={}",
@@ -478,7 +472,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      DataLoopNode::NodeFluidType::Air,
                                                      DataLoopNode::ConnectionType::Inlet,
                                                      NodeInputManager::CompFluidStream::Primary,
-                                                     ObjectIsNotParent);
+                                                     DataLoopNode::ObjectIsNotParent);
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                                                       cAlphaArgs(5),
                                                       ErrorsFound,
@@ -487,7 +481,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       DataLoopNode::NodeFluidType::Air,
                                                       DataLoopNode::ConnectionType::Outlet,
                                                       NodeInputManager::CompFluidStream::Primary,
-                                                      ObjectIsNotParent);
+                                                      DataLoopNode::ObjectIsNotParent);
 
         if (NumAlphas > 5) {
             Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(6);
@@ -526,7 +520,7 @@ void GetFanInput(EnergyPlusData &state)
         if (lAlphaFieldBlanks(2)) {
             Fan(FanNum).AvailSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
-            Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
                 ShowSevereError(state,
                                 format("{}{}: invalid {} entered ={} for {}={}",
@@ -538,7 +532,7 @@ void GetFanInput(EnergyPlusData &state)
                                        cAlphaArgs(1)));
                 ErrorsFound = true;
             } else {
-                if (HasFractionalScheduleValue(state, Fan(FanNum).AvailSchedPtrNum)) {
+                if (ScheduleManager::HasFractionalScheduleValue(state, Fan(FanNum).AvailSchedPtrNum)) {
                     ShowWarningError(state,
                                      format("{}=\"{}\" has fractional values in Schedule={}. Only 0.0 in the schedule value turns the fan off.",
                                             cCurrentModuleObject,
@@ -574,7 +568,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      DataLoopNode::NodeFluidType::Air,
                                                      DataLoopNode::ConnectionType::Inlet,
                                                      NodeInputManager::CompFluidStream::Primary,
-                                                     ObjectIsNotParent);
+                                                     DataLoopNode::ObjectIsNotParent);
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                                                       cAlphaArgs(4),
                                                       ErrorsFound,
@@ -583,7 +577,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       DataLoopNode::NodeFluidType::Air,
                                                       DataLoopNode::ConnectionType::Outlet,
                                                       NodeInputManager::CompFluidStream::Primary,
-                                                      ObjectIsNotParent);
+                                                      DataLoopNode::ObjectIsNotParent);
 
         if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
             Fan(FanNum).EndUseSubcategoryName = cAlphaArgs(5);
@@ -592,7 +586,7 @@ void GetFanInput(EnergyPlusData &state)
         }
 
         if (NumAlphas > 5 && !lAlphaFieldBlanks(6)) {
-            Fan(FanNum).FlowFractSchedNum = GetScheduleIndex(state, cAlphaArgs(6));
+            Fan(FanNum).FlowFractSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(6));
             if (Fan(FanNum).FlowFractSchedNum == 0) {
                 ShowSevereError(state,
                                 format("{}{}: invalid {} entered ={} for {}={}",
@@ -604,7 +598,7 @@ void GetFanInput(EnergyPlusData &state)
                                        cAlphaArgs(1)));
                 ErrorsFound = true;
             } else if (Fan(FanNum).FlowFractSchedNum > 0) {
-                if (!CheckScheduleValueMinMax(state, Fan(FanNum).FlowFractSchedNum, ">=", 0.0, "<=", 1.0)) {
+                if (!ScheduleManager::CheckScheduleValueMinMax(state, Fan(FanNum).FlowFractSchedNum, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state,
                                     format("{}{}: invalid {} for {}={}",
                                            RoutineName,
@@ -639,7 +633,7 @@ void GetFanInput(EnergyPlusData &state)
         }
 
         if (NumAlphas > 7 && !lAlphaFieldBlanks(8)) {
-            Fan(FanNum).MinTempLimitSchedNum = GetScheduleIndex(state, cAlphaArgs(8));
+            Fan(FanNum).MinTempLimitSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(8));
             if (Fan(FanNum).MinTempLimitSchedNum == 0) {
                 ShowSevereError(state,
                                 format("{}{}: invalid {} entered ={} for {}={}",
@@ -671,7 +665,7 @@ void GetFanInput(EnergyPlusData &state)
                 ShowContinueError(state, "This schedule will be ignored in the simulation.");
                 Fan(FanNum).BalancedFractSchedNum = 0;
             } else {
-                Fan(FanNum).BalancedFractSchedNum = GetScheduleIndex(state, cAlphaArgs(9));
+                Fan(FanNum).BalancedFractSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(9));
                 if (Fan(FanNum).BalancedFractSchedNum == 0) {
                     ShowSevereError(state,
                                     format("{}{}: invalid {} entered ={} for {}={}",
@@ -683,7 +677,7 @@ void GetFanInput(EnergyPlusData &state)
                                            cAlphaArgs(1)));
                     ErrorsFound = true;
                 } else if (Fan(FanNum).BalancedFractSchedNum > 0) {
-                    if (!CheckScheduleValueMinMax(state, Fan(FanNum).BalancedFractSchedNum, ">=", 0.0, "<=", 1.0)) {
+                    if (!ScheduleManager::CheckScheduleValueMinMax(state, Fan(FanNum).BalancedFractSchedNum, ">=", 0.0, "<=", 1.0)) {
                         ShowSevereError(state,
                                         format("{}{}: invalid {} for {}={}",
                                                RoutineName,
@@ -730,7 +724,7 @@ void GetFanInput(EnergyPlusData &state)
         if (lAlphaFieldBlanks(2)) {
             Fan(FanNum).AvailSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
-            Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(2));
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
                 ShowSevereError(state,
                                 format("{}{}: invalid {} entered ={} for {}={}",
@@ -772,7 +766,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      DataLoopNode::NodeFluidType::Air,
                                                      DataLoopNode::ConnectionType::Inlet,
                                                      NodeInputManager::CompFluidStream::Primary,
-                                                     ObjectIsNotParent);
+                                                     DataLoopNode::ObjectIsNotParent);
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                                                       cAlphaArgs(4),
                                                       ErrorsFound,
@@ -781,7 +775,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       DataLoopNode::NodeFluidType::Air,
                                                       DataLoopNode::ConnectionType::Outlet,
                                                       NodeInputManager::CompFluidStream::Primary,
-                                                      ObjectIsNotParent);
+                                                      DataLoopNode::ObjectIsNotParent);
 
         if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
             Fan(FanNum).FanPowerRatAtSpeedRatCurveIndex = GetCurveIndex(state, cAlphaArgs(5));
@@ -885,7 +879,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      DataLoopNode::NodeFluidType::Air,
                                                      DataLoopNode::ConnectionType::Inlet,
                                                      NodeInputManager::CompFluidStream::Primary,
-                                                     ObjectIsNotParent); // Air inlet node name
+                                                     DataLoopNode::ObjectIsNotParent); // Air inlet node name
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
                                                       cAlphaArgs(3),
                                                       ErrorsFound,
@@ -894,7 +888,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       DataLoopNode::NodeFluidType::Air,
                                                       DataLoopNode::ConnectionType::Outlet,
                                                       NodeInputManager::CompFluidStream::Primary,
-                                                      ObjectIsNotParent); // Air outlet node name
+                                                      DataLoopNode::ObjectIsNotParent); // Air outlet node name
 
         TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
 
@@ -902,7 +896,7 @@ void GetFanInput(EnergyPlusData &state)
         if (lAlphaFieldBlanks(4)) {
             Fan(FanNum).AvailSchedPtrNum = 0;
         } else {
-            Fan(FanNum).AvailSchedPtrNum = GetScheduleIndex(state, cAlphaArgs(4));
+            Fan(FanNum).AvailSchedPtrNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4));
             if (Fan(FanNum).AvailSchedPtrNum == 0) {
                 ShowSevereError(state,
                                 format("{}{}: invalid {} entered ={} for {}={}",
@@ -1103,7 +1097,7 @@ void GetFanInput(EnergyPlusData &state)
     }
 
     bool anyRan;
-    ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
     state.dataFans->MySizeFlag.dimension(state.dataFans->NumFans, true);
 }
 
@@ -1236,7 +1230,7 @@ void InitFan(EnergyPlusData &state,
         fan.MassFlowRateMaxAvail = fan.MaxAirMassFlowRate;
         fan.MassFlowRateMinAvail = 0.0;
         if (fan.FlowFractSchedNum > 0) { // modulate flow
-            fan.InletAirMassFlowRate = fan.MassFlowRateMaxAvail * GetCurrentScheduleValue(state, fan.FlowFractSchedNum);
+            fan.InletAirMassFlowRate = fan.MassFlowRateMaxAvail * ScheduleManager::GetCurrentScheduleValue(state, fan.FlowFractSchedNum);
             fan.InletAirMassFlowRate = max(0.0, fan.InletAirMassFlowRate);
         } else { // always run at max
             fan.InletAirMassFlowRate = fan.MassFlowRateMaxAvail;
@@ -1627,22 +1621,25 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
         int iFault = fan.FaultyFilterIndex;
 
         // Check fault availability schedules
-        if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
             Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
 
-            FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(
-                state,
-                fan.FanName,
-                fan.MaxAirFlowRate,
-                fan.DeltaPress,
-                (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) - 1) *
-                    fan.DeltaPress,
-                state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
+            FanDesignFlowRateDec =
+                CalFaultyFanAirFlowReduction(state,
+                                             fan.FanName,
+                                             fan.MaxAirFlowRate,
+                                             fan.DeltaPress,
+                                             (ScheduleManager::GetCurrentScheduleValue(
+                                                  state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) -
+                                              1) *
+                                                 fan.DeltaPress,
+                                             state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
 
             // Update MassFlow & DeltaPress of the fan
             MassFlow = min(MassFlow, fan.MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir);
             DeltaPress =
-                GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) * fan.DeltaPress;
+                ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) *
+                fan.DeltaPress;
         }
     }
 
@@ -1655,8 +1652,8 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
     MassFlow = max(MassFlow, fan.MinAirMassFlowRate);
 
     // Determine the Fan Schedule for the Time step
-    if ((GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) && !state.dataFans->LocalTurnFansOff &&
-        MassFlow > 0.0) {
+    if ((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) &&
+        !state.dataFans->LocalTurnFansOff && MassFlow > 0.0) {
         // Fan is operating
         fan.FanPower = max(0.0, MassFlow * DeltaPress / (FanEff * RhoAir)); // total fan power
         FanShaftPower = MotEff * fan.FanPower;                              // power delivered to shaft
@@ -1665,7 +1662,7 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
         // This fan does not change the moisture or Mass Flow across the component
         fan.OutletAirHumRat = fan.InletAirHumRat;
         fan.OutletAirMassFlowRate = MassFlow;
-        fan.OutletAirTemp = PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
+        fan.OutletAirTemp = Psychrometrics::PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
 
     } else {
         // Fan is off and not operating no power consumed and mass flow rate.
@@ -1754,23 +1751,26 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
         int iFault = fan.FaultyFilterIndex;
 
         // Check fault availability schedules
-        if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
             Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
 
-            FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(
-                state,
-                fan.FanName,
-                fan.MaxAirFlowRate,
-                fan.DeltaPress,
-                (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) - 1) *
-                    fan.DeltaPress,
-                state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
+            FanDesignFlowRateDec =
+                CalFaultyFanAirFlowReduction(state,
+                                             fan.FanName,
+                                             fan.MaxAirFlowRate,
+                                             fan.DeltaPress,
+                                             (ScheduleManager::GetCurrentScheduleValue(
+                                                  state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) -
+                                              1) *
+                                                 fan.DeltaPress,
+                                             state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
 
             // Update MassFlow & DeltaPress of the fan
             MaxAirFlowRate = fan.MaxAirFlowRate - FanDesignFlowRateDec;
             MaxAirMassFlowRate = fan.MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir;
             DeltaPress =
-                GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) * fan.DeltaPress;
+                ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) *
+                fan.DeltaPress;
         }
     }
 
@@ -1782,8 +1782,8 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
     MassFlow = min(MassFlow, MaxAirMassFlowRate);
 
     // Determine the Fan Schedule for the Time step
-    if ((GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) && !state.dataFans->LocalTurnFansOff &&
-        MassFlow > 0.0) {
+    if ((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) &&
+        !state.dataFans->LocalTurnFansOff && MassFlow > 0.0) {
         // Fan is operating - calculate power loss and enthalpy rise
         //  fan%FanPower = PartLoadFrac*FullMassFlow*DeltaPress/(FanEff*RhoAir) ! total fan power
         // Calculate and check limits on fraction of system flow
@@ -1811,7 +1811,7 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
         // This fan does not change the moisture or Mass Flow across the component
         fan.OutletAirHumRat = fan.InletAirHumRat;
         fan.OutletAirMassFlowRate = MassFlow;
-        fan.OutletAirTemp = PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
+        fan.OutletAirTemp = Psychrometrics::PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
 
         // KHL/FB, 2/10/2011. NFP implemented as CR 8338.
         // When fan air flow is less than 10%, the fan power curve is linearized between the 10% to 0% to
@@ -1845,7 +1845,7 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
             // This fan does not change the moisture or Mass Flow across the component
             fan.OutletAirHumRat = fan.InletAirHumRat;
             fan.OutletAirMassFlowRate = MassFlow;
-            fan.OutletAirTemp = PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
+            fan.OutletAirTemp = Psychrometrics::PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
         }
 
     } else {
@@ -1910,22 +1910,25 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
         int iFault = fan.FaultyFilterIndex;
 
         // Check fault availability schedules
-        if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
             Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
 
-            FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(
-                state,
-                fan.FanName,
-                fan.MaxAirFlowRate,
-                fan.DeltaPress,
-                (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) - 1) *
-                    fan.DeltaPress,
-                state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
+            FanDesignFlowRateDec =
+                CalFaultyFanAirFlowReduction(state,
+                                             fan.FanName,
+                                             fan.MaxAirFlowRate,
+                                             fan.DeltaPress,
+                                             (ScheduleManager::GetCurrentScheduleValue(
+                                                  state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) -
+                                              1) *
+                                                 fan.DeltaPress,
+                                             state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
 
             // Update MassFlow & DeltaPress of the fan
             MaxAirMassFlowRate = fan.MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir;
             DeltaPress =
-                GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) * fan.DeltaPress;
+                ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) *
+                fan.DeltaPress;
         }
     }
 
@@ -1939,8 +1942,8 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
     fan.FanRuntimeFraction = 0.0;
 
     // Determine the Fan Schedule for the Time step
-    if ((GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) && !state.dataFans->LocalTurnFansOff &&
-        MassFlow > 0.0 && fan.MaxAirMassFlowRate > 0.0) {
+    if ((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) &&
+        !state.dataFans->LocalTurnFansOff && MassFlow > 0.0 && fan.MaxAirMassFlowRate > 0.0) {
         // The actual flow fraction is calculated from MassFlow and the MaxVolumeFlow * AirDensity
         Real64 FlowFrac = MassFlow / MaxAirMassFlowRate;
 
@@ -2020,7 +2023,7 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
         fan.OutletAirHumRat = fan.InletAirHumRat;
         fan.OutletAirMassFlowRate = MassFlow;
         //   fan%OutletAirTemp = Tin + PowerLossToAir/(MassFlow*PsyCpAirFnW(Win,Tin))
-        fan.OutletAirTemp = PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
+        fan.OutletAirTemp = Psychrometrics::PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
     } else {
         // Fan is off and not operating no power consumed and mass flow rate.
         fan.FanPower = 0.0;
@@ -2080,10 +2083,10 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
 
     // apply controls to determine if operating
     if (fan.AvailManagerMode == AvailabilityManagerCoupling::Coupled) {
-        if (((GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0) || state.dataHVACGlobal->TurnFansOn) &&
+        if (((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0) || state.dataHVACGlobal->TurnFansOn) &&
             !state.dataHVACGlobal->TurnFansOff && MassFlow > 0.0) { // available
             if (fan.MinTempLimitSchedNum > 0) {
-                if (Tin >= GetCurrentScheduleValue(state, fan.MinTempLimitSchedNum)) {
+                if (Tin >= ScheduleManager::GetCurrentScheduleValue(state, fan.MinTempLimitSchedNum)) {
                     FanIsRunning = true;
                 } else {
                     FanIsRunning = false;
@@ -2096,9 +2099,9 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
         }
 
     } else if (fan.AvailManagerMode == AvailabilityManagerCoupling::Decoupled) {
-        if (GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 && MassFlow > 0.0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 && MassFlow > 0.0) {
             if (fan.MinTempLimitSchedNum > 0) {
-                if (Tin >= GetCurrentScheduleValue(state, fan.MinTempLimitSchedNum)) {
+                if (Tin >= ScheduleManager::GetCurrentScheduleValue(state, fan.MinTempLimitSchedNum)) {
                     FanIsRunning = true;
                 } else {
                     FanIsRunning = false;
@@ -2119,7 +2122,7 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
         // This fan does not change the moisture or Mass Flow across the component
         fan.OutletAirHumRat = fan.InletAirHumRat;
         fan.OutletAirMassFlowRate = MassFlow;
-        fan.OutletAirTemp = PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
+        fan.OutletAirTemp = Psychrometrics::PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
 
     } else {
         // Fan is off and not operating no power consumed and mass flow rate.
@@ -2207,8 +2210,8 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
     //  IF (fan%EMSMaxMassFlowOverrideOn) MassFlow   = fan%EMSAirMassFlowValue
 
     // Determine the Fan Schedule for the Time step
-    if ((GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) && !state.dataFans->LocalTurnFansOff &&
-        MassFlow > 0.0) {
+    if ((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) &&
+        !state.dataFans->LocalTurnFansOff && MassFlow > 0.0) {
         // Fan is operating - calculate fan pressure rise, component efficiencies and power, and also air enthalpy rise
 
         // Calculate fan static pressure rise using fan volumetric flow, std air density, air-handling system characteristics,
@@ -2321,7 +2324,7 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
         // This fan does not change the moisture or mass flow across the component
         fan.OutletAirHumRat = fan.InletAirHumRat; //[-]
         fan.OutletAirMassFlowRate = MassFlow;     //[kg/s]
-        fan.OutletAirTemp = PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
+        fan.OutletAirTemp = Psychrometrics::PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
     } else {
         // Fan is OFF and not operating -- no power consumed and zero mass flow rate
         fan.FanPower = 0.0;
@@ -2388,7 +2391,7 @@ void UpdateFan(EnergyPlusData &state, int const FanNum)
             state.dataHVACGlobal->UnbalExhMassFlow = fan.InletAirMassFlowRate;
             if (fan.BalancedFractSchedNum > 0) {
                 state.dataHVACGlobal->BalancedExhMassFlow =
-                    state.dataHVACGlobal->UnbalExhMassFlow * GetCurrentScheduleValue(state, fan.BalancedFractSchedNum);
+                    state.dataHVACGlobal->UnbalExhMassFlow * ScheduleManager::GetCurrentScheduleValue(state, fan.BalancedFractSchedNum);
                 state.dataHVACGlobal->UnbalExhMassFlow = state.dataHVACGlobal->UnbalExhMassFlow - state.dataHVACGlobal->BalancedExhMassFlow;
             } else {
                 state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
@@ -2838,7 +2841,7 @@ void SetFanData(EnergyPlusData &state,
         MotEff = Fan(FanNum).MotEff;
         MotInAirFrac = Fan(FanNum).MotInAirFrac;
         RhoAir = state.dataEnvrn->StdRhoAir;
-        CpAir = PsyCpAirFnW(DataPrecisionGlobals::constant_zero);
+        CpAir = Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero);
         DesignDeltaT = (DeltaP / (RhoAir * CpAir * TotEff)) * (MotEff + MotInAirFrac * (1.0 - MotEff));
     } else {
         DesignDeltaT = 0.0;
