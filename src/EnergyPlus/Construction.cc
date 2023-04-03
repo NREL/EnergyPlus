@@ -474,8 +474,6 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
             // Estimate number of nodes each layer of the construct will require
             // and calculate the nodal spacing from that
 
-            int ipts1 = 0.0; // Intermediate calculation for number of nodes per layer
-
             for (int Layer = 1; Layer <= LayersInConstruct; ++Layer) { // Begin loop thru layers ...
 
                 // The calculation of dxn used here is based on a standard stability
