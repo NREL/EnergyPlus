@@ -172,7 +172,7 @@ namespace ChillerGasAbsorption {
         Real64 FractionOfPeriodRunning = 0.0; // fraction of the time period that the unit is operating
         Real64 FuelCOP = 0.0;                 // reporting: cooling output/fuel input = CoolingLoad/CoolFuelUseRate
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static GasAbsorberSpecs *factory(EnergyPlusData &state, std::string const &objectName);
 
         void
         simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
