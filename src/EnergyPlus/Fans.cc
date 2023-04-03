@@ -1307,29 +1307,19 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     int NVPerfNum;              // Index to night ventialation performance object
     std::string equipName;      // Equipment name
     Real64 RatedPower;          // Rated fan power [W]
-    Real64 RhoAir;              // Air density [kg/m3]
-    Real64 FanVolFlow;          // Fan volumetric airflow [m3/s]
-    Real64 DuctStaticPress;     // Duct static pressure setpoint [Pa]
     Real64 DeltaPressTot;       // Total pressure rise across fan [N/m2 = Pa]
     Real64 FanOutletVelPress;   // Fan outlet velocity pressure [Pa]
     Real64 EulerNum;            // Fan Euler number [-]
     Real64 NormalizedEulerNum;  // Normalized Fan Euler number [-]
     Real64 FanDimFlow;          // Fan dimensionless airflow [-]
-    Real64 FanSpdRadS;          // Fan shaft rotational speed [rad/s]
-    Real64 MotorSpeed;          // Motor shaft rotational speed [rpm]
     Real64 XbeltMax;            // Factor for belt max eff curve [ln hp]
     Real64 FanTrqRatio;         // Ratio of fan torque to max fan torque [-]
     Real64 BeltPLEff;           // Belt normalized (part-load) efficiency [-]
-    Real64 XmotorMax;           // Factor for motor max eff curve [ln hp]
     Real64 MotorOutPwrRatio;    // Ratio of motor output power to max motor output power [-]
     Real64 MotorPLEff;          // Motor normalized (part-load) efficiency [-]
     Real64 VFDSpdRatio(0.0);    // Ratio of motor speed to motor max speed [-]
     Real64 VFDOutPwrRatio(0.0); // Ratio of VFD output power to max VFD output power [-]
-    std::string CompName;       // component name
-    std::string CompType;       // component type
-    std::string SizingString;   // input field sizing description (e.g., Nominal Capacity)
     bool bPRINT = true;         // TRUE if sizing is reported to output (eio)
-    Real64 TempFlow;            // autosized flow rate of fan [m3/s]
     int FieldNum = 2;           // IDD numeric field number where input field description is found
     int NumFansSized = 0;       // counter used to deallocate temporary string array after all fans have been sized
 
@@ -1342,12 +1332,12 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     } else {
         FieldNum = 3;
     }
-    SizingString = FanNumericFields(FanNum).FieldNames(FieldNum) + " [m3/s]";
+    std::string SizingString = FanNumericFields(FanNum).FieldNames(FieldNum) + " [m3/s]";
 
-    TempFlow = Fan(FanNum).MaxAirFlowRate;
+    Real64 TempFlow = Fan(FanNum).MaxAirFlowRate; // autosized flow rate of fan [m3/s]
     state.dataSize->DataAutosizable = Fan(FanNum).MaxAirFlowRateIsAutosizable;
-    CompType = Fan(FanNum).FanType;
-    CompName = Fan(FanNum).FanName;
+    std::string CompType = Fan(FanNum).FanType;
+    std::string CompName = Fan(FanNum).FanName;
     state.dataSize->DataEMSOverrideON = Fan(FanNum).MaxAirFlowRateEMSOverrideOn;
     state.dataSize->DataEMSOverride = Fan(FanNum).MaxAirFlowRateEMSOverrideValue;
 
@@ -1361,7 +1351,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     state.dataSize->DataEMSOverrideON = false;
     state.dataSize->DataEMSOverride = 0.0;
 
-    FanVolFlow = Fan(FanNum).MaxAirFlowRate; // Maximum volumetric airflow through fan [m3/s at standard conditions]
+    Real64 FanVolFlow = Fan(FanNum).MaxAirFlowRate; // Maximum volumetric airflow through fan [m3/s at standard conditions]
     if (Fan(FanNum).FanType_Num == FanType_ComponentModel) {
         // Get air density at standard conditions and get mass airflow through fan
         // From WeatherManager:
@@ -1370,14 +1360,14 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         // From PsychRoutines:
         //   w=MAX(dw,1.0d-5)
         //   rhoair = pb/(287.d0*(tdb+Constant::KelvinConv())*(1.0d0+1.6077687d0*w))
-        RhoAir = state.dataEnvrn->StdRhoAir;
+        Real64 RhoAir = state.dataEnvrn->StdRhoAir;
 
         // Adjust max fan volumetric airflow using fan sizing factor
         FanVolFlow *= Fan(FanNum).FanSizingFactor; //[m3/s at standard conditions]
 
         // Calculate max fan static pressure rise using max fan volumetric flow, std air density, air-handling system characteristics,
         //   and Sherman-Wray system curve model (assumes static pressure surrounding air distribution system is zero)
-        DuctStaticPress = CurveValue(state, Fan(FanNum).PressResetCurveIndex, FanVolFlow);               // Duct static pressure setpoint [Pa]
+        Real64 DuctStaticPress = CurveValue(state, Fan(FanNum).PressResetCurveIndex, FanVolFlow);               // Duct static pressure setpoint [Pa]
         DeltaPressTot = CurveValue(state, Fan(FanNum).PressRiseCurveIndex, FanVolFlow, DuctStaticPress); // Max fan total pressure rise [Pa]
         FanOutletVelPress = 0.5 * RhoAir * pow_2(FanVolFlow / Fan(FanNum).FanOutletArea);                // Max fan outlet velocity pressure [Pa]
         // Outlet velocity pressure cannot exceed total pressure rise
@@ -1410,7 +1400,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         } else {
             FanDimFlow = CurveValue(state, Fan(FanNum).DimFlowStallCurveIndex, NormalizedEulerNum); //[-]
         }
-        FanSpdRadS = FanVolFlow / (FanDimFlow * Fan(FanNum).FanMaxDimFlow * pow_3(Fan(FanNum).FanWheelDia)); //[rad/s]
+        Real64 FanSpdRadS = FanVolFlow / (FanDimFlow * Fan(FanNum).FanMaxDimFlow * pow_3(Fan(FanNum).FanWheelDia)); //[rad/s]
         Fan(FanNum).FanSpd = FanSpdRadS * 9.549296586;                                                       //[rpm, conversion factor is 30/PI]
 
         if (Fan(FanNum).PulleyDiaRatio == AutoSize) {
@@ -1419,7 +1409,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         }
 
         // For direct-drive, should have PulleyDiaRatio = 1
-        MotorSpeed = Fan(FanNum).FanSpd / Fan(FanNum).PulleyDiaRatio; //[rpm]
+        Real64 MotorSpeed = Fan(FanNum).FanSpd / Fan(FanNum).PulleyDiaRatio; //[rpm]
 
         // Check for inconsistent drive ratio and motor speed, and report design fan speed with warning
         if (MotorSpeed > (Fan(FanNum).MotorMaxSpd + 1.e-5)) {
@@ -1489,7 +1479,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         }
 
         // Calculate motor max efficiency using correlations and coefficients based on MotorMaster+ data
-        XmotorMax = std::log(Fan(FanNum).MotorMaxOutPwr / 746.0); // Natural log of motor output power in hp
+        Real64 XmotorMax = std::log(Fan(FanNum).MotorMaxOutPwr / 746.0); // Natural log of motor output power in hp
         if (Fan(FanNum).MotorMaxEffCurveIndex != 0) {
             Fan(FanNum).MotorMaxEff = CurveValue(state, Fan(FanNum).MotorMaxEffCurveIndex, XmotorMax); //[-]
         } else {
