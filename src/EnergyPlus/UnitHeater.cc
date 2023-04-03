@@ -1798,13 +1798,13 @@ namespace UnitHeater {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 AirMassFlow;  // total mass flow through the unit
-        Real64 CpAirZn;      // specific heat of dry air at zone conditions (zone conditions same as unit inlet)
-        int HCoilInAirNode;  // inlet node number for fan exit/coil inlet
-        int InletNode;       // unit air inlet node
-        int OutletNode;      // unit air outlet node
-        Real64 QCoilReq;     // Heat addition required from an electric/gas heating coil
-        Real64 mdot;         // local temporary for fluid mass flow rate
+        Real64 AirMassFlow; // total mass flow through the unit
+        Real64 CpAirZn;     // specific heat of dry air at zone conditions (zone conditions same as unit inlet)
+        int HCoilInAirNode; // inlet node number for fan exit/coil inlet
+        int InletNode;      // unit air inlet node
+        int OutletNode;     // unit air outlet node
+        Real64 QCoilReq;    // Heat addition required from an electric/gas heating coil
+        Real64 mdot;        // local temporary for fluid mass flow rate
 
         InletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
         OutletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;

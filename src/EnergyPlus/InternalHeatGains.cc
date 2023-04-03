@@ -8763,9 +8763,7 @@ namespace InternalHeatGains {
         }
     }
 
-    void UpdateInternalGainValues(EnergyPlusData &state,
-                                  bool const SuppressRadiationUpdate,
-                                  bool const SumLatentGains)
+    void UpdateInternalGainValues(EnergyPlusData &state, bool const SuppressRadiationUpdate, bool const SumLatentGains)
     {
 
         // SUBROUTINE INFORMATION:

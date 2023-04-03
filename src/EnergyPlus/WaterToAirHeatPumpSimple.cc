@@ -148,7 +148,7 @@ namespace WaterToAirHeatPumpSimple {
         // shut off after compressor cycle off  [s]
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int HPNum;                // The WatertoAirHP that you are currently loading input into
+        int HPNum; // The WatertoAirHP that you are currently loading input into
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (state.dataWaterToAirHeatPumpSimple->GetCoilsInputFlag) { // First time subroutine has been entered
