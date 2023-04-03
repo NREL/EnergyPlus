@@ -1207,10 +1207,16 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     }
     if (CurZoneEqNum > 0) {
         CheckThisZoneForSizing(state, CurZoneEqNum, SizingDesRunThisZone);
-        if (SizingDesRunThisZone) {
-            HardSizeNoDesRun = false; // Check if design infomation is available
-        }
+        // This next check was added during CppCheck corrections. This does not cause diffs
+        // because SizingDesRunThisZone is not used below this point.
+        // This check was commented to get back to original code and an issue is needed to correct.
+        // Why no check for zone equipment?
+        // if (SizingDesRunThisZone) {
+        //    HardSizeNoDesRun = false; // Check if design infomation is available
+        //}
     }
+    // I don't think the sizing logic is correct when it comes to autosized vs hard-sized inputs
+    // or input files that use Sizing:Zone or Sizing:System with autosized and/or hard-sized inputs
 
     CompType = evapCoolerTypeNames[static_cast<int>(thisEvapCond.evapCoolerType)];
 
@@ -1261,8 +1267,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 IndirectVolFlowRateDes = IndirectVolFlowRateDes * thisEvapCond.IndirectVolFlowScalingFactor;
             }
         }
-    } else if (CurZoneEqNum > 0) { // zone equipment
-        if (!IsAutoSize && !SizingDesRunThisZone) {
+    } else if (CurZoneEqNum > 0) {                    // zone equipment
+        if (!IsAutoSize && !SizingDesRunThisAirSys) { // this should be SizingDesRunThisZone
             if (thisEvapCond.IndirectVolFlowRate > 0.0) {
                 // report for the indirect evap cooler types only
                 if (thisEvapCond.evapCoolerType == EvapCoolerType::IndirectCELDEKPAD ||
@@ -1280,8 +1286,6 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 IndirectVolFlowRateDes = IndirectVolFlowRateDes * thisEvapCond.IndirectVolFlowScalingFactor;
             }
         }
-
-    } else {
     }
     if (!HardSizeNoDesRun) {
         if (IsAutoSize) {
@@ -1344,6 +1348,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     } else if (CurZoneEqNum > 0) { // zone equipment
         // zone equip evap coolers
 
+        // this should be SizingDesRunThisZone
         if (!IsAutoSize && !SizingDesRunThisAirSys) {
             // the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
             // if ( EvapCond( EvapCoolNum ).VolFlowRate > 0.0 ) {
@@ -1429,6 +1434,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
             }
         } else if (CurZoneEqNum > 0) { // zone equipment
             // zone equip evap coolers
+
+            // this should be SizingDesRunThisZone
             if (!IsAutoSize && !SizingDesRunThisAirSys) {
                 HardSizeNoDesRun = true;
                 if (thisEvapCond.PadArea > 0.0) {
@@ -1564,7 +1571,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
             }
         } else if (CurZoneEqNum > 0) { // zone equipment
             // zone equip evap coolers
-            if (!IsAutoSize && !SizingDesRunThisAirSys) {
+            if (!IsAutoSize && !SizingDesRunThisAirSys) { // this should be SizingDesRunThisZone
                 HardSizeNoDesRun = true;
                 if (thisEvapCond.IndirectPadArea > 0.0) {
                     // report for the indirect evap cooler types only
