@@ -2227,7 +2227,6 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
     //       AUTHOR         Craig Wray, LBNL
     //       DATE WRITTEN   Feb 2010
     //       MODIFIED       Chandan Sharma, March 2011, FSEC: Added LocalTurnFansOn and LocalTurnFansOff
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the component model fan.
@@ -2260,22 +2259,11 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
     Real64 MotInAirFrac;       // Fraction of fan power input to airstream
 
     // Local variables
-    Real64 FanVolFlow;          // Fan volumetric airflow [m3/s]
-    Real64 DuctStaticPress;     // Duct static pressure setpoint [Pa]
-    Real64 DeltaPressTot;       // Total pressure rise across fan [N/m2 = Pa]
-    Real64 FanOutletVelPress;   // Fan outlet velocity pressure [Pa]
-    Real64 EulerNum;            // Fan Euler number [-]
-    Real64 NormalizedEulerNum;  // Normalized Fan Euler number [-]
     Real64 FanDimFlow;          // Fan dimensionless airflow [-]
-    Real64 FanSpdRadS;          // Fan shaft rotational speed [rad/s]
-    Real64 MotorSpeed;          // Motor shaft rotational speed [rpm]
-    Real64 FanTrqRatio;         // Ratio of fan torque to max fan torque [-]
     Real64 BeltPLEff;           // Belt normalized (part-load) efficiency [-]
-    Real64 MotorOutPwrRatio;    // Ratio of motor output power to max motor output power [-]
     Real64 MotorPLEff;          // Motor normalized (part-load) efficiency [-]
     Real64 VFDSpdRatio(0.0);    // Ratio of motor speed to motor max speed [-]
     Real64 VFDOutPwrRatio(0.0); // Ratio of VFD output power to max VFD output power [-]
-    Real64 FanEnthalpyChange;   // Air enthalpy change due to fan, belt, and motor losses [kJ/kg]
 
     auto &fan = state.dataFans->Fan(FanNum);
 
@@ -2284,7 +2272,7 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
 
     if (state.dataHVACGlobal->NightVentOn && NVPerfNum > 0) {
         MotInAirFrac = state.dataFans->NightVentPerf(NVPerfNum).MotInAirFrac;
-        MaxAirMassFlowRate = state.dataFans->(NVPerfNum).MaxAirMassFlowRate;
+        MaxAirMassFlowRate = state.dataFans->NightVentPerf(NVPerfNum).MaxAirMassFlowRate;
     } else {
         MotInAirFrac = fan.MotInAirFrac;
         MaxAirMassFlowRate = fan.MaxAirMassFlowRate;
@@ -2309,10 +2297,10 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate fan static pressure rise using fan volumetric flow, std air density, air-handling system characteristics,
         //   and Sherman-Wray system curve model (assumes static pressure surrounding air distribution system is zero)
-        FanVolFlow = MassFlow / RhoAir;                                                                  //[m3/s at standard conditions]
-        DuctStaticPress = CurveValue(state, fan.PressResetCurveIndex, FanVolFlow);               // Duct static pressure setpoint [Pa]
-        DeltaPressTot = CurveValue(state, fan.PressRiseCurveIndex, FanVolFlow, DuctStaticPress); // Fan total pressure rise [Pa]
-        FanOutletVelPress = 0.5 * RhoAir * pow_2(FanVolFlow / fan.FanOutletArea);                // Fan outlet velocity pressure [Pa]
+        Real64 FanVolFlow = MassFlow / RhoAir;                                                   //[m3/s at standard conditions]
+        Real64 DuctStaticPress = CurveValue(state, fan.PressResetCurveIndex, FanVolFlow);        // Duct static pressure setpoint [Pa]
+        Real64 DeltaPressTot = CurveValue(state, fan.PressRiseCurveIndex, FanVolFlow, DuctStaticPress); // Fan total pressure rise [Pa]
+        Real64 FanOutletVelPress = 0.5 * RhoAir * pow_2(FanVolFlow / fan.FanOutletArea);                // Fan outlet velocity pressure [Pa]
         // Outlet velocity pressure cannot exceed total pressure rise
         FanOutletVelPress = min(FanOutletVelPress, DeltaPressTot);
         fan.DeltaPress = DeltaPressTot - FanOutletVelPress; // Fan static pressure rise [Pa]
@@ -2324,8 +2312,8 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate fan wheel efficiency using fan volumetric flow, fan static pressure rise,
         //   fan characteristics, and Wray dimensionless fan static efficiency model
-        EulerNum = (fan.DeltaPress * pow_4(fan.FanWheelDia)) / (RhoAir * pow_2(FanVolFlow)); //[-]
-        NormalizedEulerNum = std::log10(EulerNum / fan.EuMaxEff);
+        Real64 EulerNum = (fan.DeltaPress * pow_4(fan.FanWheelDia)) / (RhoAir * pow_2(FanVolFlow)); //[-]
+        Real64 NormalizedEulerNum = std::log10(EulerNum / fan.EuMaxEff);
         if (NormalizedEulerNum <= 0.0) {
             fan.FanWheelEff = CurveValue(state, fan.PLFanEffNormCurveIndex, NormalizedEulerNum);
         } else {
@@ -2343,14 +2331,14 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
         } else {
             FanDimFlow = CurveValue(state, fan.DimFlowStallCurveIndex, NormalizedEulerNum); //[-]
         }
-        FanSpdRadS = FanVolFlow / (FanDimFlow * fan.FanMaxDimFlow * pow_3(fan.FanWheelDia)); //[rad/s]
+        Real64 FanSpdRadS = FanVolFlow / (FanDimFlow * fan.FanMaxDimFlow * pow_3(fan.FanWheelDia)); //[rad/s]
         fan.FanTrq = fan.FanShaftPower / FanSpdRadS;                                         //[N-m]
         fan.FanSpd = FanSpdRadS * 9.549296586;                                                       //[rpm, conversion factor is 30/PI]
-        MotorSpeed = fan.FanSpd * fan.PulleyDiaRatio;                                        //[rpm]
+        Real64 MotorSpeed = fan.FanSpd * fan.PulleyDiaRatio;                                        //[rpm]
 
         // Calculate belt part-load drive efficiency using correlations and coefficients based on ACEEE data
         // Direct-drive is represented using curve coefficients such that "belt" max eff and PL eff = 1.0
-        FanTrqRatio = fan.FanTrq / fan.BeltMaxTorque; //[-]
+        Real64 FanTrqRatio = fan.FanTrq / fan.BeltMaxTorque; //[-]
         if ((FanTrqRatio <= fan.BeltTorqueTrans) && (fan.PLBeltEffReg1CurveIndex != 0)) {
             BeltPLEff = CurveValue(state, fan.PLBeltEffReg1CurveIndex, FanTrqRatio); //[-]
         } else {
@@ -2371,7 +2359,7 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
         fan.BeltInputPower = fan.FanShaftPower / fan.BeltEff; //[W]
 
         // Calculate motor part-load efficiency using correlations and coefficients based on MotorMaster+ data
-        MotorOutPwrRatio = fan.BeltInputPower / fan.MotorMaxOutPwr; //[-]
+        Real64 MotorOutPwrRatio = fan.BeltInputPower / fan.MotorMaxOutPwr; //[-]
         if (fan.PLMotorEffCurveIndex != 0) {
             MotorPLEff = CurveValue(state, fan.PLMotorEffCurveIndex, MotorOutPwrRatio); //[-]
         } else {
@@ -2413,8 +2401,7 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
         // Assumes MotInAirFrac applies to belt and motor but NOT to VFD
         fan.PowerLossToAir =
             fan.FanShaftPower + (fan.MotorInputPower - fan.FanShaftPower) * fan.MotInAirFrac; //[W]
-        FanEnthalpyChange = fan.PowerLossToAir / MassFlow;                                                            //[kJ/kg]
-        fan.OutletAirEnthalpy = fan.InletAirEnthalpy + FanEnthalpyChange;                                     //[kJ/kg]
+        fan.OutletAirEnthalpy = fan.InletAirEnthalpy + (fan.PowerLossToAir / MassFlow);         //[kJ/kg]
 
         // This fan does not change the moisture or mass flow across the component
         fan.OutletAirHumRat = fan.InletAirHumRat; //[-]
