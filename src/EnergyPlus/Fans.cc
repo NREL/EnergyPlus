@@ -1641,9 +1641,9 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
     Real64 MotEff;
     Real64 FanShaftPower; // power delivered to fan shaft
 
-    auto &Fan(state.dataFans->Fan);
+    auto &fan = state.dataFans->Fan(FanNum);
 
-    int NVPerfNum = Fan(FanNum).NVPerfNum;
+    int NVPerfNum = fan.NVPerfNum;
 
     if (state.dataHVACGlobal->NightVentOn && NVPerfNum > 0) {
         auto const &nightVentPerf = state.dataFans->NightVentPerf(NVPerfNum);
@@ -1652,22 +1652,22 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
         MotEff = nightVentPerf.MotEff;
         MotInAirFrac = nightVentPerf.MotInAirFrac;
     } else {
-        DeltaPress = Fan(FanNum).DeltaPress;
-        FanEff = Fan(FanNum).FanEff;
-        MotEff = Fan(FanNum).MotEff;
-        MotInAirFrac = Fan(FanNum).MotInAirFrac;
+        DeltaPress = fan.DeltaPress;
+        FanEff = fan.FanEff;
+        MotEff = fan.MotEff;
+        MotInAirFrac = fan.MotInAirFrac;
     }
 
     // For a Constant Volume Simple Fan the Max Flow Rate is the Flow Rate for the fan
-    Real64 RhoAir = Fan(FanNum).RhoAirStdInit;
-    Real64 MassFlow = Fan(FanNum).InletAirMassFlowRate;
+    Real64 RhoAir = fan.RhoAirStdInit;
+    Real64 MassFlow = fan.InletAirMassFlowRate;
 
     // Faulty fan operations
     // Update MassFlow & DeltaPress if there are fouling air filters corresponding to the fan
-    if (Fan(FanNum).FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
+    if (fan.FaultyFilterFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
         (!state.dataGlobal->KickOffSimulation)) {
 
-        int iFault = Fan(FanNum).FaultyFilterIndex;
+        int iFault = fan.FaultyFilterIndex;
 
         // Check fault availability schedules
         if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
@@ -1675,53 +1675,53 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
 
             FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(
                 state,
-                Fan(FanNum).FanName,
-                Fan(FanNum).MaxAirFlowRate,
-                Fan(FanNum).DeltaPress,
+                fan.FanName,
+                fan.MaxAirFlowRate,
+                fan.DeltaPress,
                 (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) - 1) *
-                    Fan(FanNum).DeltaPress,
+                    fan.DeltaPress,
                 state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
 
             // Update MassFlow & DeltaPress of the fan
-            MassFlow = min(MassFlow, Fan(FanNum).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir);
+            MassFlow = min(MassFlow, fan.MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir);
             DeltaPress = GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) *
-                         Fan(FanNum).DeltaPress;
+                         fan.DeltaPress;
         }
     }
 
     // EMS overwrite MassFlow, DeltaPress, and FanEff
-    if (Fan(FanNum).EMSMaxMassFlowOverrideOn) MassFlow = Fan(FanNum).EMSAirMassFlowValue;
-    if (Fan(FanNum).EMSFanPressureOverrideOn) DeltaPress = Fan(FanNum).EMSFanPressureValue;
-    if (Fan(FanNum).EMSFanEffOverrideOn) FanEff = Fan(FanNum).EMSFanEffValue;
+    if (fan.EMSMaxMassFlowOverrideOn) MassFlow = fan.EMSAirMassFlowValue;
+    if (fan.EMSFanPressureOverrideOn) DeltaPress = fan.EMSFanPressureValue;
+    if (fan.EMSFanEffOverrideOn) FanEff = fan.EMSFanEffValue;
 
-    MassFlow = min(MassFlow, Fan(FanNum).MaxAirMassFlowRate);
-    MassFlow = max(MassFlow, Fan(FanNum).MinAirMassFlowRate);
+    MassFlow = min(MassFlow, fan.MaxAirMassFlowRate);
+    MassFlow = max(MassFlow, fan.MinAirMassFlowRate);
 
     // Determine the Fan Schedule for the Time step
-    if ((GetCurrentScheduleValue(state, Fan(FanNum).AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) &&
+    if ((GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) &&
         !state.dataFans->LocalTurnFansOff && MassFlow > 0.0) {
         // Fan is operating
-        Fan(FanNum).FanPower = max(0.0, MassFlow * DeltaPress / (FanEff * RhoAir)); // total fan power
-        FanShaftPower = MotEff * Fan(FanNum).FanPower;                              // power delivered to shaft
-        Fan(FanNum).PowerLossToAir = FanShaftPower + (Fan(FanNum).FanPower - FanShaftPower) * MotInAirFrac;
-        Fan(FanNum).OutletAirEnthalpy = Fan(FanNum).InletAirEnthalpy + Fan(FanNum).PowerLossToAir / MassFlow;
+        fan.FanPower = max(0.0, MassFlow * DeltaPress / (FanEff * RhoAir)); // total fan power
+        FanShaftPower = MotEff * fan.FanPower;                              // power delivered to shaft
+        fan.PowerLossToAir = FanShaftPower + (fan.FanPower - FanShaftPower) * MotInAirFrac;
+        fan.OutletAirEnthalpy = fan.InletAirEnthalpy + fan.PowerLossToAir / MassFlow;
         // This fan does not change the moisture or Mass Flow across the component
-        Fan(FanNum).OutletAirHumRat = Fan(FanNum).InletAirHumRat;
-        Fan(FanNum).OutletAirMassFlowRate = MassFlow;
-        Fan(FanNum).OutletAirTemp = PsyTdbFnHW(Fan(FanNum).OutletAirEnthalpy, Fan(FanNum).OutletAirHumRat);
+        fan.OutletAirHumRat = fan.InletAirHumRat;
+        fan.OutletAirMassFlowRate = MassFlow;
+        fan.OutletAirTemp = PsyTdbFnHW(fan.OutletAirEnthalpy, fan.OutletAirHumRat);
 
     } else {
         // Fan is off and not operating no power consumed and mass flow rate.
-        Fan(FanNum).FanPower = 0.0;
+        fan.FanPower = 0.0;
         FanShaftPower = 0.0;
-        Fan(FanNum).PowerLossToAir = 0.0;
-        Fan(FanNum).OutletAirMassFlowRate = 0.0;
-        Fan(FanNum).OutletAirHumRat = Fan(FanNum).InletAirHumRat;
-        Fan(FanNum).OutletAirEnthalpy = Fan(FanNum).InletAirEnthalpy;
-        Fan(FanNum).OutletAirTemp = Fan(FanNum).InletAirTemp;
+        fan.PowerLossToAir = 0.0;
+        fan.OutletAirMassFlowRate = 0.0;
+        fan.OutletAirHumRat = fan.InletAirHumRat;
+        fan.OutletAirEnthalpy = fan.InletAirEnthalpy;
+        fan.OutletAirTemp = fan.InletAirTemp;
         // Set the Control Flow variables to 0.0 flow when OFF.
-        Fan(FanNum).MassFlowRateMaxAvail = 0.0;
-        Fan(FanNum).MassFlowRateMinAvail = 0.0;
+        fan.MassFlowRateMaxAvail = 0.0;
+        fan.MassFlowRateMinAvail = 0.0;
     }
 }
 
