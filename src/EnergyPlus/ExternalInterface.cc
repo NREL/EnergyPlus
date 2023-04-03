@@ -325,8 +325,8 @@ void CloseSocket(EnergyPlusData &state, int const FlagToWriteToSocket)
     }
 
     if (state.dataExternalInterface->socketFD >= 0) {
-        // TODO: use retVal?
-        int retVal = sendclientmessage(&state.dataExternalInterface->socketFD, &FlagToWriteToSocket);
+        // TODO: use return value from this function?
+        sendclientmessage(&state.dataExternalInterface->socketFD, &FlagToWriteToSocket);
         // Don't close socket as this may give sometimes an IOException in Windows
         // This problem seems to affect only Windows but not Mac
         //     close(state.dataExternalInterface->socketFD)

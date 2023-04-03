@@ -2406,7 +2406,6 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     Real64 FlowRatioSecWet = 0.0; // current secondary air mass flow ratio in wet mode
     thisEvapCond.EvapCoolerRDDOperatingMode = OperatingMode::None;
     Real64 TEDB = thisEvapCond.InletTemp;                    // Entering Dry Bulb Temperature
-    Real64 TEWB = thisEvapCond.InletWetBulbTemp;             // Entering Wet Bulb Temperature
     Real64 SysTempSetPoint = thisEvapCond.DesiredOutletTemp; // evaporative cooler outlet setpoint temperature, drybulb
     Real64 SecRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, InletDryBulbTempSec, InletHumRatioSec);
     Real64 MassFlowRateSecMax = SecRho * thisEvapCond.IndirectVolFlowRate; // Design secondary air mass flow rate
