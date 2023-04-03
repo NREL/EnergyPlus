@@ -1441,7 +1441,6 @@ namespace HVACHXAssistedCoolingCoil {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
-        bool PrintMessage;
 
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (state.dataHVACAssistedCC->GetCoilsInputFlag) { // First time subroutine has been called, get input data
