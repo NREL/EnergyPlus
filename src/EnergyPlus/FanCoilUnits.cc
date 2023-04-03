@@ -2078,13 +2078,12 @@ namespace FanCoilUnits {
         Real64 Error = 1.0;                                                     // Error between QZnReq and QUnitOut
         Real64 AbsError = 2.0 * DataHVACGlobals::SmallLoad;                     // Absolute error between QZnReq and QUnitOut [W]   !FB
         Real64 Relax = 1.0;
-        Real64 ElectricHeaterControl = 0.0; // 1 or 0, enables or disables heating coil
-        Real64 HWFlow = 0.0;                // hot water mass flow rate solution [kg/s]
-        Real64 HWFlowBypass = 0.0;          // hot water bypassed mass flow rate [kg/s]
-        Real64 MdotLockH = 0.0;             // saved value of locked chilled water mass flow rate [kg/s]
-        Real64 MdotLockC = 0.0;             // saved value of locked hot water mass flow rate [kg/s]
-        bool ColdFlowLocked = false;        // if true cold water flow is locked
-        bool HotFlowLocked = false;         // if true Hot water flow is locked
+        Real64 HWFlow = 0.0;         // hot water mass flow rate solution [kg/s]
+        Real64 HWFlowBypass = 0.0;   // hot water bypassed mass flow rate [kg/s]
+        Real64 MdotLockH = 0.0;      // saved value of locked chilled water mass flow rate [kg/s]
+        Real64 MdotLockC = 0.0;      // saved value of locked hot water mass flow rate [kg/s]
+        bool ColdFlowLocked = false; // if true cold water flow is locked
+        bool HotFlowLocked = false;  // if true Hot water flow is locked
 
         // select capacity control method
         switch (fanCoil.CapCtrlMeth_Num) {
@@ -3540,7 +3539,6 @@ namespace FanCoilUnits {
         Real64 PartLoadRatio = 0.0; // Part Load Ratio, fraction of time step fancoil is on
         Real64 QZnReq = 0.0;        // heating or cooling needed by zone [watts]
         Real64 QUnitOut = 0.0;      // heating or sens. cooling provided by fan coil unit [watts]
-        Real64 QTotUnitOut = 0.0;   // total unit output [watts]
         Real64 QUnitOutMax = 0.0;   // heating or sens. cooling provided by fan coil unit (running during an entire timestep)
         Real64 QUnitOutNoHC = 0.0;  // unit output with no active heating or cooling [W]
 
