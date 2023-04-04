@@ -406,9 +406,6 @@ namespace FaultsManager {
             }
 
             // Evaporative cooler check
-
-            int EvapCoolerNum;
-
             if (UtilityRoutines::SameString(state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerType,
                                             "EvaporativeCooler:Indirect:WetCoil")) {
                 // Read in evaporative cooler is not done yet
@@ -418,9 +415,10 @@ namespace FaultsManager {
                 }
 
                 // Check whether the evaporative cooler  name and type match each other;
-                EvapCoolerNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerName,
-                                                                state.dataEvapCoolers->EvapCond,
-                                                                &EvaporativeCoolers::EvapConditions::Name);
+                int EvapCoolerNum =
+                    UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerName,
+                                                    state.dataEvapCoolers->EvapCond,
+                                                    &EvaporativeCoolers::EvapConditions::Name);
                 if (EvapCoolerNum <= 0) {
                     ShowSevereError(
                         state,
@@ -511,7 +509,7 @@ namespace FaultsManager {
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum = 0;
                 int thisChil = 0;
-                for (auto &ch : state.dataPlantChillers->ElectricChiller) {
+                for (auto const &ch : state.dataPlantChillers->ElectricChiller) {
                     thisChil++;
                     if (ch.Name == state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
                         ChillerNum = thisChil;
@@ -613,7 +611,7 @@ namespace FaultsManager {
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum = 0;
                 int thisChil = 0;
-                for (auto &ch : state.dataPlantChillers->ConstCOPChiller) {
+                for (auto const &ch : state.dataPlantChillers->ConstCOPChiller) {
                     thisChil++;
                     if (ch.Name == state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
                         ChillerNum = thisChil;
@@ -647,7 +645,7 @@ namespace FaultsManager {
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum = 0;
                 int thisChil = 0;
-                for (auto &ch : state.dataPlantChillers->EngineDrivenChiller) {
+                for (auto const &ch : state.dataPlantChillers->EngineDrivenChiller) {
                     thisChil++;
                     if (ch.Name == state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
                         ChillerNum = thisChil;
@@ -681,7 +679,7 @@ namespace FaultsManager {
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum = 0;
                 int thisChil = 0;
-                for (auto &ch : state.dataPlantChillers->GTChiller) {
+                for (auto const &ch : state.dataPlantChillers->GTChiller) {
                     thisChil++;
                     if (ch.Name == state.dataFaultsMgr->FaultsChillerFouling(jFault_ChillerFouling).ChillerName) {
                         ChillerNum = thisChil;
@@ -1345,7 +1343,7 @@ namespace FaultsManager {
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum = 0;
                 int thisChil = 0;
-                for (auto &ch : state.dataPlantChillers->ElectricChiller) {
+                for (auto const &ch : state.dataPlantChillers->ElectricChiller) {
                     thisChil++;
                     if (ch.Name == state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName) {
                         ChillerNum = thisChil;
@@ -1406,7 +1404,7 @@ namespace FaultsManager {
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum = 0;
                 int thisChil = 0;
-                for (auto &ch : state.dataPlantChillers->EngineDrivenChiller) {
+                for (auto const &ch : state.dataPlantChillers->EngineDrivenChiller) {
                     thisChil++;
                     if (ch.Name == state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName) {
                         ChillerNum = thisChil;
@@ -1426,7 +1424,7 @@ namespace FaultsManager {
             case ChillerType::ChillerCombustionTurbine: {
                 ChillerNum = 0;
                 int thisChil = 0;
-                for (auto &ch : state.dataPlantChillers->GTChiller) {
+                for (auto const &ch : state.dataPlantChillers->GTChiller) {
                     thisChil++;
                     if (ch.Name == state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName) {
                         ChillerNum = thisChil;
@@ -1446,7 +1444,7 @@ namespace FaultsManager {
             case ChillerType::ChillerConstantCOP: {
                 ChillerNum = 0;
                 int thisChil = 0;
-                for (auto &ch : state.dataPlantChillers->ConstCOPChiller) {
+                for (auto const &ch : state.dataPlantChillers->ConstCOPChiller) {
                     thisChil++;
                     if (ch.Name == state.dataFaultsMgr->FaultsChillerSWTSensor(jFault_ChillerSWT).ChillerName) {
                         ChillerNum = thisChil;
@@ -2166,9 +2164,9 @@ namespace FaultsManager {
         Real64 QEvaporator_ff = QEvaporator;           // Chiller evaporator heat transfer rate, fault free [W]
 
         // Variables for faulty cases
-        Real64 EvapOutletTemp_f = EvapOutletTemp_ff;     // Chiller supply water temperature, faulty case [C]
+        Real64 EvapOutletTemp_f;                         // Chiller supply water temperature, faulty case [C]
         Real64 EvapMassFlowRate_f = EvapMassFlowRate_ff; // Chiller mass flow rate, faulty case [kg/s]
-        Real64 QEvaporator_f = QEvaporator_ff;           // Chiller evaporator heat transfer rate, faulty case [W]
+        Real64 QEvaporator_f;                            // Chiller evaporator heat transfer rate, faulty case [W]
 
         if (!FlagVariableFlow) {
             // Chillers with ConstantFlow mode
