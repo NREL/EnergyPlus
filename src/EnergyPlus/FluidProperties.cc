@@ -693,7 +693,6 @@ namespace FluidProperties {
                                                                      lAlphaFieldBlanks,
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound)) continue;
             ++FluidNum;
             FluidNames(FluidNum).Name = Alphas(1);
             if (UtilityRoutines::SameString(Alphas(2), Refrig)) {
@@ -2330,9 +2329,6 @@ namespace FluidProperties {
                                                                      lAlphaFieldBlanks,
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound)) {
-                continue;
-            }
             GlycolFound = false;
             if (UtilityRoutines::SameString(Alphas(2), EthyleneGlycol)) {
                 GlycolFound = true;
