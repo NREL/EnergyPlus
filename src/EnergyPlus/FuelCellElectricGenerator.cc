@@ -84,8 +84,6 @@ namespace FuelCellElectricGenerator {
     // MODULE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   August. 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This module simulates the operation of Solid oxide fuel cell Generators.
@@ -147,7 +145,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   March 2005
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE: This is the Solid oxide fuel cell Generator model driver.  It
         // gets the input for the models, initializes simulation variables, call
@@ -1593,8 +1590,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2005
-        //       MODIFIED     na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // simulate a FuelCell generator using the Annex 42 model
@@ -2177,8 +2172,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Aug 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // manage controls and calculations related to electrical storage in FuelCell model
@@ -2330,8 +2323,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // calculate Cp from Shomate equations for fuel
@@ -2406,8 +2397,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // calculate Enthalpy from Shomate equations for fuel
@@ -2489,8 +2478,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // calculate Cp from Shomate equations for fuel
@@ -2563,8 +2550,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // calculate Enthalpy from Shomate equations for fuel
@@ -2646,8 +2631,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   August 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // calculate Enthalpy from Shomate equations for gases
@@ -2727,8 +2710,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug. 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         Real64 tempCp;
         Real64 A;  // shomate coeff
@@ -2793,8 +2774,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   December 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // calculate Enthalpy from Shomate equations for gaseous water
@@ -2822,8 +2801,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   December 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // calculate Enthalpy from Shomate equations for liquid water
@@ -2852,8 +2829,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   December 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // calculate shomate eq. for pure liquid water
@@ -2874,8 +2849,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   March 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the AC ancillaries to determine Pel
@@ -2904,8 +2877,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Aug 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate inverter losses
@@ -2941,8 +2912,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         Real64 PelInput = Pel; // hold initial value of inout var
 
@@ -3340,7 +3309,6 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   Aug 2005
-        //       MODIFIED       na
         //       RE-ENGINEERED  B. Griffith Sept 2010, plant upgrades
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -3469,7 +3437,6 @@ namespace FuelCellElectricGenerator {
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Aug 2005
         //       MODIFIED       BG March 2007
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Couple equipment skin losses to the Zone Heat Balance
@@ -3557,14 +3524,11 @@ namespace FuelCellElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   March 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // update plant loop interactions, do any calcs needed
 
         // now update water outlet node Changing to Kg/s!
-
         PlantUtilities::SafeCopyPlantNode(state, this->ExhaustHX.WaterInNode, this->ExhaustHX.WaterOutNode);
 
         state.dataLoopNodes->Node(this->ExhaustHX.WaterOutNode).Temp = this->ExhaustHX.WaterOutletTemp;
