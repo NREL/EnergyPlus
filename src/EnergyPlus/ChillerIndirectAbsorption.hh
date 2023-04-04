@@ -177,7 +177,7 @@ namespace ChillerIndirectAbsorption {
         ReportVars Report;
         DataBranchAirLoopPlant::ControlType EquipFlowCtrl = DataBranchAirLoopPlant::ControlType::Invalid;
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static IndirectAbsorberSpecs *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,
