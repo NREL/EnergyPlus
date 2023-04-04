@@ -9507,18 +9507,6 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     // Current exterior surf temp would be used for the next step LWR calculation.
     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
         int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-        // for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
-        //     Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-        //     Real64 SrdSurfTempAbs =
-        //         GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-        //         Constant::KelvinConv;
-        //     QRadLWOutSrdSurfsRep +=
-        //         Constant::StefanBoltzmann *
-        //         dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
-        //             ->AbsorpThermal *
-        //         SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TH11 + Constant::KelvinConv));
-        // }
-
         QRadLWOutSrdSurfsRep = state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) * (state.dataSurface->Surface(SurfNum).SrdSurfTemp - TH11);
     }
     state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(SurfNum) = HExtSurf_fac + QRadLWOutSrdSurfsRep;

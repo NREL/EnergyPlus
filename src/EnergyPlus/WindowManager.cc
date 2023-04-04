@@ -2683,10 +2683,11 @@ namespace WindowManager {
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
                 int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-                // check if the SurfHSrdSurfExt uses the same calculation if there is exterior shde or blind 
-                state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) = ConvectionCoefficients::SurroundingSurfacesRadCoeffAverage(state, SurfNum, Tsout, SurfOutsideEmiss);
-                rad_out_lw_srd_per_area = state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) *
-                                          (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurfsTempAvg - SurfOutsideTemp);
+                // update SurfHSrdSurfExt if the windows has exterior shade or blind
+                state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) =
+                    ConvectionCoefficients::SurroundingSurfacesRadCoeffAverage(state, SurfNum, Tsout, SurfOutsideEmiss);
+                rad_out_lw_srd_per_area =
+                    state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) * (state.dataSurface->Surface(SurfNum).SrdSurfTemp - SurfOutsideTemp);
             }
         }
 
