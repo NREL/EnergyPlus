@@ -108,11 +108,11 @@ namespace FuelCellElectricGenerator {
         }
 
         // Now look for this object
-        for (auto &thisFC : state.dataFuelCellElectGen->FuelCell) {
-            if (thisFC.Name == objectName) {
-                return &thisFC;
-            }
-        }
+        auto thisObj = std::find_if(state.dataFuelCellElectGen->FuelCell.begin(),
+                                    state.dataFuelCellElectGen->FuelCell.end(),
+                                    [&objectName](const FCDataStruct &myObj) { return myObj.Name == objectName; });
+        if (thisObj != state.dataFuelCellElectGen->FuelCell.end()) return thisObj;
+
         // If we didn't find it, fatal
         ShowFatalError(state, format("LocalFuelCellGenFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
         // Shut up the compiler
