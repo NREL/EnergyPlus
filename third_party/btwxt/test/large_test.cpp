@@ -8,7 +8,6 @@
 #include <iostream>
 
 // btwxt
-#include "fixtures.hpp"
 #include <btwxt.h>
 #include <error.h>
 #include <griddeddata.h>
@@ -34,11 +33,10 @@ double fn1(double x0, double x1, double x2, double x3) { return (x0 + x1 + x2 + 
 class LargeFixture : public testing::Test {
 protected:
   RegularGridInterpolator test_rgi;
-  GriddedData test_gridded_data;
   std::vector<double> target;
 
   LargeFixture() {
-    std::size_t ndims = 4;
+    const std::size_t ndims = 4;
     std::vector<std::vector<double>> grid(ndims);
 
     std::size_t axis_len = 10; // could easily change to vector of lengths
@@ -69,12 +67,12 @@ protected:
     // target = {2.5, 3.5, 1.4, 4.0};
     target = {2.2, 3.3, 1.4, 4.1};
     // target = {0.0, 0.0, 0.0, 0.0};
-    test_gridded_data = GriddedData(grid, values);
+    ////test_gridded_data = GriddedData(grid, values);
     //        test_gridded_data.set_axis_interp_method(0, Method::CUBIC);
     //        test_gridded_data.set_axis_interp_method(1, Method::CUBIC);
     //        test_gridded_data.set_axis_interp_method(2, Method::CUBIC);
     //        test_gridded_data.set_axis_interp_method(3, Method::CUBIC);
-    test_rgi = RegularGridInterpolator(test_gridded_data);
+    test_rgi = RegularGridInterpolator(grid, values);
   }
 };
 
@@ -88,68 +86,45 @@ TEST_F(LargeFixture, construct) {
 TEST_F(LargeFixture, calculate) {
   test_rgi.set_new_target(target);
 
-  Btwxt::LOG_LEVEL = 0;
   std::vector<double> result = test_rgi.get_values_at_target();
   EXPECT_NEAR(result[0], fn0(target[0], target[1], target[2], target[3]), 0.02);
   EXPECT_DOUBLE_EQ(result[1], fn1(target[0], target[1], target[2], target[3]));
-  Btwxt::LOG_LEVEL = 1;
 }
 
 TEST_F(LargeFixture, verify_linear) {
   // no matter what we do, result[1] should always be 11!
   std::vector<double> result;
 
-  EXPECT_THAT(test_gridded_data.get_interp_methods(),
-              testing::ElementsAre(Method::LINEAR, Method::LINEAR, Method::LINEAR, Method::LINEAR));
-  test_rgi = RegularGridInterpolator(test_gridded_data);
   test_rgi.set_new_target(target);
   result = test_rgi.get_values_at_target();
   EXPECT_DOUBLE_EQ(result[1], 11);
 
-  test_gridded_data.set_axis_interp_method(0, Method::CUBIC);
-  EXPECT_THAT(test_gridded_data.get_interp_methods(),
-              testing::ElementsAre(Method::CUBIC, Method::LINEAR, Method::LINEAR, Method::LINEAR));
-  test_rgi = RegularGridInterpolator(test_gridded_data);
+  test_rgi.set_axis_interp_method(0, Method::CUBIC);
   test_rgi.set_new_target(target);
   result = test_rgi.get_values_at_target();
   EXPECT_DOUBLE_EQ(result[1], 11);
 
-  test_gridded_data.set_axis_interp_method(3, Method::CUBIC);
-  EXPECT_THAT(test_gridded_data.get_interp_methods(),
-              testing::ElementsAre(Method::CUBIC, Method::LINEAR, Method::LINEAR, Method::CUBIC));
-  test_rgi = RegularGridInterpolator(test_gridded_data);
+  test_rgi.set_axis_interp_method(3, Method::CUBIC);
   test_rgi.set_new_target(target);
   result = test_rgi.get_values_at_target();
   EXPECT_DOUBLE_EQ(result[1], 11);
 
-  test_gridded_data.set_axis_interp_method(0, Method::LINEAR);
-  EXPECT_THAT(test_gridded_data.get_interp_methods(),
-              testing::ElementsAre(Method::LINEAR, Method::LINEAR, Method::LINEAR, Method::CUBIC));
-  test_rgi = RegularGridInterpolator(test_gridded_data);
+  test_rgi.set_axis_interp_method(0, Method::LINEAR);
   test_rgi.set_new_target(target);
   result = test_rgi.get_values_at_target();
   EXPECT_DOUBLE_EQ(result[1], 11);
 
-  test_gridded_data.set_axis_interp_method(2, Method::CUBIC);
-  EXPECT_THAT(test_gridded_data.get_interp_methods(),
-              testing::ElementsAre(Method::LINEAR, Method::LINEAR, Method::CUBIC, Method::CUBIC));
-  test_rgi = RegularGridInterpolator(test_gridded_data);
+  test_rgi.set_axis_interp_method(2, Method::CUBIC);
   test_rgi.set_new_target(target);
   result = test_rgi.get_values_at_target();
   EXPECT_DOUBLE_EQ(result[1], 11);
 
-  test_gridded_data.set_axis_interp_method(0, Method::CUBIC);
-  EXPECT_THAT(test_gridded_data.get_interp_methods(),
-              testing::ElementsAre(Method::CUBIC, Method::LINEAR, Method::CUBIC, Method::CUBIC));
-  test_rgi = RegularGridInterpolator(test_gridded_data);
+  test_rgi.set_axis_interp_method(0, Method::CUBIC);
   test_rgi.set_new_target(target);
   result = test_rgi.get_values_at_target();
   EXPECT_DOUBLE_EQ(result[1], 11);
 
-  test_gridded_data.set_axis_interp_method(1, Method::CUBIC);
-  EXPECT_THAT(test_gridded_data.get_interp_methods(),
-              testing::ElementsAre(Method::CUBIC, Method::CUBIC, Method::CUBIC, Method::CUBIC));
-  test_rgi = RegularGridInterpolator(test_gridded_data);
+  test_rgi.set_axis_interp_method(1, Method::CUBIC);
   test_rgi.set_new_target(target);
   result = test_rgi.get_values_at_target();
   EXPECT_DOUBLE_EQ(result[1], 11);
@@ -185,7 +160,6 @@ TEST_F(LargeFixture, multi_timer) {
       {4.2, 2.7, 1.3, 4.4}, {2.1, 2.9, 1.8, 1.9}};
 
   for (std::size_t count = 0; count < 10; count++) {
-    Btwxt::LOG_LEVEL = 2;
     // Get starting timepoint
     auto start = std::chrono::high_resolution_clock::now();
     for (auto target : set_of_targets) {
@@ -194,7 +168,6 @@ TEST_F(LargeFixture, multi_timer) {
     // Get ending timepoint
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    Btwxt::LOG_LEVEL = 1;
     showMessage(MsgLevel::MSG_INFO,
                 stringify("Time taken by ten interpolations: ", duration.count(), " microseconds"));
   }

@@ -9,7 +9,6 @@
 #include "gtest/gtest.h"
 
 // btwxt
-#include "fixtures.hpp"
 #include <btwxt.h>
 #include <error.h>
 #include <griddeddata.h>
@@ -19,7 +18,6 @@ using namespace Btwxt;
 // Unit tests on free functions, generally mathematically oriented.
 
 TEST(GriddedData, free_check_sorted) {
-  Btwxt::LOG_LEVEL = 0;
   std::vector<std::pair<std::vector<double>, bool>> my_vecs = {{{1, 3, 5, 7, 9}, true},
                                                                {{1, 3, 5, 17, 9}, false},
                                                                {{9, 7, 5, 3, 1}, false},
@@ -30,7 +28,6 @@ TEST(GriddedData, free_check_sorted) {
     is_sorted = Btwxt::free_check_sorted(pair.first);
     EXPECT_EQ(is_sorted, pair.second);
   }
-  Btwxt::LOG_LEVEL = 1;
 }
 
 TEST(GriddedData, locate_coords) {

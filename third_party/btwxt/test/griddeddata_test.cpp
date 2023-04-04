@@ -8,17 +8,18 @@
 
 // btwxt
 #include "fixtures.hpp"
-#include <error.h>
-#include <griddeddata.h>
+#include "error.h"
+#include "griddeddata.h"
 
 using namespace Btwxt;
 
+//TODO: Useful any more?
 TEST_F(OneDFixture, construct_from_vectors) {
-  std::size_t ndims = test_gridded_data.get_ndims();
+  std::size_t ndims = test_rgi.get_ndims();
   EXPECT_EQ(ndims, 1u);
 }
 
-TEST_F(TwoDFixture, construct_from_vectors) {
+TEST_F(TwoDGriddedDataFixture, construct_from_vectors) {
   std::size_t ndims = test_gridded_data.get_ndims();
   EXPECT_EQ(ndims, 2u);
 
@@ -26,7 +27,7 @@ TEST_F(TwoDFixture, construct_from_vectors) {
   EXPECT_EQ(num_tables, 2u);
 }
 
-TEST_F(TwoDFixture, write_data) {
+TEST_F(TwoDGriddedDataFixture, write_data) {
   EXPECT_EQ("Axis 1,Axis 2,Value 1,Value 2,\n"
                "0,4,6,12,\n"
                "0,6,3,6,\n"
@@ -37,8 +38,7 @@ TEST_F(TwoDFixture, write_data) {
                test_gridded_data.write_data());
 }
 
-
-TEST_F(TwoDFixture, construct_from_axes) {
+TEST_F(TwoDGriddedDataFixture, construct_from_axes) {
   GridAxis ax0 = GridAxis(std::vector<double>({0, 10, 15}));
   GridAxis ax1 = GridAxis(std::vector<double>({4, 6}));
   std::vector<GridAxis> test_axes = {ax0, ax1};
@@ -58,12 +58,12 @@ TEST_F(TwoDFixture, construct_from_axes) {
   EXPECT_THAT(test_gridded_data.get_values(coords), testing::ElementsAre(8, 16));
 }
 
-TEST_F(TwoDFixture, get_grid_vector) {
+TEST_F(TwoDGriddedDataFixture, get_grid_vector) {
   std::vector<double> returned_vec = test_gridded_data.get_grid_vector(1);
   EXPECT_THAT(returned_vec, testing::ElementsAre(4, 6));
 }
 
-TEST_F(TwoDFixture, get_values) {
+TEST_F(TwoDGriddedDataFixture, get_values) {
   std::vector<std::size_t> coords = {0, 1};
   std::vector<double> returned_vec = test_gridded_data.get_values(coords);
   EXPECT_THAT(returned_vec, testing::ElementsAre(3, 6));
@@ -73,7 +73,7 @@ TEST_F(TwoDFixture, get_values) {
   EXPECT_THAT(returned_vec, testing::ElementsAre(2, 4));
 }
 
-TEST_F(TwoDFixture, get_values_relative) {
+TEST_F(TwoDGriddedDataFixture, get_values_relative) {
   std::vector<std::size_t> coords{0, 1};
   std::vector<short> translation{1, 0}; // {1, 1} stays as is
   std::vector<double> expected_vec = test_gridded_data.get_values({1, 1});
@@ -93,12 +93,12 @@ TEST_F(TwoDFixture, get_values_relative) {
 
 TEST(GridAxis, sorting) {
   std::vector<double> grid_vector = {0, 5, 7, 17, 15};
-  EXPECT_THROW(GridAxis my_grid_axis = GridAxis(grid_vector);, std::invalid_argument);
+  EXPECT_THROW(GridAxis my_grid_axis = GridAxis(grid_vector), BtwxtErr);
   grid_vector = {0, 5, 7, 10, 15};
   EXPECT_NO_THROW(GridAxis my_grid_axis = GridAxis(grid_vector););
 }
 
-TEST_F(CubicFixture, get_spacing_multipliers) {
+TEST_F(CubicGriddedDataFixture, get_spacing_multipliers) {
   // for cubic dimension 0: {6, 10, 15, 20}, multipliers should be:
   // flavor 0: {4/4, 5/9, 5/10}
   // flavor 1: {4/9, 5/10, 5/5}
@@ -116,14 +116,15 @@ TEST_F(CubicFixture, get_spacing_multipliers) {
 TEST(GridAxis, calc_spacing_multipliers) {
   std::vector<double> grid_vector{6, 10, 15, 20, 22};
 
-  GridAxis test_gridaxis(grid_vector, Method::CONSTANT, Method::CUBIC, {-DBL_MAX, DBL_MAX});
+  GridAxis test_gridaxis(grid_vector, nullptr, nullptr, Method::CONSTANT, Method::CUBIC, {-DBL_MAX, DBL_MAX});
   std::vector<std::vector<double>> values = test_gridaxis.spacing_multipliers;
   EXPECT_THAT(values[0], testing::ElementsAre(1, 5.0 / 9, 0.5, 2.0 / 7));
   EXPECT_THAT(values[1], testing::ElementsAre(4.0 / 9, 0.5, 5.0 / 7, 1));
 }
 
 TEST(GridAxis, bad_limits) {
-  GridAxis my_grid_axis({0, 5, 7, 11, 12, 15});
+  std::function write_note{[](MsgLevel, const std::string_view &str, void *){std::cout << "  NOTE: " << str << std::endl;}};
+  GridAxis my_grid_axis({0, 5, 7, 11, 12, 15}, &write_note);
   std::pair<double, double> extrap_limits{4, 17};
   std::string ExpectedOut = "  NOTE: The lower extrapolation limit (4) is within the set of "
                             "grid values. Setting to smallest grid value (0).\n";

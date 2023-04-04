@@ -5,9 +5,10 @@
 #define GRIDPOINT_H_
 
 // Standard
-#include <memory>
-#include <vector>
 #include <map>
+#include <memory>
+#include <optional>
+#include <vector>
 
 // btwxt
 #include "griddeddata.h"
@@ -18,15 +19,18 @@ enum class Bounds { OUTLAW, OUTBOUNDS, INBOUNDS };
 
 class GridPoint {
 public:
-  GridPoint();
 
-  GridPoint(GriddedData &grid_data);
+  GridPoint() = default;
 
-  GridPoint(GriddedData &grid_data, std::vector<double> v);
+  GridPoint(GriddedData &grid_data, BtwxtLoggerFn *logger = nullptr,
+            void *logger_context = nullptr);
+
+  GridPoint(GriddedData &grid_data, std::vector<double> v, BtwxtLoggerFn *logger = nullptr,
+            void *logger_context = nullptr);
 
   void set_target(const std::vector<double> &v);
 
-  std::vector<double> get_current_target();
+  std::vector<double> get_current_target() const;
 
   std::vector<std::size_t> get_floor();
 
@@ -50,8 +54,16 @@ public:
 
   void set_floor();
 
+  void set_logging_callback(BtwxtLoggerFn *callback_function, void *caller_info);
+
 private:
   friend class RegularGridInterpolator;
+  friend class ThreeDGriddedDataFixture;
+  friend class ThreeDGriddedDataFixture_hypercube_Test;
+  friend class ThreeDGriddedDataFixture_test_hypercube_Test;
+  friend class ThreeDGriddedDataFixture_make_linear_hypercube_Test;
+  BtwxtLoggerFn *callback_;
+  void *callback_context_;
   GriddedData *grid_data;
   std::size_t ndims;
   std::vector<double> target;
@@ -64,8 +76,8 @@ private:
   std::vector<Method> previous_methods;
   std::vector<std::vector<short>> hypercube;
   bool reset_hypercube;
-  std::vector<std::vector<double>> weighting_factors; // A set of weighting factors for each dimension
-
+  std::vector<std::vector<double>>
+      weighting_factors; // A set of weighting factors for each dimension
 
   std::vector<std::vector<double>> interp_coeffs;
   std::vector<std::vector<double>> cubic_slope_coeffs;
@@ -86,16 +98,15 @@ private:
 
   void set_hypercube(std::vector<Method> methods);
 
-  std::vector<std::vector<short>>& get_hypercube();
+  std::vector<std::vector<short>> &get_hypercube();
 
   void set_hypercube_values();
 
   void set_results();
 
-  std::map<std::pair<std::size_t,std::size_t>,std::vector<std::vector<double>>> hypercube_cache;
+  std::map<std::pair<std::size_t, std::size_t>, std::vector<std::vector<double>>> hypercube_cache;
 
   std::size_t hypercube_size_hash;
-
 };
 
 // free functions

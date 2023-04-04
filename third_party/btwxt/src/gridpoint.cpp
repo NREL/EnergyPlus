@@ -2,18 +2,18 @@
  * See the LICENSE file for additional terms and conditions. */
 
 // Standard
+#include <algorithm>
 #include <iostream>
 #include <numeric>
-#include <algorithm>
 
 // btwxt
 #include "error.h"
 
+#include "gridpoint.h"
+
 namespace Btwxt {
 
-GridPoint::GridPoint() {}
-
-GridPoint::GridPoint(GriddedData &grid_data_in)
+GridPoint::GridPoint(GriddedData &grid_data_in, BtwxtLoggerFn *logger, void *logger_context)
     : grid_data(&grid_data_in),
       ndims(grid_data->get_ndims()),
       target(ndims, 0.0),
@@ -29,9 +29,14 @@ GridPoint::GridPoint(GriddedData &grid_data_in)
       cubic_slope_coeffs(ndims, std::vector<double>(2, 0.0)),
       results(grid_data->num_tables),
       hypercube_size_hash(0) {
+  if (logger) {
+    callback_ = logger;
+    callback_context_ = logger_context;
+  }
 }
 
-GridPoint::GridPoint(GriddedData &grid_data_in, std::vector<double> v)
+GridPoint::GridPoint(GriddedData &grid_data_in, std::vector<double> v, BtwxtLoggerFn *logger,
+                     void *logger_context)
     : grid_data(&grid_data_in),
       ndims(grid_data->get_ndims()),
       target_is_set(false),
@@ -44,16 +49,19 @@ GridPoint::GridPoint(GriddedData &grid_data_in, std::vector<double> v)
       interp_coeffs(ndims, std::vector<double>(2, 0.0)),
       cubic_slope_coeffs(ndims, std::vector<double>(2, 0.0)),
       results(grid_data->num_tables) {
+  if (logger) {
+    callback_ = logger;
+    callback_context_ = logger_context;
+  }
   set_target(v);
 }
 
 void GridPoint::set_target(const std::vector<double> &v) {
   if (v.size() != ndims) {
-    showMessage(MsgLevel::MSG_ERR,
-                stringify("Target and Gridded Data do not have the same dimensions."));
+    throw BtwxtErr(stringify("Target and Gridded Data do not have the same dimensions."));
   }
   if (target_is_set) {
-    if (std::equal(v.begin(), v.end(), target.begin()) && (methods == grid_data->get_interp_methods())) {
+    if ((v == target) && (methods == grid_data->get_interp_methods())) {
       return;
     }
   }
@@ -66,11 +74,11 @@ void GridPoint::set_target(const std::vector<double> &v) {
   set_results();
 }
 
-std::vector<double> GridPoint::get_current_target() {
-  if (!target_is_set) {
-    showMessage(MsgLevel::MSG_WARN,
-                stringify("The current target was requested, but no target has been set."));
-    return target;
+std::vector<double> GridPoint::get_current_target() const {
+  if (!target_is_set && callback_) {
+    (*callback_)(MsgLevel::MSG_WARN,
+                 stringify("The current target was requested, but no target has been set."),
+                 callback_context_);
   }
   return target;
 }
@@ -95,23 +103,26 @@ void GridPoint::set_floor() {
 }
 
 void GridPoint::set_dim_floor(std::size_t dim) {
-  GridAxis &axis = grid_data->grid_axes[dim];
+  const GridAxis &axis = grid_data->grid_axes[dim];
   std::size_t l = axis.grid.size();
   if (target[dim] < axis.extrapolation_limits.first) {
     is_inbounds[dim] = Bounds::OUTLAW;
     point_floor[dim] = 0u;
   } else if (target[dim] > axis.extrapolation_limits.second) {
     is_inbounds[dim] = Bounds::OUTLAW;
-    point_floor[dim] = std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
+    point_floor[dim] =
+        std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
   } else if (target[dim] < axis.grid[0]) {
     is_inbounds[dim] = Bounds::OUTBOUNDS;
     point_floor[dim] = 0;
   } else if (target[dim] > axis.grid.back()) {
     is_inbounds[dim] = Bounds::OUTBOUNDS;
-    point_floor[dim] = std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
+    point_floor[dim] =
+        std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
   } else if (target[dim] == axis.grid.back()) {
     is_inbounds[dim] = Bounds::INBOUNDS;
-    point_floor[dim] = std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
+    point_floor[dim] =
+        std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
   } else {
     is_inbounds[dim] = Bounds::INBOUNDS;
     std::vector<double>::const_iterator upper =
@@ -146,9 +157,9 @@ void GridPoint::consolidate_methods()
   if (target_is_set) {
     auto extrap_methods = grid_data->get_extrap_methods();
     for (std::size_t dim = 0; dim < ndims; dim++) {
-      if (is_inbounds[dim]==Bounds::OUTBOUNDS) {
+      if (is_inbounds[dim] == Bounds::OUTBOUNDS) {
         methods[dim] = extrap_methods[dim];
-      } else if (is_inbounds[dim]==Bounds::OUTLAW) {
+      } else if (is_inbounds[dim] == Bounds::OUTLAW) {
         // showMessage(MsgLevel::MSG_WARN, stringify("The target is outside the extrapolation limits
         // in dimension ", dim,
         //                                ". Will perform constant extrapolation."));
@@ -164,10 +175,10 @@ void GridPoint::consolidate_methods()
 
 void GridPoint::set_hypercube() { set_hypercube(grid_data->get_interp_methods()); }
 
-void GridPoint::set_hypercube(std::vector<Method> methods) {
-  if (methods.size() != ndims) {
-    showMessage(MsgLevel::MSG_ERR, stringify("Error setting hypercube. Methods vector does not "
-                                             "have the correct number of dimensions."));
+void GridPoint::set_hypercube(std::vector<Method> m_methods) {
+  if (m_methods.size() != ndims) {
+    throw BtwxtErr(stringify("Error setting hypercube. Methods vector does not "
+                             "have the correct number of dimensions."));
   }
   std::size_t previous_size = hypercube.size();
   std::vector<std::vector<int>> options(ndims, {0, 1});
@@ -179,10 +190,10 @@ void GridPoint::set_hypercube(std::vector<Method> methods) {
     if (target_is_set && weights[dim] == 0.0) {
       options[dim] = {0};
       reset_hypercube = true;
-    } else if (methods[dim] == Method::CUBIC) {
+    } else if (m_methods[dim] == Method::CUBIC) {
       options[dim] = {-1, 0, 1, 2};
     }
-    hypercube_size_hash += options[dim].size()*digit;
+    hypercube_size_hash += options[dim].size() * digit;
     digit *= 10;
   }
   hypercube = {{}};
@@ -191,7 +202,7 @@ void GridPoint::set_hypercube(std::vector<Method> methods) {
     for (const auto &x : hypercube) {
       for (const auto item : list) {
         r.push_back(x);
-        r.back().push_back(item);
+        r.back().push_back(static_cast<short>(item));
       }
     }
     hypercube = std::move(r);
@@ -213,8 +224,10 @@ void GridPoint::calculate_interp_coeffs() {
     if (methods[dim] == Method::CUBIC) {
       interp_coeffs[dim][0] = 2 * mu * mu * mu - 3 * mu * mu + 1;
       interp_coeffs[dim][1] = -2 * mu * mu * mu + 3 * mu * mu;
-      cubic_slope_coeffs[dim][0] = (mu * mu * mu - 2 * mu * mu + mu)*grid_data->get_axis_spacing_mult(dim, 0, point_floor[dim]);
-      cubic_slope_coeffs[dim][1] = (mu * mu * mu - mu * mu)*grid_data->get_axis_spacing_mult(dim, 1, point_floor[dim]);
+      cubic_slope_coeffs[dim][0] = (mu * mu * mu - 2 * mu * mu + mu) *
+                                   grid_data->get_axis_spacing_mult(dim, 0, point_floor[dim]);
+      cubic_slope_coeffs[dim][1] =
+          (mu * mu * mu - mu * mu) * grid_data->get_axis_spacing_mult(dim, 1, point_floor[dim]);
     } else {
       if (methods[dim] == Method::CONSTANT) {
         mu = mu < 0 ? 0 : 1;
@@ -237,8 +250,8 @@ void GridPoint::set_hypercube_values() {
     hypercube_values.resize(hypercube.size(), std::vector<double>(grid_data->num_tables));
     hypercube_cache.clear();
   }
-  if (hypercube_cache.count({floor_index,hypercube_size_hash})) {
-    hypercube_values = hypercube_cache.at({floor_index,hypercube_size_hash});
+  if (hypercube_cache.count({floor_index, hypercube_size_hash})) {
+    hypercube_values = hypercube_cache.at({floor_index, hypercube_size_hash});
     return;
   }
   std::size_t hypercube_index = 0;
@@ -246,7 +259,7 @@ void GridPoint::set_hypercube_values() {
     hypercube_values[hypercube_index] = grid_data->get_values_relative(point_floor, v);
     ++hypercube_index;
   }
-  hypercube_cache[{floor_index,hypercube_size_hash}] = hypercube_values;
+  hypercube_cache[{floor_index, hypercube_size_hash}] = hypercube_values;
 }
 
 void GridPoint::set_results() {
@@ -262,13 +275,15 @@ void GridPoint::set_results() {
 }
 
 std::vector<double> GridPoint::get_results() {
-  if (grid_data->num_tables == 0u) {
-    showMessage(MsgLevel::MSG_WARN,
-                stringify("There are no value tables in the gridded data. No results returned."));
+  if (grid_data->num_tables == 0u && callback_) {
+    (*callback_)(MsgLevel::MSG_WARN,
+                 stringify("There are no value tables in the gridded data. No results returned."),
+                 callback_context_);
   }
-  if (!target_is_set) {
-    showMessage(MsgLevel::MSG_WARN,
-                stringify("Results were requested, but no target has been set."));
+  if (!target_is_set && callback_) {
+    (*callback_)(MsgLevel::MSG_WARN,
+                 stringify("Results were requested, but no target has been set."),
+                 callback_context_);
   }
   return results;
 }
@@ -283,12 +298,10 @@ double GridPoint::get_vertex_weight(const std::vector<short> &v) {
 
 void GridPoint::normalize_grid_values_at_target(const double scalar) {
   if (!target_is_set) {
-    showMessage(MsgLevel::MSG_WARN,
-                stringify("Cannot normalize grid values. No target has been set."));
-    return;
+    throw BtwxtErr(stringify("Cannot normalize grid values. No target has been set."));
   }
   for (std::size_t table_index = 0; table_index < grid_data->num_tables; ++table_index) {
-    grid_data->normalize_value_table(table_index,results[table_index]*scalar);
+    grid_data->normalize_value_table(table_index, results[table_index] * scalar);
   }
   hypercube_cache.clear();
   set_results();
@@ -296,17 +309,21 @@ void GridPoint::normalize_grid_values_at_target(const double scalar) {
 
 double GridPoint::normalize_grid_values_at_target(std::size_t table_num, const double scalar) {
   if (!target_is_set) {
-    showMessage(MsgLevel::MSG_WARN,
-                stringify("Cannot normalize grid values. No target has been set."));
-    return scalar;
+    throw BtwxtErr(stringify("Cannot normalize grid values. No target has been set."));
   }
-  // create a scalar which represents the product of the inverted normalization factor and the value in the table at the independent variable reference value
-  double total_scalar = results[table_num]*scalar;
-  grid_data->normalize_value_table(table_num,total_scalar);
+  // create a scalar which represents the product of the inverted normalization factor and the value
+  // in the table at the independent variable reference value
+  double total_scalar = results[table_num] * scalar;
+  grid_data->normalize_value_table(table_num, total_scalar);
   hypercube_cache.clear();
   set_results();
 
   return total_scalar;
+}
+
+void GridPoint::set_logging_callback(BtwxtLoggerFn *callback_function, void *caller_info) {
+  callback_ = callback_function;
+  callback_context_ = caller_info;
 }
 
 } // namespace Btwxt

@@ -5,33 +5,23 @@
 #define GRIDINTERP_H_
 
 // Standard
+#include <functional>
 #include <vector>
 
 // btwxt
+#include "error.h"
 #include "griddeddata.h"
 #include "gridpoint.h"
 
 namespace Btwxt {
 
-enum class MsgLevel { MSG_DEBUG, MSG_INFO, MSG_WARN, MSG_ERR };
-extern int LOG_LEVEL;
-
-typedef void (*BtwxtCallbackFunction)(const MsgLevel messageType, const std::string message,
-                                      void *contextPtr);
-
-extern BtwxtCallbackFunction btwxtCallbackFunction;
-extern void *messageCallbackContextPtr;
-
-void setMessageCallback(BtwxtCallbackFunction callbackFunction, void *contextPtr);
-
 // this will be the public-facing class.
 class RegularGridInterpolator {
 public:
   // GridSpace, GridAxis, AllValueTables, ValueTable are instantiated in RGI constructor.
+  RegularGridInterpolator() = default;
 
-  RegularGridInterpolator();
-
-  explicit RegularGridInterpolator(GriddedData &grid_data);
+  RegularGridInterpolator(const std::vector<std::vector<double>> &grid);
 
   RegularGridInterpolator(const std::vector<std::vector<double>> &grid,
                           const std::vector<std::vector<double>> &values);
@@ -52,12 +42,10 @@ public:
   }
 
   // Add value table to GriddedData
-  std::size_t add_value_table(std::vector<double> &value_vector) {
-    return grid_data.add_value_table(value_vector);
-  }
+  std::size_t add_value_table(const std::vector<double> &value_vector);
 
   // GridPoint gets instantiated inside calculate_value_at_target
-  double get_value_at_target(std::vector<double> target, std::size_t table_index);
+  double get_value_at_target(const std::vector<double>& target, std::size_t table_index);
 
   double operator()(std::vector<double> target, std::size_t table_index) {
     return get_value_at_target(std::move(target), table_index);
@@ -85,21 +73,38 @@ public:
 
   double normalize_values_at_target(std::size_t table_index, const double scalar = 1.0);
 
-  double normalize_values_at_target(std::size_t table_index, const std::vector<double> &target, const double scalar = 1.0);
+  double normalize_values_at_target(std::size_t table_index, const std::vector<double> &target,
+                                    const double scalar = 1.0);
 
-  std::vector<double> get_current_target();
+  std::vector<double> get_current_target() const;
 
   void clear_current_target();
 
-  std::size_t get_ndims();
+  std::size_t get_ndims() const;
+
+  std::size_t get_num_tables() const;
 
   void set_axis_interp_method(std::size_t dim, Method method) {
     grid_data.set_axis_interp_method(dim, method);
   }
 
-  std::vector<std::vector<short>>& get_hypercube();
+  void set_axis_extrap_method(const std::size_t &dim, Method method) {
+    grid_data.set_axis_extrap_method(dim, method);
+  }
+
+  void set_axis_extrap_limits(const std::size_t &dim,
+                              const std::pair<double, double> &extrap_limits) {
+    grid_data.set_axis_extrap_limits(dim, extrap_limits);
+  }
 
   std::pair<double, double> get_axis_limits(int dim);
+
+  BtwxtLoggerFn callback_function_;
+  void *caller_context_;
+
+  void set_logging_callback(BtwxtLoggerFn callback_function, void *caller_info);
+
+  void log_message(MsgLevel messageType, std::string_view message) const;
 
 private:
   GriddedData grid_data;

@@ -15,7 +15,7 @@
 
 using namespace Btwxt;
 
-TEST_F(TwoDFixture, grid_point_basics) {
+TEST_F(TwoDGriddedDataFixture, grid_point_basics) {
   GridPoint grid_point(test_gridded_data, target);
 
   std::vector<std::size_t> point_floor = grid_point.get_floor();
@@ -27,7 +27,7 @@ TEST_F(TwoDFixture, grid_point_basics) {
   EXPECT_EQ(weights, expected_weights);
 }
 
-TEST_F(TwoDFixture, grid_point_out_of_bounds) {
+TEST_F(TwoDGriddedDataFixture, grid_point_out_of_bounds) {
   std::vector<double> oobounds_vector = {16, 3};
   GridPoint grid_point(test_gridded_data, oobounds_vector);
 
@@ -40,7 +40,7 @@ TEST_F(TwoDFixture, grid_point_out_of_bounds) {
   EXPECT_EQ(weights, expected_weights);
 }
 
-TEST_F(TwoDFixture, grid_point_consolidate_methods) {
+TEST_F(TwoDGriddedDataFixture, grid_point_consolidate_methods) {
   GridPoint grid_point(test_gridded_data, target);
 
   std::vector<Method> methods = grid_point.get_methods();
@@ -54,7 +54,7 @@ TEST_F(TwoDFixture, grid_point_consolidate_methods) {
   EXPECT_EQ(methods, expected_methods);
 }
 
-TEST_F(TwoDFixture, grid_point_interp_coeffs) {
+TEST_F(TwoDGriddedDataFixture, grid_point_interp_coeffs) {
   GridPoint grid_point(test_gridded_data, target);
 
   std::vector<std::vector<double>> interp_coeffs = grid_point.get_interp_coeffs();
@@ -68,7 +68,7 @@ TEST_F(TwoDFixture, grid_point_interp_coeffs) {
   EXPECT_EQ(cubic_slope_coeffs[1][1], 0);
 }
 
-TEST_F(CubicFixture, grid_point_interp_coeffs) {
+TEST_F(CubicGriddedDataFixture, grid_point_interp_coeffs) {
   GridPoint grid_point(test_gridded_data, target);
 
   std::vector<std::vector<double>> interp_coeffs = grid_point.get_interp_coeffs();
@@ -79,6 +79,8 @@ TEST_F(CubicFixture, grid_point_interp_coeffs) {
   EXPECT_EQ(interp_coeffs[0][0], 2 * mu * mu * mu - 3 * mu * mu + 1);
   EXPECT_EQ(interp_coeffs[0][1], -2 * mu * mu * mu + 3 * mu * mu);
 
-  EXPECT_EQ(cubic_slope_coeffs[0][0], (mu * mu * mu - 2 * mu * mu + mu)*test_gridded_data.get_axis_spacing_mult(0,0,floor));
-  EXPECT_EQ(cubic_slope_coeffs[0][1], (mu * mu * mu - mu * mu)*test_gridded_data.get_axis_spacing_mult(0,1,floor));
+  EXPECT_EQ(cubic_slope_coeffs[0][0], (mu * mu * mu - 2 * mu * mu + mu) *
+                                          test_gridded_data.get_axis_spacing_mult(0, 0, floor));
+  EXPECT_EQ(cubic_slope_coeffs[0][1],
+            (mu * mu * mu - mu * mu) * test_gridded_data.get_axis_spacing_mult(0, 1, floor));
 }
