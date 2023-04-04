@@ -665,7 +665,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // associate the resource number with each tariff
         if (tariff(iInObj).reportMeterIndx >= 1) {
             tariff(iInObj).resourceNum = static_cast<Constant::eResource>(getEnumerationValue(
-                Constant::ResourceTypeNamesUC,
+                Constant::eResourceNamesUC,
                 UtilityRoutines::MakeUPPERCase(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType)));
         }
     }

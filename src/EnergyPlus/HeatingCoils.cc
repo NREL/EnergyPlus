@@ -675,7 +675,7 @@ namespace HeatingCoils {
             heatingCoil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
             heatingCoil.ResourceType = static_cast<Constant::eResource>(
-                getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(3))));
+                getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(3))));
             if (!(heatingCoil.ResourceType == Constant::eResource::NaturalGas ||
                   heatingCoil.ResourceType == Constant::eResource::Propane ||
                   heatingCoil.ResourceType == Constant::eResource::Diesel ||
@@ -696,7 +696,7 @@ namespace HeatingCoils {
                                        Alphas(1)));
                 state.dataHeatingCoils->InputErrorsFound = true;
             }
-            std::string const FuelType(Constant::ResourceTypeNames[static_cast<int>(heatingCoil.ResourceType)]);
+            std::string const FuelType(Constant::eResourceNames[static_cast<int>(heatingCoil.ResourceType)]);
 
             heatingCoil.Efficiency = Numbers(1);
             heatingCoil.NominalCapacity = Numbers(2);

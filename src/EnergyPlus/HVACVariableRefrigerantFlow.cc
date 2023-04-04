@@ -2322,7 +2322,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         if (!lAlphaFieldBlanks(39)) {
             // A39; \field Fuel type, Validate fuel type input
-            thisVrfSys.FuelTypeNum = static_cast<Constant::eResource>(getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(39))));
+            thisVrfSys.FuelTypeNum =
+                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(39))));
             if (thisVrfSys.FuelTypeNum == Constant::eResource::Invalid) {
                 ShowSevereError(
                     state,
@@ -4859,7 +4860,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     for (int NumCond = 1; NumCond <= state.dataHVACVarRefFlow->NumVRFCond; ++NumCond) {
         auto &thisVrf = state.dataHVACVarRefFlow->VRF(NumCond);
-        std::string_view const sFuelType = Constant::ResourceTypeNames[static_cast<int>(thisVrf.FuelTypeNum)];
+        std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(thisVrf.FuelTypeNum)];
         SetupOutputVariable(state,
                             "VRF Heat Pump Total Cooling Rate",
                             OutputProcessor::Unit::W,
@@ -5048,8 +5049,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         if (thisVrf.DefrostStrategy == StandardRatings::DefrostStrat::Resistive ||
-            (thisVrf.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
-             thisVrf.FuelTypeNum == Constant::eResource::Electricity)) {
+            (thisVrf.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle && thisVrf.FuelTypeNum == Constant::eResource::Electricity)) {
             SetupOutputVariable(state,
                                 "VRF Heat Pump Defrost Electricity Rate",
                                 OutputProcessor::Unit::W,

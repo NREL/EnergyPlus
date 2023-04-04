@@ -4016,8 +4016,8 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // A12; \field Fuel type, Validate fuel type input
-        thisDXCoil.FuelTypeNum = static_cast<Constant::eResource>(
-            getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(12))));
+        thisDXCoil.FuelTypeNum =
+            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(12))));
         if (thisDXCoil.FuelTypeNum == Constant::eResource::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format(",,,invalid choice for {}.  Entered choice = {}", cAlphaFields(12), Alphas(12)));
@@ -4529,8 +4529,8 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // A9; \field Fuel type, Validate fuel type input
-        thisDXCoil.FuelTypeNum = static_cast<Constant::eResource>(
-            getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(9))));
+        thisDXCoil.FuelTypeNum =
+            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(9))));
         if (thisDXCoil.FuelTypeNum == Constant::eResource::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format(",,,invalid choice for {}.  Entered choice = {}", cAlphaFields(9), Alphas(9)));
@@ -6050,7 +6050,7 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System");
 
             if (thisDXCoil.FuelTypeNum != Constant::eResource::Electricity) {
-                std::string_view sFuelType = Constant::ResourceTypeNames[static_cast<int>(thisDXCoil.FuelTypeNum)];
+                std::string_view sFuelType = Constant::eResourceNames[static_cast<int>(thisDXCoil.FuelTypeNum)];
                 SetupOutputVariable(state,
                                     format("Cooling Coil {} Rate", sFuelType),
                                     OutputProcessor::Unit::W,
@@ -6208,7 +6208,7 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System");
 
             if (thisDXCoil.FuelTypeNum != Constant::eResource::Electricity) {
-                std::string_view sFuelType = Constant::ResourceTypeNames[static_cast<int>(thisDXCoil.FuelTypeNum)];
+                std::string_view sFuelType = Constant::eResourceNames[static_cast<int>(thisDXCoil.FuelTypeNum)];
                 SetupOutputVariable(state,
                                     format("Heating Coil {} Rate", sFuelType),
                                     OutputProcessor::Unit::W,
@@ -6232,7 +6232,7 @@ void GetDXCoils(EnergyPlusData &state)
 
             if (thisDXCoil.FuelTypeNum != Constant::eResource::Electricity &&
                 thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
-                std::string_view sFuelType = Constant::ResourceTypeNames[static_cast<int>(thisDXCoil.FuelTypeNum)];
+                std::string_view sFuelType = Constant::eResourceNames[static_cast<int>(thisDXCoil.FuelTypeNum)];
                 SetupOutputVariable(state,
                                     format("Heating Coil Defrost {} Rate", sFuelType),
                                     OutputProcessor::Unit::W,

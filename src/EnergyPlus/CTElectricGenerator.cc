@@ -316,7 +316,8 @@ namespace CTElectricGenerator {
             }
 
             // Validate fuel type input
-            state.dataCTElectricGenerator->CTGenerator(genNum).FuelType = static_cast<Constant::eResource>(getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
+            state.dataCTElectricGenerator->CTGenerator(genNum).FuelType =
+                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
             if (state.dataCTElectricGenerator->CTGenerator(genNum).FuelType == Constant::eResource::Invalid) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), AlphArray(11)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
@@ -358,7 +359,7 @@ namespace CTElectricGenerator {
 
     void CTGeneratorData::setupOutputVars(EnergyPlusData &state)
     {
-        std::string_view const sFuelType = Constant::ResourceTypeNames[static_cast<int>(this->FuelType)];
+        std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Rate",
                             OutputProcessor::Unit::W,

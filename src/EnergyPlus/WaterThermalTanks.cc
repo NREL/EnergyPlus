@@ -2435,7 +2435,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         // Validate Heater Fuel Type
         Tank.FuelType = static_cast<Constant::eResource>(
-            getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+            getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
         switch (Tank.FuelType) {
         case Constant::eResource::Invalid: {
             ShowSevereError(state,
@@ -2498,7 +2498,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         // Validate Off-Cycle Parasitic Fuel Type
         Tank.OffCycParaFuelType = static_cast<Constant::eResource>(
-            getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
+            getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
         switch (Tank.OffCycParaFuelType) {
         case Constant::eResource::Invalid:
             if (state.dataIPShortCut->cAlphaArgs(6).empty()) { // If blank, default to Fuel Type for heater
@@ -2524,7 +2524,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         // Validate On-Cycle Parasitic Fuel Type
         Tank.OnCycParaFuelType = static_cast<Constant::eResource>(
-            getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(7))));
+            getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(7))));
         switch (Tank.OnCycParaFuelType) {
         case Constant::eResource::Invalid:
             if (state.dataIPShortCut->cAlphaArgs(7).empty()) { // If blank, default to Fuel Type for heater
@@ -3006,7 +3006,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         // Validate Heater Fuel Type
         Tank.FuelType = static_cast<Constant::eResource>(
-            getEnumerationValue(Constant::ResourceTypeNamesUC,
+            getEnumerationValue(Constant::eResourceNamesUC,
                                 UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
                                     7)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
         if (Tank.FuelType == Constant::eResource::Invalid) {
@@ -3034,7 +3034,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         // Validate Off-Cycle Parasitic Fuel Type
         Tank.OffCycParaFuelType = static_cast<Constant::eResource>(
-            getEnumerationValue(Constant::ResourceTypeNamesUC,
+            getEnumerationValue(Constant::eResourceNamesUC,
                                 UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
                                     8)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
         if (Tank.OffCycParaFuelType == Constant::eResource::Invalid) {
@@ -3059,7 +3059,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         // Validate On-Cycle Parasitic Fuel Type
         Tank.OnCycParaFuelType = static_cast<Constant::eResource>(getEnumerationValue(
-            Constant::ResourceTypeNamesUC,
+            Constant::eResourceNamesUC,
             UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
                 9)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported/empty
         if (Tank.OnCycParaFuelType == Constant::eResource::Invalid) {
@@ -5436,68 +5436,64 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        format("Water Heater {} Rate", Constant::ResourceTypeNames[static_cast<int>(this->FuelType)]),
+                        format("Water Heater {} Rate", Constant::eResourceNames[static_cast<int>(this->FuelType)]),
                         OutputProcessor::Unit::W,
                         this->FuelRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
-                        format("Water Heater {} Energy", Constant::ResourceTypeNames[static_cast<int>(this->FuelType)]),
+                        format("Water Heater {} Energy", Constant::eResourceNames[static_cast<int>(this->FuelType)]),
                         OutputProcessor::Unit::J,
                         this->FuelEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
-                        Constant::ResourceTypeNames[static_cast<int>(this->FuelType)],
+                        Constant::eResourceNames[static_cast<int>(this->FuelType)],
                         "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
 
-    SetupOutputVariable(
-        state,
-                        format("Water Heater Off Cycle Parasitic {} Rate", Constant::ResourceTypeNames[static_cast<int>(this->OffCycParaFuelType)]),
-        OutputProcessor::Unit::W,
-        this->OffCycParaFuelRate,
-        OutputProcessor::SOVTimeStepType::System,
-        OutputProcessor::SOVStoreType::Average,
-        this->Name);
-    SetupOutputVariable(
-        state,
-                        format("Water Heater Off Cycle Parasitic {} Energy", Constant::ResourceTypeNames[static_cast<int>(this->OffCycParaFuelType)]),
-        OutputProcessor::Unit::J,
-        this->OffCycParaFuelEnergy,
-        OutputProcessor::SOVTimeStepType::System,
-        OutputProcessor::SOVStoreType::Summed,
-        this->Name,
-        _,
-                        Constant::ResourceTypeNames[static_cast<int>(this->OffCycParaFuelType)],
-        "DHW",
-        this->EndUseSubcategoryName,
-        "Plant");
+    SetupOutputVariable(state,
+                        format("Water Heater Off Cycle Parasitic {} Rate", Constant::eResourceNames[static_cast<int>(this->OffCycParaFuelType)]),
+                        OutputProcessor::Unit::W,
+                        this->OffCycParaFuelRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        format("Water Heater Off Cycle Parasitic {} Energy", Constant::eResourceNames[static_cast<int>(this->OffCycParaFuelType)]),
+                        OutputProcessor::Unit::J,
+                        this->OffCycParaFuelEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name,
+                        _,
+                        Constant::eResourceNames[static_cast<int>(this->OffCycParaFuelType)],
+                        "DHW",
+                        this->EndUseSubcategoryName,
+                        "Plant");
 
-    SetupOutputVariable(
-        state,
-                        format("Water Heater On Cycle Parasitic {} Rate", Constant::ResourceTypeNames[static_cast<int>(this->OnCycParaFuelType)]),
-        OutputProcessor::Unit::W,
-        this->OnCycParaFuelRate,
-        OutputProcessor::SOVTimeStepType::System,
-        OutputProcessor::SOVStoreType::Average,
-        this->Name);
-    SetupOutputVariable(
-        state,
-                        format("Water Heater On Cycle Parasitic {} Energy", Constant::ResourceTypeNames[static_cast<int>(this->OnCycParaFuelType)]),
-        OutputProcessor::Unit::J,
-        this->OnCycParaFuelEnergy,
-        OutputProcessor::SOVTimeStepType::System,
-        OutputProcessor::SOVStoreType::Summed,
-        this->Name,
-        _,
-                        Constant::ResourceTypeNames[static_cast<int>(this->OnCycParaFuelType)],
-        "DHW",
-        this->EndUseSubcategoryName,
-        "Plant");
+    SetupOutputVariable(state,
+                        format("Water Heater On Cycle Parasitic {} Rate", Constant::eResourceNames[static_cast<int>(this->OnCycParaFuelType)]),
+                        OutputProcessor::Unit::W,
+                        this->OnCycParaFuelRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        format("Water Heater On Cycle Parasitic {} Energy", Constant::eResourceNames[static_cast<int>(this->OnCycParaFuelType)]),
+                        OutputProcessor::Unit::J,
+                        this->OnCycParaFuelEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name,
+                        _,
+                        Constant::eResourceNames[static_cast<int>(this->OnCycParaFuelType)],
+                        "DHW",
+                        this->EndUseSubcategoryName,
+                        "Plant");
 
     SetupOutputVariable(state,
                         "Water Heater Water Volume Flow Rate",

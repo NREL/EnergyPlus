@@ -107,7 +107,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     }
     // Validate fuel type input
     this->compressorFuelType = static_cast<Constant::eResource>(
-        getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(input_data.compressor_fuel_type)));
+        getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(input_data.compressor_fuel_type)));
     if (this->compressorFuelType == Constant::eResource::Invalid) {
         ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Compressor Fuel Type=\"" + input_data.compressor_fuel_type + "\".");

@@ -857,8 +857,8 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
             //       \key Water
             //       \key OtherFuel1
             //       \key OtherFuel2
-            elcc->UsePriceEscalation(iInObj).resource = static_cast<Constant::eResource>(
-                getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
+            elcc->UsePriceEscalation(iInObj).resource =
+                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
             if (NumAlphas > 3) {
                 ShowWarningError(state, format("In {} contains more alpha fields than expected.", CurrentModuleObject));
             }
@@ -1008,8 +1008,8 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
             //       \key Water
             //       \key OtherFuel1
             //       \key OtherFuel2
-            elcc->UseAdjustment(iInObj).resource = static_cast<Constant::eResource>(
-                getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
+            elcc->UseAdjustment(iInObj).resource =
+                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
             if (NumAlphas > 2) {
                 ShowWarningError(state, format("In {} contains more alpha fields than expected.", CurrentModuleObject));
             }
@@ -1244,7 +1244,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
 
             elcc->CashFlow[cashFlowCounter].Resource = static_cast<Constant::eResource>(iResource);
             elcc->CashFlow[cashFlowCounter].SourceKind = SourceKindType::Resource;
-            elcc->CashFlow[cashFlowCounter].name = Constant::ResourceTypeNames[static_cast<int>(iResource)];
+            elcc->CashFlow[cashFlowCounter].name = Constant::eResourceNames[static_cast<int>(iResource)];
             if (cashFlowCounter <= elcc->numCashFlow) {
                 // put the monthly energy costs into the cashflow prior to adjustments
                 // energy costs (a.k.a. resource costs) start at the start of service and repeat
@@ -1752,7 +1752,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         }
         for (int jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
             columnHead(jObj) = elcc->UsePriceEscalation(jObj).name;
-            tableBody(jObj, 1) = Constant::ResourceTypeNames[static_cast<int>(elcc->UsePriceEscalation(jObj).resource)];
+            tableBody(jObj, 1) = Constant::eResourceNames[static_cast<int>(elcc->UsePriceEscalation(jObj).resource)];
             tableBody(jObj, 2) = format("{} {}",
                                         UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->UsePriceEscalation(jObj).escalationStartMonth)],
                                         elcc->UsePriceEscalation(jObj).escalationStartYear);
@@ -1793,7 +1793,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             }
             for (int jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) { // loop through objects not columns to add names
                 columnHead(jObj) = elcc->UseAdjustment(jObj).name;
-                tableBody(jObj, 1) = Constant::ResourceTypeNames[static_cast<int>(elcc->UseAdjustment(jObj).resource)];
+                tableBody(jObj, 1) = Constant::eResourceNames[static_cast<int>(elcc->UseAdjustment(jObj).resource)];
             }
             for (int jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) {
                 for (int iYear = 1; iYear <= numYears; ++iYear) {

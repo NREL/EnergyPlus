@@ -198,7 +198,7 @@ namespace BoilerSteam {
 
             // Validate fuel type input
             thisBoiler.FuelType = static_cast<Constant::eResource>(
-                getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+                getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
             if (thisBoiler.FuelType == Constant::eResource::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -416,7 +416,7 @@ namespace BoilerSteam {
 
     void BoilerSpecs::setupOutputVars(EnergyPlusData &state)
     {
-        std::string_view sFuelType = Constant::ResourceTypeNames[static_cast<int>(this->FuelType)];
+        std::string_view sFuelType = Constant::eResourceNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Boiler Heating Rate",
                             OutputProcessor::Unit::W,

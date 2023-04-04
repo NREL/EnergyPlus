@@ -2431,7 +2431,7 @@ namespace PlantChillers {
 
             // Validate fuel type input
             thisChiller.FuelType = static_cast<Constant::eResource>(
-                getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(12))));
+                getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(12))));
             if (thisChiller.FuelType == Constant::eResource::Invalid) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -2715,7 +2715,7 @@ namespace PlantChillers {
             }
         }
 
-        std::string_view const sFuelType = Constant::ResourceTypeNames[static_cast<int>(this->FuelType)];
+        std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             format("Chiller {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
@@ -4492,7 +4492,7 @@ namespace PlantChillers {
 
             // Fuel Type Case Statement
             thisChiller.FuelType = static_cast<Constant::eResource>(
-                getEnumerationValue(Constant::ResourceTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
+                getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
             if (thisChiller.FuelType == Constant::eResource::Invalid) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -4714,7 +4714,7 @@ namespace PlantChillers {
                             _,
                             "Plant");
 
-        std::string_view const sFuelType = Constant::ResourceTypeNames[static_cast<int>(this->FuelType)];
+        std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             format("Chiller {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
