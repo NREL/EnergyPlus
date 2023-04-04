@@ -329,7 +329,7 @@ namespace ExternalInterface {
 
     void VerifyExternalInterfaceObject(EnergyPlusData &state);
 
-    Real64 GetCurSimStartTimeSeconds(EnergyPlusData &state);
+    Real64 GetCurSimStartTimeSeconds(const EnergyPlusData &state);
 
     std::string trim(std::string const &str);
 

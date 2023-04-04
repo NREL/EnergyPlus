@@ -83,8 +83,6 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
 // MODULE INFORMATION:
 //       AUTHOR         R. Raustad (FSEC)
 //       DATE WRITTEN   May 2008
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // This module simulates the performance of the revised BLAST
@@ -104,11 +102,11 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
 // Manufacturers performance data can be used to generate the coefficients for the model.
 
 static constexpr std::string_view calcChillerAbsorptionIndirect("CALC Chiller:Absorption:Indirect ");
-auto constexpr waterIndex(1);
+int constexpr waterIndex = 1;
 static constexpr std::string_view fluidNameSteam = "STEAM";
 static constexpr std::string_view fluidNameWater = "WATER";
 
-PlantComponent *IndirectAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+IndirectAbsorberSpecs *IndirectAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data
     if (state.dataChillerIndirectAbsorption->GetInput) {
@@ -116,11 +114,10 @@ PlantComponent *IndirectAbsorberSpecs::factory(EnergyPlusData &state, std::strin
         state.dataChillerIndirectAbsorption->GetInput = false;
     }
     // Now look for this particular object
-    for (auto &thisAbs : state.dataChillerIndirectAbsorption->IndirectAbsorber) {
-        if (thisAbs.Name == objectName) {
-            return &thisAbs;
-        }
-    }
+    auto thisObj = std::find_if(state.dataChillerIndirectAbsorption->IndirectAbsorber.begin(),
+                                state.dataChillerIndirectAbsorption->IndirectAbsorber.end(),
+                                [&objectName](const IndirectAbsorberSpecs &myObj) { return myObj.Name == objectName; });
+    if (thisObj != state.dataChillerIndirectAbsorption->IndirectAbsorber.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalIndirectAbsorptionChillerFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
@@ -889,8 +886,6 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   September 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for initializations of the Indirect Absorption Chiller components
@@ -914,7 +909,7 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
 
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::CWInitConvTemp,
+                                                       Constant::CWInitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 
@@ -924,7 +919,7 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
 
         rho = FluidProperties::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                DataGlobalConstants::CWInitConvTemp,
+                                                Constant::CWInitConvTemp,
                                                 state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                 RoutineName);
 
@@ -940,7 +935,7 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
 
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::HWInitConvTemp,
+                                                        Constant::HWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
                 this->GenMassFlowRateMax = rho * this->GeneratorVolFlowRate;
@@ -999,7 +994,6 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     //       AUTHOR         R. Raustad (FSEC)
     //       DATE WRITTEN   May 2008
     //       MODIFIED       November 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for sizing Indirect Absorption Chiller Components for which capacities and flow rates
@@ -1076,13 +1070,13 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
 
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             tmpNomCap =
@@ -1264,13 +1258,13 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
 
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             tmpCondVolFlowRate =
@@ -1543,7 +1537,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
         } else if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::HWInitConvTemp,
+                                                           Constant::HWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1576,7 +1570,6 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
     //       AUTHOR         R. Raustad (FSEC)
     //       DATE WRITTEN   May 2008
     //       MODIFIED       Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // simulate a vapor compression Absorber using a revised BLAST model
@@ -2091,10 +2084,10 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
     } // IF(GeneratorInletNode .GT. 0)THEN
 
     // convert power to energy
-    this->GeneratorEnergy = this->QGenerator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->PumpingEnergy = this->PumpingPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->GeneratorEnergy = this->QGenerator * state.dataHVACGlobal->TimeStepSysSec;
+    this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSysSec;
+    this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSysSec;
+    this->PumpingEnergy = this->PumpingPower * state.dataHVACGlobal->TimeStepSysSec;
 
     //                              ------
     //                            /        \.

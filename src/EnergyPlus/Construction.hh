@@ -52,9 +52,9 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
 
@@ -88,36 +88,36 @@ namespace Construction {
         Real64 OutsideAbsorpSolar = 0.0;  // Outside Layer solar absorptance of an opaque surface; not used for windows.
         Real64 InsideAbsorpThermal = 0.0; // Inside Layer Thermal absorptance for opaque surfaces or windows;
         // for windows, applies to innermost glass layer
-        Real64 OutsideAbsorpThermal = 0.0;                                                         // Outside Layer Thermal absorptance
-        DataSurfaces::SurfaceRoughness OutsideRoughness = DataSurfaces::SurfaceRoughness::Invalid; // Outside Surface roughness index
-        int DayltPropPtr = 0;                                                                      // Pointer to Daylight Construction Properties
+        Real64 OutsideAbsorpThermal = 0.0;                                                 // Outside Layer Thermal absorptance
+        Material::SurfaceRoughness OutsideRoughness = Material::SurfaceRoughness::Invalid; // Outside Surface roughness index
+        int DayltPropPtr = 0;                                                              // Pointer to Daylight Construction Properties
         int W5FrameDivider = 0; // FrameDivider number for window construction from Window5 data file;
         //  zero is construction not from Window5 file or Window5 construction has no frame.
         // Conductive properties for the construction
-        Array1D<Real64> CTFCross;     // Cross or Y terms of the CTF equation
-        Array1D<Real64> CTFFlux;      // Flux history terms of the CTF equation
-        Array1D<Real64> CTFInside;    // Inside or Z terms of the CTF equation
-        Array1D<Real64> CTFOutside;   // Outside or X terms of the CTF equation
-        Array1D<Real64> CTFSourceIn;  // Heat source/sink inside terms of CTF equation
-        Array1D<Real64> CTFSourceOut; // Heat source/sink outside terms of CTF equation
-        Real64 CTFTimeStep;           // Time increment for stable simulation of construct (could be greater than TimeStep)
+        std::array<Real64, MaxCTFTerms> CTFCross{};     // Cross or Y terms of the CTF equation
+        std::array<Real64, MaxCTFTerms> CTFFlux{};      // Flux history terms of the CTF equation
+        std::array<Real64, MaxCTFTerms> CTFInside{};    // Inside or Z terms of the CTF equation
+        std::array<Real64, MaxCTFTerms> CTFOutside{};   // Outside or X terms of the CTF equation
+        std::array<Real64, MaxCTFTerms> CTFSourceIn{};  // Heat source/sink inside terms of CTF equation
+        std::array<Real64, MaxCTFTerms> CTFSourceOut{}; // Heat source/sink outside terms of CTF equation
+        Real64 CTFTimeStep;                             // Time increment for stable simulation of construct (could be greater than TimeStep)
         // The next three series of terms are used to calculate the temperature at the location of a source/sink
         // in the QTF formulation.  This calculation is necessary to allow the proper simulation of a
         // radiant system.
-        Array1D<Real64> CTFTSourceOut; // Outside terms of the CTF equation for interior temp
+        std::array<Real64, MaxCTFTerms> CTFTSourceOut{}; // Outside terms of the CTF equation for interior temp
         // calc@source location
-        Array1D<Real64> CTFTSourceIn; // Inside terms of the CTF equation for interior temp
+        std::array<Real64, MaxCTFTerms> CTFTSourceIn{}; // Inside terms of the CTF equation for interior temp
         // calc@source location
-        Array1D<Real64> CTFTSourceQ; // Source/sink terms of the CTF equation for interior temp
+        std::array<Real64, MaxCTFTerms> CTFTSourceQ{}; // Source/sink terms of the CTF equation for interior temp
         // calc@source location
         // The next three series of terms are used to calculate the temperature at a location specified by the user.
         // This location must be between two layers and is intended to allow the user to evaluate whether or not
         // condensation is a possibility between material layers.
-        Array1D<Real64> CTFTUserOut; // Outside terms of the CTF equation for interior temp
+        std::array<Real64, MaxCTFTerms> CTFTUserOut{}; // Outside terms of the CTF equation for interior temp
         // calc@user location
-        Array1D<Real64> CTFTUserIn; // Inside terms of the CTF equation for interior temp
+        std::array<Real64, MaxCTFTerms> CTFTUserIn{}; // Inside terms of the CTF equation for interior temp
         // calc@user location
-        Array1D<Real64> CTFTUserSource; // Source/sink terms of the CTF equation for interior temp
+        std::array<Real64, MaxCTFTerms> CTFTUserSource{}; // Source/sink terms of the CTF equation for interior temp
         // calc@user location
         int NumHistories = 0; // CTFTimeStep/TimeStepZone or the number of temp/flux history series
         // for the construction
@@ -271,17 +271,12 @@ namespace Construction {
 
         // Default Constructor
         ConstructionProps()
-            : LayerPoint(MaxLayersInConstruct, 0), CTFCross({0, MaxCTFTerms - 1}, 0.0), CTFFlux(MaxCTFTerms - 1, 0.0),
-              CTFInside({0, MaxCTFTerms - 1}, 0.0), CTFOutside({0, MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, MaxCTFTerms - 1}, 0.0),
-              CTFSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0),
-              CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0), CTFTUserOut({0, MaxCTFTerms - 1}, 0.0), CTFTUserIn({0, MaxCTFTerms - 1}, 0.0),
-              CTFTUserSource({0, MaxCTFTerms - 1}, 0.0), AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0),
-              AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0),
-              AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0), AbsBeamShadeCoef(6, 0.0), BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0),
-              BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0),
-              BlTransDiffVis(DataSurfaces::MaxSlatAngs, 0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0),
-              BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0),
-              BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0), ReflSolBeamFrontCoef(6, 0.0),
+            : LayerPoint(MaxLayersInConstruct, 0), AbsDiffBlind(Material::MaxSlatAngs, 0.0), AbsDiffBlindGnd(Material::MaxSlatAngs, 0.0),
+              AbsDiffBlindSky(Material::MaxSlatAngs, 0.0), AbsDiffBackBlind(Material::MaxSlatAngs, 0.0), AbsBeamShadeCoef(6, 0.0),
+              BlTransDiff(Material::MaxSlatAngs, 0.0), BlTransDiffGnd(Material::MaxSlatAngs, 0.0), BlTransDiffSky(Material::MaxSlatAngs, 0.0),
+              TransDiffVis(0.0), BlTransDiffVis(Material::MaxSlatAngs, 0.0), BlReflectSolDiffBack(Material::MaxSlatAngs, 0.0),
+              BlReflectSolDiffFront(Material::MaxSlatAngs, 0.0), BlReflectVisDiffBack(Material::MaxSlatAngs, 0.0),
+              BlReflectVisDiffFront(Material::MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0), ReflSolBeamFrontCoef(6, 0.0),
               ReflSolBeamBackCoef(6, 0.0), tBareSolDiff(5, 0.0), tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0),
               rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0), abBareSolDiff(5, 0.0),
               AbsDiffFrontEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), AbsDiffBackEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0)

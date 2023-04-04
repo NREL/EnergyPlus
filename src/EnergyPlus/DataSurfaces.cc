@@ -324,7 +324,7 @@ Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) con
     if (ExtBoundCond > 0) {
         value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(ExtBoundCond);
     } else {
-        Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + DataGlobalConstants::KelvinConv;
+        Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + Constant::KelvinConv;
         value = state.dataWindowManager->sigma * pow_4(tout);
         value = ViewFactorSkyIR *
                     (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) +
@@ -732,6 +732,46 @@ Real64 AbsBackSide(EnergyPlusData &state, int SurfNum)
         (state.dataSurface->SurfWinExtBeamAbsByShade(SurfNum) + state.dataSurface->SurfWinExtDiffAbsByShade(SurfNum)) *
         state.dataSurface->SurfWinShadeAbsFacFace2(SurfNum);
     return AbsorptanceFromExteriorBackSide + AbsorptanceFromInteriorBackSide;
+}
+
+void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
+{
+    if (!state.dataHeatBal->AnyVariableAbsorptance) return;
+    for (int surfNum : state.dataSurface->AllHTSurfaceList) {
+        auto const &thisSurface = state.dataSurface->Surface(surfNum);
+        int ConstrNum = thisSurface.Construction;
+        auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+        int TotLayers = thisConstruct.TotLayers;
+        if (TotLayers == 0) continue;
+        int materNum = thisConstruct.LayerPoint(1);
+        if (materNum == 0) continue; // error finding material number
+        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(materNum));
+        assert(thisMaterial != nullptr);
+        if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
+            // check for dynamic coating defined on interior surface
+            if (thisSurface.ExtBoundCond != ExternalEnvironment) {
+                ShowWarningError(state,
+                                 format("MaterialProperty:VariableAbsorptance defined on an interior surface, {}. This VariableAbsorptance property "
+                                        "will be ignored here",
+                                        thisSurface.Name));
+            } else {
+                state.dataSurface->AllVaryAbsOpaqSurfaceList.push_back(surfNum);
+            }
+        }
+    }
+    // check for dynamic coating defined on the non-outside layer of a construction
+    for (int ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
+        auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+        for (int Layer = 2; Layer <= thisConstruct.TotLayers; ++Layer) {
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(Layer)));
+            if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
+                ShowWarningError(state,
+                                 format("MaterialProperty:VariableAbsorptance defined on a inside-layer materials, {}. This VariableAbsorptance "
+                                        "property will be ignored here",
+                                        thisMaterial->Name));
+            }
+        }
+    }
 }
 
 } // namespace EnergyPlus::DataSurfaces

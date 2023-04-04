@@ -37,11 +37,11 @@ jobs:
       contents: write
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
       id: setup-python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ env.Python_REQUIRED_VERSION }}
 
@@ -60,7 +60,8 @@ jobs:
       run: |
         set -x
         echo "Using brew to install mactex and adding it to PATH"
-        brew install --cask mactex
+        brew update
+        brew install --cask mactex-no-gui
         echo "/Library/TeX/texbin" >> $GITHUB_PATH
         # The MACOSX_DEPLOYMENT_TARGET environment variable sets the default value for the CMAKE_OSX_DEPLOYMENT_TARGET variable.
         # We use cmake commands to build some subprojects, so setting it globally

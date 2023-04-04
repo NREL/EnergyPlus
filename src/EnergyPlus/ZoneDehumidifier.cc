@@ -259,7 +259,7 @@ namespace ZoneDehumidifier {
 
             // A2,  \field Availability Schedule Name
             if (lAlphaBlanks(2)) {
-                state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr =
                     GetScheduleIndex(state, Alphas(2)); // Convert schedule name to pointer
@@ -812,7 +812,7 @@ namespace ZoneDehumidifier {
             WaterRemovalVolRate = WaterRemovalRateFactor * state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedWaterRemoval;
 
             WaterRemovalMassRate =
-                WaterRemovalVolRate / (24.0 * DataGlobalConstants::SecInHour * 1000.0) *
+                WaterRemovalVolRate / (24.0 * Constant::SecInHour * 1000.0) *
                 RhoH2O(max((InletAirTemp - 11.0), 1.0)); //(L/d)/(24 hr/day *3600 sec/hr * 1000 L/m3) | Density of water, minimum temp = 1.0C
 
             if (WaterRemovalMassRate > 0.0) {
@@ -1098,45 +1098,27 @@ namespace ZoneDehumidifier {
         // PURPOSE OF THIS SUBROUTINE:
         // Fills some of the report variables for the zone dehumidifiers
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using Psychrometrics::RhoH2O;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
 
         // DERIVED TYPE DEFINITIONS:
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 ReportingConstant; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-        Real64 RhoWater;          // Density of condensate (water) being removed (kg/m3)
-        Real64 InletAirTemp;      // Dry-bulb temperature of air entering the dehumidifier (C)
-        Real64 OutletAirTemp;     // Dry-bulb temperature of air leaving the dehumidifier (C)
-        int AirInletNodeNum;      // Node number corresponding to the air entering dehumidifier
-
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 RhoWater;      // Density of condensate (water) being removed (kg/m3)
+        Real64 InletAirTemp;  // Dry-bulb temperature of air entering the dehumidifier (C)
+        Real64 OutletAirTemp; // Dry-bulb temperature of air leaving the dehumidifier (C)
+        int AirInletNodeNum;  // Node number corresponding to the air entering dehumidifier
 
         state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingEnergy =
-            state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingRate * ReportingConstant;
+            state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingRate * TimeStepSysSec;
         state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).WaterRemoved =
-            state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).WaterRemovalRate * ReportingConstant;
+            state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).WaterRemovalRate * TimeStepSysSec;
         state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).ElecConsumption =
-            state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).ElecPower * ReportingConstant;
+            state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).ElecPower * TimeStepSysSec;
         state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).OffCycleParasiticElecCons =
-            state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).OffCycleParasiticElecPower * ReportingConstant;
+            state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).OffCycleParasiticElecPower * TimeStepSysSec;
 
         // Dehumidifier water collection to water storage tank (if needed)
         if (state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateCollectMode == CondensateOutlet::ToTank) {
@@ -1154,7 +1136,7 @@ namespace ZoneDehumidifier {
             }
 
             state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).DehumidCondVol =
-                state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).DehumidCondVolFlowRate * ReportingConstant;
+                state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).DehumidCondVolFlowRate * TimeStepSysSec;
 
             state.dataWaterData->WaterStorage(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankID)
                 .VdotAvailSupply(state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).CondensateTankSupplyARRID) =

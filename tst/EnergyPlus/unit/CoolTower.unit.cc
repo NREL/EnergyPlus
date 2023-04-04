@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
@@ -92,6 +93,14 @@ TEST_F(EnergyPlusFixture, ExerciseCoolTower)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTC = 1;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 1;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 1;
+
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutWetBulbTemp = 26.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutHumRat =
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
+    state->dataEnvrn->StdRhoAir =
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     state->dataEnvrn->WindSpeed = 20.0;
     CoolTower::ManageCoolTower(*state);
     // auto &thisTower = state->dataCoolTower->CoolTowerSys(1);

@@ -279,7 +279,7 @@ namespace UnitVentilator {
 
             unitVent.Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                unitVent.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                unitVent.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 unitVent.SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (unitVent.SchedPtr == 0) {
@@ -1204,7 +1204,7 @@ namespace UnitVentilator {
 
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::HWInitConvTemp,
+                                                                   Constant::HWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
 
@@ -1961,12 +1961,12 @@ namespace UnitVentilator {
                                 }
                                 rho = FluidProperties::GetDensityGlycol(state,
                                                                         state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidName,
-                                                                        DataGlobalConstants::HWInitConvTemp,
+                                                                        Constant::HWInitConvTemp,
                                                                         state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidIndex,
                                                                         RoutineName);
                                 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                             state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidName,
-                                                                            DataGlobalConstants::HWInitConvTemp,
+                                                                            Constant::HWInitConvTemp,
                                                                             state.dataPlnt->PlantLoop(unitVent.HWplantLoc.loopNum).FluidIndex,
                                                                             RoutineName);
                                 MaxVolHotWaterFlowDes = DesHeatingLoad / (WaterCoilSizDeltaT * Cp * rho);
@@ -3363,13 +3363,13 @@ namespace UnitVentilator {
         //       DATE WRITTEN   May 2000
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
 
-        unitVent.HeatEnergy = unitVent.HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        unitVent.SensCoolEnergy = unitVent.SensCoolPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        unitVent.TotCoolEnergy = unitVent.TotCoolPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        unitVent.ElecEnergy = unitVent.ElecPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        unitVent.HeatEnergy = unitVent.HeatPower * TimeStepSysSec;
+        unitVent.SensCoolEnergy = unitVent.SensCoolPower * TimeStepSysSec;
+        unitVent.TotCoolEnergy = unitVent.TotCoolPower * TimeStepSysSec;
+        unitVent.ElecEnergy = unitVent.ElecPower * TimeStepSysSec;
 
         if (unitVent.FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!state.dataGlobal->SysSizingCalc) {

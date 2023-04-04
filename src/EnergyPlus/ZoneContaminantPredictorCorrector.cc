@@ -1331,7 +1331,7 @@ void GetZoneContaminanSetPoints(EnergyPlusData &state)
         state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedule = state.dataIPShortCut->cAlphaArgs(3);
         if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr =
-                DataGlobalConstants::ScheduleAlwaysOn; // (Returns 1.0)
+                ScheduleManager::ScheduleAlwaysOn; // (Returns 1.0)
         } else {
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr =
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
@@ -1437,7 +1437,7 @@ void GetZoneContaminanSetPoints(EnergyPlusData &state)
         if (NumAlphas > 6) {
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedule = state.dataIPShortCut->cAlphaArgs(7);
             if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr =
                     GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7));
@@ -2052,7 +2052,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // Calculate Co2 from infiltration + humidity added from latent load to determine system added/subtracted moisture.
                 Real64 CO2Gain = state.dataContaminantBalance->ZoneCO2Gain(ZoneNum) * RhoAir * 1.0e6;
 
-                Real64 SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
+                Real64 SysTimeStepInSeconds = Constant::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
                 // Calculate the coefficients for the 3rd Order derivative for final
                 // zone CO2.  The A, B, C coefficients are analogous to the CO2 balance.
@@ -2166,7 +2166,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // to determine system added/subtracted moisture.
                 GCGain = state.dataContaminantBalance->ZoneGCGain(ZoneNum) * RhoAir * 1.0e6;
 
-                Real64 SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
+                Real64 SysTimeStepInSeconds = Constant::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
                 // Calculate the coefficients for the 3rd Order derivative for final
                 // zone GC.  The A, B, C coefficients are analogous to the GC balance.
@@ -2360,7 +2360,7 @@ void InverseModelCO2(EnergyPlusData &state,
     Real64 M_inf(0.0); // Reversely solved infiltration mass flow rate
 
     Real64 SysTimeStepInSeconds(0.0);
-    SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
+    SysTimeStepInSeconds = Constant::SecInHour * state.dataHVACGlobal->TimeStepSys;
 
     state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredCO2Concentration =
         ScheduleManager::GetCurrentScheduleValue(state, state.dataHybridModel->HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
@@ -2414,9 +2414,8 @@ void InverseModelCO2(EnergyPlusData &state,
             }
 
             // Add threshold for air change rate
-            Real64 ACH_inf =
-                max(0.0, min(10.0, M_inf / (CpAir * AirDensity / DataGlobalConstants::SecInHour * state.dataHeatBal->Zone(ZoneNum).Volume)));
-            M_inf = ACH_inf * state.dataHeatBal->Zone(ZoneNum).Volume * AirDensity / DataGlobalConstants::SecInHour;
+            Real64 ACH_inf = max(0.0, min(10.0, M_inf / (CpAir * AirDensity / Constant::SecInHour * state.dataHeatBal->Zone(ZoneNum).Volume)));
+            M_inf = ACH_inf * state.dataHeatBal->Zone(ZoneNum).Volume * AirDensity / Constant::SecInHour;
             state.dataHeatBal->Zone(ZoneNum).MCPIHM = M_inf;
             state.dataHeatBal->Zone(ZoneNum).InfilOAAirChangeRateHM = ACH_inf;
         }
@@ -2642,7 +2641,7 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             ZoneMassFlowRate += node.MassFlowRate / ZoneMult;
         }
 
-        Real64 SysTimeStepInSeconds = DataGlobalConstants::SecInHour * state.dataHVACGlobal->TimeStepSys;
+        Real64 SysTimeStepInSeconds = Constant::SecInHour * state.dataHVACGlobal->TimeStepSys;
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
         // Calculate the coefficients for the 3rd order derivative for final

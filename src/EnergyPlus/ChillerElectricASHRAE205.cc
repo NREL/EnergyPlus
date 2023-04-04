@@ -135,7 +135,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
 
     state.dataChillerElectricASHRAE205->Electric205Chiller.allocate(numElectric205Chillers);
 
-    auto const ChillerInstances = ip->epJSON.find(state.dataIPShortCut->cCurrentModuleObject).value();
+    auto const &ChillerInstances = ip->epJSON.find(state.dataIPShortCut->cCurrentModuleObject).value();
     int ChillerNum{0};
     auto const &objectSchemaProps = ip->getObjectSchemaProps(state, state.dataIPShortCut->cCurrentModuleObject);
     for (auto &instance : ChillerInstances.items()) {
@@ -171,7 +171,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         thisChiller.InterpolationType =
             InterpMethods[UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
 
-        const auto compressorSequence = thisChiller.Representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number;
+        const auto &compressorSequence = thisChiller.Representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number;
         // minmax_element is sound but perhaps overkill; as sequence numbers are required by A205 to be in ascending order
         const auto minmaxSequenceNum = std::minmax_element(compressorSequence.begin(), compressorSequence.end());
         thisChiller.MinSequenceNumber = *(minmaxSequenceNum.first);
@@ -276,7 +276,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         }
 
         {
-            auto tmpFlowRate = fields.at("chilled_water_maximum_requested_flow_rate");
+            auto &tmpFlowRate = fields.at("chilled_water_maximum_requested_flow_rate");
             if (tmpFlowRate == "Autosize") {
                 thisChiller.EvapVolFlowRate = DataSizing::AutoSize;
                 thisChiller.EvapVolFlowRateWasAutoSized = true;
@@ -285,7 +285,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             }
         }
         {
-            auto tmpFlowRate = fields.at("condenser_maximum_requested_flow_rate");
+            auto &tmpFlowRate = fields.at("condenser_maximum_requested_flow_rate");
             if (tmpFlowRate == "Autosize") {
                 thisChiller.CondVolFlowRate = DataSizing::AutoSize;
                 thisChiller.CondVolFlowRateWasAutoSized = true;
@@ -458,11 +458,10 @@ ASHRAE205ChillerSpecs *ASHRAE205ChillerSpecs::factory(EnergyPlusData &state, std
         getChillerASHRAE205Input(state);
         state.dataChillerElectricASHRAE205->getInputFlag = false;
     }
-    for (auto &obj : state.dataChillerElectricASHRAE205->Electric205Chiller) {
-        if (obj.Name == objectName) {
-            return &obj;
-        }
-    }
+    auto thisObj = std::find_if(state.dataChillerElectricASHRAE205->Electric205Chiller.begin(),
+                                state.dataChillerElectricASHRAE205->Electric205Chiller.end(),
+                                [&objectName](const ASHRAE205ChillerSpecs &myObj) { return myObj.Name == objectName; });
+    if (thisObj != state.dataChillerElectricASHRAE205->Electric205Chiller.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("ASHRAE205ChillerSpecs::factory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     return nullptr;                                                                                                         // LCOV_EXCL_LINE
@@ -615,7 +614,7 @@ void ASHRAE205ChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag
     if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::CWInitConvTemp,
+                                                       Constant::CWInitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 
@@ -636,7 +635,7 @@ void ASHRAE205ChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag
         if (this->OilCoolerInletNode) {
             Real64 rho_oil_cooler = FluidProperties::GetDensityGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->OCPlantLoc.loopNum).FluidName,
-                                                                      DataGlobalConstants::InitConvTemp,
+                                                                      Constant::InitConvTemp,
                                                                       state.dataPlnt->PlantLoop(this->OCPlantLoc.loopNum).FluidIndex,
                                                                       RoutineName);
             this->OilCoolerMassFlowRate = rho_oil_cooler * this->OilCoolerVolFlowRate;
@@ -645,7 +644,7 @@ void ASHRAE205ChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag
         if (this->AuxiliaryHeatInletNode) {
             Real64 rho_aux = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->AHPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::InitConvTemp,
+                                                               Constant::InitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->AHPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
             this->AuxiliaryMassFlowRate = rho_aux * this->AuxiliaryVolFlowRate;
@@ -790,7 +789,7 @@ void ASHRAE205ChillerSpecs::size([[maybe_unused]] EnergyPlusData &state)
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -886,9 +885,9 @@ void ASHRAE205ChillerSpecs::size([[maybe_unused]] EnergyPlusData &state)
     // TODO: Determine actual rated flow rates instead of design flow rates
     this->RefCap = this->Representation->performance.performance_map_cooling
                        .calculate_performance(this->EvapVolFlowRate,
-                                              this->TempRefEvapOut + DataGlobalConstants::KelvinConv,
+                                              this->TempRefEvapOut + Constant::KelvinConv,
                                               this->CondVolFlowRate,
-                                              this->TempRefCondIn + DataGlobalConstants::KelvinConv,
+                                              this->TempRefCondIn + Constant::KelvinConv,
                                               this->MaxSequenceNumber,
                                               this->InterpolationType)
                        .net_evaporator_capacity;
@@ -897,13 +896,13 @@ void ASHRAE205ChillerSpecs::size([[maybe_unused]] EnergyPlusData &state)
         if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * tmpEvapVolFlowRate;
@@ -1280,7 +1279,7 @@ void ASHRAE205ChillerSpecs::findEvaporatorMassFlowRate(EnergyPlusData &state, Re
 
     const Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                          state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                         DataGlobalConstants::CWInitConvTemp,
+                                                         Constant::CWInitConvTemp,
                                                          state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                          RoutineName);
 
@@ -1425,17 +1424,17 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     // Available chiller capacity is capacity at the highest sequence number; i.e. max chiller capacity
     const Real64 maximumChillerCap = this->Representation->performance.performance_map_cooling
                                          .calculate_performance(this->EvapVolFlowRate,
-                                                                this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
+                                                                this->EvapOutletTemp + Constant::KelvinConv,
                                                                 this->CondVolFlowRate,
-                                                                this->CondInletTemp + DataGlobalConstants::KelvinConv,
+                                                                this->CondInletTemp + Constant::KelvinConv,
                                                                 this->MaxSequenceNumber,
                                                                 this->InterpolationType)
                                          .net_evaporator_capacity;
     const Real64 minimumChillerCap = this->Representation->performance.performance_map_cooling
                                          .calculate_performance(this->EvapVolFlowRate,
-                                                                this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
+                                                                this->EvapOutletTemp + Constant::KelvinConv,
                                                                 this->CondVolFlowRate,
-                                                                this->CondInletTemp + DataGlobalConstants::KelvinConv,
+                                                                this->CondInletTemp + Constant::KelvinConv,
                                                                 this->MinSequenceNumber,
                                                                 this->InterpolationType)
                                          .net_evaporator_capacity;
@@ -1459,9 +1458,9 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
         auto f = [MyLoad, this](Real64 partLoadSeqNum) {
             this->QEvaporator = this->Representation->performance.performance_map_cooling
                                     .calculate_performance(this->EvapVolFlowRate,
-                                                           this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
+                                                           this->EvapOutletTemp + Constant::KelvinConv,
                                                            this->CondVolFlowRate,
-                                                           this->CondInletTemp + DataGlobalConstants::KelvinConv,
+                                                           this->CondInletTemp + Constant::KelvinConv,
                                                            partLoadSeqNum,
                                                            this->InterpolationType)
                                     .net_evaporator_capacity;
@@ -1481,11 +1480,11 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     }
 
     // Use performance map to get the rest of results at new sequence number
-    auto lookupVariablesCooling =
+    auto lookupVariablesCooling = // This is a struct returned by value, relying on RVO (THIS_AUTO_OK)
         this->Representation->performance.performance_map_cooling.calculate_performance(this->EvapVolFlowRate,
-                                                                                        this->EvapOutletTemp + DataGlobalConstants::KelvinConv,
+                                                                                        this->EvapOutletTemp + Constant::KelvinConv,
                                                                                         this->CondVolFlowRate,
-                                                                                        this->CondInletTemp + DataGlobalConstants::KelvinConv,
+                                                                                        this->CondInletTemp + Constant::KelvinConv,
                                                                                         partLoadSeqNum,
                                                                                         this->InterpolationType);
     this->QEvaporator = lookupVariablesCooling.net_evaporator_capacity * this->ChillerCyclingRatio;
@@ -1513,7 +1512,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
         }
 #endif // 0
 
-    auto cd = this->Representation->performance.cycling_degradation_coefficient;
+    Real64 cd = this->Representation->performance.cycling_degradation_coefficient;
     Real64 cyclingFactor{(1.0 - cd) + (cd * this->ChillerCyclingRatio)};
     Real64 runtimeFactor{this->ChillerCyclingRatio / cyclingFactor};
     this->Power = lookupVariablesCooling.input_power * runtimeFactor + ((1 - this->ChillerCyclingRatio) * standbyPower);
@@ -1539,7 +1538,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
 
     // Oil cooler and Auxiliary Heat delta-T calculations
     if (this->OilCoolerInletNode) {
-        auto oilCoolerDeltaTemp{0.0};
+        Real64 oilCoolerDeltaTemp = 0.0;
         PlantUtilities::SetComponentFlowRate(
             state, this->OilCoolerMassFlowRate, this->OilCoolerInletNode, this->OilCoolerOutletNode, this->OCPlantLoc);
 
@@ -1557,7 +1556,7 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
         state.dataLoopNodes->Node(this->OilCoolerOutletNode).Temp = state.dataLoopNodes->Node(this->OilCoolerInletNode).Temp - oilCoolerDeltaTemp;
     }
     if (this->AuxiliaryHeatInletNode) {
-        auto auxiliaryDeltaTemp{0.0};
+        Real64 auxiliaryDeltaTemp = 0.0;
         PlantUtilities::SetComponentFlowRate(
             state, this->AuxiliaryMassFlowRate, this->AuxiliaryHeatInletNode, this->AuxiliaryHeatOutletNode, this->AHPlantLoc);
 
@@ -1615,10 +1614,10 @@ void ASHRAE205ChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad, b
         state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
         // Set node flow rates;  for these load based models
         // assume that sufficient evaporator flow rate is available
-        this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->OilCoolerEnergy = this->QOilCooler * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->AuxiliaryEnergy = this->QAuxiliary * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSysSec;
+        this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSysSec;
+        this->OilCoolerEnergy = this->QOilCooler * state.dataHVACGlobal->TimeStepSysSec;
+        this->AuxiliaryEnergy = this->QAuxiliary * state.dataHVACGlobal->TimeStepSysSec;
         this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
         this->CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
@@ -1630,8 +1629,8 @@ void ASHRAE205ChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad, b
     }
 
     // Calculate in case of standby power
-    this->AmbientZoneGainEnergy = this->AmbientZoneGain * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->AmbientZoneGainEnergy = this->AmbientZoneGain * state.dataHVACGlobal->TimeStepSysSec;
+    this->Energy = this->Power * state.dataHVACGlobal->TimeStepSysSec;
 }
 
 void ASHRAE205ChillerSpecs::simulate(
@@ -1663,9 +1662,9 @@ void ASHRAE205ChillerSpecs::getDesignCapacities(
     if (calledFromLocation.loopNum == this->CWPlantLoc.loopNum) {
         MinLoad = this->Representation->performance.performance_map_cooling
                       .calculate_performance(this->EvapVolFlowRate,
-                                             this->TempRefEvapOut + DataGlobalConstants::KelvinConv,
+                                             this->TempRefEvapOut + Constant::KelvinConv,
                                              this->CondVolFlowRate,
-                                             this->TempRefCondIn + DataGlobalConstants::KelvinConv,
+                                             this->TempRefCondIn + Constant::KelvinConv,
                                              this->MinSequenceNumber,
                                              this->InterpolationType)
                       .net_evaporator_capacity;

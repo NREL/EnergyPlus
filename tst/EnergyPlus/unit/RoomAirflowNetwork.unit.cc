@@ -148,6 +148,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     int ZoneNum = 1;
     int RoomAirNode;
     state->dataHVACGlobal->TimeStepSys = 15.0 / 60.0;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens = 1;
 
@@ -554,8 +555,8 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
     ErrorsFound = false;
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);

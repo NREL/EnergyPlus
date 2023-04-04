@@ -278,7 +278,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
         FuelType.FuelTypeNames(Loop) = state.dataIPShortCut->cAlphaArgs(1);
 
         {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelType.FuelTypeNames(Loop)));
+            std::string const &SELECT_CASE_var = FuelType.FuelTypeNames(Loop);
             if (SELECT_CASE_var == "NATURALGAS") {
                 if (Pollution.NatGasCoef.FuelFactorUsed) {
                     ShowWarningError(
@@ -2184,7 +2184,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
         if (FuelType.FuelTypeNames(Loop).empty()) continue;
 
         {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelType.FuelTypeNames(Loop)));
+            std::string const &SELECT_CASE_var = FuelType.FuelTypeNames(Loop);
             if (SELECT_CASE_var == "NATURALGAS") {
                 // Pollutants from Natural Gas
                 SetupOutputVariable(state,
@@ -6185,7 +6185,7 @@ void ReadEnergyMeters(EnergyPlusData &state)
     // This routine reads the meters for the energy used
 
     // Using/Aliasing
-    auto &FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
+    Real64 FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &Pollution = state.dataPollutionModule->Pollution;

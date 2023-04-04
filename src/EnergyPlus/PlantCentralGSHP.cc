@@ -315,13 +315,13 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                 if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpEvapVolFlowRate > 0.0) {
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                                       DataGlobalConstants::CWInitConvTemp,
+                                                                       Constant::CWInitConvTemp,
                                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                        RoutineName);
 
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   Constant::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
                     tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * tmpEvapVolFlowRate;
@@ -416,7 +416,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                 if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->GLHEPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   Constant::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->GLHEPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
                     // TODO: JM 2018-12-06 I wonder why Cp isn't calculated at the same temp as rho...
@@ -703,12 +703,12 @@ void GetWrapperInput(EnergyPlusData &state)
                     state.dataIPShortCut->cAlphaArgs(loop);
                 state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperComponentName = state.dataIPShortCut->cAlphaArgs(loop + 1);
                 if (state.dataIPShortCut->lAlphaFieldBlanks(loop + 2)) {
-                    state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr =
                         ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(loop + 2));
                     if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr == 0) {
-                        state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = ScheduleManager::ScheduleAlwaysOn;
                         ShowWarningError(state, "Chiller Heater Modules Control Schedule Name not found");
                         ShowContinueError(state,
                                           format(" for {}= {}",
@@ -1511,7 +1511,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                 ShowContinueError(state, "EIR as a function of PLR curve output at various part-load ratios shown below:");
                 ShowContinueError(state, "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
 
-                const auto curve_output = fmt::format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ","));
+                std::string const curve_output = fmt::format("Curve Output = {:7.2F}", fmt::join(CurveValArray, ","));
                 ShowContinueError(state, curve_output);
 
                 CHErrorsFound = true;
@@ -1699,7 +1699,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
@@ -1913,7 +1913,7 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
             // Hot water temperature is known, but evaporator mass flow rates will be adjusted in the following "Do" loop
             Real64 InitDensity = FluidProperties::GetDensityGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   Constant::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
             Real64 EvapDensity = FluidProperties::GetDensityGlycol(state,
@@ -2354,7 +2354,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
             // Hot water temperature is known, but condenser mass flow rates will be adjusted in the following "Do" loop
             Real64 InitDensity = FluidProperties::GetDensityGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   Constant::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
             Real64 EvapDensity = FluidProperties::GetDensityGlycol(state,
@@ -3425,7 +3425,7 @@ void WrapperSpecs::UpdateChillerRecords(EnergyPlusData &state) // Wrapper number
     Real64 SecInTimeStep; // Number of seconds per HVAC system time step, to convert from W (J/s) to J
     int ChillerHeaterNum; // Chiller heater number
 
-    SecInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    SecInTimeStep = state.dataHVACGlobal->TimeStepSysSec;
 
     for (ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
         this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoad =
@@ -3451,7 +3451,7 @@ void WrapperSpecs::UpdateChillerHeaterRecords(EnergyPlusData &state) // Wrapper 
     //       DATE WRITTEN:    Feb 2013
 
     // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-    Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSysSec;
 
     for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
         this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoad =

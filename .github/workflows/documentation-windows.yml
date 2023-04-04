@@ -15,10 +15,10 @@ jobs:
 
     steps:
     - name: Checkout EnergyPlus
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Python 3.7
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.7
 
@@ -103,14 +103,14 @@ jobs:
 
     - name: Upload entire pdf folder
       if: ${{ always() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: InputOutputReference
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/
 
     - name: Upload log folder upon failure
       if: ${{ failure() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Xelatex_Logs_after_all
         path: C:\Users\runneradmin\AppData\Local\MiKTeX\miktex\log\

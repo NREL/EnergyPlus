@@ -117,7 +117,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
     state->dataFurnaces->Furnace(FurnaceNum).IdleMassFlowRate = 0.2;
     state->dataFurnaces->Furnace(FurnaceNum).IdleSpeedRatio = 0.2;
-    state->dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
     state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = 1;
 
     state->dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(1) = 0.25;
@@ -283,6 +283,10 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.branchNum = 1;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.compNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolTotal = 30000.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCOPCoolAtRatedCdts = 3.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapHeat = 30000.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCOPHeatAtRatedCdts = 3.0;
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirInletNodeNum = 3;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirOutletNodeNum = 2;
@@ -292,6 +296,10 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.branchNum = 1;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.compNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCapCoolTotal = 30000.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCOPCoolAtRatedCdts = 3.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCapHeat = 30000.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCOPHeatAtRatedCdts = 3.0;
 
     // set up plant loop
     state->dataPlnt->TotNumLoops = 2;

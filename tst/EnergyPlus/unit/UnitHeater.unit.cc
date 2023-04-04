@@ -1125,6 +1125,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
 
     state->dataLoopNodes->MoreNodeInfo.allocate(20);
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
 
@@ -1152,12 +1153,12 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     HWMaxVolFlowRate = state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
     HWDensity = GetDensityGlycol(*state,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidName,
-                                 DataGlobalConstants::HWInitConvTemp,
+                                 Constant::HWInitConvTemp,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidIndex,
                                  "xxx");
     CpHW = GetSpecificHeatGlycol(*state,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidName,
-                                 DataGlobalConstants::HWInitConvTemp,
+                                 Constant::HWInitConvTemp,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidIndex,
                                  "xxx");
     HWPlantDeltaTDesign = state->dataSize->PlantSizData(PltSizHeatNum).DeltaT;

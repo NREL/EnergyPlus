@@ -110,19 +110,18 @@ namespace NonZoneEquipmentManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterHeaterNum; // Water heater object number
-        auto &NumOfWaterHeater = state.dataGlobal->NumOfWaterHeater;
         auto &CountNonZoneEquip = state.dataGlobal->CountNonZoneEquip;
 
         if (CountNonZoneEquip) {
-            NumOfWaterHeater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WaterHeater:Mixed") +
-                               state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WaterHeater:Stratified");
+            state.dataGlobal->NumOfWaterHeater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WaterHeater:Mixed") +
+                                                 state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "WaterHeater:Stratified");
             CountNonZoneEquip = false;
         }
 
         SimulateWaterUse(state, FirstHVACIteration); // simulate non-plant loop water use.
 
         if (!state.dataGlobal->ZoneSizingCalc) {
-            for (WaterHeaterNum = 1; WaterHeaterNum <= NumOfWaterHeater; ++WaterHeaterNum) {
+            for (WaterHeaterNum = 1; WaterHeaterNum <= state.dataGlobal->NumOfWaterHeater; ++WaterHeaterNum) {
                 SimulateWaterHeaterStandAlone(state, WaterHeaterNum, FirstHVACIteration);
             }
         }

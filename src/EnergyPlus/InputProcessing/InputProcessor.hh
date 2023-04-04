@@ -137,6 +137,8 @@ public:
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
+    const json &getJSONObjectItem(EnergyPlusData &state, std::string_view ObjType, std::string_view ObjName);
+
     void getObjectItem(EnergyPlusData &state,
                        std::string_view Object,
                        int const Number,
@@ -150,7 +152,7 @@ public:
                        ObjexxFCL::Optional<Array1D_string> AlphaFieldNames = _,
                        ObjexxFCL::Optional<Array1D_string> NumericFieldNames = _);
 
-    int getIDFObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
+    int getIDFObjNum(EnergyPlusData &state, std::string_view Object, int const Number);
 
     int getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
 
@@ -160,7 +162,7 @@ public:
     );
 
     int getObjectItemNum(EnergyPlusData &state,
-                         std::string const &ObjType,     // Object Type (ref: IDD Objects)
+                         std::string_view ObjType,       // Object Type (ref: IDD Objects)
                          std::string const &NameTypeVal, // Object "name" field type ( used as search key )
                          std::string const &ObjName      // Name of the object type
     );
@@ -303,14 +305,17 @@ private:
 
     json const &getPatternProperties(EnergyPlusData &state, json const &schema_obj);
 
-    inline std::string convertToUpper(std::string s)
+    inline std::string convertToUpper(std::string_view s)
     {
+        std::string s2;
         size_t len = s.size();
+        s2.resize(len);
         for (size_t i = 0; i < len; ++i) {
             char c = s[i];
-            s[i] = ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ASCII only
+            s2[i] = ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ASCII only
         }
-        return s;
+        s2[len] = '\0';
+        return s2;
     }
 
     using UnorderedObjectTypeMap = std::unordered_map<std::string, std::string>;
@@ -326,8 +331,12 @@ public:
     json epJSON;
 
 private:
+    // Maps OBJECTTYPE to ObjectType (example entry: {"ZONEHVAC:EQUIPMENTLIST", "ZoneHVAC:EquipmentList"})
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
+    // Maps ObjectType to ObjectCache (json::const_iterator const &schemaIterator, std::vector<json::const_iterator> const &inputObjectIterators)
     UnorderedObjectCacheMap objectCacheMap;
+
+    // ObjectType to vector of ObjectName
     UnusedObjectSet unusedInputs;
     char s[129] = {0};
 

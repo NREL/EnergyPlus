@@ -271,6 +271,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataBranchNodeConnections->CompSets(2).ParentCName = "AirSystem";
 
     state->dataEnvrn->OutDryBulbTemp = 30.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     OutputReportPredefined::SetPredefinedTables(*state);
     Psychrometrics::InitializePsychRoutines(*state);
     createCoilSelectionReportObj(*state);
@@ -658,7 +659,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-    EXPECT_EQ("ASHRAE90VARIABLEFAN", thisFanCoil.CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::ASHRAE, thisFanCoil.CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:ONOFF", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);

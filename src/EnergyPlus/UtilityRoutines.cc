@@ -127,15 +127,15 @@ namespace UtilityRoutines {
 
         if (String.empty()) return rProcessNumber;
 
-        auto const front_trim(String.find_first_not_of(' '));
-        auto const back_trim(String.find_last_not_of(' '));
+        size_t const front_trim = String.find_first_not_of(' ');
+        size_t const back_trim = String.find_last_not_of(' ');
         if (front_trim == std::string::npos || back_trim == std::string::npos) {
             return rProcessNumber;
         } else {
             String = String.substr(front_trim, back_trim - front_trim + 1);
         }
 
-        auto result = fast_float::from_chars(String.data(), String.data() + String.size(), rProcessNumber);
+        auto result = fast_float::from_chars(String.data(), String.data() + String.size(), rProcessNumber); // (AUTO_OK_OBJ)
         size_t remaining_size = result.ptr - String.data();
         if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
             rProcessNumber = 0.0;
@@ -466,7 +466,7 @@ namespace UtilityRoutines {
         // PURPOSE OF THIS FUNCTION:
         // Validates fuel types and sets output strings
 
-        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelTypeInput));
+        std::string const SELECT_CASE_var = UtilityRoutines::MakeUPPERCase(FuelTypeInput);
 
         if (SELECT_CASE_var == "ELECTRICITY") {
             FuelTypeOutput = "Electricity";
@@ -519,7 +519,7 @@ namespace UtilityRoutines {
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
-                                                   DataGlobalConstants::ResourceType &FuelTypeNum,
+                                                   Constant::ResourceType &FuelTypeNum,
                                                    bool &FuelTypeErrorsFound)
     {
         // FUNCTION INFORMATION:
@@ -527,49 +527,49 @@ namespace UtilityRoutines {
         //       DATE WRITTEN   May 2020
 
         // PURPOSE OF THIS FUNCTION:
-        // Validates fuel types and sets output strings with DataGlobalConstants::AssignResourceTypeNum() (Boilers.cc and boilerSteam.cc)
+        // Validates fuel types and sets output strings with Constant::AssignResourceTypeNum() (Boilers.cc and boilerSteam.cc)
 
-        auto const SELECT_CASE_var(FuelTypeInput);
+        std::string const SELECT_CASE_var = FuelTypeInput;
 
         if (SELECT_CASE_var == "ELECTRICITY") {
             FuelTypeOutput = "Electricity";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
+            FuelTypeNum = Constant::AssignResourceTypeNum("ELECTRICITY");
 
         } else if (SELECT_CASE_var == "NATURALGAS") {
             FuelTypeOutput = "NaturalGas";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
+            FuelTypeNum = Constant::AssignResourceTypeNum("NATURALGAS");
 
         } else if (SELECT_CASE_var == "DIESEL") {
             FuelTypeOutput = "Diesel";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
+            FuelTypeNum = Constant::AssignResourceTypeNum("DIESEL");
 
         } else if (SELECT_CASE_var == "GASOLINE") {
             FuelTypeOutput = "Gasoline";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
+            FuelTypeNum = Constant::AssignResourceTypeNum("GASOLINE");
 
         } else if (SELECT_CASE_var == "COAL") {
             FuelTypeOutput = "Coal";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("COAL");
+            FuelTypeNum = Constant::AssignResourceTypeNum("COAL");
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
             FuelTypeOutput = "FuelOilNo1";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO1");
+            FuelTypeNum = Constant::AssignResourceTypeNum("FUELOILNO1");
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
             FuelTypeOutput = "FuelOilNo2";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO2");
+            FuelTypeNum = Constant::AssignResourceTypeNum("FUELOILNO2");
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
+            FuelTypeNum = Constant::AssignResourceTypeNum("PROPANE");
 
         } else if (SELECT_CASE_var == "OTHERFUEL1") {
             FuelTypeOutput = "OtherFuel1";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
+            FuelTypeNum = Constant::AssignResourceTypeNum("OTHERFUEL1");
 
         } else if (SELECT_CASE_var == "OTHERFUEL2") {
             FuelTypeOutput = "OtherFuel2";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
+            FuelTypeNum = Constant::AssignResourceTypeNum("OTHERFUEL2");
 
         } else {
             FuelTypeErrorsFound = true;
@@ -723,7 +723,7 @@ int AbortEnergyPlus(EnergyPlusData &state)
     state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
     Seconds = state.dataSysVars->Elapsed_Time;
     if (Seconds < 0.0) Seconds = 0.0;
-    const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
+    const std::string Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
     state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
     state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
@@ -861,7 +861,7 @@ int EndEnergyPlus(EnergyPlusData &state)
     state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
     Seconds = state.dataSysVars->Elapsed_Time;
     if (Seconds < 0.0) Seconds = 0.0;
-    const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
+    const std::string Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
     state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
     state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
@@ -1206,12 +1206,12 @@ void ShowContinueErrorTimeStamp(EnergyPlusData &state, std::string const &Messag
     }
 
     if (len(Message) < 50) {
-        const auto m = format("{}{}{}, at Simulation time={} {}",
-                              Message,
-                              cEnvHeader,
-                              state.dataEnvrn->EnvironmentName,
-                              state.dataEnvrn->CurMnDy,
-                              CreateSysTimeIntervalString(state));
+        const std::string m = format("{}{}{}, at Simulation time={} {}",
+                                     Message,
+                                     cEnvHeader,
+                                     state.dataEnvrn->EnvironmentName,
+                                     state.dataEnvrn->CurMnDy,
+                                     CreateSysTimeIntervalString(state));
 
         ShowErrorMessage(state, format(" **   ~~~   ** {}", m), OutUnit1, OutUnit2);
         if (state.dataSQLiteProcedures->sqlite) {
@@ -1221,11 +1221,11 @@ void ShowContinueErrorTimeStamp(EnergyPlusData &state, std::string const &Messag
             state.dataGlobal->errorCallback(Error::Continue, m);
         }
     } else {
-        const auto postfix = format("{}{}, at Simulation time={} {}",
-                                    cEnvHeader,
-                                    state.dataEnvrn->EnvironmentName,
-                                    state.dataEnvrn->CurMnDy,
-                                    CreateSysTimeIntervalString(state));
+        const std::string postfix = format("{}{}, at Simulation time={} {}",
+                                           cEnvHeader,
+                                           state.dataEnvrn->EnvironmentName,
+                                           state.dataEnvrn->CurMnDy,
+                                           CreateSysTimeIntervalString(state));
         ShowErrorMessage(state, format(" **   ~~~   ** {}", Message));
         ShowErrorMessage(state, format(" **   ~~~   ** {}", postfix), OutUnit1, OutUnit2);
         if (state.dataSQLiteProcedures->sqlite) {
@@ -1700,7 +1700,7 @@ void ShowRecurringErrors(EnergyPlusData &state)
         ShowMessage(state, "===== Recurring Error Summary =====");
         ShowMessage(state, "The following recurring error messages occurred.");
         for (Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
-            auto const &error(state.dataErrTracking->RecurringErrors(Loop));
+            auto const &error = state.dataErrTracking->RecurringErrors(Loop);
             // Suppress reporting the count if it is a continue error
             if (has_prefix(error.Message, " **   ~~~   ** ")) {
                 ShowMessage(state, error.Message);
@@ -1711,8 +1711,8 @@ void ShowRecurringErrors(EnergyPlusData &state)
                     state.dataGlobal->errorCallback(Error::Continue, error.Message);
                 }
             } else {
-                const auto warning = has_prefix(error.Message, " ** Warning ** ");
-                const auto severe = has_prefix(error.Message, " ** Severe  ** ");
+                const bool warning = has_prefix(error.Message, " ** Warning ** ");
+                const bool severe = has_prefix(error.Message, " ** Severe  ** ");
 
                 ShowMessage(state, "");
                 ShowMessage(state, error.Message);

@@ -385,7 +385,7 @@ namespace InternalHeatGains {
 
                     // Number of people calculation method.
                     {
-                        auto const peopleMethod(IHGAlphas(4));
+                        std::string const &peopleMethod = IHGAlphas(4);
                         if (peopleMethod == "PEOPLE") {
                             // Set space load fraction
                             Real64 spaceFrac = 1.0;
@@ -528,7 +528,7 @@ namespace InternalHeatGains {
                     if (IHGNumNumbers >= 5 && !IHGNumericFieldBlanks(5)) {
                         thisPeople.UserSpecSensFrac = IHGNumbers(5);
                     } else {
-                        thisPeople.UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
+                        thisPeople.UserSpecSensFrac = Constant::AutoCalculate;
                     }
 
                     if (IHGNumNumbers >= 6 && !IHGNumericFieldBlanks(6)) {
@@ -675,7 +675,7 @@ namespace InternalHeatGains {
                         for (int OptionNum = NumFirstTCModel; OptionNum <= lastOption; ++OptionNum) {
 
                             {
-                                auto const thermalComfortType(IHGAlphas(OptionNum));
+                                std::string const &thermalComfortType = IHGAlphas(OptionNum);
 
                                 if (thermalComfortType == "FANGER") {
                                     thisPeople.Fanger = true;
@@ -740,7 +740,7 @@ namespace InternalHeatGains {
 
                             // MRT Calculation Type and Surface Name
                             {
-                                auto const mrtType(IHGAlphas(7));
+                                std::string const &mrtType = IHGAlphas(7);
 
                                 if (mrtType == "ZONEAVERAGED") {
                                     thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
@@ -1286,7 +1286,7 @@ namespace InternalHeatGains {
                     // Lights Design Level calculation method.
                     {
                         // Set space load fraction
-                        auto const lightingLevel(IHGAlphas(4));
+                        std::string const &lightingLevel = IHGAlphas(4);
                         if (lightingLevel == "LIGHTINGLEVEL") {
                             Real64 spaceFrac = 1.0;
                             if (thisLightsInput.numOfSpaces > 1) {
@@ -1724,7 +1724,7 @@ namespace InternalHeatGains {
 
                     // Electric equipment design level calculation method.
                     {
-                        auto const equipmentLevel(IHGAlphas(4));
+                        std::string const &equipmentLevel = IHGAlphas(4);
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
                             Real64 spaceFrac = 1.0;
                             if (thisElecEqInput.numOfSpaces > 1) {
@@ -1968,7 +1968,7 @@ namespace InternalHeatGains {
 
                     // Gas equipment design level calculation method.
                     {
-                        auto const equipmentLevel(IHGAlphas(4));
+                        std::string const &equipmentLevel = IHGAlphas(4);
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
                             Real64 spaceFrac = 1.0;
                             if (thisGasEqInput.numOfSpaces > 1) {
@@ -2232,7 +2232,7 @@ namespace InternalHeatGains {
 
                     // Hot Water equipment design level calculation method.
                     {
-                        auto const equipmentLevel(IHGAlphas(4));
+                        std::string const &equipmentLevel = IHGAlphas(4);
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
                             Real64 spaceFrac = 1.0;
                             if (thisHWEqInput.numOfSpaces > 1) {
@@ -2468,7 +2468,7 @@ namespace InternalHeatGains {
 
                     // Steam equipment design level calculation method.
                     {
-                        auto const equipmentLevel(IHGAlphas(4));
+                        std::string const &equipmentLevel = IHGAlphas(4);
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
                             Real64 spaceFrac = 1.0;
                             if (thisStmEqInput.numOfSpaces > 1) {
@@ -2686,7 +2686,7 @@ namespace InternalHeatGains {
                         thisZoneOthEq.otherEquipFuelTypeString = FuelTypeString; // Save for output variable setup later
                         // Build list of fuel types used in each zone and space (excluding None and Water)
                         bool found = false;
-                        for (auto fuelType : state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums) {
+                        for (ExteriorEnergyUse::ExteriorFuelUsage fuelType : state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums) {
                             if (thisZoneOthEq.OtherEquipFuelType == fuelType) {
                                 found = true;
                                 break;
@@ -2697,7 +2697,7 @@ namespace InternalHeatGains {
                             state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames.emplace_back(FuelTypeString);
                         }
                         found = false;
-                        for (auto fuelType : state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums) {
+                        for (ExteriorEnergyUse::ExteriorFuelUsage fuelType : state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums) {
                             if (thisZoneOthEq.OtherEquipFuelType == fuelType) {
                                 found = true;
                                 break;
@@ -2735,7 +2735,7 @@ namespace InternalHeatGains {
                     // equipment design level calculation method.
                     unsigned int DesignLevelFieldNumber;
                     {
-                        auto const equipmentLevel(IHGAlphas(5));
+                        std::string const &equipmentLevel = IHGAlphas(5);
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
                             DesignLevelFieldNumber = 1;
                             Real64 spaceFrac = 1.0;
@@ -2962,7 +2962,7 @@ namespace InternalHeatGains {
                     }
 
                     {
-                        auto const equipmentLevel(IHGAlphas(4));
+                        std::string const &equipmentLevel = IHGAlphas(4);
                         if (equipmentLevel == "WATTS/UNIT") {
                             Real64 spaceFrac = 1.0;
                             if (thisITEqInput.numOfSpaces > 1) {
@@ -3048,7 +3048,7 @@ namespace InternalHeatGains {
                         }
 
                         if (IHGAlphaFieldBlanks(5)) {
-                            thisZoneITEq.OperSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                            thisZoneITEq.OperSchedPtr = ScheduleManager::ScheduleAlwaysOn;
                         } else {
                             thisZoneITEq.OperSchedPtr = GetScheduleIndex(state, IHGAlphas(5));
                         }
@@ -3089,7 +3089,7 @@ namespace InternalHeatGains {
                         }
 
                         if (IHGAlphaFieldBlanks(6)) {
-                            thisZoneITEq.CPULoadSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                            thisZoneITEq.CPULoadSchedPtr = ScheduleManager::ScheduleAlwaysOn;
                         } else {
                             thisZoneITEq.CPULoadSchedPtr = GetScheduleIndex(state, IHGAlphas(6));
                         }
@@ -3247,7 +3247,7 @@ namespace InternalHeatGains {
                         if (zoneEqIndex > 0) { // zoneEqIndex could be zero in the case of an uncontrolled zone
                             auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.begin();
                             auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.end();
-                            auto key = thisZoneITEq.SupplyAirNodeNum;
+                            int key = thisZoneITEq.SupplyAirNodeNum;
                             thisZoneITEq.inControlledZone = true;
                             bool supplyNodeFound = false;
                             if (std::find(itStart, itEnd, key) != itEnd) {
@@ -3755,7 +3755,7 @@ namespace InternalHeatGains {
 
             print(state.files.eio, "{:.3R},", state.dataHeatBal->People(Loop).FractionRadiant);
             print(state.files.eio, "{:.3R},", state.dataHeatBal->People(Loop).FractionConvected);
-            if (state.dataHeatBal->People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate) {
+            if (state.dataHeatBal->People(Loop).UserSpecSensFrac == Constant::AutoCalculate) {
                 print(state.files.eio, "AutoCalculate,");
             } else {
                 print(state.files.eio, "{:.3R},", state.dataHeatBal->People(Loop).UserSpecSensFrac);
@@ -4135,7 +4135,7 @@ namespace InternalHeatGains {
     }
 
     void setupIHGZonesAndSpaces(EnergyPlusData &state,
-                                const std::string objectType,
+                                const std::string &objectType,
                                 EPVector<InternalHeatGains::GlobalInternalGainMiscObject> &inputObjects,
                                 int &numInputObjects,
                                 int &numGainInstances,
@@ -7339,7 +7339,7 @@ namespace InternalHeatGains {
                 ActivityLevel_WperPerson = GetCurrentScheduleValue(state, state.dataHeatBal->People(Loop).ActivityLevelPtr);
                 TotalPeopleGain = NumberOccupants * ActivityLevel_WperPerson;
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
-                if (state.dataHeatBal->People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate) {
+                if (state.dataHeatBal->People(Loop).UserSpecSensFrac == Constant::AutoCalculate) {
                     Real64 airTemp = thisZoneHB.MAT;
                     if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
                         if (state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ)) {
@@ -7699,7 +7699,7 @@ namespace InternalHeatGains {
                 int const lastSurf = thisSpace.HTSurfaceLast;
                 if (firstSurf <= 0) continue;
                 for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-                    auto &thisEnclosure(state.dataViewFactor->EnclRadInfo(state.dataSurface->Surface(SurfNum).RadEnclIndex));
+                    auto &thisEnclosure = state.dataViewFactor->EnclRadInfo(state.dataSurface->Surface(SurfNum).RadEnclIndex);
 
                     if (!state.dataGlobal->doLoadComponentPulseNow) {
                         state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) =
@@ -8181,7 +8181,7 @@ namespace InternalHeatGains {
                     state.dataHeatBal->ZoneRpt(it->first).ITEAdjReturnTemp = state.dataHeatBal->Zone(it->first).AdjustedReturnTempByITE;
                 }
             }
-            it++;
+            ++it;
         }
 
     } // End CalcZoneITEq
@@ -8233,7 +8233,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->Lights(Loop).TotGainEnergy = state.dataHeatBal->Lights(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
             if (!state.dataGlobal->WarmupFlag) {
                 if (state.dataGlobal->DoOutputReporting && state.dataOutRptTab->WriteTabularFiles &&
-                    (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
+                    (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumulate the total electricity used for each Light object
                     state.dataHeatBal->Lights(Loop).SumConsumption += state.dataHeatBal->Lights(Loop).Consumption;
                     // for tabular report, accumulate the time when each Light has consumption (using a very small threshold instead of zero)

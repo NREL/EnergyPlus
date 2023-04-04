@@ -286,7 +286,7 @@ void GetPlantLoopData(EnergyPlusData &state)
     // Using/Aliasing
     using ScheduleManager::GetScheduleIndex;
     using SetPointManager::IsNodeOnSetPtManager;
-    auto localTempSetPt = SetPointManager::CtrlVarType::Temp;
+    SetPointManager::CtrlVarType localTempSetPt = SetPointManager::CtrlVarType::Temp;
     using NodeInputManager::GetOnlySingleNode;
     using namespace BranchInputManager;
     using DataSizing::AutoSize;
@@ -429,8 +429,8 @@ void GetPlantLoopData(EnergyPlusData &state)
         // correct loop temperature step.  Loop data is read in supply side, but the volume is not used in
         // a calculation there.
         this_loop.Volume = Num(5);
-        if (state.dataIPShortCut->lNumericFieldBlanks(5)) this_loop.Volume = DataGlobalConstants::AutoCalculate;
-        if (this_loop.Volume == DataGlobalConstants::AutoCalculate) {
+        if (state.dataIPShortCut->lNumericFieldBlanks(5)) this_loop.Volume = Constant::AutoCalculate;
+        if (this_loop.Volume == Constant::AutoCalculate) {
             this_loop.VolumeWasAutoSized = true;
         }
         // circulation time used to autocalculate loop volume
@@ -1176,6 +1176,18 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                         break;
                     }
+                    case PlantEquipmentType::HeatPumpFuelFiredHeating: {
+                        this_comp.compPtr = EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::factory(
+                            state, PlantEquipmentType::HeatPumpFuelFiredHeating, CompNames(CompNum));
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
+                        break;
+                    }
+                    case PlantEquipmentType::HeatPumpFuelFiredCooling: {
+                        this_comp.compPtr = EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::factory(
+                            state, PlantEquipmentType::HeatPumpFuelFiredCooling, CompNames(CompNum));
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
+                        break;
+                    }
                     case PlantEquipmentType::HeatPumpVRF: {
                         if (LoopSideNum == LoopSideLocation::Demand) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
@@ -1837,7 +1849,7 @@ void GetPlantInput(EnergyPlusData &state)
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     //                    auto &this_comp_type(CompTypes(CompNum));
                     auto &this_comp(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
-                    auto type = this_comp.TypeOf;
+                    // auto type = this_comp.TypeOf;
                     this_comp.oneTimeInit(state);
                 }
             }
@@ -3159,11 +3171,8 @@ void SizePlantLoop(EnergyPlusData &state,
 
     // should now have plant volume, calculate plant volume's mass for fluid type
     if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Water) {
-        FluidDensity = GetDensityGlycol(state,
-                                        state.dataPlnt->PlantLoop(LoopNum).FluidName,
-                                        DataGlobalConstants::InitConvTemp,
-                                        state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
-                                        RoutineName);
+        FluidDensity = GetDensityGlycol(
+            state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Constant::InitConvTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
     } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Steam) {
         FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
     } else {
@@ -3297,11 +3306,8 @@ void ResizePlantLoopLevelSizes(EnergyPlusData &state, int const LoopNum // Suppl
 
     // should now have plant volume, calculate plant volume's mass for fluid type
     if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Water) {
-        FluidDensity = GetDensityGlycol(state,
-                                        state.dataPlnt->PlantLoop(LoopNum).FluidName,
-                                        DataGlobalConstants::InitConvTemp,
-                                        state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
-                                        RoutineName);
+        FluidDensity = GetDensityGlycol(
+            state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Constant::InitConvTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
     } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Steam) {
         FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
     } else {
@@ -4199,6 +4205,17 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                     } break;
                     case DataPlant::PlantEquipmentType::HeatPumpEIRCooling:
                     case PlantEquipmentType::HeatPumpEIRHeating: { // 95, 96
+                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
+                        if (LoopSideCtr == LoopSideLocation::Demand) {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
+                        } else {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
+                        }
+                    } break;
+                    case DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling:
+                    case PlantEquipmentType::HeatPumpFuelFiredHeating: {
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         if (LoopSideCtr == LoopSideLocation::Demand) {
                             this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;

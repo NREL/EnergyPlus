@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -71,6 +72,7 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/WaterManager.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -402,7 +404,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     Coil.DXCoilType = "Coil:Heating:DX:MultiSpeed";
     Coil.DXCoilType_Num = CoilDX_MultiSpeedHeating;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
 
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataHeatBal->HeatReclaimDXCoil.allocate(state->dataDXCoils->NumDXCoils);
@@ -449,7 +451,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
     Coil.FuelType = "Electricity";
-    Coil.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
+    Coil.FuelTypeNum = Constant::ResourceType::Electricity;
     Coil.RegionNum = 4;
     Coil.MSRatedTotCap(1) = 2202.5268975202675;
     Coil.MSRatedCOP(1) = 4.200635910578916;
@@ -782,7 +784,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     state->dataLoopNodes->Node.allocate(1);
     Coil.AirOutNode = 1;
 
@@ -804,7 +806,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
     Coil.FuelType = "Electricity";
-    Coil.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
+    Coil.FuelTypeNum = Constant::ResourceType::Electricity;
     Coil.RegionNum = 4;
 
     state->dataCurveManager->allocateCurveVector(5);
@@ -1301,14 +1303,14 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     GetDXCoils(*state);
 
     EXPECT_EQ("Electricity", state->dataDXCoils->DXCoil(1).FuelType); // it also covers a test for fuel type input
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Electricity, state->dataDXCoils->DXCoil(1).FuelTypeNum));
+    EXPECT_TRUE(compare_enums(Constant::ResourceType::Electricity, state->dataDXCoils->DXCoil(1).FuelTypeNum));
     EXPECT_EQ(0, state->dataDXCoils->DXCoil(1).MSWasteHeat(2));
 
     // Test calculations of the waste heat function #5162
 
     // Case 2 test waste heat is zero when the parent has not heat recovery inputs
     state->dataDXCoils->DXCoil(1).FuelType = "NaturalGas";
-    state->dataDXCoils->DXCoil(1).FuelTypeNum = DataGlobalConstants::ResourceType::Natural_Gas;
+    state->dataDXCoils->DXCoil(1).FuelTypeNum = Constant::ResourceType::Natural_Gas;
     state->dataDXCoils->DXCoil(1).MSHPHeatRecActive = false;
 
     state->dataEnvrn->OutDryBulbTemp = 35;
@@ -4014,7 +4016,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     auto &AirOutletNode = state->dataLoopNodes->Node(2);
     // set coil parameters
     Coil.DXCoilType_Num = CoilDX_CoolingSingleSpeed;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.RatedTotCap(1) = 17580.0;
     Coil.RatedCOP(1) = 3.0;
     Coil.RatedEIR(1) = 1.0 / Coil.RatedCOP(1);
@@ -4121,6 +4123,22 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
+
+    // set storage tank for testing
+    state->dataWaterData->NumWaterStorageTanks = 1;
+    state->dataWaterData->WaterStorage.allocate(state->dataWaterData->NumWaterStorageTanks);
+    Coil.CondensateCollectMode = CondensateCollectAction::ToTank;
+    state->dataWaterData->WaterStorage(1).VdotAvailSupply.allocate(1);
+    state->dataWaterData->WaterStorage(1).TwaterSupply.allocate(1);
+    Coil.CondensateTankID = 1;
+    Coil.CondensateTankSupplyARRID = 1;
+    // calculate condensate vol flow rate
+    Real64 waterDensity = Psychrometrics::RhoH2O((Coil.InletAirTemp + Coil.OutletAirTemp) / 2.0);
+    Real64 results_condenstateVdot = Coil.InletAirMassFlowRate * (Coil.InletAirHumRat - Coil.OutletAirHumRat) / waterDensity;
+    Coil.DXCoilType = "Coil:Cooling:DX:SingleSpeed";
+    ReportDXCoil(*state, DXCoilNum);
+    // check condensate volume flow rate
+    EXPECT_NEAR(results_condenstateVdot, Coil.CondensateVdot, 1.0E-11);
 }
 
 TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
@@ -4150,7 +4168,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
 
     Coil.DXCoilType_Num = CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.NumOfSpeeds = 2;
     Coil.MSRatedTotCap.allocate(Coil.NumOfSpeeds);
     Coil.MSRatedSHR.allocate(Coil.NumOfSpeeds);
@@ -4330,6 +4348,21 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
+
+    // set storage tank for testing
+    state->dataWaterData->NumWaterStorageTanks = 1;
+    state->dataWaterData->WaterStorage.allocate(state->dataWaterData->NumWaterStorageTanks);
+    Coil.CondensateCollectMode = CondensateCollectAction::ToTank;
+    state->dataWaterData->WaterStorage(1).VdotAvailSupply.allocate(1);
+    state->dataWaterData->WaterStorage(1).TwaterSupply.allocate(1);
+    Coil.CondensateTankID = 1;
+    Coil.CondensateTankSupplyARRID = 1;
+    // calculate condensate vol flow rate
+    Real64 waterDensity = Psychrometrics::RhoH2O((Coil.InletAirTemp + Coil.OutletAirTemp) / 2.0);
+    Real64 results_condenstateVdot = Coil.InletAirMassFlowRate * (Coil.InletAirHumRat - Coil.OutletAirHumRat) / waterDensity;
+    ReportDXCoil(*state, DXCoilNum);
+    // check condensate volume flow rate
+    EXPECT_NEAR(results_condenstateVdot, Coil.CondensateVdot, 1.0E-11);
 }
 
 TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)

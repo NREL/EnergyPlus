@@ -1003,7 +1003,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->Zone(state->dataHeatBal->People(1).ZonePtr).TotOccupants = state->dataHeatBal->People(1).NumberOfPeople;
     state->dataHeatBal->People(1).FractionRadiant = 0.3;
     state->dataHeatBal->People(1).FractionConvected = 1.0 - state->dataHeatBal->People(1).FractionRadiant;
-    state->dataHeatBal->People(1).UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
+    state->dataHeatBal->People(1).UserSpecSensFrac = Constant::AutoCalculate;
     state->dataHeatBal->People(1).CO2RateFactor = 3.82e-8;
     state->dataHeatBal->People(1).Show55Warning = true;
     state->dataHeatBal->People(1).Pierce = true;

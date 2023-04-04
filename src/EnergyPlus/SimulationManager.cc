@@ -363,12 +363,11 @@ namespace SimulationManager {
 
             if (!Available) break;
             if (ErrorsFound) break;
-            if ((!state.dataGlobal->DoDesDaySim) && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
-            if ((!state.dataGlobal->DoWeathSim) && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) continue;
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay)
-                continue; // don't run these here, only for sizing simulations
+            if ((!state.dataGlobal->DoDesDaySim) && (state.dataGlobal->KindOfSim != Constant::KindOfSim::RunPeriodWeather)) continue;
+            if ((!state.dataGlobal->DoWeathSim) && (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) continue;
+            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
 
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign)
+            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeRunPeriodDesign)
                 continue; // don't run these here, only for sizing simulations
 
             ++EnvCount;
@@ -427,7 +426,7 @@ namespace SimulationManager {
                     state.dataReportFlag->cWarmupDay = fmt::to_string(state.dataReportFlag->NumOfWarmupDays);
                     DisplayString(state, "Warming up {" + state.dataReportFlag->cWarmupDay + '}');
                 } else if (state.dataGlobal->DayOfSim == 1) {
-                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                    if (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
                         DisplayString(state, "Starting Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
                     } else {
                         DisplayString(state, "Starting Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
@@ -436,7 +435,7 @@ namespace SimulationManager {
                     print(state.files.eio, Format_700, state.dataReportFlag->NumOfWarmupDays);
                     OutputProcessor::ResetAccumulationWhenWarmupComplete(state);
                 } else if (state.dataReportFlag->DisplayPerfSimulationFlag) {
-                    if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                    if (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
                         DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
                     } else {
                         DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
@@ -820,7 +819,7 @@ namespace SimulationManager {
 
         state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
         state.dataGlobal->MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
-        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * Constant::SecInHour;
 
         CurrentModuleObject = "ConvergenceLimits";
         Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -912,8 +911,7 @@ namespace SimulationManager {
 
                     auto diagnosticsExtensibles = fields.find("diagnostics");
                     if (diagnosticsExtensibles != fields.end()) {
-                        auto diagnosticsExtensiblesArray = diagnosticsExtensibles.value();
-                        for (auto diagnosticsExtensible : diagnosticsExtensiblesArray) {
+                        for (auto &diagnosticsExtensible : diagnosticsExtensibles.value()) {
 
                             // We want to avoid cryptic failures such as this one: "[json.exception.out_of_range.403] key 'key' not found"
                             // Which happens if you put an "empty" entry in the extensible portion
@@ -1187,7 +1185,7 @@ namespace SimulationManager {
                         state.dataGlobal->NumOfTimeStepInHour = 1;
                         state.dataGlobal->TimeStepZone = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
                         state.dataGlobal->MinutesPerTimeStep = state.dataGlobal->TimeStepZone * 60;
-                        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                        state.dataGlobal->TimeStepZoneSec = state.dataGlobal->TimeStepZone * Constant::SecInHour;
                         state.dataGlobal->OverrideTimestep = true;
                     }
                     if (overrideZoneAirHeatBalAlg) {
@@ -1582,7 +1580,7 @@ namespace SimulationManager {
 
     std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const fs::path &filePath, std::ios_base::openmode mode)
     {
-        auto result = std::make_unique<std::ofstream>(filePath, mode);
+        auto result = std::make_unique<std::ofstream>(filePath, mode); // (AUTO_OK_UPTR)
         if (!result->good()) {
             ShowFatalError(state, format("OpenOutputFiles: Could not open file {} for output (write).", filePath.string()));
         }
@@ -1593,13 +1591,13 @@ namespace SimulationManager {
     {
         std::unique_ptr<fmt::ostream> result = nullptr;
 #ifdef _WIN32
-        auto filePathStr = filePath.string();
-        auto path = filePathStr.c_str();
+        std::string filePathStr = filePath.string();
+        const char *path = filePathStr.c_str();
 #else
-        auto path = filePath.c_str();
+        const char *path = filePath.c_str();
 #endif
         try {
-            auto f = fmt::output_file(path, fmt::buffer_size = (2 << 17));
+            auto f = fmt::output_file(path, fmt::buffer_size = (2 << 17)); // (AUTO_OK_OBJ)
             result = std::make_unique<fmt::ostream>(std::move(f));
         } catch (const std::system_error &error) {
             ShowSevereError(state, error.what());
@@ -1672,7 +1670,7 @@ namespace SimulationManager {
         std::string cIDFSetThreads;
 
         state.files.audit.ensure_open(state, "CloseOutputFiles", state.files.outputControl.audit);
-        constexpr static auto variable_fmt{" {}={:12}\n"};
+        constexpr static std::string_view variable_fmt = " {}={:12}\n";
         // Record some items on the audit file
         print(state.files.audit, variable_fmt, "NumOfRVariable", state.dataOutputProcessor->NumOfRVariable_Setup);
         print(state.files.audit, variable_fmt, "NumOfRVariable(Total)", state.dataOutputProcessor->NumTotalRVariable);
@@ -2076,18 +2074,18 @@ namespace SimulationManager {
         // return air paths, controlled zones.
         // This information should be useful in diagnosing node connection input errors.
 
-        constexpr static auto errstring("**error**");
+        static constexpr std::string_view errstring = "**error**";
 
         // Formats
-        static constexpr std::string_view Format_700("! <#Component Sets>,<Number of Component Sets>");
-        static constexpr std::string_view Format_702("! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,<Component "
-                                                     "Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>");
-        static constexpr std::string_view Format_720("! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>");
-        static constexpr std::string_view Format_722(
-            "! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>");
-        static constexpr std::string_view Format_723(
+        static constexpr std::string_view Format_700 = "! <#Component Sets>,<Number of Component Sets>";
+        static constexpr std::string_view Format_702 = "! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,<Component "
+                                                       "Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>";
+        static constexpr std::string_view Format_720 = "! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>";
+        static constexpr std::string_view Format_722 =
+            "! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>";
+        static constexpr std::string_view Format_723 =
             "! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,<Zone Name>,<Heating "
-            "Priority>,<Cooling Priority>");
+            "Priority>,<Cooling Priority>";
 
         // Report outside air node names on the Branch-Node Details file
         print(state.files.bnd, "{}\n", "! ===============================================================");
@@ -2438,7 +2436,7 @@ namespace SimulationManager {
 
                 //  Plant Supply Side Mixer
                 if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
-                    const auto totalInletNodes = state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
+                    const int totalInletNodes = state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
                     print(state.files.bnd,
                           "   Plant Loop Connector,Mixer,{},{},{},{}\n",
                           state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
@@ -2531,7 +2529,7 @@ namespace SimulationManager {
                       state.dataZoneEquip->ZoneEquipConfig(Count).NumExhaustNodes,
                       state.dataZoneEquip->ZoneEquipConfig(Count).NumReturnNodes);
                 for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumInletNodes; ++Count1) {
-                    auto ChrName = state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNode);
+                    std::string ChrName = state.dataLoopNodes->NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNode);
                     if (ChrName == "Undefined") ChrName = "N/A";
                     print(state.files.bnd,
                           "   Controlled Zone Inlet,{},{},{},{},{}\n",

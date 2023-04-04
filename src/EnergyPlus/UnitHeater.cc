@@ -302,7 +302,7 @@ namespace UnitHeater {
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name = Alphas(1);
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
-                state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr == 0) {
@@ -878,7 +878,7 @@ namespace UnitHeater {
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::WaterHeatingCoil) {
                 rho = GetDensityGlycol(state,
                                        state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidName,
-                                       DataGlobalConstants::HWInitConvTemp,
+                                       Constant::HWInitConvTemp,
                                        state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
@@ -1041,8 +1041,8 @@ namespace UnitHeater {
         Real64 WaterCoilSizDeltaT;      // water coil deltaT for design water flow rate autosizing
         int CoilNum;                    // index of water coil object
 
-        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
-        auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
+        auto &ZoneEqSizing = state.dataSize->ZoneEqSizing;
+        auto &CurZoneEqNum = state.dataSize->CurZoneEqNum;
 
         PltSizHeatNum = 0;
         ErrorsFound = false;
@@ -1253,13 +1253,13 @@ namespace UnitHeater {
                                 rho = GetDensityGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidName,
-                                    DataGlobalConstants::HWInitConvTemp,
+                                    Constant::HWInitConvTemp,
                                     state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidIndex,
                                     RoutineName);
                                 Cp = GetSpecificHeatGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidName,
-                                    DataGlobalConstants::HWInitConvTemp,
+                                    Constant::HWInitConvTemp,
                                     state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidIndex,
                                     RoutineName);
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
@@ -1714,7 +1714,7 @@ namespace UnitHeater {
                     CalcUnitHeaterComponents(state, UnitHeatNum, FirstHVACIteration, FullOutput, OpMode, PartLoadFrac);
                     if ((FullOutput - state.dataUnitHeaters->QZnReq) > SmallLoad) {
                         // Unit heater full load capacity is able to meet the load, Find PLR
-                        auto opMode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode;
+                        int opMode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode;
 
                         auto f = [&state, UnitHeatNum, FirstHVACIteration, opMode](Real64 const PartLoadRatio) {
                             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2034,12 +2034,10 @@ namespace UnitHeater {
         // Needs description, as appropriate.
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
-        state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatEnergy =
-            state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecEnergy =
-            state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatEnergy = state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower * TimeStepSysSec;
+        state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecEnergy = state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower * TimeStepSysSec;
 
         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!state.dataGlobal->SysSizingCalc) {

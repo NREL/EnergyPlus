@@ -119,14 +119,13 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // There needs to be a simulation record otherwise the foreign key constraint will fail
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(1, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::DesignDay);
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        1, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::DesignDay);
+        2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::DesignDay, 1);
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::DesignDay, 1);
+        3, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::RunPeriodDesign);
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        3, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::RunPeriodDesign);
-    state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::RunPeriodWeather, 1);
+        4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::RunPeriodWeather, 1);
     auto result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
@@ -143,10 +142,10 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // This should fail to insert due to foreign key constraint
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        5, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::DesignDay, 100);
+        5, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::DesignDay, 100);
     // This should fail to insert due to duplicate primary key
     state->dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
-        4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::DesignDay, 1);
+        4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::DesignDay, 1);
     result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
@@ -616,13 +615,13 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     zoneGroupData1->ZoneList = 2;
     zoneGroupData1->Multiplier = 99;
 
-    auto const &materialData0 = std::make_unique<Material::MaterialProperties>();
+    auto const &materialData0 = std::make_unique<Material::MaterialChild>();
     materialData0->Name = "test material 1";
-    materialData0->Group = Material::MaterialGroup::Air;
-    auto const &materialData1 = std::make_unique<Material::MaterialProperties>();
+    materialData0->group = Material::Group::Air;
+    auto const &materialData1 = std::make_unique<Material::MaterialChild>();
     materialData1->Name = "test material 2";
-    materialData1->Group = Material::MaterialGroup::Shade;
-    materialData1->Roughness = DataSurfaces::SurfaceRoughness::Rough; // 1
+    materialData1->group = Material::Group::Shade;
+    materialData1->Roughness = Material::SurfaceRoughness::Rough; // 1
     materialData1->Conductivity = 2;
     materialData1->Density = 2;
     materialData1->IsoMoistCap = 2;
@@ -647,7 +646,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     constructData1->OutsideAbsorpSolar = 2;
     constructData1->InsideAbsorpThermal = 2;
     constructData1->OutsideAbsorpThermal = 2;
-    constructData1->OutsideRoughness = DataSurfaces::SurfaceRoughness::Rough; // 1
+    constructData1->OutsideRoughness = Material::SurfaceRoughness::Rough; // 1
     constructData1->TypeIsWindow = true;
     constructData1->LayerPoint.allocate(2);
     constructData1->LayerPoint(1) = 2;

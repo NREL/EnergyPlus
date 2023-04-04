@@ -431,7 +431,7 @@ void DetermineDateTokens(EnergyPlusData &state,
     // Take out separator characters, other extraneous stuff
 
     for (Loop = 0; Loop < NumSingleChars; ++Loop) {
-        auto Pos = index(CurrentString, SingleChars[Loop]);
+        size_t Pos = index(CurrentString, SingleChars[Loop]);
         while (Pos != std::string::npos) {
             CurrentString[Pos] = ' ';
             Pos = index(CurrentString, SingleChars[Loop]);
@@ -439,7 +439,7 @@ void DetermineDateTokens(EnergyPlusData &state,
     }
 
     for (Loop = 0; Loop < NumDoubleChars; ++Loop) {
-        auto Pos = index(CurrentString, DoubleChars[Loop]);
+        size_t Pos = index(CurrentString, DoubleChars[Loop]);
         while (Pos != std::string::npos) {
             CurrentString.replace(Pos, 2, "  ");
             Pos = index(CurrentString, DoubleChars[Loop]);
@@ -455,7 +455,7 @@ void DetermineDateTokens(EnergyPlusData &state,
         Loop = 0;
         while (Loop < 3) { // Max of 3 fields
             if (CurrentString == BlankString) break;
-            auto Pos = index(CurrentString, ' ');
+            size_t Pos = index(CurrentString, ' ');
             ++Loop;
             if (Pos == std::string::npos) Pos = CurrentString.length();
             Fields(Loop) = CurrentString.substr(0, Pos);
@@ -761,8 +761,8 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
     // time step.
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // Return value
     std::string OutputString;
@@ -789,10 +789,10 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
         ++ActualTimeHrS;
         ActualTimeMinS = 0;
     }
-    const auto TimeStmpS = format("{:02}:{:02}", ActualTimeHrS, ActualTimeMinS);
+    const std::string TimeStmpS = format("{:02}:{:02}", ActualTimeHrS, ActualTimeMinS);
     Real64 minutes = ((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin);
 
-    auto TimeStmpE = format("{:02}:{:2.0F}", static_cast<int>(ActualTimeE), minutes);
+    std::string TimeStmpE = format("{:02}:{:2.0F}", static_cast<int>(ActualTimeE), minutes);
 
     if (TimeStmpE[3] == ' ') {
         TimeStmpE[3] = '0';
@@ -1433,16 +1433,15 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
     std::string::size_type const ItemLength = len(ZoneName) + ItemNameLength;
     ResultName = ZoneName + ' ' + ItemName;
     bool TooLong = false;
-    if (ItemLength > DataGlobalConstants::MaxNameLength) {
+    if (ItemLength > Constant::MaxNameLength) {
         ShowWarningError(state, fmt::format("{}{} Combination of ZoneList and Object Name generate a name too long.", calledFrom, CurrentObject));
         ShowContinueError(state, format("Object Name=\"{}\".", ItemName));
         ShowContinueError(state, format("ZoneList/Zone Name=\"{}\".", ZoneName));
-        ShowContinueError(
-            state,
-            format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.", ItemLength, DataGlobalConstants::MaxNameLength));
+        ShowContinueError(state,
+                          format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.", ItemLength, Constant::MaxNameLength));
         ShowContinueError(state,
                           format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.",
-                                 MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength));
+                                 MaxZoneNameLength + 1 + ItemNameLength - Constant::MaxNameLength));
         ShowContinueError(state, format("name that will be used (may be needed in reporting)=\"{}\".", ResultName));
         TooLong = true;
     }

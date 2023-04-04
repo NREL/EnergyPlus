@@ -456,14 +456,6 @@ namespace HeatRecovery {
                                       bool &ErrorsFound          // set to true if problem
     );
 
-    void SetHeatExchangerData(EnergyPlusData &state,
-                              int HXNum,                                          // Index of HX
-                              bool &ErrorsFound,                                  // Set to true if certain errors found
-                              std::string const &HXName,                          // Name of HX
-                              ObjexxFCL::Optional<Real64> SupplyAirVolFlow = _,   // HX supply air flow rate    [m3/s]
-                              ObjexxFCL::Optional<Real64> SecondaryAirVolFlow = _ // HX secondary air flow rate [m3/s]
-    );
-
 } // namespace HeatRecovery
 
 struct ErrorTracker2
@@ -494,6 +486,7 @@ struct HeatRecoveryData : BaseGlobalStruct
     ErrorTracker2 error4;
     ErrorTracker2 error5;
     ErrorTracker2 error6;
+    ErrorTracker2 error7;
     std::string OutputCharProc;       // character string for warning messages
     std::string OutputCharRegen;      // character string for warning messages
     Real64 TimeStepSysLast7 = 0.0;    // last system time step (used to check for downshifting)

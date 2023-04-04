@@ -314,7 +314,7 @@ namespace RoomAirModelManager {
 
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSched = state.dataIPShortCut->cAlphaArgs(3);
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).AvailSchedID == 0) {
@@ -728,7 +728,7 @@ namespace RoomAirModelManager {
             }
 
             {
-                auto const nodeType(state.dataIPShortCut->cAlphaArgs(2));
+                std::string const &nodeType = state.dataIPShortCut->cAlphaArgs(2);
                 if (nodeType == "INLET") {
                     state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::InletAir;
                 } else if (nodeType == "FLOOR") {
@@ -758,7 +758,7 @@ namespace RoomAirModelManager {
 
                 // report severe error since the following air nodes require surfaces associated with them
                 {
-                    auto const nodeType(state.dataIPShortCut->cAlphaArgs(2));
+                    std::string const &nodeType = state.dataIPShortCut->cAlphaArgs(2);
                     if (nodeType == "FLOOR" || nodeType == "CEILING" || nodeType == "MUNDTROOM" || nodeType == "PLUME4" || nodeType == "REESROOM1" ||
                         nodeType == "REESROOM2" || nodeType == "REESROOM3" || nodeType == "REESROOM4") {
                         // terminate the program due to a severe error in the specified input
@@ -783,7 +783,7 @@ namespace RoomAirModelManager {
                 // report warning error since the following air nodes do not require surfaces associated with them
                 // and assign .FALSE. to 'SurfNeeded'
                 {
-                    auto const nodeType(state.dataIPShortCut->cAlphaArgs(2));
+                    std::string const &nodeType = state.dataIPShortCut->cAlphaArgs(2);
                     if (nodeType == "INLET" || nodeType == "CONTROL" || nodeType == "RETURN" || nodeType == "PLUME1" || nodeType == "PLUME2" ||
                         nodeType == "PLUME3") {
                         ShowWarningError(

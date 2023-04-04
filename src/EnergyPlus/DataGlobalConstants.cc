@@ -52,7 +52,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus::DataGlobalConstants {
+namespace EnergyPlus::Constant {
 
 ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
 {
@@ -67,7 +67,7 @@ ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
     // Assists in assigning proper numeric resource types to data structures.
 
     {
-        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(ResourceTypeChar));
+        std::string const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(ResourceTypeChar));
 
         if (SELECT_CASE_var == "ELECTRICITY") {
             return ResourceType::Electricity;
@@ -370,4 +370,4 @@ std::string GetResourceTypeChar(ResourceType const ResourceTypeNum)
     }
 }
 
-} // namespace EnergyPlus::DataGlobalConstants
+} // namespace EnergyPlus::Constant

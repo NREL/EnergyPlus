@@ -549,7 +549,7 @@ namespace SteamBaseboardRadiator {
             // Get schedule
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Schedule = state.dataIPShortCut->cAlphaArgs(3);
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr =
                     GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
@@ -921,7 +921,6 @@ namespace SteamBaseboardRadiator {
 
         static constexpr std::string_view RoutineName("InitSteamCoil");
 
-        auto &MyEnvrnFlag = state.dataSteamBaseboardRadiator->MyEnvrnFlag;
         int Loop;
         int SteamInletNode;
         Real64 StartEnthSteam;
@@ -932,19 +931,16 @@ namespace SteamBaseboardRadiator {
         if (state.dataSteamBaseboardRadiator->MyOneTimeFlag) {
 
             // initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(state.dataSteamBaseboardRadiator->NumSteamBaseboards);
-            state.dataSteamBaseboardRadiator->MySizeFlag.allocate(state.dataSteamBaseboardRadiator->NumSteamBaseboards);
+            state.dataSteamBaseboardRadiator->MyEnvrnFlag.dimension(state.dataSteamBaseboardRadiator->NumSteamBaseboards, true);
+            state.dataSteamBaseboardRadiator->MySizeFlag.dimension(state.dataSteamBaseboardRadiator->NumSteamBaseboards, true);
             state.dataSteamBaseboardRadiator->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             state.dataSteamBaseboardRadiator->QBBSteamRadSource.dimension(state.dataSteamBaseboardRadiator->NumSteamBaseboards, 0.0);
             state.dataSteamBaseboardRadiator->QBBSteamRadSrcAvg.dimension(state.dataSteamBaseboardRadiator->NumSteamBaseboards, 0.0);
             state.dataSteamBaseboardRadiator->LastQBBSteamRadSrc.dimension(state.dataSteamBaseboardRadiator->NumSteamBaseboards, 0.0);
             state.dataSteamBaseboardRadiator->LastSysTimeElapsed.dimension(state.dataSteamBaseboardRadiator->NumSteamBaseboards, 0.0);
             state.dataSteamBaseboardRadiator->LastTimeStepSys.dimension(state.dataSteamBaseboardRadiator->NumSteamBaseboards, 0.0);
-            state.dataSteamBaseboardRadiator->SetLoopIndexFlag.allocate(state.dataSteamBaseboardRadiator->NumSteamBaseboards);
-            MyEnvrnFlag = true;
-            state.dataSteamBaseboardRadiator->MySizeFlag = true;
+            state.dataSteamBaseboardRadiator->SetLoopIndexFlag.dimension(state.dataSteamBaseboardRadiator->NumSteamBaseboards, true);
             state.dataSteamBaseboardRadiator->MyOneTimeFlag = false;
-            state.dataSteamBaseboardRadiator->SetLoopIndexFlag = true;
         }
 
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = ControlledZoneNum;
@@ -992,7 +988,7 @@ namespace SteamBaseboardRadiator {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(BaseboardNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataSteamBaseboardRadiator->MyEnvrnFlag(BaseboardNum)) {
             // Initialize
             SteamInletNode = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode;
             state.dataLoopNodes->Node(SteamInletNode).Temp = 100.0;
@@ -1028,11 +1024,11 @@ namespace SteamBaseboardRadiator {
             state.dataSteamBaseboardRadiator->LastSysTimeElapsed = 0.0;
             state.dataSteamBaseboardRadiator->LastTimeStepSys = 0.0;
 
-            MyEnvrnFlag(BaseboardNum) = false;
+            state.dataSteamBaseboardRadiator->MyEnvrnFlag(BaseboardNum) = false;
         }
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(BaseboardNum) = true;
+            state.dataSteamBaseboardRadiator->MyEnvrnFlag(BaseboardNum) = true;
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
@@ -1594,16 +1590,13 @@ namespace SteamBaseboardRadiator {
         //       RE-ENGINEERED  na
 
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotEnergy =
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSys *
-            DataGlobalConstants::SecInHour;
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Energy =
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSysSec;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvEnergy =
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSys *
-            DataGlobalConstants::SecInHour;
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadEnergy =
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSys *
-            DataGlobalConstants::SecInHour;
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     }
 
     void

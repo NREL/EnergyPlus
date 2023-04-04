@@ -83,8 +83,6 @@ namespace CTElectricGenerator {
     // MODULE INFORMATION:
     //       AUTHOR         Dan Fisher
     //       DATE WRITTEN   Sept 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This module simulates the performance of the COMBUSTION turbine
@@ -97,7 +95,7 @@ namespace CTElectricGenerator {
     // All CT Generator models are based on a polynomial fit of Generator
     // performance data.
 
-    PlantComponent *CTGeneratorData::factory(EnergyPlusData &state, std::string const &objectName)
+    CTGeneratorData *CTGeneratorData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for generators if it hasn't been done already
         if (state.dataCTElectricGenerator->getCTInputFlag) {
@@ -106,11 +104,10 @@ namespace CTElectricGenerator {
         }
 
         // Now look for this particular generator in the list
-        for (auto &CTGen : state.dataCTElectricGenerator->CTGenerator) {
-            if (CTGen.Name == objectName) {
-                return &CTGen;
-            }
-        }
+        auto myCTGen = std::find_if(state.dataCTElectricGenerator->CTGenerator.begin(),
+                                    state.dataCTElectricGenerator->CTGenerator.end(),
+                                    [&objectName](const CTGeneratorData &CTElecGen) { return CTElecGen.Name == objectName; });
+        if (myCTGen != state.dataCTElectricGenerator->CTGenerator.end()) return myCTGen;
         // If we didn't find it, fatal
         ShowFatalError(state,
                        format("LocalCombustionTurbineGeneratorFactory: Error getting inputs for combustion turbine generator named: {}",
@@ -128,8 +125,6 @@ namespace CTElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE: This is the CT Generator driver.  It
         // gets the input for the models, initializes simulation variables, call
@@ -326,7 +321,6 @@ namespace CTElectricGenerator {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), AlphArray(11)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
-                FuelTypeError = false;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecMaxTemp = NumArray(12);
@@ -532,8 +526,6 @@ namespace CTElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // simulate a vapor compression Generator using the CT model
@@ -561,14 +553,13 @@ namespace CTElectricGenerator {
         // design turbine inlet temperature (C)
         Real64 designAirInletTemp = this->DesignAirInletTemp;
 
-        int heatRecInNode;    // Heat Recovery Fluid Inlet Node Num
         Real64 heatRecInTemp; // Heat Recovery Fluid Inlet Temperature (C)
 
         Real64 heatRecMdot; // Heat Recovery Fluid Mass FlowRate (kg/s)
         Real64 heatRecCp;   // Specific Heat of the Heat Recovery Fluid (J/kg-K)
 
         if (this->HeatRecActive) {
-            heatRecInNode = this->HeatRecInletNodeNum;
+            int heatRecInNode = this->HeatRecInletNodeNum;
             heatRecInTemp = state.dataLoopNodes->Node(heatRecInNode).Temp;
 
             heatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -710,16 +701,16 @@ namespace CTElectricGenerator {
 
         // Calculate Energy
         // Generator output (J)
-        Real64 ElectricEnergyGen = elecPowerGenerated * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ElectricEnergyGen = elecPowerGenerated * state.dataHVACGlobal->TimeStepSysSec;
 
         // Amount of Fuel Energy Required to run COMBUSTION turbine (J)
-        Real64 FuelEnergyUsed = FuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 FuelEnergyUsed = FuelUseRate * state.dataHVACGlobal->TimeStepSysSec;
 
         // recovered lube oil heat (J)
-        Real64 lubeOilEnergyRec = QLubeOilRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 lubeOilEnergyRec = QLubeOilRec * state.dataHVACGlobal->TimeStepSysSec;
 
         // recovered exhaust heat (J)
-        Real64 exhaustEnergyRec = QExhaustRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 exhaustEnergyRec = QExhaustRec * state.dataHVACGlobal->TimeStepSysSec;
 
         this->ElecPowerGenerated = elecPowerGenerated;
         this->ElecEnergyGenerated = ElectricEnergyGen;
@@ -758,7 +749,6 @@ namespace CTElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Oct 2000
-        //       MODIFIED       na
         //       RE-ENGINEERED  Brent Griffith, Sept 2010 plant upgrades, generalize fluid props
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -802,12 +792,11 @@ namespace CTElectricGenerator {
 
     void CTGeneratorData::oneTimeInit(EnergyPlusData &state)
     {
-        auto constexpr RoutineName("InitICEngineGenerators");
-        bool errFlag;
+        std::string_view constexpr RoutineName("InitICEngineGenerators");
 
         if (this->MyPlantScanFlag) { // this flag to be removed
             if (allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
-                errFlag = false;
+                bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(
                     state, this->Name, DataPlant::PlantEquipmentType::Generator_CTurbine, this->HRPlantLoc, errFlag, _, _, _, _, _);
                 if (errFlag) {
@@ -830,7 +819,7 @@ namespace CTElectricGenerator {
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp,
+                                                           Constant::InitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
