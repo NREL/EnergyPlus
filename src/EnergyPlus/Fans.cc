@@ -116,8 +116,6 @@ void SimulateFanComponents(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int FanNum; // current fan number
 
-    auto &Fan(state.dataFans->Fan);
-
     // Obtains and Allocates fan related parameters from input file
     if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
         GetFanInput(state);
@@ -125,7 +123,7 @@ void SimulateFanComponents(EnergyPlusData &state,
     }
 
     if (CompIndex == 0) {
-        FanNum = UtilityRoutines::FindItemInList(CompName, Fan, &FanEquipConditions::FanName);
+        FanNum = UtilityRoutines::FindItemInList(CompName, state.dataFans->Fan, &FanEquipConditions::FanName);
         if (FanNum == 0) {
             ShowFatalError(state, format("SimulateFanComponents: Fan not found={}", CompName));
         }
@@ -139,12 +137,12 @@ void SimulateFanComponents(EnergyPlusData &state,
                     "SimulateFanComponents: Invalid CompIndex passed={}, Number of Fans={}, Fan name={}", FanNum, state.dataFans->NumFans, CompName));
         }
         if (state.dataFans->CheckEquipName(FanNum)) {
-            if (!CompName.empty() && CompName != Fan(FanNum).FanName) {
+            if (!CompName.empty() && CompName != state.dataFans->Fan(FanNum).FanName) {
                 ShowFatalError(state,
                                format("SimulateFanComponents: Invalid CompIndex passed={}, Fan name={}, stored Fan Name for that index={}",
                                       FanNum,
                                       CompName,
-                                      Fan(FanNum).FanName));
+                                      state.dataFans->Fan(FanNum).FanName));
             }
             state.dataFans->CheckEquipName(FanNum) = false;
         }
@@ -168,20 +166,26 @@ void SimulateFanComponents(EnergyPlusData &state,
     }
 
     // Calculate the Correct Fan Model with the current FanNum
-    if (Fan(FanNum).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
+    switch (state.dataFans->Fan(FanNum).FanType_Num) {
+    case DataHVACGlobals::FanType_SimpleConstVolume: {
         SimSimpleFan(state, FanNum);
-    } else if (Fan(FanNum).FanType_Num == DataHVACGlobals::FanType_SimpleVAV) {
+    } break;
+    case DataHVACGlobals::FanType_SimpleVAV: {
         if (present(PressureRise)) {
             SimVariableVolumeFan(state, FanNum, PressureRise);
         } else {
             SimVariableVolumeFan(state, FanNum);
         }
-    } else if (Fan(FanNum).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
+    } break;
+    case DataHVACGlobals::FanType_SimpleOnOff: {
         SimOnOffFan(state, FanNum, SpeedRatio);
-    } else if (Fan(FanNum).FanType_Num == DataHVACGlobals::FanType_ZoneExhaust) {
+    } break;
+    case DataHVACGlobals::FanType_ZoneExhaust: {
         SimZoneExhaustFan(state, FanNum);
-    } else if (Fan(FanNum).FanType_Num == DataHVACGlobals::FanType_ComponentModel) {
+    } break;
+    case DataHVACGlobals::FanType_ComponentModel: {
         SimComponentModelFan(state, FanNum);
+    } break;
     }
 
     // Update the current fan to the outlet nodes
@@ -206,21 +210,9 @@ void GetFanInput(EnergyPlusData &state)
     // Obtains input data for fans and stores it in fan data structures
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int FanNum;       // The fan that you are currently loading input into
-    int NumSimpFan;   // The number of Simple Const Vol Fans
-    int NumVarVolFan; // The number of Simple Variable Vol Fans
-    int NumOnOff;     // The number of Simple on-off Fans
-    int NumZoneExhFan;
-    int SimpFanNum;
-    int OnOffFanNum;
-    int VarVolFanNum;
-    int ExhFanNum;
-    int NVPerfNum;
-    int NumCompModelFan;
-    int CompModelFanNum;
+    int FanNum; // The fan that you are currently loading input into
     int NumAlphas;
     int NumNums;
-    int checkNum;
     int IOStat;
     bool ErrorsFound(false);                                        // If errors detected in input
     static constexpr std::string_view RoutineName("GetFanInput: "); // include trailing blank space
@@ -242,25 +234,25 @@ void GetFanInput(EnergyPlusData &state)
 
     int MaxAlphas = 0;
     int MaxNumbers = 0;
-    NumSimpFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:ConstantVolume");
+    int NumSimpFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:ConstantVolume");
     if (NumSimpFan > 0) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Fan:ConstantVolume", NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNums);
     }
-    NumVarVolFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:VariableVolume");
+    int NumVarVolFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:VariableVolume");
     if (NumVarVolFan > 0) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Fan:VariableVolume", NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNums);
     }
-    NumOnOff = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:OnOff");
+    int NumOnOff = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:OnOff");
     if (NumOnOff > 0) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Fan:OnOff", NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNums);
     }
-    NumZoneExhFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:ZoneExhaust");
+    int NumZoneExhFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:ZoneExhaust");
     if (NumZoneExhFan > 0) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Fan:ZoneExhaust", NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -273,7 +265,7 @@ void GetFanInput(EnergyPlusData &state)
         MaxNumbers = max(MaxNumbers, NumNums);
     }
 
-    NumCompModelFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:ComponentModel");
+    int NumCompModelFan = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Fan:ComponentModel");
     if (NumCompModelFan > 0) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Fan:ComponentModel", NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -295,7 +287,7 @@ void GetFanInput(EnergyPlusData &state)
     }
     state.dataFans->CheckEquipName.dimension(state.dataFans->NumFans, true);
 
-    for (SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum) {
+    for (int SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum) {
         FanNum = SimpFanNum;
         cCurrentModuleObject = "Fan:ConstantVolume";
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -380,7 +372,7 @@ void GetFanInput(EnergyPlusData &state)
 
     } // end Number of Simple FAN Loop
 
-    for (VarVolFanNum = 1; VarVolFanNum <= NumVarVolFan; ++VarVolFanNum) {
+    for (int VarVolFanNum = 1; VarVolFanNum <= NumVarVolFan; ++VarVolFanNum) {
         FanNum = NumSimpFan + VarVolFanNum;
         cCurrentModuleObject = "Fan:VariableVolume";
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -485,7 +477,7 @@ void GetFanInput(EnergyPlusData &state)
 
     } // end Number of Variable Volume FAN Loop
 
-    for (ExhFanNum = 1; ExhFanNum <= NumZoneExhFan; ++ExhFanNum) {
+    for (int ExhFanNum = 1; ExhFanNum <= NumZoneExhFan; ++ExhFanNum) {
         FanNum = NumSimpFan + NumVarVolFan + ExhFanNum;
         cCurrentModuleObject = "Fan:ZoneExhaust";
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -689,7 +681,7 @@ void GetFanInput(EnergyPlusData &state)
 
     } // end of Zone Exhaust Fan loop
 
-    for (OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum) {
+    for (int OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum) {
         FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + OnOffFanNum;
         cCurrentModuleObject = "Fan:OnOff";
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -788,7 +780,6 @@ void GetFanInput(EnergyPlusData &state)
     } // end Number of Simple  ON-OFF FAN Loop
 
     cCurrentModuleObject = "FanPerformance:NightVentilation";
-    state.dataFans->NumNightVentPerf = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataFans->NumNightVentPerf > 0) {
         NightVentPerf.allocate(state.dataFans->NumNightVentPerf);
@@ -803,7 +794,7 @@ void GetFanInput(EnergyPlusData &state)
         }
     }
     // input the night ventilation performance objects
-    for (NVPerfNum = 1; NVPerfNum <= state.dataFans->NumNightVentPerf; ++NVPerfNum) {
+    for (int NVPerfNum = 1; NVPerfNum <= state.dataFans->NumNightVentPerf; ++NVPerfNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  NVPerfNum,
@@ -838,7 +829,7 @@ void GetFanInput(EnergyPlusData &state)
         }
     }
 
-    for (CompModelFanNum = 1; CompModelFanNum <= NumCompModelFan; ++CompModelFanNum) {
+    for (int CompModelFanNum = 1; CompModelFanNum <= NumCompModelFan; ++CompModelFanNum) {
         FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + CompModelFanNum;
 
         cCurrentModuleObject = "Fan:ComponentModel";
@@ -962,7 +953,7 @@ void GetFanInput(EnergyPlusData &state)
 
     // Check Fans
     for (FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
-        for (checkNum = FanNum + 1; checkNum <= state.dataFans->NumFans; ++checkNum) {
+        for (int checkNum = FanNum + 1; checkNum <= state.dataFans->NumFans; ++checkNum) {
             if (Fan(FanNum).InletNodeNum == Fan(checkNum).InletNodeNum) {
                 ErrorsFound = true;
                 ShowSevereError(state, "GetFanInput, duplicate fan inlet node names, must be unique for fans.");
@@ -986,98 +977,87 @@ void GetFanInput(EnergyPlusData &state)
         ShowFatalError(state, format("{}Errors found in input.  Program terminates.", RoutineName));
     }
 
-    for (FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
+    for (auto &thisFan : state.dataFans->Fan) {
         // Setup Report variables for the Fans  CurrentModuleObject='Fans'
         SetupOutputVariable(state,
                             "Fan Electricity Rate",
                             OutputProcessor::Unit::W,
-                            Fan(FanNum).FanPower,
+                            thisFan.FanPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            Fan(FanNum).FanName);
+                            thisFan.FanName);
         SetupOutputVariable(state,
                             "Fan Rise in Air Temperature",
                             OutputProcessor::Unit::deltaC,
-                            Fan(FanNum).DeltaTemp,
+                            thisFan.DeltaTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            Fan(FanNum).FanName);
+                            thisFan.FanName);
         SetupOutputVariable(state,
                             "Fan Heat Gain to Air",
                             OutputProcessor::Unit::W,
-                            Fan(FanNum).PowerLossToAir,
+                            thisFan.PowerLossToAir,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            Fan(FanNum).FanName);
+                            thisFan.FanName);
         SetupOutputVariable(state,
                             "Fan Electricity Energy",
                             OutputProcessor::Unit::J,
-                            Fan(FanNum).FanEnergy,
+                            thisFan.FanEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            Fan(FanNum).FanName,
+                            thisFan.FanName,
                             _,
                             "Electricity",
                             "Fans",
-                            Fan(FanNum).EndUseSubcategoryName,
+                            thisFan.EndUseSubcategoryName,
                             "System");
         SetupOutputVariable(state,
                             "Fan Air Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
-                            Fan(FanNum).OutletAirMassFlowRate,
+                            thisFan.OutletAirMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            Fan(FanNum).FanName);
-        if ((Fan(FanNum).FanType_Num == DataHVACGlobals::FanType_ZoneExhaust) && (Fan(FanNum).BalancedFractSchedNum > 0)) {
+                            thisFan.FanName);
+        if ((thisFan.FanType_Num == DataHVACGlobals::FanType_ZoneExhaust) && (thisFan.BalancedFractSchedNum > 0)) {
             SetupOutputVariable(state,
                                 "Fan Unbalanced Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                Fan(FanNum).UnbalancedOutletMassFlowRate,
+                                thisFan.UnbalancedOutletMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Fan(FanNum).FanName);
+                                thisFan.FanName);
             SetupOutputVariable(state,
                                 "Fan Balanced Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                Fan(FanNum).BalancedOutletMassFlowRate,
+                                thisFan.BalancedOutletMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                Fan(FanNum).FanName);
+                                thisFan.FanName);
         }
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-
-            SetupEMSInternalVariable(state, "Fan Maximum Mass Flow Rate", Fan(FanNum).FanName, "[kg/s]", Fan(FanNum).MaxAirMassFlowRate);
-            SetupEMSActuator(state,
-                             "Fan",
-                             Fan(FanNum).FanName,
-                             "Fan Air Mass Flow Rate",
-                             "[kg/s]",
-                             Fan(FanNum).EMSMaxMassFlowOverrideOn,
-                             Fan(FanNum).EMSAirMassFlowValue);
-            SetupEMSInternalVariable(state, "Fan Nominal Pressure Rise", Fan(FanNum).FanName, "[Pa]", Fan(FanNum).DeltaPress);
-            SetupEMSActuator(state,
-                             "Fan",
-                             Fan(FanNum).FanName,
-                             "Fan Pressure Rise",
-                             "[Pa]",
-                             Fan(FanNum).EMSFanPressureOverrideOn,
-                             Fan(FanNum).EMSFanPressureValue);
-            SetupEMSInternalVariable(state, "Fan Nominal Total Efficiency", Fan(FanNum).FanName, "[fraction]", Fan(FanNum).FanEff);
+            SetupEMSInternalVariable(state, "Fan Maximum Mass Flow Rate", thisFan.FanName, "[kg/s]", thisFan.MaxAirMassFlowRate);
             SetupEMSActuator(
-                state, "Fan", Fan(FanNum).FanName, "Fan Total Efficiency", "[fraction]", Fan(FanNum).EMSFanEffOverrideOn, Fan(FanNum).EMSFanEffValue);
+                state, "Fan", thisFan.FanName, "Fan Air Mass Flow Rate", "[kg/s]", thisFan.EMSMaxMassFlowOverrideOn, thisFan.EMSAirMassFlowValue);
+            SetupEMSInternalVariable(state, "Fan Nominal Pressure Rise", thisFan.FanName, "[Pa]", thisFan.DeltaPress);
+            SetupEMSActuator(
+                state, "Fan", thisFan.FanName, "Fan Pressure Rise", "[Pa]", thisFan.EMSFanPressureOverrideOn, thisFan.EMSFanPressureValue);
+            SetupEMSInternalVariable(state, "Fan Nominal Total Efficiency", thisFan.FanName, "[fraction]", thisFan.FanEff);
+            SetupEMSActuator(
+                state, "Fan", thisFan.FanName, "Fan Total Efficiency", "[fraction]", thisFan.EMSFanEffOverrideOn, thisFan.EMSFanEffValue);
 
             SetupEMSActuator(state,
                              "Fan",
-                             Fan(FanNum).FanName,
+                             thisFan.FanName,
                              "Fan Autosized Air Flow Rate",
                              "[m3/s]",
-                             Fan(FanNum).MaxAirFlowRateEMSOverrideOn,
-                             Fan(FanNum).MaxAirFlowRateEMSOverrideValue);
+                             thisFan.MaxAirFlowRateEMSOverrideOn,
+                             thisFan.MaxAirFlowRateEMSOverrideValue);
         }
     }
 
-    for (OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum) {
+    for (int OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum) {
         FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + OnOffFanNum;
         SetupOutputVariable(state,
                             "Fan Runtime Fraction",
@@ -1314,9 +1294,9 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate max fan static pressure rise using max fan volumetric flow, std air density, air-handling system characteristics,
         //   and Sherman-Wray system curve model (assumes static pressure surrounding air distribution system is zero)
-        Real64 DuctStaticPress = Curve::CurveValue(state, fan.PressResetCurveIndex, FanVolFlow); // Duct static pressure setpoint [Pa]
+        Real64 DuctStaticPress = Curve::CurveValue(state, fan.PressResetCurveIndex, FanVolFlow);        // Duct static pressure setpoint [Pa]
         DeltaPressTot = Curve::CurveValue(state, fan.PressRiseCurveIndex, FanVolFlow, DuctStaticPress); // Max fan total pressure rise [Pa]
-        FanOutletVelPress = 0.5 * RhoAir * pow_2(FanVolFlow / fan.FanOutletArea);                // Max fan outlet velocity pressure [Pa]
+        FanOutletVelPress = 0.5 * RhoAir * pow_2(FanVolFlow / fan.FanOutletArea);                       // Max fan outlet velocity pressure [Pa]
         // Outlet velocity pressure cannot exceed total pressure rise
         FanOutletVelPress = min(FanOutletVelPress, DeltaPressTot);
         fan.DeltaPress = DeltaPressTot - FanOutletVelPress; // Max fan static pressure rise [Pa]
@@ -1447,7 +1427,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate max VFD efficiency and input power using correlations and coefficients based on VFD type
         if ((fan.VFDEffType == "SPEED") && (fan.VFDEffCurveIndex != 0)) {
-            VFDSpdRatio = MotorSpeed / fan.MotorMaxSpd;                        //[-]
+            VFDSpdRatio = MotorSpeed / fan.MotorMaxSpd;                               //[-]
             fan.VFDEff = Curve::CurveValue(state, fan.VFDEffCurveIndex, VFDSpdRatio); //[-]
         } else {
             if ((fan.VFDEffType == "POWER") && (fan.VFDEffCurveIndex != 0)) {
@@ -1465,7 +1445,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
                     ShowContinueError(state, format("...Design VFD output power (without oversizing) [W]: {:.2R}", fan.MotorInputPower));
                 }
 
-                VFDOutPwrRatio = fan.MotorInputPower / fan.VFDMaxOutPwr;              //[-]
+                VFDOutPwrRatio = fan.MotorInputPower / fan.VFDMaxOutPwr;                     //[-]
                 fan.VFDEff = Curve::CurveValue(state, fan.VFDEffCurveIndex, VFDOutPwrRatio); //[-]
             } else {
                 // No curve specified - use constant efficiency
@@ -2191,10 +2171,10 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate fan static pressure rise using fan volumetric flow, std air density, air-handling system characteristics,
         //   and Sherman-Wray system curve model (assumes static pressure surrounding air distribution system is zero)
-        Real64 FanVolFlow = MassFlow / RhoAir;                                                          //[m3/s at standard conditions]
-        Real64 DuctStaticPress = Curve::CurveValue(state, fan.PressResetCurveIndex, FanVolFlow);        // Duct static pressure setpoint [Pa]
+        Real64 FanVolFlow = MassFlow / RhoAir;                                                                 //[m3/s at standard conditions]
+        Real64 DuctStaticPress = Curve::CurveValue(state, fan.PressResetCurveIndex, FanVolFlow);               // Duct static pressure setpoint [Pa]
         Real64 DeltaPressTot = Curve::CurveValue(state, fan.PressRiseCurveIndex, FanVolFlow, DuctStaticPress); // Fan total pressure rise [Pa]
-        Real64 FanOutletVelPress = 0.5 * RhoAir * pow_2(FanVolFlow / fan.FanOutletArea);                // Fan outlet velocity pressure [Pa]
+        Real64 FanOutletVelPress = 0.5 * RhoAir * pow_2(FanVolFlow / fan.FanOutletArea);                       // Fan outlet velocity pressure [Pa]
         // Outlet velocity pressure cannot exceed total pressure rise
         FanOutletVelPress = min(FanOutletVelPress, DeltaPressTot);
         fan.DeltaPress = DeltaPressTot - FanOutletVelPress; // Fan static pressure rise [Pa]
@@ -2267,11 +2247,11 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate VFD efficiency using correlations and coefficients based on VFD type
         if ((fan.VFDEffType == "SPEED") && (fan.VFDEffCurveIndex != 0)) {
-            VFDSpdRatio = MotorSpeed / fan.MotorMaxSpd;                        //[-]
+            VFDSpdRatio = MotorSpeed / fan.MotorMaxSpd;                               //[-]
             fan.VFDEff = Curve::CurveValue(state, fan.VFDEffCurveIndex, VFDSpdRatio); //[-]
         } else {
             if ((fan.VFDEffType == "POWER") && (fan.VFDEffCurveIndex != 0)) {
-                VFDOutPwrRatio = fan.MotorInputPower / fan.VFDMaxOutPwr;              //[-]
+                VFDOutPwrRatio = fan.MotorInputPower / fan.VFDMaxOutPwr;                     //[-]
                 fan.VFDEff = Curve::CurveValue(state, fan.VFDEffCurveIndex, VFDOutPwrRatio); //[-]
             } else {
                 // No curve specified - use constant efficiency
@@ -2594,9 +2574,9 @@ int GetFanInletNode(EnergyPlusData &state,
     }
 }
 
-int getFanInNodeIndex(EnergyPlusData &state,
-                      int const FanIndex, // fan index
-                      bool &ErrorsFound   // set to true if problem
+[[maybe_unused]] int getFanInNodeIndex(EnergyPlusData &state,
+                                       int const FanIndex, // fan index
+                                       bool &ErrorsFound   // set to true if problem
 )
 {
     // Obtains and Allocates fan related parameters from input file
