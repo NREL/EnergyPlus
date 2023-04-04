@@ -47,7 +47,7 @@ ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
 ForEachMacros:  []
 IncludeBlocks:   Preserve
-IncludeCategories:
+IncludeCategories: 
   - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
     Priority:        2
   - Regex:           '^(<|"(gtest|gmock|isl|json)/)'
@@ -101,8 +101,8 @@ SpaceBeforeCtorInitializerColon: true
 SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: ControlStatements
 #CF14# SpaceBeforeParensOptions:
-# AfterControlStatements: true
-# AfterFunctionDefinitionName: true
+  # AfterControlStatements: true
+  # AfterFunctionDefinitionName: true
 SpaceBeforeRangeBasedForLoopColon: true
 #CF11# SpaceBeforeSquareBrackets: false
 SpaceInEmptyParentheses: false
@@ -112,8 +112,8 @@ SpacesInCStyleCastParentheses: false
 #CF11# SpacesInConditionalStatement: false
 SpacesInContainerLiterals: true
 #CF14# SpacesInLineCommentPrefix:
-# Minimum: 0
-# Maximum: 1
+  # Minimum: 0
+  # Maximum: 1
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 Standard:        Cpp11
@@ -123,3 +123,4 @@ TabWidth:        4
 #CF11# UseCRLF: Never
 UseTab:          Never
 #CF12# WhitespaceSensitiveMacros []
+

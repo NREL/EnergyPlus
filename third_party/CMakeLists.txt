@@ -192,4 +192,4 @@ set(LIBTK205_BUILD_TESTING
 set(libtk205_USE_SUBMODULES
         OFF
         CACHE BOOL "" FORCE)
-add_subdirectory(libtk205)
+#add_subdirectory(libtk205)

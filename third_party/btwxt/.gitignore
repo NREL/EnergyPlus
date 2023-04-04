@@ -1,5 +1,5 @@
-# Ignore the build directory
-builds
-build
-.idea
+builds/
+build/
+.idea/
 .vs/
+.vscode/

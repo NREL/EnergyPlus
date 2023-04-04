@@ -161,7 +161,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         std::pair<EnergyPlusData *, std::string> callbackPair{&state,
                                                               format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
         tk205::set_error_handler(tk205ErrCallback, &callbackPair);
-        Btwxt::LOG_LEVEL = static_cast<int>(Btwxt::MsgLevel::MSG_WARN);
+        //Btwxt::LOG_LEVEL = static_cast<int>(Btwxt::MsgLevel::MSG_WARN);
         thisChiller.Representation =
             std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(RSInstanceFactory::create("RS0001", rep_file_path.string().c_str()));
         if (nullptr == thisChiller.Representation) {

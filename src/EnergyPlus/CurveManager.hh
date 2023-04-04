@@ -60,8 +60,8 @@
 #include <nlohmann/json.hpp>
 
 // Btwxt Headers
-#include <btwxt.h>
-#include <griddeddata.h>
+#include <btwxt/btwxt.h>
+#include <btwxt/grid-axis.h>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -222,17 +222,30 @@ namespace Curve {
         std::size_t numColumns = 0u;
     };
 
+    class EPlusLogging : public Courierr::Courierr {
+    public:
+        void error(const std::string_view message) override;
+        void warning(const std::string_view message) override;
+        void info(const std::string_view message)  override {}
+        void debug(const std::string_view message) override {}
+    };
+
     // Container for Btwxt N-d Objects
     class BtwxtManager
     {
     public:
         // Map RGI collection to string name of independent variable list
-        int addGrid(const std::string &indVarListName, Btwxt::GriddedData grid)
+        int addGrid(const std::string &indVarListName, const std::vector<Btwxt::GridAxis> grid)
         {
-            grids.emplace_back(grid);
+            grids.emplace_back(grid, btwxt_logger);
             gridMap.emplace(indVarListName, grids.size() - 1);
             return static_cast<int>(grids.size()) - 1;
         };
+        void setLoggingContext(void* context) {
+            for (auto &btwxt : grids) {
+                btwxt.get_logger()->set_message_context(context); // TODO: set_context can be its own function
+            }
+        }
         double normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, double scalar = 1.0);
         int addOutputValues(int gridIndex, std::vector<double> values);
         int getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound);
@@ -240,14 +253,13 @@ namespace Curve {
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
         std::map<std::string, const nlohmann::json &> independentVarRefs;
         std::map<fs::path, TableFile> tableFiles;
+        static std::shared_ptr<EPlusLogging> btwxt_logger;
         void clear();
 
     private:
         std::map<std::string, std::size_t> gridMap;
         std::vector<Btwxt::RegularGridInterpolator> grids;
     };
-
-    void BtwxtMessageCallback(Btwxt::MsgLevel messageType, std::string message, void *contextPtr);
 
     void ResetPerformanceCurveOutput(EnergyPlusData &state);
 

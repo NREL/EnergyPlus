@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.10) # required for gtest_discover_tests
 
-project(btwxt)
+project(courierr)
 
 # Set a default build type if none was specified
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -15,10 +15,13 @@ find_package(Git QUIET)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
-include(compiler-flags)
-
 option(${PROJECT_NAME}_BUILD_TESTING "Build ${PROJECT_NAME} testing targets" OFF)
-option(${PROJECT_NAME}_COVERAGE "Add ${PROJECT_NAME} coverage reports" OFF)
+option(${PROJECT_NAME}_COVERAGE "Generate ${PROJECT_NAME} coverage reports" OFF)
+option(${PROJECT_NAME}_STATIC_LIB "Make ${PROJECT_NAME} a static library" ON)
+
+if (NOT ${PROJECT_NAME}_STATIC_LIB)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif ()
 
 # Set up testing/coverage
 if (${PROJECT_NAME}_BUILD_TESTING)
@@ -29,8 +32,8 @@ if (${PROJECT_NAME}_BUILD_TESTING)
     endif ()
 endif ()
 
+# Add subdirectories
 add_subdirectory("include/${PROJECT_NAME}")
-add_subdirectory(src)
 add_subdirectory(vendor)
 
 if (${PROJECT_NAME}_BUILD_TESTING)
