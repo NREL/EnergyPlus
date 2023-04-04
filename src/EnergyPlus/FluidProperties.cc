@@ -167,8 +167,6 @@ namespace FluidProperties {
         int NumOfGlyFluidPropArrays;
         std::string TempsName;
         bool FirstSHMatch;
-        int NumOfPressPts;
-        int NumOfConcPts;
         bool ErrorsFound(false);
         int Index;
         int NumOfGlyConcs;
@@ -176,7 +174,6 @@ namespace FluidProperties {
         int NumOfOptionalInput;
         std::string CurrentModuleObject; // for ease in renaming.
         Real64 pTemp;
-        int iTemp;
         int j;
         int FluidNum;
 
@@ -1462,7 +1459,7 @@ namespace FluidProperties {
             //    END IF
 
             //   Error check on entering saturated data
-            iTemp = 0;
+            int iTemp = 0;
             CurrentModuleObject = "FluidProperties:Saturated";
             for (InData = 1; InData <= NumOfSatFluidPropArrays; ++InData) {
 
@@ -1532,7 +1529,7 @@ namespace FluidProperties {
             CurrentModuleObject = "FluidProperties:Superheated";
             TempsName = "";
             FirstSHMatch = true;
-            NumOfPressPts = 0;
+            int NumOfPressPts = 0;
             for (InData = 1; InData <= NumOfSHFluidPropArrays; ++InData) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
@@ -1826,7 +1823,7 @@ namespace FluidProperties {
             // make sure that all of the concentration input is linked to the same temperature list
             TempsName = "";
             FirstSHMatch = true;
-            NumOfConcPts = 0;
+            int NumOfConcPts = 0;
             state.dataFluidProps->GlyRawData(Loop).CpDataPresent = false;
             for (InData = 1; InData <= NumOfGlyFluidPropArrays; ++InData) { // check temperatures given for specific heat are consistant
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -5093,12 +5090,11 @@ namespace FluidProperties {
         Real64 Temperature; // Temperature to drive values
         Real64 ReturnValue; // Values returned from glycol functions
         int Loop;           // Loop Counter
-        int GlycolIndex;    // index used in routine / function calls, value is returned on first use (when index=0)
 
         state.dataFluidProps->GetInput = false; // input has already been gotten
 
         for (GlycolNum = 1; GlycolNum <= state.dataFluidProps->NumOfGlycols; ++GlycolNum) {
-            GlycolIndex = 0; // used in routine calls -- value is returned when first 0
+            int GlycolIndex = 0; // used in routine calls -- value is returned when first 0
             // Lay out the basic values:
             if (!state.dataFluidProps->GlycolData(GlycolNum).GlycolName.empty()) {
                 print(state.files.debug,
@@ -5421,12 +5417,11 @@ namespace FluidProperties {
         Real64 ReturnValue; // Values returned from refrigerant functions
         int Loop;           // Loop Counter
         int Loop1;          // Loop Counter
-        int RefrigIndex;
 
         state.dataFluidProps->GetInput = false; // input has already been gotten
 
         for (RefrigNum = 1; RefrigNum <= state.dataFluidProps->NumOfRefrigerants; ++RefrigNum) {
-            RefrigIndex = 0; // used in routine calls -- value is returned when first 0
+            int RefrigIndex = 0; // used in routine calls -- value is returned when first 0
             // Lay out the basic values:
             if (!state.dataFluidProps->RefrigData(RefrigNum).Name.empty()) {
                 print(state.files.debug, "Refrigerant={}", state.dataFluidProps->RefrigData(RefrigNum).Name);
@@ -6840,7 +6835,6 @@ namespace FluidProperties {
         auto const &refrig(state.dataFluidProps->RefrigData(RefrigNum));
 
         LoTempIndex = FindArrayIndex(Temperature, refrig.SHTemps, 1, refrig.NumSuperTempPts);
-        HiTempIndex = LoTempIndex + 1;
 
         // check temperature data range and attempt to cap if necessary
         if ((LoTempIndex > 0) && (LoTempIndex < refrig.NumSuperTempPts)) { // in range
@@ -7636,10 +7630,10 @@ namespace FluidProperties {
             // have begin()/end()
             assert(glycol_CpTemps.size() <=
                    static_cast<std::size_t>(std::numeric_limits<int>::max())); // Array indexes are int now so this is future protection
-            int beg(1), mid, end(glycol_CpTemps.isize());                      // 1-based indexing
+            int beg(1), end(glycol_CpTemps.isize());                           // 1-based indexing
             assert(end > 0);
             while (beg + 1 < end) {
-                mid = ((beg + end) >> 1); // bit shifting is faster than /2
+                int mid = ((beg + end) >> 1); // bit shifting is faster than /2
                 (Temperature > glycol_CpTemps(mid) ? beg : end) = mid;
             } // Invariant: glycol_CpTemps[beg] <= Temperature <= glycol_CpTemps[end]
             return GetInterpValue_fast(Temperature, glycol_CpTemps(beg), glycol_CpTemps(end), glycol_CpValues(beg), glycol_CpValues(end));
