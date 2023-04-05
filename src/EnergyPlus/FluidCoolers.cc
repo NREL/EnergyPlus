@@ -106,7 +106,7 @@ FluidCoolerspecs *FluidCoolerspecs::factory(EnergyPlusData &state, DataPlant::Pl
     auto thisObj = std::find_if(
         state.dataFluidCoolers->SimpleFluidCooler.begin(),
         state.dataFluidCoolers->SimpleFluidCooler.end(),
-        [&objectType, &objectName](const FluidCoolerspecs &myObj) { return myObj.FluidCoolerType == objectType && myObj.Name == objectName; });
+        [objectType, &objectName](const FluidCoolerspecs &myObj) { return myObj.FluidCoolerType == objectType && myObj.Name == objectName; });
     if (thisObj != state.dataFluidCoolers->SimpleFluidCooler.end()) return thisObj;
 
     // If we didn't find it, fatal
@@ -1943,7 +1943,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for passing results to the outlet water node.
 
-    auto &waterOutletNode = this->WaterOutletNodeNum;
+    int waterOutletNode = this->WaterOutletNodeNum;
     state.dataLoopNodes->Node(waterOutletNode).Temp = this->OutletWaterTemp;
 
     if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked ||
@@ -1973,7 +1973,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
 
     // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
     Real64 LoopMinTemp = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinTemp;
-    if (this->OutletWaterTemp<LoopMinTemp &&this->WaterMassFlowRate> 0.0) {
+    if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
         ++this->OutletWaterTempErrorCount;
 
         if (this->OutletWaterTempErrorCount < 2) {
