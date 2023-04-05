@@ -9457,25 +9457,18 @@ namespace Furnaces {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int FurnaceInletNode;     // Furnace inlet node number
-        int FurnaceOutletNode;    // Furnace outlet node number
         Real64 AirMassFlow;       // Furnace inlet node temperature
-        Real64 WSHPRuntimeFrac;   // Compressor runtime fraction
-        Real64 CompPartLoadRatio; // Compressor part load ratio
         Real64 Dummy;             // dummy variable
         Real64 Tout;              // Temporary variable used when outlet temp > DesignMaxOutletTemp
         Real64 Wout;              // Temporary variable used when outlet temp > DesignMaxOutletTemp
-        int CoolingCoilType_Num;  // Numeric Equivalent for CoolingCoilType
-        int HeatingCoilType_Num;  // Numeric Equivalent for HeatingCoilType
         Real64 QActual;           // heating coil load met or delivered
         bool SuppHeatingCoilFlag; // .TRUE. if supplemental heating coil
 
-        FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
-        FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
-        CoolingCoilType_Num = state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num;
-        HeatingCoilType_Num = state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num;
-        WSHPRuntimeFrac = state.dataFurnaces->Furnace(FurnaceNum).WSHPRuntimeFrac;
-        CompPartLoadRatio = state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio;
+        int FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
+        int FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
+        int CoolingCoilType_Num = state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num;
+        Real64 WSHPRuntimeFrac = state.dataFurnaces->Furnace(FurnaceNum).WSHPRuntimeFrac; // Compressor runtime fraction
+        Real64 CompPartLoadRatio = state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio;
         state.dataFurnaces->ModifiedHeatCoilLoad = 0.0;
 
         if (present(CoolingHeatingPLRRat)) {
@@ -9846,9 +9839,9 @@ namespace Furnaces {
         // If the fan runs continually do not allow coils to set OnOffFanPartLoadRatio.
         if (FanOpMode == ContFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
 
-        Real64 SensibleOutput(0.0); // sensible output rate, {W}
-        Real64 LatentOutput(0.0);   // latent output rate, {W}
-        Real64 TotalOutput(0.0);    // total output rate, {W}
+        Real64 SensibleOutput = 0.0; // sensible output rate, {W}
+        Real64 LatentOutput = 0.0;   // latent output rate, {W}
+        Real64 TotalOutput = 0.0;    // total output rate, {W}
         CalcZoneSensibleLatentOutput(AirMassFlow,
                                      state.dataLoopNodes->Node(FurnaceOutletNode).Temp,
                                      state.dataLoopNodes->Node(FurnaceOutletNode).HumRat,
@@ -10451,21 +10444,18 @@ namespace Furnaces {
         int constexpr SolveMaxIter(50);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 QActual;         // actual heating load
-        Real64 mdot;            // heating coil steam or hot water mass flow rate
-        Real64 MinWaterFlow;    // coil minimum hot water mass flow rate, kg/s
-        Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
-        Real64 HotWaterMdot;    // actual hot water mass flow rate
-        std::array<Real64, 4> Par;
-        int SolFlag;
-        std::string &HeatingCoilName = state.dataFurnaces->HeatingCoilName; // name of heating coil
-        int CoilTypeNum(0);                                                 // heating coil type number
-        int HeatingCoilIndex(0);                                            // heating coil index
-        int CoilControlNode(0);                                             // control node for hot water and steam heating coils
-        int CoilOutletNode(0);                                              // air outlet node of the heatiing coils
-        PlantLocation plantLoc{};                                           // plant loop location
+        Real64 mdot;              // heating coil steam or hot water mass flow rate
+        Real64 MinWaterFlow;      // coil minimum hot water mass flow rate, kg/s
+        Real64 MaxHotWaterFlow;   // coil maximum hot water mass flow rate, kg/s
+        Real64 HotWaterMdot;      // actual hot water mass flow rate
+        int CoilTypeNum(0);       // heating coil type number
+        int HeatingCoilIndex(0);  // heating coil index
+        int CoilControlNode(0);   // control node for hot water and steam heating coils
+        int CoilOutletNode(0);    // air outlet node of the heatiing coils
+        PlantLocation plantLoc{}; // plant loop location
 
-        QActual = 0.0;
+        Real64 QActual = 0.0;                                               // actual heating load
+        std::string &HeatingCoilName = state.dataFurnaces->HeatingCoilName; // name of heating coil
 
         if (SuppHeatingCoilFlag) {
             HeatingCoilName = state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName;
@@ -10500,18 +10490,6 @@ namespace Furnaces {
                 if (QActual > (QCoilLoad + SmallLoad)) {
                     // control water flow to obtain output matching QCoilLoad
                     MinWaterFlow = 0.0;
-                    Par[0] = double(FurnaceNum);
-                    if (FirstHVACIteration) {
-                        Par[1] = 1.0;
-                    } else {
-                        Par[1] = 0.0;
-                    }
-                    Par[2] = QCoilLoad;
-                    if (SuppHeatingCoilFlag) {
-                        Par[3] = 1.0;
-                    } else {
-                        Par[3] = 0.0;
-                    }
                     auto f = [&state, FurnaceNum, FirstHVACIteration, QCoilLoad, SuppHeatingCoilFlag](Real64 const HWFlow) {
                         Real64 QCoilRequested = QCoilLoad;
 
@@ -10548,6 +10526,7 @@ namespace Furnaces {
                         }
                         return QCoilRequested != 0.0 ? (QCoilActual - QCoilRequested) / QCoilRequested : 0.0;
                     };
+                    int SolFlag = 0;
                     General::SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, f, MinWaterFlow, MaxHotWaterFlow);
                     if (SolFlag == -1) {
                         if (state.dataFurnaces->Furnace(FurnaceNum).HotWaterCoilMaxIterIndex == 0) {
@@ -10655,8 +10634,6 @@ namespace Furnaces {
         Real64 ActualSensibleOutput;      // Actual furnace sensible capacity
         Real64 QToHeatSetPt;              // Load required to meet heating setpoint temp (>0 is a heating load)
         Real64 NoCompOutput;              // output when no active compressor [W]
-        int TotBranchNum;                 // total exit branch number
-        int ZoneSideNodeNum;              // zone equip supply node
         bool EconoActive;                 // TRUE if Economizer is active
 
         // to be removed by furnace/unitary system
@@ -10904,9 +10881,9 @@ namespace Furnaces {
         state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = AirMassFlow;
 
         if (!FirstHVACIteration && AirMassFlow > 0.0 && AirLoopNum > 0) {
-            TotBranchNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumOutletBranches;
+            int TotBranchNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumOutletBranches;
             if (TotBranchNum == 1) {
-                ZoneSideNodeNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(1);
+                int ZoneSideNodeNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(1);
                 // THE MASS FLOW PRECISION of the system solver is not enough for some small air flow rate iterations , BY DEBUGGING
                 // it may cause mass flow rate occilations between airloop and zoneequip
                 // specify the air flow rate directly for one-to-one system, when the iteration deviation is closing the solver precision level
