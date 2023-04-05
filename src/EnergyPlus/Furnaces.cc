@@ -161,9 +161,6 @@ namespace Furnaces {
     //                     child components in SimFurnace).
     //                     Fan is simulated based on placement (drawthru or blowthru).
 
-    // Using/Aliasing
-    using namespace DataLoopNode;
-
     // MODULE PARAMETER DEFINITIONS
     static constexpr std::string_view BlankString;
 
@@ -923,7 +920,7 @@ namespace Furnaces {
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
-                                                    ObjectIsParent);
+                                                    DataLoopNode::ObjectIsParent);
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     Alphas(4),
@@ -933,7 +930,7 @@ namespace Furnaces {
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
-                                                    ObjectIsParent);
+                                                    DataLoopNode::ObjectIsParent);
 
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -1538,7 +1535,7 @@ namespace Furnaces {
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
-                                                    ObjectIsParent);
+                                                    DataLoopNode::ObjectIsParent);
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     Alphas(4),
@@ -1548,7 +1545,7 @@ namespace Furnaces {
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
-                                                    ObjectIsParent);
+                                                    DataLoopNode::ObjectIsParent);
 
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -2942,7 +2939,7 @@ namespace Furnaces {
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
-                                                    ObjectIsParent);
+                                                    DataLoopNode::ObjectIsParent);
 
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
@@ -2953,7 +2950,7 @@ namespace Furnaces {
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
-                                                    ObjectIsParent);
+                                                    DataLoopNode::ObjectIsParent);
 
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -3960,7 +3957,7 @@ namespace Furnaces {
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
-                                                    ObjectIsParent);
+                                                    DataLoopNode::ObjectIsParent);
 
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
@@ -3971,7 +3968,7 @@ namespace Furnaces {
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
-                                                    ObjectIsParent);
+                                                    DataLoopNode::ObjectIsParent);
 
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -4421,7 +4418,7 @@ namespace Furnaces {
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::ConnectionType::OutsideAirReference,
                                                         NodeInputManager::CompFluidStream::Primary,
-                                                        ObjectIsNotParent);
+                                                        DataLoopNode::ObjectIsNotParent);
                 // need better verification.
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum)) {
                     ShowSevereError(state, format("For {} = {}", CurrentModuleObject, Alphas(1)));
@@ -7643,7 +7640,7 @@ namespace Furnaces {
 
                     if (FullSensibleOutput > NoHeatOutput) {
 
-                        //       check bounds on sensible output prior to iteration using RegulaFalsi
+                        // check bounds on sensible output prior to iteration using RegulaFalsi
                         if (FullSensibleOutput <= SystemSensibleLoad) {
                             PartLoadRatio = 1.0;
                             //         save modified HeatCoilLoad in case it was reset because outlet temp > DesignMaxOutletTemp
@@ -7954,8 +7951,8 @@ namespace Furnaces {
                 if (FullSensibleOutput < NoCoolOutput) {
                     if (CoolCoilLoad != 0.0 || state.dataFurnaces->HPDehumidificationLoadFlag) {
 
-                        //           check bounds on sensible output prior to iteration using RegulaFalsi
-                        //           Negative value represents cooling load, IF FullSensibleOutput .GT. CoolCoilLoad, load is greater than capacity
+                        // check bounds on sensible output prior to iteration using RegulaFalsi
+                        // Negative value represents cooling load, IF FullSensibleOutput .GT. CoolCoilLoad, load is greater than capacity
                         if (FullSensibleOutput >= CoolCoilLoad) {
                             PartLoadRatio = 1.0;
                             //           Likewise IF NoCoolOutput .LT. CoolCoilLoad, then load can be met using only the fan (constant fan mode only)
@@ -8140,7 +8137,7 @@ namespace Furnaces {
                                               HXUnitOn);
                         }
 
-                        //         check bounds on latent output prior to iteration using RegulaFalsi
+                        // check bounds on latent output prior to iteration using RegulaFalsi
                         if (TempLatentOutput > SystemMoistureLoad ||
                             (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode &&
                              TempCoolOutput > CoolCoilLoad)) {
@@ -8427,16 +8424,16 @@ namespace Furnaces {
                     //       IF a humidistat is used and there is a moisture load, check if the latent PLR is greater than the (sensible) PLR
                     //        IF(LatentPartLoadRatio .GT. PartLoadRatio .and. SystemMoistureLoad .lt. 0.0 .and. Furnace(FurnaceNum)%Humidistat) THEN
                     if (LatentPartLoadRatio > PartLoadRatio && state.dataFurnaces->Furnace(FurnaceNum).Humidistat) {
-                        //         For dehumidification mode CoolReheat, compare the Sensible and Latent PLR values, if latentPLR is greater
-                        //         than PLR (sensible), then overcooling is required and reheat will be activated using the HumControl flag.
+                        // For dehumidification mode CoolReheat, compare the Sensible and Latent PLR values, if latentPLR is greater
+                        // than PLR (sensible), then overcooling is required and reheat will be activated using the HumControl flag.
                         if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
                             PartLoadRatio = LatentPartLoadRatio;
                             HumControl = true;
                         }
-                        //         For dehumidification mode MultiMode, compare the Sensible and Latent PLR values, if latentPLR is
-                        //         greater than PLR (sensible), then use the latent PLR to control the unit.
-                        //         For MultiMode control, the latent PLR is found by enabling the HX and calculating a PLR required to meet the
-                        //         sensible load. Overcooling is not required, and reheat will not be activated using the HumControl flag.
+                        // For dehumidification mode MultiMode, compare the Sensible and Latent PLR values, if latentPLR is
+                        // greater than PLR (sensible), then use the latent PLR to control the unit.
+                        // For MultiMode control, the latent PLR is found by enabling the HX and calculating a PLR required to meet the
+                        // sensible load. Overcooling is not required, and reheat will not be activated using the HumControl flag.
                         if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode) {
                             PartLoadRatio = LatentPartLoadRatio;
                         }
@@ -8749,7 +8746,7 @@ namespace Furnaces {
 
             state.dataFurnaces->Furnace(FurnaceNum).InitHeatPump = false;
 
-            //       check bounds on sensible output prior to iteration using RegulaFalsi
+            // check bounds on sensible output prior to iteration using RegulaFalsi
             if (ZoneSensLoadMetFanONCompON > TotalZoneSensLoad) {
                 CoolPartLoadRatio = 1.0;
                 HPCoilSensDemand = std::abs(ZoneSensLoadMetFanONCompON - ZoneSensLoadMetFanONCompOFF);
@@ -8954,7 +8951,7 @@ namespace Furnaces {
 
             state.dataFurnaces->Furnace(FurnaceNum).InitHeatPump = false;
 
-            //       check bounds on sensible output prior to iteration using RegulaFalsi
+            // check bounds on sensible output prior to iteration using RegulaFalsi
             if (ZoneSensLoadMetFanONCompON < TotalZoneSensLoad) {
                 HeatPartLoadRatio = 1.0;
                 ZoneSensLoadMet = ZoneSensLoadMetFanONCompON;
