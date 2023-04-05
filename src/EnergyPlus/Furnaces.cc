@@ -6196,8 +6196,6 @@ namespace Furnaces {
                             state.dataFurnaces->HeatingLoad = false;
                             if (state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling > 0) {
                                 SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
-                                //               CALL SetOnOffMassFlowRateVSCoil(FurnaceNum, Furnace(FurnaceNum)%ControlZoneNum, FirstHVACIteration, &
-                                //                    AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio)
                             } else {
                                 SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
                             }
@@ -6213,8 +6211,6 @@ namespace Furnaces {
                         }
                         if (state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling > 0) {
                             SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
-                            //               CALL SetOnOffMassFlowRateVSCoil(FurnaceNum, Furnace(FurnaceNum)%ControlZoneNum, FirstHVACIteration, &
-                            //                    AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio)
                         } else {
                             SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
                         }
@@ -6249,8 +6245,6 @@ namespace Furnaces {
 
                         if (state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling > 0) {
                             SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
-                            //           CALL SetOnOffMassFlowRateVSCoil(FurnaceNum, Furnace(FurnaceNum)%ControlZoneNum, FirstHVACIteration, &
-                            //                    AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio)
                             CalcVarSpeedHeatPump(state,
                                                  FurnaceNum,
                                                  false,
@@ -6291,8 +6285,6 @@ namespace Furnaces {
                             }
                             if (state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling > 0) {
                                 SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
-                                //               CALL SetOnOffMassFlowRateVSCoil(FurnaceNum, Furnace(FurnaceNum)%ControlZoneNum, FirstHVACIteration, &
-                                //                     AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio)
                             } else {
                                 SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
                             }
@@ -6302,8 +6294,6 @@ namespace Furnaces {
                         QZnReq = 0.0;
                         state.dataFurnaces->HeatingLoad = false;
                         if (state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling > 0) {
-                            //            CALL SetOnOffMassFlowRateVSCoil(FurnaceNum, Furnace(FurnaceNum)%ControlZoneNum, FirstHVACIteration, &
-                            //                        AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio)
                             SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
                         } else {
                             SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
@@ -6381,8 +6371,6 @@ namespace Furnaces {
             }
             if (state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling > 0) {
                 SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
-                //       CALL SetOnOffMassFlowRateVSCoil(FurnaceNum, Furnace(FurnaceNum)%ControlZoneNum, FirstHVACIteration, &
-                //                AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio)
             } else {
                 SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, ZoneLoad, MoistureLoad, PartLoadRatio);
             }
@@ -10658,24 +10646,13 @@ namespace Furnaces {
 
         Real64 PartLoadFrac; // compressor part load fraction
         Real64 SpeedRatio;   // compressor speed ratio
-        bool UnitOn;         // TRUE if unit is on
-        int OutletNode;      // MSHP air outlet node
-        int InletNode;       // MSHP air inlet node
-        Real64 AirMassFlow;  // air mass flow rate [kg/s]
-        int OpMode;          // operating mode (fan cycling or continious; DX coil always cycles)
-        int ZoneNum;         // Controlled zone number
         Real64 QTotUnitOut;  // capacity output
         auto &SpeedNum = state.dataFurnaces->SpeedNum;
         auto &SupHeaterLoad = state.dataFurnaces->SupHeaterLoad;
-        Real64 TotalZoneLatentLoad;       // Total ZONE latent load
-        Real64 TotalZoneSensibleLoad;     // Total ZONE sensible load
-        Real64 SystemSensibleLoad;        // Positive value means heating required
         CompressorOperation CompressorOp; // compressor operation; 1=on, 0=off
-        Real64 SaveMassFlowRate;          // saved inlet air mass flow rate [kg/s]
         Real64 QSensUnitOut;              // sensible capacity output
         Real64 QLatUnitOut;               // latent capacity output
         Real64 ActualSensibleOutput;      // Actual furnace sensible capacity
-        Real64 ReheatCoilLoad;            // reheat coil load due to dehumidification
         Real64 QToHeatSetPt;              // Load required to meet heating setpoint temp (>0 is a heating load)
         Real64 NoCompOutput;              // output when no active compressor [W]
         int TotBranchNum;                 // total exit branch number
@@ -10692,18 +10669,17 @@ namespace Furnaces {
         state.dataHVACGlobal->SuppHeatingCoilPower = 0.0;
         state.dataHVACGlobal->DefrostElecPower = 0.0;
 
-        SystemSensibleLoad = QZnReq;
-        TotalZoneSensibleLoad = QZnReq;
-        TotalZoneLatentLoad = QLatReq;
+        Real64 SystemSensibleLoad = QZnReq; // Positive value means heating required
+        Real64 TotalZoneSensibleLoad = QZnReq;
+        Real64 TotalZoneLatentLoad = QLatReq;
 
         // initialize local variables
-        UnitOn = true;
-        OutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
-        InletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
-        AirMassFlow = state.dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate;
-        OpMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode;
-        ZoneNum = state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum;
-        CompressorOp = CompressorOperation::On;
+        bool UnitOn = true;
+        int OutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
+        int InletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
+        Real64 AirMassFlow = state.dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate;
+        int OpMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode; // fan operating mode
+        int ZoneNum = state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum;
 
         // Set latent load for heating
         if (state.dataFurnaces->HeatingLoad) {
@@ -10736,7 +10712,7 @@ namespace Furnaces {
             EconoActive = false;
         }
 
-        SaveMassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+        Real64 SaveMassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         // decide current working mode for IHP
         if ((FirstHVACIteration) && (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP))
             DecideWorkMode(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, TotalZoneSensibleLoad, TotalZoneLatentLoad);
@@ -10814,7 +10790,7 @@ namespace Furnaces {
             }
         }
 
-        ReheatCoilLoad = 0.0;
+        Real64 ReheatCoilLoad = 0.0;
         TotalZoneSensibleLoad = QZnReq;
         TotalZoneLatentLoad = QLatReq;
         //     Calculate the reheat coil output
@@ -12519,112 +12495,6 @@ namespace Furnaces {
         //  IF(ABS(Node(OutNode)%MassFlowRate - 0.435)  < 0.001) THEN
         //    Node(OutNode)%MassFlowRate  = Node(InletNode)%MassFlowRate
         //  END IF
-    }
-
-    void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
-                                    int const FurnaceNum,                       // index to furnace
-                                    int const ZoneNum,                          // index to zone
-                                    bool const FirstHVACIteration,              // Flag for 1st HVAC iteration
-                                    [[maybe_unused]] int const AirLoopNum,      // index to air loop !unused1208
-                                    Real64 &OnOffAirFlowRatio,                  // ratio of coil on to coil off air flow rate
-                                    [[maybe_unused]] int const OpMode,          // fan operating mode
-                                    [[maybe_unused]] Real64 const QZnReq,       // sensible load to be met (W) !unused1208
-                                    [[maybe_unused]] Real64 const MoistureLoad, // moisture load to be met (W)
-                                    Real64 &PartLoadRatio                       // coil part-load ratio
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Bo Shen
-        //       DATE WRITTEN   March 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for initializations of the Furnace Components.
-
-        // METHODOLOGY EMPLOYED:
-        // The HeatCool furnace/unitarysystem and air-to-air heat pump may have alternate air flow rates
-        // in cooling, heating, and when no cooling or heating is needed. Set up the coil (comp) ON and OFF
-        // air flow rates. Use these flow rates during the Calc routines to set the average mass flow rates
-        // based on PLR.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int InNode;  // Inlet node number in MSHP loop
-        int OutNode; // Outlet node number in MSHP loop
-
-        InNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
-        OutNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
-
-        if (state.dataFurnaces->CoolingLoad) {
-            state.dataFurnaces->Furnace(FurnaceNum).HeatCoolMode = Furnaces::ModeOfOperation::CoolingMode;
-        } else if (state.dataFurnaces->HeatingLoad) {
-            state.dataFurnaces->Furnace(FurnaceNum).HeatCoolMode = Furnaces::ModeOfOperation::HeatingMode;
-        } else {
-            state.dataFurnaces->Furnace(FurnaceNum).HeatCoolMode = Furnaces::ModeOfOperation::NoCoolHeat;
-        }
-
-        // Set the inlet node mass flow rate
-        if (state.dataFurnaces->Furnace(FurnaceNum).OpMode == ContFanCycCoil) {
-            // constant fan mode
-            if ((state.dataFurnaces->Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::HeatingMode) &&
-                !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
-                state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(1);
-                state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).MSHeatingSpeedRatio(1);
-                state.dataFurnaces->Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
-            } else if ((state.dataFurnaces->Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::CoolingMode) &&
-                       !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
-                state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(1);
-                state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio(1);
-                state.dataFurnaces->Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::CoolingMode;
-            } else {
-                state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).IdleMassFlowRate;
-                state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).IdleSpeedRatio;
-            }
-            state.dataFurnaces->CompOffMassFlow = state.dataFurnaces->Furnace(FurnaceNum).IdleMassFlowRate;
-            state.dataFurnaces->CompOffFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).IdleSpeedRatio;
-        } else {
-            // cycling fan mode
-            if ((state.dataFurnaces->Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::HeatingMode) &&
-                !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
-                state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(1);
-                state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).MSHeatingSpeedRatio(1);
-            } else if ((state.dataFurnaces->Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::CoolingMode) &&
-                       !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
-                state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(1);
-                state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio(1);
-            } else {
-                state.dataFurnaces->CompOnMassFlow = 0.0;
-                state.dataFurnaces->CompOnFlowRatio = 0.0;
-            }
-            state.dataFurnaces->CompOffMassFlow = 0.0;
-            state.dataFurnaces->CompOffFlowRatio = 0.0;
-        }
-
-        // Set the inlet node mass flow rate
-        if (GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr) > 0.0 &&
-            state.dataFurnaces->CompOnMassFlow != 0.0) {
-            OnOffAirFlowRatio = 1.0;
-            if (FirstHVACIteration) {
-                state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataFurnaces->CompOnMassFlow;
-                PartLoadRatio = 0.0;
-            } else {
-                if (state.dataFurnaces->Furnace(FurnaceNum).HeatCoolMode != Furnaces::ModeOfOperation::NoCoolHeat) {
-                    PartLoadRatio = 1.0;
-                } else {
-                    PartLoadRatio = 0.0;
-                }
-            }
-        } else {
-            PartLoadRatio = 0.0;
-            state.dataLoopNodes->Node(InNode).MassFlowRate = 0.0;
-            state.dataLoopNodes->Node(OutNode).MassFlowRate = 0.0;
-            state.dataLoopNodes->Node(OutNode).MassFlowRateMaxAvail = 0.0;
-            OnOffAirFlowRatio = 1.0;
-        }
-
-        // Set the system mass flow rates
-        SetVSHPAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     }
 
     void SetMinOATCompressor(EnergyPlusData &state,

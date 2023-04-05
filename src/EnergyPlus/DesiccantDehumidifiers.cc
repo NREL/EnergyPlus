@@ -649,7 +649,7 @@ namespace DesiccantDehumidifiers {
             }
         }
 
-        for (DesicDehumIndex = 1; DesicDehumIndex <= state.dataDesiccantDehumidifiers->NumGenericDesicDehums; ++DesicDehumIndex) {
+        for (int DesicDehumIndex = 1; DesicDehumIndex <= state.dataDesiccantDehumidifiers->NumGenericDesicDehums; ++DesicDehumIndex) {
 
             CurrentModuleObject = "Dehumidifier:Desiccant:System";
 
@@ -1539,7 +1539,7 @@ namespace DesiccantDehumidifiers {
                                 desicDehum.Name);
         }
 
-        for (DesicDehumIndex = 1; DesicDehumIndex <= state.dataDesiccantDehumidifiers->NumGenericDesicDehums; ++DesicDehumIndex) {
+        for (int DesicDehumIndex = 1; DesicDehumIndex <= state.dataDesiccantDehumidifiers->NumGenericDesicDehums; ++DesicDehumIndex) {
             // this is wrong, should be a loop from (state.dataDesiccantDehumidifiers->NumSolidDesicDehums + 1) to
             // (state.dataDesiccantDehumidifiers->NumDesicDehums = NumSolidDesicDehums + NumGenericDesicDehums)
             // DesicDehumNum = DesicDehumIndex + state.dataDesiccantDehumidifiers->NumSolidDesicDehums;
