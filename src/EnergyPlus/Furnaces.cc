@@ -163,8 +163,6 @@ namespace Furnaces {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataZoneEquipment;
-    using namespace ScheduleManager;
 
     // MODULE PARAMETER DEFINITIONS
     static constexpr std::string_view BlankString;
@@ -197,9 +195,6 @@ namespace Furnaces {
         // dehumidification control type is COOLREHEAT. Both the supplemental and reheat heating coil load is calculated
         // in the Calc routines and returned here through subroutine arguments. The actual simulation of these coils is
         // performed here (i.e. the supplemental and reheat coil loads are passed as 0 to CalcFurnaceOutput).
-
-        // Using/Aliasing
-        using namespace DataZoneEnergyDemands;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FurnaceNum;           // Furnace number
@@ -911,7 +906,7 @@ namespace Furnaces {
             if (lAlphaBlanks(2)) {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
+                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                     ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(2), Alphas(2)));
@@ -942,7 +937,7 @@ namespace Furnaces {
 
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
-            state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr = GetScheduleIndex(state, Alphas(5));
+            state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(5));
             if (!lAlphaBlanks(5) && state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr == 0) {
                 ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                 ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(5), Alphas(5)));
@@ -1082,7 +1077,8 @@ namespace Furnaces {
                     // Check fan's schedule for cycling fan operation if constant volume fan is used
                     if (state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr > 0 &&
                         state.dataFurnaces->Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                        if (!CheckScheduleValueMinMax(state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
+                        if (!ScheduleManager::CheckScheduleValueMinMax(
+                                state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                             ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                             ShowContinueError(state, format("For {} = {}", cAlphaFields(7), Alphas(7)));
                             ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
@@ -1525,7 +1521,7 @@ namespace Furnaces {
             if (lAlphaBlanks(2)) {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
+                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                     ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(2), Alphas(2)));
@@ -1556,7 +1552,7 @@ namespace Furnaces {
 
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
-            state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr = GetScheduleIndex(state, Alphas(5));
+            state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(5));
             if (!lAlphaBlanks(5) && state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr == 0) {
                 ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                 ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(5), Alphas(5)));
@@ -1694,7 +1690,8 @@ namespace Furnaces {
                     // Check fan's schedule for cycling fan operation if constant volume fan is used
                     if (state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr > 0 &&
                         state.dataFurnaces->Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                        if (!CheckScheduleValueMinMax(state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
+                        if (!ScheduleManager::CheckScheduleValueMinMax(
+                                state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                             ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                             ShowContinueError(state, format("For {} = {}", cAlphaFields(7), Alphas(7)));
                             ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
@@ -2844,7 +2841,7 @@ namespace Furnaces {
             }
 
             if (state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr > 0) {
-                if (!CheckScheduleValueMinMax(state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr, ">=", 0.0, "<=", 0.0)) {
+                if (!ScheduleManager::CheckScheduleValueMinMax(state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr, ">=", 0.0, "<=", 0.0)) {
                     //           set air flow control mode:
                     //             UseCompressorOnFlow = operate at last cooling or heating air flow requested when compressor is off
                     //             UseCompressorOffFlow = operate at value specified by user
@@ -2928,7 +2925,7 @@ namespace Furnaces {
             if (lAlphaBlanks(2)) {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
+                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                     ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(2), Alphas(2)));
@@ -3517,7 +3514,7 @@ namespace Furnaces {
                 ErrorsFound = true;
             }
 
-            state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr = GetScheduleIndex(state, Alphas(15));
+            state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(15));
             if (!lAlphaBlanks(15) && state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr == 0) {
                 ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                 ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(15), Alphas(15)));
@@ -3534,7 +3531,7 @@ namespace Furnaces {
 
             if (state.dataFurnaces->Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr > 0) {
-                    if (!CheckScheduleValueMinMax(state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
+                    if (!ScheduleManager::CheckScheduleValueMinMax(state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                         ShowContinueError(state, format("For {} = {}", cAlphaFields(7), Alphas(7)));
                         ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
@@ -3748,7 +3745,7 @@ namespace Furnaces {
             }
 
             if (state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr > 0) {
-                if (!CheckScheduleValueMinMax(
+                if (!ScheduleManager::CheckScheduleValueMinMax(
                         state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr, ">=", 0.0, "<=", 0.0)) { // Autodesk:Note Range is 0 to 0?
                     //           set air flow control mode:
                     //             UseCompressorOnFlow = operate at last cooling or heating air flow requested when compressor is off
@@ -3946,7 +3943,7 @@ namespace Furnaces {
             if (lAlphaBlanks(2)) {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
+                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                     ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(2), Alphas(2)));
@@ -4442,7 +4439,7 @@ namespace Furnaces {
                 ErrorsFound = true;
             }
 
-            state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr = GetScheduleIndex(state, Alphas(16));
+            state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(16));
             if (!lAlphaBlanks(16) && state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr == 0) {
                 ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                 ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(16), Alphas(16)));
@@ -5663,7 +5660,7 @@ namespace Furnaces {
         }
 
         if (state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr > 0) {
-            if (GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr) == 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr) == 0.0) {
                 state.dataFurnaces->Furnace(FurnaceNum).OpMode = DataHVACGlobals::CycFanCycCoil;
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).OpMode = DataHVACGlobals::ContFanCycCoil;
@@ -5716,7 +5713,7 @@ namespace Furnaces {
         if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != DataHVACGlobals::Furnace_HeatOnly &&
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatOnly) {
 
-            if (GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) {
                 if ((state.dataFurnaces->HeatingLoad || state.dataFurnaces->CoolingLoad) ||
                     (state.dataFurnaces->Furnace(FurnaceNum).Humidistat && MoistureLoad < 0.0)) {
                     PartLoadRatio = 1.0;
@@ -6002,8 +5999,10 @@ namespace Furnaces {
 
         QToCoolSetPt = 0.0;
         QToHeatSetPt = 0.0;
-        if (OpMode == DataHVACGlobals::ContFanCycCoil && GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0 &&
-            ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr) > 0.0 || state.dataHVACGlobal->TurnFansOn) &&
+        if (OpMode == DataHVACGlobals::ContFanCycCoil &&
+            ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0 &&
+            ((ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr) > 0.0 ||
+              state.dataHVACGlobal->TurnFansOn) &&
              !state.dataHVACGlobal->TurnFansOff)) {
 
             if (state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling > 0) {
@@ -6458,9 +6457,6 @@ namespace Furnaces {
         // and heating capacities of a DX heat pump system will be identical. In real life the ARI
         // heating and cooling capacities are close but not identical.
 
-        // Using/Aliasing
-        using namespace DataSizing;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Iter;                 // iteration count
         Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
@@ -6659,7 +6655,7 @@ namespace Furnaces {
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate == AutoSize) {
+        if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
@@ -6686,7 +6682,7 @@ namespace Furnaces {
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow == AutoSize) {
+        if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
@@ -6712,7 +6708,7 @@ namespace Furnaces {
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow == AutoSize) {
+        if (state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
@@ -6739,7 +6735,7 @@ namespace Furnaces {
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow == AutoSize) {
+        if (state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
@@ -6766,7 +6762,7 @@ namespace Furnaces {
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity == AutoSize) {
+        if (state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
@@ -6806,7 +6802,7 @@ namespace Furnaces {
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity == AutoSize) {
+        if (state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
@@ -6826,7 +6822,7 @@ namespace Furnaces {
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp == AutoSize) {
+        if (state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
@@ -6842,7 +6838,7 @@ namespace Furnaces {
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity == AutoSize) {
+        if (state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
@@ -6915,9 +6911,6 @@ namespace Furnaces {
         // METHODOLOGY EMPLOYED:
         // Determine the operating PLR to meet the zone sensible load.
 
-        // Using/Aliasing
-        using namespace ScheduleManager;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr MaxIter(15);    // maximum number of iterations
         Real64 constexpr MinPLR(0.0); // minimum part load ratio allowed
@@ -6953,8 +6946,8 @@ namespace Furnaces {
             furnaceInNode.MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
         } else {
             // If Furnace runs then set HeatCoilLoad on Heating Coil and the Mass Flow
-            if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) && (furnaceInNode.MassFlowRate > 0.0) &&
-                (state.dataFurnaces->HeatingLoad)) {
+            if ((ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) &&
+                (furnaceInNode.MassFlowRate > 0.0) && (state.dataFurnaces->HeatingLoad)) {
 
                 furnaceInNode.MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
                 HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity;
@@ -7121,7 +7114,7 @@ namespace Furnaces {
                 //      END IF
                 state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = furnaceInNode.MassFlowRate;
 
-            } else if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) &&
+            } else if ((ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) &&
                        (furnaceInNode.MassFlowRate > 0.0) && (OpMode == DataHVACGlobals::ContFanCycCoil)) {
                 HeatCoilLoad = 0.0;
             } else { // no heating and no flow
@@ -7197,10 +7190,6 @@ namespace Furnaces {
         //        dehumidification control type is COOLREHEAT. Both the supplemental and reheat heating coil load is calculated
         //        in the Calc routines. The actual simulation of these coils is performed in the SimFurnace routine (i.e. the
         //        supplemental and reheat coil loads are passed as 0 to CalcFurnaceOutput).
-
-        // Using/Aliasing
-        using namespace ScheduleManager;
-        using namespace DataZoneEnergyDemands;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr MaxIter(100);   // maximum number of iterations
@@ -7375,7 +7364,8 @@ namespace Furnaces {
             //*********** Heating Section ************
             // If Furnace runs with a heating load then set HeatCoilLoad on Heating Coil and the Mass Flow
             //         (Node(FurnaceInletNode)%MassFlowRate .gt. 0.0d0) .and. &
-            if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) && (state.dataFurnaces->HeatingLoad)) {
+            if ((ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) &&
+                (state.dataFurnaces->HeatingLoad)) {
 
                 //    Heat pumps only calculate a single PLR each time step (i.e. only cooling or heating allowed in a single time step)
                 if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
@@ -7863,7 +7853,8 @@ namespace Furnaces {
             // Simulate if scheduled ON and cooling load or if a moisture load exists when using a humidistat
             // Check of HeatingLatentOutput is used to reduce overshoot during simultaneous heating and cooling
             // Setback flag is used to avoid continued RH control when Tstat is setback (RH should float down)
-            if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0 && state.dataFurnaces->CoolingLoad) ||
+            if ((ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0 &&
+                 state.dataFurnaces->CoolingLoad) ||
                 (state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
                  state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat &&
                  (SystemMoistureLoad < 0.0 || (SystemMoistureLoad >= 0.0 && HeatingLatentOutput > SystemMoistureLoad &&
@@ -8575,7 +8566,7 @@ namespace Furnaces {
             //*********HVAC Scheduled OFF*************
             // No heating or cooling or dehumidification
             //!!LKL discrepancy with < 0?
-            if (GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) == 0.0 ||
+            if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) == 0.0 ||
                 state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate == 0.0) {
                 state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = 0.0;
                 CoolCoilLoad = 0.0;
@@ -8680,7 +8671,7 @@ namespace Furnaces {
         // AND air flow rate is greater than zero...
         // AND the air system has a cooling load and is not set back or in the deadband...
         // OR the system is controlled by a humidistat and there is a latent load
-        if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0 &&
+        if ((ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0 &&
              state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate > 0.0) &&
             ((state.dataFurnaces->CoolingLoad) ||
              (state.dataFurnaces->Furnace(FurnaceNum).Humidistat && state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilLatentDemand < 0.0))) {
@@ -8886,7 +8877,7 @@ namespace Furnaces {
 
             //*********HEATING CALCULATIONS****************
             // If Furnace runs with a heating load then set HeatCoilLoad on Heating Coil and the Mass Flow
-        } else if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) &&
+        } else if ((ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) &&
                    (state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate > 0.0) && state.dataFurnaces->HeatingLoad) {
 
             // Set the air flow rate to the design flow rate and set the fan operation fraction to 1 (continuous operation)
@@ -9107,7 +9098,7 @@ namespace Furnaces {
             }
 
             //**********HVAC Scheduled ON, but no cooling, dehumidification or heating load*********
-        } else if (GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) {
+        } else if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) {
             state.dataFurnaces->Furnace(FurnaceNum).InitHeatPump = true; // initialization call to Calc Furnace
             HeatPartLoadRatio = 0.0;
             CoolPartLoadRatio = 0.0;
@@ -9886,9 +9877,6 @@ namespace Furnaces {
         // The air flow rate in cooling, heating, and no cooling or heating can be different.
         // Calculate the air flow rate based on initializations made in InitFurnace.
 
-        // Using/Aliasing
-        using namespace DataZoneEnergyDemands;
-
         int InletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
         Real64 AverageUnitMassFlow =
             (PartLoadRatio * state.dataFurnaces->CompOnMassFlow) + ((1 - PartLoadRatio) * state.dataFurnaces->CompOffMassFlow);
@@ -9899,8 +9887,9 @@ namespace Furnaces {
             state.dataFurnaces->FanSpeedRatio = state.dataFurnaces->CompOnFlowRatio;
         }
         // IF the furnace is scheduled on or nightime cycle overrides fan schedule. Uses same logic as fan.
-        if (GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0 &&
-            ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr) > 0.0 || state.dataHVACGlobal->TurnFansOn) &&
+        if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0 &&
+            ((ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr) > 0.0 ||
+              state.dataHVACGlobal->TurnFansOn) &&
              !state.dataHVACGlobal->TurnFansOff)) {
             state.dataLoopNodes->Node(InletNode).MassFlowRate = AverageUnitMassFlow;
             state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AverageUnitMassFlow;
@@ -10289,8 +10278,6 @@ namespace Furnaces {
         // METHODOLOGY EMPLOYED:
         // Calls ControlMSHPOutput to obtain the desired unit output
 
-        using namespace DataZoneEnergyDemands;
-
         Real64 PartLoadFrac; // compressor part load fraction
         Real64 SpeedRatio;   // compressor speed ratio
         Real64 QTotUnitOut;  // capacity output
@@ -10441,7 +10428,7 @@ namespace Furnaces {
         TotalZoneSensibleLoad = QZnReq;
         TotalZoneLatentLoad = QLatReq;
         //     Calculate the reheat coil output
-        if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) &&
+        if ((ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) &&
             (state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
              state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat &&
              (QLatReq < 0.0))) { // if a Humidistat is installed and dehumdification control type is CoolReheat
@@ -10649,7 +10636,7 @@ namespace Furnaces {
         Real64 noLatOutput = 0.0;
         Real64 ErrorToler = 0.001; // Error tolerance for convergence from input deck
 
-        if (GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) == 0.0) return;
+        if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) == 0.0) return;
 
         // Get result when DX coil is off
         SupHeaterLoad = 0.0;
@@ -12035,7 +12022,7 @@ namespace Furnaces {
             }
         }
 
-        if (GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) == 0.0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) == 0.0) {
             state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
             OnOffAirFlowRatio = 0.0;
         } else {
