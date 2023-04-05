@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.fwd.hh>
-#include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -488,10 +487,10 @@ namespace WaterThermalTanks {
               HPWaterHeaterSensibleCapacity(0.0), HPWaterHeaterLatentCapacity(0.0), WrappedCondenserBottomLocation(0.0),
               WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), ControlSensor1Node(1), ControlSensor1Weight(1.0),
               ControlSensor2Height(-1.0), ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0), ControlTempFinal(0.0),
-              AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              HPWHAirMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), HPWHWaterVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              HPWHWaterMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSAirSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSWaterSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0), bIsIHP(false), MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true),
+              AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              HPWHAirMassFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0), HPWHWaterVolFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              HPWHWaterMassFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0), MSAirSpeedRatio(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSWaterSpeedRatio(DataHVACGlobals::MaxSpeedLevels, 0.0), bIsIHP(false), MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true),
               CheckHPWHEquipName(true), myOneTimeInitFlag(true)
         {
         }
@@ -788,7 +787,7 @@ namespace WaterThermalTanks {
 
         void MinePlantStructForInfo(EnergyPlusData &state);
 
-        void SizeSupplySidePlantConnections(EnergyPlusData &state, Optional_int_const LoopNum = _);
+        void SizeSupplySidePlantConnections(EnergyPlusData &state, const int loopNum);
 
         void CalcWaterThermalTank(EnergyPlusData &state);
 
@@ -893,11 +892,18 @@ namespace WaterThermalTanks {
                                 bool FirstHVACIteration // TRUE if First iteration of simulation
         );
 
-        Real64 PLRResidualHPWH(EnergyPlusData &state, Real64 HPPartLoadRatio, Array1D<Real64> const &Par);
+        Real64 PLRResidualHPWH(EnergyPlusData &state, Real64 HPPartLoadRatio, Real64 desTankTemp, TankOperatingMode mode, Real64 mDotWater);
 
         Real64 PLRResidualIterSpeed(EnergyPlusData &state,
                                     Real64 SpeedRatio, // speed ratio between two speed levels
-                                    Array1D<Real64> const &Par);
+                                    int HPNum,
+                                    int SpeedNum,
+                                    int HPWaterInletNode,
+                                    int HPWaterOutletNode,
+                                    Real64 RhoWater,
+                                    Real64 desTankTemp,
+                                    TankOperatingMode mode,
+                                    bool FirstHVACIteration);
 
         static void ValidatePLFCurve(EnergyPlusData &state, int CurveIndex, bool &IsValid);
 

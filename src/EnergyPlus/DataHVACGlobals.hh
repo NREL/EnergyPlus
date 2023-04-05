@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -310,6 +310,8 @@ namespace DataHVACGlobals {
     int constexpr ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir(37);
     int constexpr ZoneEquipTypeOf_AirLoopHVACReturnAir(38);
 
+    int constexpr MaxSpeedLevels = 10;
+
     extern Array1D_string const cFanTypes;
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;
@@ -424,6 +426,7 @@ struct HVACGlobalsData : BaseGlobalStruct
     bool FirstTimeStepSysFlag = false; // Set to true at the start of each sub-time step
 
     Real64 TimeStepSys = 0.0;                  // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
+    Real64 TimeStepSysSec = 0.0;               // System Time Increment in seconds
     Real64 SysTimeElapsed = 0.0;               // elapsed system time in zone timestep (hours)
     Real64 FracTimeStepZone = 0.0;             // System time step divided by the zone time step
     bool ShortenTimeStepSys = false;           // Logical flag that triggers shortening of system time step
@@ -444,6 +447,7 @@ struct HVACGlobalsData : BaseGlobalStruct
     Real64 ElecHeatingCoilPower = 0.0;     // Electric power consumed by electric heating coil
     Real64 SuppHeatingCoilPower = 0.0;     // Electric power consumed by electric supplemental heating coil
     Real64 AirToAirHXElecPower = 0.0;      // Electric power consumed by Heat Exchanger:Air To Air (Generic or Flat Plate)
+    Real64 DefrostElecPower = 0.0;         // Electric power consumed by DX heating coil for defrosting (Resistive or ReverseCycle)
     // from last simulation in HeatRecovery.cc
     Real64 UnbalExhMassFlow = 0.0;      // unbalanced zone exhaust from a zone equip component [kg/s]
     Real64 BalancedExhMassFlow = 0.0;   // balanced zone exhaust (declared as so by user)  [kg/s]

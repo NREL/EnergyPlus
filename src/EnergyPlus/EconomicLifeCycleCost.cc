@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -95,14 +95,6 @@ namespace EnergyPlus::EconomicLifeCycleCost {
 //   Systems", and "Engineering Economic Analysis, Ninth Edition", by
 //   Donald Newnan, Ted Eschenback, and Jerome Lavelle.
 
-// OTHER NOTES:
-// na
-
-// Using/Aliasing
-using namespace DataGlobalConstants;
-
-// Functions
-
 void GetInputForLifeCycleCost(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -114,18 +106,13 @@ void GetInputForLifeCycleCost(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     //    Read the input file for "LifeCycleCost:Parameters" object.
 
-    // Using/Aliasing
-    using OutputReportTabular::AddTOCEntry;
-
-    auto &elcc(state.dataEconLifeCycleCost);
-
-    if (elcc->GetInput_GetLifeCycleCostInput) {
+    if (state.dataEconLifeCycleCost->GetInput_GetLifeCycleCostInput) {
         GetInputLifeCycleCostParameters(state);
         GetInputLifeCycleCostRecurringCosts(state);
         GetInputLifeCycleCostNonrecurringCost(state);
         GetInputLifeCycleCostUsePriceEscalation(state);
         GetInputLifeCycleCostUseAdjustment(state);
-        elcc->GetInput_GetLifeCycleCostInput = false;
+        state.dataEconLifeCycleCost->GetInput_GetLifeCycleCostInput = false;
     }
 }
 
@@ -207,8 +194,9 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
                 ShowWarningError(state,
-                                 "In " + CurrentModuleObject + " named " + AlphaArray(1) +
-                                     " a field was found containing LifeCycleCost: which may indicate a missing comma.");
+                                 format("In {} named {} a field was found containing LifeCycleCost: which may indicate a missing comma.",
+                                        CurrentModuleObject,
+                                        AlphaArray(1)));
             }
         }
         // start to extract values from input array into appropriate fields
@@ -225,9 +213,10 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         elcc->discountConvention = static_cast<DiscConv>(getEnumerationValue(DiscConvNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
         if (elcc->discountConvention == DiscConv::Invalid) {
             elcc->discountConvention = DiscConv::EndOfYear;
-            ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
-                                 "\". EndOfYear will be used.");
+            ShowWarningError(
+                state,
+                format(
+                    "{}: Invalid {}=\"{}\". EndOfYear will be used.", CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(2), AlphaArray(2)));
         }
         // A3,  \field Inflation Approach
         //      \type choice
@@ -238,47 +227,58 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         if (elcc->inflationApproach == InflAppr::Invalid) {
             elcc->inflationApproach = InflAppr::ConstantDollar;
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
-                                 "\". ConstantDollar will be used.");
+                             format("{}: Invalid {}=\"{}\". ConstantDollar will be used.",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cAlphaFieldNames(3),
+                                    AlphaArray(3)));
         }
         // N1,  \field Real Discount Rate
         //      \type real
         elcc->realDiscountRate = NumArray(1);
         if ((elcc->inflationApproach == InflAppr::ConstantDollar) && state.dataIPShortCut->lNumericFieldBlanks(1)) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid for field " + state.dataIPShortCut->cNumericFieldNames(1) +
-                                 " to be blank when ConstantDollar analysis is be used.");
+                             format("{}: Invalid for field {} to be blank when ConstantDollar analysis is be used.",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(1)));
         }
         if ((elcc->realDiscountRate > 0.30) || (elcc->realDiscountRate < -0.30)) {
-            ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(1) +
-                                 ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ");
+            ShowWarningError(
+                state,
+                format("{}: Invalid value in field {}.  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ",
+                       CurrentModuleObject,
+                       state.dataIPShortCut->cNumericFieldNames(1)));
         }
         // N2,  \field Nominal Discount Rate
         //      \type real
         elcc->nominalDiscountRate = NumArray(2);
         if ((elcc->inflationApproach == InflAppr::CurrentDollar) && state.dataIPShortCut->lNumericFieldBlanks(2)) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid for field " + state.dataIPShortCut->cNumericFieldNames(2) +
-                                 " to be blank when CurrentDollar analysis is be used.");
+                             format("{}: Invalid for field {} to be blank when CurrentDollar analysis is be used.",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(2)));
         }
         if ((elcc->nominalDiscountRate > 0.30) || (elcc->nominalDiscountRate < -0.30)) {
-            ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
-                                 ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ");
+            ShowWarningError(
+                state,
+                format("{}: Invalid value in field {}.  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ",
+                       CurrentModuleObject,
+                       state.dataIPShortCut->cNumericFieldNames(2)));
         }
         // N3,  \field Inflation
         //      \type real
         elcc->inflation = NumArray(3);
         if ((elcc->inflationApproach == InflAppr::ConstantDollar) && (!state.dataIPShortCut->lNumericFieldBlanks(3))) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid for field " + state.dataIPShortCut->cNumericFieldNames(3) +
-                                 " contain a value when ConstantDollar analysis is be used.");
+                             format("{}: Invalid for field {} contain a value when ConstantDollar analysis is be used.",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(3)));
         }
         if ((elcc->inflation > 0.30) || (elcc->inflation < -0.30)) {
-            ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
-                                 ".  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ");
+            ShowWarningError(
+                state,
+                format("{}: Invalid value in field {}.  This value is the decimal value not a percentage so most values are between 0.02 and 0.15. ",
+                       CurrentModuleObject,
+                       state.dataIPShortCut->cNumericFieldNames(3)));
         }
         // A4,  \field Base Date Month
         //      \type choice
@@ -299,8 +299,10 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         if (elcc->baseDateMonth == -1) {
             elcc->baseDateMonth = 0;
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid month entered in field " + state.dataIPShortCut->cAlphaFieldNames(4) +
-                                 ". Using January instead of \"" + AlphaArray(4) + "\"");
+                             format("{}: Invalid month entered in field {}. Using January instead of \"{}\"",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cAlphaFieldNames(4),
+                                    AlphaArray(4)));
         }
         // N4,  \field Base Date Year
         //      \type integer
@@ -309,13 +311,15 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         elcc->baseDateYear = int(NumArray(4));
         if (elcc->baseDateYear > 2100) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(4) +
-                                 ".  Value greater than 2100 yet it is representing a year. ");
+                             format("{}: Invalid value in field {}.  Value greater than 2100 yet it is representing a year. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(4)));
         }
         if (elcc->baseDateYear < 1900) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(4) +
-                                 ".  Value less than 1900 yet it is representing a year. ");
+                             format("{}: Invalid value in field {}.  Value less than 1900 yet it is representing a year. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(4)));
         }
         // A5,  \field Service Date Month
         //      \type choice
@@ -336,8 +340,10 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         if (elcc->serviceDateMonth == -1) {
             elcc->serviceDateMonth = 0;
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid month entered in field " + state.dataIPShortCut->cAlphaFieldNames(5) +
-                                 ". Using January instead of \"" + AlphaArray(5) + "\"");
+                             format("{}: Invalid month entered in field {}. Using January instead of \"{}\"",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cAlphaFieldNames(5),
+                                    AlphaArray(5)));
         }
         // N5,  \field Service Date Year
         //      \type integer
@@ -346,13 +352,15 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         elcc->serviceDateYear = int(NumArray(5));
         if (elcc->serviceDateYear > 2100) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(5) +
-                                 ".  Value greater than 2100 yet it is representing a year. ");
+                             format("{}: Invalid value in field {}.  Value greater than 2100 yet it is representing a year. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(5)));
         }
         if (elcc->serviceDateYear < 1900) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(5) +
-                                 ".  Value less than 1900 yet it is representing a year. ");
+                             format("{}: Invalid value in field {}.  Value less than 1900 yet it is representing a year. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(5)));
         }
         // N6,  \field Length of Study Period in Years
         //      \type integer
@@ -361,13 +369,15 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         elcc->lengthStudyYears = int(NumArray(6));
         if (elcc->lengthStudyYears > 100) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(6) +
-                                 ".  A value greater than 100 is not reasonable for an economic evaluation. ");
+                             format("{}: Invalid value in field {}.  A value greater than 100 is not reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(6)));
         }
         if (elcc->lengthStudyYears < 1) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(6) +
-                                 ".  A value less than 1 is not reasonable for an economic evaluation. ");
+                             format("{}: Invalid value in field {}.  A value less than 1 is not reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(6)));
         }
         elcc->lengthStudyTotalMonths = elcc->lengthStudyYears * 12;
         // N7, \field Tax rate
@@ -376,8 +386,9 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         elcc->taxRate = NumArray(7);
         if (elcc->taxRate < 0.0 && (!state.dataIPShortCut->lNumericFieldBlanks(7))) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(10) +
-                                 ".  A value less than 0 is not reasonable for a tax rate. ");
+                             format("{}: Invalid value in field {}.  A value less than 0 is not reasonable for a tax rate. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(10)));
         }
         // A6;  \field Depreciation Method
         //      \type choice
@@ -397,19 +408,23 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         if (elcc->depreciationMethod == DeprMethod::Invalid) {
             elcc->depreciationMethod = DeprMethod::None;
             if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                ShowWarningError(state,
-                                 CurrentModuleObject + ": The input field " + state.dataIPShortCut->cAlphaFieldNames(6) +
-                                     "is blank. \"None\" will be used.");
+                ShowWarningError(
+                    state,
+                    format("{}: The input field {}is blank. \"None\" will be used.", CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(6)));
             } else {
                 ShowWarningError(state,
-                                 CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + AlphaArray(6) +
-                                     R"(". "None" will be used.)");
+                                 format("{}: Invalid {}=\"{}{}",
+                                        CurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaFieldNames(6),
+                                        AlphaArray(6),
+                                        R"(". "None" will be used.)"));
             }
         }
         // compute derived variables
         elcc->lastDateYear = elcc->baseDateYear + elcc->lengthStudyYears - 1;
     } else {
-        ShowWarningError(state, CurrentModuleObject + ": Only one instance of this object is allowed. No life-cycle cost reports will be generated.");
+        ShowWarningError(
+            state, format("{}: Only one instance of this object is allowed. No life-cycle cost reports will be generated.", CurrentModuleObject));
         elcc->LCCparamPresent = false;
     }
 }
@@ -461,8 +476,9 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
                 ShowWarningError(state,
-                                 "In " + CurrentModuleObject + " named " + AlphaArray(1) +
-                                     " a field was found containing LifeCycleCost: which may indicate a missing comma.");
+                                 format("In {} named {} a field was found containing LifeCycleCost: which may indicate a missing comma.",
+                                        CurrentModuleObject,
+                                        AlphaArray(1)));
             }
         }
         // start to extract values from input array into appropriate fields
@@ -482,15 +498,19 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \default Maintenance
         elcc->RecurringCosts[iInObj].category =
             static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUCNoSpace, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
-        bool isNotRecurringCost = BITF_TEST_NONE(BITF(elcc->RecurringCosts[iInObj].category),
-                                                 BITF(CostCategory::Maintenance) | BITF(CostCategory::Repair) | BITF(CostCategory::Operation) |
-                                                     BITF(CostCategory::Replacement) | BITF(CostCategory::MinorOverhaul) |
-                                                     BITF(CostCategory::MajorOverhaul) | BITF(CostCategory::OtherOperational));
+        bool isNotRecurringCost =
+            (elcc->RecurringCosts[iInObj].category != CostCategory::Maintenance && elcc->RecurringCosts[iInObj].category != CostCategory::Repair &&
+             elcc->RecurringCosts[iInObj].category != CostCategory::Operation && elcc->RecurringCosts[iInObj].category != CostCategory::Replacement &&
+             elcc->RecurringCosts[iInObj].category != CostCategory::MinorOverhaul &&
+             elcc->RecurringCosts[iInObj].category != CostCategory::MajorOverhaul &&
+             elcc->RecurringCosts[iInObj].category != CostCategory::OtherOperational);
         if (isNotRecurringCost) {
             elcc->RecurringCosts[iInObj].category = CostCategory::Maintenance;
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
-                                 "\". The category of Maintenance will be used.");
+                             format("{}: Invalid {}=\"{}\". The category of Maintenance will be used.",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cAlphaFieldNames(2),
+                                    AlphaArray(2)));
         }
         //   N1,  \field Cost
         //        \type real
@@ -505,8 +525,10 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         if (elcc->RecurringCosts[iInObj].startOfCosts == StartCosts::Invalid) {
             elcc->RecurringCosts[iInObj].startOfCosts = StartCosts::ServicePeriod;
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
-                                 "\". The start of the service period will be used.");
+                             format("{}: Invalid {}=\"{}\". The start of the service period will be used.",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cAlphaFieldNames(3),
+                                    AlphaArray(3)));
         }
         //   N2,  \field Years from Start
         //        \type integer
@@ -514,16 +536,18 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \maximum 100
         elcc->RecurringCosts[iInObj].yearsFromStart = int(NumArray(2));
         if (elcc->RecurringCosts[iInObj].yearsFromStart > 100) {
-            ShowWarningError(
-                state,
-                CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
-                    ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. ");
+            ShowWarningError(state,
+                             format("{}: Invalid value in field {}.  This value is the number of years from the start so a value greater than 100 is "
+                                    "not reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(2)));
         }
         if (elcc->RecurringCosts[iInObj].yearsFromStart < 0) {
-            ShowWarningError(
-                state,
-                CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
-                    ".  This value is the number of years from the start so a value less than 0 is not reasonable for an economic evaluation. ");
+            ShowWarningError(state,
+                             format("{}: Invalid value in field {}.  This value is the number of years from the start so a value less than 0 is not "
+                                    "reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(2)));
         }
         //   N3,  \field Months from Start
         //        \type integer
@@ -532,15 +556,17 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         elcc->RecurringCosts[iInObj].monthsFromStart = int(NumArray(3));
         if (elcc->RecurringCosts[iInObj].monthsFromStart > 1200) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
-                                 ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an "
-                                 "economic evaluation. ");
+                             format("{}: Invalid value in field {}.  This value is the number of months from the start so a value greater than 1200 "
+                                    "is not reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(3)));
         }
         if (elcc->RecurringCosts[iInObj].monthsFromStart < 0) {
-            ShowWarningError(
-                state,
-                CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
-                    ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. ");
+            ShowWarningError(state,
+                             format("{}: Invalid value in field {}.  This value is the number of months from the start so a value less than 0 is not "
+                                    "reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(3)));
         }
         //   N4,  \field Repeat Period Years
         //        \type integer
@@ -549,15 +575,17 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         elcc->RecurringCosts[iInObj].repeatPeriodYears = int(NumArray(4));
         if (elcc->RecurringCosts[iInObj].repeatPeriodYears > 100) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(4) +
-                                 ".  This value is the number of years between occurrences of the cost so a value greater than 100 is not reasonable "
-                                 "for an economic evaluation. ");
+                             format("{}: Invalid value in field {}.  This value is the number of years between occurrences of the cost so a value "
+                                    "greater than 100 is not reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(4)));
         }
         if (elcc->RecurringCosts[iInObj].repeatPeriodYears < 1) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(4) +
-                                 ".  This value is the number of years between occurrences of the cost so a value less than 1 is not reasonable for "
-                                 "an economic evaluation. ");
+                             format("{}: Invalid value in field {}.  This value is the number of years between occurrences of the cost so a value "
+                                    "less than 1 is not reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(4)));
         }
         //   N5,  \field Repeat Period Months
         //        \type integer
@@ -566,33 +594,41 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         elcc->RecurringCosts[iInObj].repeatPeriodMonths = int(NumArray(5));
         if (elcc->RecurringCosts[iInObj].repeatPeriodMonths > 1200) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(5) +
-                                 ".  This value is the number of months between occurrences of the cost so a value greater than 1200 is not "
-                                 "reasonable for an economic evaluation. ");
+                             format("{}: Invalid value in field {}.  This value is the number of months between occurrences of the cost so a value "
+                                    "greater than 1200 is not reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(5)));
         }
         if (elcc->RecurringCosts[iInObj].repeatPeriodMonths < 0) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(5) +
-                                 ".  This value is the number of months between occurrences of the cost so a value less than 0 is not reasonable for "
-                                 "an economic evaluation. ");
+                             format("{}: Invalid value in field {}.  This value is the number of months between occurrences of the cost so a value "
+                                    "less than 0 is not reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(5)));
         }
         if ((elcc->RecurringCosts[iInObj].repeatPeriodMonths == 0) && (elcc->RecurringCosts[iInObj].repeatPeriodYears == 0)) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in fields " + state.dataIPShortCut->cNumericFieldNames(5) + " and " +
-                                 state.dataIPShortCut->cNumericFieldNames(4) + ".  The repeat period must not be zero months and zero years. ");
+                             format("{}: Invalid value in fields {} and {}.  The repeat period must not be zero months and zero years. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(5),
+                                    state.dataIPShortCut->cNumericFieldNames(4)));
         }
         //   N6;  \field Annual escalation rate
         //        \type real
         elcc->RecurringCosts[iInObj].annualEscalationRate = int(NumArray(6));
         if (elcc->RecurringCosts[iInObj].annualEscalationRate > 0.30) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(6) +
-                                 ".  This value is the decimal value for the annual escalation so most values are between 0.02 and 0.15. ");
+                             format("{}: Invalid value in field {}.  This value is the decimal value for the annual escalation so most values are "
+                                    "between 0.02 and 0.15. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(6)));
         }
         if (elcc->RecurringCosts[iInObj].annualEscalationRate < -0.30) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(6) +
-                                 ".  This value is the decimal value for the annual escalation so most values are between 0.02 and 0.15. ");
+                             format("{}: Invalid value in field {}.  This value is the decimal value for the annual escalation so most values are "
+                                    "between 0.02 and 0.15. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(6)));
         }
         // express the years and months fields in total months
         elcc->RecurringCosts[iInObj].totalMonthsFromStart =
@@ -655,8 +691,9 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         for (jFld = 1; jFld <= NumAlphas; ++jFld) {
             if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
                 ShowWarningError(state,
-                                 "In " + CurrentModuleObject + " named " + AlphaArray(1) +
-                                     " a field was found containing LifeCycleCost: which may indicate a missing comma.");
+                                 format("In {} named {} a field was found containing LifeCycleCost: which may indicate a missing comma.",
+                                        CurrentModuleObject,
+                                        AlphaArray(1)));
             }
         }
         // start to extract values from input array into appropriate fields
@@ -672,14 +709,16 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //      \default Construction
         elcc->NonrecurringCost[iInObj].category =
             static_cast<CostCategory>(getEnumerationValue(CostCategoryNamesUCNoSpace, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
-        bool isNotNonRecurringCost =
-            BITF_TEST_NONE(BITF(elcc->NonrecurringCost[iInObj].category),
-                           BITF(CostCategory::Construction) | BITF(CostCategory::Salvage) | BITF(CostCategory::OtherCapital));
+        bool isNotNonRecurringCost = (elcc->NonrecurringCost[iInObj].category != CostCategory::Construction &&
+                                      elcc->NonrecurringCost[iInObj].category != CostCategory::Salvage &&
+                                      elcc->NonrecurringCost[iInObj].category != CostCategory::OtherCapital);
         if (isNotNonRecurringCost) {
             elcc->NonrecurringCost[iInObj].category = CostCategory::Construction;
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
-                                 "\". The category of Construction will be used.");
+                             format("{}: Invalid {}=\"{}\". The category of Construction will be used.",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cAlphaFieldNames(2),
+                                    AlphaArray(2)));
         }
         // N1,  \field Cost
         //      \type real
@@ -694,8 +733,10 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         if (elcc->NonrecurringCost[iInObj].startOfCosts == StartCosts::Invalid) {
             elcc->NonrecurringCost[iInObj].startOfCosts = StartCosts::ServicePeriod;
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
-                                 "\". The start of the service period will be used.");
+                             format("{}: Invalid {}=\"{}\". The start of the service period will be used.",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cAlphaFieldNames(3),
+                                    AlphaArray(3)));
         }
         // N2,  \field Years from Start
         //      \type integer
@@ -703,16 +744,18 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //      \maximum 100
         elcc->NonrecurringCost[iInObj].yearsFromStart = int(NumArray(2));
         if (elcc->NonrecurringCost[iInObj].yearsFromStart > 100) {
-            ShowWarningError(
-                state,
-                CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
-                    ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. ");
+            ShowWarningError(state,
+                             format("{}: Invalid value in field {}.  This value is the number of years from the start so a value greater than 100 is "
+                                    "not reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(2)));
         }
         if (elcc->NonrecurringCost[iInObj].yearsFromStart < 0) {
-            ShowWarningError(
-                state,
-                CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(2) +
-                    ".  This value is the number of years from the start so a value less than 0 is not reasonable for an economic evaluation. ");
+            ShowWarningError(state,
+                             format("{}: Invalid value in field {}.  This value is the number of years from the start so a value less than 0 is not "
+                                    "reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(2)));
         }
         //  N3;  \field Months from Start
         //       \type integer
@@ -721,15 +764,17 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         elcc->NonrecurringCost[iInObj].monthsFromStart = int(NumArray(3));
         if (elcc->NonrecurringCost[iInObj].monthsFromStart > 1200) {
             ShowWarningError(state,
-                             CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
-                                 ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an "
-                                 "economic evaluation. ");
+                             format("{}: Invalid value in field {}.  This value is the number of months from the start so a value greater than 1200 "
+                                    "is not reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(3)));
         }
         if (elcc->NonrecurringCost[iInObj].monthsFromStart < 0) {
-            ShowWarningError(
-                state,
-                CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(3) +
-                    ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. ");
+            ShowWarningError(state,
+                             format("{}: Invalid value in field {}.  This value is the number of months from the start so a value less than 0 is not "
+                                    "reasonable for an economic evaluation. ",
+                                    CurrentModuleObject,
+                                    state.dataIPShortCut->cNumericFieldNames(3)));
         }
         // express the years and months fields in total months
         elcc->NonrecurringCost[iInObj].totalMonthsFromStart =
@@ -749,14 +794,11 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     int iInObj;                      // loop index variable for reading in objects
-    int jFld;                        // loop counter
-    int jYear;                       // loop counter
     int NumFields;                   // Total number of elements
     int NumAlphas;                   // Number of elements in the alpha array
     int NumNums;                     // Number of elements in the numeric array
     Array1D_string AlphaArray;       // character string data
     Array1D<Real64> NumArray;        // numeric data
-    int IOStat;                      // IO Status when calling get input subroutine
     std::string CurrentModuleObject; // for ease in renaming.
 
     auto &elcc(state.dataEconLifeCycleCost);
@@ -772,6 +814,7 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
         elcc->UsePriceEscalation(iInObj).Escalation.allocate(elcc->lengthStudyYears);
     }
     if (elcc->numUsePriceEscalation > 0) {
+        int IOStat; // IO Status when calling get input subroutine
         for (iInObj = 1; iInObj <= elcc->numUsePriceEscalation; ++iInObj) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -786,11 +829,12 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
-            for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+            for (int jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
                     ShowWarningError(state,
-                                     "In " + CurrentModuleObject + " named " + AlphaArray(1) +
-                                         " a field was found containing LifeCycleCost: which may indicate a missing comma.");
+                                     format("In {} named {} a field was found containing LifeCycleCost: which may indicate a missing comma.",
+                                            CurrentModuleObject,
+                                            AlphaArray(1)));
                 }
             }
             // start to extract values from input array into appropriate fields
@@ -813,9 +857,9 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
             //       \key Water
             //       \key OtherFuel1
             //       \key OtherFuel2
-            elcc->UsePriceEscalation(iInObj).resource = AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
+            elcc->UsePriceEscalation(iInObj).resource = Constant::AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
             if (NumAlphas > 3) {
-                ShowWarningError(state, "In " + CurrentModuleObject + " contains more alpha fields than expected.");
+                ShowWarningError(state, format("In {} contains more alpha fields than expected.", CurrentModuleObject));
             }
             // N1,  \field Escalation Start Year
             //      \type integer
@@ -824,13 +868,15 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
             elcc->UsePriceEscalation(iInObj).escalationStartYear = int(NumArray(1));
             if (elcc->UsePriceEscalation(iInObj).escalationStartYear > 2100) {
                 ShowWarningError(state,
-                                 CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(1) +
-                                     ".  Value greater than 2100 yet it is representing a year. ");
+                                 format("{}: Invalid value in field {}.  Value greater than 2100 yet it is representing a year. ",
+                                        CurrentModuleObject,
+                                        state.dataIPShortCut->cNumericFieldNames(1)));
             }
             if (elcc->UsePriceEscalation(iInObj).escalationStartYear < 1900) {
                 ShowWarningError(state,
-                                 CurrentModuleObject + ": Invalid value in field " + state.dataIPShortCut->cNumericFieldNames(1) +
-                                     ".  Value less than 1900 yet it is representing a year. ");
+                                 format("{}: Invalid value in field {}.  Value less than 1900 yet it is representing a year. ",
+                                        CurrentModuleObject,
+                                        state.dataIPShortCut->cNumericFieldNames(1)));
             }
             // A3,  \field Escalation Start Month
             //      \type choice
@@ -852,15 +898,17 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
             if (elcc->UsePriceEscalation(iInObj).escalationStartMonth == -1) {
                 elcc->UsePriceEscalation(iInObj).escalationStartMonth = 0;
                 ShowWarningError(state,
-                                 CurrentModuleObject + ": Invalid month entered in field " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                     ". Using January instead of \"" + AlphaArray(3) + "\"");
+                                 format("{}: Invalid month entered in field {}. Using January instead of \"{}\"",
+                                        CurrentModuleObject,
+                                        state.dataIPShortCut->cAlphaFieldNames(3),
+                                        AlphaArray(3)));
             }
             // N2,  \field Year 1 Escalation
             //      \type real
             //      \begin-extensible
             // The array is from the baseDateYear until baseDateYear + lengthStudyYears
             // Set the array to default to 1.0
-            for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
+            for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 elcc->UsePriceEscalation(iInObj).Escalation(jYear) = 1.0;
             }
             // Since the years in the UsePriceEscalation may not match up with the baseDateYear and
@@ -871,7 +919,7 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
             elcc->UsePriceEscalation_escEndYear = elcc->UsePriceEscalation_escStartYear + elcc->UsePriceEscalation_escNumYears - 1;
             elcc->UsePriceEscalation_earlierEndYear = min(elcc->UsePriceEscalation_escEndYear, elcc->lastDateYear);   // pick the earlier ending date
             elcc->UsePriceEscalation_laterStartYear = max(elcc->UsePriceEscalation_escStartYear, elcc->baseDateYear); // pick the later starting date
-            for (jYear = elcc->UsePriceEscalation_laterStartYear; jYear <= elcc->UsePriceEscalation_earlierEndYear; ++jYear) {
+            for (int jYear = elcc->UsePriceEscalation_laterStartYear; jYear <= elcc->UsePriceEscalation_earlierEndYear; ++jYear) {
                 elcc->UsePriceEscalation_curFld = 2 + jYear - elcc->UsePriceEscalation_escStartYear;
                 elcc->UsePriceEscalation_curEsc = 1 + jYear - elcc->baseDateYear;
                 if ((elcc->UsePriceEscalation_curFld <= NumNums) && (elcc->UsePriceEscalation_curFld >= 1)) {
@@ -896,16 +944,12 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     int iInObj;                      // loop index variable for reading in objects
-    int jFld;                        // loop counter
-    int jYear;                       // loop counter
     int NumFields;                   // Total number of elements
     int NumAlphas;                   // Number of elements in the alpha array
     int NumNums;                     // Number of elements in the numeric array
     Array1D_string AlphaArray;       // character string data
     Array1D<Real64> NumArray;        // numeric data
-    int IOStat;                      // IO Status when calling get input subroutine
     std::string CurrentModuleObject; // for ease in renaming.
-    int numFldsToUse;
 
     auto &elcc(state.dataEconLifeCycleCost);
 
@@ -920,6 +964,7 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
         elcc->UseAdjustment(iInObj).Adjustment.allocate(elcc->lengthStudyYears);
     }
     if (elcc->numUseAdjustment > 0) {
+        int IOStat; // IO Status when calling get input subroutine
         for (iInObj = 1; iInObj <= elcc->numUseAdjustment; ++iInObj) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -934,11 +979,12 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             // check to make sure none of the values are another life cycle cost object
-            for (jFld = 1; jFld <= NumAlphas; ++jFld) {
+            for (int jFld = 1; jFld <= NumAlphas; ++jFld) {
                 if (hasi(AlphaArray(jFld), "LifeCycleCost:")) {
                     ShowWarningError(state,
-                                     "In " + CurrentModuleObject + " named " + AlphaArray(1) +
-                                         " a field was found containing LifeCycleCost: which may indicate a missing comma.");
+                                     format("In {} named {} a field was found containing LifeCycleCost: which may indicate a missing comma.",
+                                            CurrentModuleObject,
+                                            AlphaArray(1)));
                 }
             }
             // start to extract values from input array into appropriate fields
@@ -961,19 +1007,19 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
             //       \key Water
             //       \key OtherFuel1
             //       \key OtherFuel2
-            elcc->UseAdjustment(iInObj).resource = AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
+            elcc->UseAdjustment(iInObj).resource = Constant::AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
             if (NumAlphas > 2) {
-                ShowWarningError(state, "In " + CurrentModuleObject + " contains more alpha fields than expected.");
+                ShowWarningError(state, format("In {} contains more alpha fields than expected.", CurrentModuleObject));
             }
             //  N1,  \field Year 1 Multiplier
             //       \type real
             //       \begin-extensible
             // Set the array to default to 1.0
-            for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
+            for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 elcc->UseAdjustment(iInObj).Adjustment(jYear) = 1.0;
             }
-            numFldsToUse = min(NumNums, elcc->lengthStudyYears);
-            for (jYear = 1; jYear <= numFldsToUse; ++jYear) {
+            int numFldsToUse = min(NumNums, elcc->lengthStudyYears);
+            for (int jYear = 1; jYear <= numFldsToUse; ++jYear) {
                 elcc->UseAdjustment(iInObj).Adjustment(jYear) = NumArray(jYear);
             }
         }
@@ -993,35 +1039,10 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
     //    DATE WRITTEN   July 2010
-    //    MODIFIED       na
-    //    RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //    Convert all recurring and nonrecurring costs into cash flows
     //    used in calculations and reporting.
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Using/Aliasing
-    using EconomicTariff::GetMonthlyCostForResource;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int iCashFlow;
@@ -1033,26 +1054,19 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     int firstMonth;
     int monthsBaseToService;
 
-    std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> resourceCosts;
+    std::map<int, std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>> resourceCosts;
     for (int jMonth = 1; jMonth <= 12; ++jMonth) {
-        std::map<DataGlobalConstants::ResourceType, Real64> monthMap;
-        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-            monthMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
-        }
-        resourceCosts.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(jMonth, monthMap));
+        resourceCosts[jMonth] = std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>();
+        std::fill(resourceCosts[jMonth].begin(), resourceCosts[jMonth].end(), 0.0);
     }
 
     Array1D<Real64> curResourceCosts(12);
 
-    std::map<DataGlobalConstants::ResourceType, bool> resourceCostNotZero;
-    for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-        resourceCostNotZero.insert(std::pair<DataGlobalConstants::ResourceType, bool>(iResource, false));
-    }
+    std::array<bool, static_cast<int>(Constant::ResourceType::Num)> resourceCostNotZero{};
+    std::fill(resourceCostNotZero.begin(), resourceCostNotZero.end(), false);
 
-    std::map<DataGlobalConstants::ResourceType, Real64> resourceCostAnnual;
-    for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-        resourceCostAnnual.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
-    }
+    std::array<Real64, static_cast<int>(Constant::ResourceType::Num)> resourceCostAnnual{};
+    std::fill(resourceCostAnnual.begin(), resourceCostAnnual.end(), 0.0);
 
     Real64 annualCost;
     int found;
@@ -1085,28 +1099,25 @@ void ExpressAsCashFlows(EnergyPlusData &state)
 
     // gather costs from EconomicTariff for each end use
     elcc->numResourcesUsed = 0;
-    for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-        GetMonthlyCostForResource(state, iResource, curResourceCosts);
+    for (int iResource = 0; iResource < static_cast<int>(Constant::ResourceType::Num); ++iResource) {
+        EconomicTariff::GetMonthlyCostForResource(state, static_cast<Constant::ResourceType>(iResource), curResourceCosts);
         annualCost = 0.0;
         for (int jMonth = 1; jMonth <= 12; ++jMonth) {
-            resourceCosts.at(jMonth).at(iResource) = curResourceCosts(jMonth);
-            annualCost += resourceCosts.at(jMonth).at(iResource);
+            resourceCosts[jMonth][iResource] = curResourceCosts(jMonth);
+            annualCost += resourceCosts[jMonth][iResource];
         }
         if (annualCost != 0.0) {
             ++elcc->numResourcesUsed;
-            resourceCostNotZero.at(iResource) = true;
+            resourceCostNotZero[iResource] = true;
         } else {
-            resourceCostNotZero.at(iResource) = false;
+            resourceCostNotZero[iResource] = false;
         }
-        resourceCostAnnual.at(iResource) = annualCost;
+        resourceCostAnnual[iResource] = annualCost;
     }
     // allocate the escalated energy cost arrays
     for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
-        std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
-        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-            yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
-        }
-        elcc->EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
+        elcc->EscalatedEnergy[year] = std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>();
+        std::fill(elcc->EscalatedEnergy[year].begin(), elcc->EscalatedEnergy[year].end(), 0.0);
     }
 
     elcc->EscalatedTotEnergy.allocate(elcc->lengthStudyYears);
@@ -1118,7 +1129,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
         monthlyInflationFactor = 1.0; // not really used but just in case
     } else if (elcc->inflationApproach == InflAppr::CurrentDollar) {
         // to allocate an interest rate (in this case inflation) cannot just use 1/12
-        // for the monthly value since it will be slightly wrong. Instead use inverse of
+        // for the monthly value since it will be slightly wrong. Instead, use inverse of
         // formula from Newnan (4-32) which is r = m x (ia + 1)^(1/m) - 1)
         inflationPerMonth = std::pow(elcc->inflation + 1.0, 1.0 / 12.0) - 1;
         for (int jMonth = 1; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
@@ -1158,8 +1169,8 @@ void ExpressAsCashFlows(EnergyPlusData &state)
             elcc->CashFlow[offset + jCost].mnAmount(month) = elcc->NonrecurringCost[jCost].cost * monthlyInflationFactor(month);
         } else {
             ShowWarningError(state,
-                             "For life cycle costing a nonrecurring cost named " + elcc->NonrecurringCost[jCost].name +
-                                 " contains a cost which is not within the study period.");
+                             format("For life cycle costing a nonrecurring cost named {} contains a cost which is not within the study period.",
+                                    elcc->NonrecurringCost[jCost].name));
         }
     }
     // Put recurring costs into cashflows
@@ -1184,61 +1195,62 @@ void ExpressAsCashFlows(EnergyPlusData &state)
                 }
             }
         } else {
-            ShowWarningError(state,
-                             "For life cycle costing the recurring cost named " + elcc->RecurringCosts[jCost].name +
-                                 " has the first year of the costs that is not within the study period.");
+            ShowWarningError(
+                state,
+                format("For life cycle costing the recurring cost named {} has the first year of the costs that is not within the study period.",
+                       elcc->RecurringCosts[jCost].name));
         }
     }
     // Put resource costs into cashflows
     // the first cash flow for resources should be after the categories, recurring and nonrecurring costs
     int cashFlowCounter = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost - 1; // Since CashFlow starts at 0
-    for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-        if (resourceCostNotZero.at(iResource)) {
+    for (int iResource = 0; iResource < static_cast<int>(Constant::ResourceType::Num); ++iResource) {
+        if (resourceCostNotZero[iResource]) {
             ++cashFlowCounter;
 
-            switch (iResource) {
-            case DataGlobalConstants::ResourceType::Water:
-            case DataGlobalConstants::ResourceType::OnSiteWater:
-            case DataGlobalConstants::ResourceType::MainsWater:
-            case DataGlobalConstants::ResourceType::RainWater:
-            case DataGlobalConstants::ResourceType::WellWater:
-            case DataGlobalConstants::ResourceType::Condensate:
+            switch (static_cast<Constant::ResourceType>(iResource)) {
+            case Constant::ResourceType::Water:
+            case Constant::ResourceType::OnSiteWater:
+            case Constant::ResourceType::MainsWater:
+            case Constant::ResourceType::RainWater:
+            case Constant::ResourceType::WellWater:
+            case Constant::ResourceType::Condensate:
                 elcc->CashFlow[cashFlowCounter].Category = CostCategory::Water;
                 break;
-            case DataGlobalConstants::ResourceType::Electricity:
-            case DataGlobalConstants::ResourceType::Natural_Gas:
-            case DataGlobalConstants::ResourceType::Gasoline:
-            case DataGlobalConstants::ResourceType::Diesel:
-            case DataGlobalConstants::ResourceType::Coal:
-            case DataGlobalConstants::ResourceType::FuelOil_1:
-            case DataGlobalConstants::ResourceType::FuelOil_2:
-            case DataGlobalConstants::ResourceType::Propane:
-            case DataGlobalConstants::ResourceType::EnergyTransfer:
-            case DataGlobalConstants::ResourceType::Steam:
-            case DataGlobalConstants::ResourceType::DistrictCooling:
-            case DataGlobalConstants::ResourceType::DistrictHeating:
-            case DataGlobalConstants::ResourceType::ElectricityProduced:
-            case DataGlobalConstants::ResourceType::ElectricityPurchased:
-            case DataGlobalConstants::ResourceType::ElectricityNet:
-            case DataGlobalConstants::ResourceType::SolarWater:
-            case DataGlobalConstants::ResourceType::SolarAir:
+            case Constant::ResourceType::Electricity:
+            case Constant::ResourceType::Natural_Gas:
+            case Constant::ResourceType::Gasoline:
+            case Constant::ResourceType::Diesel:
+            case Constant::ResourceType::Coal:
+            case Constant::ResourceType::FuelOil_1:
+            case Constant::ResourceType::FuelOil_2:
+            case Constant::ResourceType::Propane:
+            case Constant::ResourceType::EnergyTransfer:
+            case Constant::ResourceType::Steam:
+            case Constant::ResourceType::DistrictCooling:
+            case Constant::ResourceType::DistrictHeating:
+            case Constant::ResourceType::ElectricityProduced:
+            case Constant::ResourceType::ElectricityPurchased:
+            case Constant::ResourceType::ElectricityNet:
+            case Constant::ResourceType::SolarWater:
+            case Constant::ResourceType::SolarAir:
                 elcc->CashFlow[cashFlowCounter].Category = CostCategory::Energy;
                 break;
             default:
                 elcc->CashFlow[cashFlowCounter].Category = CostCategory::Operation;
             }
 
-            elcc->CashFlow[cashFlowCounter].Resource = iResource;
+            elcc->CashFlow[cashFlowCounter].Resource = static_cast<Constant::ResourceType>(iResource);
             elcc->CashFlow[cashFlowCounter].SourceKind = SourceKindType::Resource;
-            elcc->CashFlow[cashFlowCounter].name = GetResourceTypeChar(iResource);
+            elcc->CashFlow[cashFlowCounter].name = GetResourceTypeChar(static_cast<Constant::ResourceType>(iResource));
             if (cashFlowCounter <= elcc->numCashFlow) {
                 // put the monthly energy costs into the cashflow prior to adjustments
                 // energy costs (a.k.a. resource costs) start at the start of service and repeat
                 // until the end of the study total
                 for (int jMonth = 1; jMonth <= 12; ++jMonth) {
-                    elcc->CashFlow[cashFlowCounter].mnAmount(monthsBaseToService + jMonth) = resourceCosts.at(jMonth).at(iResource);
+                    elcc->CashFlow[cashFlowCounter].mnAmount(monthsBaseToService + jMonth) = resourceCosts[jMonth][iResource];
                 }
-                elcc->CashFlow[cashFlowCounter].orginalCost = resourceCostAnnual.at(iResource);
+                elcc->CashFlow[cashFlowCounter].orginalCost = resourceCostAnnual[iResource];
                 for (int jMonth = monthsBaseToService + 13; jMonth <= elcc->lengthStudyTotalMonths; ++jMonth) {
                     // use the cost from a year earlier
                     elcc->CashFlow[cashFlowCounter].mnAmount(jMonth) = elcc->CashFlow[cashFlowCounter].mnAmount(jMonth - 12);
@@ -1251,7 +1263,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
                 // need to find the correct adjustment to use for the current resource
                 found = 0;
                 for (jAdj = 1; jAdj <= elcc->numUseAdjustment; ++jAdj) {
-                    if (elcc->UseAdjustment(jAdj).resource == iResource) {
+                    if (elcc->UseAdjustment(jAdj).resource == static_cast<Constant::ResourceType>(iResource)) {
                         found = jAdj;
                         break;
                     }
@@ -1314,11 +1326,11 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     }
     // generate a warning if resource referenced was not used
     for (int nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
-        auto curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
-        if (!resourceCostNotZero.at(curResource) && state.dataGlobal->DoWeathSim) {
+        Constant::ResourceType curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
+        if (!resourceCostNotZero[static_cast<int>(curResource)] && state.dataGlobal->DoWeathSim) {
             ShowWarningError(state,
-                             "The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + elcc->UsePriceEscalation(nUsePriceEsc).name +
-                                 "\" has no energy cost. ");
+                             format("The resource referenced by LifeCycleCost:UsePriceEscalation= \"{}\" has no energy cost. ",
+                                    elcc->UsePriceEscalation(nUsePriceEsc).name));
             ShowContinueError(state, "... It is likely that the wrong resource is used. The resource should match the meter used in Utility:Tariff.");
         }
     }
@@ -1334,13 +1346,13 @@ void ComputeEscalatedEnergyCosts(EnergyPlusData &state)
     for (int iCashFlow = 0; iCashFlow < elcc->numCashFlow; ++iCashFlow) {
         if (elcc->CashFlow[iCashFlow].pvKind == PrValKind::Energy) {
             // make sure this is not water
-            auto curResource = elcc->CashFlow[iCashFlow].Resource;
-            if (elcc->CashFlow[iCashFlow].Resource == DataGlobalConstants::ResourceType::Water ||
-                (elcc->CashFlow[iCashFlow].Resource >= DataGlobalConstants::ResourceType::OnSiteWater &&
-                 elcc->CashFlow[iCashFlow].Resource <= DataGlobalConstants::ResourceType::Condensate)) {
+            Constant::ResourceType curResource = elcc->CashFlow[iCashFlow].Resource;
+            if (elcc->CashFlow[iCashFlow].Resource == Constant::ResourceType::Water ||
+                (elcc->CashFlow[iCashFlow].Resource >= Constant::ResourceType::OnSiteWater &&
+                 elcc->CashFlow[iCashFlow].Resource <= Constant::ResourceType::Condensate)) {
                 continue;
             }
-            if ((curResource != DataGlobalConstants::ResourceType::None)) {
+            if ((curResource != Constant::ResourceType::None)) {
                 int found = 0;
                 for (nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
                     if (elcc->UsePriceEscalation(nUsePriceEsc).resource == curResource) {
@@ -1350,20 +1362,20 @@ void ComputeEscalatedEnergyCosts(EnergyPlusData &state)
                 }
                 if (found > 0) {
                     for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-                        elcc->EscalatedEnergy.at(jYear).at(curResource) =
+                        elcc->EscalatedEnergy[jYear][static_cast<int>(curResource)] =
                             elcc->CashFlow[iCashFlow].yrAmount(jYear) * elcc->UsePriceEscalation(found).Escalation(jYear);
                     }
                 } else { // if no escalation than just store the original energy cost
                     for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-                        elcc->EscalatedEnergy.at(jYear).at(curResource) = elcc->CashFlow[iCashFlow].yrAmount(jYear);
+                        elcc->EscalatedEnergy[jYear][static_cast<int>(curResource)] = elcc->CashFlow[iCashFlow].yrAmount(jYear);
                     }
                 }
             }
         }
     }
-    for (auto kResource : state.dataGlobalConst->AllResourceTypes) {
+    for (int kResource = 0; kResource < static_cast<int>(Constant::ResourceType::Num); ++kResource) {
         for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-            elcc->EscalatedTotEnergy(jYear) += elcc->EscalatedEnergy.at(jYear).at(kResource);
+            elcc->EscalatedTotEnergy(jYear) += elcc->EscalatedEnergy[jYear][kResource];
         }
     }
 }
@@ -1401,7 +1413,6 @@ void ComputePresentValue(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 totalPV;
-    int curCategory;
     Real64 curDiscountRate;
     int iCashFlow;
     int jYear;
@@ -1415,8 +1426,8 @@ void ComputePresentValue(EnergyPlusData &state)
         switch (elcc->CashFlow[iCashFlow].SourceKind) {
         case SourceKindType::Resource: {
             // only for real fuels purchased such as electricity, natural gas, etc..
-            if ((elcc->CashFlow[iCashFlow].Resource >= DataGlobalConstants::ResourceType::Electricity) &&
-                (elcc->CashFlow[iCashFlow].Resource <= DataGlobalConstants::ResourceType::ElectricitySurplusSold)) {
+            if ((elcc->CashFlow[iCashFlow].Resource >= Constant::ResourceType::Electricity) &&
+                (elcc->CashFlow[iCashFlow].Resource <= Constant::ResourceType::ElectricitySurplusSold)) {
                 elcc->CashFlow[iCashFlow].pvKind = PrValKind::Energy;
             } else {
                 elcc->CashFlow[iCashFlow].pvKind = PrValKind::NonEnergy;
@@ -1440,16 +1451,13 @@ void ComputePresentValue(EnergyPlusData &state)
         }
     }
     // compute the Single Present Value factors based on the discount rate
-    elcc->SPV.allocate(elcc->lengthStudyYears);
+    elcc->SPV.allocate(elcc->lengthStudyYears); // Should this be energySPV?
     for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
-        std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
-        for (auto iResource : state.dataGlobalConst->AllResourceTypes) {
-            yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
-        }
-        elcc->energySPV.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
+        elcc->energySPV[year] = std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>();
+        std::fill(elcc->energySPV[year].begin(), elcc->energySPV[year].end(), 0.0);
     }
 
-    // Depending if using Constant or Current Dollar analysis
+    // Depending on if using Constant or Current Dollar analysis
     // use the appropriate discount rate
     if (elcc->inflationApproach == InflAppr::ConstantDollar) {
         curDiscountRate = elcc->realDiscountRate;
@@ -1465,18 +1473,18 @@ void ComputePresentValue(EnergyPlusData &state)
     }
     // use SPV as default values for all energy types
     for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-        for (auto kResource : state.dataGlobalConst->AllResourceTypes) {
-            elcc->energySPV.at(jYear).at(kResource) = elcc->SPV(jYear);
+        for (int iResource = 0; iResource < static_cast<int>(Constant::ResourceType::Num); ++iResource) {
+            elcc->energySPV[jYear][iResource] = elcc->SPV(jYear);
         }
     }
     // loop through the resources and if they match a UseEscalation use those values instead
     for (nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
-        auto curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
-        if (curResource != DataGlobalConstants::ResourceType::None) {
+        Constant::ResourceType curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
+        if (curResource != Constant::ResourceType::None) {
             for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 // the following is based on UPV* formula from NIST 135 supplement but is for a single year
                 effectiveYear = double(jYear) - DiscConv2EffectiveYearAdjustment[static_cast<int>(elcc->discountConvention)];
-                elcc->energySPV.at(jYear).at(curResource) =
+                elcc->energySPV[jYear][static_cast<int>(curResource)] =
                     elcc->UsePriceEscalation(nUsePriceEsc).Escalation(jYear) / std::pow(1.0 + curDiscountRate, effectiveYear);
             }
         }
@@ -1493,12 +1501,12 @@ void ComputePresentValue(EnergyPlusData &state)
             break;
         }
         case PrValKind::Energy: {
-            auto curResource = elcc->CashFlow[iCashFlow].Resource;
-            if (curResource != DataGlobalConstants::ResourceType::None) {
+            Constant::ResourceType curResource = elcc->CashFlow[iCashFlow].Resource;
+            if (curResource != Constant::ResourceType::None) {
                 totalPV = 0.0;
                 for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                     elcc->CashFlow[iCashFlow].yrPresVal(jYear) =
-                        elcc->CashFlow[iCashFlow].yrAmount(jYear) * elcc->energySPV.at(jYear).at(curResource);
+                        elcc->CashFlow[iCashFlow].yrAmount(jYear) * elcc->energySPV[jYear][static_cast<int>(curResource)];
                     totalPV += elcc->CashFlow[iCashFlow].yrPresVal(jYear);
                 }
                 elcc->CashFlow[iCashFlow].presentValue = totalPV;
@@ -1515,7 +1523,7 @@ void ComputePresentValue(EnergyPlusData &state)
         elcc->CashFlow[i].presentValue = 0; // initialize value to zero before summing in next for loop
     }
     for (iCashFlow = CostCategory::Num; iCashFlow < elcc->numCashFlow; ++iCashFlow) {
-        curCategory = elcc->CashFlow[iCashFlow].Category;
+        int curCategory = elcc->CashFlow[iCashFlow].Category;
         if ((curCategory < CostCategory::Num) && (curCategory >= 0)) {
             elcc->CashFlow[curCategory].presentValue += elcc->CashFlow[iCashFlow].presentValue;
             for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
@@ -1601,7 +1609,7 @@ void ComputeTaxAndDepreciation(EnergyPlusData &state)
     // The MACRS valus are based on Modified Accelerated Cost Recovery System GDS for 3, 5, 7, 10 year
     // property are based on 200% depreciation method shown in Appendix A using half year. 15 and 20 are
     // based on 150% (Chart 1). For Straight Line depreciation GDS is used for 27 years (actually 27.5)
-    // 31 years (actually 31.5 years) and 39 years using mid month. For 40 years ADS is used (chart 2)
+    // 31 years (actually 31.5 years) and 39 years using mid-month. For 40 years ADS is used (chart 2)
     // Table A-1 is used for 3, 4, 5, 10, 15 and 20 years. Table A-6 is for 27 years. Table A-7 for 31 years.
     // Table A-7a for 39 years. Table A-13 for 40 years. These years are a classification of property
     // and should not be confused with the length of the study. For 27 years, 31 years, 39 years and 40 years
@@ -1654,30 +1662,6 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
     //    Write the output report related to life-cycle costing
     //    to the tabular output file.
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using OutputReportTabular::RealToStr;
-    using OutputReportTabular::WriteReportHeaders;
-    using OutputReportTabular::WriteSubtitle;
-    using OutputReportTabular::WriteTable;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // all arrays are in the format: (row, column)
     Array1D_string columnHead;
@@ -1685,23 +1669,13 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
     Array1D_string rowHead;
     Array2D_string tableBody;
 
-    int numColumns;
-    int iYear;
-    int jObj;
-    int kMonth;
-    int curCashFlow;
-    int numRows;
-    int offset;
-    int numYears;
-    Real64 totalPV;
-
-    auto &elcc(state.dataEconLifeCycleCost);
+    auto const &elcc = state.dataEconLifeCycleCost;
 
     if (elcc->LCCparamPresent && state.dataOutRptTab->displayLifeCycleCostReport) {
         //---------------------------------
         // Life-Cycle Cost Verification and Results Report
         //---------------------------------
-        WriteReportHeaders(state, "Life-Cycle Cost Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
+        OutputReportTabular::WriteReportHeaders(state, "Life-Cycle Cost Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
         //---- Life-Cycle Cost Parameters
         rowHead.allocate(11);
         columnHead.allocate(1);
@@ -1725,29 +1699,29 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         tableBody(1, 2) = DiscConvNames[static_cast<int>(elcc->discountConvention)];
         tableBody(1, 3) = InflApprNames[static_cast<int>(elcc->inflationApproach)];
         if (elcc->inflationApproach == InflAppr::ConstantDollar) {
-            tableBody(1, 4) = RealToStr(elcc->realDiscountRate, 4);
+            tableBody(1, 4) = OutputReportTabular::RealToStr(elcc->realDiscountRate, 4);
         } else {
             tableBody(1, 4) = "-- N/A --";
         }
         if (elcc->inflationApproach == InflAppr::CurrentDollar) {
-            tableBody(1, 5) = RealToStr(elcc->nominalDiscountRate, 4);
+            tableBody(1, 5) = OutputReportTabular::RealToStr(elcc->nominalDiscountRate, 4);
         } else {
             tableBody(1, 5) = "-- N/A --";
         }
         if (elcc->inflationApproach == InflAppr::CurrentDollar) {
-            tableBody(1, 6) = RealToStr(elcc->inflation, 4);
+            tableBody(1, 6) = OutputReportTabular::RealToStr(elcc->inflation, 4);
         } else {
             tableBody(1, 6) = "-- N/A --";
         }
         tableBody(1, 7) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear);
         tableBody(1, 8) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->serviceDateMonth)], elcc->serviceDateYear);
         tableBody(1, 9) = fmt::to_string(elcc->lengthStudyYears);
-        tableBody(1, 10) = RealToStr(elcc->taxRate, 4);
+        tableBody(1, 10) = OutputReportTabular::RealToStr(elcc->taxRate, 4);
         tableBody(1, 11) = DeprMethodNames[static_cast<int>(elcc->depreciationMethod)];
 
         columnWidth = 14; // array assignment - same for all columns
-        WriteSubtitle(state, "Life-Cycle Cost Parameters");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Life-Cycle Cost Parameters");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters");
@@ -1762,7 +1736,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth.deallocate();
         tableBody.deallocate();
         //---- Use Price Escalation
-        numColumns = max(1, elcc->numUsePriceEscalation);
+        int numColumns = max(1, elcc->numUsePriceEscalation);
         rowHead.allocate(elcc->lengthStudyYears + 2);
         columnHead.allocate(numColumns);
         columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
@@ -1771,23 +1745,23 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnHead = "none";
         rowHead(1) = "Resource";
         rowHead(2) = "Start Date";
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear + 2) = fmt::to_string(iYear);
         }
-        for (jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
+        for (int jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
             columnHead(jObj) = elcc->UsePriceEscalation(jObj).name;
             tableBody(jObj, 1) = GetResourceTypeChar(elcc->UsePriceEscalation(jObj).resource);
             tableBody(jObj, 2) = format("{} {}",
                                         UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->UsePriceEscalation(jObj).escalationStartMonth)],
                                         elcc->UsePriceEscalation(jObj).escalationStartYear);
         }
-        for (jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) {
-            for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                tableBody(jObj, iYear + 2) = RealToStr(elcc->UsePriceEscalation(jObj).Escalation(iYear), 6);
+        for (int jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) {
+            for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+                tableBody(jObj, iYear + 2) = OutputReportTabular::RealToStr(elcc->UsePriceEscalation(jObj).Escalation(iYear), 6);
             }
         }
-        WriteSubtitle(state, "Use Price Escalation");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Use Price Escalation");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation");
@@ -1803,7 +1777,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         //---- Use Adjustment
         if (elcc->numUseAdjustment >= 1) { // only create table if objects used
             numColumns = max(1, elcc->numUseAdjustment);
-            numYears = elcc->lengthStudyYears - (elcc->serviceDateYear - elcc->baseDateYear);
+            int numYears = elcc->lengthStudyYears - (elcc->serviceDateYear - elcc->baseDateYear);
             rowHead.allocate(numYears + 1);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
@@ -1811,21 +1785,21 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             tableBody = "";
             columnHead = "none";
             rowHead(1) = "";
-            for (iYear = 1; iYear <= numYears; ++iYear) {
+            for (int iYear = 1; iYear <= numYears; ++iYear) {
                 rowHead(iYear + 1) =
                     format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->serviceDateMonth)], elcc->serviceDateYear + iYear - 1);
             }
-            for (jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) { // loop through objects not columns to add names
+            for (int jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) { // loop through objects not columns to add names
                 columnHead(jObj) = elcc->UseAdjustment(jObj).name;
                 tableBody(jObj, 1) = GetResourceTypeChar(elcc->UseAdjustment(jObj).resource);
             }
-            for (jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) {
-                for (iYear = 1; iYear <= numYears; ++iYear) {
-                    tableBody(jObj, iYear + 1) = RealToStr(elcc->UseAdjustment(jObj).Adjustment(iYear), 6);
+            for (int jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) {
+                for (int iYear = 1; iYear <= numYears; ++iYear) {
+                    tableBody(jObj, iYear + 1) = OutputReportTabular::RealToStr(elcc->UseAdjustment(jObj).Adjustment(iYear), 6);
                 }
             }
-            WriteSubtitle(state, "Use Adjustment");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+            OutputReportTabular::WriteSubtitle(state, "Use Adjustment");
+            OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment");
@@ -1847,22 +1821,22 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         tableBody.allocate(numColumns, elcc->lengthStudyYears + 1);
         tableBody = "";
         rowHead(1) = "";
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear + 1) =
                 format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
         }
-        for (jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost); ++jObj) {
-            curCashFlow = CostCategory::Num + jObj;
+        for (int jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost); ++jObj) {
+            int curCashFlow = CostCategory::Num + jObj;
             columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
 
             tableBody(jObj + 1, 1) = SourceKindTypeNames[static_cast<int>(elcc->CashFlow[curCashFlow].SourceKind)];
 
-            for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                tableBody(jObj + 1, iYear + 1) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
+            for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+                tableBody(jObj + 1, iYear + 1) = OutputReportTabular::RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
             }
         }
-        WriteSubtitle(state, "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                                rowHead,
@@ -1891,23 +1865,23 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
         tableBody.allocate(numColumns, elcc->lengthStudyYears);
         tableBody = "";
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
         }
-        for (jObj = 0; jObj < elcc->numResourcesUsed; ++jObj) {
-            curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
+        for (int jObj = 0; jObj < elcc->numResourcesUsed; ++jObj) {
+            int curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
             columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
-            for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                tableBody(jObj + 1, iYear) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
+            for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+                tableBody(jObj + 1, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
             }
         }
         columnHead(numColumns) = Total;
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-            tableBody(jObj + 1, iYear) =
-                RealToStr(elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+            tableBody(elcc->numResourcesUsed + 1, iYear) = OutputReportTabular::RealToStr(
+                elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
         }
-        WriteSubtitle(state, "Energy and Water Cost Cash Flows (Without Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Energy and Water Cost Cash Flows (Without Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy and Water Cost Cash Flows (Without Escalation)");
@@ -1927,29 +1901,30 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
         tableBody.allocate(numColumns, elcc->lengthStudyYears);
         tableBody = "";
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
         }
-        for (jObj = 0; jObj < elcc->numResourcesUsed; ++jObj) {
-            curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
+        for (int jObj = 0; jObj < elcc->numResourcesUsed; ++jObj) {
+            int curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
             columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
-            auto curResource = elcc->CashFlow[curCashFlow].Resource;
-            if (elcc->CashFlow[curCashFlow].Resource != DataGlobalConstants::ResourceType::Water) {
-                for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                    tableBody(jObj + 1, iYear) = RealToStr(elcc->EscalatedEnergy.at(iYear).at(curResource), 2);
+            Constant::ResourceType curResource = elcc->CashFlow[curCashFlow].Resource;
+            if (elcc->CashFlow[curCashFlow].Resource != Constant::ResourceType::Water) {
+                for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+                    tableBody(jObj + 1, iYear) = OutputReportTabular::RealToStr(elcc->EscalatedEnergy[iYear][static_cast<int>(curResource)], 2);
                 }
             } else { // for water just use the original cashflow since not involved in escalation
-                for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                    tableBody(jObj + 1, iYear) = RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
+                for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+                    tableBody(jObj + 1, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[curCashFlow].yrAmount(iYear), 2);
                 }
             }
         }
         columnHead(numColumns) = Total;
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-            tableBody(jObj + 1, iYear) = RealToStr(elcc->EscalatedTotEnergy(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+            tableBody(elcc->numResourcesUsed + 1, iYear) =
+                OutputReportTabular::RealToStr(elcc->EscalatedTotEnergy(iYear) + elcc->CashFlow[CostCategory::Water].yrAmount(iYear), 2);
         }
-        WriteSubtitle(state, "Energy and Water Cost Cash Flows (With Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Energy and Water Cost Cash Flows (With Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy and Water Cost Cash Flows (With Escalation)");
@@ -1975,15 +1950,15 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             columnHead(tableColumnIndex) = CostCategoryNamesNoSpace[static_cast<int>(CostCategory)];
         }
         columnHead(4) = Total;
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
             for (int CostCategory = CostCategory::Construction, tableColumnIndex = 1; CostCategory <= CostCategory::TotCaptl;
                  ++tableColumnIndex, ++CostCategory) {
-                tableBody(tableColumnIndex, iYear) = RealToStr(elcc->CashFlow[CostCategory].yrAmount(iYear), 2);
+                tableBody(tableColumnIndex, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[CostCategory].yrAmount(iYear), 2);
             }
         }
-        WriteSubtitle(state, "Capital Cash Flow by Category (Without Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Capital Cash Flow by Category (Without Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Capital Cash Flow by Category (Without Escalation)");
@@ -2009,14 +1984,14 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         }
         columnHead(10) = Total;
 
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
             for (int CashFlowCostCategory = CostCategory::Maintenance; CashFlowCostCategory <= CostCategory::TotOper; ++CashFlowCostCategory) {
-                tableBody(CashFlowCostCategory + 1, iYear) = RealToStr(elcc->CashFlow[CashFlowCostCategory].yrAmount(iYear), 2);
+                tableBody(CashFlowCostCategory + 1, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[CashFlowCostCategory].yrAmount(iYear), 2);
             }
         }
-        WriteSubtitle(state, "Operating Cash Flow by Category (Without Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Operating Cash Flow by Category (Without Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Operating Cash Flow by Category (Without Escalation)");
@@ -2042,18 +2017,18 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         }
         columnHead(10) = Total;
 
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
             for (int CashFlowCostCategory = CostCategory::Maintenance; CashFlowCostCategory <= CostCategory::Water; ++CashFlowCostCategory) {
-                tableBody(CashFlowCostCategory + 1, iYear) = RealToStr(elcc->CashFlow[CashFlowCostCategory].yrAmount(iYear), 2);
+                tableBody(CashFlowCostCategory + 1, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[CashFlowCostCategory].yrAmount(iYear), 2);
             }
-            tableBody(9, iYear) = RealToStr(elcc->EscalatedTotEnergy(iYear), 2);
+            tableBody(9, iYear) = OutputReportTabular::RealToStr(elcc->EscalatedTotEnergy(iYear), 2);
             Real64 yearly_total_cost = elcc->CashFlow[CostCategory::TotOper].yrAmount(iYear) + elcc->EscalatedTotEnergy(iYear) -
                                        elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear);
-            tableBody(10, iYear) = RealToStr(yearly_total_cost, 2);
+            tableBody(10, iYear) = OutputReportTabular::RealToStr(yearly_total_cost, 2);
         }
-        WriteSubtitle(state, "Operating Cash Flow by Category (With Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Operating Cash Flow by Category (With Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Operating Cash Flow by Category (With Escalation)");
@@ -2067,57 +2042,55 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth.deallocate();
         tableBody.deallocate();
         //---- DEBUG ONLY - Monthly Cash Flows
-        bool showMonthlyCashFlows = false;
-        if (showMonthlyCashFlows) {
-            rowHead.allocate(elcc->lengthStudyTotalMonths);
-            columnHead.allocate(elcc->numCashFlow);
-            columnWidth.allocate(elcc->numCashFlow);
-            tableBody.allocate(elcc->numCashFlow, elcc->lengthStudyTotalMonths);
-            tableBody = "";
-            columnHead(1) = "mnt";
-            columnHead(2) = "rpr";
-            columnHead(3) = "opr";
-            columnHead(4) = "repl";
-            columnHead(5) = "mOvhl";
-            columnHead(6) = "MOvhl";
-            columnHead(7) = "oOpr";
-            columnHead(8) = "cons";
-            columnHead(9) = "slvg";
-            columnHead(10) = "oCap";
-            columnHead(11) = "H2O";
-            columnHead(12) = "ene";
-            columnHead(13) = "tEne";
-            columnHead(14) = "tOpr";
-            columnHead(15) = "tCap";
-            columnHead(16) = "Totl";
-            for (jObj = CostCategory::Num; jObj < elcc->numCashFlow; ++jObj) {
-                columnHead(jObj + 1) = elcc->CashFlow[jObj].name;
-            }
-            for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
-                rowHead(kMonth) = format("{} {}",
-                                         UtilityRoutines::MonthNamesCC[static_cast<int>(1 + (kMonth + elcc->baseDateMonth - 2) % 12) - 1],
-                                         elcc->baseDateYear + int((kMonth - 1) / 12));
-            }
-            for (kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
-                for (jObj = 0; jObj < elcc->numCashFlow; ++jObj) {
-                    tableBody(jObj + 1, kMonth) = RealToStr(elcc->CashFlow[jObj].mnAmount(kMonth), 2);
-                }
-            }
-            WriteSubtitle(state, "DEBUG ONLY - Monthly Cash Flows");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (state.dataSQLiteProcedures->sqlite) {
-                state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
-            }
-            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
-            }
-            columnHead.deallocate();
-            rowHead.deallocate();
-            columnWidth.deallocate();
-            tableBody.deallocate();
-        }
+        // bool showMonthlyCashFlows = false;
+        // if (showMonthlyCashFlows) {
+        //    rowHead.allocate(elcc->lengthStudyTotalMonths);
+        //    columnHead.allocate(elcc->numCashFlow);
+        //    columnWidth.allocate(elcc->numCashFlow);
+        //    tableBody.allocate(elcc->numCashFlow, elcc->lengthStudyTotalMonths);
+        //    tableBody = "";
+        //    columnHead(1) = "mnt";
+        //    columnHead(2) = "rpr";
+        //    columnHead(3) = "opr";
+        //    columnHead(4) = "repl";
+        //    columnHead(5) = "mOvhl";
+        //    columnHead(6) = "MOvhl";
+        //    columnHead(7) = "oOpr";
+        //    columnHead(8) = "cons";
+        //    columnHead(9) = "slvg";
+        //    columnHead(10) = "oCap";
+        //    columnHead(11) = "H2O";
+        //    columnHead(12) = "ene";
+        //    columnHead(13) = "tEne";
+        //    columnHead(14) = "tOpr";
+        //    columnHead(15) = "tCap";
+        //    columnHead(16) = "Totl";
+        //    for (int jObj = CostCategory::Num; jObj < elcc->numCashFlow; ++jObj) {
+        //        columnHead(jObj + 1) = elcc->CashFlow[jObj].name;
+        //    }
+        //    for (int kMonth = 1; kMonth <= elcc->lengthStudyTotalMonths; ++kMonth) {
+        //        rowHead(kMonth) = format("{} {}",
+        //                                 UtilityRoutines::MonthNamesCC[static_cast<int>(1 + (kMonth + elcc->baseDateMonth - 2) % 12) - 1],
+        //                                 elcc->baseDateYear + int((kMonth - 1) / 12));
+        //        for (int jObj = 0; jObj < elcc->numCashFlow; ++jObj) {
+        //            tableBody(jObj + 1, kMonth) = OutputReportTabular::RealToStr(elcc->CashFlow[jObj].mnAmount(kMonth), 2);
+        //        }
+        //    }
+        //    OutputReportTabular::WriteSubtitle(state, "DEBUG ONLY - Monthly Cash Flows");
+        //    OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        //    if (state.dataSQLiteProcedures->sqlite) {
+        //        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+        //            tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
+        //    }
+        //    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+        //        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+        //            tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
+        //    }
+        //    columnHead.deallocate();
+        //    rowHead.deallocate();
+        //    columnWidth.deallocate();
+        //    tableBody.deallocate();
+        //}
         //---- Monthly Total Cash Flow
         rowHead.allocate(elcc->lengthStudyYears);
         columnHead.allocate(12);
@@ -2125,19 +2098,18 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth = 14; // array assignment - same for all columns
         tableBody.allocate(12, elcc->lengthStudyYears);
         tableBody = "";
-        for (kMonth = 1; kMonth <= 12; ++kMonth) {
+        for (int kMonth = 1; kMonth <= 12; ++kMonth) {
             columnHead(kMonth) = UtilityRoutines::MonthNamesCC[static_cast<int>(kMonth - 1)];
         }
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = fmt::to_string(elcc->baseDateYear + iYear - 1);
-        }
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-            for (kMonth = 1; kMonth <= 12; ++kMonth) {
-                tableBody(kMonth, iYear) = RealToStr(elcc->CashFlow[CostCategory::TotGrand].mnAmount((iYear - 1) * 12 + kMonth), 2);
+            for (int kMonth = 1; kMonth <= 12; ++kMonth) {
+                tableBody(kMonth, iYear) =
+                    OutputReportTabular::RealToStr(elcc->CashFlow[CostCategory::TotGrand].mnAmount((iYear - 1) * 12 + kMonth), 2);
             }
         }
-        WriteSubtitle(state, "Monthly Total Cash Flow (Without Escalation)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Monthly Total Cash Flow (Without Escalation)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)");
@@ -2151,7 +2123,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnWidth.deallocate();
         tableBody.deallocate();
         //---- Present Value for Recurring, Nonrecurring and Energy Costs
-        numRows = max(1, elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed);
+        int numRows = max(1, elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed);
         rowHead.allocate(numRows + 1);
         columnHead.allocate(5);
         columnWidth.allocate(5);
@@ -2163,10 +2135,10 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnHead(3) = "Cost";
         columnHead(4) = "Present Value";
         columnHead(5) = "Present Value Factor";
-        totalPV = 0.0;
+        Real64 totalPV = 0.0;
         rowHead(numRows + 1) = TotalUC;
-        for (jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed); ++jObj) {
-            offset = CostCategory::Num;
+        for (int jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost + elcc->numResourcesUsed); ++jObj) {
+            int offset = CostCategory::Num;
             rowHead(jObj + 1) = elcc->CashFlow[offset + jObj].name;
             switch (elcc->CashFlow[offset + jObj].Category) {
             case CostCategory::Maintenance:
@@ -2207,18 +2179,19 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
                 break;
             }
             }
-            tableBody(3, jObj + 1) = RealToStr(elcc->CashFlow[offset + jObj].orginalCost, 2);
-            tableBody(4, jObj + 1) = RealToStr(elcc->CashFlow[offset + jObj].presentValue, 2);
+            tableBody(3, jObj + 1) = OutputReportTabular::RealToStr(elcc->CashFlow[offset + jObj].orginalCost, 2);
+            tableBody(4, jObj + 1) = OutputReportTabular::RealToStr(elcc->CashFlow[offset + jObj].presentValue, 2);
             totalPV += elcc->CashFlow[offset + jObj].presentValue;
             if (elcc->CashFlow[offset + jObj].orginalCost != 0.0) {
-                tableBody(5, jObj + 1) = RealToStr(elcc->CashFlow[offset + jObj].presentValue / elcc->CashFlow[offset + jObj].orginalCost, 4);
+                tableBody(5, jObj + 1) =
+                    OutputReportTabular::RealToStr(elcc->CashFlow[offset + jObj].presentValue / elcc->CashFlow[offset + jObj].orginalCost, 4);
             } else {
                 tableBody(5, jObj + 1) = "-";
             }
         }
-        tableBody(4, numRows + 1) = RealToStr(totalPV, 2);
-        WriteSubtitle(state, "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        tableBody(4, numRows + 1) = OutputReportTabular::RealToStr(totalPV, 2);
+        OutputReportTabular::WriteSubtitle(state, "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody,
@@ -2254,11 +2227,11 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnHead(1) = "Present Value";
 
         for (int CashFlowCostCategory = CostCategory::Maintenance; CashFlowCostCategory <= CostCategory::TotGrand; ++CashFlowCostCategory) {
-            tableBody(1, CashFlowCostCategory + 1) = RealToStr(elcc->CashFlow[CashFlowCostCategory].presentValue, 2);
+            tableBody(1, CashFlowCostCategory + 1) = OutputReportTabular::RealToStr(elcc->CashFlow[CashFlowCostCategory].presentValue, 2);
         }
 
-        WriteSubtitle(state, "Present Value by Category");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Present Value by Category");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category");
@@ -2283,22 +2256,22 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         columnHead(3) = "Present Value of Costs";
 
         totalPV = 0.0;
-        for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+        for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
             rowHead(iYear) = format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
-            tableBody(1, iYear) = RealToStr(elcc->CashFlow[CostCategory::TotGrand].yrAmount(iYear), 2);
+            tableBody(1, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[CostCategory::TotGrand].yrAmount(iYear), 2);
             // adjust for escalated energy costs
             Real64 yearly_total_cost = elcc->CashFlow[CostCategory::TotGrand].yrAmount(iYear) + elcc->EscalatedTotEnergy(iYear) -
                                        elcc->CashFlow[CostCategory::TotEnergy].yrAmount(iYear);
-            tableBody(2, iYear) = RealToStr(yearly_total_cost, 2);
-            tableBody(3, iYear) = RealToStr(elcc->CashFlow[CostCategory::TotGrand].yrPresVal(iYear), 2);
+            tableBody(2, iYear) = OutputReportTabular::RealToStr(yearly_total_cost, 2);
+            tableBody(3, iYear) = OutputReportTabular::RealToStr(elcc->CashFlow[CostCategory::TotGrand].yrPresVal(iYear), 2);
             totalPV += elcc->CashFlow[CostCategory::TotGrand].yrPresVal(iYear);
         }
 
         rowHead(elcc->lengthStudyYears + 1) = TotalUC;
-        tableBody(3, elcc->lengthStudyYears + 1) = RealToStr(totalPV, 2);
+        tableBody(3, elcc->lengthStudyYears + 1) = OutputReportTabular::RealToStr(totalPV, 2);
 
-        WriteSubtitle(state, "Present Value by Year");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        OutputReportTabular::WriteSubtitle(state, "Present Value by Year");
+        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year");
@@ -2326,22 +2299,22 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             columnHead(5) = "After Tax Present Value";
 
             totalPV = 0.0;
-            for (iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
+            for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
                 rowHead(iYear) =
                     format("{} {}", UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
-                tableBody(1, iYear) = RealToStr(elcc->DepreciatedCapital(iYear), 2);
-                tableBody(2, iYear) = RealToStr(elcc->TaxableIncome(iYear), 2);
-                tableBody(3, iYear) = RealToStr(elcc->Taxes(iYear), 2);
-                tableBody(4, iYear) = RealToStr(elcc->AfterTaxCashFlow(iYear), 2);
-                tableBody(5, iYear) = RealToStr(elcc->AfterTaxPresentValue(iYear), 2);
+                tableBody(1, iYear) = OutputReportTabular::RealToStr(elcc->DepreciatedCapital(iYear), 2);
+                tableBody(2, iYear) = OutputReportTabular::RealToStr(elcc->TaxableIncome(iYear), 2);
+                tableBody(3, iYear) = OutputReportTabular::RealToStr(elcc->Taxes(iYear), 2);
+                tableBody(4, iYear) = OutputReportTabular::RealToStr(elcc->AfterTaxCashFlow(iYear), 2);
+                tableBody(5, iYear) = OutputReportTabular::RealToStr(elcc->AfterTaxPresentValue(iYear), 2);
                 totalPV += elcc->AfterTaxPresentValue(iYear);
             }
 
             rowHead(elcc->lengthStudyYears + 1) = TotalUC;
-            tableBody(5, elcc->lengthStudyYears + 1) = RealToStr(totalPV, 2);
+            tableBody(5, elcc->lengthStudyYears + 1) = OutputReportTabular::RealToStr(totalPV, 2);
 
-            WriteSubtitle(state, "After Tax Estimate");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+            OutputReportTabular::WriteSubtitle(state, "After Tax Estimate");
+            OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             if (state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate");

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -83,8 +83,6 @@ namespace CTElectricGenerator {
     // MODULE INFORMATION:
     //       AUTHOR         Dan Fisher
     //       DATE WRITTEN   Sept 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This module simulates the performance of the COMBUSTION turbine
@@ -97,7 +95,7 @@ namespace CTElectricGenerator {
     // All CT Generator models are based on a polynomial fit of Generator
     // performance data.
 
-    PlantComponent *CTGeneratorData::factory(EnergyPlusData &state, std::string const &objectName)
+    CTGeneratorData *CTGeneratorData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for generators if it hasn't been done already
         if (state.dataCTElectricGenerator->getCTInputFlag) {
@@ -106,15 +104,14 @@ namespace CTElectricGenerator {
         }
 
         // Now look for this particular generator in the list
-        for (auto &CTGen : state.dataCTElectricGenerator->CTGenerator) {
-            if (CTGen.Name == objectName) {
-                return &CTGen;
-            }
-        }
+        auto myCTGen = std::find_if(state.dataCTElectricGenerator->CTGenerator.begin(),
+                                    state.dataCTElectricGenerator->CTGenerator.end(),
+                                    [&objectName](const CTGeneratorData &CTElecGen) { return CTElecGen.Name == objectName; });
+        if (myCTGen != state.dataCTElectricGenerator->CTGenerator.end()) return myCTGen;
         // If we didn't find it, fatal
         ShowFatalError(state,
-                       "LocalCombustionTurbineGeneratorFactory: Error getting inputs for combustion turbine generator named: " +
-                           objectName); // LCOV_EXCL_LINE
+                       format("LocalCombustionTurbineGeneratorFactory: Error getting inputs for combustion turbine generator named: {}",
+                              objectName)); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -128,8 +125,6 @@ namespace CTElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE: This is the CT Generator driver.  It
         // gets the input for the models, initializes simulation variables, call
@@ -161,7 +156,7 @@ namespace CTElectricGenerator {
         int NumCTGenerators = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (NumCTGenerators <= 0) {
-            ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, format("No {} equipment specified in input file", state.dataIPShortCut->cCurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -189,7 +184,7 @@ namespace CTElectricGenerator {
             state.dataCTElectricGenerator->CTGenerator(genNum).RatedPowerOutput = NumArray(1);
             if (NumArray(1) == 0.0) {
                 ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), NumArray(1)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
@@ -212,50 +207,50 @@ namespace CTElectricGenerator {
             // Load Special CT Generator Input
 
             state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedFuelInputCurve =
-                CurveManager::GetCurveIndex(state, AlphArray(3)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(3)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedFuelInputCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + AlphArray(3));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(3), AlphArray(3)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedFuelInputCurve =
-                CurveManager::GetCurveIndex(state, AlphArray(4)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(4)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedFuelInputCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + AlphArray(4));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).ExhaustFlowCurve =
-                CurveManager::GetCurveIndex(state, AlphArray(5)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(5)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).ExhaustFlowCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + AlphArray(5));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedExhaustTempCurve =
-                CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedExhaustTempCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + AlphArray(6));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), AlphArray(6)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedExhaustTempCurve =
-                CurveManager::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedExhaustTempCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphArray(7));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), AlphArray(7)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).QLubeOilRecoveredCurve =
-                CurveManager::GetCurveIndex(state, AlphArray(8)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(8)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).QLubeOilRecoveredCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
             }
 
@@ -281,8 +276,8 @@ namespace CTElectricGenerator {
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInletNodeNum == 0) {
-                    ShowSevereError(state,
-                                    "Missing Node Name, Heat Recovery Inlet, for " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(
+                        state, format("Missing Node Name, Heat Recovery Inlet, for {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                     ErrorsFound = true;
                 }
                 state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutletNodeNum =
@@ -297,7 +292,8 @@ namespace CTElectricGenerator {
                                                         DataLoopNode::ObjectIsNotParent);
                 if (state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutletNodeNum == 0) {
                     ShowSevereError(
-                        state, "Missing Node Name, Heat Recovery Outlet, for " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                        state,
+                        format("Missing Node Name, Heat Recovery Outlet, for {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                     ErrorsFound = true;
                 }
                 BranchNodeConnections::TestCompSet(
@@ -311,8 +307,9 @@ namespace CTElectricGenerator {
                 state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutletNodeNum = 0;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(9) || !state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                     ShowWarningError(state,
-                                     "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + state.dataIPShortCut->cCurrentModuleObject +
-                                         '=' + AlphArray(1));
+                                     format("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for {}={}",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            AlphArray(1)));
                     ShowContinueError(state, "However, Node names were specified for Heat Recovery inlet or outlet nodes");
                 }
             }
@@ -321,10 +318,9 @@ namespace CTElectricGenerator {
             bool FuelTypeError(false);
             UtilityRoutines::ValidateFuelType(state, AlphArray(11), state.dataCTElectricGenerator->CTGenerator(genNum).FuelType, FuelTypeError);
             if (FuelTypeError) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphArray(11));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), AlphArray(11)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
-                FuelTypeError = false;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecMaxTemp = NumArray(12);
@@ -345,8 +341,10 @@ namespace CTElectricGenerator {
                                                         DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataCTElectricGenerator->CTGenerator(genNum).OAInletNode)) {
                     ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + ", \"" + state.dataCTElectricGenerator->CTGenerator(genNum).Name +
-                                        "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray(12));
+                                    format("{}, \"{}\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= {}",
+                                           state.dataIPShortCut->cCurrentModuleObject,
+                                           state.dataCTElectricGenerator->CTGenerator(genNum).Name,
+                                           AlphArray(12)));
                     ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                     ErrorsFound = true;
                 }
@@ -354,7 +352,7 @@ namespace CTElectricGenerator {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
+            ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
         }
     }
 
@@ -528,8 +526,6 @@ namespace CTElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // simulate a vapor compression Generator using the CT model
@@ -557,14 +553,13 @@ namespace CTElectricGenerator {
         // design turbine inlet temperature (C)
         Real64 designAirInletTemp = this->DesignAirInletTemp;
 
-        int heatRecInNode;    // Heat Recovery Fluid Inlet Node Num
         Real64 heatRecInTemp; // Heat Recovery Fluid Inlet Temperature (C)
 
         Real64 heatRecMdot; // Heat Recovery Fluid Mass FlowRate (kg/s)
         Real64 heatRecCp;   // Specific Heat of the Heat Recovery Fluid (J/kg-K)
 
         if (this->HeatRecActive) {
-            heatRecInNode = this->HeatRecInletNodeNum;
+            int heatRecInNode = this->HeatRecInletNodeNum;
             heatRecInTemp = state.dataLoopNodes->Node(heatRecInNode).Temp;
 
             heatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -627,14 +622,14 @@ namespace CTElectricGenerator {
         // The TempBasedFuelInputCurve is a correction based on deviation from design inlet air temperature conditions.
         // The first coefficient of this fit should be 1.0 to ensure that no correction is made at design conditions.
         // (EFUEL) rate of Fuel Energy Required to run COMBUSTION turbine (W)
-        Real64 FuelUseRate = elecPowerGenerated * CurveManager::CurveValue(state, this->PLBasedFuelInputCurve, PLR) *
-                             CurveManager::CurveValue(state, this->TempBasedFuelInputCurve, ambientDeltaT);
+        Real64 FuelUseRate = elecPowerGenerated * Curve::CurveValue(state, this->PLBasedFuelInputCurve, PLR) *
+                             Curve::CurveValue(state, this->TempBasedFuelInputCurve, ambientDeltaT);
 
         // Use Curve fit to determine Exhaust Flow.  This curve shows the ratio of exhaust gas flow (kg/s) to electric power
         // output (J/s).  The units on ExhaustFlowCurve are (kg/J).  When multiplied by the rated power of the unit,
         // it gives the exhaust flow rate in kg/s
         // (FEX) Exhaust Gas Flow Rate cubic meters per second???
-        Real64 exhaustFlow = ratedPowerOutput * CurveManager::CurveValue(state, this->ExhaustFlowCurve, ambientDeltaT);
+        Real64 exhaustFlow = ratedPowerOutput * Curve::CurveValue(state, this->ExhaustFlowCurve, ambientDeltaT);
 
         // Use Curve fit to determine Exhaust Temperature.  This curve calculates the exhaust temperature (C) by
         // multiplying the exhaust temperature (C) for a particular part load as given by PLBasedExhaustTempCurve
@@ -645,8 +640,8 @@ namespace CTElectricGenerator {
         if ((PLR > 0.0) && ((exhaustFlow > 0.0) || (maxExhaustperCTPower > 0.0))) {
 
             // (TEX) Exhaust Gas Temperature in C
-            Real64 exhaustTemp = CurveManager::CurveValue(state, this->PLBasedExhaustTempCurve, PLR) *
-                                 CurveManager::CurveValue(state, this->TempBasedExhaustTempCurve, ambientDeltaT);
+            Real64 exhaustTemp = Curve::CurveValue(state, this->PLBasedExhaustTempCurve, PLR) *
+                                 Curve::CurveValue(state, this->TempBasedExhaustTempCurve, ambientDeltaT);
 
             // (UACGC) Heat Exchanger UA to Capacity
             Real64 UA_loc = this->UACoef[0] * std::pow(ratedPowerOutput, this->UACoef[1]);
@@ -667,7 +662,7 @@ namespace CTElectricGenerator {
         // multiplying the total power generated by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
         // recovered lube oil heat (W)
-        Real64 QLubeOilRec = elecPowerGenerated * CurveManager::CurveValue(state, this->QLubeOilRecoveredCurve, PLR);
+        Real64 QLubeOilRec = elecPowerGenerated * Curve::CurveValue(state, this->QLubeOilRecoveredCurve, PLR);
 
         // Check for divide by zero
         Real64 HeatRecOutTemp; // Heat Recovery Fluid Outlet Temperature (C)
@@ -706,16 +701,16 @@ namespace CTElectricGenerator {
 
         // Calculate Energy
         // Generator output (J)
-        Real64 ElectricEnergyGen = elecPowerGenerated * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ElectricEnergyGen = elecPowerGenerated * state.dataHVACGlobal->TimeStepSysSec;
 
         // Amount of Fuel Energy Required to run COMBUSTION turbine (J)
-        Real64 FuelEnergyUsed = FuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 FuelEnergyUsed = FuelUseRate * state.dataHVACGlobal->TimeStepSysSec;
 
         // recovered lube oil heat (J)
-        Real64 lubeOilEnergyRec = QLubeOilRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 lubeOilEnergyRec = QLubeOilRec * state.dataHVACGlobal->TimeStepSysSec;
 
         // recovered exhaust heat (J)
-        Real64 exhaustEnergyRec = QExhaustRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 exhaustEnergyRec = QExhaustRec * state.dataHVACGlobal->TimeStepSysSec;
 
         this->ElecPowerGenerated = elecPowerGenerated;
         this->ElecEnergyGenerated = ElectricEnergyGen;
@@ -754,7 +749,6 @@ namespace CTElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Oct 2000
-        //       MODIFIED       na
         //       RE-ENGINEERED  Brent Griffith, Sept 2010 plant upgrades, generalize fluid props
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -798,12 +792,11 @@ namespace CTElectricGenerator {
 
     void CTGeneratorData::oneTimeInit(EnergyPlusData &state)
     {
-        auto constexpr RoutineName("InitICEngineGenerators");
-        bool errFlag;
+        std::string_view constexpr RoutineName("InitICEngineGenerators");
 
         if (this->MyPlantScanFlag) { // this flag to be removed
             if (allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
-                errFlag = false;
+                bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(
                     state, this->Name, DataPlant::PlantEquipmentType::Generator_CTurbine, this->HRPlantLoc, errFlag, _, _, _, _, _);
                 if (errFlag) {
@@ -826,7 +819,7 @@ namespace CTElectricGenerator {
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp,
+                                                           Constant::InitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -117,7 +117,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
     state->dataFurnaces->Furnace(FurnaceNum).IdleMassFlowRate = 0.2;
     state->dataFurnaces->Furnace(FurnaceNum).IdleSpeedRatio = 0.2;
-    state->dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
     state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = 1;
 
     state->dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(1) = 0.25;
@@ -270,8 +270,10 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->NumWatertoAirHPs = 2;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).Name = "WATERCOOLINGCOIL";
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPPlantType = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPType = WaterToAirHeatPumpSimple::WatertoAirHP::Cooling;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).Name = "WATERHEATINGCOIL";
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WAHPPlantType = DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WAHPType = WaterToAirHeatPumpSimple::WatertoAirHP::Heating;
     state->dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag.allocate(2);
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).AirInletNodeNum = 1;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).AirOutletNodeNum = 3;
@@ -281,6 +283,10 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.branchNum = 1;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.compNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapCoolTotal = 30000.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCOPCoolAtRatedCdts = 3.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCapHeat = 30000.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).RatedCOPHeatAtRatedCdts = 3.0;
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirInletNodeNum = 3;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirOutletNodeNum = 2;
@@ -290,6 +296,10 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.branchNum = 1;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.compNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCapCoolTotal = 30000.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCOPCoolAtRatedCdts = 3.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCapHeat = 30000.0;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatedCOPHeatAtRatedCdts = 3.0;
 
     // set up plant loop
     state->dataPlnt->TotNumLoops = 2;

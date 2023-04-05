@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,7 +68,7 @@ namespace PlantPressureSystem {
         bool FirstHVACIteration,                                                        // System flag
         DataPlant::PressureCall CallType,                                               // Enumerated call type
         DataPlant::LoopSideLocation LoopSideNum = DataPlant::LoopSideLocation::Invalid, // Loop side num for specific branch simulation
-        Optional_int_const BranchNum = _                                                // Branch num for specific branch simulation
+        ObjexxFCL::Optional_int_const BranchNum = _                                     // Branch num for specific branch simulation
     );
 
     void InitPressureDrop(EnergyPlusData &state, int LoopNum, bool FirstHVACIteration);

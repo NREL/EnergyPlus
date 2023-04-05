@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -135,8 +135,8 @@ void SetComponentFlowRate(EnergyPlusData &state,
     if (plantLoc.loopNum == 0) { // protect from hard crash below
         if (InletNode > 0) {
             ShowSevereError(state,
-                            "SetComponentFlowRate: trapped plant loop index = 0, check component with inlet node named=" +
-                                state.dataLoopNodes->NodeID(InletNode));
+                            format("SetComponentFlowRate: trapped plant loop index = 0, check component with inlet node named={}",
+                                   state.dataLoopNodes->NodeID(InletNode)));
         } else {
             ShowSevereError(state, "SetComponentFlowRate: trapped plant loop node id = 0");
         }
@@ -146,8 +146,8 @@ void SetComponentFlowRate(EnergyPlusData &state,
     }
 
     Real64 const MdotOldRequest = state.dataLoopNodes->Node(InletNode).MassFlowRateRequest;
-    auto &loop_side(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum));
-    auto &comp(loop_side.Branch(plantLoc.branchNum).Comp(plantLoc.compNum));
+    auto &loop_side = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum);
+    auto &comp = loop_side.Branch(plantLoc.branchNum).Comp(plantLoc.compNum);
 
     if (comp.CurOpSchemeType == DataPlant::OpScheme::Demand) {
         // store flow request on inlet node
@@ -174,8 +174,8 @@ void SetComponentFlowRate(EnergyPlusData &state,
             // throw error for developers, need to change a component model to set hardware limits on inlet
             if (!state.dataLoopNodes->Node(InletNode).plantNodeErrorMsgIssued) {
                 ShowSevereError(state,
-                                "SetComponentFlowRate: check component model implementation for component with inlet node named=" +
-                                    state.dataLoopNodes->NodeID(InletNode));
+                                format("SetComponentFlowRate: check component model implementation for component with inlet node named={}",
+                                       state.dataLoopNodes->NodeID(InletNode)));
                 ShowContinueError(state, format("Inlet node MassFlowRatMax = {:.8R}", state.dataLoopNodes->Node(InletNode).MassFlowRateMax));
                 state.dataLoopNodes->Node(InletNode).plantNodeErrorMsgIssued = true;
             }
@@ -201,9 +201,9 @@ void SetComponentFlowRate(EnergyPlusData &state,
                 bool EMSLoadOverride = false;
 
                 for (int CompNum = 1; CompNum <= loop_side.Branch(plantLoc.branchNum).TotalComponents; ++CompNum) {
-                    auto &thisComp(loop_side.Branch(plantLoc.branchNum).Comp(CompNum));
+                    auto &thisComp = loop_side.Branch(plantLoc.branchNum).Comp(CompNum);
                     int const CompInletNodeNum = thisComp.NodeNumIn;
-                    auto &thisInletNode(state.dataLoopNodes->Node(CompInletNodeNum));
+                    auto &thisInletNode = state.dataLoopNodes->Node(CompInletNodeNum);
                     SeriesBranchHighFlowRequest = max(thisInletNode.MassFlowRateRequest, SeriesBranchHighFlowRequest);
                     SeriesBranchHardwareMaxLim = min(thisInletNode.MassFlowRateMax, SeriesBranchHardwareMaxLim);
                     SeriesBranchHardwareMinLim = max(thisInletNode.MassFlowRateMin, SeriesBranchHardwareMinLim);
@@ -230,7 +230,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
                 state.dataLoopNodes->Node(OutletNode).MassFlowRate = CompFlow;
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
                 for (int CompNum = 1; CompNum <= loop_side.Branch(plantLoc.branchNum).TotalComponents; ++CompNum) {
-                    auto &thisComp(loop_side.Branch(plantLoc.branchNum).Comp(CompNum));
+                    auto &thisComp = loop_side.Branch(plantLoc.branchNum).Comp(CompNum);
                     int const CompInletNodeNum = thisComp.NodeNumIn;
                     int const CompOutletNodeNum = thisComp.NodeNumOut;
                     state.dataLoopNodes->Node(CompInletNodeNum).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
@@ -252,7 +252,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
 
                 for (int CompNum = 1; CompNum <= loop_side.Branch(plantLoc.branchNum).TotalComponents; ++CompNum) {
                     // check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
-                    auto &thisComp(loop_side.Branch(plantLoc.branchNum).Comp(CompNum));
+                    auto &thisComp = loop_side.Branch(plantLoc.branchNum).Comp(CompNum);
                     if (thisComp.EMSLoadOverrideOn && thisComp.EMSLoadOverrideValue == 0.0) EMSLoadOverride = true;
                 }
 
@@ -306,14 +306,14 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Set flow on node and branch while honoring constraints on actuated node
 
-    auto &a_node(state.dataLoopNodes->Node(ActuatedNode));
+    auto &a_node = state.dataLoopNodes->Node(ActuatedNode);
     if (plantLoc.loopNum == 0 || plantLoc.loopSideNum == DataPlant::LoopSideLocation::Invalid) {
         // early in simulation before plant loops are setup and found
         a_node.MassFlowRate = CompFlow;
         return;
     }
 
-    auto &loop_side(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum));
+    auto &loop_side = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum);
 
     // store original flow
     Real64 const MdotOldRequest = a_node.MassFlowRateRequest;
@@ -329,7 +329,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
     // Set loop flow rate
 
     if (plantLoc.loopNum > 0 && plantLoc.loopSideNum != DataPlant::LoopSideLocation::Invalid) {
-        auto const &branch(loop_side.Branch(plantLoc.branchNum));
+        auto const &branch = loop_side.Branch(plantLoc.branchNum);
         if (loop_side.FlowLock == DataPlant::FlowLock::Unlocked) {
             if (state.dataPlnt->PlantLoop(plantLoc.loopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
                 a_node.MassFlowRate = CompFlow;
@@ -344,7 +344,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
                 bool EMSLoadOverride = false;
                 // check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
                 for (int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum) {
-                    auto const &comp(branch.Comp(CompNum));
+                    auto const &comp = branch.Comp(CompNum);
                     if (comp.EMSLoadOverrideOn && comp.EMSLoadOverrideValue == 0.0) EMSLoadOverride = true;
                 }
                 if (EMSLoadOverride) { // actuate EMS controlled components to 0 if On/Off Supervisory control is active off
@@ -356,7 +356,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
                 a_node.MassFlowRate = min(a_node.MassFlowRateMax, a_node.MassFlowRate);
                 if (a_node.MassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) a_node.MassFlowRate = 0.0;
                 for (int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum) {
-                    auto const &comp(branch.Comp(CompNum));
+                    auto const &comp = branch.Comp(CompNum);
                     if (ActuatedNode == comp.NodeNumIn) {
                         //            ! found controller set to inlet of a component.  now set that component's outlet
                         int const NodeNum = comp.NodeNumOut;
@@ -389,7 +389,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
         Real64 const a_node_MasFlowRate(a_node.MassFlowRate);
         Real64 const a_node_MasFlowRateRequest(a_node.MassFlowRateRequest);
         for (int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum) {
-            auto const &comp(branch.Comp(CompNum));
+            auto const &comp = branch.Comp(CompNum);
             int NodeNum = comp.NodeNumIn;
             state.dataLoopNodes->Node(NodeNum).MassFlowRate = a_node_MasFlowRate;
             state.dataLoopNodes->Node(NodeNum).MassFlowRateRequest = a_node_MasFlowRateRequest;
@@ -439,7 +439,7 @@ Real64 RegulateCondenserCompFlowReqOp(EnergyPlusData &state, PlantLocation const
 
     CompCurLoad = DataPlant::CompData::getPlantComponent(state, plantLoc).MyLoad;
     CompRunFlag = DataPlant::CompData::getPlantComponent(state, plantLoc).ON;
-    auto CompOpScheme = DataPlant::CompData::getPlantComponent(state, plantLoc).CurOpSchemeType;
+    DataPlant::OpScheme CompOpScheme = DataPlant::CompData::getPlantComponent(state, plantLoc).CurOpSchemeType;
 
     if (CompRunFlag) {
 
@@ -547,12 +547,13 @@ void CheckPlantMixerSplitterConsistency(EnergyPlusData &state,
                 if (state.dataPlnt->PlantLoop(LoopNum).MFErrIndex1 == 0) {
                     ShowSevereMessage(state, "Plant flows do not resolve -- splitter inlet flow does not match mixer outlet flow ");
                     ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError(state, "PlantLoop name= " + state.dataPlnt->PlantLoop(LoopNum).Name);
-                    ShowContinueError(state, "Plant Connector:Mixer name= " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name);
+                    ShowContinueError(state, format("PlantLoop name= {}", state.dataPlnt->PlantLoop(LoopNum).Name));
+                    ShowContinueError(state,
+                                      format("Plant Connector:Mixer name= {}", state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name));
                     ShowContinueError(
                         state, format("Mixer outlet mass flow rate= {:.6R} {{kg/s}}", state.dataLoopNodes->Node(MixerOutletNode).MassFlowRate));
-                    ShowContinueError(state,
-                                      "Plant Connector:Splitter name= " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name);
+                    ShowContinueError(
+                        state, format("Plant Connector:Splitter name= {}", state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name));
                     ShowContinueError(
                         state, format("Splitter inlet mass flow rate= {:.6R} {{kg/s}}", state.dataLoopNodes->Node(SplitterInletNode).MassFlowRate));
                     ShowContinueError(state, format("Difference in two mass flow rates= {:.6R} {{kg/s}}", AbsDifference));
@@ -569,12 +570,13 @@ void CheckPlantMixerSplitterConsistency(EnergyPlusData &state,
                 if (AbsDifference > DataBranchAirLoopPlant::MassFlowTolerance * 10.0) {
                     ShowSevereError(state, "Plant flows do not resolve -- splitter inlet flow does not match mixer outlet flow ");
                     ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError(state, "PlantLoop name= " + state.dataPlnt->PlantLoop(LoopNum).Name);
-                    ShowContinueError(state, "Plant Connector:Mixer name= " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name);
+                    ShowContinueError(state, format("PlantLoop name= {}", state.dataPlnt->PlantLoop(LoopNum).Name));
+                    ShowContinueError(state,
+                                      format("Plant Connector:Mixer name= {}", state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name));
                     ShowContinueError(
                         state, format("Mixer outlet mass flow rate= {:.6R} {{kg/s}}", state.dataLoopNodes->Node(MixerOutletNode).MassFlowRate));
-                    ShowContinueError(state,
-                                      "Plant Connector:Splitter name= " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name);
+                    ShowContinueError(
+                        state, format("Plant Connector:Splitter name= {}", state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name));
                     ShowContinueError(
                         state, format("Splitter inlet mass flow rate= {:.6R} {{kg/s}}", state.dataLoopNodes->Node(SplitterInletNode).MassFlowRate));
                     ShowContinueError(state, format("Difference in two mass flow rates= {:.6R} {{kg/s}}", AbsDifference));
@@ -600,11 +602,12 @@ void CheckPlantMixerSplitterConsistency(EnergyPlusData &state,
                 if (state.dataPlnt->PlantLoop(LoopNum).MFErrIndex2 == 0) {
                     ShowSevereMessage(state, "Plant flows do not resolve -- splitter inlet flow does not match branch outlet flows");
                     ShowContinueErrorTimeStamp(state, "");
-                    ShowContinueError(state, "PlantLoop name= " + state.dataPlnt->PlantLoop(LoopNum).Name);
-                    ShowContinueError(state, "Plant Connector:Mixer name= " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name);
-                    ShowContinueError(state, format("Sum of Branch outlet mass flow rates= {:.6R} {{kg/s}}", SumOutletFlow));
+                    ShowContinueError(state, format("PlantLoop name= {}", state.dataPlnt->PlantLoop(LoopNum).Name));
                     ShowContinueError(state,
-                                      "Plant Connector:Splitter name= " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name);
+                                      format("Plant Connector:Mixer name= {}", state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name));
+                    ShowContinueError(state, format("Sum of Branch outlet mass flow rates= {:.6R} {{kg/s}}", SumOutletFlow));
+                    ShowContinueError(
+                        state, format("Plant Connector:Splitter name= {}", state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name));
                     ShowContinueError(
                         state, format("Splitter inlet mass flow rate= {:.6R} {{kg/s}}", state.dataLoopNodes->Node(SplitterInletNode).MassFlowRate));
                     ShowContinueError(state, format("Difference in two mass flow rates= {:.6R} {{kg/s}}", AbsDifference));
@@ -707,7 +710,7 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
     }
 
     if (makefatalerror) {
-        ShowSevereError(state, "Plant temperatures are getting far too " + hotcold + ", check controls and relative loads and capacities");
+        ShowSevereError(state, format("Plant temperatures are getting far too {}, check controls and relative loads and capacities", hotcold));
         ShowContinueErrorTimeStamp(state, "");
         ShowContinueError(state,
                           format("PlantLoop Name ({} Side) = {}",
@@ -790,7 +793,7 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
         ShowContinueError(state, format("PlantLoop Capacity={:.1R} {{W}}", LoopCapacity));
         ShowContinueError(state, format("PlantLoop Capacity (LoopSideLocation::Supply)={:.1R} {{W}}", LoopSupplySideCapacity));
         ShowContinueError(state, format("PlantLoop Capacity (LoopSideLocation::Demand)={:.1R} {{W}}", LoopDemandSideCapacity));
-        ShowContinueError(state, "PlantLoop Operation Scheme=" + state.dataPlnt->PlantLoop(LoopNum).OperationScheme);
+        ShowContinueError(state, format("PlantLoop Operation Scheme={}", state.dataPlnt->PlantLoop(LoopNum).OperationScheme));
         ShowContinueError(state, format("PlantLoop Operation Dispatched Load = {:.1R} {{W}}", DispatchedCapacity));
         ShowContinueError(state,
                           format("PlantLoop Operation Dispatched Load (LoopSideLocation::Supply)= {:.1R} {{W}}", LoopSupplySideDispatchedCapacity));
@@ -805,7 +808,7 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
         ShowContinueError(state, "    lots of node time series data to see what is going wrong.");
         ShowContinueError(state, "  If this is happening during Warmup, you can use Output:Diagnostics,ReportDuringWarmup;");
         ShowContinueError(state, "  This is detected at the loop level, but the typical problems are in the components.");
-        ShowFatalError(state, "CheckForRunawayPlantTemps: Simulation terminated because of run away plant temperatures, too " + hotcold);
+        ShowFatalError(state, format("CheckForRunawayPlantTemps: Simulation terminated because of run away plant temperatures, too {}", hotcold));
     }
 }
 
@@ -1217,8 +1220,8 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
 
     int TotalConnected;
 
-    auto &loop_side_1(state.dataPlnt->PlantLoop(Loop1PlantLoc.loopNum).LoopSide(Loop1PlantLoc.loopSideNum));
-    auto &connected_1(loop_side_1.Connected);
+    auto &loop_side_1 = state.dataPlnt->PlantLoop(Loop1PlantLoc.loopNum).LoopSide(Loop1PlantLoc.loopSideNum);
+    auto &connected_1 = loop_side_1.Connected;
     if (allocated(connected_1)) {
         TotalConnected = ++loop_side_1.TotalConnected;
         connected_1.redimension(TotalConnected);
@@ -1231,8 +1234,8 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
     connected_1(TotalConnected).ConnectorTypeOf_Num = static_cast<int>(ComponentType);
     connected_1(TotalConnected).LoopDemandsOnRemote = Loop1DemandsOnLoop2;
 
-    auto &loop_side_2(state.dataPlnt->PlantLoop(Loop2PlantLoc.loopNum).LoopSide(Loop2PlantLoc.loopSideNum));
-    auto &connected_2(loop_side_2.Connected);
+    auto &loop_side_2 = state.dataPlnt->PlantLoop(Loop2PlantLoc.loopNum).LoopSide(Loop2PlantLoc.loopSideNum);
+    auto &connected_2 = loop_side_2.Connected;
     if (allocated(connected_2)) {
         TotalConnected = ++loop_side_2.TotalConnected;
         connected_2.redimension(TotalConnected);
@@ -1401,8 +1404,8 @@ void RegisterPlantCompDesignFlow(EnergyPlusData &state,
 void SafeCopyPlantNode(EnergyPlusData &state,
                        int const InletNodeNum,
                        int const OutletNodeNum,
-                       Optional_int_const LoopNum,
-                       [[maybe_unused]] Optional<Real64 const> OutletTemp // set on outlet node if present and water.
+                       ObjexxFCL::Optional_int_const LoopNum,
+                       [[maybe_unused]] ObjexxFCL::Optional<Real64 const> OutletTemp // set on outlet node if present and water.
 )
 {
 
@@ -1580,9 +1583,9 @@ void LogPlantConvergencePoints(EnergyPlusData &state, bool const FirstHVACIterat
     //   Store this in the history array of each node using EOSHIFT
 
     for (int ThisLoopNum = 1; ThisLoopNum <= isize(state.dataPlnt->PlantLoop); ++ThisLoopNum) {
-        auto &loop(state.dataPlnt->PlantLoop(ThisLoopNum));
+        auto &loop = state.dataPlnt->PlantLoop(ThisLoopNum);
         for (DataPlant::LoopSideLocation ThisLoopSide : DataPlant::LoopSideKeys) {
-            auto &loop_side(loop.LoopSide(ThisLoopSide));
+            auto &loop_side = loop.LoopSide(ThisLoopSide);
 
             if (FirstHVACIteration) {
                 loop_side.InletNode.TemperatureHistory = 0.0;
@@ -1612,11 +1615,11 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
                              DataPlant::PlantEquipmentType CompType,
                              PlantLocation &plantLoc,
                              bool &errFlag,
-                             Optional<Real64 const> LowLimitTemp,
-                             Optional<Real64 const> HighLimitTemp,
-                             Optional_int CountMatchPlantLoops,
-                             Optional_int_const InletNodeNumber,
-                             Optional_int_const SingleLoopSearch)
+                             ObjexxFCL::Optional<Real64 const> LowLimitTemp,
+                             ObjexxFCL::Optional<Real64 const> HighLimitTemp,
+                             ObjexxFCL::Optional_int CountMatchPlantLoops,
+                             ObjexxFCL::Optional_int_const InletNodeNumber,
+                             ObjexxFCL::Optional_int_const SingleLoopSearch)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1658,13 +1661,13 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
     }
 
     for (LoopCtr = StartingLoopNum; LoopCtr <= EndingLoopNum; ++LoopCtr) {
-        auto &this_loop(state.dataPlnt->PlantLoop(LoopCtr));
+        auto &this_loop = state.dataPlnt->PlantLoop(LoopCtr);
         for (DataPlant::LoopSideLocation LoopSideCtr : DataPlant::LoopSideKeys) {
-            auto &this_loop_side(this_loop.LoopSide(LoopSideCtr));
+            auto &this_loop_side = this_loop.LoopSide(LoopSideCtr);
             for (BranchCtr = 1; BranchCtr <= this_loop_side.TotalBranches; ++BranchCtr) {
-                auto &this_branch(this_loop_side.Branch(BranchCtr));
+                auto &this_branch = this_loop_side.Branch(BranchCtr);
                 for (CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr) {
-                    auto &this_component(this_branch.Comp(CompCtr));
+                    auto &this_component = this_branch.Comp(CompCtr);
                     if (this_component.Type == CompType) {
                         if (UtilityRoutines::SameString(CompName, this_component.Name)) {
                             FoundCompName = true;
@@ -1718,11 +1721,11 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
             }
             if (present(InletNodeNumber)) {
                 if (FoundCompName) {
-                    ShowContinueError(state, "Looking for matching inlet Node=\"" + state.dataLoopNodes->NodeID(InletNodeNumber) + "\".");
+                    ShowContinueError(state, format("Looking for matching inlet Node=\"{}\".", state.dataLoopNodes->NodeID(InletNodeNumber)));
                 }
             }
             if (present(SingleLoopSearch)) {
-                ShowContinueError(state, "Look at Operation Scheme=\"" + state.dataPlnt->PlantLoop(SingleLoopSearch).OperationScheme + "\".");
+                ShowContinueError(state, format("Look at Operation Scheme=\"{}\".", state.dataPlnt->PlantLoop(SingleLoopSearch).OperationScheme));
                 ShowContinueError(state, "Look at Branches and Components on the Loop.");
                 ShowBranchesOnLoop(state, SingleLoopSearch);
             }
@@ -1743,7 +1746,7 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                               std::string_view const CallerName, // really used for error messages
                               int const NodeNum,                 // index in Node structure of node to be scanned
                               PlantLocation &pLantLoc,           // return value for location
-                              Optional_int CompNum)
+                              ObjexxFCL::Optional_int CompNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1774,13 +1777,13 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
     FoundNode = false;
 
     for (LoopCtr = 1; LoopCtr <= state.dataPlnt->TotNumLoops; ++LoopCtr) {
-        auto &this_loop(state.dataPlnt->PlantLoop(LoopCtr));
+        auto &this_loop = state.dataPlnt->PlantLoop(LoopCtr);
         for (DataPlant::LoopSideLocation LoopSideCtr : DataPlant::LoopSideKeys) {
-            auto &this_loop_side(this_loop.LoopSide(LoopSideCtr));
+            auto &this_loop_side = this_loop.LoopSide(LoopSideCtr);
             for (BranchCtr = 1; BranchCtr <= this_loop_side.TotalBranches; ++BranchCtr) {
-                auto &this_branch(this_loop_side.Branch(BranchCtr));
+                auto &this_branch = this_loop_side.Branch(BranchCtr);
                 for (CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr) {
-                    auto &this_comp(this_branch.Comp(CompCtr));
+                    auto &this_comp = this_branch.Comp(CompCtr);
                     if (NodeNum == this_comp.NodeNumIn) {
                         FoundNode = true;
                         ++inFoundCount;
@@ -1805,7 +1808,7 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
 
     if (!FoundNode) {
         ShowSevereError(state, "ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops");
-        ShowContinueError(state, "Node Name=\"" + state.dataLoopNodes->NodeID(NodeNum) + "\"");
+        ShowContinueError(state, format("Node Name=\"{}\"", state.dataLoopNodes->NodeID(NodeNum)));
         if (!state.dataGlobal->DoingSizing) {
             ShowContinueError(state, format("called by {}", CallerName));
         } else {
@@ -1866,7 +1869,7 @@ void SetAllPlantSimFlagsToValue(EnergyPlusData &state, bool const Value)
 
     // Loop over all loops
     for (LoopCtr = 1; LoopCtr <= state.dataPlnt->TotNumLoops; ++LoopCtr) {
-        auto &this_loop(state.dataPlnt->PlantLoop(LoopCtr));
+        auto &this_loop = state.dataPlnt->PlantLoop(LoopCtr);
         this_loop.LoopSide(DataPlant::LoopSideLocation::Demand).SimLoopSideNeeded = Value;
         this_loop.LoopSide(DataPlant::LoopSideLocation::Supply).SimLoopSideNeeded = Value;
     }
@@ -1892,24 +1895,25 @@ void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number
     for (DataPlant::LoopSideLocation LSN : DataPlant::LoopSideKeys) {
         ShowContinueError(state, format("{} Branches:", DataPlant::DemandSupplyNames[static_cast<int>(LSN)]));
         for (BrN = 1; BrN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).TotalBranches; ++BrN) {
-            ShowContinueError(state, "  " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Name);
+            ShowContinueError(state, format("  {}", state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Name));
             ShowContinueError(state, "    Components on Branch:");
             for (CpN = 1; CpN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).TotalComponents; ++CpN) {
                 ShowContinueError(state,
-                                  "      " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Comp(CpN).TypeOf + ':' +
-                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Comp(CpN).Name);
+                                  format("      {}:{}",
+                                         state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Comp(CpN).TypeOf,
+                                         state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Comp(CpN).Name));
             }
         }
     }
 }
 
 int MyPlantSizingIndex(EnergyPlusData &state,
-                       std::string const &CompType,           // component description
-                       std::string_view CompName,             // user name of component
-                       int const NodeNumIn,                   // component water inlet node
-                       [[maybe_unused]] int const NodeNumOut, // component water outlet node
-                       bool &ErrorsFound,                     // set to true if there's an error, unchanged otherwise
-                       Optional_bool_const SupressErrors      // used for WSHP's where condenser loop may not be on a plant loop
+                       std::string const &CompType,                 // component description
+                       std::string_view CompName,                   // user name of component
+                       int const NodeNumIn,                         // component water inlet node
+                       [[maybe_unused]] int const NodeNumOut,       // component water outlet node
+                       bool &ErrorsFound,                           // set to true if there's an error, unchanged otherwise
+                       ObjexxFCL::Optional_bool_const SupressErrors // used for WSHP's where condenser loop may not be on a plant loop
 )
 {
 
@@ -1960,15 +1964,15 @@ int MyPlantSizingIndex(EnergyPlusData &state,
         }
         if (MyPltSizNum == 0) {
             if (PrintErrorFlag) {
-                ShowSevereError(state,
-                                "MyPlantSizingIndex: Could not find " + state.dataPlnt->PlantLoop(MyPltLoopNum).Name + " in Sizing:Plant objects.");
-                ShowContinueError(state, "...reference Component Type=\"" + CompType + "\", Name=\"" + std::string{CompName} + "\".");
+                ShowSevereError(
+                    state, format("MyPlantSizingIndex: Could not find {} in Sizing:Plant objects.", state.dataPlnt->PlantLoop(MyPltLoopNum).Name));
+                ShowContinueError(state, format("...reference Component Type=\"{}\", Name=\"{}\".", CompType, CompName));
             }
             ErrorsFound = true;
         }
     } else {
         if (PrintErrorFlag) {
-            ShowWarningError(state, "MyPlantSizingIndex: Could not find " + CompType + " with name " + std::string{CompName} + " on any plant loop");
+            ShowWarningError(state, format("MyPlantSizingIndex: Could not find {} with name {} on any plant loop", CompType, CompName));
         }
         ErrorsFound = true;
     }

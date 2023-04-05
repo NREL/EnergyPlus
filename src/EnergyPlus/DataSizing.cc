@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -436,8 +436,6 @@ void GetCoilDesFlowT(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   September 2014
-    //       MODIFIED
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function calculates the coil design air flow rate and exit temperature depending on the
@@ -447,86 +445,59 @@ void GetCoilDesFlowT(EnergyPlusData &state,
     // energy and mass flow balance
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int DDAtSensPeak(0);
-    int TimeStepAtSensPeak(0);
-    int DDAtFlowPeak(0);
-    int TimeStepAtFlowPeak(0);
-    int CoolCapCtrl; // type of coil capacity control
-    int PeakLoadType;
-    int DDAtTotPeak(0);
-    int TimeStepAtTotPeak(0);
-    int TimeStepAtPeak(0);
-    Real64 ZoneCoolLoadSum(0); // sum of zone cooling loads at the peak [W]
-    Real64 AvgZoneTemp(0);     // average zone temperature [C]
-    Real64 AvgSupTemp(0.0);    // average supply temperature for bypass control [C]
-    Real64 TotFlow(0.0);       // total flow for bypass control [m3/s]
-    Real64 MixTemp(0.0);       // mixed air temperature at the peak [C]
+    int TimeStepAtPeak = 0;
+    Real64 ZoneCoolLoadSum = 0; // sum of zone cooling loads at the peak [W]
+    Real64 AvgZoneTemp = 0;     // average zone temperature [C]
 
-    auto &SysSizInput(state.dataSize->SysSizInput);
-    auto &FinalSysSizing(state.dataSize->FinalSysSizing);
-    auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
-    auto &CalcSysSizing(state.dataSize->CalcSysSizing);
+    auto &finalSysSizing = state.dataSize->FinalSysSizing(SysNum);
+    auto &sysSizPeakDDNum = state.dataSize->SysSizPeakDDNum(SysNum);
+    auto &calcSysSizing = state.dataSize->CalcSysSizing(SysNum);
 
-    CoolCapCtrl = SysSizInput(SysNum).CoolCapControl;
-    PeakLoadType = SysSizInput(SysNum).CoolingPeakLoadType;
-    DDAtSensPeak = SysSizPeakDDNum(SysNum).SensCoolPeakDD;
-    if (DDAtSensPeak > 0) {
-        TimeStepAtSensPeak = SysSizPeakDDNum(SysNum).TimeStepAtSensCoolPk(DDAtSensPeak);
-        DDAtFlowPeak = SysSizPeakDDNum(SysNum).CoolFlowPeakDD;
-        TimeStepAtFlowPeak = SysSizPeakDDNum(SysNum).TimeStepAtCoolFlowPk(DDAtFlowPeak);
-        DDAtTotPeak = SysSizPeakDDNum(SysNum).TotCoolPeakDD;
-        TimeStepAtTotPeak = SysSizPeakDDNum(SysNum).TimeStepAtTotCoolPk(DDAtTotPeak);
+    int sysSizIndex =
+        UtilityRoutines::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+    if (sysSizIndex == 0) sysSizIndex = 1;
+    auto &sysSizInput = state.dataSize->SysSizInput(sysSizIndex);
 
-        if (PeakLoadType == TotalCoolingLoad) {
-            TimeStepAtPeak = TimeStepAtTotPeak;
+    if (sysSizPeakDDNum.SensCoolPeakDD > 0) {
+        if (sysSizInput.coolingPeakLoad == PeakLoad::TotalCooling) {
+            TimeStepAtPeak = sysSizPeakDDNum.TimeStepAtTotCoolPk(sysSizPeakDDNum.TotCoolPeakDD);
         } else {
-            TimeStepAtPeak = TimeStepAtSensPeak;
+            TimeStepAtPeak = sysSizPeakDDNum.TimeStepAtSensCoolPk(sysSizPeakDDNum.SensCoolPeakDD);
         }
     } else {
-        if ((CoolCapCtrl == VT) || (CoolCapCtrl == Bypass)) {
+        if ((sysSizInput.CoolCapControl == CapacityControl::VT) || (sysSizInput.CoolCapControl == CapacityControl::Bypass)) {
             ShowWarningError(state,
-                             "GetCoilDesFlow: AirLoopHVAC=" + SysSizInput(SysNum).AirPriLoopName + "has no time of peak cooling load for sizing.");
+                             format("GetCoilDesFlow: AirLoopHVAC = {} has no time of peak cooling load for sizing.", sysSizInput.AirPriLoopName));
             ShowContinueError(state, "Using Central Cooling Capacity Control Method=VAV instead of Bypass or VT.");
-            CoolCapCtrl = VAV;
+            sysSizInput.CoolCapControl = CapacityControl::VAV;
         }
     }
 
-    if (CoolCapCtrl == VAV) {
-        DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
-        DesFlow = FinalSysSizing(SysNum).MassFlowAtCoolPeak / state.dataEnvrn->StdRhoAir;
-        DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
-    } else if (CoolCapCtrl == OnOff) {
-        DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
+    if (sysSizInput.CoolCapControl == CapacityControl::VAV) {
+        DesExitTemp = finalSysSizing.CoolSupTemp;
+        DesFlow = finalSysSizing.MassFlowAtCoolPeak / state.dataEnvrn->StdRhoAir;
+        DesExitHumRat = finalSysSizing.CoolSupHumRat;
+    } else if (sysSizInput.CoolCapControl == CapacityControl::OnOff) {
+        DesExitTemp = finalSysSizing.CoolSupTemp;
         DesFlow = state.dataSize->DataAirFlowUsedForSizing;
-        DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
-    } else if (CoolCapCtrl == VT) {
-        if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
-            ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
-            AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
-        } else if (FinalSysSizing(SysNum).CoolingPeakLoadType == TotalCoolingLoad) {
-            ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
-            AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
-        }
-        DesExitTemp = max(FinalSysSizing(SysNum).CoolSupTemp,
-                          AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow));
-        DesFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
+        DesExitHumRat = finalSysSizing.CoolSupHumRat;
+    } else if (sysSizInput.CoolCapControl == CapacityControl::VT) {
+        ZoneCoolLoadSum = calcSysSizing.SumZoneCoolLoadSeq(TimeStepAtPeak);
+        AvgZoneTemp = calcSysSizing.CoolZoneAvgTempSeq(TimeStepAtPeak);
+        DesExitTemp =
+            max(finalSysSizing.CoolSupTemp, AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * finalSysSizing.DesCoolVolFlow));
+        DesFlow = finalSysSizing.DesCoolVolFlow;
         DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, state.dataEnvrn->StdBaroPress, "GetCoilDesFlowT");
-    } else if (CoolCapCtrl == Bypass) {
-        if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
-            ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
-            AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
-        } else if (FinalSysSizing(SysNum).CoolingPeakLoadType == TotalCoolingLoad) {
-            ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
-            AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
-        }
-        AvgSupTemp = AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow);
-        TotFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
-        MixTemp = CalcSysSizing(SysNum).MixTempAtCoolPeak;
-        DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
-        if (MixTemp > DesExitTemp) {
-            DesFlow = TotFlow * max(0.0, min(1.0, ((MixTemp - AvgSupTemp) / (MixTemp - DesExitTemp))));
+    } else if (sysSizInput.CoolCapControl == CapacityControl::Bypass) {
+        ZoneCoolLoadSum = calcSysSizing.SumZoneCoolLoadSeq(TimeStepAtPeak);
+        AvgZoneTemp = calcSysSizing.CoolZoneAvgTempSeq(TimeStepAtPeak);
+        DesExitTemp = finalSysSizing.CoolSupTemp;
+        if (calcSysSizing.MixTempAtCoolPeak > DesExitTemp) {
+            Real64 AvgSupTemp = AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * finalSysSizing.DesCoolVolFlow);
+            DesFlow = finalSysSizing.DesCoolVolFlow *
+                      max(0.0, min(1.0, ((calcSysSizing.MixTempAtCoolPeak - AvgSupTemp) / (calcSysSizing.MixTempAtCoolPeak - DesExitTemp))));
         } else {
-            DesFlow = TotFlow;
+            DesFlow = finalSysSizing.DesCoolVolFlow;
         }
         DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, state.dataEnvrn->StdBaroPress, "GetCoilDesFlowT");
     }
@@ -719,8 +690,9 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
     if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::IAQProcedure && this->myEnvrnFlag) {
         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
             ShowSevereError(state,
-                            "DesignSpecification:OutdoorAir=\"" + this->Name +
-                                R"(" valid Outdoor Air Method =" IndoorAirQualityProcedure" requires CO2 simulation.)");
+                            format("DesignSpecification:OutdoorAir=\"{}{}",
+                                   this->Name,
+                                   R"(" valid Outdoor Air Method =" IndoorAirQualityProcedure" requires CO2 simulation.)"));
             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
             ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
         }
@@ -729,8 +701,9 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
     if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCOccSch && this->myEnvrnFlag) {
         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
             ShowSevereError(state,
-                            "DesignSpecification:OutdoorAir=\"" + this->Name +
-                                R"(" valid Outdoor Air Method =" ProportionalControlBasedOnDesignOccupancy" requires CO2 simulation.)");
+                            format("DesignSpecification:OutdoorAir=\"{}{}",
+                                   this->Name,
+                                   R"(" valid Outdoor Air Method =" ProportionalControlBasedOnDesignOccupancy" requires CO2 simulation.)"));
             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
             ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
         }
@@ -739,8 +712,9 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
     if (this->OAFlowMethod == DataSizing::OAFlowCalcMethod::PCDesOcc && this->myEnvrnFlag) {
         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
             ShowSevereError(state,
-                            "DesignSpecification:OutdoorAir=\"" + this->Name +
-                                R"(" valid Outdoor Air Method =" ProportionalControlBasedOnOccupancySchedule" requires CO2 simulation.)");
+                            format("DesignSpecification:OutdoorAir=\"{}{}",
+                                   this->Name,
+                                   R"(" valid Outdoor Air Method =" ProportionalControlBasedOnOccupancySchedule" requires CO2 simulation.)"));
             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
             ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
         }
@@ -879,8 +853,8 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                ZoneMaxCO2,
                                                ZoneMinCO2));
                                     ShowContinueError(state,
-                                                      "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. Default "
-                                                      "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
+                                                      "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
+                                                      "Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(
@@ -903,8 +877,8 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                ZoneMaxCO2,
                                                ZoneMinCO2));
                                     ShowContinueError(state,
-                                                      "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. Default "
-                                                      "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
+                                                      "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
+                                                      "Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(
@@ -948,8 +922,8 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                              "generation from people is not greater than zero. Occurs in Zone =\"{}\". ",
                                                              thisZone.Name));
                                     ShowContinueError(state,
-                                                      "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. Default "
-                                                      "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
+                                                      "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
+                                                      "Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(state,
@@ -969,8 +943,8 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
                                                              "generation from people is not greater than zero. Occurs in Zone =\"{}\". ",
                                                              thisZone.Name));
                                     ShowContinueError(state,
-                                                      "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. Default "
-                                                      "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
+                                                      "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
+                                                      "Default \"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                     ShowContinueErrorTimeStamp(state, "");
                                 } else {
                                     ShowRecurringWarningErrorAtEnd(state,

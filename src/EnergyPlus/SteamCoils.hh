@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -155,10 +155,10 @@ namespace SteamCoils {
                                      std::string_view CompName,
                                      bool FirstHVACIteration,
                                      int &CompIndex,
-                                     Optional<Real64 const> QCoilReq = _, // coil load to be met
-                                     Optional<Real64> QCoilActual = _,    // coil load actually delivered returned to calling component
-                                     Optional_int_const FanOpMode = _,
-                                     Optional<Real64 const> PartLoadRatio = _);
+                                     ObjexxFCL::Optional<Real64 const> QCoilReq = _, // coil load to be met
+                                     ObjexxFCL::Optional<Real64> QCoilActual = _,    // coil load actually delivered returned to calling component
+                                     ObjexxFCL::Optional_int_const FanOpMode = _,
+                                     ObjexxFCL::Optional<Real64 const> PartLoadRatio = _);
 
     void GetSteamCoilInput(EnergyPlusData &state);
 
@@ -267,10 +267,10 @@ namespace SteamCoils {
     // sets data to a coil that is used as a regeneration air heating coil in
     // desiccant dehumidification system
     void SetSteamCoilData(EnergyPlusData &state,
-                          int CoilNum,                                 // index of hot steam heating Coil
-                          bool &ErrorsFound,                           // Set to true if certain errors found
-                          Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
-                          Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this coil is used
+                          int CoilNum,                                            // index of hot steam heating Coil
+                          bool &ErrorsFound,                                      // Set to true if certain errors found
+                          ObjexxFCL::Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
+                          ObjexxFCL::Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this coil is used
     );
 
 } // namespace SteamCoils

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,7 +56,6 @@
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 #include <nlohmann/json.hpp>
 
@@ -68,6 +67,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
 
@@ -76,7 +76,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace CurveManager {
+namespace Curve {
 
     // Curve Type parameters, these can differ from object types (e.g. a CurveType_TableOneIV can be linear, quadratic, etc)
 
@@ -84,7 +84,6 @@ namespace CurveManager {
     {
         Invalid = -1,
         Linear,
-        BiLinear,
         Quadratic,
         BiQuadratic,
         Cubic,
@@ -107,6 +106,29 @@ namespace CurveManager {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(CurveType::Num)> objectNames = {
+        "Curve:Linear",
+        "Curve:Quadratic",
+        "Curve:Biquadratic",
+        "Curve:Cubic",
+        "Curve:QuadLinear",
+        "Curve:Bicubic",
+        "Curve:Triquadratic",
+        "Curve:Exponent",
+        "Curve:Quartic",
+        "Curve:FanPressureRise",
+        "Curve:ExponentialSkewNormal",
+        "Curve:Sigmoid",
+        "Curve:RectangularHyperbola1",
+        "Curve:RectangularHyperbola2",
+        "Curve:ExponentialDecay",
+        "Curve:DoubleExponentialDecay",
+        "Curve:QuadraticLinear",
+        "Curve:QuintLinear",
+        "Curve:CubicLinear",
+        "Curve:ChillerPartLoadWithLift",
+    }; // namespace Curve
+
     enum class InterpType
     {
         Invalid = -1,
@@ -115,113 +137,80 @@ namespace CurveManager {
         Num
     };
 
-    struct TriQuadraticCurveDataStruct
+    struct Limits
     {
-        // Members
-        // this structure is for 27 coefficient full triquadratic (!)
-        Real64 CoeffA0 = 0.0;
-        Real64 CoeffA1 = 0.0;
-        Real64 CoeffA2 = 0.0;
-        Real64 CoeffA3 = 0.0;
-        Real64 CoeffA4 = 0.0;
-        Real64 CoeffA5 = 0.0;
-        Real64 CoeffA6 = 0.0;
-        Real64 CoeffA7 = 0.0;
-        Real64 CoeffA8 = 0.0;
-        Real64 CoeffA9 = 0.0;
-        Real64 CoeffA10 = 0.0;
-        Real64 CoeffA11 = 0.0;
-        Real64 CoeffA12 = 0.0;
-        Real64 CoeffA13 = 0.0;
-        Real64 CoeffA14 = 0.0;
-        Real64 CoeffA15 = 0.0;
-        Real64 CoeffA16 = 0.0;
-        Real64 CoeffA17 = 0.0;
-        Real64 CoeffA18 = 0.0;
-        Real64 CoeffA19 = 0.0;
-        Real64 CoeffA20 = 0.0;
-        Real64 CoeffA21 = 0.0;
-        Real64 CoeffA22 = 0.0;
-        Real64 CoeffA23 = 0.0;
-        Real64 CoeffA24 = 0.0;
-        Real64 CoeffA25 = 0.0;
-        Real64 CoeffA26 = 0.0;
+        Real64 min = 0.0;
+        Real64 max = 0.0;
+        bool minPresent = false;
+        bool maxPresent = false;
     };
 
-    struct PerformanceCurveData
+    struct Curve
     {
-        // Members
-        std::string Name;                                   // Curve Name
-        std::string ObjectType;                             // Curve object type
-        CurveType curveType = CurveType::Invalid;           // Curve type (see parameter definitions above)
-        InterpType InterpolationType = InterpType::Invalid; // Table interpolation method
-        int DataFormat = 0;                                 // format of tabular data
-        int TableIndex = 0;                               // Index to tabular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
-        int NumDims = 0;                                  // Number of dimensions (AKA, independent variables)
-        int NumIVLowErrorIndex = 0;                       // Index to table object error message for too few IV's
-        int NumIVHighErrorIndex = 0;                      // Index to table object error message for too many IV's
-        int X1SortOrder = 1;                              // sort order for table data for X1
-        int X2SortOrder = 1;                              // sort order for table data for X2
-        int GridValueIndex = 0;                           // Index of output within RGI for new Table:Lookup
-        Real64 NormalizationValue = 1.0;                  // normalization value (TODO: Move from Table object)
-        Real64 Coeff1 = 0.0;                              // constant coefficient
-        Real64 Coeff2 = 0.0;                              // linear coeff (1st independent variable)
-        Real64 Coeff3 = 0.0;                              // quadratic coeff (1st independent variable)
-        Real64 Coeff4 = 0.0;                              // linear coeff (2nd ind var) or cubic coeff
-        Real64 Coeff5 = 0.0;                              // quadratic coeff (2nd independent variable)
-        Real64 Coeff6 = 0.0;                              // cross coeff (1st & 2nd ind var)
-        Real64 Coeff7 = 0.0;                              // cubic coeff for bicubic (1st ind var)
-        Real64 Coeff8 = 0.0;                              // cubic coeff for bicubic (2nd ind var)
-        Real64 Coeff9 = 0.0;                              // cross coeff for bicubic (1st quadratic & 2nd linear)
-        Real64 Coeff10 = 0.0;                             // cross coeff for bicubic (1st linear & 2nd quadratic)
-        Real64 Coeff11 = 0.0;                             // cross coeff
-        Real64 Coeff12 = 0.0;                             // cross coeff
-        Real64 Var1Max = 0.0;                             // maximum of 1st independent variable
-        Real64 Var1Min = 0.0;                             // minimum of 1st independent variable
-        Real64 Var2Max = 0.0;                             // maximum of 2nd independent variable
-        Real64 Var2Min = 0.0;                             // minimum of 2nd independent variable
-        Real64 Var3Max = 0.0;                             // maximum of 3rd independent variable
-        Real64 Var3Min = 0.0;                             // minimum of 3rd independent variable
-        Real64 Var4Max = 0.0;                             // maximum of 4th independent variable
-        Real64 Var4Min = 0.0;                             // minimum of 4th independent variable
-        Real64 Var5Max = 0.0;                             // maximum of 5th independent variable
-        Real64 Var5Min = 0.0;                             // minimum of 5th independent variable
-        Real64 Var6Max = 0.0;                             // maximum of 6th independent variable
-        Real64 Var6Min = 0.0;                             // minimum of 6th independent variable
-        Real64 CurveMin = 0.0;                            // minimum value of curve output
-        Real64 CurveMax = 0.0;                            // maximum value of curve output
-        bool CurveMinPresent = false;                     // If TRUE, then cap minimum curve output
-        bool CurveMaxPresent = false;                     // if TRUE, then cap maximum curve output
-        bool Var1MinPresent = false;                      // uses data set limit to set Var1Min if false
-        bool Var1MaxPresent = false;                      // uses data set limit to set Var1Max if false
-        bool Var2MinPresent = false;                      // uses data set limit to set Var2Min if false
-        bool Var2MaxPresent = false;                      // uses data set limit to set Var2Max if false
-        bool Var3MinPresent = false;                      // uses data set limit to set Var3Min if false
-        bool Var3MaxPresent = false;                      // uses data set limit to set Var3Max if false
-        bool Var4MinPresent = false;                      // uses data set limit to set Var4Min if false
-        bool Var4MaxPresent = false;                      // uses data set limit to set Var4Max if false
-        bool Var5MinPresent = false;                      // uses data set limit to set Var5Min if false
-        bool Var5MaxPresent = false;                      // uses data set limit to set Var5Max if false
-        bool Var6MinPresent = false;                      // uses data set limit to set Var6Min if false
-        bool Var6MaxPresent = false;                      // uses data set limit to set Var6Max if false
-        Array1D<TriQuadraticCurveDataStruct> Tri2ndOrder; // structure for triquadratic curve data
-        bool EMSOverrideOn = false;                       // if TRUE, then EMS is calling to override curve value
-        Real64 EMSOverrideCurveValue = 0.0;               // Value of curve result EMS is directing to use
-        Real64 CurveOutput = 0.0;                         // curve output or result
-        Real64 CurveInput1 = 0.0;                         // curve input #1 (e.g., x or X1 variable)
-        Real64 CurveInput2 = 0.0;                         // curve input #2 (e.g., y or X2 variable)
-        Real64 CurveInput3 = 0.0;                         // curve input #3 (e.g., z or X3 variable)
-        Real64 CurveInput4 = 0.0;                         // curve input #4 (e.g., X4 variable)
-        Real64 CurveInput5 = 0.0;                         // curve input #5 (e.g., X5 variable)
-        Real64 CurveInput6 = 0.0;                         // curve input #6 (e.g., X6 variable)
+        // Basic data
+        std::string Name;                         // Curve Name
+        CurveType curveType = CurveType::Invalid; // Curve type (see parameter definitions above)
+        // Table data stuff
+        InterpType interpolationType = InterpType::Invalid; // Table interpolation method
+        int TableIndex = 0;     // Index to tabular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
+        int numDims = 0;        // Number of dimensions (AKA, independent variables)
+        int GridValueIndex = 0; // Index of output within RGI for new Table:Lookup
+        // input coefficients
+        std::array<Real64, 27> coeff = {0.0}; // curve coefficients
+        // independent variables
+        std::array<Real64, 6> inputs = {0.0}; // curve inputs
+        std::array<Limits, 6> inputLimits;    // min/max of independent variables
+        // dependent (output) variable
+        Real64 output = 0.0; // curve output or result
+        Limits outputLimits; // min/max of curve output
+        // EMS override
+        bool EMSOverrideOn = false;         // if TRUE, then EMS is calling to override curve value
+        Real64 EMSOverrideCurveValue = 0.0; // Value of curve result EMS is directing to use
+        Real64 value(EnergyPlusData &state, Real64 V1);
+        Real64 value(EnergyPlusData &state, Real64 V1, Real64 V2);
+        Real64 value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3);
+        Real64 value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4);
+        Real64 value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5);
+        Real64 value(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5, Real64 V6);
+        Real64 valueFallback(EnergyPlusData &state, Real64 V1, Real64 V2, Real64 V3, Real64 V4, Real64 V5);
+        Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                       const Real64 Var1 // 1st independent variable
+        );
+        Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                       const Real64 Var1, // 1st independent variable
+                                       const Real64 Var2  // 2nd independent variable
+        );
+        Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                       const Real64 Var1, // 1st independent variable
+                                       const Real64 Var2, // 2nd independent variable
+                                       const Real64 Var3  // 3rd independent variable
+        );
+        Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                       const Real64 Var1, // 1st independent variable
+                                       const Real64 Var2, // 2nd independent variable
+                                       const Real64 Var3, // 3rd independent variable
+                                       const Real64 Var4  // 4th independent variable
+        );
+        Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                       const Real64 Var1, // 1st independent variable
+                                       const Real64 Var2, // 2nd independent variable
+                                       const Real64 Var3, // 3rd independent variable
+                                       const Real64 Var4, // 4th independent variable
+                                       const Real64 Var5  // 5th independent variable
+        );
+        Real64 BtwxtTableInterpolation(EnergyPlusData &state,
+                                       const Real64 Var1, // 1st independent variable
+                                       const Real64 Var2, // 2nd independent variable
+                                       const Real64 Var3, // 3rd independent variable
+                                       const Real64 Var4, // 4th independent variable
+                                       const Real64 Var5, // 5th independent variable
+                                       const Real64 Var6);
     };
 
     // Table file objects
     class TableFile
     {
     public:
-        TableFile() = default;
-        TableFile(EnergyPlusData &state, fs::path const &path);
         fs::path filePath;
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
@@ -237,13 +226,10 @@ namespace CurveManager {
     class BtwxtManager
     {
     public:
-        using json = nlohmann::json;
-        static std::map<std::string, Btwxt::Method> interpMethods;
-        static std::map<std::string, Btwxt::Method> extrapMethods;
         // Map RGI collection to string name of independent variable list
-        int addGrid(std::string indVarListName, Btwxt::GriddedData grid)
+        int addGrid(const std::string &indVarListName, Btwxt::GriddedData grid)
         {
-            grids.emplace_back(Btwxt::RegularGridInterpolator(grid));
+            grids.emplace_back(grid);
             gridMap.emplace(indVarListName, grids.size() - 1);
             return static_cast<int>(grids.size()) - 1;
         };
@@ -251,9 +237,8 @@ namespace CurveManager {
         int addOutputValues(int gridIndex, std::vector<double> values);
         int getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);
-        std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
-        std::map<std::string, const json &> independentVarRefs;
+        std::map<std::string, const nlohmann::json &> independentVarRefs;
         std::map<fs::path, TableFile> tableFiles;
         void clear();
 
@@ -262,20 +247,53 @@ namespace CurveManager {
         std::vector<Btwxt::RegularGridInterpolator> grids;
     };
 
-    // Functions
-
     void BtwxtMessageCallback(Btwxt::MsgLevel messageType, std::string message, void *contextPtr);
 
     void ResetPerformanceCurveOutput(EnergyPlusData &state);
 
     Real64 CurveValue(EnergyPlusData &state,
-                      int CurveIndex,                  // index of curve in curve array
-                      Real64 Var1,                     // 1st independent variable
-                      Optional<Real64 const> Var2 = _, // 2nd independent variable
-                      Optional<Real64 const> Var3 = _, // 3rd independent variable
-                      Optional<Real64 const> Var4 = _, // 4th independent variable
-                      Optional<Real64 const> Var5 = _, // 5th independent variable
-                      Optional<Real64 const> Var6 = _  // 6th independent variable
+                      int CurveIndex, // index of curve in curve array
+                      Real64 Var1     // 1st independent variable
+    );
+
+    Real64 CurveValue(EnergyPlusData &state,
+                      int CurveIndex, // index of curve in curve array
+                      Real64 Var1,    // 1st independent variable
+                      Real64 Var2     // 1st independent variable
+    );
+
+    Real64 CurveValue(EnergyPlusData &state,
+                      int CurveIndex, // index of curve in curve array
+                      Real64 Var1,    // 1st independent variable
+                      Real64 Var2,    // 1st independent variable
+                      Real64 Var3     // 1st independent variable
+    );
+
+    Real64 CurveValue(EnergyPlusData &state,
+                      int CurveIndex, // index of curve in curve array
+                      Real64 Var1,    // 1st independent variable
+                      Real64 Var2,    // 1st independent variable
+                      Real64 Var3,    // 1st independent variable
+                      Real64 Var4     // 1st independent variable
+    );
+
+    Real64 CurveValue(EnergyPlusData &state,
+                      int CurveIndex, // index of curve in curve array
+                      Real64 Var1,    // 1st independent variable
+                      Real64 Var2,    // 1st independent variable
+                      Real64 Var3,    // 1st independent variable
+                      Real64 Var4,    // 1st independent variable
+                      Real64 Var5     // 1st independent variable
+    );
+
+    Real64 CurveValue(EnergyPlusData &state,
+                      int CurveIndex, // index of curve in curve array
+                      Real64 Var1,    // 1st independent variable
+                      Real64 Var2,    // 1st independent variable
+                      Real64 Var3,    // 1st independent variable
+                      Real64 Var4,    // 1st independent variable
+                      Real64 Var5,    // 1st independent variable
+                      Real64 Var6     // 1st independent variable
     );
 
     void GetCurveInput(EnergyPlusData &state);
@@ -284,24 +302,6 @@ namespace CurveManager {
 
     void InitCurveReporting(EnergyPlusData &state);
 
-    Real64 PerformanceCurveObject(EnergyPlusData &state,
-                                  int CurveIndex,                  // index of curve in curve array
-                                  Real64 Var1,                     // 1st independent variable
-                                  Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                  Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                  Optional<Real64 const> Var4 = _, // 4th independent variable
-                                  Optional<Real64 const> Var5 = _  // 5th independent variable
-    );
-
-    Real64 BtwxtTableInterpolation(EnergyPlusData &state,
-                                   int CurveIndex,                  // index of curve in curve array
-                                   Real64 Var1,                     // 1st independent variable
-                                   Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                   Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                   Optional<Real64 const> Var4 = _, // 4th independent variable
-                                   Optional<Real64 const> Var5 = _, // 5th independent variable
-                                   Optional<Real64 const> Var6 = _);
-
     bool IsCurveInputTypeValid(std::string const &InInputType); // index of curve in curve array
 
     bool IsCurveOutputTypeValid(std::string const &InOutputType); // index of curve in curve array
@@ -309,7 +309,7 @@ namespace CurveManager {
     bool CheckCurveDims(EnergyPlusData &state,
                         int CurveIndex,
                         std::vector<int> validDims,
-                        const std::string_view routineName,
+                        std::string_view routineName,
                         std::string_view objectType,
                         std::string_view objectName,
                         std::string_view curveFieldText);
@@ -330,26 +330,81 @@ namespace CurveManager {
     );
 
     void GetCurveMinMaxValues(EnergyPlusData &state,
-                              int CurveIndex,               // index of curve in curve array
-                              Real64 &Var1Min,              // Minimum values of 1st independent variable
-                              Real64 &Var1Max,              // Maximum values of 1st independent variable
-                              Optional<Real64> Var2Min = _, // Minimum values of 2nd independent variable
-                              Optional<Real64> Var2Max = _, // Maximum values of 2nd independent variable
-                              Optional<Real64> Var3Min = _, // Minimum values of 3rd independent variable
-                              Optional<Real64> Var3Max = _, // Maximum values of 3rd independent variable
-                              Optional<Real64> Var4Min = _, // Minimum values of 4th independent variable
-                              Optional<Real64> Var4Max = _, // Maximum values of 4th independent variable
-                              Optional<Real64> Var5Min = _, // Minimum values of 5th independent variable
-                              Optional<Real64> Var5Max = _, // Maximum values of 5th independent variable
-                              Optional<Real64> Var6Min = _, // Minimum values of 6th independent variable
-                              Optional<Real64> Var6Max = _  // Maximum values of 6th independent variable
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max       // Maximum values of 1st independent variable
     );
 
-    void SetCurveOutputMinMaxValues(EnergyPlusData &state,
-                                    int CurveIndex,                      // index of curve in curve array
-                                    bool &ErrorsFound,                   // TRUE when errors occur
-                                    Optional<Real64 const> CurveMin = _, // Minimum value of curve output
-                                    Optional<Real64 const> CurveMax = _  // Maximum values of curve output
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max       // Maximum values of 2nd independent variable
+    );
+
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max,      // Maximum values of 2nd independent variable
+                              Real64 &Var3Min,      // Minimum values of 3rd independent variable
+                              Real64 &Var3Max       // Maximum values of 3rd independent variable
+    );
+
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max,      // Maximum values of 2nd independent variable
+                              Real64 &Var3Min,      // Minimum values of 3rd independent variable
+                              Real64 &Var3Max,      // Maximum values of 3rd independent variable
+                              Real64 &Var4Min,      // Minimum values of 4th independent variable
+                              Real64 &Var4Max       // Maximum values of 4th independent variable
+    );
+
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max,      // Maximum values of 2nd independent variable
+                              Real64 &Var3Min,      // Minimum values of 3rd independent variable
+                              Real64 &Var3Max,      // Maximum values of 3rd independent variable
+                              Real64 &Var4Min,      // Minimum values of 4th independent variable
+                              Real64 &Var4Max,      // Maximum values of 4th independent variable
+                              Real64 &Var5Min,      // Minimum values of 5th independent variable
+                              Real64 &Var5Max       // Maximum values of 5th independent variable
+    );
+
+    void GetCurveMinMaxValues(EnergyPlusData &state,
+                              int const CurveIndex, // index of curve in curve array
+                              Real64 &Var1Min,      // Minimum values of 1st independent variable
+                              Real64 &Var1Max,      // Maximum values of 1st independent variable
+                              Real64 &Var2Min,      // Minimum values of 2nd independent variable
+                              Real64 &Var2Max,      // Maximum values of 2nd independent variable
+                              Real64 &Var3Min,      // Minimum values of 3rd independent variable
+                              Real64 &Var3Max,      // Maximum values of 3rd independent variable
+                              Real64 &Var4Min,      // Minimum values of 4th independent variable
+                              Real64 &Var4Max,      // Maximum values of 4th independent variable
+                              Real64 &Var5Min,      // Minimum values of 5th independent variable
+                              Real64 &Var5Max,      // Maximum values of 5th independent variable
+                              Real64 &Var6Min,      // Minimum values of 6th independent variable
+                              Real64 &Var6Max       // Maximum values of 6th independent variable
+    );
+
+    void SetCurveOutputMinValue(EnergyPlusData &state,
+                                int CurveIndex,       // index of curve in curve array
+                                bool &ErrorsFound,    // TRUE when errors occur
+                                const Real64 CurveMin // Minimum value of curve output
+    );
+
+    void SetCurveOutputMaxValue(EnergyPlusData &state,
+                                int CurveIndex,       // index of curve in curve array
+                                bool &ErrorsFound,    // TRUE when errors occur
+                                const Real64 CurveMax // Maximum values of curve output
     );
 
     void GetPressureSystemInput(EnergyPlusData &state);
@@ -364,20 +419,23 @@ namespace CurveManager {
     Real64 CalculateMoodyFrictionFactor(EnergyPlusData &state, Real64 ReynoldsNumber, Real64 RoughnessRatio);
 
     void checkCurveIsNormalizedToOne(EnergyPlusData &state,
-                                     std::string callingRoutineObj,   // calling routine with object type
-                                     std::string objectName,          // parent object where curve is used
-                                     int curveIndex,                  // index to curve object
-                                     std::string cFieldName,          // object field name
-                                     std::string cFieldValue,         // user input curve name
-                                     Real64 Var1,                     // required 1st independent variable
-                                     Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                     Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                     Optional<Real64 const> Var4 = _, // 4th independent variable
-                                     Optional<Real64 const> Var5 = _, // 5th independent variable
-                                     Optional<Real64 const> Var6 = _  // 6th independent variable
-    );
+                                     const std::string &callingRoutineObj, // calling routine with object type
+                                     const std::string &objectName,        // parent object where curve is used
+                                     int curveIndex,                       // index to curve object
+                                     const std::string &cFieldName,        // object field name
+                                     const std::string &cFieldValue,       // user input curve name
+                                     Real64 Var1);                         // required 1st independent variable
 
-} // namespace CurveManager
+    void checkCurveIsNormalizedToOne(EnergyPlusData &state,
+                                     const std::string &callingRoutineObj, // calling routine with object type
+                                     const std::string &objectName,        // parent object where curve is used
+                                     int curveIndex,                       // index to curve object
+                                     const std::string &cFieldName,        // object field name
+                                     const std::string &cFieldValue,       // user input curve name
+                                     Real64 Var1,                          // required 1st independent variable
+                                     Real64 Var2);                         // 2nd independent variable
+
+} // namespace Curve
 
 struct CurveManagerData : BaseGlobalStruct
 {
@@ -385,13 +443,24 @@ struct CurveManagerData : BaseGlobalStruct
     bool GetCurvesInputFlag = true;
     bool CurveValueMyBeginTimeStepFlag = false;
     bool FrictionFactorErrorHasOccurred = false;
-    Array1D<CurveManager::PerformanceCurveData> PerfCurve;
-    CurveManager::BtwxtManager btwxtManager;
+    bool showFallbackMessage = true;
+    EPVector<Curve::Curve *> PerfCurve;
+    Curve::BtwxtManager btwxtManager;
     std::unordered_map<std::string, std::string> UniqueCurveNames;
+
+    void allocateCurveVector(int const count)
+    {
+        this->NumCurves = count;
+        for (int curveIndex = 1; curveIndex <= count; curveIndex++)
+            this->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
+    }
 
     void clear_state() override
     {
-        *this = CurveManagerData();
+        for (Curve::Curve *p : PerfCurve) {
+            delete p;
+        }
+        new (this) CurveManagerData();
     }
 };
 

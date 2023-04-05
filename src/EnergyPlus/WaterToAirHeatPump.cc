@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -351,9 +351,8 @@ namespace WaterToAirHeatPump {
             heatPump.LoadSideTotalUACoeff = NumArray(7);
             heatPump.LoadSideOutsideUACoeff = NumArray(8);
 
-            if ((heatPump.LoadSideOutsideUACoeff < DataGlobalConstants::rTinyValue) ||
-                (heatPump.LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue)) {
-                ShowSevereError(state, "Input problem for " + CurrentModuleObject + '=' + heatPump.Name);
+            if ((heatPump.LoadSideOutsideUACoeff < Constant::rTinyValue) || (heatPump.LoadSideTotalUACoeff < Constant::rTinyValue)) {
+                ShowSevereError(state, format("Input problem for {}={}", CurrentModuleObject, heatPump.Name));
                 ShowContinueError(state, " One or both load side UA values entered are below tolerance, likely zero or blank.");
                 ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
                 ShowContinueError(state, "  the release of EnergyPlus version 5.");
@@ -536,8 +535,8 @@ namespace WaterToAirHeatPump {
                                                           ObjectIsNotParent);
 
             heatPump.LoadSideTotalUACoeff = NumArray(5);
-            if (heatPump.LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue) {
-                ShowSevereError(state, "Input problem for " + CurrentModuleObject + '=' + heatPump.Name);
+            if (heatPump.LoadSideTotalUACoeff < Constant::rTinyValue) {
+                ShowSevereError(state, format("Input problem for {}={}", CurrentModuleObject, heatPump.Name));
                 ShowContinueError(state, " Load side UA value is less than tolerance, likely zero or blank.");
                 ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
                 ShowContinueError(state, "  the release of EnergyPlus version 5.");
@@ -938,16 +937,16 @@ namespace WaterToAirHeatPump {
             ScanPlantLoopsForObject(state, heatPump.Name, heatPump.WAHPType, heatPump.plantLoc, errFlag, _, _, _, _, _);
 
             if (state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidName == "WATER") {
-                if (heatPump.SourceSideUACoeff < DataGlobalConstants::rTinyValue) {
-                    ShowSevereError(state, "Input problem for water to air heat pump, \"" + heatPump.Name + "\".");
+                if (heatPump.SourceSideUACoeff < Constant::rTinyValue) {
+                    ShowSevereError(state, format("Input problem for water to air heat pump, \"{}\".", heatPump.Name));
                     ShowContinueError(state, " Source side UA value is less than tolerance, likely zero or blank.");
                     ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
                     ShowContinueError(state, "  the release of EnergyPlus version 5.");
                     errFlag = true;
                 }
             } else {
-                if ((heatPump.SourceSideHTR1 < DataGlobalConstants::rTinyValue) || (heatPump.SourceSideHTR2 < DataGlobalConstants::rTinyValue)) {
-                    ShowSevereError(state, "Input problem for water to air heat pump, \"" + heatPump.Name + "\".");
+                if ((heatPump.SourceSideHTR1 < Constant::rTinyValue) || (heatPump.SourceSideHTR2 < Constant::rTinyValue)) {
+                    ShowSevereError(state, format("Input problem for water to air heat pump, \"{}\".", heatPump.Name));
                     ShowContinueError(state, " A source side heat transfer resistance value is less than tolerance, likely zero or blank.");
                     ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
                     ShowContinueError(state, "  the release of EnergyPlus version 5.");
@@ -997,12 +996,12 @@ namespace WaterToAirHeatPump {
             // The rest of the one time initializations
             rho = GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidName,
-                                   DataGlobalConstants::InitConvTemp,
+                                   Constant::InitConvTemp,
                                    state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidIndex,
                                    RoutineName);
             Cp = GetSpecificHeatGlycol(state,
                                        state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidName,
-                                       DataGlobalConstants::InitConvTemp,
+                                       Constant::InitConvTemp,
                                        state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
@@ -1213,7 +1212,6 @@ namespace WaterToAirHeatPump {
         Real64 QLatActual;                // Qlatent at actual operating conditions
         Real64 SHRss;                     // Sensible heat ratio at steady state
         Real64 SHReff;                    // Effective sensible heat ratio at part-load condition
-        Array1D<Real64> Par(4);           // Parameter array passed to RegulaFalsi function
         int SolFlag;                      // Solution flag returned from RegulaFalsi function
         Real64 LoadSideAirInletEnth_Unit; // calc conditions for unit
         Real64 LoadResidual;              // loop convergence criteria
@@ -1473,20 +1471,16 @@ namespace WaterToAirHeatPump {
                         CompSuctionTemp2 = CompSuctionSatTemp + DegreeofSuperheat;
                     }
 
-                    //  Do not need the name of the refrigerant if we already have the index (from above CALLs)
-                    Par(1) = SuctionPr;
-                    Par(2) = double(state.dataWaterToAirHeatPump->RefrigIndex);
-                    Par(3) = SuperHeatEnth;
+                    auto f = [&state, SuctionPr, SuperHeatEnth](Real64 const CompSuctionTemp) {
+                        static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
+                        std::string Refrigerant; // Name of refrigerant
+                        int refrigIndex = state.dataWaterToAirHeatPump->RefrigIndex;
+                        Real64 compSuctionEnth = GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, refrigIndex, RoutineName);
+                        return (compSuctionEnth - SuperHeatEnth) / SuperHeatEnth;
+                    };
 
-                    General::SolveRoot(state,
-                                       ERR,
-                                       STOP1,
-                                       SolFlag,
-                                       state.dataWaterToAirHeatPump->CompSuctionTemp,
-                                       CalcCompSuctionTempResidual,
-                                       CompSuctionTemp1,
-                                       CompSuctionTemp2,
-                                       Par);
+                    General::SolveRoot(
+                        state, ERR, STOP1, SolFlag, state.dataWaterToAirHeatPump->CompSuctionTemp, f, CompSuctionTemp1, CompSuctionTemp2);
                     if (SolFlag == -1) {
                         heatPump.SimFlag = false;
                         return;
@@ -1639,66 +1633,6 @@ namespace WaterToAirHeatPump {
         heatPump.OutletWaterEnthalpy = heatPump.InletWaterEnthalpy + QSource / heatPump.InletWaterMassFlowRate;
     }
 
-    Real64 CalcCompSuctionTempResidual(EnergyPlusData &state,
-                                       Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-                                       Array1D<Real64> const &Par    // Function parameters
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Richard Raustad
-        //       DATE WRITTEN   October 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // To calculate the compressor suction temperature for water to air HP's
-
-        // METHODOLOGY EMPLOYED:
-        // Use SolveRoot to call this Function to converge on a solution
-
-        // Using/Aliasing
-        using FluidProperties::GetSupHeatDensityRefrig;
-        using FluidProperties::GetSupHeatEnthalpyRefrig;
-
-        // Return value
-        Real64 Residuum; // Result (force to 0)
-
-        // Argument array dimensioning
-
-        // Locals
-        int RefrigIndex;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string Refrigerant; // Name of refrigerant
-        Real64 SuctionPr;
-        Real64 CompSuctionEnth;
-        Real64 SuperHeatEnth;
-
-        // Convert parameters to usable variables
-        SuctionPr = Par(1);
-        RefrigIndex = int(Par(2));
-        SuperHeatEnth = Par(3);
-
-        CompSuctionEnth = GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, RefrigIndex, RoutineName);
-
-        // Calculate residual based on output calculation flag
-        Residuum = (CompSuctionEnth - SuperHeatEnth) / SuperHeatEnth;
-
-        return Residuum;
-    }
-
     void CalcWatertoAirHPHeating(EnergyPlusData &state,
                                  int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
@@ -1798,7 +1732,6 @@ namespace WaterToAirHeatPump {
         Real64 CompSuctionSatTemp; // Temperature of Saturated Refrigerant at Compressor Suction Pressure [C]
         bool StillSimulatingFlag;  // Final Simulation Flag
         bool Converged;            // Overall convergence Flag
-        Array1D<Real64> Par(4);    // Parameter array passed to RegulaFalsi function
         int SolFlag;               // Solution flag returned from RegulaFalsi function
         Real64 LoadResidual;       // loop convergence criteria
         Real64 SourceResidual;     // loop convergence criteria
@@ -2011,11 +1944,16 @@ namespace WaterToAirHeatPump {
                 //        END DO LOOP
 
                 //       Do not need the name of the refrigerant if we already have the index (from above CALLs)
-                Par(1) = SuctionPr;
-                Par(2) = double(state.dataWaterToAirHeatPump->RefrigIndex);
-                Par(3) = SuperHeatEnth;
 
-                General::SolveRoot(state, ERR, STOP1, SolFlag, CompSuctionTemp, CalcCompSuctionTempResidual, CompSuctionTemp1, CompSuctionTemp2, Par);
+                auto f = [&state, SuctionPr, SuperHeatEnth](Real64 const CompSuctionTemp) {
+                    static constexpr std::string_view RoutineName("CalcWaterToAirHPHeating:CalcCompSuctionTemp");
+                    std::string Refrigerant; // Name of refrigerant
+                    int refrigIndex = state.dataWaterToAirHeatPump->RefrigIndex;
+                    Real64 compSuctionEnth = GetSupHeatEnthalpyRefrig(state, Refrigerant, CompSuctionTemp, SuctionPr, refrigIndex, RoutineName);
+                    return (compSuctionEnth - SuperHeatEnth) / SuperHeatEnth;
+                };
+
+                General::SolveRoot(state, ERR, STOP1, SolFlag, CompSuctionTemp, f, CompSuctionTemp1, CompSuctionTemp2);
                 if (SolFlag == -1) {
                     heatPump.SimFlag = false;
                     return;
@@ -2159,14 +2097,10 @@ namespace WaterToAirHeatPump {
         // Data is moved from the HP data structure to the HP outlet nodes.
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
         using PlantUtilities::SafeCopyPlantNode;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 ReportingConstant;
-
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // WatertoAirHP(HPNum)%SimFlag=.FALSE.
         if (!heatPump.SimFlag) {
             // Heatpump is off; just pass through conditions
@@ -2218,11 +2152,11 @@ namespace WaterToAirHeatPump {
         heatPump.InletAirMassFlowRate = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).MassFlowRate;
         heatPump.OutletAirMassFlowRate = heatPump.InletAirMassFlowRate;
 
-        heatPump.Energy = heatPump.Power * ReportingConstant;
-        heatPump.EnergyLoadTotal = heatPump.QLoadTotal * ReportingConstant;
-        heatPump.EnergySensible = heatPump.QSensible * ReportingConstant;
-        heatPump.EnergyLatent = heatPump.QLatent * ReportingConstant;
-        heatPump.EnergySource = heatPump.QSource * ReportingConstant;
+        heatPump.Energy = heatPump.Power * TimeStepSysSec;
+        heatPump.EnergyLoadTotal = heatPump.QLoadTotal * TimeStepSysSec;
+        heatPump.EnergySensible = heatPump.QSensible * TimeStepSysSec;
+        heatPump.EnergyLatent = heatPump.QLatent * TimeStepSysSec;
+        heatPump.EnergySource = heatPump.QSource * TimeStepSysSec;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).CO2 = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).CO2;
@@ -2447,7 +2381,7 @@ namespace WaterToAirHeatPump {
         IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterToAirHeatPump->WatertoAirHP);
 
         if (IndexNum == 0) {
-            ShowSevereError(state, "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
         }
 
@@ -2503,7 +2437,7 @@ namespace WaterToAirHeatPump {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError(state, "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
             CoilCapacity = -1000.0;
         }
@@ -2551,7 +2485,7 @@ namespace WaterToAirHeatPump {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError(state, "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
             NodeNumber = 0;
         }
@@ -2599,7 +2533,7 @@ namespace WaterToAirHeatPump {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError(state, "Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
             NodeNumber = 0;
         }

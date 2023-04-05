@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -141,7 +141,7 @@ void ReportSurfaces(EnergyPlusData &state)
             DXFOut(state, Option1, Option2);
             DXFDone = true;
         } else {
-            ShowWarningError(state, "ReportSurfaces: DXF output already generated.  DXF with option=[" + Option1 + "] will not be generated.");
+            ShowWarningError(state, format("ReportSurfaces: DXF output already generated.  DXF with option=[{}] will not be generated.", Option1));
         }
     }
 
@@ -164,7 +164,7 @@ void ReportSurfaces(EnergyPlusData &state)
             VRMLOut(state, Option1, Option2);
             VRMLDone = true;
         } else {
-            ShowWarningError(state, "ReportSurfaces: VRML output already generated.  VRML with option=[" + Option1 + "] will not be generated.");
+            ShowWarningError(state, format("ReportSurfaces: VRML output already generated.  VRML with option=[{}] will not be generated.", Option1));
         }
     }
 
@@ -201,8 +201,9 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
     }
 
     if (state.dataOutputReports->optiondone) {
-        ShowWarningError(state, "Report of Surfaces/Lines Option has already been completed with option=" + state.dataOutputReports->lastoption);
-        ShowContinueError(state, "..option=\"" + option + "\" will not be done this time.");
+        ShowWarningError(state,
+                         format("Report of Surfaces/Lines Option has already been completed with option={}", state.dataOutputReports->lastoption));
+        ShowContinueError(state, format("..option=\"{}\" will not be done this time.", option));
         return;
     }
 
@@ -420,7 +421,7 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
     if ((int)state.dataDaylightingData->DaylRefPt.size() > 0) {
         for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
             auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-            auto curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
+            DataSurfaceColors::ColorNo curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
             std::string refPtType;
             if (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
                 refPtType = "DEDayRefPt";
@@ -473,23 +474,25 @@ void DXFOut(EnergyPlusData &state,
     bool TriangulateFace(false);
 
     // Formats
-    constexpr auto Format_702("  0\nSECTION\n  2\nENTITIES\n");
-    constexpr auto Format_707("999\nDXF created from EnergyPlus\n");
-    constexpr auto Format_708("999\n{}{}{}\n");
+    constexpr std::string_view Format_702("  0\nSECTION\n  2\nENTITIES\n");
+    constexpr std::string_view Format_707("999\nDXF created from EnergyPlus\n");
+    constexpr std::string_view Format_708("999\n{}{}{}\n");
 
-    constexpr auto Format_715("  0\nPOLYLINE\n  8\n{}\n 62\n{:3}\n 66\n  1\n 10\n 0.0\n 20\n 0.0\n 30\n{:15.5F}\n 70\n   9\n 40\n{}\n 41\n{}\n");
-    constexpr auto Format_716("  0\nVERTEX\n  8\n{}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n");
-    constexpr auto Format_717("  0\nSEQEND\n  8\n{}\n");
-    constexpr auto Format_704("  0\n3DFACE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 11\n{:15.5F}\n 21\n{:15.5F}\n "
-                              "31\n{:15.5F}\n 12\n{:15.5F}\n 22\n{:15.5F}\n 32\n{:15.5F}\n");
-    constexpr auto Format_704_0("  0\n3DFACE\n  8\n{}\n 62\n{:3}\n");
-    constexpr auto Format_704_1(" 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n");
-    constexpr auto Format_704_2(" 11\n{:15.5F}\n 21\n{:15.5F}\n 31\n{:15.5F}\n");
-    constexpr auto Format_704_3(" 12\n{:15.5F}\n 22\n{:15.5F}\n 32\n{:15.5F}\n");
-    constexpr auto Format_705(" 13\n{:15.5F}\n 23\n{:15.5F}\n 33\n{:15.5F}\n");
-    constexpr auto Format_706("  0\nENDSEC\n  0\nEOF\n");
-    constexpr auto Format_709("  0\nCIRCLE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n{:15.5F}\n");
-    constexpr auto Format_710("999\n{}\n");
+    constexpr std::string_view Format_715(
+        "  0\nPOLYLINE\n  8\n{}\n 62\n{:3}\n 66\n  1\n 10\n 0.0\n 20\n 0.0\n 30\n{:15.5F}\n 70\n   9\n 40\n{}\n 41\n{}\n");
+    constexpr std::string_view Format_716("  0\nVERTEX\n  8\n{}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n");
+    constexpr std::string_view Format_717("  0\nSEQEND\n  8\n{}\n");
+    constexpr std::string_view Format_704(
+        "  0\n3DFACE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 11\n{:15.5F}\n 21\n{:15.5F}\n "
+        "31\n{:15.5F}\n 12\n{:15.5F}\n 22\n{:15.5F}\n 32\n{:15.5F}\n");
+    constexpr std::string_view Format_704_0("  0\n3DFACE\n  8\n{}\n 62\n{:3}\n");
+    constexpr std::string_view Format_704_1(" 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n");
+    constexpr std::string_view Format_704_2(" 11\n{:15.5F}\n 21\n{:15.5F}\n 31\n{:15.5F}\n");
+    constexpr std::string_view Format_704_3(" 12\n{:15.5F}\n 22\n{:15.5F}\n 32\n{:15.5F}\n");
+    constexpr std::string_view Format_705(" 13\n{:15.5F}\n 23\n{:15.5F}\n 33\n{:15.5F}\n");
+    constexpr std::string_view Format_706("  0\nENDSEC\n  0\nEOF\n");
+    constexpr std::string_view Format_709("  0\nCIRCLE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n{:15.5F}\n");
+    constexpr std::string_view Format_710("999\n{}\n");
 
     if (PolygonAction == "TRIANGULATE3DFACE" || PolygonAction == "TRIANGULATE" || PolygonAction.empty()) {
         TriangulateFace = true;
@@ -505,7 +508,7 @@ void DXFOut(EnergyPlusData &state,
         ThickPolyline = false;
         PolylineWidth = " 0";
     } else {
-        ShowWarningError(state, "DXFOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
+        ShowWarningError(state, format("DXFOut: Illegal key specified for Surfaces with > 4 sides={}", PolygonAction));
         ShowContinueError(state, R"(...Valid keys are: "ThickPolyline", "RegularPolyline", "Triangulate3DFace".)");
         ShowContinueError(state, "\"Triangulate3DFace\" will be used for any surfaces with > 4 sides.");
         TriangulateFace = true;
@@ -534,7 +537,7 @@ void DXFOut(EnergyPlusData &state,
 
     WriteDXFCommon(state, dxffile, ColorScheme);
     auto &DXFcolorno = state.dataSurfColor->DXFcolorno;
-    auto colorindex = DataSurfaceColors::ColorNo::ShdDetFix;
+    DataSurfaceColors::ColorNo colorindex = DataSurfaceColors::ColorNo::ShdDetFix;
     //  Do all detached shading surfaces first
     for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         std::string ShadeType;
@@ -577,18 +580,18 @@ void DXFOut(EnergyPlusData &state,
             } else {
                 Array1D<DataVectorTypes::dTriangle> mytriangles;
 
-                const auto ntri = DXFEarClipping::Triangulate(state,
-                                                              thisSurface.Sides,
-                                                              thisSurface.Vertex,
-                                                              mytriangles,
-                                                              thisSurface.Azimuth,
-                                                              thisSurface.Tilt,
-                                                              thisSurface.Name,
-                                                              thisSurface.Class);
+                const int ntri = DXFEarClipping::Triangulate(state,
+                                                             thisSurface.Sides,
+                                                             thisSurface.Vertex,
+                                                             mytriangles,
+                                                             thisSurface.Azimuth,
+                                                             thisSurface.Tilt,
+                                                             thisSurface.Name,
+                                                             thisSurface.Class);
                 for (int svert = 1; svert <= ntri; ++svert) {
-                    const auto vv0 = mytriangles(svert).vv0;
-                    const auto vv1 = mytriangles(svert).vv1;
-                    const auto vv2 = mytriangles(svert).vv2;
+                    const int vv0 = mytriangles(svert).vv0;
+                    const int vv1 = mytriangles(svert).vv1;
+                    const int vv2 = mytriangles(svert).vv2;
                     print(dxffile,
                           Format_704,
                           ShadeType,
@@ -611,7 +614,7 @@ void DXFOut(EnergyPlusData &state,
 
     // now do zone surfaces, by zone
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
-        const auto TempZoneName = normalizeName(state.dataHeatBal->Zone(zones).Name);
+        const std::string TempZoneName = normalizeName(state.dataHeatBal->Zone(zones).Name);
 
         for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             auto &thisSurface = state.dataSurface->Surface(surf);
@@ -659,18 +662,18 @@ void DXFOut(EnergyPlusData &state,
                 } else {
                     Array1D<DataVectorTypes::dTriangle> mytriangles;
 
-                    const auto ntri = DXFEarClipping::Triangulate(state,
-                                                                  thisSurface.Sides,
-                                                                  thisSurface.Vertex,
-                                                                  mytriangles,
-                                                                  thisSurface.Azimuth,
-                                                                  thisSurface.Tilt,
-                                                                  thisSurface.Name,
-                                                                  thisSurface.Class);
+                    const int ntri = DXFEarClipping::Triangulate(state,
+                                                                 thisSurface.Sides,
+                                                                 thisSurface.Vertex,
+                                                                 mytriangles,
+                                                                 thisSurface.Azimuth,
+                                                                 thisSurface.Tilt,
+                                                                 thisSurface.Name,
+                                                                 thisSurface.Class);
                     for (int svert = 1; svert <= ntri; ++svert) {
-                        const auto vv0 = mytriangles(svert).vv0;
-                        const auto vv1 = mytriangles(svert).vv1;
-                        const auto vv2 = mytriangles(svert).vv2;
+                        const int vv0 = mytriangles(svert).vv0;
+                        const int vv1 = mytriangles(svert).vv1;
+                        const int vv2 = mytriangles(svert).vv2;
                         print(dxffile,
                               Format_704,
                               TempZoneName,
@@ -744,9 +747,9 @@ void DXFOut(EnergyPlusData &state,
                                                            DataSurfaces::SurfaceClass::Fin);
                     }
                     for (int svert = 1; svert <= ntri; ++svert) {
-                        const auto vv0 = mytriangles(svert).vv0;
-                        const auto vv1 = mytriangles(svert).vv1;
-                        const auto vv2 = mytriangles(svert).vv2;
+                        const int vv0 = mytriangles(svert).vv0;
+                        const int vv1 = mytriangles(svert).vv1;
+                        const int vv2 = mytriangles(svert).vv2;
                         print(dxffile,
                               Format_704,
                               TempZoneName,
@@ -771,7 +774,7 @@ void DXFOut(EnergyPlusData &state,
     DXFDaylightingReferencePoints(state, dxffile);
 
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
-        const auto curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
+        const DataSurfaceColors::ColorNo curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
 
         for (int mapnum = 1; mapnum <= (int)state.dataDaylightingData->IllumMap.size(); ++mapnum) {
             if (state.dataDaylightingData->IllumMapCalc(mapnum).zoneIndex != zones) continue;
@@ -808,17 +811,18 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     // Use the surface absolute coordinate information to produce
     // lines.
 
-    std::string const PolylineWidth(" 0.55");
+    constexpr std::string_view PolylineWidth = " 0.55";
 
-    constexpr auto Format_702("  0\nSECTION\n  2\nENTITIES\n");
-    constexpr auto Format_707("999\nDXF created from EnergyPlus\n");
-    constexpr auto Format_708("999\n{}{}{}\n");
+    constexpr std::string_view Format_702("  0\nSECTION\n  2\nENTITIES\n");
+    constexpr std::string_view Format_707("999\nDXF created from EnergyPlus\n");
+    constexpr std::string_view Format_708("999\n{}{}{}\n");
 
-    constexpr auto Format_715("  0\nPOLYLINE\n  8\n{}\n 62\n{:3}\n 66\n  1\n 10\n 0.0\n 20\n 0.0\n 30\n{:15.5F}\n 70\n   9\n 40\n{}\n 41\n{}\n");
-    constexpr auto Format_716("  0\nVERTEX\n  8\n{}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n");
-    constexpr auto Format_717("  0\nSEQEND\n  8\n{}\n");
-    constexpr auto Format_706("  0\nENDSEC\n  0\nEOF\n");
-    constexpr auto Format_710("999\n{}\n");
+    constexpr std::string_view Format_715(
+        "  0\nPOLYLINE\n  8\n{}\n 62\n{:3}\n 66\n  1\n 10\n 0.0\n 20\n 0.0\n 30\n{:15.5F}\n 70\n   9\n 40\n{}\n 41\n{}\n");
+    constexpr std::string_view Format_716("  0\nVERTEX\n  8\n{}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n");
+    constexpr std::string_view Format_717("  0\nSEQEND\n  8\n{}\n");
+    constexpr std::string_view Format_706("  0\nENDSEC\n  0\nEOF\n");
+    constexpr std::string_view Format_710("999\n{}\n");
 
     if (state.dataSurface->TotSurfaces > 0 && !allocated(state.dataSurface->Surface)) {
         // no error needed, probably in end processing, just return
@@ -870,7 +874,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
 
     // now do zone surfaces, by zone
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
-        const auto SaveZoneName = normalizeName(state.dataHeatBal->Zone(zones).Name);
+        std::string const SaveZoneName = normalizeName(state.dataHeatBal->Zone(zones).Name);
 
         surfcount = 0;
         for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
@@ -895,7 +899,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
             ++surfcount;
 
             print(dxffile, Format_710, thisSurface.ZoneName + ':' + thisSurface.Name);
-            const auto TempZoneName = SaveZoneName + '_' + fmt::to_string(surfcount);
+            std::string const TempZoneName = format("{}_{}", SaveZoneName, surfcount);
             Real64 minz = 99999.0;
             for (int vert = 1; vert <= thisSurface.Sides; ++vert) {
                 minz = min(minz, thisSurface.Vertex(vert).z);
@@ -919,7 +923,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
             ++surfcount;
 
             print(dxffile, Format_710, thisSurface.ZoneName + ':' + thisSurface.Name);
-            const auto TempZoneName = SaveZoneName + '_' + fmt::to_string(surfcount);
+            std::string const TempZoneName = format("{}_{}", SaveZoneName, surfcount);
             Real64 minz = 99999.0;
             for (int vert = 1; vert <= thisSurface.Sides; ++vert) {
                 minz = min(minz, thisSurface.Vertex(vert).z);
@@ -1454,7 +1458,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         RegularPolyline = true;
         PolylineWidth = " 0";
     } else {
-        ShowWarningError(state, "VRMLOut: Illegal key specified for Surfaces with > 4 sides=" + PolygonAction);
+        ShowWarningError(state, format("VRMLOut: Illegal key specified for Surfaces with > 4 sides={}", PolygonAction));
         ShowContinueError(state, "\"TRIANGULATE 3DFACE\" will be used for any surfaces with > 4 sides.");
         TriangulateFace = true;
     }
@@ -1525,18 +1529,18 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             print<check_syntax(Format_805)>(wrlfile, Format_805);
         } else { // will be >4 sided polygon with triangulate option
             Array1D<DataVectorTypes::dTriangle> mytriangles;
-            const auto ntri = DXFEarClipping::Triangulate(state,
-                                                          thisSurface.Sides,
-                                                          thisSurface.Vertex,
-                                                          mytriangles,
-                                                          thisSurface.Azimuth,
-                                                          thisSurface.Tilt,
-                                                          thisSurface.Name,
-                                                          thisSurface.Class);
+            const int ntri = DXFEarClipping::Triangulate(state,
+                                                         thisSurface.Sides,
+                                                         thisSurface.Vertex,
+                                                         mytriangles,
+                                                         thisSurface.Azimuth,
+                                                         thisSurface.Tilt,
+                                                         thisSurface.Name,
+                                                         thisSurface.Class);
             for (int svert = 1; svert <= ntri; ++svert) {
-                const auto vv0 = mytriangles(svert).vv0;
-                const auto vv1 = mytriangles(svert).vv1;
-                const auto vv2 = mytriangles(svert).vv2;
+                const int vv0 = mytriangles(svert).vv0;
+                const int vv1 = mytriangles(svert).vv1;
+                const int vv2 = mytriangles(svert).vv2;
                 print(wrlfile, " {} {} {} -1\n", vv0 - 1, vv1 - 1, vv2 - 1);
             }
             print(wrlfile, Format_805);
@@ -1573,18 +1577,18 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
                 print<check_syntax(Format_805)>(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<DataVectorTypes::dTriangle> mytriangles;
-                const auto ntri = DXFEarClipping::Triangulate(state,
-                                                              thisSurface.Sides,
-                                                              thisSurface.Vertex,
-                                                              mytriangles,
-                                                              thisSurface.Azimuth,
-                                                              thisSurface.Tilt,
-                                                              thisSurface.Name,
-                                                              thisSurface.Class);
+                const int ntri = DXFEarClipping::Triangulate(state,
+                                                             thisSurface.Sides,
+                                                             thisSurface.Vertex,
+                                                             mytriangles,
+                                                             thisSurface.Azimuth,
+                                                             thisSurface.Tilt,
+                                                             thisSurface.Name,
+                                                             thisSurface.Class);
                 for (int svert = 1; svert <= ntri; ++svert) {
-                    const auto vv0 = mytriangles(svert).vv0;
-                    const auto vv1 = mytriangles(svert).vv1;
-                    const auto vv2 = mytriangles(svert).vv2;
+                    const int vv0 = mytriangles(svert).vv0;
+                    const int vv1 = mytriangles(svert).vv1;
+                    const int vv2 = mytriangles(svert).vv2;
                     print(wrlfile, " {} {} {} -1\n", vv0 - 1, vv1 - 1, vv2 - 1);
                 }
                 print(wrlfile, Format_805);
@@ -1613,18 +1617,18 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
                 print(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<DataVectorTypes::dTriangle> mytriangles;
-                const auto ntri = DXFEarClipping::Triangulate(state,
-                                                              thisSurface.Sides,
-                                                              thisSurface.Vertex,
-                                                              mytriangles,
-                                                              thisSurface.Azimuth,
-                                                              thisSurface.Tilt,
-                                                              thisSurface.Name,
-                                                              thisSurface.Class);
+                const int ntri = DXFEarClipping::Triangulate(state,
+                                                             thisSurface.Sides,
+                                                             thisSurface.Vertex,
+                                                             mytriangles,
+                                                             thisSurface.Azimuth,
+                                                             thisSurface.Tilt,
+                                                             thisSurface.Name,
+                                                             thisSurface.Class);
                 for (int svert = 1; svert <= ntri; ++svert) {
-                    const auto vv0 = mytriangles(svert).vv0;
-                    const auto vv1 = mytriangles(svert).vv1;
-                    const auto vv2 = mytriangles(svert).vv2;
+                    const int vv0 = mytriangles(svert).vv0;
+                    const int vv1 = mytriangles(svert).vv1;
+                    const int vv2 = mytriangles(svert).vv2;
                     print(wrlfile, " {} {} {} -1\n", vv0 - 1, vv1 - 1, vv2 - 1);
                 }
                 print(wrlfile, Format_805);

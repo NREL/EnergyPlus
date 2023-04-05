@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -236,7 +236,7 @@ namespace HVACControllers {
                            bool &IsConvergedFlag,
                            bool &IsUpToDateFlag,
                            bool &BypassOAController,
-                           Optional_bool AllowWarmRestartFlag = _);
+                           ObjexxFCL::Optional_bool AllowWarmRestartFlag = _);
 
     void GetControllerInput(EnergyPlusData &state);
 
@@ -314,6 +314,10 @@ namespace HVACControllers {
                                    int AirLoopPass,
                                    DataHVACControllers::ControllerOperation Operation, // Operation to execute
                                    bool IsConvergedFlag);
+
+    Real64 GetCurrentHVACTime(EnergyPlusData &state);
+
+    Real64 GetPreviousHVACTime(EnergyPlusData &state);
 
     std::string CreateHVACTimeString(EnergyPlusData &state);
 

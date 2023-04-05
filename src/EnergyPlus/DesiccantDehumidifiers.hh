@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -279,19 +279,15 @@ namespace DesiccantDehumidifiers {
     void ReportDesiccantDehumidifier(EnergyPlusData &state, int DesicDehumNum); // number of the current dehumidifier being simulated
 
     void CalcNonDXHeatingCoils(EnergyPlusData &state,
-                               int DesicDehumNum,                    // Desiccant dehumidifier unit index
-                               bool FirstHVACIteration,              // flag for first HVAC iteration in the time step
-                               Real64 RegenCoilLoad,                 // heating coil load to be met (Watts)
-                               Optional<Real64> RegenCoilLoadmet = _ // heating load met
+                               int DesicDehumNum,                               // Desiccant dehumidifier unit index
+                               bool FirstHVACIteration,                         // flag for first HVAC iteration in the time step
+                               Real64 RegenCoilLoad,                            // heating coil load to be met (Watts)
+                               ObjexxFCL::Optional<Real64> RegenCoilLoadmet = _ // heating load met
     );
 
     int GetProcAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
 
     int GetProcAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
-
-    int GetRegAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
-
-    int GetRegAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound);
 
 } // namespace DesiccantDehumidifiers
 
@@ -305,8 +301,6 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct
     bool GetInputDesiccantDehumidifier = true; // First time, input is "gotten"
     bool InitDesiccantDehumidifierOneTimeFlag = true;
     bool MySetPointCheckFlag = true; // I think this actually needs to be a vector or a member variable on the struct, not just a single bool
-    bool CalcSolidDesiccantDehumidifierMyOneTimeFlag = true; // one time flag
-    bool CalcGenericDesiccantDehumidifierMyOneTimeFlag = true;
     Array1D<DesiccantDehumidifiers::DesiccantDehumidifierData> DesicDehum;
     std::unordered_map<std::string, std::string> UniqueDesicDehumNames;
 
@@ -316,9 +310,7 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct
     Real64 SteamDensity = 0.0; // density of steam at 100C
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
-    Real64 RhoAirStdInit = 0.0;
-    Real64 QRegen = 0.0;            // required coil load passed to sim heating coil routine (W)
-    Real64 RhoAirStdInitCGDD = 0.0; // standard air density (kg/m3)
+    Real64 QRegen = 0.0;          // required coil load passed to sim heating coil routine (W)
 
     void clear_state() override
     {

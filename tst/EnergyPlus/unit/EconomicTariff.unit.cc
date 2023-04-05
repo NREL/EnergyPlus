@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -589,7 +589,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * Constant::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
@@ -620,7 +620,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(EconomicTariff::seasonSummer, state->dataEconTariff->chargeSimple(2).season);
     EXPECT_EQ(0.04, state->dataEconTariff->chargeSimple(2).costPerVal);
 
-    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather; // fake a weather run
 
     // Unitialized: default initialized to 0
     EXPECT_EQ(0, state->dataEconTariff->tariff(1).seasonForMonth(5));
@@ -1131,7 +1131,7 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * Constant::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state);
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
@@ -1153,7 +1153,7 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
 
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
     EconomicTariff::UpdateUtilityBills(*state);
-    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather;
 
     state->dataEnvrn->Month = 5;
     state->dataEnvrn->DayOfMonth = 31;

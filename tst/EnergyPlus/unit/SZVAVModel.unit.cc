@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,7 +80,7 @@
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 using namespace EnergyPlus;
-using namespace CurveManager;
+using namespace Curve;
 using namespace DataBranchNodeConnections;
 using namespace DataEnvironment;
 using namespace DataHeatBalance;
@@ -271,6 +271,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataBranchNodeConnections->CompSets(2).ParentCName = "AirSystem";
 
     state->dataEnvrn->OutDryBulbTemp = 30.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     OutputReportPredefined::SetPredefinedTables(*state);
     Psychrometrics::InitializePsychRoutines(*state);
     createCoilSelectionReportObj(*state);
@@ -658,7 +659,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-    EXPECT_EQ("ASHRAE90VARIABLEFAN", thisFanCoil.CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::ASHRAE, thisFanCoil.CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:ONOFF", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);

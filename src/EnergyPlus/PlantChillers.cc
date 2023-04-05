@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -153,7 +153,7 @@ namespace PlantChillers {
                 return &thisChiller;
             }
         }
-        ShowFatalError(state, "Could not locate electric chiller with name: " + chillerName);
+        ShowFatalError(state, format("Could not locate electric chiller with name: {}", chillerName));
         return nullptr;
     }
 
@@ -179,7 +179,7 @@ namespace PlantChillers {
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataPlantChillers->NumElectricChillers <= 0) {
-            ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " Equipment specified in input file");
+            ShowSevereError(state, format("No {} Equipment specified in input file", state.dataIPShortCut->cCurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -224,8 +224,8 @@ namespace PlantChillers {
             case DataPlant::CondenserType::EvapCooled:
                 break;
             default: {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             }
@@ -237,14 +237,14 @@ namespace PlantChillers {
             if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
                 ShowSevereError(state,
                                 format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             thisChiller.COP = state.dataIPShortCut->rNumericArgs(2);
             if (state.dataIPShortCut->rNumericArgs(2) == 0.0) {
                 ShowSevereError(state,
                                 format("Invalid {}={:.3R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             thisChiller.EvapInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -279,16 +279,14 @@ namespace PlantChillers {
                 //  since it is not used elsewhere for connection
                 // for transition purposes, add this node if not there.
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
                     }
                 }
                 if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
@@ -307,8 +305,9 @@ namespace PlantChillers {
                 bool Okay;
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
                 if (!Okay) {
-                    ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + ", Adding OutdoorAir:Node=" + state.dataIPShortCut->cAlphaArgs(5));
+                    ShowWarningError(
+                        state,
+                        format("{}, Adding OutdoorAir:Node={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(5)));
                 }
 
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -347,12 +346,14 @@ namespace PlantChillers {
                                                    "Condenser Water Nodes");
                 // Condenser Inlet node name is necessary for Water Cooled
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + "is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {}is blank ", state.dataIPShortCut->cAlphaFieldNames(5)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 } else if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + "is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {}is blank ", state.dataIPShortCut->cAlphaFieldNames(6)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             } else {
@@ -382,12 +383,14 @@ namespace PlantChillers {
                                                    "Condenser (unknown?) Nodes");
                 // Condenser Inlet node name is necessary
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + "is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {}is blank ", state.dataIPShortCut->cAlphaFieldNames(5)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 } else if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + "is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {}is blank ", state.dataIPShortCut->cAlphaFieldNames(6)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             }
@@ -413,8 +416,9 @@ namespace PlantChillers {
             thisChiller.CapRatCoef(3) = state.dataIPShortCut->rNumericArgs(13);
             if ((state.dataIPShortCut->rNumericArgs(11) + state.dataIPShortCut->rNumericArgs(12) + state.dataIPShortCut->rNumericArgs(13)) == 0.0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject +
-                                    ": Sum of Capacity Ratio Coef = 0.0, chiller=" + state.dataIPShortCut->cAlphaArgs(1));
+                                format("{}: Sum of Capacity Ratio Coef = 0.0, chiller={}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             thisChiller.PowerRatCoef(1) = state.dataIPShortCut->rNumericArgs(14);
@@ -431,9 +435,8 @@ namespace PlantChillers {
                 static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\",");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
+                                format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
                 ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
                 thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
@@ -457,8 +460,9 @@ namespace PlantChillers {
                                                                                       NodeInputManager::CompFluidStream::Tertiary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
                 thisChiller.HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -471,8 +475,9 @@ namespace PlantChillers {
                                                                                        NodeInputManager::CompFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
 
@@ -492,8 +497,8 @@ namespace PlantChillers {
                         ShowSevereError(
                             state, format("Invalid {}={:.6R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
                         ShowSevereError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowContinueError(
+                            state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
                     }
                 }
@@ -512,11 +517,11 @@ namespace PlantChillers {
                     if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                         thisChiller.HeatRecInletLimitSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
                         if (thisChiller.HeatRecInletLimitSchedNum == 0) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                                state.dataIPShortCut->cAlphaArgs(1) + "\"");
-                            ShowContinueError(state,
-                                              "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + state.dataIPShortCut->cAlphaArgs(11));
+                            ShowSevereError(
+                                state,
+                                format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                            ShowContinueError(
+                                state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11)));
                             ErrorsFound = true;
                         }
                     } else {
@@ -556,8 +561,9 @@ namespace PlantChillers {
                 }
                 if ((!state.dataIPShortCut->lAlphaFieldBlanks(8)) || (!state.dataIPShortCut->lAlphaFieldBlanks(9))) {
                     ShowWarningError(state,
-                                     "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + state.dataIPShortCut->cCurrentModuleObject +
-                                         '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                     format("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for {}={}",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "However, Node names were specified for Heat Recovery inlet or outlet nodes");
                 }
             }
@@ -565,8 +571,9 @@ namespace PlantChillers {
             thisChiller.BasinHeaterPowerFTempDiff = state.dataIPShortCut->rNumericArgs(23);
             if (state.dataIPShortCut->rNumericArgs(23) < 0.0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + ", \"" + thisChiller.Name +
-                                    "\" TRIM(state.dataIPShortCut->cNumericFieldNames(23)) must be >= 0");
+                                format("{}, \"{}\" TRIM(state.dataIPShortCut->cNumericFieldNames(23)) must be >= 0",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       thisChiller.Name));
                 ErrorsFound = true;
             }
 
@@ -578,8 +585,10 @@ namespace PlantChillers {
                 }
                 if (thisChiller.BasinHeaterSetPointTemp < 2.0) {
                     ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + ":\"" + thisChiller.Name + "\", " +
-                                         state.dataIPShortCut->cNumericFieldNames(24) + " is less than 2 deg C. Freezing could occur.");
+                                     format("{}:\"{}\", {} is less than 2 deg C. Freezing could occur.",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            thisChiller.Name,
+                                            state.dataIPShortCut->cNumericFieldNames(24)));
                 }
             }
 
@@ -587,9 +596,11 @@ namespace PlantChillers {
                 thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(10));
                 if (thisChiller.BasinHeaterSchedulePtr == 0) {
                     ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + ", \"" + thisChiller.Name +
-                                         "\" TRIM(state.dataIPShortCut->cAlphaFieldNames(10)) \"" + state.dataIPShortCut->cAlphaArgs(10) +
-                                         "\" was not found. Basin heater operation will not be modeled and the simulation continues");
+                                     format("{}, \"{}\" TRIM(state.dataIPShortCut->cAlphaFieldNames(10)) \"{}\" was not found. Basin heater "
+                                            "operation will not be modeled and the simulation continues",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            thisChiller.Name,
+                                            state.dataIPShortCut->cAlphaArgs(10)));
                 }
             }
             if (NumAlphas > 12) {
@@ -600,7 +611,7 @@ namespace PlantChillers {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
+            ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
         }
     }
 
@@ -855,7 +866,7 @@ namespace PlantChillers {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
@@ -869,7 +880,7 @@ namespace PlantChillers {
 
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
 
@@ -896,7 +907,7 @@ namespace PlantChillers {
             if (this->HeatRecActive) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::HWInitConvTemp,
+                                                        Constant::HWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
                 this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -916,7 +927,7 @@ namespace PlantChillers {
                     if (THeatRecSetPoint == DataLoopNode::SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             if (!this->HRSPErrDone) {
-                                ShowWarningError(state, "Missing heat recovery temperature setpoint for chiller named " + this->Name);
+                                ShowWarningError(state, format("Missing heat recovery temperature setpoint for chiller named {}", this->Name));
                                 ShowContinueError(state,
                                                   "  A temperature setpoint is needed at the heat recovery leaving temperature setpoint node "
                                                   "specified, use a SetpointManager");
@@ -933,7 +944,7 @@ namespace PlantChillers {
                             state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                             if (FatalError) {
                                 if (!this->HRSPErrDone) {
-                                    ShowWarningError(state, "Missing heat recovery temperature setpoint for chiller named " + this->Name);
+                                    ShowWarningError(state, format("Missing heat recovery temperature setpoint for chiller named {}", this->Name));
                                     ShowContinueError(state,
                                                       "  A temperature setpoint is needed at the heat recovery leaving temperature setpoint node "
                                                       "specified, use a SetpointManager to establish a setpoint");
@@ -1031,12 +1042,12 @@ namespace PlantChillers {
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   Constant::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
                 tmpNomCap =
@@ -1065,7 +1076,7 @@ namespace PlantChillers {
                                                          this->NomCap);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeChillerElectric: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", this->NomCap));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1080,7 +1091,7 @@ namespace PlantChillers {
         } else {
             if (this->NomCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Electric Chiller nominal capacity requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Electric Chiller object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Electric Chiller object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) {
@@ -1119,7 +1130,7 @@ namespace PlantChillers {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeChillerElectric: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(
                                         state, format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
                                     ShowContinueError(
@@ -1137,7 +1148,7 @@ namespace PlantChillers {
         } else {
             if (this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Electric Chiller evap flow rate requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Electric Chiller object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Electric Chiller object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
@@ -1189,7 +1200,7 @@ namespace PlantChillers {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeChillerElectric: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(
                                         state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
                                     ShowContinueError(
@@ -1208,7 +1219,7 @@ namespace PlantChillers {
             if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Electric Chiller condenser flow rate requires a condenser");
                 ShowContinueError(state, "loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Electric Chiller object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Electric Chiller object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
@@ -1255,7 +1266,7 @@ namespace PlantChillers {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - this->DesignHeatRecVolFlowRate) / this->DesignHeatRecVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeChillerElectric: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(state,
                                                       format("User-Specified Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]",
                                                              this->DesignHeatRecVolFlowRate));
@@ -1329,7 +1340,7 @@ namespace PlantChillers {
                 ++this->MsgErrorCount;
                 //       Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
                 if (this->MsgErrorCount < 2) {
-                    ShowWarningError(state, this->MsgBuffer1 + '.');
+                    ShowWarningError(state, format("{}.", this->MsgBuffer1));
                     ShowContinueError(state, this->MsgBuffer2);
                 } else {
                     ShowRecurringWarningErrorAtEnd(
@@ -1753,7 +1764,7 @@ namespace PlantChillers {
                                                                        RoutineName);
                 this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + condInletTemp;
             } else {
-                ShowSevereError(state, "CalcElectricChillerModel: Condenser flow = 0, for ElectricChiller=" + this->Name);
+                ShowSevereError(state, format("CalcElectricChillerModel: Condenser flow = 0, for ElectricChiller={}", this->Name));
                 ShowContinueErrorTimeStamp(state, "");
             }
         } else { // Air Cooled or Evap Cooled
@@ -1775,9 +1786,9 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSysSec;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSysSec;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSysSec;
 
         // check for problems (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
@@ -1785,8 +1796,8 @@ namespace PlantChillers {
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
                 if (condInletTemp > 70.0) {
-                    ShowSevereError(state,
-                                    "CalcElectricChillerModel: Condenser loop inlet temperatures over 70.0 C for ElectricChiller=" + this->Name);
+                    ShowSevereError(
+                        state, format("CalcElectricChillerModel: Condenser loop inlet temperatures over 70.0 C for ElectricChiller={}", this->Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, format("Condenser loop water temperatures are too high at{:.2R}", condInletTemp));
                     ShowContinueError(state, "Check input for condenser plant loop, especially cooling tower");
@@ -1797,7 +1808,7 @@ namespace PlantChillers {
             }
             if (!state.dataGlobal->WarmupFlag) {
                 if (AvailNomCapRat < 0.0) { // apparently the real reason energy goes negative
-                    ShowSevereError(state, "CalcElectricChillerModel: Capacity ratio below zero for ElectricChiller=" + this->Name);
+                    ShowSevereError(state, format("CalcElectricChillerModel: Capacity ratio below zero for ElectricChiller={}", this->Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, "Check input for Capacity Ratio Curve");
                     ShowContinueError(state, format("Condenser inlet temperature: {:.2R}", condInletTemp));
@@ -1901,7 +1912,7 @@ namespace PlantChillers {
         }
 
         this->QHeatRecovery = this->QHeatRecovered;
-        this->EnergyHeatRecovery = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->EnergyHeatRecovery = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSysSec;
         state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
         this->HeatRecMdot = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;
         this->ChillerCondAvgTemp = this->AvgCondSinkTemp;
@@ -1913,7 +1924,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // set node temperatures
@@ -1930,7 +1941,6 @@ namespace PlantChillers {
             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
 
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
 
@@ -1960,7 +1970,6 @@ namespace PlantChillers {
             this->CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
             if (this->Power != 0.0) {
@@ -2013,7 +2022,8 @@ namespace PlantChillers {
                     (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
-                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                            ShowWarningError(state,
+                                             format("Missing temperature setpoint for LeavingSetpointModulated mode chiller named {}", this->Name));
                             ShowContinueError(
                                 state,
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
@@ -2028,7 +2038,8 @@ namespace PlantChillers {
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
-                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                                ShowWarningError(
+                                    state, format("Missing temperature setpoint for LeavingSetpointModulated mode chiller named {}", this->Name));
                                 ShowContinueError(
                                     state, "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
@@ -2064,7 +2075,7 @@ namespace PlantChillers {
                 return &thisChiller;
             }
         }
-        ShowFatalError(state, "Could not locate engine driven chiller with name: " + chillerName);
+        ShowFatalError(state, format("Could not locate engine driven chiller with name: {}", chillerName));
         return nullptr;
     }
 
@@ -2126,7 +2137,7 @@ namespace PlantChillers {
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataPlantChillers->NumEngineDrivenChillers <= 0) {
-            ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, format("No {} equipment specified in input file", state.dataIPShortCut->cCurrentModuleObject));
             ErrorsFound = true;
         }
         // See if load distribution manager has already gotten the input
@@ -2169,7 +2180,7 @@ namespace PlantChillers {
             if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
                 ShowSevereError(state,
                                 format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -2177,7 +2188,7 @@ namespace PlantChillers {
             if (state.dataIPShortCut->rNumericArgs(2) == 0.0) {
                 ShowSevereError(state,
                                 format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -2188,8 +2199,8 @@ namespace PlantChillers {
             } else if (state.dataIPShortCut->cAlphaArgs(2) == "EVAPORATIVELYCOOLED") {
                 thisChiller.CondenserType = DataPlant::CondenserType::EvapCooled;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -2224,16 +2235,14 @@ namespace PlantChillers {
                 // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
                 //  since it is not used elsewhere for connection
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
                     }
                 }
                 if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
@@ -2253,8 +2262,9 @@ namespace PlantChillers {
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
                 if (!Okay) {
                     ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject +
-                                         ", Adding OutdoorAir:DataLoopNode::Node=" + state.dataIPShortCut->cAlphaArgs(5));
+                                     format("{}, Adding OutdoorAir:DataLoopNode::Node={}",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            state.dataIPShortCut->cAlphaArgs(5)));
                 }
 
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -2293,12 +2303,14 @@ namespace PlantChillers {
                                                    "Condenser Water Nodes");
                 // Condenser Inlet node name is necessary for Water Cooled
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {} is blank ", state.dataIPShortCut->cAlphaFieldNames(5)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 } else if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {} is blank ", state.dataIPShortCut->cAlphaFieldNames(6)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             } else {
@@ -2328,12 +2340,14 @@ namespace PlantChillers {
                                                    "Condenser (unknown?) Nodes");
                 // Condenser Inlet node name is necessary for Water Cooled
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {} is blank ", state.dataIPShortCut->cAlphaFieldNames(5)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 } else if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {} is blank ", state.dataIPShortCut->cAlphaFieldNames(6)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             }
@@ -2359,8 +2373,9 @@ namespace PlantChillers {
             thisChiller.CapRatCoef(3) = state.dataIPShortCut->rNumericArgs(13);
             if ((state.dataIPShortCut->rNumericArgs(11) + state.dataIPShortCut->rNumericArgs(12) + state.dataIPShortCut->rNumericArgs(13)) == 0.0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject +
-                                    ": Sum of Capacity Ratio Coef = 0.0, chiller=" + state.dataIPShortCut->cAlphaArgs(1));
+                                format("{}: Sum of Capacity Ratio Coef = 0.0, chiller={}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             thisChiller.PowerRatCoef(1) = state.dataIPShortCut->rNumericArgs(14);
@@ -2372,41 +2387,38 @@ namespace PlantChillers {
             thisChiller.TempLowLimitEvapOut = state.dataIPShortCut->rNumericArgs(20);
 
             // Load Special EngineDriven Chiller Curve Fit Inputs
-            thisChiller.ClngLoadtoFuelCurve = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert curve name to number
+            thisChiller.ClngLoadtoFuelCurve = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // convert curve name to number
             if (thisChiller.ClngLoadtoFuelCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
-            thisChiller.RecJacHeattoFuelCurve =
-                CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8)); // convert curve name to number
+            thisChiller.RecJacHeattoFuelCurve = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(8)); // convert curve name to number
             if (thisChiller.RecJacHeattoFuelCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
-            thisChiller.RecLubeHeattoFuelCurve =
-                CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(9)); // convert curve name to number
+            thisChiller.RecLubeHeattoFuelCurve = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(9)); // convert curve name to number
             if (thisChiller.RecLubeHeattoFuelCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
-            thisChiller.TotExhausttoFuelCurve =
-                CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(10)); // convert curve name to number
+            thisChiller.TotExhausttoFuelCurve = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(10)); // convert curve name to number
             if (thisChiller.TotExhausttoFuelCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + state.dataIPShortCut->cAlphaArgs(10));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
-            thisChiller.ExhaustTempCurve = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11)); // convert curve name to number
+            thisChiller.ExhaustTempCurve = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11)); // convert curve name to number
             if (thisChiller.ExhaustTempCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + state.dataIPShortCut->cAlphaArgs(11));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -2420,8 +2432,8 @@ namespace PlantChillers {
             bool FuelTypeError(false);
             UtilityRoutines::ValidateFuelType(state, state.dataIPShortCut->cAlphaArgs(12), thisChiller.FuelType, FuelTypeError);
             if (FuelTypeError) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + state.dataIPShortCut->cAlphaArgs(12));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
                     state, "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
@@ -2445,8 +2457,9 @@ namespace PlantChillers {
                                                                                       NodeInputManager::CompFluidStream::Tertiary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + '=' + state.dataIPShortCut->cAlphaArgs(13));
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
                 thisChiller.HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -2459,8 +2472,9 @@ namespace PlantChillers {
                                                                                        NodeInputManager::CompFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + '=' + state.dataIPShortCut->cAlphaArgs(14));
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(14), state.dataIPShortCut->cAlphaArgs(14)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
                 BranchNodeConnections::TestCompSet(state,
@@ -2482,8 +2496,8 @@ namespace PlantChillers {
                         ShowSevereError(
                             state, format("Invalid {}={:.6R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
                         ShowSevereError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowContinueError(
+                            state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
                     }
                 }
@@ -2501,8 +2515,9 @@ namespace PlantChillers {
                 }
                 if ((!state.dataIPShortCut->lAlphaFieldBlanks(13)) || (!state.dataIPShortCut->lAlphaFieldBlanks(14))) {
                     ShowWarningError(state,
-                                     "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + state.dataIPShortCut->cCurrentModuleObject +
-                                         '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                     format("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for {}={}",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "However, Node names were specified for Heat Recovery inlet or outlet nodes");
                 }
             }
@@ -2511,9 +2526,8 @@ namespace PlantChillers {
                 static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(15)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\",");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + '=' + state.dataIPShortCut->cAlphaArgs(15));
+                                format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15)));
                 ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
                 thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
@@ -2527,8 +2541,9 @@ namespace PlantChillers {
             thisChiller.BasinHeaterPowerFTempDiff = state.dataIPShortCut->rNumericArgs(29);
             if (state.dataIPShortCut->rNumericArgs(29) < 0.0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + ", \"" + thisChiller.Name +
-                                    "\" TRIM(state.dataIPShortCut->cNumericFieldNames(29)) must be >= 0");
+                                format("{}, \"{}\" TRIM(state.dataIPShortCut->cNumericFieldNames(29)) must be >= 0",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       thisChiller.Name));
                 ErrorsFound = true;
             }
 
@@ -2540,8 +2555,10 @@ namespace PlantChillers {
                 }
                 if (thisChiller.BasinHeaterSetPointTemp < 2.0) {
                     ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + ":\"" + thisChiller.Name + "\", " +
-                                         state.dataIPShortCut->cNumericFieldNames(30) + " is less than 2 deg C. Freezing could occur.");
+                                     format("{}:\"{}\", {} is less than 2 deg C. Freezing could occur.",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            thisChiller.Name,
+                                            state.dataIPShortCut->cNumericFieldNames(30)));
                 }
             }
 
@@ -2549,9 +2566,11 @@ namespace PlantChillers {
                 thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(16));
                 if (thisChiller.BasinHeaterSchedulePtr == 0) {
                     ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + ", \"" + thisChiller.Name +
-                                         "\" TRIM(state.dataIPShortCut->cAlphaFieldNames(16)) \"" + state.dataIPShortCut->cAlphaArgs(16) +
-                                         "\" was not found. Basin heater operation will not be modeled and the simulation continues");
+                                     format("{}, \"{}\" TRIM(state.dataIPShortCut->cAlphaFieldNames(16)) \"{}\" was not found. Basin heater "
+                                            "operation will not be modeled and the simulation continues",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            thisChiller.Name,
+                                            state.dataIPShortCut->cAlphaArgs(16)));
                 }
             }
 
@@ -2567,7 +2586,7 @@ namespace PlantChillers {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
+            ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
         }
     }
 
@@ -2866,7 +2885,7 @@ namespace PlantChillers {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
@@ -2881,7 +2900,7 @@ namespace PlantChillers {
 
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
 
@@ -2907,7 +2926,7 @@ namespace PlantChillers {
             if (this->HeatRecActive) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::HWInitConvTemp,
+                                                        Constant::HWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
                 this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -3000,12 +3019,12 @@ namespace PlantChillers {
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   Constant::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
                 tmpNomCap =
@@ -3035,7 +3054,7 @@ namespace PlantChillers {
                                                          this->NomCap);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeChillerEngineDriven: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", this->NomCap));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -3050,7 +3069,7 @@ namespace PlantChillers {
         } else {
             if (this->NomCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Engine Driven Chiller nominal capacity requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Engine Driven Chiller object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Engine Driven Chiller object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) {
@@ -3088,7 +3107,7 @@ namespace PlantChillers {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeChillerEngineDriven: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(
                                         state, format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
                                     ShowContinueError(
@@ -3106,7 +3125,7 @@ namespace PlantChillers {
         } else {
             if (this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Engine Driven Chiller evap flow rate requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Engine Driven Chiller object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Engine Driven Chiller object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
@@ -3161,7 +3180,7 @@ namespace PlantChillers {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeChillerEngineDriven: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(
                                         state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
                                     ShowContinueError(
@@ -3180,7 +3199,7 @@ namespace PlantChillers {
             if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of EngineDriven Chiller condenser flow rate requires a condenser");
                 ShowContinueError(state, "loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in EngineDriven Chiller object=" + this->Name);
+                ShowContinueError(state, format("Occurs in EngineDriven Chiller object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
@@ -3236,7 +3255,7 @@ namespace PlantChillers {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser) / DesignHeatRecVolFlowRateUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeEngineDrivenChiller: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeEngineDrivenChiller: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(
                                         state,
                                         format("User-Specified Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", DesignHeatRecVolFlowRateUser));
@@ -3337,7 +3356,7 @@ namespace PlantChillers {
                 ++this->MsgErrorCount;
                 //     Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
                 if (this->MsgErrorCount < 2) {
-                    ShowWarningError(state, this->MsgBuffer1 + '.');
+                    ShowWarningError(state, format("{}.", this->MsgBuffer1));
                     ShowContinueError(state, this->MsgBuffer2);
                 } else {
                     ShowRecurringWarningErrorAtEnd(
@@ -3738,7 +3757,7 @@ namespace PlantChillers {
                                                                        RoutineName);
                 this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + this->CondInletTemp;
             } else {
-                ShowSevereError(state, "CalcEngineDrivenChillerModel: Condenser flow = 0, for EngineDrivenChiller=" + this->Name);
+                ShowSevereError(state, format("CalcEngineDrivenChillerModel: Condenser flow = 0, for EngineDrivenChiller={}", this->Name));
                 ShowContinueErrorTimeStamp(state, "");
             }
 
@@ -3760,7 +3779,7 @@ namespace PlantChillers {
         } else {
             PartLoadRat = max(this->MinPartLoadRat, PartLoadRat);
             // (RELDC) Ratio of Shaft Power to Fuel Energy Input
-            Real64 ClngLoadFuelRat = CurveManager::CurveValue(state, this->ClngLoadtoFuelCurve, PartLoadRat);
+            Real64 ClngLoadFuelRat = Curve::CurveValue(state, this->ClngLoadtoFuelCurve, PartLoadRat);
             EngineDrivenFuelEnergy = this->QEvaporator / ClngLoadFuelRat;
         }
         // Use Curve fit to determine energy recovered in the water jacket.  This curve calculates the water jacket energy recovered (J/s) by
@@ -3768,26 +3787,26 @@ namespace PlantChillers {
         // particular part load.
 
         // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
-        Real64 RecJacHeattoFuelRat = CurveManager::CurveValue(state, this->RecJacHeattoFuelCurve, PartLoadRat);
+        Real64 RecJacHeattoFuelRat = Curve::CurveValue(state, this->RecJacHeattoFuelCurve, PartLoadRat);
         this->QJacketRecovered = EngineDrivenFuelEnergy * RecJacHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered Lubricant Energy.  This curve calculates the lube energy recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
         // (RLUBDC) Ratio of Recoverable Lube Oil Heat to Fuel Energy Input
-        Real64 RecLubeHeattoFuelRat = CurveManager::CurveValue(state, this->RecLubeHeattoFuelCurve, PartLoadRat);
+        Real64 RecLubeHeattoFuelRat = Curve::CurveValue(state, this->RecLubeHeattoFuelCurve, PartLoadRat);
         this->QLubeOilRecovered = EngineDrivenFuelEnergy * RecLubeHeattoFuelRat;
 
         // Use Curve fit to determine Heat Recovered from the exhaust.  This curve calculates the  energy recovered (J/s) by
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the exhaust at that
         // particular part load.
-        Real64 TotExhausttoFuelRat = CurveManager::CurveValue(state, this->TotExhausttoFuelCurve, PartLoadRat);
+        Real64 TotExhausttoFuelRat = Curve::CurveValue(state, this->TotExhausttoFuelCurve, PartLoadRat);
         Real64 TotalExhaustEnergy = EngineDrivenFuelEnergy * TotExhausttoFuelRat;
 
         // Use Curve fit to determine Exhaust Temperature in C.  The temperature is simply a curve fit
         // of the exhaust temperature in C to the part load ratio.
         if (PartLoadRat != 0) {
-            Real64 exhaustTemp = CurveManager::CurveValue(state, this->ExhaustTempCurve, PartLoadRat);
+            Real64 exhaustTemp = Curve::CurveValue(state, this->ExhaustTempCurve, PartLoadRat);
             Real64 ExhaustGasFlow = TotalExhaustEnergy / (ExhaustCP * (exhaustTemp - ReferenceTemp));
 
             // Use Curve fit to determine stack temp after heat recovery
@@ -3815,14 +3834,14 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSysSec;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSysSec;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSysSec;
         this->FuelEnergyUseRate = EngineDrivenFuelEnergy;
-        this->FuelEnergy = this->FuelEnergyUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->JacketEnergyRec = this->QJacketRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->LubeOilEnergyRec = this->QLubeOilRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->ExhaustEnergyRec = this->QExhaustRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->FuelEnergy = this->FuelEnergyUseRate * state.dataHVACGlobal->TimeStepSysSec;
+        this->JacketEnergyRec = this->QJacketRecovered * state.dataHVACGlobal->TimeStepSysSec;
+        this->LubeOilEnergyRec = this->QLubeOilRecovered * state.dataHVACGlobal->TimeStepSysSec;
+        this->ExhaustEnergyRec = this->QExhaustRecovered * state.dataHVACGlobal->TimeStepSysSec;
         this->QTotalHeatRecovered = this->QExhaustRecovered + this->QLubeOilRecovered + this->QJacketRecovered;
         this->TotalHeatEnergyRec = this->ExhaustEnergyRec + this->LubeOilEnergyRec + this->JacketEnergyRec;
         this->FuelEnergyUseRate = std::abs(this->FuelEnergyUseRate);
@@ -3834,8 +3853,9 @@ namespace PlantChillers {
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
                 if (this->CondInletTemp > 70.0) {
-                    ShowSevereError(state,
-                                    "CalcEngineDrivenChillerModel: Condenser loop inlet temperatures > 70.0 C for EngineDrivenChiller=" + this->Name);
+                    ShowSevereError(
+                        state,
+                        format("CalcEngineDrivenChillerModel: Condenser loop inlet temperatures > 70.0 C for EngineDrivenChiller={}", this->Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, format("Condenser loop water temperatures are too high at{:.2R}", this->CondInletTemp));
                     ShowContinueError(state, "Check input for condenser plant loop, especially cooling tower");
@@ -3846,7 +3866,7 @@ namespace PlantChillers {
             }
             if (!state.dataGlobal->WarmupFlag) {
                 if (AvailNomCapRat < 0.0) { // apparently the real reason energy goes negative
-                    ShowSevereError(state, "CalcEngineDrivenChillerModel: Capacity ratio below zero for EngineDrivenChiller=" + this->Name);
+                    ShowSevereError(state, format("CalcEngineDrivenChillerModel: Capacity ratio below zero for EngineDrivenChiller={}", this->Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, "Check input for Capacity Ratio Curve");
                     ShowContinueError(state, format("Condenser inlet temperature: {:.2R}", this->CondInletTemp));
@@ -3926,7 +3946,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running
             // set node temperatures
@@ -3945,7 +3965,6 @@ namespace PlantChillers {
             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
             this->FuelCOP = 0.0;
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
         } else { // Chiller is running
@@ -3963,7 +3982,6 @@ namespace PlantChillers {
                 this->FuelCOP = 0.0;
             }
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
         }
@@ -4018,7 +4036,8 @@ namespace PlantChillers {
                     (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
-                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                            ShowWarningError(state,
+                                             format("Missing temperature setpoint for LeavingSetpointModulated mode chiller named {}", this->Name));
                             ShowContinueError(
                                 state,
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
@@ -4033,7 +4052,8 @@ namespace PlantChillers {
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
-                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                                ShowWarningError(
+                                    state, format("Missing temperature setpoint for LeavingSetpointModulated mode chiller named {}", this->Name));
                                 ShowContinueError(
                                     state, "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
@@ -4066,7 +4086,7 @@ namespace PlantChillers {
                 return &thisChiller;
             }
         }
-        ShowFatalError(state, "Could not locate gas turbine chiller with name: " + chillerName);
+        ShowFatalError(state, format("Could not locate gas turbine chiller with name: {}", chillerName));
         return nullptr;
     }
 
@@ -4130,7 +4150,7 @@ namespace PlantChillers {
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataPlantChillers->NumGTChillers <= 0) {
-            ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, format("No {} equipment specified in input file", state.dataIPShortCut->cCurrentModuleObject));
             ErrorsFound = true;
         }
         // See if load distribution manager has already gotten the input
@@ -4173,7 +4193,7 @@ namespace PlantChillers {
             if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
                 ShowSevereError(state,
                                 format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -4181,7 +4201,7 @@ namespace PlantChillers {
             if (state.dataIPShortCut->rNumericArgs(2) == 0.0) {
                 ShowSevereError(state,
                                 format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -4192,8 +4212,8 @@ namespace PlantChillers {
             } else if (state.dataIPShortCut->cAlphaArgs(2) == "EVAPORATIVELYCOOLED") {
                 thisChiller.CondenserType = DataPlant::CondenserType::EvapCooled;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -4228,16 +4248,14 @@ namespace PlantChillers {
                 // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
                 // since it is not used elsewhere for connection
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
                     }
                 }
                 if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(6) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
@@ -4256,8 +4274,9 @@ namespace PlantChillers {
                 bool Okay;
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
                 if (!Okay) {
-                    ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + ", Adding OutdoorAir:Node=" + state.dataIPShortCut->cAlphaArgs(5));
+                    ShowWarningError(
+                        state,
+                        format("{}, Adding OutdoorAir:Node={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(5)));
                 }
 
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -4296,12 +4315,14 @@ namespace PlantChillers {
                                                    "Condenser (unknown?) Nodes");
                 // Condenser Inlet node name is necessary for Water Cooled
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {} is blank ", state.dataIPShortCut->cAlphaFieldNames(5)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 } else if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {} is blank ", state.dataIPShortCut->cAlphaFieldNames(6)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             }
@@ -4328,8 +4349,9 @@ namespace PlantChillers {
             thisChiller.CapRatCoef(3) = state.dataIPShortCut->rNumericArgs(13);
             if ((state.dataIPShortCut->rNumericArgs(11) + state.dataIPShortCut->rNumericArgs(12) + state.dataIPShortCut->rNumericArgs(13)) == 0.0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject +
-                                    ": Sum of Capacity Ratio Coef = 0.0, chiller=" + state.dataIPShortCut->cAlphaArgs(1));
+                                format("{}: Sum of Capacity Ratio Coef = 0.0, chiller={}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             thisChiller.PowerRatCoef(1) = state.dataIPShortCut->rNumericArgs(14);
@@ -4392,8 +4414,9 @@ namespace PlantChillers {
                                                                                       NodeInputManager::CompFluidStream::Tertiary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
                 thisChiller.HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -4406,8 +4429,9 @@ namespace PlantChillers {
                                                                                        NodeInputManager::CompFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
                 BranchNodeConnections::TestCompSet(state,
@@ -4430,8 +4454,8 @@ namespace PlantChillers {
                         ShowSevereError(
                             state, format("Invalid {}={:.6R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
                         ShowSevereError(state, "Condenser fluid flow rate must be specified for Heat Reclaim applications.");
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowContinueError(
+                            state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ErrorsFound = true;
                     }
                 }
@@ -4443,8 +4467,9 @@ namespace PlantChillers {
                 thisChiller.HeatRecOutletNodeNum = 0;
                 if ((!state.dataIPShortCut->lAlphaFieldBlanks(7)) || (!state.dataIPShortCut->lAlphaFieldBlanks(8))) {
                     ShowWarningError(state,
-                                     "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + state.dataIPShortCut->cCurrentModuleObject +
-                                         '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                     format("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for {}={}",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state, "However, Node names were specified for heat recovery inlet or outlet nodes");
                 }
                 if (thisChiller.CondenserType == DataPlant::CondenserType::AirCooled ||
@@ -4457,9 +4482,8 @@ namespace PlantChillers {
                 static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\",");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
+                                format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
                 ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
                 thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
@@ -4469,8 +4493,8 @@ namespace PlantChillers {
             bool FuelTypeError(false);
             UtilityRoutines::ValidateFuelType(state, state.dataIPShortCut->cAlphaArgs(10), thisChiller.FuelType, FuelTypeError);
             if (FuelTypeError) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + state.dataIPShortCut->cAlphaArgs(10));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
                     state, "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
                 ErrorsFound = true;
@@ -4485,8 +4509,10 @@ namespace PlantChillers {
             thisChiller.BasinHeaterPowerFTempDiff = state.dataIPShortCut->rNumericArgs(48);
             if (state.dataIPShortCut->rNumericArgs(48) < 0.0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + "=\"" + thisChiller.Name + "\"" +
-                                    state.dataIPShortCut->cNumericFieldNames(48) + " must be >= 0");
+                                format("{}=\"{}\"{} must be >= 0",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       thisChiller.Name,
+                                       state.dataIPShortCut->cNumericFieldNames(48)));
                 ErrorsFound = true;
             }
 
@@ -4498,8 +4524,10 @@ namespace PlantChillers {
                 }
                 if (thisChiller.BasinHeaterSetPointTemp < 2.0) {
                     ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + ":\"" + thisChiller.Name + "\", " +
-                                         state.dataIPShortCut->cNumericFieldNames(49) + " is less than 2 deg C. Freezing could occur.");
+                                     format("{}:\"{}\", {} is less than 2 deg C. Freezing could occur.",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            thisChiller.Name,
+                                            state.dataIPShortCut->cNumericFieldNames(49)));
                 }
             }
 
@@ -4507,9 +4535,11 @@ namespace PlantChillers {
                 thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
                 if (thisChiller.BasinHeaterSchedulePtr == 0) {
                     ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + ", \"" + thisChiller.Name +
-                                         "\" TRIM(state.dataIPShortCut->cAlphaFieldNames(11)) \"" + state.dataIPShortCut->cAlphaArgs(11) +
-                                         "\" was not found. Basin heater operation will not be modeled and the simulation continues");
+                                     format("{}, \"{}\" TRIM(state.dataIPShortCut->cAlphaFieldNames(11)) \"{}\" was not found. Basin heater "
+                                            "operation will not be modeled and the simulation continues",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            thisChiller.Name,
+                                            state.dataIPShortCut->cAlphaArgs(11)));
                 }
             }
 
@@ -4535,7 +4565,7 @@ namespace PlantChillers {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
+            ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
         }
     }
 
@@ -4784,7 +4814,7 @@ namespace PlantChillers {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
@@ -4798,7 +4828,7 @@ namespace PlantChillers {
 
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
 
@@ -4824,7 +4854,7 @@ namespace PlantChillers {
             if (this->HeatRecActive) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::HWInitConvTemp,
+                                                        Constant::HWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
                 this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -4917,12 +4947,12 @@ namespace PlantChillers {
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   Constant::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
                 tmpNomCap =
@@ -4952,7 +4982,7 @@ namespace PlantChillers {
                                                          this->NomCap);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeGTChiller: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", this->NomCap));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -4967,7 +4997,7 @@ namespace PlantChillers {
         } else {
             if (this->NomCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Gas Turbine Chiller nominal capacity requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Gas Turbine Chiller object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Gas Turbine Chiller object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) {
@@ -5009,7 +5039,7 @@ namespace PlantChillers {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeGTChiller: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(
                                         state, format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
                                     ShowContinueError(
@@ -5027,7 +5057,7 @@ namespace PlantChillers {
         } else {
             if (this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Gas Turbine Chiller evap flow rate requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Gas Turbine Chiller object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Gas Turbine Chiller object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
@@ -5084,7 +5114,7 @@ namespace PlantChillers {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeGTChiller: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(
                                         state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
                                     ShowContinueError(
@@ -5103,7 +5133,7 @@ namespace PlantChillers {
             if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Gas Turbine Chiller condenser flow rate requires a condenser");
                 ShowContinueError(state, "loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Gas Turbine Chiller object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Gas Turbine Chiller object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
@@ -5141,7 +5171,7 @@ namespace PlantChillers {
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(GTEngineCapacityDes - this->GTEngineCapacity) / this->GTEngineCapacity) >
                             state.dataSize->AutoVsHardSizingThreshold) {
-                            ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
+                            ShowMessage(state, format("SizeGTChiller: Potential issue with equipment sizing for {}", this->Name));
                             ShowContinueError(state, format("User-Specified Gas Turbine Engine Capacity of {:.2R} [W]", this->GTEngineCapacity));
                             ShowContinueError(state,
                                               format("differs from Design Size Gas Turbine Engine Capacity of {:.2R} [W]", GTEngineCapacityDes));
@@ -5195,7 +5225,7 @@ namespace PlantChillers {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser) / DesignHeatRecVolFlowRateUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeGasTurbineChiller: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeGasTurbineChiller: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(
                                         state,
                                         format("User-Specified Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", DesignHeatRecVolFlowRateUser));
@@ -5286,7 +5316,7 @@ namespace PlantChillers {
                 ++this->MsgErrorCount;
                 // Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
                 if (this->MsgErrorCount < 2) {
-                    ShowWarningError(state, this->MsgBuffer1 + '.');
+                    ShowWarningError(state, format("{}.", this->MsgBuffer1));
                     ShowContinueError(state, this->MsgBuffer2);
                 } else {
                     ShowRecurringWarningErrorAtEnd(
@@ -5666,7 +5696,7 @@ namespace PlantChillers {
                                                                        RoutineName);
                 this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + condInletTemp;
             } else {
-                ShowSevereError(state, "CalcGasTurbineChillerModel: Condenser flow = 0, for GasTurbineChiller=" + this->Name);
+                ShowSevereError(state, format("CalcGasTurbineChillerModel: Condenser flow = 0, for GasTurbineChiller={}", this->Name));
                 ShowContinueErrorTimeStamp(state, "");
             }
 
@@ -5778,14 +5808,14 @@ namespace PlantChillers {
 
         this->HeatRecOutletTemp = HeatRecOutTemp;
         this->HeatRecMdot = heatRecMdot;
-        this->HeatRecLubeEnergy = this->HeatRecLubeRate * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        this->HeatRecLubeEnergy = this->HeatRecLubeRate * (state.dataHVACGlobal->TimeStepSysSec);
         this->FuelEnergyIn = std::abs(fuelEnergyIn);
         this->FuelMassUsedRate = std::abs(fuelEnergyIn) / (this->FuelHeatingValue * KJtoJ);
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSysSec;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSysSec;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSysSec;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
@@ -5793,7 +5823,7 @@ namespace PlantChillers {
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
                 if (condInletTemp > 70.0) {
-                    ShowSevereError(state, "CalcGTChillerModel: Condenser loop inlet temperatures over 70.0 C for GTChiller=" + this->Name);
+                    ShowSevereError(state, format("CalcGTChillerModel: Condenser loop inlet temperatures over 70.0 C for GTChiller={}", this->Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, format("Condenser loop water temperatures are too high at{:.2R}", condInletTemp));
                     ShowContinueError(state, "Check input for condenser plant loop, especially cooling tower");
@@ -5804,7 +5834,7 @@ namespace PlantChillers {
             }
             if (!state.dataGlobal->WarmupFlag) {
                 if (AvailNomCapRat < 0.0) { // apparently the real reason energy goes negative
-                    ShowSevereError(state, "CalcGTChillerModel: Capacity ratio below zero for GTChiller=" + this->Name);
+                    ShowSevereError(state, format("CalcGTChillerModel: Capacity ratio below zero for GTChiller={}", this->Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, "Check input for Capacity Ratio Curve");
                     ShowContinueError(state, format("Condenser inlet temperature: {:.2R}", condInletTemp));
@@ -5825,7 +5855,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher / Brandon Anderson
         //       DATE WRITTEN:    September 2000
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             // set node temperatures
@@ -5858,7 +5888,6 @@ namespace PlantChillers {
             this->ExhaustStackTemp = 0.0;
             this->FuelCOP = 0.0;
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
 
@@ -5878,15 +5907,14 @@ namespace PlantChillers {
             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
 
             this->FuelEnergyUsedRate = this->FuelEnergyIn;
-            this->FuelEnergyUsed = this->FuelEnergyUsedRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-            this->FuelMassUsed = this->FuelMassUsedRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->FuelEnergyUsed = this->FuelEnergyUsedRate * state.dataHVACGlobal->TimeStepSysSec;
+            this->FuelMassUsed = this->FuelMassUsedRate * state.dataHVACGlobal->TimeStepSysSec;
             if (this->FuelEnergyUsedRate != 0.0) {
                 this->FuelCOP = this->QEvaporator / this->FuelEnergyUsedRate;
             } else {
                 this->FuelCOP = 0.0;
             }
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
         }
@@ -5933,7 +5961,8 @@ namespace PlantChillers {
                     (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
-                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                            ShowWarningError(state,
+                                             format("Missing temperature setpoint for LeavingSetpointModulated mode chiller named {}", this->Name));
                             ShowContinueError(
                                 state,
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
@@ -5948,7 +5977,8 @@ namespace PlantChillers {
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
-                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                                ShowWarningError(
+                                    state, format("Missing temperature setpoint for LeavingSetpointModulated mode chiller named {}", this->Name));
                                 ShowContinueError(
                                     state, "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
@@ -5981,7 +6011,7 @@ namespace PlantChillers {
                 return &thisChiller;
             }
         }
-        ShowFatalError(state, "Could not locate constant COP chiller with name: " + chillerName);
+        ShowFatalError(state, format("Could not locate constant COP chiller with name: {}", chillerName));
         return nullptr;
     }
 
@@ -6036,7 +6066,7 @@ namespace PlantChillers {
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
         if (state.dataPlantChillers->NumConstCOPChillers <= 0) {
-            ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError(state, format("No {} equipment specified in input file", state.dataIPShortCut->cCurrentModuleObject));
             ErrorsFound = true;
         }
 
@@ -6078,14 +6108,14 @@ namespace PlantChillers {
             if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
                 ShowSevereError(state,
                                 format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
             thisChiller.COP = state.dataIPShortCut->rNumericArgs(2);
             if (state.dataIPShortCut->rNumericArgs(2) == 0.0) {
                 ShowSevereError(state,
                                 format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -6097,8 +6127,8 @@ namespace PlantChillers {
             } else if (state.dataIPShortCut->cAlphaArgs(6) == "WATERCOOLED") {
                 thisChiller.CondenserType = DataPlant::CondenserType::WaterCooled;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
@@ -6150,16 +6180,14 @@ namespace PlantChillers {
                 // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
                 //  since it is not used elsewhere for connection
                 if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 21) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 21) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(4) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(4) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 79) + " CONDENSER INLET NODE";
                     }
                 }
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 22) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 22) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1) + " CONDENSER OUTLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(5) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 78) + " CONDENSER OUTLET NODE";
@@ -6179,8 +6207,9 @@ namespace PlantChillers {
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
                 if (!Okay) {
                     ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject +
-                                         ", Adding OutdoorAir:DataLoopNode::Node=" + state.dataIPShortCut->cAlphaArgs(4));
+                                     format("{}, Adding OutdoorAir:DataLoopNode::Node={}",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            state.dataIPShortCut->cAlphaArgs(4)));
                 }
 
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -6219,12 +6248,14 @@ namespace PlantChillers {
                                                    "Condenser Water Nodes");
                 // Condenser Inlet node name is necessary for Water Cooled
                 if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + "is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {}is blank ", state.dataIPShortCut->cAlphaFieldNames(4)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 } else if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + "is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {}is blank ", state.dataIPShortCut->cAlphaFieldNames(5)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             } else {
@@ -6254,12 +6285,14 @@ namespace PlantChillers {
                                                    "Condenser (unknown?) Nodes");
                 // Condenser Inlet node name is necessary for Water Cooled
                 if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + "is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {}is blank ", state.dataIPShortCut->cAlphaFieldNames(4)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 } else if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + "is blank ");
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowSevereError(state, format("Invalid, {}is blank ", state.dataIPShortCut->cAlphaFieldNames(5)));
+                    ShowContinueError(state,
+                                      format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 }
             }
@@ -6268,9 +6301,8 @@ namespace PlantChillers {
                 static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\",");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
+                                format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
                 ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
                 thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
@@ -6280,8 +6312,9 @@ namespace PlantChillers {
             thisChiller.BasinHeaterPowerFTempDiff = state.dataIPShortCut->rNumericArgs(6);
             if (state.dataIPShortCut->rNumericArgs(6) < 0.0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + ", \"" + thisChiller.Name +
-                                    "\" TRIM(state.dataIPShortCut->cNumericFieldNames(6)) must be >= 0");
+                                format("{}, \"{}\" TRIM(state.dataIPShortCut->cNumericFieldNames(6)) must be >= 0",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       thisChiller.Name));
                 ErrorsFound = true;
             }
 
@@ -6293,8 +6326,10 @@ namespace PlantChillers {
                 }
                 if (thisChiller.BasinHeaterSetPointTemp < 2.0) {
                     ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + ":\"" + thisChiller.Name + "\", " +
-                                         state.dataIPShortCut->cNumericFieldNames(7) + " is less than 2 deg C. Freezing could occur.");
+                                     format("{}:\"{}\", {} is less than 2 deg C. Freezing could occur.",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            thisChiller.Name,
+                                            state.dataIPShortCut->cNumericFieldNames(7)));
                 }
             }
 
@@ -6302,15 +6337,17 @@ namespace PlantChillers {
                 thisChiller.BasinHeaterSchedulePtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
                 if (thisChiller.BasinHeaterSchedulePtr == 0) {
                     ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + ", \"" + thisChiller.Name +
-                                         "\" TRIM(state.dataIPShortCut->cAlphaFieldNames(8)) \"" + state.dataIPShortCut->cAlphaArgs(8) +
-                                         "\" was not found. Basin heater operation will not be modeled and the simulation continues");
+                                     format("{}, \"{}\" TRIM(state.dataIPShortCut->cAlphaFieldNames(8)) \"{}\" was not found. Basin heater operation "
+                                            "will not be modeled and the simulation continues",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            thisChiller.Name,
+                                            state.dataIPShortCut->cAlphaArgs(8)));
                 }
             }
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
+            ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
         }
     }
 
@@ -6484,7 +6521,7 @@ namespace PlantChillers {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             this->EvapMassFlowRateMax = this->EvapVolFlowRate * rho;
@@ -6497,7 +6534,7 @@ namespace PlantChillers {
 
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
 
@@ -6598,12 +6635,12 @@ namespace PlantChillers {
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   Constant::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
                 tmpNomCap =
@@ -6633,7 +6670,7 @@ namespace PlantChillers {
                                                          NomCapUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeChillerConstantCOP: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -6648,7 +6685,7 @@ namespace PlantChillers {
         } else {
             if (this->NomCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Constant COP Chiller nominal capacity requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Chiller:ConstantCOP object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Chiller:ConstantCOP object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) {
@@ -6690,7 +6727,7 @@ namespace PlantChillers {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
+                                    ShowMessage(state, format("SizeChillerConstantCOP: Potential issue with equipment sizing for {}", this->Name));
                                     ShowContinueError(state,
                                                       format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
                                     ShowContinueError(
@@ -6708,7 +6745,7 @@ namespace PlantChillers {
         } else {
             if (this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Constant COP Chiller evap flow rate requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Chiller:ConstantCOP object=" + this->Name);
+                ShowContinueError(state, format("Occurs in Chiller:ConstantCOP object={}", this->Name));
                 ErrorsFound = true;
             }
             if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
@@ -6764,7 +6801,8 @@ namespace PlantChillers {
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                         state.dataSize->AutoVsHardSizingThreshold) {
-                                        ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
+                                        ShowMessage(state,
+                                                    format("SizeChillerConstantCOP: Potential issue with equipment sizing for {}", this->Name));
                                         ShowContinueError(
                                             state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
                                         ShowContinueError(
@@ -6784,7 +6822,7 @@ namespace PlantChillers {
                 if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                     ShowSevereError(state, "Autosizing of Constant COP Chiller condenser flow rate requires a condenser");
                     ShowContinueError(state, "loop Sizing:Plant object");
-                    ShowContinueError(state, "Occurs in Chiller:ConstantCOP object=" + this->Name);
+                    ShowContinueError(state, format("Occurs in Chiller:ConstantCOP object={}", this->Name));
                     ErrorsFound = true;
                 }
                 if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
@@ -6942,7 +6980,7 @@ namespace PlantChillers {
                 ++this->MsgErrorCount;
                 //       Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
                 if (this->MsgErrorCount < 2) {
-                    ShowWarningError(state, this->MsgBuffer1 + '.');
+                    ShowWarningError(state, format("{}.", this->MsgBuffer1));
                     ShowContinueError(state, this->MsgBuffer2);
                 } else {
                     ShowRecurringWarningErrorAtEnd(
@@ -7201,7 +7239,7 @@ namespace PlantChillers {
             if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / CpCond + CondInletTemp;
             } else {
-                ShowSevereError(state, "CalcConstCOPChillerModel: Condenser flow = 0, for CONST COP Chiller=" + this->Name);
+                ShowSevereError(state, format("CalcConstCOPChillerModel: Condenser flow = 0, for CONST COP Chiller={}", this->Name));
                 ShowContinueErrorTimeStamp(state, "");
             }
         } else { // Air Cooled or Evap Cooled
@@ -7211,9 +7249,9 @@ namespace PlantChillers {
         }
 
         // Calculate Energy
-        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSysSec;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSysSec;
+        this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSysSec;
 
         // check for problems BG 9/12/06 (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
@@ -7221,8 +7259,8 @@ namespace PlantChillers {
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
                 // first check for run away condenser loop temps (only reason yet to be observed for this?)
                 if (CondInletTemp > 70.0) {
-                    ShowSevereError(state,
-                                    "CalcConstCOPChillerModel: Condenser loop inlet temperatures over 70.0 C for ConstCOPChiller=" + this->Name);
+                    ShowSevereError(
+                        state, format("CalcConstCOPChillerModel: Condenser loop inlet temperatures over 70.0 C for ConstCOPChiller={}", this->Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, format("Condenser loop water temperatures are too high at{:.2R}", CondInletTemp));
                     ShowContinueError(state, "Check input for condenser plant loop, especially cooling tower");
@@ -7244,7 +7282,7 @@ namespace PlantChillers {
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    October 1998
 
-        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         if (MyLoad >= 0.0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
             this->Power = 0.0;
@@ -7259,7 +7297,6 @@ namespace PlantChillers {
             this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
             this->ActualCOP = 0.0;
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
 
@@ -7276,7 +7313,6 @@ namespace PlantChillers {
                 this->ActualCOP = 0.0;
             }
             if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-                this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             }
 
@@ -7317,7 +7353,8 @@ namespace PlantChillers {
                     (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         if (!this->ModulatedFlowErrDone) {
-                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                            ShowWarningError(state,
+                                             format("Missing temperature setpoint for LeavingSetpointModulated mode chiller named {}", this->Name));
                             ShowContinueError(
                                 state,
                                 "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager");
@@ -7332,7 +7369,8 @@ namespace PlantChillers {
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
-                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
+                                ShowWarningError(
+                                    state, format("Missing temperature setpoint for LeavingSetpointModulated mode chiller named {}", this->Name));
                                 ShowContinueError(
                                     state, "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode");
                                 ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -273,7 +273,7 @@ namespace DaylightingManager {
         bool const hitIntObs,                         // True iff interior obstruction hit
         bool const hitExtObs,                         // True iff ray from ref pt to ext win hits an exterior obstruction
         DataDaylighting::CalledFor const CalledFrom,  // indicate  which type of routine called this routine
-        Real64 &TVISIntWin,                           // Visible transmittance of int win at COSBIntWin for light from ext win
+        Real64 TVISIntWin,                            // Visible transmittance of int win at COSBIntWin for light from ext win
         Real64 &TVISIntWinDisk,                       // Visible transmittance of int win at COSBIntWin for sun
         int const MapNum = 0);
 
@@ -319,8 +319,8 @@ namespace DaylightingManager {
     int findWinShadingStatus(int const IWin);
 
     void DayltgGlare(EnergyPlusData &state,
-                     int &IL,                  // Reference point index: 1=first ref pt, 2=second ref pt
-                     Real64 &BLUM,             // Window background (surround) luminance (cd/m2)
+                     int IL,                   // Reference point index: 1=first ref pt, 2=second ref pt
+                     Real64 BLUM,              // Window background (surround) luminance (cd/m2)
                      Real64 &GLINDX,           // Glare index
                      int const daylightCtrlNum // Current daylighting control number
     );
@@ -368,8 +368,8 @@ namespace DaylightingManager {
 
     void DayltgElecLightingControl(EnergyPlusData &state);
 
-    Real64 DayltgGlarePositionFactor(Real64 &X, // Lateral and vertical distance of luminous window element from
-                                     Real64 &Y);
+    Real64 DayltgGlarePositionFactor(Real64 X, // Lateral and vertical distance of luminous window element from
+                                     Real64 Y);
 
     void DayltgInterReflectedIllum(EnergyPlusData &state,
                                    int const ISunPos, // Sun position counter; used to avoid calculating various
@@ -416,7 +416,7 @@ namespace DaylightingManager {
                                                 DataDaylighting::CalledFor const CalledFrom, // indicate  which type of routine called this routine
                                                 int const MapNum = 0);
 
-    Real64 DayltgSkyLuminance(EnergyPlusData &state,
+    Real64 DayltgSkyLuminance(EnergyPlusData const &state,
                               int const ISky,     // Sky type: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
                               Real64 const THSKY, // Azimuth and altitude of sky element (radians)
                               Real64 const PHSKY);

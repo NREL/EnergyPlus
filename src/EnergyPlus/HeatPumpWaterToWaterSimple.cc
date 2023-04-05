@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -122,7 +122,7 @@ PlantComponent *GshpSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipm
         }
     }
 
-    ShowFatalError(state, "EquationFit_WWHP factory: Error getting inputs for wwhp named: " + eir_wwhp_name);
+    ShowFatalError(state, format("EquationFit_WWHP factory: Error getting inputs for wwhp named: {}", eir_wwhp_name));
     return nullptr;
 }
 
@@ -150,7 +150,7 @@ void GshpSpecs::simulate(EnergyPlusData &state,
                                                                 this->reportSourceSideMassFlowRate,
                                                                 FirstHVACIteration);
         } else {
-            ShowFatalError(state, "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
+            ShowFatalError(state, format("SimHPWatertoWaterSimple:: Invalid loop connection {}, Requested Unit={}", HPEqFitCooling, this->Name));
         }
     } else if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
         if (calledFromLocation.loopNum == this->LoadPlantLoc.loopNum) { // chilled water loop
@@ -170,7 +170,7 @@ void GshpSpecs::simulate(EnergyPlusData &state,
                                                                 this->reportSourceSideMassFlowRate,
                                                                 FirstHVACIteration);
         } else {
-            ShowFatalError(state, "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
+            ShowFatalError(state, format("SimHPWatertoWaterSimple:: Invalid loop connection {}, Requested Unit={}", HPEqFitCooling, this->Name));
         }
     } else {
         ShowFatalError(state, "SimHPWatertoWaterSimple: Module called with incorrect GSHPType");
@@ -230,7 +230,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
-    using CurveManager::GetCurveIndex;
+    using Curve::GetCurveIndex;
     using NodeInputManager::GetOnlySingleNode;
     using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -297,22 +297,22 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex > 0) {
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex,
-                                                        {4},
-                                                        "GetWatertoWaterHPInput",
-                                                        HPEqFitCoolingUC,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
-                                                        "Cooling Capacity Curve Name");
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex,
+                                                 {4},
+                                                 "GetWatertoWaterHPInput",
+                                                 HPEqFitCoolingUC,
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                 "Cooling Capacity Curve Name");
         }
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex > 0) {
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex,
-                                                        {4},
-                                                        "GetWatertoWaterHPInput",
-                                                        HPEqFitCoolingUC,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
-                                                        "Cooling Compressor Power Curve Name");
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex,
+                                                 {4},
+                                                 "GetWatertoWaterHPInput",
+                                                 HPEqFitCoolingUC,
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                 "Cooling Compressor Power Curve Name");
         }
 
         if (NumNums > 4) {
@@ -474,22 +474,22 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex > 0) {
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex,
-                                                        {4},
-                                                        "GetWatertoWaterHPInput",
-                                                        HPEqFitHeatingUC,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
-                                                        "Heating Capacity Curve Name");
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex,
+                                                 {4},
+                                                 "GetWatertoWaterHPInput",
+                                                 HPEqFitHeatingUC,
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                 "Heating Capacity Curve Name");
         }
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex > 0) {
-            ErrorsFound |= CurveManager::CheckCurveDims(state,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex,
-                                                        {4},
-                                                        "GetWatertoWaterHPInput",
-                                                        HPEqFitHeatingUC,
-                                                        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
-                                                        "Heating Compressor Power Curve Name");
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex,
+                                                 {4},
+                                                 "GetWatertoWaterHPInput",
+                                                 HPEqFitHeatingUC,
+                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                 "Heating Compressor Power Curve Name");
         }
         if (NumNums > 4) {
             if (!state.dataIPShortCut->lNumericFieldBlanks(5)) {
@@ -618,9 +618,9 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                 UtilityRoutines::FindItemInList(state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName, state.dataHPWaterToWaterSimple->GSHP);
             if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionIndex == 0) {
                 ShowSevereError(state,
-                                "GetEquationFitWaterToWater Input: did not find companion heat pump named '" +
-                                    state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName + "' in heat pump called " +
-                                    state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                                format("GetEquationFitWaterToWater Input: did not find companion heat pump named '{}' in heat pump called {}",
+                                       state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName,
+                                       state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name));
                 ErrorsFound = true;
             } else {
                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionIdentified = true;
@@ -730,7 +730,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     using FluidProperties::GetDensityGlycol;
     using PlantUtilities::InitComponentNodes;
     using PlantUtilities::SetComponentFlowRate;
@@ -743,8 +743,6 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     int LoadSideOutletNode;   // Load Side Outlet Node
     int SourceSideInletNode;  // Source Side Inlet Node
     int SourceSideOutletNode; // Source Side Outlet Node
-    auto &CurrentSimTime = state.dataHPWaterToWaterSimple->CurrentSimTime;
-    auto &PrevSimTime = state.dataHPWaterToWaterSimple->PrevSimTime;
 
     int LoopNum;
     DataPlant::LoopSideLocation LoopSideNum;
@@ -794,26 +792,26 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
         if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
             rho = GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                   DataGlobalConstants::HWInitConvTemp,
+                                   Constant::HWInitConvTemp,
                                    state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                    RoutineName);
             this->LoadSideDesignMassFlow = this->RatedLoadVolFlowHeat * rho;
             rho = GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                   DataGlobalConstants::CWInitConvTemp,
+                                   Constant::CWInitConvTemp,
                                    state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                    RoutineName);
             this->SourceSideDesignMassFlow = this->RatedSourceVolFlowHeat * rho;
         } else if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFCooling) {
             rho = GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                   DataGlobalConstants::CWInitConvTemp,
+                                   Constant::CWInitConvTemp,
                                    state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                    RoutineName);
             this->LoadSideDesignMassFlow = this->RatedLoadVolFlowCool * rho;
             rho = GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                   DataGlobalConstants::HWInitConvTemp,
+                                   Constant::HWInitConvTemp,
                                    state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                    RoutineName);
             this->SourceSideDesignMassFlow = this->RatedSourceVolFlowCool * rho;
@@ -832,13 +830,13 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     // Reset the environment flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag = true;
 
-    if (PrevSimTime != CurrentSimTime) {
-        PrevSimTime = CurrentSimTime;
+    if (state.dataHPWaterToWaterSimple->PrevSimTime != state.dataHPWaterToWaterSimple->CurrentSimTime) {
+        state.dataHPWaterToWaterSimple->PrevSimTime = state.dataHPWaterToWaterSimple->CurrentSimTime;
     }
 
     // Calculate the simulation time
-    CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
-                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
+    state.dataHPWaterToWaterSimple->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
+                                                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
     LoopNum = this->LoadPlantLoc.loopNum;
     LoopSideNum = this->LoadPlantLoc.loopSideNum;
@@ -955,12 +953,12 @@ void GshpSpecs::sizeCoolingWaterToWaterHP(EnergyPlusData &state)
             }
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
             tmpCoolingCap = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadSideVolFlowRate;
@@ -968,12 +966,12 @@ void GshpSpecs::sizeCoolingWaterToWaterHP(EnergyPlusData &state)
             tmpLoadSideVolFlowRate = this->RatedLoadVolFlowHeat;
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
             tmpCoolingCap = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadSideVolFlowRate;
@@ -1014,7 +1012,7 @@ void GshpSpecs::sizeCoolingWaterToWaterHP(EnergyPlusData &state)
 
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpCoolingCap - nomCoolingCapUser) / nomCoolingCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                                ShowMessage(state, format("sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for {}", this->Name));
                                 ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", nomCoolingCapUser));
                                 ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpCoolingCap));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1063,7 +1061,7 @@ void GshpSpecs::sizeCoolingWaterToWaterHP(EnergyPlusData &state)
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpLoadSideVolFlowRate - nomLoadSideVolFlowUser) / nomLoadSideVolFlowUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                                ShowMessage(state, format("sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for {}", this->Name));
                                 ShowContinueError(state,
                                                   format("User-Specified Load Side Volume Flow Rate of {:.2R} [m3/s]", nomLoadSideVolFlowUser));
                                 ShowContinueError(
@@ -1121,7 +1119,7 @@ void GshpSpecs::sizeCoolingWaterToWaterHP(EnergyPlusData &state)
         } else { // no companion heatpump, no plant sizing object
             if ((this->ratedLoadVolFlowCoolWasAutoSized || this->ratedCapCoolWasAutoSized) && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.");
-                ShowContinueError(state, "Occurs in HeatPump:WaterToWater:EquationFit:Cooling object = " + this->Name);
+                ShowContinueError(state, format("Occurs in HeatPump:WaterToWater:EquationFit:Cooling object = {}", this->Name));
                 errorsFound = true;
             }
         }
@@ -1143,12 +1141,12 @@ void GshpSpecs::sizeCoolingWaterToWaterHP(EnergyPlusData &state)
     if (pltSourceSizNum > 0) {
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::CWInitConvTemp,
+                                                       Constant::CWInitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
         tmpSourceSideVolFlowRate = tmpCoolingCap * (1.0 + (1.0 / this->refCOP)) / (state.dataSize->PlantSizData(pltSourceSizNum).DeltaT * Cp * rho);
@@ -1194,7 +1192,7 @@ void GshpSpecs::sizeCoolingWaterToWaterHP(EnergyPlusData &state)
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(tmpSourceSideVolFlowRate - nomSourceSideVolFlowUser) / nomSourceSideVolFlowUser) >
                         state.dataSize->AutoVsHardSizingThreshold) {
-                        ShowMessage(state, "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                        ShowMessage(state, format("sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for {}", this->Name));
                         ShowContinueError(state, format("User-Specified Source Side Volume Flow Rate of {:.2R} [m3/s]", nomSourceSideVolFlowUser));
                         ShowContinueError(state,
                                           format("differs from Design Size Source Side Volume Flow Rate of {:.2R} [m3/s]", tmpSourceSideVolFlowRate));
@@ -1240,7 +1238,7 @@ void GshpSpecs::sizeCoolingWaterToWaterHP(EnergyPlusData &state)
                 }
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(tmpPowerDraw - nomPowerDrawUser) / nomPowerDrawUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                        ShowMessage(state, "sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                        ShowMessage(state, format("sizeCoolingWaterToWaterHP: Potential issue with equipment sizing for {}", this->Name));
                         ShowContinueError(state, format("User-Specified Cooling Power Consumption of {:.2R} [W]", nomPowerDrawUser));
                         ShowContinueError(state, format("differs from Design Size Cooling Power Consumption of {:.2R} [W]", tmpPowerDraw));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1311,12 +1309,12 @@ void GshpSpecs::sizeHeatingWaterToWaterHP(EnergyPlusData &state)
             }
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::HWInitConvTemp,
+                                                           Constant::HWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::HWInitConvTemp,
+                                                               Constant::HWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
             tmpHeatingCap = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadSideVolFlowRate;
@@ -1324,12 +1322,12 @@ void GshpSpecs::sizeHeatingWaterToWaterHP(EnergyPlusData &state)
             tmpLoadSideVolFlowRate = this->RatedLoadVolFlowCool;
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::HWInitConvTemp,
+                                                           Constant::HWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::HWInitConvTemp,
+                                                               Constant::HWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
             tmpHeatingCap = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadSideVolFlowRate;
@@ -1369,7 +1367,7 @@ void GshpSpecs::sizeHeatingWaterToWaterHP(EnergyPlusData &state)
                         }
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpHeatingCap - nomHeatingCapUser) / nomHeatingCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                                ShowMessage(state, format("sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for {}", this->Name));
                                 ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", nomHeatingCapUser));
                                 ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpHeatingCap));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1418,7 +1416,7 @@ void GshpSpecs::sizeHeatingWaterToWaterHP(EnergyPlusData &state)
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpLoadSideVolFlowRate - nomLoadSideVolFlowUser) / nomLoadSideVolFlowUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state, "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                                ShowMessage(state, format("sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for {}", this->Name));
                                 ShowContinueError(state,
                                                   format("User-Specified Load Side Volume Flow Rate of {:.2R} [m3/s]", nomLoadSideVolFlowUser));
                                 ShowContinueError(
@@ -1476,7 +1474,7 @@ void GshpSpecs::sizeHeatingWaterToWaterHP(EnergyPlusData &state)
         } else { // no companion heatpump, no plant sizing object
             if ((this->ratedLoadVolFlowHeatWasAutoSized || this->ratedCapHeatWasAutoSized) && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.");
-                ShowContinueError(state, "Occurs in HeatPump:WaterToWater:EquationFit:Heating object = " + this->Name);
+                ShowContinueError(state, format("Occurs in HeatPump:WaterToWater:EquationFit:Heating object = {}", this->Name));
                 errorsFound = true;
             }
         }
@@ -1498,12 +1496,12 @@ void GshpSpecs::sizeHeatingWaterToWaterHP(EnergyPlusData &state)
     if (pltSourceSizNum > 0) {
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::HWInitConvTemp,
+                                                       Constant::HWInitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::HWInitConvTemp,
+                                                           Constant::HWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
         tmpSourceSideVolFlowRate = tmpHeatingCap * (1.0 - (1.0 / this->refCOP)) / (state.dataSize->PlantSizData(pltSourceSizNum).DeltaT * Cp * rho);
@@ -1548,7 +1546,7 @@ void GshpSpecs::sizeHeatingWaterToWaterHP(EnergyPlusData &state)
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(tmpSourceSideVolFlowRate - nomSourceSideVolFlowUser) / nomSourceSideVolFlowUser) >
                         state.dataSize->AutoVsHardSizingThreshold) {
-                        ShowMessage(state, "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                        ShowMessage(state, format("sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for {}", this->Name));
                         ShowContinueError(state, format("User-Specified Source Side Volume Flow Rate of {:.2R} [m3/s]", nomSourceSideVolFlowUser));
                         ShowContinueError(state,
                                           format("differs from Design Size Source Side Volume Flow Rate of {:.2R} [m3/s]", tmpSourceSideVolFlowRate));
@@ -1594,7 +1592,7 @@ void GshpSpecs::sizeHeatingWaterToWaterHP(EnergyPlusData &state)
                 }
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(tmpPowerDraw - nomPowerDrawUser) / nomPowerDrawUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                        ShowMessage(state, "sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for " + this->Name);
+                        ShowMessage(state, format("sizeHeatingWaterToWaterHP: Potential issue with equipment sizing for {}", this->Name));
                         ShowContinueError(state, format("User-Specified Heating Power Consumption of {:.2R} [W]", nomPowerDrawUser));
                         ShowContinueError(state, format("differs from Design Size Heating Power Consumption of {:.2R} [W]", tmpPowerDraw));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1645,14 +1643,14 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
     // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    using CurveManager::CurveValue;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
+    using Curve::CurveValue;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 constexpr CelsiustoKelvin(DataGlobalConstants::KelvinConv); // Conversion from Celsius to Kelvin
-    Real64 constexpr Tref(283.15);                                     // Reference Temperature for performance curves,10C [K]
+    Real64 constexpr CelsiustoKelvin(Constant::KelvinConv); // Conversion from Celsius to Kelvin
+    Real64 constexpr Tref(283.15);                          // Reference Temperature for performance curves,10C [K]
     static constexpr std::string_view RoutineName("CalcWatertoWaterHPCooling");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1676,7 +1674,6 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
     Real64 QLoad;         // Cooling Capacity [W]
     Real64 QSource;       // Source Side Heat Transfer Rate [W]
     Real64 PartLoadRatio; // Part-Load Ratio
-    Real64 ReportingConstant;
     Real64 rhoLoadSide;
     Real64 rhoSourceSide;
     Real64 CpLoadSide;
@@ -1723,7 +1720,7 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
         if (QLoad <= 0.0) {
             if (this->CoolCapNegativeCounter < 1) {
                 ++this->CoolCapNegativeCounter;
-                ShowWarningError(state, HPEqFitCooling + " \"" + this->Name + "\":");
+                ShowWarningError(state, format("{} \"{}\":", HPEqFitCooling, this->Name));
                 ShowContinueError(state, format(" Cooling capacity curve output is <= 0.0 ({:.4T}).", QLoad));
                 ShowContinueError(state, format(" Zero or negative value occurs with a load-side inlet temperature of {:.2T} C,", LoadSideInletTemp));
                 ShowContinueError(state, format(" a source-side inlet temperature of {:.2T} C,", SourceSideInletTemp));
@@ -1742,7 +1739,7 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
         if (Power <= 0.0) {
             if (this->CoolPowerNegativeCounter < 1) {
                 ++this->CoolPowerNegativeCounter;
-                ShowWarningError(state, HPEqFitCooling + " \"" + this->Name + "\":");
+                ShowWarningError(state, format("{} \"{}\":", HPEqFitCooling, this->Name));
                 ShowContinueError(state, format(" Cooling compressor power curve output is <= 0.0 ({:.4T}).", Power));
                 ShowContinueError(state, format(" Zero or negative value occurs with a load-side inlet temperature of {:.2T} C,", LoadSideInletTemp));
                 ShowContinueError(state, format(" a source-side inlet temperature of {:.2T} C,", SourceSideInletTemp));
@@ -1788,14 +1785,12 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
     LoadSideOutletTemp = LoadSideInletTemp - QLoad / (LoadSideMassFlowRate * CpLoadSide);
     SourceSideOutletTemp = SourceSideInletTemp + QSource / (SourceSideMassFlowRate * CpSourceSide);
 
-    ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-
     this->reportPower = Power;
-    this->reportEnergy = Power * ReportingConstant;
+    this->reportEnergy = Power * TimeStepSysSec;
     this->reportQSource = QSource;
     this->reportQLoad = QLoad;
-    this->reportQSourceEnergy = QSource * ReportingConstant;
-    this->reportQLoadEnergy = QLoad * ReportingConstant;
+    this->reportQSourceEnergy = QSource * TimeStepSysSec;
+    this->reportQLoadEnergy = QLoad * TimeStepSysSec;
     this->reportLoadSideOutletTemp = LoadSideOutletTemp;
     this->reportSourceSideOutletTemp = SourceSideOutletTemp;
 }
@@ -1817,14 +1812,14 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
     // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    using CurveManager::CurveValue;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
+    using Curve::CurveValue;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const CelsiustoKelvin(DataGlobalConstants::KelvinConv); // Conversion from Celsius to Kelvin
-    Real64 constexpr Tref(283.15);                                 // Reference Temperature for performance curves,10C [K]
+    Real64 const CelsiustoKelvin(Constant::KelvinConv); // Conversion from Celsius to Kelvin
+    Real64 constexpr Tref(283.15);                      // Reference Temperature for performance curves,10C [K]
     static constexpr std::string_view RoutineName("CalcWatertoWaterHPHeating");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1847,7 +1842,6 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
     Real64 QLoad;                      // Cooling Capacity [W]
     Real64 QSource;                    // Source Side Heat Transfer Rate [W]
     Real64 PartLoadRatio;              // Part Load Ratio
-    Real64 ReportingConstant;
     Real64 rhoLoadSide;
     Real64 rhoSourceSide;
     Real64 CpLoadSide;
@@ -1892,7 +1886,7 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
         if (QLoad <= 0.0) {
             if (this->HeatCapNegativeCounter < 1) {
                 ++this->HeatCapNegativeCounter;
-                ShowWarningError(state, HPEqFitHeating + " \"" + this->Name + "\":");
+                ShowWarningError(state, format("{} \"{}\":", HPEqFitHeating, this->Name));
                 ShowContinueError(state, format(" Heating capacity curve output is <= 0.0 ({:.4T}).", QLoad));
                 ShowContinueError(state, format(" Zero or negative value occurs with a load-side inlet temperature of {:.2T} C,", LoadSideInletTemp));
                 ShowContinueError(state, format(" a source-side inlet temperature of {:.2T} C,", SourceSideInletTemp));
@@ -1911,7 +1905,7 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
         if (Power <= 0.0) {
             if (this->HeatPowerNegativeCounter < 1) {
                 ++this->HeatPowerNegativeCounter;
-                ShowWarningError(state, HPEqFitHeating + " \"" + this->Name + "\":");
+                ShowWarningError(state, format("{} \"{}\":", HPEqFitHeating, this->Name));
                 ShowContinueError(state, format(" Heating compressor power curve output is <= 0.0 ({:.4T}).", Power));
                 ShowContinueError(state, format(" Zero or negative value occurs with a load-side inlet temperature of {:.2T} C,", LoadSideInletTemp));
                 ShowContinueError(state, format(" a source-side inlet temperature of {:.2T} C,", SourceSideInletTemp));
@@ -1957,14 +1951,12 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
     LoadSideOutletTemp = LoadSideInletTemp + QLoad / (LoadSideMassFlowRate * CpLoadSide);
     SourceSideOutletTemp = SourceSideInletTemp - QSource / (SourceSideMassFlowRate * CpSourceSide);
 
-    ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-
     this->reportPower = Power;
-    this->reportEnergy = Power * ReportingConstant;
+    this->reportEnergy = Power * TimeStepSysSec;
     this->reportQSource = QSource;
     this->reportQLoad = QLoad;
-    this->reportQSourceEnergy = QSource * ReportingConstant;
-    this->reportQLoadEnergy = QLoad * ReportingConstant;
+    this->reportQSourceEnergy = QSource * TimeStepSysSec;
+    this->reportQLoadEnergy = QLoad * TimeStepSysSec;
     this->reportLoadSideOutletTemp = LoadSideOutletTemp;
     this->reportSourceSideOutletTemp = SourceSideOutletTemp;
 }

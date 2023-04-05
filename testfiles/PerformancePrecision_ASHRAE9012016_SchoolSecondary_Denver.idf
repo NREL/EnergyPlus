@@ -240,7 +240,7 @@
 !    CHW_deltaT = 8.33
 !    HOTW_PumpCurve_flag = pump_ride_on_curve
 
-  Version,22.2;
+  Version,23.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

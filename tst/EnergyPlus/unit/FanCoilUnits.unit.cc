@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,6 +66,7 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -257,7 +258,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
 
     GetFanCoilUnits(*state);
-    EXPECT_EQ("MULTISPEEDFAN", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::MultiSpeedFan, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
     EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
@@ -578,7 +579,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
 
     GetFanCoilUnits(*state);
-    EXPECT_EQ("MULTISPEEDFAN", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::MultiSpeedFan, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
     EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
@@ -896,7 +897,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
 
     GetFanCoilUnits(*state);
-    EXPECT_EQ("CONSTANTFANVARIABLEFLOW", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
     EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
@@ -1294,7 +1295,7 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
 
     GetFanCoilUnits(*state);
-    EXPECT_EQ("CONSTANTFANVARIABLEFLOW", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
     EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
@@ -1621,7 +1622,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
 
     GetFanCoilUnits(*state);
-    EXPECT_EQ("CONSTANTFANVARIABLEFLOW", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
     EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
@@ -1992,7 +1993,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
 
     GetFanCoilUnits(*state);
-    EXPECT_EQ("ASHRAE90VARIABLEFAN", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::ASHRAE, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
     EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
@@ -2253,27 +2254,6 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     state->dataHeatBal->Zone.deallocate();
 }
 
-Real64 ResidualFancoil(EnergyPlusData &state,
-                       Real64 const mdot,
-                       Array1<Real64> const &Par // Function parameters
-)
-{
-    int FanCoilNum = 1;
-    int ControlledZoneNum = 1;
-    bool FirstHVACIteration = false;
-    Real64 QUnitOut;
-    Real64 QZnReq = Par(1);
-    Real64 Residual;
-
-    state.dataLoopNodes->Node(12).MassFlowRate = mdot;
-
-    Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
-
-    Residual = (QUnitOut - QZnReq) / QZnReq;
-
-    return Residual;
-}
-
 TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
 {
 
@@ -2305,9 +2285,9 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
         " ScheduleTypeLimits, Fraction, 0.0, 1.0, CONTINUOUS;",
         " NodeList, Zone1Inlets, Zone1FCAirOut;",
         " NodeList, Zone1Exhausts, Zone1FCAirIn;",
-        " Coil:Cooling:Water, Zone1FCCoolCoil, FCAvailSch, 0.0002, 0.5, 7.22, 24.34, 14.0, 0.0095, 0.009, Zone1FCChWIn, Zone1FCChWOut, "
+        " Coil:Cooling:Water, Zone1FCCoolCoil, FCAvailSch, 0.0002, 0.5, 7.22, 24.34, 14.0, 0.0095, 0.009, Zone1FCChWIn, Zone1FCChWOut, ",
         "Zone1FCFanOut, Zone1FCCCOut, SimpleAnalysis, CrossFlow;",
-        " Coil:Heating:Water, Zone1FanCoilHeatingCoil, FCAvailSch, 150.0, 0.00014, Zone1FCHWIn, Zone1FCHWOut, Zone1FCCCOut, Zone1FCAirOut, "
+        " Coil:Heating:Water, Zone1FanCoilHeatingCoil, FCAvailSch, 150.0, 0.00014, Zone1FCHWIn, Zone1FCHWOut, Zone1FCCCOut, Zone1FCAirOut, ",
         "UFactorTimesAreaAndDesignWaterFlowRate, autosize, 82.2, 16.6, 71.1, 32.2, ;",
 
         " ZoneHVAC:FourPipeFanCoil,",
@@ -2549,18 +2529,27 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
     int MaxIte = 4;
     int SolFla;
     Real64 mdot;
-    Array1D<Real64> Par(2); // Function parameters
-    Par(1) = -1000.0;
-    Par(2) = 0.0;
+
+    auto f = [this](Real64 const mdot) {
+        Real64 constexpr QZnReq2 = -1000.0;
+        int FanCoilNum = 1;
+        int ControlledZoneNum = 1;
+        bool FirstHVACIteration = false;
+        Real64 QUnitOut;
+        this->state->dataLoopNodes->Node(12).MassFlowRate = mdot;
+        Calc4PipeFanCoil(*this->state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
+        return (QUnitOut - QZnReq2) / QZnReq2;
+    };
 
     state->dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Bisection;
-    General::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, MinWaterFlow, MaxWaterFlow, Par);
+    General::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, f, MinWaterFlow, MaxWaterFlow);
     EXPECT_EQ(-1, SolFla);
+
     MaxIte = 20;
     MinWaterFlow = 0.0;
     MaxWaterFlow = 0.09375;
     state->dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
-    General::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, MinWaterFlow, MaxWaterFlow, Par);
+    General::SolveRoot(*state, ErrorToler, MaxIte, SolFla, mdot, f, MinWaterFlow, MaxWaterFlow);
     EXPECT_EQ(3, SolFla);
 }
 
@@ -2734,7 +2723,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, state->dataFans->Fan(1).FanType_Num);
 
     GetFanCoilUnits(*state);
-    EXPECT_EQ("CYCLINGFAN", state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::CycFan, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", state->dataFanCoilUnits->FanCoil(1).OAMixType);
     EXPECT_EQ("FAN:ONOFF", state->dataFanCoilUnits->FanCoil(1).FanType);
     EXPECT_EQ("COIL:COOLING:WATER", state->dataFanCoilUnits->FanCoil(1).CCoilType);
@@ -3179,7 +3168,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
 
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
 
-    EXPECT_EQ("CYCLINGFAN", thisFanCoil.CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::CycFan, thisFanCoil.CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
@@ -3578,7 +3567,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-    EXPECT_EQ("MULTISPEEDFAN", thisFanCoil.CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::MultiSpeedFan, thisFanCoil.CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
@@ -3945,7 +3934,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-    EXPECT_EQ("MULTISPEEDFAN", thisFanCoil.CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::MultiSpeedFan, thisFanCoil.CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
@@ -4312,7 +4301,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-    EXPECT_EQ("MULTISPEEDFAN", thisFanCoil.CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::MultiSpeedFan, thisFanCoil.CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:SYSTEMMODEL", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
@@ -4627,7 +4616,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ElectricHeatingCoilASHRAE90VariableFan)
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
-    EXPECT_EQ("ASHRAE90VARIABLEFAN", thisFanCoil.CapCtrlMeth);
+    EXPECT_TRUE(compare_enums(CCM::ASHRAE, thisFanCoil.CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:ONOFF", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);

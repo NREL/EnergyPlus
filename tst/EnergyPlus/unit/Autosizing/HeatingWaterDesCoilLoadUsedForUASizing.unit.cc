@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -368,7 +368,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilLoadUsedForUASizingGauntlet)
     eiooutput = "";
 
     // Test 15 - Airloop Equipment, 50% OA, MinOA option
-    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOAOption = DataSizing::MinOA;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOAOption = DataSizing::OAControl::MinOA;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = state->dataSize->DataAirFlowUsedForSizing / 2.0;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).PreheatTemp = 19.0;
     // start with an auto-sized value as the user input

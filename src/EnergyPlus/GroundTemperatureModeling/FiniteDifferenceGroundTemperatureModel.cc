@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,8 +72,7 @@ namespace EnergyPlus {
 //******************************************************************************
 
 // Finite difference model factory
-std::shared_ptr<FiniteDiffGroundTempsModel>
-FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName)
+std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -98,9 +97,10 @@ FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTe
     // New shared pointer for this model object
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
+    GroundTempObjType objType = GroundTempObjType::FiniteDiffGroundTemp;
+
     // Search through finite diff models here
-    std::string const cCurrentModuleObject =
-        state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::FiniteDiffGroundTemp));
+    std::string_view const cCurrentModuleObject = GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(objType)];
     int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
@@ -111,7 +111,7 @@ FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTe
         if (objectName == state.dataIPShortCut->cAlphaArgs(1)) {
             // Read input into object here
 
-            thisModel->objectType = objectType;
+            thisModel->objectType = objType;
             thisModel->objectName = state.dataIPShortCut->cAlphaArgs(1);
             thisModel->baseConductivity = state.dataIPShortCut->rNumericArgs(1);
             thisModel->baseDensity = state.dataIPShortCut->rNumericArgs(2);
@@ -134,7 +134,9 @@ FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTe
         // Return the pointer
         return thisModel;
     } else {
-        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference--Errors getting input for ground temperature model");
+        ShowFatalError(state,
+                       fmt::format("{}--Errors getting input for ground temperature model",
+                                   GroundTemperatureManager::groundTempModelNames[static_cast<int>(objType)]));
         return nullptr;
     }
 }
@@ -190,7 +192,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     // Save current environment so we can revert back when done
     int Envrn_reset = state.dataWeatherManager->Envrn;
-    DataGlobalConstants::KindOfSim KindOfSim_reset = state.dataGlobal->KindOfSim;
+    Constant::KindOfSim KindOfSim_reset = state.dataGlobal->KindOfSim;
     int TimeStep_reset = state.dataGlobal->TimeStep;
     int HourOfDay_reset = state.dataGlobal->HourOfDay;
     bool BeginEnvrnFlag_reset = state.dataGlobal->BeginEnvrnFlag;
@@ -218,7 +220,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     ++state.dataWeatherManager->TotRunPers;
     state.dataWeatherManager->Environment.redimension(state.dataWeatherManager->NumOfEnvrn);
     state.dataWeatherManager->RunPeriodInput.redimension(state.dataWeatherManager->TotRunPers);
-    state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::ReadAllWeatherData;
+    state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = Constant::KindOfSim::ReadAllWeatherData;
     state.dataWeatherManager->RPReadAllWeatherData = true;
     state.dataGlobal->WeathSimReq = true;
     // RunPeriod is initialized to be one year of simulation
@@ -235,7 +237,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
         ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
     }
 
-    if (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::ReadAllWeatherData) {
+    if (state.dataGlobal->KindOfSim != Constant::KindOfSim::ReadAllWeatherData) {
         // This shouldn't happen
         ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
     }
@@ -462,7 +464,7 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    timeStepInSeconds = DataGlobalConstants::SecsInDay;
+    timeStepInSeconds = Constant::SecsInDay;
     bool convergedFinal = false;
 
     initDomain(state);
@@ -830,14 +832,14 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // Temporary KA model for initialization
-    std::unique_ptr<KusudaGroundTempsModel> tempModel(new KusudaGroundTempsModel());
+    auto tempModel = std::make_unique<KusudaGroundTempsModel>(); // (AUTO_OK) Why does this have to be a unique_ptr?
 
     tempModel->objectName = "KAModelForFDModel";
     tempModel->objectType = GroundTempObjType::KusudaGroundTemp;
     tempModel->aveGroundTemp = annualAveAirTemp;
     tempModel->aveGroundTempAmplitude =
         (maxDailyAirTemp - minDailyAirTemp) / 4.0; // Rough estimate here. Ground temps will not swing as far as the air temp.
-    tempModel->phaseShiftInSecs = dayOfMinDailyAirTemp * DataGlobalConstants::SecsInDay;
+    tempModel->phaseShiftInSecs = dayOfMinDailyAirTemp * Constant::SecsInDay;
     tempModel->groundThermalDiffisivity = baseConductivity / (baseDensity * baseSpecificHeat);
 
     // Initialize temperatures and volume
@@ -1077,7 +1079,7 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &
 
     depth = _depth;
 
-    simTimeInDays = seconds / DataGlobalConstants::SecsInDay;
+    simTimeInDays = seconds / Constant::SecsInDay;
 
     if (simTimeInDays > state.dataWeatherManager->NumDaysInYear) {
         simTimeInDays = remainder(simTimeInDays, state.dataWeatherManager->NumDaysInYear);
@@ -1117,7 +1119,7 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &s
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(Optional<int const> cell, Optional_bool_const InitOnly)
+void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(ObjexxFCL::Optional<int const> cell, ObjexxFCL::Optional_bool_const InitOnly)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Edwin Lee

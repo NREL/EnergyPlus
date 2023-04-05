@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -369,9 +369,9 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state)
         }
 
         if (state.dataGlobal->runReadVars) {
-            //            state.files.outputControl.csv = true;
             if (state.files.outputControl.csv) {
                 ShowWarningMessage(state, "Native CSV output requested in input file, but running ReadVarsESO due to command line argument.");
+                ShowWarningMessage(state, "This will overwrite the native CSV output.");
             }
             int status = CommandLineInterface::runReadVarsESO(state);
             if (status) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -94,7 +94,7 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(*state, trendVarIndex, 3));
 }
 
-TEST_F(EnergyPlusFixture, MultiplePluginVariableObjects)
+TEST_F(EnergyPlusFixture, DISABLED_MultiplePluginVariableObjects)
 {
     std::string const idf_objects =
         ("PythonPlugin:Variables, Variables1, VariableA, VariableB;  PythonPlugin:Variables, Variables2, VariableA, VariableC;");

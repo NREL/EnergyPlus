@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -121,7 +121,7 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 minOutdoorDrybulb = 0.0;
     Real64 maxOutdoorDrybulbForBasin = 0.0;
     bool mySizeFlag = true;
-    DataGlobalConstants::ResourceType compressorFuelType = DataGlobalConstants::ResourceType::None;
+    Constant::ResourceType compressorFuelType = Constant::ResourceType::None;
     std::string compressorFuelTypeForOutput;
     Real64 compressorFuelRate = 0.0;
     Real64 compressorFuelConsumption = 0.0;

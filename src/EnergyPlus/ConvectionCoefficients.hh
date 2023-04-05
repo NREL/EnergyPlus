@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -267,30 +267,31 @@ namespace ConvectionCoefficients {
 
     // Functions
 
-    void InitInteriorConvectionCoeffs(EnergyPlusData &state,
-                                      const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-                                      Optional_int_const ZoneToResimulate = _     // if passed in, then only calculate surfaces that have this zone
+    void
+    InitInteriorConvectionCoeffs(EnergyPlusData &state,
+                                 const Array1D<Real64> &SurfaceTemperatures,        // Temperature of surfaces for evaluation of HcIn
+                                 ObjexxFCL::Optional_int_const ZoneToResimulate = _ // if passed in, then only calculate surfaces that have this zone
     );
 
     void InitExteriorConvectionCoeff(EnergyPlusData &state,
-                                     int SurfNum,                              // Surface number (in Surface derived type)
-                                     Real64 HMovInsul,                         // Equivalent convection coefficient of movable insulation
-                                     DataSurfaces::SurfaceRoughness Roughness, // Roughness index (1-6), see DataHeatBalance parameters
-                                     Real64 AbsExt,                            // Exterior thermal absorptance
-                                     Real64 TempExt,                           // Exterior surface temperature (C)
-                                     Real64 &HExt,                             // Convection coefficient to exterior air
-                                     Real64 &HSky,                             // "Convection" coefficient to sky temperature
-                                     Real64 &HGround,                          // "Convection" coefficient to ground temperature
-                                     Real64 &HAir                              // Radiation to Air Component
+                                     int SurfNum,                          // Surface number (in Surface derived type)
+                                     Real64 HMovInsul,                     // Equivalent convection coefficient of movable insulation
+                                     Material::SurfaceRoughness Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                                     Real64 AbsExt,                        // Exterior thermal absorptance
+                                     Real64 TempExt,                       // Exterior surface temperature (C)
+                                     Real64 &HExt,                         // Convection coefficient to exterior air
+                                     Real64 &HSky,                         // "Convection" coefficient to sky temperature
+                                     Real64 &HGround,                      // "Convection" coefficient to ground temperature
+                                     Real64 &HAir                          // Radiation to Air Component
     );
 
-    Real64 CalcHfExteriorSparrow(Real64 SurfWindSpeed,                     // Local wind speed at height of the heat transfer surface (m/s)
-                                 Real64 GrossArea,                         // Gross surface area {m2}
-                                 Real64 Perimeter,                         // Surface perimeter length {m}
-                                 Real64 CosTilt,                           // Cosine of the Surface Tilt Angle
-                                 Real64 Azimuth,                           // Facing angle (degrees) of the surface outward normal
-                                 DataSurfaces::SurfaceRoughness Roughness, // Surface roughness index
-                                 Real64 WindDirection                      // Wind (compass) direction (degrees)
+    Real64 CalcHfExteriorSparrow(Real64 SurfWindSpeed,                 // Local wind speed at height of the heat transfer surface (m/s)
+                                 Real64 GrossArea,                     // Gross surface area {m2}
+                                 Real64 Perimeter,                     // Surface perimeter length {m}
+                                 Real64 CosTilt,                       // Cosine of the Surface Tilt Angle
+                                 Real64 Azimuth,                       // Facing angle (degrees) of the surface outward normal
+                                 Material::SurfaceRoughness Roughness, // Surface roughness index
+                                 Real64 WindDirection                  // Wind (compass) direction (degrees)
     );
 
     bool Windward(Real64 CosTilt,      // Cosine of the surface tilt angle
@@ -302,8 +303,8 @@ namespace ConvectionCoefficients {
 
     void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes, std::string const &ConvectionType, int Value);
 
-    Real64 CalcASHRAESimpExtConvectCoeff(DataSurfaces::SurfaceRoughness Roughness, // Integer index for roughness, relates to parameter array indices
-                                         Real64 SurfWindSpeed                      // Current wind speed, m/s
+    Real64 CalcASHRAESimpExtConvectCoeff(Material::SurfaceRoughness Roughness, // Integer index for roughness, relates to parameter array indices
+                                         Real64 SurfWindSpeed                  // Current wind speed, m/s
     );
 
     Real64 CalcASHRAESimpleIntConvCoeff(Real64 Tsurf, Real64 Tamb, Real64 cosTilt);
@@ -323,10 +324,10 @@ namespace ConvectionCoefficients {
     );
 
     void CalcDetailedHcInForDVModel(EnergyPlusData &state,
-                                    int SurfNum,                                // surface number for which coefficients are being calculated
-                                    const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-                                    Array1D<Real64> &HcIn,                      // Interior Convection Coeff Array
-                                    Optional<Array1S<Real64> const> Vhc = _     // Velocity array for forced convection coeff calculation
+                                    int SurfNum,                                       // surface number for which coefficients are being calculated
+                                    const Array1D<Real64> &SurfaceTemperatures,        // Temperature of surfaces for evaluation of HcIn
+                                    Array1D<Real64> &HcIn,                             // Interior Convection Coeff Array
+                                    ObjexxFCL::Optional<Array1S<Real64> const> Vhc = _ // Velocity array for forced convection coeff calculation
     );
 
     Real64 CalcZoneSupplyAirTemp(EnergyPlusData &state, int ZoneNum);
@@ -702,15 +703,15 @@ namespace ConvectionCoefficients {
                                                       int ZoneNum                // for messages
     );
 
-    Real64 CalcSparrowWindward(DataSurfaces::SurfaceRoughness RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
+    Real64 CalcSparrowWindward(Material::SurfaceRoughness RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
 
     Real64 CalcSparrowWindward(
-        EnergyPlusData &state, DataSurfaces::SurfaceRoughness RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
+        EnergyPlusData &state, Material::SurfaceRoughness RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
 
-    Real64 CalcSparrowLeeward(DataSurfaces::SurfaceRoughness RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
+    Real64 CalcSparrowLeeward(Material::SurfaceRoughness RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
 
     Real64 CalcSparrowLeeward(
-        EnergyPlusData &state, DataSurfaces::SurfaceRoughness RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
+        EnergyPlusData &state, Material::SurfaceRoughness RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
 
     Real64 CalcMoWITTNatural(Real64 DeltaTemp);
 
@@ -722,11 +723,11 @@ namespace ConvectionCoefficients {
 
     Real64 CalcMoWITTLeeward(Real64 DeltaTemp, Real64 WindAtZ);
 
-    Real64 CalcDOE2Forced(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 HfSmooth, DataSurfaces::SurfaceRoughness RoughnessIndex);
+    Real64 CalcDOE2Forced(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 HfSmooth, Material::SurfaceRoughness RoughnessIndex);
 
-    Real64 CalcDOE2Windward(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 WindAtZ, DataSurfaces::SurfaceRoughness RoughnessIndex);
+    Real64 CalcDOE2Windward(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 WindAtZ, Material::SurfaceRoughness RoughnessIndex);
 
-    Real64 CalcDOE2Leeward(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 WindAtZ, DataSurfaces::SurfaceRoughness RoughnessIndex);
+    Real64 CalcDOE2Leeward(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 WindAtZ, Material::SurfaceRoughness RoughnessIndex);
 
     Real64 CalcNusseltJurges(Real64 WindAtZ);
 
@@ -758,7 +759,7 @@ namespace ConvectionCoefficients {
                          Real64 WindDirect, // Wind direction measured clockwise from geographic North
                          Real64 RoofArea,
                          Real64 RoofPerimeter,
-                         DataSurfaces::SurfaceRoughness RoughnessIndex);
+                         Material::SurfaceRoughness RoughnessIndex);
 
     Real64 CalcClearRoof(EnergyPlusData &state,
                          int SurfNum,

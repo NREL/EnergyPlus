@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -109,7 +109,7 @@ enum class ThermalLossDestination
     Num
 };
 
-void initializeElectricPowerServiceZoneGains(EnergyPlusData &state);
+void initializeElectricPowerServiceZoneGains(const EnergyPlusData &state);
 
 class DCtoACInverter
 // This class is for modelling a power conversion device that takes DC power in and produces AC power out.
@@ -829,7 +829,7 @@ private:                      // data
 
 }; // class ElectricPowerServiceManager
 
-void createFacilityElectricPowerServiceObject(EnergyPlusData &state);
+void createFacilityElectricPowerServiceObject(const EnergyPlusData &state);
 
 Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName, bool &errorsFound);
 

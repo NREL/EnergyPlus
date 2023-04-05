@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,7 +52,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus::DataGlobalConstants {
+namespace EnergyPlus::Constant {
 
 ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
 {
@@ -67,7 +67,7 @@ ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
     // Assists in assigning proper numeric resource types to data structures.
 
     {
-        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(ResourceTypeChar));
+        std::string const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(ResourceTypeChar));
 
         if (SELECT_CASE_var == "ELECTRICITY") {
             return ResourceType::Electricity;
@@ -370,4 +370,4 @@ std::string GetResourceTypeChar(ResourceType const ResourceTypeNum)
     }
 }
 
-} // namespace EnergyPlus::DataGlobalConstants
+} // namespace EnergyPlus::Constant

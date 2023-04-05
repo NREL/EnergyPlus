@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -79,7 +79,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInput)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
 
-    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType_Num, DataGlobalConstants::ResourceType::OtherFuel1));
+    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType_Num, Constant::ResourceType::OtherFuel1));
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInputError)
@@ -123,7 +123,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeCoal)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
 
-    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType_Num, DataGlobalConstants::ResourceType::Coal));
+    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType_Num, Constant::ResourceType::Coal));
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
 
-    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType_Num, DataGlobalConstants::ResourceType::Propane));
+    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType_Num, Constant::ResourceType::Propane));
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)

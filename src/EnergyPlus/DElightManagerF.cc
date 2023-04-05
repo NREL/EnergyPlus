@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -137,7 +137,6 @@ namespace DElightManagerF {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iNumDElightZones;   // Counter for Thermal Zones with hosted Daylighting:DElight objects
         int iNumOpaqueSurfs;    // Counter for opaque surfaces in each zone
-        int iSurfaceFirst;      // starting loop variable for surfaces
         int iNumWindows;        // Counter for windows hosted in each surface
         int iconstruct;         // Index for construction type of surfaces
         int iMatlLayer;         // Index for the outside (i.e., 1st) Material Layer for a Construction
@@ -215,7 +214,7 @@ namespace DElightManagerF {
         int iNumWndoConsts = 0;
 
         // Open a file for writing DElight input from EnergyPlus data
-        auto delightInFile = state.files.delightIn.open(state, "DElightInputGenerator", state.files.outputControl.delightin);
+        auto delightInFile = state.files.delightIn.open(state, "DElightInputGenerator", state.files.outputControl.delightin); // (THIS_AUTO_OK)
 
         // Start of DElight input file
         print(delightInFile, Format_901, state.dataStrGlobals->CurrentDateTime);
@@ -233,8 +232,8 @@ namespace DElightManagerF {
               state.dataEnvrn->TimeZoneNumber);
 
         // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
-        CosBldgRelNorth = std::cos(-state.dataHeatBal->BuildingAzimuth * DataGlobalConstants::DegToRadians);
-        SinBldgRelNorth = std::sin(-state.dataHeatBal->BuildingAzimuth * DataGlobalConstants::DegToRadians);
+        CosBldgRelNorth = std::cos(-state.dataHeatBal->BuildingAzimuth * Constant::DegToRadians);
+        SinBldgRelNorth = std::sin(-state.dataHeatBal->BuildingAzimuth * Constant::DegToRadians);
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
         for (auto &znDayl : state.dataDaylightingData->daylightControl) {
@@ -242,7 +241,7 @@ namespace DElightManagerF {
 
                 // Register Error if 0 DElight RefPts have been input for valid DElight object
                 if (znDayl.TotalDaylRefPoints == 0) {
-                    ShowSevereError(state, "No Reference Points input for daylighting zone using DElight =" + znDayl.Name);
+                    ShowSevereError(state, format("No Reference Points input for daylighting zone using DElight ={}", znDayl.Name));
                     ErrorsFound = true;
                 }
 
@@ -250,7 +249,7 @@ namespace DElightManagerF {
                 if (znDayl.TotalDaylRefPoints > 100) {
                     // Restrict to 100 Ref Pt maximum
                     znDayl.TotalDaylRefPoints = 100;
-                    ShowWarningError(state, "Maximum of 100 Reference Points exceeded for daylighting zone using DElight =" + znDayl.Name);
+                    ShowWarningError(state, format("Maximum of 100 Reference Points exceeded for daylighting zone using DElight ={}", znDayl.Name));
                     ShowWarningError(state, "  Only first 100 Reference Points included in DElight analysis");
                 }
                 znDayl.DaylRefPtAbsCoord.allocate(3, znDayl.TotalDaylRefPoints);
@@ -303,8 +302,8 @@ namespace DElightManagerF {
                           znDayl.DElightGriddingResolution * M22FT2);
 
                     // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-                    CosZoneRelNorth = std::cos(-zn.RelNorth * DataGlobalConstants::DegToRadians);
-                    SinZoneRelNorth = std::sin(-zn.RelNorth * DataGlobalConstants::DegToRadians);
+                    CosZoneRelNorth = std::cos(-zn.RelNorth * Constant::DegToRadians);
+                    SinZoneRelNorth = std::sin(-zn.RelNorth * Constant::DegToRadians);
 
                     // Zone Lighting Schedule Data Section
                     // NOTE: Schedules are not required since hourly values are retrieved from EnergyPlus as needed
@@ -313,122 +312,100 @@ namespace DElightManagerF {
                     // Zone Surface Data Section
                     // Count the number of opaque surfaces bounding the current zone
                     iNumOpaqueSurfs = 0;
-                    iSurfaceFirst = zn.HTSurfaceFirst;
-                    int const iSurfaceLast = zn.HTSurfaceLast; // ending loop variable for surfaces
-
-                    for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
-                        auto &surf(state.dataSurface->Surface(isurf));
-                        if (surf.Class == SurfaceClass::Wall) ++iNumOpaqueSurfs;
-                        if (surf.Class == SurfaceClass::Roof) ++iNumOpaqueSurfs;
-                        if (surf.Class == SurfaceClass::Floor) ++iNumOpaqueSurfs;
+                    for (int spaceNum : zn.spaceIndexes) {
+                        auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+                        for (int isurf = thisSpace.HTSurfaceFirst; isurf <= thisSpace.HTSurfaceLast; ++isurf) {
+                            auto const &surf(state.dataSurface->Surface(isurf));
+                            if (surf.Class == SurfaceClass::Wall) ++iNumOpaqueSurfs;
+                            if (surf.Class == SurfaceClass::Roof) ++iNumOpaqueSurfs;
+                            if (surf.Class == SurfaceClass::Floor) ++iNumOpaqueSurfs;
+                        }
                     } // Zone Opaque Surface loop
 
                     print(delightInFile, Format_906, iNumOpaqueSurfs);
 
                     // Write each opaque bounding Surface to the DElight input file
-                    for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
+                    for (int spaceNum : zn.spaceIndexes) {
+                        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                        int const iSurfaceFirst = thisSpace.HTSurfaceFirst;
+                        int const iSurfaceLast = thisSpace.HTSurfaceLast;
+                        for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
 
-                        auto &surf(state.dataSurface->Surface(isurf));
+                            auto &surf(state.dataSurface->Surface(isurf));
 
-                        // Only process "opaque bounding" surface types
-                        if ((surf.Class == SurfaceClass::Wall) || (surf.Class == SurfaceClass::Roof) || (surf.Class == SurfaceClass::Floor)) {
+                            // Only process "opaque bounding" surface types
+                            if ((surf.Class == SurfaceClass::Wall) || (surf.Class == SurfaceClass::Roof) || (surf.Class == SurfaceClass::Floor)) {
 
-                            // Get the Construction index for this Surface
-                            iconstruct = surf.Construction;
+                                // Get the Construction index for this Surface
+                                iconstruct = surf.Construction;
 
-                            // Is this Surface exposed to the exterior?
-                            if (surf.ExtSolar) {
-                                // Get the index for the outside (i.e., 1st) Material Layer for this Construction
-                                iMatlLayer = state.dataConstruction->Construct(iconstruct).LayerPoint(1);
-                                // Get the outside visible reflectance of this material layer
-                                // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
-                                rExtVisRefl = 1.0 - state.dataMaterial->Material(iMatlLayer).AbsorpVisible;
-                            } else {
-                                rExtVisRefl = 0.0;
-                            }
+                                // Is this Surface exposed to the exterior?
+                                if (surf.ExtSolar) {
+                                    // Get the index for the outside (i.e., 1st) Material Layer for this Construction
+                                    iMatlLayer = state.dataConstruction->Construct(iconstruct).LayerPoint(1);
+                                    // Get the outside visible reflectance of this material layer
+                                    // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
+                                    auto const *thisMaterial =
+                                        dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(iMatlLayer));
+                                    assert(thisMaterial != nullptr);
+                                    rExtVisRefl = 1.0 - thisMaterial->AbsorpVisible;
+                                } else {
+                                    rExtVisRefl = 0.0;
+                                }
 
-                            // Remove any blanks from the Surface Name for ease of input to DElight
-                            cNameWOBlanks = ReplaceBlanksWithUnderscores(surf.Name);
-                            print(delightInFile,
-                                  Format_907,
-                                  cNameWOBlanks,
-                                  surf.Azimuth,
-                                  surf.Tilt,
-                                  state.dataConstruction->Construct(iconstruct).ReflectVisDiffBack,
-                                  rExtVisRefl,
-                                  surf.Sides);
+                                // Remove any blanks from the Surface Name for ease of input to DElight
+                                cNameWOBlanks = ReplaceBlanksWithUnderscores(surf.Name);
+                                print(delightInFile,
+                                      Format_907,
+                                      cNameWOBlanks,
+                                      surf.Azimuth,
+                                      surf.Tilt,
+                                      state.dataConstruction->Construct(iconstruct).ReflectVisDiffBack,
+                                      rExtVisRefl,
+                                      surf.Sides);
 
-                            // Write out the vertex coordinates for each vertex
-                            int const iNumVertices = surf.Sides; // Counter for surface vertices
-                            for (int ivert = 1; ivert <= iNumVertices; ++ivert) {
-                                print(
-                                    delightInFile, Format_908, surf.Vertex(ivert).x * M2FT, surf.Vertex(ivert).y * M2FT, surf.Vertex(ivert).z * M2FT);
-                            }
+                                // Write out the vertex coordinates for each vertex
+                                for (int ivert = 1; ivert <= surf.Sides; ++ivert) {
+                                    print(delightInFile,
+                                          Format_908,
+                                          surf.Vertex(ivert).x * M2FT,
+                                          surf.Vertex(ivert).y * M2FT,
+                                          surf.Vertex(ivert).z * M2FT);
+                                }
 
-                            // Count each Window hosted by the current opaque bounding Surface
-                            iNumWindows = 0;
-                            for (int iwndo = iSurfaceFirst; iwndo <= iSurfaceLast; ++iwndo) {
-                                if (state.dataSurface->Surface(iwndo).Class == SurfaceClass::Window) {
-                                    auto &wndo(state.dataSurface->Surface(iwndo));
-                                    if (wndo.BaseSurfName == surf.Name) {
+                                // Count each Window hosted by the current opaque bounding Surface
+                                iNumWindows = 0;
+                                for (int iwndo = iSurfaceFirst; iwndo <= iSurfaceLast; ++iwndo) {
+                                    if (state.dataSurface->Surface(iwndo).Class == SurfaceClass::Window) {
+                                        auto &wndo(state.dataSurface->Surface(iwndo));
+                                        if (wndo.BaseSurfName == surf.Name) {
 
-                                        // Error if window has multiplier > 1 since this causes incorrect illuminance calc
-                                        if (wndo.Multiplier > 1.0) {
-                                            ShowSevereError(state,
-                                                            "Multiplier > 1.0 for window " + wndo.Name +
-                                                                " not allowed since it is in a zone with DElight daylighting.");
-                                            ErrorsFound = true;
-                                        }
-
-                                        // Error if window has a shading device (blind/shade/screen) since
-                                        // DElight cannot perform dynamic shading device deployment
-                                        if (wndo.HasShadeControl) {
-                                            ShowSevereError(state,
-                                                            "Shading Device on window " + wndo.Name +
-                                                                " dynamic control is not supported in a zone with DElight daylighting.");
-                                            ErrorsFound = true;
-                                        }
-
-                                        // Loop through all Doppelganger Surface Names to ignore these Windows
-                                        lWndoIsDoppelganger = false;
-                                        for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
-
-                                            // Is the current Window Surface a Doppelganger?
-                                            if (wndo.Name == cfs.wndwName) {
-                                                // Ignore this Doppelganger Window
-                                                lWndoIsDoppelganger = true;
+                                            // Error if window has multiplier > 1 since this causes incorrect illuminance calc
+                                            if (wndo.Multiplier > 1.0) {
+                                                ShowSevereError(
+                                                    state,
+                                                    format(
+                                                        "Multiplier > 1.0 for window {} not allowed since it is in a zone with DElight daylighting.",
+                                                        wndo.Name));
+                                                ErrorsFound = true;
                                             }
 
-                                        } // CFS object loop A
-
-                                        if (!lWndoIsDoppelganger) {
-                                            ++iNumWindows;
-                                        }
-
-                                    } // Surface hosts Window test
-                                }     // Window test
-                            }         // Window loop
-
-                            print(delightInFile, Format_909, iNumWindows);
-
-                            // If the current opaque bounding Surface hosts Windows,
-                            // then write each hosted Window to the DElight input file
-                            // and track the Window Construction type for later writing
-                            if (iNumWindows > 0) {
-                                for (int iwndo2 = iSurfaceFirst; iwndo2 <= iSurfaceLast; ++iwndo2) {
-                                    if (state.dataSurface->Surface(iwndo2).Class == SurfaceClass::Window) {
-
-                                        auto &wndo2(state.dataSurface->Surface(iwndo2));
-
-                                        if (wndo2.BaseSurfName == surf.Name) {
+                                            // Error if window has a shading device (blind/shade/screen) since
+                                            // DElight cannot perform dynamic shading device deployment
+                                            if (wndo.HasShadeControl) {
+                                                ShowSevereError(state,
+                                                                format("Shading Device on window {} dynamic control is not supported in a zone with "
+                                                                       "DElight daylighting.",
+                                                                       wndo.Name));
+                                                ErrorsFound = true;
+                                            }
 
                                             // Loop through all Doppelganger Surface Names to ignore these Windows
                                             lWndoIsDoppelganger = false;
-
-                                            for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
+                                            for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
 
                                                 // Is the current Window Surface a Doppelganger?
-                                                if (wndo2.Name == cfs.wndwName) {
+                                                if (wndo.Name == cfs.wndwName) {
                                                     // Ignore this Doppelganger Window
                                                     lWndoIsDoppelganger = true;
                                                 }
@@ -436,112 +413,147 @@ namespace DElightManagerF {
                                             } // CFS object loop A
 
                                             if (!lWndoIsDoppelganger) {
+                                                ++iNumWindows;
+                                            }
 
-                                                // Track unique window construction types here for later writing to
-                                                // the library section of DElight input file
+                                        } // Surface hosts Window test
+                                    }     // Window test
+                                }         // Window loop
 
-                                                // Get the Construction index for this Window Surface
-                                                iconstruct = wndo2.Construction;
+                                print(delightInFile, Format_909, iNumWindows);
 
-                                                // Has the current Construction index been encountered before?
-                                                lWndoConstFound = false;
-                                                for (int iconst = 1; iconst <= iNumWndoConsts; ++iconst) {
-                                                    if (iconstruct == iWndoConstIndexes(iconst)) lWndoConstFound = true;
+                                // If the current opaque bounding Surface hosts Windows,
+                                // then write each hosted Window to the DElight input file
+                                // and track the Window Construction type for later writing
+                                if (iNumWindows > 0) {
+                                    for (int iwndo2 = iSurfaceFirst; iwndo2 <= iSurfaceLast; ++iwndo2) {
+                                        if (state.dataSurface->Surface(iwndo2).Class == SurfaceClass::Window) {
+
+                                            auto &wndo2(state.dataSurface->Surface(iwndo2));
+
+                                            if (wndo2.BaseSurfName == surf.Name) {
+
+                                                // Loop through all Doppelganger Surface Names to ignore these Windows
+                                                lWndoIsDoppelganger = false;
+
+                                                for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
+
+                                                    // Is the current Window Surface a Doppelganger?
+                                                    if (wndo2.Name == cfs.wndwName) {
+                                                        // Ignore this Doppelganger Window
+                                                        lWndoIsDoppelganger = true;
+                                                    }
+
+                                                } // CFS object loop A
+
+                                                if (!lWndoIsDoppelganger) {
+
+                                                    // Track unique window construction types here for later writing to
+                                                    // the library section of DElight input file
+
+                                                    // Get the Construction index for this Window Surface
+                                                    iconstruct = wndo2.Construction;
+
+                                                    // Has the current Construction index been encountered before?
+                                                    lWndoConstFound = false;
+                                                    for (int iconst = 1; iconst <= iNumWndoConsts; ++iconst) {
+                                                        if (iconstruct == iWndoConstIndexes(iconst)) lWndoConstFound = true;
+                                                    }
+                                                    if (!lWndoConstFound) {
+                                                        ++iNumWndoConsts;
+                                                        iWndoConstIndexes(iNumWndoConsts) = iconstruct;
+                                                    }
+
+                                                    // Write this Window to the DElight input file
+                                                    // Remove any blanks from the Window Surface Name for ease of input to DElight
+                                                    cNameWOBlanks = ReplaceBlanksWithUnderscores(wndo2.Name);
+                                                    print(delightInFile, Format_910, cNameWOBlanks, iconstruct + 10000, wndo2.Sides);
+                                                    // Use WndoConstIndex + 10000 as the Glass Type Name
+                                                    // to differentiate EPlus glass types within DElight
+
+                                                    // Write out the vertex coordinates for each vertex
+                                                    for (int ivert = 1; ivert <= wndo2.Sides; ++ivert) {
+                                                        print(delightInFile,
+                                                              Format_908,
+                                                              wndo2.Vertex(ivert).x * M2FT,
+                                                              wndo2.Vertex(ivert).y * M2FT,
+                                                              wndo2.Vertex(ivert).z * M2FT);
+                                                    }
+                                                } //! lWndoIsDoppelganger
+                                            }     // Surface hosts Window2 test
+                                        }         // Window2 Class test
+                                    }             // Window2 loop
+                                }                 // Hosted Windows test
+
+                                // Write the number of CFS hosted by the current Opaque Bounding Surface
+                                iHostedCFS = 0;
+
+                                // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
+                                for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
+
+                                    // Does the current Opaque Bounding Surface host the current CFS object?
+                                    if (surf.Name == cfs.surfName) {
+                                        // Count this hosted CFS
+                                        ++iHostedCFS;
+                                    }
+                                } // CFS object loop 1
+
+                                print(delightInFile, Format_911, iHostedCFS);
+
+                                // Now write each of the hosted CFS data
+                                // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
+                                for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
+
+                                    // Does the current Opaque Bounding Surface host the current CFS object?
+                                    if (surf.Name == cfs.surfName) {
+
+                                        // Get the Doppelganger surface for this CFS
+                                        iDoppelganger = 0;
+                                        for (int iwndo3 = iSurfaceFirst; iwndo3 <= iSurfaceLast; ++iwndo3) {
+
+                                            auto const &wndo3(state.dataSurface->Surface(iwndo3));
+
+                                            if (wndo3.Class == SurfaceClass::Window) {
+
+                                                // Is the current Window Surface the Doppelganger for the current CFS?
+                                                if (wndo3.Name == cfs.wndwName) {
+                                                    // Store the window surface index for future reference
+                                                    iDoppelganger = iwndo3;
                                                 }
-                                                if (!lWndoConstFound) {
-                                                    ++iNumWndoConsts;
-                                                    iWndoConstIndexes(iNumWndoConsts) = iconstruct;
-                                                }
-
-                                                // Write this Window to the DElight input file
-                                                // Remove any blanks from the Window Surface Name for ease of input to DElight
-                                                cNameWOBlanks = ReplaceBlanksWithUnderscores(wndo2.Name);
-                                                print(delightInFile, Format_910, cNameWOBlanks, iconstruct + 10000, wndo2.Sides);
-                                                // Use WndoConstIndex + 10000 as the Glass Type Name
-                                                // to differentiate EPlus glass types within DElight
-
-                                                // Write out the vertex coordinates for each vertex
-                                                int const iNumVertices = wndo2.Sides; // Counter for surface vertices
-                                                for (int ivert = 1; ivert <= iNumVertices; ++ivert) {
-                                                    print(delightInFile,
-                                                          Format_908,
-                                                          wndo2.Vertex(ivert).x * M2FT,
-                                                          wndo2.Vertex(ivert).y * M2FT,
-                                                          wndo2.Vertex(ivert).z * M2FT);
-                                                }
-                                            } //! lWndoIsDoppelganger
-                                        }     // Surface hosts Window2 test
-                                    }         // Window2 Class test
-                                }             // Window2 loop
-                            }                 // Hosted Windows test
-
-                            // Write the number of CFS hosted by the current Opaque Bounding Surface
-                            iHostedCFS = 0;
-
-                            // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
-                            for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
-
-                                // Does the current Opaque Bounding Surface host the current CFS object?
-                                if (surf.Name == cfs.surfName) {
-                                    // Count this hosted CFS
-                                    ++iHostedCFS;
-                                }
-                            } // CFS object loop 1
-
-                            print(delightInFile, Format_911, iHostedCFS);
-
-                            // Now write each of the hosted CFS data
-                            // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
-                            for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
-
-                                // Does the current Opaque Bounding Surface host the current CFS object?
-                                if (surf.Name == cfs.surfName) {
-
-                                    // Get the Doppelganger surface for this CFS
-                                    iDoppelganger = 0;
-                                    for (int iwndo3 = iSurfaceFirst; iwndo3 <= iSurfaceLast; ++iwndo3) {
-
-                                        auto &wndo3(state.dataSurface->Surface(iwndo3));
-
-                                        if (wndo3.Class == SurfaceClass::Window) {
-
-                                            // Is the current Window Surface the Doppelganger for the current CFS?
-                                            if (wndo3.Name == cfs.wndwName) {
-                                                // Store the window surface index for future reference
-                                                iDoppelganger = iwndo3;
                                             }
                                         }
-                                    }
 
-                                    // Make sure that a valid Doppelganger surface exists
-                                    if (iDoppelganger > 0) {
+                                        // Make sure that a valid Doppelganger surface exists
+                                        if (iDoppelganger > 0) {
 
-                                        // Write the data for this hosted CFS
-                                        auto &doppelgangerSurf(state.dataSurface->Surface(iDoppelganger));
+                                            // Write the data for this hosted CFS
+                                            auto &doppelgangerSurf(state.dataSurface->Surface(iDoppelganger));
 
-                                        // Remove any blanks from the CFS Name for ease of input to DElight
-                                        cNameWOBlanks = ReplaceBlanksWithUnderscores(cfs.Name);
-                                        int const iNumVertices = doppelgangerSurf.Sides; // Counter for surface vertices
-                                        print(delightInFile, Format_915, cNameWOBlanks, cfs.ComplexFeneType, cfs.feneRota, iNumVertices);
+                                            // Remove any blanks from the CFS Name for ease of input to DElight
+                                            cNameWOBlanks = ReplaceBlanksWithUnderscores(cfs.Name);
+                                            print(
+                                                delightInFile, Format_915, cNameWOBlanks, cfs.ComplexFeneType, cfs.feneRota, doppelgangerSurf.Sides);
 
-                                        // Write out the vertex coordinates for each vertex
-                                        for (int ivert = 1; ivert <= iNumVertices; ++ivert) {
-                                            print(delightInFile,
-                                                  Format_908,
-                                                  doppelgangerSurf.Vertex(ivert).x * M2FT,
-                                                  doppelgangerSurf.Vertex(ivert).y * M2FT,
-                                                  doppelgangerSurf.Vertex(ivert).z * M2FT);
+                                            // Write out the vertex coordinates for each vertex
+                                            for (int ivert = 1; ivert <= doppelgangerSurf.Sides; ++ivert) {
+                                                print(delightInFile,
+                                                      Format_908,
+                                                      doppelgangerSurf.Vertex(ivert).x * M2FT,
+                                                      doppelgangerSurf.Vertex(ivert).y * M2FT,
+                                                      doppelgangerSurf.Vertex(ivert).z * M2FT);
+                                            }
                                         }
-                                    }
-                                    // Register Error if there is no valid Doppelganger for current Complex Fenestration
-                                    if (iDoppelganger == 0) {
-                                        ShowSevereError(state, "No Doppelganger Window Surface found for Complex Fenestration =" + cfs.Name);
-                                        ErrorsFound = true;
-                                    }
-                                } // The current Opaque Bounding Surface hosts the current CFS object?
-                            }     // CFS object loop 2
-                        }         // Opaque Bounding Surface test
-                    }             // Zone Surface loop
+                                        // Register Error if there is no valid Doppelganger for current Complex Fenestration
+                                        if (iDoppelganger == 0) {
+                                            ShowSevereError(state,
+                                                            format("No Doppelganger Window Surface found for Complex Fenestration ={}", cfs.Name));
+                                            ErrorsFound = true;
+                                        }
+                                    } // The current Opaque Bounding Surface hosts the current CFS object?
+                                }     // CFS object loop 2
+                            }         // Opaque Bounding Surface test
+                        }
+                    } // Zone Surface loop
 
                     // Write ZONE REFERENCE POINTS
                     print(delightInFile, Format_912, znDayl.TotalDaylRefPoints);
@@ -551,7 +563,7 @@ namespace DElightManagerF {
 
                         // Is this RefPt hosted by current DElight Zone?
                         if (izone == refPt.ZoneNum) {
-                            auto &zn(state.dataHeatBal->Zone(izone));
+                            auto &thisZone = state.dataHeatBal->Zone(izone);
 
                             // Limit to maximum of 100 RefPts
                             if (znDayl.TotalDaylRefPoints <= 100) {
@@ -562,12 +574,12 @@ namespace DElightManagerF {
                                     RefPt_WCS_Coord(3) = refPt.z;
                                 } else {
                                     // Transform reference point coordinates into building coordinate system
-                                    Xb = refPt.x * CosZoneRelNorth - refPt.y * SinZoneRelNorth + zn.OriginX;
-                                    Yb = refPt.x * SinZoneRelNorth + refPt.y * CosZoneRelNorth + zn.OriginY;
+                                    Xb = refPt.x * CosZoneRelNorth - refPt.y * SinZoneRelNorth + thisZone.OriginX;
+                                    Yb = refPt.x * SinZoneRelNorth + refPt.y * CosZoneRelNorth + thisZone.OriginY;
                                     // Transform into World Coordinate System
                                     RefPt_WCS_Coord(1) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
                                     RefPt_WCS_Coord(2) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-                                    RefPt_WCS_Coord(3) = refPt.z + zn.OriginZ;
+                                    RefPt_WCS_Coord(3) = refPt.z + thisZone.OriginZ;
                                     if (ldoTransform) {          // Geometry transform
                                         Xo = RefPt_WCS_Coord(1); // world coordinates.... shifted by relative north angle...
                                         Yo = RefPt_WCS_Coord(2);
@@ -586,31 +598,35 @@ namespace DElightManagerF {
                                 znDayl.DaylRefPtAbsCoord({1, 3}, refPt.indexToFracAndIllum) = RefPt_WCS_Coord({1, 3});
 
                                 // Validate that Reference Point coordinates are within the host Zone
-                                if (RefPt_WCS_Coord(1) < zn.MinimumX || RefPt_WCS_Coord(1) > zn.MaximumX) {
-                                    ShowWarningError(state, "DElightInputGenerator:Reference point X Value outside Zone Min/Max X, Zone=" + zn.Name);
+                                if (RefPt_WCS_Coord(1) < thisZone.MinimumX || RefPt_WCS_Coord(1) > thisZone.MaximumX) {
+                                    ShowWarningError(
+                                        state, format("DElightInputGenerator:Reference point X Value outside Zone Min/Max X, Zone={}", zn.Name));
                                     ShowSevereError(state,
                                                     format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
-                                                           zn.MinimumX,
+                                                           thisZone.MinimumX,
                                                            RefPt_WCS_Coord(1),
-                                                           zn.MaximumX));
+                                                           thisZone.MaximumX));
                                     ErrorsFound = true;
                                 }
-                                if (RefPt_WCS_Coord(2) < zn.MinimumY || RefPt_WCS_Coord(2) > zn.MaximumY) {
-                                    ShowWarningError(state, "DElightInputGenerator:Reference point Y Value outside Zone Min/Max Y, Zone=" + zn.Name);
+                                if (RefPt_WCS_Coord(2) < thisZone.MinimumY || RefPt_WCS_Coord(2) > thisZone.MaximumY) {
+                                    ShowWarningError(
+                                        state, format("DElightInputGenerator:Reference point Y Value outside Zone Min/Max Y, Zone={}", zn.Name));
                                     ShowSevereError(state,
                                                     format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
-                                                           zn.MinimumY,
+                                                           thisZone.MinimumY,
                                                            RefPt_WCS_Coord(2),
-                                                           zn.MaximumY));
+                                                           thisZone.MaximumY));
                                     ErrorsFound = true;
                                 }
-                                if (RefPt_WCS_Coord(3) < state.dataHeatBal->Zone(izone).MinimumZ || RefPt_WCS_Coord(3) > zn.MaximumZ) {
-                                    ShowWarningError(state, "DElightInputGenerator:Reference point Z Value outside Zone Min/Max Z, Zone=" + zn.Name);
+                                if (RefPt_WCS_Coord(3) < state.dataHeatBal->Zone(izone).MinimumZ || RefPt_WCS_Coord(3) > thisZone.MaximumZ) {
+                                    ShowWarningError(
+                                        state,
+                                        format("DElightInputGenerator:Reference point Z Value outside Zone Min/Max Z, Zone={}", thisZone.Name));
                                     ShowSevereError(state,
                                                     format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
-                                                           zn.MinimumZ,
+                                                           thisZone.MinimumZ,
                                                            RefPt_WCS_Coord(3),
-                                                           zn.MaximumZ));
+                                                           thisZone.MaximumZ));
                                     ErrorsFound = true;
                                 }
 
@@ -706,7 +722,7 @@ namespace DElightManagerF {
         int IOStat;
         int CFSNum = 0;
 
-        constexpr auto cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
+        constexpr std::string_view cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
 
         int TotDElightCFS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataDaylightingData->DElightComplexFene.allocate(TotDElightCFS);
@@ -770,14 +786,11 @@ namespace DElightManagerF {
         // ratio for the entire building based on user input.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto CurrentModuleObject("GeometryTransform");
+        constexpr std::string_view CurrentModuleObject("GeometryTransform");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string cAlphas(1);
         Array1D<Real64> rNumerics(2);
-        int NAlphas;
-        int NNum;
-        int IOStat;
 
         // begin execution
         // get user input...
@@ -786,6 +799,9 @@ namespace DElightManagerF {
         NewAspectRatio = 1.0;
 
         if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
+            int NAlphas;
+            int NNum;
+            int IOStat;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      1,
@@ -837,7 +853,7 @@ namespace DElightManagerF {
     }
 
     void DElightElecLtgCtrl(int iNameLength,
-                            std::string cZoneName,
+                            std::string const &cZoneName,
                             Real64 dBldgLat,
                             Real64 dHISKF,
                             Real64 dHISUNF,
@@ -848,7 +864,7 @@ namespace DElightManagerF {
                             Real64 &pdPowerReducFac,
                             int piErrorFlag)
     {
-        auto zoneNameArr(getCharArrayFromString(cZoneName));
+        std::vector<char> zoneNameArr(getCharArrayFromString(cZoneName));
         delightelecltgctrl(
             iNameLength, &zoneNameArr[0], dBldgLat, dHISKF, dHISUNF, dCloudFraction, dSOLCOSX, dSOLCOSY, dSOLCOSZ, &pdPowerReducFac, &piErrorFlag);
     }

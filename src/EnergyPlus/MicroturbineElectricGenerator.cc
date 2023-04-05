@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -107,8 +107,8 @@ PlantComponent *MTGeneratorSpecs::factory(EnergyPlusData &state, std::string con
         }
     }
     // If we didn't find it, fatal
-    ShowFatalError(state,
-                   "LocalMicroTurbineGeneratorFactory: Error getting inputs for microturbine generator named: " + objectName); // LCOV_EXCL_LINE
+    ShowFatalError(
+        state, format("LocalMicroTurbineGeneratorFactory: Error getting inputs for microturbine generator named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
     return nullptr; // LCOV_EXCL_LINE
 }
@@ -131,7 +131,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
 
     if (state.dataMircoturbElectGen->NumMTGenerators <= 0) {
-        ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
+        ShowSevereError(state, format("No {} equipment specified in input file", state.dataIPShortCut->cCurrentModuleObject));
         ErrorsFound = true;
     }
 
@@ -163,8 +163,8 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecPowerOutput = NumArray(1);
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecPowerOutput <= 0.0) {
             ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), NumArray(1)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " must be greater than 0.");
+            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
+            ShowContinueError(state, format("{} must be greater than 0.", state.dataIPShortCut->cNumericFieldNames(1)));
             ErrorsFound = true;
         }
 
@@ -173,8 +173,8 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MinElecPowerOutput < 0.0) {
             ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(2), NumArray(2)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(2) + " must be greater than 0.");
+            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
+            ShowContinueError(state, format("{} must be greater than 0.", state.dataIPShortCut->cNumericFieldNames(2)));
             ErrorsFound = true;
         }
 
@@ -184,15 +184,16 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         } else {
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MaxElecPowerOutput <= 0.0) {
                 ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(3), NumArray(3)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(3) + " must be greater than 0.");
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
+                ShowContinueError(state, format("{} must be greater than 0.", state.dataIPShortCut->cNumericFieldNames(3)));
                 ErrorsFound = true;
             }
         }
 
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MinElecPowerOutput >=
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MaxElecPowerOutput) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "= " + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name);
+            ShowSevereError(
+                state, format("{}= {}", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
             ShowContinueError(state,
                               format("{} [{:.2R}] > {} [{:.2R}]",
                                      state.dataIPShortCut->cNumericFieldNames(2),
@@ -208,9 +209,12 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MaxElecPowerOutput ||
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecPowerOutput <
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MinElecPowerOutput) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "= " + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name);
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " must be >= " + state.dataIPShortCut->cNumericFieldNames(2));
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " must be <= " + state.dataIPShortCut->cNumericFieldNames(3));
+            ShowSevereError(
+                state, format("{}= {}", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+            ShowContinueError(state,
+                              format("{} must be >= {}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->cNumericFieldNames(2)));
+            ShowContinueError(state,
+                              format("{} must be <= {}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->cNumericFieldNames(3)));
             ShowContinueError(state, format("{} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(1), NumArray(1)));
             ShowContinueError(state, format("{} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(2), NumArray(2)));
             ShowContinueError(state, format("{} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(3), NumArray(3)));
@@ -221,8 +225,8 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecEfficiencyLHV <= 0.0) {
             ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(4), NumArray(4)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(4) + " must be greater than 0.");
+            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
+            ShowContinueError(state, format("{} must be greater than 0.", state.dataIPShortCut->cNumericFieldNames(4)));
             ErrorsFound = true;
         }
 
@@ -232,8 +236,8 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletHumRat <= 0.0) {
             ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(6), NumArray(6)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(6) + " must be greater than 0.");
+            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
+            ShowContinueError(state, format("{} must be greater than 0.", state.dataIPShortCut->cNumericFieldNames(6)));
             ErrorsFound = true;
         } else {
             // Reference barometric pressure, adjusted for reference elevation (Pa)
@@ -247,10 +251,10 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         }
 
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum =
-            CurveManager::GetCurveIndex(state, AlphArray(2)); // Convert curve name to number
+            Curve::GetCurveIndex(state, AlphArray(2)); // Convert curve name to number
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum == 0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + AlphArray(2));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), AlphArray(2)));
+            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
             ErrorsFound = true;
         } else {
             // Verify curve object, only legal type is BiQuadratic
@@ -258,17 +262,16 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             if (!ErrorsFound) {
                 // Check electrical power output at reference combustion inlet temp and elevation
                 // Output of Electrical Power Output Modifier Curve (function of temp and elev)
-                Real64 ElectOutFTempElevOutput =
-                    CurveManager::CurveValue(state,
-                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum,
-                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp,
-                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElevation);
+                Real64 ElectOutFTempElevOutput = Curve::CurveValue(state,
+                                                                   state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecPowFTempElevCurveNum,
+                                                                   state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp,
+                                                                   state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElevation);
                 if (std::abs(ElectOutFTempElevOutput - 1.0) > 0.1) {
-                    ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + " \"" +
-                                         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2));
-                    ShowContinueError(state, "...Curve output at reference conditions should equal 1 (+-10%).");
+                    ShowWarningError(
+                        state,
+                        format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                    ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(2), AlphArray(2)));
+                    ShowContinueError(state, "... Curve output at reference conditions should equal 1 (+-10%).");
                     ShowContinueError(state,
                                       format("...Reference combustion air inlet temperature = {:.4T} C",
                                              state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp));
@@ -281,11 +284,11 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         }
 
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFTempCurveNum =
-            CurveManager::GetCurveIndex(state, AlphArray(3)); // Convert curve name to number
+            Curve::GetCurveIndex(state, AlphArray(3)); // Convert curve name to number
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFTempCurveNum == 0) {
-            ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-            ShowSevereError(state, state.dataIPShortCut->cAlphaFieldNames(3) + " not found = " + AlphArray(3));
+            ShowSevereError(
+                state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+            ShowSevereError(state, format("{} not found = {}", state.dataIPShortCut->cAlphaFieldNames(3), AlphArray(3)));
             ErrorsFound = true;
         } else {
             // Verify curve object, only legal types are Quadratic and Cubic
@@ -293,14 +296,14 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             if (!ErrorsFound) {
                 // Check electrical efficiency at reference combustion inlet temp
                 // Output of Electrical Efficiency Modifier Curve (function of temp)
-                Real64 ElecEfficFTempOutput = CurveManager::CurveValue(state,
-                                                                       state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFTempCurveNum,
-                                                                       state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp);
+                Real64 ElecEfficFTempOutput = Curve::CurveValue(state,
+                                                                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFTempCurveNum,
+                                                                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp);
                 if (std::abs(ElecEfficFTempOutput - 1.0) > 0.1) {
-                    ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + " \"" +
-                                         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(3) + " = " + AlphArray(3));
+                    ShowWarningError(
+                        state,
+                        format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                    ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(3), AlphArray(3)));
                     ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                     ShowContinueError(state,
                                       format("... Reference combustion air inlet temperature = {:.4T} C",
@@ -311,11 +314,11 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         }
 
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFPLRCurveNum =
-            CurveManager::GetCurveIndex(state, AlphArray(4)); // Convert curve name to number
+            Curve::GetCurveIndex(state, AlphArray(4)); // Convert curve name to number
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFPLRCurveNum == 0) {
-            ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-            ShowSevereError(state, state.dataIPShortCut->cAlphaFieldNames(4) + " not found = " + AlphArray(4));
+            ShowSevereError(
+                state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+            ShowSevereError(state, format("{} not found = {}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
             ErrorsFound = true;
         } else {
             // Verify curve object, only legal types are Quadratic and Cubic
@@ -324,20 +327,19 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                 // Check electrical efficiency at PLR = 1
                 // Output of Electrical Efficiency Modifier Curve (function of PLR)
                 Real64 ElecEfficFPLROutput =
-                    CurveManager::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, 1.0);
+                    Curve::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, 1.0);
                 if (std::abs(ElecEfficFPLROutput - 1.0) > 0.1) {
-                    ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + " \"" +
-                                         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
+                    ShowWarningError(
+                        state,
+                        format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                    ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
                     ShowContinueError(state, "... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
                     ShowContinueError(state, format("... Curve output = {:.4T}", ElecEfficFPLROutput));
                 }
 
                 Real64 Var1Min(0.0);
                 Real64 Var1Max(0.0);
-                CurveManager::GetCurveMinMaxValues(
-                    state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, Var1Min, Var1Max);
+                Curve::GetCurveMinMaxValues(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ElecEffFPLRCurveNum, Var1Min, Var1Max);
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MinPartLoadRat = Var1Min;
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).MaxPartLoadRat = Var1Max;
             }
@@ -347,9 +349,9 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         bool FuelTypeError(false);
         UtilityRoutines::ValidateFuelType(state, AlphArray(5), state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType, FuelTypeError);
         if (FuelTypeError) {
-            ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "  = " + AlphArray(5));
+            ShowSevereError(
+                state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+            ShowSevereError(state, format("Invalid {}  = {}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
             ErrorsFound = true;
             FuelTypeError = false;
         }
@@ -359,24 +361,25 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelLowerHeatingValue <= 0.0) {
             ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(9), NumArray(9)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(9) + " must be greater than 0.");
+            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
+            ShowContinueError(state, format("{} must be greater than 0.", state.dataIPShortCut->cNumericFieldNames(9)));
             ErrorsFound = true;
         }
 
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelHigherHeatingValue <= 0.0) {
             ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(8), NumArray(8)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(8) + " must be greater than 0.");
+            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
+            ShowContinueError(state, format("{} must be greater than 0.", state.dataIPShortCut->cNumericFieldNames(8)));
             ErrorsFound = true;
         }
 
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelLowerHeatingValue >
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelHigherHeatingValue) {
-            ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+            ShowSevereError(
+                state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
             ShowContinueError(
-                state, state.dataIPShortCut->cNumericFieldNames(8) + " must be greater than the " + state.dataIPShortCut->cNumericFieldNames(9));
+                state,
+                format("{} must be greater than the {}", state.dataIPShortCut->cNumericFieldNames(8), state.dataIPShortCut->cNumericFieldNames(9)));
             ShowContinueError(state, format("{}={:.2R}", state.dataIPShortCut->cNumericFieldNames(8), NumArray(8)));
             ShowContinueError(state, format("{}={:.2R}", state.dataIPShortCut->cNumericFieldNames(9), NumArray(9)));
             ErrorsFound = true;
@@ -385,8 +388,8 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).StandbyPower = NumArray(10);
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).StandbyPower < 0.0) {
             ShowWarningError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(10), NumArray(10)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(10) + " must be greater than 0.");
+            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
+            ShowContinueError(state, format("{} must be greater than 0.", state.dataIPShortCut->cNumericFieldNames(10)));
             ShowContinueError(state, "Resetting to 0 and the simulation continues.");
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).StandbyPower = 0.0;
         }
@@ -394,18 +397,18 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPower = NumArray(11);
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPower < 0.0) {
             ShowWarningError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(11), NumArray(11)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(11) + " must be greater than 0.");
+            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
+            ShowContinueError(state, format("{} must be greater than 0.", state.dataIPShortCut->cNumericFieldNames(11)));
             ShowContinueError(state, "Resetting to 0 and the simulation continues.");
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPower = 0.0;
         }
 
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum =
-            CurveManager::GetCurveIndex(state, AlphArray(6)); // Convert curve name to number
+            Curve::GetCurveIndex(state, AlphArray(6)); // Convert curve name to number
         //   If blank, then the calc routine assumes modifier curve value = 1 for entire simulation
         if (!state.dataIPShortCut->lAlphaFieldBlanks(6) && state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum == 0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + AlphArray(6));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+            ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), AlphArray(6)));
+            ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
             ErrorsFound = true;
         } else if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum > 0) {
             // Verify curve object, only legal type is Quadratic
@@ -416,13 +419,13 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                          state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecEfficiencyLHV) /
                                         (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelLowerHeatingValue * 1000.0);
                 // Output of Ancillary Power Modifer Curve (function of temps and fuel flow)
-                Real64 AncillaryPowerOutput = CurveManager::CurveValue(
-                    state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum, RefFuelUseMdot);
+                Real64 AncillaryPowerOutput =
+                    Curve::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).AncillaryPowerFuelCurveNum, RefFuelUseMdot);
                 if (std::abs(AncillaryPowerOutput - 1.0) > 0.1) {
-                    ShowWarningError(state,
-                                     state.dataIPShortCut->cCurrentModuleObject + " \"" +
-                                         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                    ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(6) + " = " + AlphArray(6));
+                    ShowWarningError(
+                        state,
+                        format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                    ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(6), AlphArray(6)));
                     ShowContinueError(state, "... Curve output at reference conditions should equal 1 (+-10%).");
                     ShowContinueError(state,
                                       format("... Reference Electrical Power Output           = {:.2T} W",
@@ -479,8 +482,8 @@ void GetMTGeneratorInput(EnergyPlusData &state)
              state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum == 0) ||
             (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecOutletNodeNum == 0 &&
              state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum > 0)) {
-            ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+            ShowSevereError(
+                state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
             ShowContinueError(state, "... If one Heat Recovery Water Node Name is specified, then both the Inlet and Outlet Heat Recovery");
             ShowContinueError(state, "... Water Node Names must be specified. Only one water node is being specified for this generator.");
             ErrorsFound = true;
@@ -495,8 +498,9 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefThermalEffLHV = NumArray(12);
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefThermalEffLHV < 0.0) {
                 ShowWarningError(
-                    state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(12) + " must be >= 0.");
+                    state,
+                    format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                ShowContinueError(state, format("{} must be >= 0.", state.dataIPShortCut->cNumericFieldNames(12)));
                 ShowContinueError(state, "Resetting to 0 and the simulation continues.");
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefThermalEffLHV = 0.0;
             }
@@ -523,8 +527,8 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).PlantFlowControl = false;
             }
             if ((!(UtilityRoutines::SameString(AlphArray(9), "InternalControl"))) && (!(UtilityRoutines::SameString(AlphArray(9), "PlantControl")))) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphArray(9));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), AlphArray(9)));
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ShowContinueError(state, "Operating Mode must be INTERNAL CONTROL or PLANT CONTROL.");
                 ErrorsFound = true;
             }
@@ -533,15 +537,14 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate <= 0.0) {
                 ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(14), NumArray(14)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(14) + " must be greater than 0.");
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
+                ShowContinueError(state, format("{} must be greater than 0.", state.dataIPShortCut->cNumericFieldNames(14)));
                 ErrorsFound = true;
             }
 
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).InternalFlowControl) { // Get Heat Recovery Water Flow Rate Modifier Curve
 
-                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum =
-                    CurveManager::GetCurveIndex(state, AlphArray(10));
+                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum = Curve::GetCurveIndex(state, AlphArray(10));
                 if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecFlowFTempPowCurveNum != 0) {
                     // Verify curve object, only legal type is BiQuadratic
                 }
@@ -549,23 +552,24 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             } // End of IF (MTGenerator(GeneratorNum)%InternalFlowControl) THEN
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum =
-                CurveManager::GetCurveIndex(state, AlphArray(11)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(11)); // convert curve name to number
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum != 0) {
                 // Verify curve object, only legal types are BiQuadratic and BiCubic
 
                 if (!ErrorsFound) {
                     // Output of Thermal Efficiency Modifier Curve (function of temp and elevation)
                     Real64 ThermalEffTempElevOutput =
-                        CurveManager::CurveValue(state,
-                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum,
-                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp,
-                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElevation);
+                        Curve::CurveValue(state,
+                                          state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ThermEffFTempElevCurveNum,
+                                          state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp,
+                                          state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElevation);
 
                     if (std::abs(ThermalEffTempElevOutput - 1.0) > 0.1) {
                         ShowWarningError(state,
-                                         state.dataIPShortCut->cCurrentModuleObject + " \"" +
-                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(11) + " = " + AlphArray(11));
+                                         format("{} \"{}\"",
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                        ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(11), AlphArray(11)));
                         ShowContinueError(state, "... Curve output at reference conditions should equal 1 (+-10%).");
                         ShowContinueError(state,
                                           format("... Reference combustion air inlet temperature      = {:.4T} C",
@@ -578,20 +582,21 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             }
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum =
-                CurveManager::GetCurveIndex(state, AlphArray(12)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(12)); // convert curve name to number
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum != 0) {
                 // Verify curve object, only legal types are Quadratic or Cubic
 
                 if (!ErrorsFound) {
                     // Output of Heat Recovery Rate Modifier Curve (function of PLR)
                     Real64 HeatRecRateFPLROutput =
-                        CurveManager::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum, 1.0);
+                        Curve::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFPLRCurveNum, 1.0);
 
                     if (std::abs(HeatRecRateFPLROutput - 1.0) > 0.1) {
                         ShowWarningError(state,
-                                         state.dataIPShortCut->cCurrentModuleObject + " \"" +
-                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(12) + " = " + AlphArray(12));
+                                         format("{} \"{}\"",
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                        ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(12), AlphArray(12)));
                         ShowContinueError(state, "... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
                         ShowContinueError(state, format("... Curve output = {:.4T}", HeatRecRateFPLROutput));
                     }
@@ -599,22 +604,22 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             }
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum =
-                CurveManager::GetCurveIndex(state, AlphArray(13)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(13)); // convert curve name to number
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum != 0) {
                 // Verify curve object, only legal type is Quadratic
 
                 if (!ErrorsFound) {
                     // Output of Heat Recovery Rate Modifier Curve (function of inlet water temp)
-                    Real64 HeatRecRateFTempOutput =
-                        CurveManager::CurveValue(state,
-                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum,
-                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefInletWaterTemp);
+                    Real64 HeatRecRateFTempOutput = Curve::CurveValue(state,
+                                                                      state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFTempCurveNum,
+                                                                      state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefInletWaterTemp);
 
                     if (std::abs(HeatRecRateFTempOutput - 1.0) > 0.1) {
                         ShowWarningError(state,
-                                         state.dataIPShortCut->cCurrentModuleObject + " \"" +
-                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(13) + " = " + AlphArray(13));
+                                         format("{} \"{}\"",
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                        ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(13), AlphArray(13)));
                         ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                         ShowContinueError(state,
                                           format("... Reference inlet water temperature temperature      = {:.4T} C",
@@ -624,22 +629,23 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                 }
             }
 
-            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum = CurveManager::GetCurveIndex(state, AlphArray(14));
+            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum = Curve::GetCurveIndex(state, AlphArray(14));
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum != 0) {
                 // Verify curve object, only legal type is Quadratic
 
                 if (!ErrorsFound) {
                     // Output of Heat Recovery Rate Modifier Curve (function of water flow rate)
                     Real64 HeatRecRateFFlowOutput =
-                        CurveManager::CurveValue(state,
-                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum,
-                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate);
+                        Curve::CurveValue(state,
+                                          state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecRateFWaterFlowCurveNum,
+                                          state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate);
 
                     if (std::abs(HeatRecRateFFlowOutput - 1.0) > 0.1) {
                         ShowWarningError(state,
-                                         state.dataIPShortCut->cCurrentModuleObject + " \"" +
-                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(14) + " = " + AlphArray(14));
+                                         format("{} \"{}\"",
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                        ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(14), AlphArray(14)));
                         ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                         ShowContinueError(state,
                                           format("... Reference Heat Recovery Water Flow Rate      = {:.4T} m3/s",
@@ -652,8 +658,9 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate = NumArray(15);
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate < 0.0) {
                 ShowWarningError(
-                    state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(15) + " must be >= 0.");
+                    state,
+                    format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                ShowContinueError(state, format("{} must be >= 0.", state.dataIPShortCut->cNumericFieldNames(15)));
                 ShowContinueError(state, "Resetting to 0 and the simulation continues.");
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate = 0.0;
             }
@@ -661,8 +668,9 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate = NumArray(16);
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate < 0.0) {
                 ShowWarningError(
-                    state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(16) + " must be >= 0.");
+                    state,
+                    format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                ShowContinueError(state, format("{} must be >= 0.", state.dataIPShortCut->cNumericFieldNames(16)));
                 ShowContinueError(state, "Resetting to 0 and the simulation continues.");
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate = 0.0;
             }
@@ -670,12 +678,14 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate <
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate) {
                 ShowWarningError(
-                    state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                    state,
+                    format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                ShowContinueError(
+                    state, format("{} must be >= {}", state.dataIPShortCut->cNumericFieldNames(16), state.dataIPShortCut->cNumericFieldNames(15)));
                 ShowContinueError(state,
-                                  state.dataIPShortCut->cNumericFieldNames(16) + " must be >= " + state.dataIPShortCut->cNumericFieldNames(15));
-                ShowContinueError(state,
-                                  "Resetting " + state.dataIPShortCut->cNumericFieldNames(16) + " = " + state.dataIPShortCut->cNumericFieldNames(15) +
-                                      " and the simulation continues.");
+                                  format("Resetting {} = {} and the simulation continues.",
+                                         state.dataIPShortCut->cNumericFieldNames(16),
+                                         state.dataIPShortCut->cNumericFieldNames(15)));
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate =
                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate;
             }
@@ -684,12 +694,14 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate <
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate) {
                 ShowWarningError(
-                    state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                    state,
+                    format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                ShowContinueError(
+                    state, format("{} must be >= {}", state.dataIPShortCut->cNumericFieldNames(14), state.dataIPShortCut->cNumericFieldNames(15)));
                 ShowContinueError(state,
-                                  state.dataIPShortCut->cNumericFieldNames(14) + " must be >= " + state.dataIPShortCut->cNumericFieldNames(15));
-                ShowContinueError(state,
-                                  "Resetting " + state.dataIPShortCut->cNumericFieldNames(14) + " = " + state.dataIPShortCut->cNumericFieldNames(15) +
-                                      " and the simulation continues.");
+                                  format("Resetting {} = {} and the simulation continues.",
+                                         state.dataIPShortCut->cNumericFieldNames(14),
+                                         state.dataIPShortCut->cNumericFieldNames(15)));
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate =
                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMinVolFlowRate;
             }
@@ -698,12 +710,14 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate >
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate) {
                 ShowWarningError(
-                    state, state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+                    state,
+                    format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                ShowContinueError(
+                    state, format("{} must be <= {}", state.dataIPShortCut->cNumericFieldNames(14), state.dataIPShortCut->cNumericFieldNames(16)));
                 ShowContinueError(state,
-                                  state.dataIPShortCut->cNumericFieldNames(14) + " must be <= " + state.dataIPShortCut->cNumericFieldNames(16));
-                ShowContinueError(state,
-                                  "Resetting " + state.dataIPShortCut->cNumericFieldNames(14) + " = " + state.dataIPShortCut->cNumericFieldNames(16) +
-                                      " and the simulation continues.");
+                                  format("Resetting {} = {} and the simulation continues.",
+                                         state.dataIPShortCut->cNumericFieldNames(14),
+                                         state.dataIPShortCut->cNumericFieldNames(16)));
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate =
                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate;
             }
@@ -733,9 +747,9 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         //    Combustion air inlet node must be an outside air node
         if (!state.dataIPShortCut->lAlphaFieldBlanks(15) &&
             !OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInletNodeNum)) {
-            ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-            ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(15) + " is not a valid Outdoor Air Node = " + AlphArray(15));
+            ShowSevereError(
+                state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+            ShowContinueError(state, format("{} is not a valid Outdoor Air Node = {}", state.dataIPShortCut->cAlphaFieldNames(15), AlphArray(15)));
             ShowContinueError(state, "it does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
             ErrorsFound = true;
         }
@@ -755,11 +769,12 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
         if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirOutletNodeNum > 0 &&
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInletNodeNum == 0) {
-            ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " \"" + state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
+            ShowSevereError(
+                state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
             ShowContinueError(state,
-                              "A " + state.dataIPShortCut->cAlphaFieldNames(15) + " must be specified when a " +
-                                  state.dataIPShortCut->cAlphaFieldNames(16) + " is specified.");
+                              format("A {} must be specified when a {} is specified.",
+                                     state.dataIPShortCut->cAlphaFieldNames(15),
+                                     state.dataIPShortCut->cAlphaFieldNames(16)));
             ErrorsFound = true;
         }
 
@@ -772,27 +787,27 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefExhaustAirMassFlowRate <= 0.0 &&
                 !state.dataIPShortCut->lNumericFieldBlanks(18)) {
                 ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(18), NumArray(18)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(18) + " must be greater than 0.");
+                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
+                ShowContinueError(state, format("{} must be greater than 0.", state.dataIPShortCut->cNumericFieldNames(18)));
                 ErrorsFound = true;
             }
 
-            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhFlowFTempCurveNum = CurveManager::GetCurveIndex(state, AlphArray(17));
+            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhFlowFTempCurveNum = Curve::GetCurveIndex(state, AlphArray(17));
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhFlowFTempCurveNum != 0) {
                 // Verify curve object, only legal types are Quadratic and Cubic
 
                 if (!ErrorsFound) {
                     // Output of Exhaust Air Flow Modifier Curve (function of inlet air temp)
-                    Real64 ExhFlowFTempOutput =
-                        CurveManager::CurveValue(state,
-                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhFlowFTempCurveNum,
-                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp);
+                    Real64 ExhFlowFTempOutput = Curve::CurveValue(state,
+                                                                  state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhFlowFTempCurveNum,
+                                                                  state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp);
 
                     if (std::abs(ExhFlowFTempOutput - 1.0) > 0.1) {
                         ShowWarningError(state,
-                                         state.dataIPShortCut->cCurrentModuleObject + " \"" +
-                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(17) + " = " + AlphArray(17));
+                                         format("{} \"{}\"",
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                        ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(17), AlphArray(17)));
                         ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                         ShowContinueError(state,
                                           format("... Reference combustion air inlet temperature      = {:.4T} C",
@@ -803,20 +818,21 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             }
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum =
-                CurveManager::GetCurveIndex(state, AlphArray(18)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(18)); // convert curve name to number
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum != 0) {
                 // Verify curve object, legal types are Quadratic or Cubic
 
                 if (!ErrorsFound) {
                     // Output of Exhaust Air Flow Modifier Curve (function of PLR)
                     Real64 ExhFlowFPLROutput =
-                        CurveManager::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum, 1.0);
+                        Curve::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhFlowFPLRCurveNum, 1.0);
 
                     if (std::abs(ExhFlowFPLROutput - 1.0) > 0.1) {
                         ShowWarningError(state,
-                                         state.dataIPShortCut->cCurrentModuleObject + " \"" +
-                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(18) + " = " + AlphArray(18));
+                                         format("{} \"{}\"",
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                        ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(18), AlphArray(18)));
                         ShowContinueError(state, "... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
                         ShowContinueError(state, format("... Curve output = {:.4T}", ExhFlowFPLROutput));
                     }
@@ -825,22 +841,22 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).NomExhAirOutletTemp = NumArray(19);
 
-            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum = CurveManager::GetCurveIndex(state, AlphArray(19));
+            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum = Curve::GetCurveIndex(state, AlphArray(19));
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum != 0) {
                 // Verify curve object, only legal types are Quadratic and Cubic
 
                 if (!ErrorsFound) {
                     // Output of Exhaust Air Temperature Modifier Curve (function of inlet air temp)
-                    Real64 ExhAirTempFTempOutput =
-                        CurveManager::CurveValue(state,
-                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum,
-                                                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp);
+                    Real64 ExhAirTempFTempOutput = Curve::CurveValue(state,
+                                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhAirTempFTempCurveNum,
+                                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefCombustAirInletTemp);
 
                     if (std::abs(ExhAirTempFTempOutput - 1.0) > 0.1) {
                         ShowWarningError(state,
-                                         state.dataIPShortCut->cCurrentModuleObject + " \"" +
-                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(19) + " = " + AlphArray(19));
+                                         format("{} \"{}\"",
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                        ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(19), AlphArray(19)));
                         ShowContinueError(state, "... Curve output at reference condition should equal 1 (+-10%).");
                         ShowContinueError(state,
                                           format("... Reference combustion air inlet temperature      = {:.4T} C",
@@ -851,20 +867,21 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             }
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum =
-                CurveManager::GetCurveIndex(state, AlphArray(20)); // convert curve name to number
+                Curve::GetCurveIndex(state, AlphArray(20)); // convert curve name to number
             if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum != 0) {
                 // Verify curve object, legal types are Quadratic or Cubic
 
                 if (!ErrorsFound) {
                     // Output of Exhaust Air Temperature Modifier Curve (function of PLR)
                     Real64 ExhOutAirTempFPLROutput =
-                        CurveManager::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum, 1.0);
+                        Curve::CurveValue(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhAirTempFPLRCurveNum, 1.0);
 
                     if (std::abs(ExhOutAirTempFPLROutput - 1.0) > 0.1) {
                         ShowWarningError(state,
-                                         state.dataIPShortCut->cCurrentModuleObject + " \"" +
-                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name + "\"");
-                        ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(20) + " = " + AlphArray(20));
+                                         format("{} \"{}\"",
+                                                state.dataIPShortCut->cCurrentModuleObject,
+                                                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
+                        ShowContinueError(state, format("{} = {}", state.dataIPShortCut->cAlphaFieldNames(20), AlphArray(20)));
                         ShowContinueError(state, "... Curve output at a part-load ratio of 1 should equal 1 (+-10%).");
                         ShowContinueError(state, format("... Curve output = {:.4T}", ExhOutAirTempFPLROutput));
                     }
@@ -876,7 +893,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
+        ShowFatalError(state, format("Errors found in processing input for {}", state.dataIPShortCut->cCurrentModuleObject));
     }
 }
 
@@ -1147,8 +1164,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
             if (this->HeatRecFlowFTempPowCurveNum != 0) {
                 DesiredMassFlowRate =
                     this->DesignHeatRecMassFlowRate *
-                    CurveManager::CurveValue(
-                        state, this->HeatRecFlowFTempPowCurveNum, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp, MyLoad);
+                    Curve::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp, MyLoad);
             } else {
                 DesiredMassFlowRate = this->DesignHeatRecMassFlowRate; // Assume modifier = 1 if curve not specified
             }
@@ -1172,8 +1188,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
             if (this->HeatRecFlowFTempPowCurveNum != 0) {
                 Real64 DesiredMassFlowRate =
                     this->DesignHeatRecMassFlowRate *
-                    CurveManager::CurveValue(
-                        state, this->HeatRecFlowFTempPowCurveNum, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp, MyLoad);
+                    Curve::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp, MyLoad);
                 PlantUtilities::SetComponentFlowRate(
                     state, DesiredMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
             } else {
@@ -1291,13 +1306,13 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
 
     //   Calculate power modifier curve value (function of inlet air temperature and elevation)
     // Power ratio as a function of inlet air temperature and elevation
-    Real64 PowerFTempElev = CurveManager::CurveValue(state, this->ElecPowFTempElevCurveNum, CombustionAirInletTemp, state.dataEnvrn->Elevation);
+    Real64 PowerFTempElev = Curve::CurveValue(state, this->ElecPowFTempElevCurveNum, CombustionAirInletTemp, state.dataEnvrn->Elevation);
 
     //   Warn user if power modifier curve output is less than 0
     if (PowerFTempElev < 0.0) {
         if (this->PowerFTempElevErrorIndex == 0) {
             //        MTGenerator(GeneratorNum)%PowerFTempElevErrorCount = MTGenerator(GeneratorNum)%PowerFTempElevErrorCount + 1
-            ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+            ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
             ShowContinueError(state,
                               format("... Electrical Power Modifier curve (function of temperature and elevation) output is less than zero ({:.4T}).",
                                      PowerFTempElev));
@@ -1354,13 +1369,13 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
 
         //     Calculate electrical efficiency modifier curve output (function of temp)
         // Electrical efficiency as a function of temperature curve output
-        Real64 ElecEfficiencyFTemp = CurveManager::CurveValue(state, this->ElecEffFTempCurveNum, CombustionAirInletTemp);
+        Real64 ElecEfficiencyFTemp = Curve::CurveValue(state, this->ElecEffFTempCurveNum, CombustionAirInletTemp);
 
         //     Warn user if efficiency modifier curve output is less than 0
         if (ElecEfficiencyFTemp < 0.0) {
             if (this->EffFTempErrorIndex == 0) {
                 //          MTGenerator(GeneratorNum)%EffFTempErrorCount = MTGenerator(GeneratorNum)%EffFTempErrorCount + 1
-                ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                 ShowContinueError(
                     state,
                     format("... Electrical Efficiency Modifier (function of temperature) output is less than zero ({:.4T}).", ElecEfficiencyFTemp));
@@ -1379,12 +1394,12 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
 
         //     Calculate efficiency modifier curve output (function of PLR)
         // Electrical efficiency as a function of PLR curve output
-        Real64 ElecEfficiencyFPLR = CurveManager::CurveValue(state, this->ElecEffFPLRCurveNum, PLR);
+        Real64 ElecEfficiencyFPLR = Curve::CurveValue(state, this->ElecEffFPLRCurveNum, PLR);
 
         //     Warn user if efficiency modifier curve output is less than 0
         if (ElecEfficiencyFPLR < 0.0) {
             if (this->EffFPLRErrorIndex == 0) {
-                ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                 ShowContinueError(state,
                                   format("... Electrical Efficiency Modifier (function of part-load ratio) output is less than zero ({:.4T}).",
                                          ElecEfficiencyFPLR));
@@ -1422,11 +1437,11 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
 
         //     Calculate ancillary power requirement
         if (this->AncillaryPowerFuelCurveNum > 0) {
-            AnciPowerFMdotFuel = CurveManager::CurveValue(state, this->AncillaryPowerFuelCurveNum, this->FuelMdot);
+            AnciPowerFMdotFuel = Curve::CurveValue(state, this->AncillaryPowerFuelCurveNum, this->FuelMdot);
             //       Warn user if ancillary power modifier curve output is less than 0
             if (AnciPowerFMdotFuel < 0.0) {
                 if (this->AnciPowerFMdotFuelErrorIndex == 0) {
-                    ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                    ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                     ShowContinueError(
                         state,
                         format("... Ancillary Power Modifier (function of fuel input) output is less than zero ({:.4T}).", AnciPowerFMdotFuel));
@@ -1459,7 +1474,7 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
     if (AncPowerCalcIterIndex > MaxAncPowerIter) {
 
         if (this->AnciPowerIterErrorIndex == 0) {
-            ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+            ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
             ShowContinueError(state, "... Iteration loop for electric power generation is not converging within tolerance.");
             ShowContinueError(state, "... Check the Ancillary Power Modifier Curve (function of fuel input).");
             ShowContinueError(state, format("... Ancillary Power = {:.1T} W.", ancillaryPowerRate));
@@ -1491,12 +1506,11 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
         // Thermal efficiency as a function of air temperature and elevation
         Real64 ThermalEffFTempElev;
         if (this->ThermEffFTempElevCurveNum > 0) {
-            ThermalEffFTempElev =
-                CurveManager::CurveValue(state, this->ThermEffFTempElevCurveNum, CombustionAirInletTemp, state.dataEnvrn->Elevation);
+            ThermalEffFTempElev = Curve::CurveValue(state, this->ThermEffFTempElevCurveNum, CombustionAirInletTemp, state.dataEnvrn->Elevation);
             //       Warn user if power modifier curve output is less than 0
             if (ThermalEffFTempElev < 0.0) {
                 if (this->ThermEffFTempElevErrorIndex == 0) {
-                    ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                    ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                     ShowContinueError(
                         state,
                         format("... Electrical Power Modifier curve (function of temperature and elevation) output is less than zero ({:.4T}).",
@@ -1523,11 +1537,11 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
 
         //     Calculate heat recovery rate modifier curve output (function of PLR)
         if (this->HeatRecRateFPLRCurveNum > 0) {
-            HeatRecRateFPLR = CurveManager::CurveValue(state, this->HeatRecRateFPLRCurveNum, PLR);
+            HeatRecRateFPLR = Curve::CurveValue(state, this->HeatRecRateFPLRCurveNum, PLR);
             //       Warn user if heat recovery modifier curve output is less than 0
             if (HeatRecRateFPLR < 0.0) {
                 if (this->HeatRecRateFPLRErrorIndex == 0) {
-                    ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                    ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                     ShowContinueError(
                         state,
                         format("... Heat Recovery Rate Modifier (function of part-load ratio) output is less than zero ({:.4T}).", HeatRecRateFPLR));
@@ -1551,10 +1565,10 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
 
         //     Calculate heat recovery rate modifier curve output (function of inlet water temp)
         if (this->HeatRecRateFTempCurveNum > 0) {
-            HeatRecRateFTemp = CurveManager::CurveValue(state, this->HeatRecRateFTempCurveNum, HeatRecInTemp);
+            HeatRecRateFTemp = Curve::CurveValue(state, this->HeatRecRateFTempCurveNum, HeatRecInTemp);
             if (HeatRecRateFTemp < 0.0) {
                 if (this->HeatRecRateFTempErrorIndex == 0) {
-                    ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                    ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                     ShowContinueError(state,
                                       format("... Heat Recovery Rate Modifier (function of inlet water temp) output is less than zero ({:.4T}).",
                                              HeatRecRateFTemp));
@@ -1586,10 +1600,10 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
 
             // Heat recovery fluid flow rate (m3/s)
             Real64 HeatRecVolFlowRate = heatRecMdot / rho;
-            HeatRecRateFFlow = CurveManager::CurveValue(state, this->HeatRecRateFWaterFlowCurveNum, HeatRecVolFlowRate);
+            HeatRecRateFFlow = Curve::CurveValue(state, this->HeatRecRateFWaterFlowCurveNum, HeatRecVolFlowRate);
             if (HeatRecRateFFlow < 0.0) {
                 if (this->HeatRecRateFFlowErrorIndex == 0) {
-                    ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                    ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                     ShowContinueError(
                         state,
                         format("... Heat Recovery Rate Modifier (function of water flow rate) output is less than zero ({:.4T}).", HeatRecRateFFlow));
@@ -1649,7 +1663,7 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
         //     Check water mass flow rate against minimum
         if (this->HeatRecMinMassFlowRate > heatRecMdot && heatRecMdot > 0.0) {
             if (this->HRMinFlowErrorIndex == 0) {
-                ShowWarningError(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                ShowWarningError(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                 ShowContinueError(state,
                                   format("...Heat reclaim water flow rate is below the generators minimum mass flow rate of ({:.4T}).",
                                          this->HeatRecMinMassFlowRate));
@@ -1668,7 +1682,7 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
         //     Check water mass flow rate against maximum
         if (heatRecMdot > this->HeatRecMaxMassFlowRate && heatRecMdot > 0.0) {
             if (this->HRMaxFlowErrorIndex == 0) {
-                ShowWarningError(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                ShowWarningError(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                 ShowContinueError(state,
                                   format("...Heat reclaim water flow rate is above the generators maximum mass flow rate of ({:.4T}).",
                                          this->HeatRecMaxMassFlowRate));
@@ -1698,11 +1712,11 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
         Real64 ExhFlowFTemp; // Exhaust air flow rate as a function of temperature curve output
 
         if (this->ExhFlowFTempCurveNum != 0) { // Exhaust Flow Rate versus Inlet Air Temp
-            ExhFlowFTemp = CurveManager::CurveValue(state, this->ExhFlowFTempCurveNum, CombustionAirInletTemp);
+            ExhFlowFTemp = Curve::CurveValue(state, this->ExhFlowFTempCurveNum, CombustionAirInletTemp);
             //       Warn user if exhaust modifier curve output is less than or equal to 0
             if (ExhFlowFTemp <= 0.0) {
                 if (this->ExhFlowFTempErrorIndex == 0) {
-                    ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                    ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                     ShowContinueError(
                         state,
                         format("...Exhaust Air Flow Rate Modifier (function of temperature) output is less than or equal to zero ({:.4T}).",
@@ -1726,11 +1740,11 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
         Real64 ExhFlowFPLR; // Exhaust air flow rate as a function of part-load ratio curve output
 
         if (this->ExhFlowFPLRCurveNum != 0) { // Exhaust Flow Rate versus Part-Load Ratio
-            ExhFlowFPLR = CurveManager::CurveValue(state, this->ExhFlowFPLRCurveNum, PLR);
+            ExhFlowFPLR = Curve::CurveValue(state, this->ExhFlowFPLRCurveNum, PLR);
             //       Warn user if exhaust modifier curve output is less than or equal to 0
             if (ExhFlowFPLR <= 0.0) {
                 if (this->ExhFlowFPLRErrorIndex == 0) {
-                    ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                    ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                     ShowContinueError(
                         state,
                         format("...Exhaust Air Flow Rate Modifier (function of part-load ratio) output is less than or equal to zero ({:.4T}).",
@@ -1768,11 +1782,11 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
         Real64 ExhAirTempFTemp; // Exhaust air temperature as a function of inlet air temp curve output
 
         if (this->ExhAirTempFTempCurveNum != 0) { // Exhaust Air Temp versus Inlet Air Temp
-            ExhAirTempFTemp = CurveManager::CurveValue(state, this->ExhAirTempFTempCurveNum, CombustionAirInletTemp);
+            ExhAirTempFTemp = Curve::CurveValue(state, this->ExhAirTempFTempCurveNum, CombustionAirInletTemp);
             //       Warn user if exhaust modifier curve output is less than or equal to 0
             if (ExhAirTempFTemp <= 0.0) {
                 if (this->ExhTempFTempErrorIndex == 0) {
-                    ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                    ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                     ShowContinueError(
                         state,
                         format("...Exhaust Air Temperature Modifier (function of temperature) output is less than or equal to zero ({:.4T}).",
@@ -1796,11 +1810,11 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
         Real64 ExhAirTempFPLR; // Exhaust air temperature as a function of part-load ratio curve output
 
         if (this->ExhAirTempFPLRCurveNum != 0) { // Exhaust Air Temp versus Part-Load Ratio
-            ExhAirTempFPLR = CurveManager::CurveValue(state, this->ExhAirTempFPLRCurveNum, PLR);
+            ExhAirTempFPLR = Curve::CurveValue(state, this->ExhAirTempFPLRCurveNum, PLR);
             //       Warn user if exhaust modifier curve output is less than or equal to 0
             if (ExhAirTempFPLR <= 0.0) {
                 if (this->ExhTempFPLRErrorIndex == 0) {
-                    ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                    ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                     ShowContinueError(
                         state,
                         format("...Exhaust Air Temperature Modifier (function of part-load ratio) output is less than or equal to zero ({:.4T}).",
@@ -1852,7 +1866,7 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
 
         if (this->ExhaustAirTemperature < CombustionAirInletTemp) {
             if (this->ExhTempLTInletTempIndex == 0) {
-                ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                 ShowContinueError(state,
                                   "...The model has calculated the exhaust air temperature to be less than the combustion air inlet temperature.");
                 ShowContinueError(state, format("...Value of exhaust air temperature   ={:.4T} C.", this->ExhaustAirTemperature));
@@ -1869,7 +1883,7 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
 
         if (this->ExhaustAirHumRat < CombustionAirInletW) {
             if (this->ExhHRLTInletHRIndex == 0) {
-                ShowWarningMessage(state, "GENERATOR:MICROTURBINE \"" + this->Name + "\"");
+                ShowWarningMessage(state, format("GENERATOR:MICROTURBINE \"{}\"", this->Name));
                 ShowContinueError(
                     state, "...The model has calculated the exhaust air humidity ratio to be less than the combustion air inlet humidity ratio.");
                 ShowContinueError(state, format("...Value of exhaust air humidity ratio          ={:.6T} kgWater/kgDryAir.", this->ExhaustAirHumRat));
@@ -1913,9 +1927,9 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
             state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).MassFlowRateMinAvail;
     }
 
-    this->EnergyGen = this->ElecPowerGenerated * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->ExhaustEnergyRec = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->EnergyGen = this->ElecPowerGenerated * state.dataHVACGlobal->TimeStepSysSec;
+    this->ExhaustEnergyRec = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSysSec;
+    this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * state.dataHVACGlobal->TimeStepSysSec;
     if (this->FuelEnergyUseRateLHV > 0.0) {
         this->ElectricEfficiencyLHV = this->ElecPowerGenerated / this->FuelEnergyUseRateLHV;
         this->ThermalEfficiencyLHV = this->QHeatRecovered / this->FuelEnergyUseRateLHV;
@@ -1923,8 +1937,8 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
         this->ElectricEfficiencyLHV = 0.0;
         this->ThermalEfficiencyLHV = 0.0;
     }
-    this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSysSec;
 }
 void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
 {
@@ -1953,7 +1967,7 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
         // size mass flow rate
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::InitConvTemp,
+                                                       Constant::InitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 

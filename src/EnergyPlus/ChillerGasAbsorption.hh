@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -172,7 +172,7 @@ namespace ChillerGasAbsorption {
         Real64 FractionOfPeriodRunning = 0.0; // fraction of the time period that the unit is operating
         Real64 FuelCOP = 0.0;                 // reporting: cooling output/fuel input = CoolingLoad/CoolFuelUseRate
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static GasAbsorberSpecs *factory(EnergyPlusData &state, std::string const &objectName);
 
         void
         simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;

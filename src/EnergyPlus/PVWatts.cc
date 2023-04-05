@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,10 +66,10 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 // SAM Headers
-//#include <../third_party/ssc/shared/lib_irradproc.h>
-//#include <../third_party/ssc/shared/lib_pvwatts.h>
-//#include <../third_party/ssc/shared/lib_pvshade.h>
-//#include <../third_party/ssc/shared/lib_pv_incidence_modifier.h>
+// #include <../third_party/ssc/shared/lib_irradproc.h>
+// #include <../third_party/ssc/shared/lib_pvwatts.h>
+// #include <../third_party/ssc/shared/lib_pvshade.h>
+// #include <../third_party/ssc/shared/lib_pv_incidence_modifier.h>
 #include <../third_party/ssc/ssc/sscapi.h>
 
 namespace EnergyPlus {
@@ -255,7 +255,7 @@ namespace PVWatts {
         ModuleType moduleType;
         auto moduleTypeIt = moduleTypeMap.find(cAlphaArgs(AlphaFields::MODULE_TYPE));
         if (moduleTypeIt == moduleTypeMap.end()) {
-            ShowSevereError(state, "PVWatts: Invalid Module Type: " + cAlphaArgs(AlphaFields::MODULE_TYPE));
+            ShowSevereError(state, format("PVWatts: Invalid Module Type: {}", cAlphaArgs(AlphaFields::MODULE_TYPE)));
             errorsFound = true;
         } else {
             moduleType = moduleTypeIt->second;
@@ -269,7 +269,7 @@ namespace PVWatts {
         ArrayType arrayType;
         auto arrayTypeIt = arrayTypeMap.find(cAlphaArgs(AlphaFields::ARRAY_TYPE));
         if (arrayTypeIt == arrayTypeMap.end()) {
-            ShowSevereError(state, "PVWatts: Invalid Array Type: " + cAlphaArgs(AlphaFields::ARRAY_TYPE));
+            ShowSevereError(state, format("PVWatts: Invalid Array Type: {}", cAlphaArgs(AlphaFields::ARRAY_TYPE)));
             errorsFound = true;
         } else {
             arrayType = arrayTypeIt->second;
@@ -280,7 +280,7 @@ namespace PVWatts {
         GeometryType geometryType;
         auto geometryTypeIt = geometryTypeMap.find(cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
         if (geometryTypeIt == geometryTypeMap.end()) {
-            ShowSevereError(state, "PVWatts: Invalid Geometry Type: " + cAlphaArgs(AlphaFields::GEOMETRY_TYPE));
+            ShowSevereError(state, format("PVWatts: Invalid Geometry Type: {}", cAlphaArgs(AlphaFields::GEOMETRY_TYPE)));
             errorsFound = true;
         } else {
             geometryType = geometryTypeIt->second;
@@ -386,15 +386,15 @@ namespace PVWatts {
 
     void PVWattsGenerator::calc(EnergyPlusData &state)
     {
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // We only run this once for each zone time step.
         const int NumTimeStepsToday_loc = state.dataGlobal->HourOfDay * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
         if (NumTimeStepsToday_ != NumTimeStepsToday_loc) {
             NumTimeStepsToday_ = NumTimeStepsToday_loc;
         } else {
-            outputDCEnergy_ = outputDCPower_ * TimeStepSys * DataGlobalConstants::SecInHour;
-            outputACEnergy_ = outputACPower_ * TimeStepSys * DataGlobalConstants::SecInHour;
+            outputDCEnergy_ = outputDCPower_ * TimeStepSysSec;
+            outputACEnergy_ = outputACPower_ * TimeStepSysSec;
             return;
         }
         // SSC Inputs
@@ -450,9 +450,9 @@ namespace PVWatts {
         } else {
             // Report Out
             ssc_data_get_number(pvwattsData_, "dc", &outputDCPower_);
-            outputDCEnergy_ = outputDCPower_ * TimeStepSys * DataGlobalConstants::SecInHour;
+            outputDCEnergy_ = outputDCPower_ * TimeStepSysSec;
             ssc_data_get_number(pvwattsData_, "ac", &outputACPower_);
-            outputACEnergy_ = outputACPower_ * TimeStepSys * DataGlobalConstants::SecInHour;
+            outputACEnergy_ = outputACPower_ * TimeStepSysSec;
             ssc_data_get_number(pvwattsData_, "tcell", &cellTemperature_);
             ssc_data_get_number(pvwattsData_, "poa", &planeOfArrayIrradiance_);
         }

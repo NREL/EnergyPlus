@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -207,7 +207,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     }
 
     if (input_data.availability_schedule_name.empty()) {
-        this->availScheduleIndex = DataGlobalConstants::ScheduleAlwaysOn;
+        this->availScheduleIndex = ScheduleManager::ScheduleAlwaysOn;
     } else {
         this->availScheduleIndex = ScheduleManager::GetScheduleIndex(state, input_data.availability_schedule_name);
     }
@@ -308,7 +308,7 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                         _,
                         "System");
 
-    if (this->performance.compressorFuelType != DataGlobalConstants::ResourceType::Electricity) {
+    if (this->performance.compressorFuelType != Constant::ResourceType::Electricity) {
         SetupOutputVariable(state,
                             "Cooling Coil " + this->performance.compressorFuelTypeForOutput + " Rate",
                             OutputProcessor::Unit::W,
@@ -723,14 +723,14 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
-    Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     // update condensate collection tank
     if (this->condensateTankIndex > 0) {
         if (speedNum > 0) {
             // calculate and report condensation rates  (how much water extracted from the air stream)
             // water flow of water in m3/s for water system interactions
-            Real64 averageTemp = (evapInletNode.Temp - evapOutletNode.Temp) / 2.0;
+            Real64 averageTemp = (evapInletNode.Temp + evapOutletNode.Temp) / 2.0;
             Real64 waterDensity = Psychrometrics::RhoH2O(averageTemp);
             Real64 inHumidityRatio = evapInletNode.HumRat;
             Real64 outHumidityRatio = evapOutletNode.HumRat;

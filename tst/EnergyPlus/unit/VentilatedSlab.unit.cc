@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
@@ -2359,7 +2360,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    GetMaterialData(*state, ErrorsFound); // read construction material data
+    Material::GetMaterialData(*state, ErrorsFound); // read construction material data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;

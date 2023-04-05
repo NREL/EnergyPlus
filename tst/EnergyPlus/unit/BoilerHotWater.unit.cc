@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -281,4 +281,47 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     EXPECT_NEAR(thisBoiler.BoilerPLR, 0.24, 0.01);
     Real64 ExpectedBoilerEff = (0.5887682 + 0.7888184 * thisBoiler.BoilerPLR - 0.3862498 * pow(thisBoiler.BoilerPLR, 2)) * thisBoiler.NomEffic;
     EXPECT_NEAR(thisBoiler.BoilerEff, ExpectedBoilerEff, 0.01);
+}
+
+TEST_F(EnergyPlusFixture, Boiler_HotWater_Factory)
+{
+    state->dataBoilers->Boiler.allocate(3);
+    state->dataBoilers->Boiler(1).Name = "Boiler1";
+    state->dataBoilers->Boiler(2).Name = "Boiler2";
+    state->dataBoilers->Boiler(3).Name = "Boiler3";
+
+    state->dataBoilers->Boiler(3).NomCap = 1000.0;
+    state->dataBoilers->Boiler(3).MinPartLoadRat = 0.1;
+    state->dataBoilers->Boiler(3).MaxPartLoadRat = 1.1;
+    state->dataBoilers->Boiler(3).OptPartLoadRat = 1.0;
+
+    state->dataBoilers->getBoilerInputFlag = false;
+
+    // the pointer to plant equipment is declared as PlantComponent *compPtr;
+    // this unit test creates that pointer to a boiler to test that the boiler factory returns the correct reference
+    PlantComponent *compPtr = Boilers::BoilerSpecs::factory(*state, state->dataBoilers->Boiler(3).Name);
+
+    PlantLocation Location;
+    Real64 MaxLoad;
+    Real64 MinLoad;
+    Real64 OptLoad;
+    compPtr->getDesignCapacities(*state, Location, MaxLoad, MinLoad, OptLoad);
+
+    EXPECT_EQ(MinLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).MinPartLoadRat);
+    EXPECT_EQ(100.0, MinLoad);
+
+    EXPECT_EQ(MaxLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).MaxPartLoadRat);
+    EXPECT_EQ(1100.0, MaxLoad);
+
+    EXPECT_EQ(OptLoad, state->dataBoilers->Boiler(3).NomCap * state->dataBoilers->Boiler(3).OptPartLoadRat);
+    EXPECT_EQ(1000.0, OptLoad);
+
+    EXPECT_EQ(0.0, state->dataBoilers->Boiler(1).NomCap);
+    EXPECT_EQ(0.0, state->dataBoilers->Boiler(2).NomCap);
+    EXPECT_EQ(1000.0, state->dataBoilers->Boiler(3).NomCap);
+
+    // and the boiler factory now returns a boiler class pointer
+    BoilerSpecs *thisBoiler = Boilers::BoilerSpecs::factory(*state, state->dataBoilers->Boiler(2).Name);
+    EXPECT_EQ(0.0, thisBoiler->NomCap);
+    EXPECT_EQ(thisBoiler->Name, state->dataBoilers->Boiler(2).Name);
 }

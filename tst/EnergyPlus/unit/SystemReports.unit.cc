@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -79,9 +79,7 @@
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus::SystemReports;
-using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataAirSystems;
-using namespace EnergyPlus::DataGlobalConstants;
 
 namespace EnergyPlus {
 
@@ -112,7 +110,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).EndUse_CompMode = SystemReports::EndUseType::CoolingOnly;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).CurMeterReading = 100.0;
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType = AssignResourceTypeNum("NaturalGas");
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType = Constant::AssignResourceTypeNum("NaturalGas");
 
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name = "Main Gas Heating Coil";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf = "COIL:HEATING:DESUPERHEATER";
@@ -122,7 +120,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).EndUse_CompMode = SystemReports::EndUseType::CoolingOnly;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).CurMeterReading = 100.0;
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = AssignResourceTypeNum("NaturalGas");
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = Constant::AssignResourceTypeNum("NaturalGas");
 
     state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
     state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
@@ -159,8 +157,8 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     state->dataSysRpts->SysLoadRepVars(1).HCCompNaturalGas = 0;
     state->dataSysRpts->SysLoadRepVars(1).TotNaturalGas = 0;
 
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType = AssignResourceTypeNum("Propane");
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = AssignResourceTypeNum("Propane");
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType = Constant::AssignResourceTypeNum("Propane");
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = Constant::AssignResourceTypeNum("Propane");
 
     // Calculate SysHumidPropane ("Air System Humidifier Propane Energy" Output Variable)
     CalcSystemEnergyUse(*state,
@@ -187,8 +185,12 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     ReportSystemEnergyUse(*state);
     EXPECT_EQ(state->dataSysRpts->SysLoadRepVars(1).TotPropane, 200);
 }
+
 TEST_F(EnergyPlusFixture, ReportVentilationLoads_ZoneEquip)
 {
+
+    state->dataHVACGlobal->TimeStepSys = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.2;
     state->dataHVACGlobal->NumPrimaryAirSys = 0;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
     state->dataGlobal->NumOfZones = 1;

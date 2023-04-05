@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -118,7 +118,7 @@ namespace ZoneAirLoopEquipmentManager {
         if (CompIndex == 0) {
             AirDistUnitNum = UtilityRoutines::FindItemInList(ZoneAirLoopEquipName, state.dataDefineEquipment->AirDistUnit);
             if (AirDistUnitNum == 0) {
-                ShowFatalError(state, "ManageZoneAirLoopEquipment: Unit not found=" + ZoneAirLoopEquipName);
+                ShowFatalError(state, format("ManageZoneAirLoopEquipment: Unit not found={}", ZoneAirLoopEquipName));
             }
             CompIndex = AirDistUnitNum;
         } else {
@@ -235,7 +235,7 @@ namespace ZoneAirLoopEquipmentManager {
                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipName(AirDistCompUnitNum) = AlphArray(4);
                 ValidateComponent(state, AlphArray(3), AlphArray(4), IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
-                    ShowContinueError(state, "In " + CurrentModuleObject + " = " + AlphArray(1));
+                    ShowContinueError(state, format("In {} = {}", CurrentModuleObject, AlphArray(1)));
                     ErrorsFound = true;
                 }
                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeakFrac = NumArray(1);
@@ -247,9 +247,9 @@ namespace ZoneAirLoopEquipmentManager {
                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).LeakLoadMult =
                         1.0 / (1.0 - state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).DownStreamLeakFrac);
                 } else {
-                    ShowSevereError(state,
-                                    "Error found in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
-                    ShowContinueError(state, cNumericFields(2) + " must be less than 1.0");
+                    ShowSevereError(
+                        state, format("Error found in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
+                    ShowContinueError(state, format("{} must be less than 1.0", cNumericFields(2)));
                     ErrorsFound = true;
                 }
                 if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeakFrac > 0.0) {
@@ -269,9 +269,9 @@ namespace ZoneAirLoopEquipmentManager {
                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).AirTerminalSizingSpecIndex =
                         UtilityRoutines::FindItemInList(AlphArray(5), state.dataSize->AirTerminalSizingSpec);
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).AirTerminalSizingSpecIndex == 0) {
-                        ShowSevereError(state, cAlphaFields(5) + " = " + AlphArray(5) + " not found.");
-                        ShowContinueError(state,
-                                          "Occurs in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
+                        ShowSevereError(state, format("{} = {} not found.", cAlphaFields(5), AlphArray(5)));
+                        ShowContinueError(
+                            state, format("Occurs in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
                         ErrorsFound = true;
                     }
                 }
@@ -283,10 +283,12 @@ namespace ZoneAirLoopEquipmentManager {
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeak ||
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(
-                            state, "Error found in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
+                            state,
+                            format("Error found in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
                         ShowContinueError(state,
-                                          "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
-                                              state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum));
+                                          format("Simple duct leakage model not available for {} = {}",
+                                                 cAlphaFields(3),
+                                                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum)));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
@@ -296,10 +298,12 @@ namespace ZoneAirLoopEquipmentManager {
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeak ||
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(
-                            state, "Error found in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
+                            state,
+                            format("Error found in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
                         ShowContinueError(state,
-                                          "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
-                                              state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum));
+                                          format("Simple duct leakage model not available for {} = {}",
+                                                 cAlphaFields(3),
+                                                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum)));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
@@ -309,10 +313,12 @@ namespace ZoneAirLoopEquipmentManager {
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeak ||
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(
-                            state, "Error found in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
+                            state,
+                            format("Error found in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
                         ShowContinueError(state,
-                                          "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
-                                              state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum));
+                                          format("Simple duct leakage model not available for {} = {}",
+                                                 cAlphaFields(3),
+                                                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum)));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
@@ -346,10 +352,12 @@ namespace ZoneAirLoopEquipmentManager {
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeak ||
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(
-                            state, "Error found in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
+                            state,
+                            format("Error found in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
                         ShowContinueError(state,
-                                          "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
-                                              state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum));
+                                          format("Simple duct leakage model not available for {} = {}",
+                                                 cAlphaFields(3),
+                                                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum)));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
@@ -359,10 +367,12 @@ namespace ZoneAirLoopEquipmentManager {
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeak ||
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(
-                            state, "Error found in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
+                            state,
+                            format("Error found in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
                         ShowContinueError(state,
-                                          "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
-                                              state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum));
+                                          format("Simple duct leakage model not available for {} = {}",
+                                                 cAlphaFields(3),
+                                                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum)));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
@@ -372,10 +382,12 @@ namespace ZoneAirLoopEquipmentManager {
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeak ||
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(
-                            state, "Error found in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
+                            state,
+                            format("Error found in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
                         ShowContinueError(state,
-                                          "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
-                                              state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum));
+                                          format("Simple duct leakage model not available for {} = {}",
+                                                 cAlphaFields(3),
+                                                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum)));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
@@ -385,10 +397,12 @@ namespace ZoneAirLoopEquipmentManager {
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeak ||
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(
-                            state, "Error found in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
+                            state,
+                            format("Error found in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
                         ShowContinueError(state,
-                                          "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
-                                              state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum));
+                                          format("Simple duct leakage model not available for {} = {}",
+                                                 cAlphaFields(3),
+                                                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum)));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
@@ -398,10 +412,12 @@ namespace ZoneAirLoopEquipmentManager {
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeak ||
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(
-                            state, "Error found in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
+                            state,
+                            format("Error found in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
                         ShowContinueError(state,
-                                          "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
-                                              state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum));
+                                          format("Simple duct leakage model not available for {} = {}",
+                                                 cAlphaFields(3),
+                                                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum)));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
@@ -413,10 +429,12 @@ namespace ZoneAirLoopEquipmentManager {
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeak ||
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(
-                            state, "Error found in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
+                            state,
+                            format("Error found in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
                         ShowContinueError(state,
-                                          "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
-                                              state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum));
+                                          format("Simple duct leakage model not available for {} = {}",
+                                                 cAlphaFields(3),
+                                                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum)));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
@@ -430,18 +448,21 @@ namespace ZoneAirLoopEquipmentManager {
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeak ||
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError(
-                            state, "Error found in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
+                            state,
+                            format("Error found in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
                         ShowContinueError(state,
-                                          "Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
-                                              state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum));
+                                          format("Simple duct leakage model not available for {} = {}",
+                                                 cAlphaFields(3),
+                                                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state,
-                                    "Error found in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
+                    ShowSevereError(
+                        state, format("Error found in {} = {}", CurrentModuleObject, state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
                     ShowContinueError(state,
-                                      "Invalid " + cAlphaFields(3) + " = " +
-                                          state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum));
+                                      format("Invalid {} = {}",
+                                             cAlphaFields(3),
+                                             state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum)));
                     ErrorsFound = true;
                 }
 
@@ -532,7 +553,7 @@ namespace ZoneAirLoopEquipmentManager {
             }
         }
         if (ErrorsFound) {
-            ShowFatalError(state, std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " Input");
+            ShowFatalError(state, format("{}Errors found in getting {} Input", RoutineName, CurrentModuleObject));
         }
     }
 
@@ -820,8 +841,10 @@ namespace ZoneAirLoopEquipmentManager {
                 ProvideSysOutput = false;
             } break;
             default: {
-                ShowSevereError(state, "Error found in ZoneHVAC:AirDistributionUnit=" + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
-                ShowContinueError(state, "Invalid Component=" + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompNum));
+                ShowSevereError(
+                    state, format("Error found in ZoneHVAC:AirDistributionUnit={}", state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
+                ShowContinueError(state,
+                                  format("Invalid Component={}", state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompNum)));
                 ShowFatalError(state, "Preceding condition causes termination.");
             } break;
             }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
@@ -81,15 +80,16 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindTurbine.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
-void createFacilityElectricPowerServiceObject(EnergyPlusData &state)
+void createFacilityElectricPowerServiceObject(const EnergyPlusData &state)
 {
     state.dataElectPwrSvcMgr->facilityElectricServiceObj = std::make_unique<ElectricPowerServiceManager>();
 }
 
-void initializeElectricPowerServiceZoneGains(EnergyPlusData &state) // namespace routine for handling call from InternalHeatGains
+void initializeElectricPowerServiceZoneGains(const EnergyPlusData &state) // namespace routine for handling call from InternalHeatGains
 {
     // internal zone gains need to be re initialized for begin new environment earlier than the main call into manage electric power service
     if (state.dataElectPwrSvcMgr->facilityElectricServiceObj->newEnvironmentInternalGainsFlag && state.dataGlobal->BeginEnvrnFlag) {
@@ -126,19 +126,19 @@ void ElectricPowerServiceManager::manageElectricPowerService(
 
     // retrieve data from meters for demand and production
     totalBldgElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec;
-    totalHVACElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::System) /
-                           (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    totalHVACElecDemand_ =
+        GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
-    elecProducedPVRate_ = GetInstantMeterValue(state, elecProducedPVIndex_, OutputProcessor::TimeStepType::System) /
-                          (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedWTRate_ = GetInstantMeterValue(state, elecProducedWTIndex_, OutputProcessor::TimeStepType::System) /
-                          (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedStorageRate_ = GetInstantMeterValue(state, elecProducedStorageIndex_, OutputProcessor::TimeStepType::System) /
-                               (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedCoGenRate_ = GetInstantMeterValue(state, elecProducedCoGenIndex_, OutputProcessor::TimeStepType::System) /
-                             (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    elecProducedPVRate_ =
+        GetInstantMeterValue(state, elecProducedPVIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedWTRate_ =
+        GetInstantMeterValue(state, elecProducedWTIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedStorageRate_ =
+        GetInstantMeterValue(state, elecProducedStorageIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedCoGenRate_ =
+        GetInstantMeterValue(state, elecProducedCoGenIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
     elecProducedPowerConversionRate_ = GetInstantMeterValue(state, elecProducedPowerConversionIndex_, OutputProcessor::TimeStepType::System) /
-                                       (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+                                       (state.dataHVACGlobal->TimeStepSysSec);
 
     wholeBldgRemainingLoad_ = totalElectricDemand_;
 
@@ -201,7 +201,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
     numLoadCenters_ = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ElectricLoadCenter:Distribution");
 
     if (numLoadCenters_ > 0) {
-        for (auto iLoadCenterNum = 1; iLoadCenterNum <= numLoadCenters_; ++iLoadCenterNum) {
+        for (int iLoadCenterNum = 1; iLoadCenterNum <= numLoadCenters_; ++iLoadCenterNum) {
             // call Electric Power Load Center constructor, in place
             elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(state, iLoadCenterNum));
         }
@@ -258,11 +258,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
         int numAlphas; // Number of elements in the alpha array
         int numNums;   // Number of elements in the numeric array
         int iOStat;    // IO Status when calling get input subroutine
-        int facilityPowerInTransformerIDFObjNum = 0;
         bool foundInFromGridTransformer = false;
 
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
-        for (auto loopTransformer = 1; loopTransformer <= numTransformers_; ++loopTransformer) {
+        for (int loopTransformer = 1; loopTransformer <= numTransformers_; ++loopTransformer) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      loopTransformer,
@@ -279,15 +278,17 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerInFromGrid")) {
                 if (!foundInFromGridTransformer) {
                     foundInFromGridTransformer = true;
-                    facilityPowerInTransformerIDFObjNum = loopTransformer;
                     facilityPowerInTransformerName_ = state.dataIPShortCut->cAlphaArgs(1);
                     facilityPowerInTransformerPresent_ = true;
                 } else {
                     // should only have one transformer in input that is PowerInFromGrid
                     ShowWarningError(state,
-                                     std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                         state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                                     format("{}{}=\"{}\", invalid entry.",
+                                            routineName,
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowContinueError(state,
+                                      format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                     ShowContinueError(state,
                                       "Only one transformer with Usage PowerInFromGrid can be used, first one in input file will be used and the "
                                       "simulation continues...");
@@ -479,22 +480,22 @@ void ElectricPowerServiceManager::updateWholeBuildingRecords(EnergyPlusData &sta
 
     // main panel balancing.
     totalBldgElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec;
-    totalHVACElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::System) /
-                           (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    totalHVACElecDemand_ =
+        GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
-    elecProducedPVRate_ = GetInstantMeterValue(state, elecProducedPVIndex_, OutputProcessor::TimeStepType::System) /
-                          (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedWTRate_ = GetInstantMeterValue(state, elecProducedWTIndex_, OutputProcessor::TimeStepType::System) /
-                          (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedStorageRate_ = GetInstantMeterValue(state, elecProducedStorageIndex_, OutputProcessor::TimeStepType::System) /
-                               (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedCoGenRate_ = GetInstantMeterValue(state, elecProducedCoGenIndex_, OutputProcessor::TimeStepType::System) /
-                             (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    elecProducedPVRate_ =
+        GetInstantMeterValue(state, elecProducedPVIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedWTRate_ =
+        GetInstantMeterValue(state, elecProducedWTIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedStorageRate_ =
+        GetInstantMeterValue(state, elecProducedStorageIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
+    elecProducedCoGenRate_ =
+        GetInstantMeterValue(state, elecProducedCoGenIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
     elecProducedPowerConversionRate_ = GetInstantMeterValue(state, elecProducedPowerConversionIndex_, OutputProcessor::TimeStepType::System) /
-                                       (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+                                       (state.dataHVACGlobal->TimeStepSysSec);
 
     electProdRate_ = elecProducedCoGenRate_ + elecProducedPVRate_ + elecProducedWTRate_ + elecProducedStorageRate_ + elecProducedPowerConversionRate_;
-    electricityProd_ = electProdRate_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // whole building
+    electricityProd_ = electProdRate_ * state.dataHVACGlobal->TimeStepSysSec; // whole building
 
     // Report the Total Electric Power Purchased [W], If negative then there is extra power to be sold or stored.
     electPurchRate_ = totalElectricDemand_ - electProdRate_;
@@ -503,19 +504,19 @@ void ElectricPowerServiceManager::updateWholeBuildingRecords(EnergyPlusData &sta
     if (electPurchRate_ < 0.0) electPurchRate_ = 0.0; // don't want negative purchased...
 
     // Report the Total Electric Energy Purchased [J]
-    electricityPurch_ = electPurchRate_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    electricityPurch_ = electPurchRate_ * state.dataHVACGlobal->TimeStepSysSec;
 
     // report the total electric surplus....
     electSurplusRate_ = electProdRate_ - totalElectricDemand_;
     if (std::abs(electSurplusRate_) < 0.0001) electSurplusRate_ = 0.0;
     if (electSurplusRate_ < 0.0) electSurplusRate_ = 0.0; // don't want negative surplus
 
-    electricitySurplus_ = electSurplusRate_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    electricitySurplus_ = electSurplusRate_ * state.dataHVACGlobal->TimeStepSysSec;
 
     // report the net electricity , + is purchased, - is surplus
     electricityNetRate_ = totalElectricDemand_ - electProdRate_;
 
-    electricityNet_ = electricityNetRate_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    electricityNet_ = electricityNetRate_ * state.dataHVACGlobal->TimeStepSysSec;
 }
 
 void ElectricPowerServiceManager::reportPVandWindCapacity(EnergyPlusData &state)
@@ -523,9 +524,9 @@ void ElectricPowerServiceManager::reportPVandWindCapacity(EnergyPlusData &state)
     // LEED report
     pvTotalCapacity_ = 0.0;
     windTotalCapacity_ = 0.0;
-    for (auto &lc : elecLoadCenterObjs) {
+    for (auto const &lc : elecLoadCenterObjs) {
         if (lc->numGenerators > 0) {
-            for (auto &g : lc->elecGenCntrlObj) {
+            for (auto const &g : lc->elecGenCntrlObj) {
                 if (g->generatorType == GeneratorType::PV) {
                     pvTotalCapacity_ += g->maxPowerOut;
                 }
@@ -547,7 +548,7 @@ void ElectricPowerServiceManager::reportPVandWindCapacity(EnergyPlusData &state)
 void ElectricPowerServiceManager::sumUpNumberOfStorageDevices()
 {
     numElecStorageDevices = 0;
-    for (auto &e : elecLoadCenterObjs) {
+    for (auto const &e : elecLoadCenterObjs) {
         if (e->storageObj != nullptr) {
             ++numElecStorageDevices;
         }
@@ -590,8 +591,9 @@ void ElectricPowerServiceManager::checkLoadCenters(EnergyPlusData &state)
         for (std::size_t j = 0; j < storageNames.size(); ++j) {
             if (storageNames[i] == storageNames[j] && i != j) {
                 ShowSevereError(state,
-                                "ElectricPowerServiceManager::checkLoadCenters, the electrical storage device named = " + storageNames[i] +
-                                    " is used in more than one ElectricLoadCenter:Distribution input object.");
+                                format("ElectricPowerServiceManager::checkLoadCenters, the electrical storage device named = {} is used in more than "
+                                       "one ElectricLoadCenter:Distribution input object.",
+                                       storageNames[i]));
                 ShowContinueError(state, "Electric Load Centers cannot share the same storage device.");
                 errorsFound = true;
                 break;
@@ -606,8 +608,9 @@ void ElectricPowerServiceManager::checkLoadCenters(EnergyPlusData &state)
         for (std::size_t j = 0; j < genListNames.size(); ++j) {
             if (genListNames[i] == genListNames[j] && i != j) {
                 ShowSevereError(state,
-                                "ElectricPowerServiceManager::checkLoadCenters, the generator list named = " + genListNames[i] +
-                                    " is used in more than one ElectricLoadCenter:Distribution input object.");
+                                format("ElectricPowerServiceManager::checkLoadCenters, the generator list named = {} is used in more than one "
+                                       "ElectricLoadCenter:Distribution input object.",
+                                       genListNames[i]));
                 ShowContinueError(state, "Electric Load Centers cannot share the same generator list (ElectricLoadCenter:Generators).");
                 errorsFound = true;
                 break;
@@ -622,8 +625,9 @@ void ElectricPowerServiceManager::checkLoadCenters(EnergyPlusData &state)
         for (std::size_t j = 0; j < inverterNames.size(); ++j) {
             if (inverterNames[i] == inverterNames[j] && i != j) {
                 ShowSevereError(state,
-                                "ElectricPowerServiceManager::checkLoadCenters, the inverter device named = " + inverterNames[i] +
-                                    " is used in more than one ElectricLoadCenter:Distribution input object.");
+                                format("ElectricPowerServiceManager::checkLoadCenters, the inverter device named = {} is used in more than one "
+                                       "ElectricLoadCenter:Distribution input object.",
+                                       inverterNames[i]));
                 ShowContinueError(state, "Electric Load Centers cannot share the same inverter device.");
                 errorsFound = true;
                 break;
@@ -638,8 +642,9 @@ void ElectricPowerServiceManager::checkLoadCenters(EnergyPlusData &state)
         for (std::size_t j = 0; j < converterNames.size(); ++j) {
             if (converterNames[i] == converterNames[j] && i != j) {
                 ShowSevereError(state,
-                                "ElectricPowerServiceManager::checkLoadCenters, the converter device named = " + converterNames[i] +
-                                    " is used in more than one ElectricLoadCenter:Distribution input object.");
+                                format("ElectricPowerServiceManager::checkLoadCenters, the converter device named = {} is used in more than one "
+                                       "ElectricLoadCenter:Distribution input object.",
+                                       converterNames[i]));
                 ShowContinueError(state, "Electric Load Centers cannot share the same converter device.");
                 errorsFound = true;
                 break;
@@ -654,8 +659,9 @@ void ElectricPowerServiceManager::checkLoadCenters(EnergyPlusData &state)
         for (std::size_t j = 0; j < transformerNames.size(); ++j) {
             if (transformerNames[i] == transformerNames[j] && i != j) {
                 ShowSevereError(state,
-                                "ElectricPowerServiceManager::checkLoadCenters, the transformer device named = " + transformerNames[i] +
-                                    " is used in more than one ElectricLoadCenter:Distribution input object.");
+                                format("ElectricPowerServiceManager::checkLoadCenters, the transformer device named = {} is used in more than one "
+                                       "ElectricLoadCenter:Distribution input object.",
+                                       transformerNames[i]));
                 ShowContinueError(state, "Electric Load Centers cannot share the same transformer device.");
                 errorsFound = true;
                 break;
@@ -691,10 +697,9 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     int numAlphas; // Number of elements in the alpha array
     int numNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
-    bool errorsFound;
 
     state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Distribution";
-    errorsFound = false;
+    bool errorsFound = false;
     if (objectNum > 0) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
@@ -718,10 +723,11 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
             int testIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Generators", generatorListName_);
             if (testIndex == 0) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
                 errorsFound = true;
             }
         }
@@ -743,10 +749,11 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "FollowThermalLimitElectrical")) {
                 genOperationScheme_ = GeneratorOpScheme::ThermalFollowLimitElectrical;
             } else {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                 errorsFound = true;
             }
         }
@@ -756,15 +763,17 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         trackSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
         if ((trackSchedPtr_ == 0) && (genOperationScheme_ == GeneratorOpScheme::TrackSchedule)) {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
             } else {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = blank field.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = blank field.", state.dataIPShortCut->cAlphaFieldNames(4)));
             }
             ShowContinueError(state, "Schedule not found; Must be entered and valid when Generator Operation Scheme=TrackSchedule");
             errorsFound = true;
@@ -798,10 +807,10 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             bussType = ElectricBussType::ACBuss;
             state.dataIPShortCut->cAlphaArgs(6) = "AlternatingCurrent (field was blank)";
         } else {
-            ShowSevereError(state,
-                            std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
+            ShowSevereError(
+                state,
+                format("{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
             errorsFound = true;
         }
 
@@ -809,10 +818,11 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                 inverterName = state.dataIPShortCut->cAlphaArgs(7);
             } else {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(7) + " is blank, but buss type requires inverter.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("{} is blank, but buss type requires inverter.", state.dataIPShortCut->cAlphaFieldNames(7)));
                 errorsFound = true;
             }
         }
@@ -821,10 +831,11 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                 storageName_ = state.dataIPShortCut->cAlphaArgs(8);
             } else {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(8) + " is blank, but buss type requires storage.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("{} is blank, but buss type requires storage.", state.dataIPShortCut->cAlphaFieldNames(8)));
                 errorsFound = true;
             }
         }
@@ -849,10 +860,11 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "FacilityDemandLeveling")) {
                 storageScheme_ = StorageOpScheme::FacilityDemandLeveling;
             } else {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + " = " + state.dataIPShortCut->cAlphaArgs(10));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
                 errorsFound = true;
             }
         } else { // blank (preserve legacy behavior for short files)
@@ -864,12 +876,13 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
         } else {
             if (storageScheme_ == StorageOpScheme::MeterDemandStoreExcessOnSite) { // throw error
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) +
-                                      ", cannot be blank when storage operation scheme is TrackMeterDemandStoreExcessOnSite");
+                                  format("Invalid {}, cannot be blank when storage operation scheme is TrackMeterDemandStoreExcessOnSite",
+                                         state.dataIPShortCut->cAlphaFieldNames(11)));
                 errorsFound = true;
             }
         }
@@ -879,12 +892,14 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             converterPresent_ = true;
         } else {
             if (storageScheme_ == StorageOpScheme::ChargeDischargeSchedules || storageScheme_ == StorageOpScheme::FacilityDemandLeveling) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + ", cannot be blank when storage scheme is " +
-                                      state.dataIPShortCut->cAlphaArgs(10));
+                                  format("Invalid {}, cannot be blank when storage scheme is {}",
+                                         state.dataIPShortCut->cAlphaFieldNames(12),
+                                         state.dataIPShortCut->cAlphaArgs(10)));
                 errorsFound = true;
             }
         }
@@ -914,10 +929,11 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
         if (state.dataIPShortCut->lNumericFieldBlanks(6)) {
             if (storageScheme_ == StorageOpScheme::FacilityDemandLeveling) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(6) + " = blank field.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = blank field.", state.dataIPShortCut->cNumericFieldNames(6)));
                 errorsFound = true;
             }
         } else {
@@ -926,15 +942,17 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         storageChargeModSchedIndex_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));
         if (storageChargeModSchedIndex_ == 0 && storageScheme_ == StorageOpScheme::ChargeDischargeSchedules) {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + " = " + state.dataIPShortCut->cAlphaArgs(13));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(13), state.dataIPShortCut->cAlphaArgs(13)));
             } else {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + " = blank field.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = blank field.", state.dataIPShortCut->cAlphaFieldNames(13)));
             }
             ShowContinueError(state, "Schedule not found; Must be entered and valid when Storage Operation Scheme = TrackChargeDischargeSchedules");
             errorsFound = true;
@@ -943,15 +961,17 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         storageDischargeModSchedIndex_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(14));
         if (storageDischargeModSchedIndex_ == 0 && storageScheme_ == StorageOpScheme::ChargeDischargeSchedules) {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + " = " + state.dataIPShortCut->cAlphaArgs(14));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(14), state.dataIPShortCut->cAlphaArgs(14)));
             } else {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + " = blank field.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = blank field.", state.dataIPShortCut->cAlphaFieldNames(14)));
             }
             ShowContinueError(state, "Schedule not found; Must be entered and valid when Storage Operation Scheme = TrackChargeDischargeSchedules");
             errorsFound = true;
@@ -960,15 +980,17 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         facilityDemandTargetModSchedIndex_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(15));
         if (facilityDemandTargetModSchedIndex_ == 0 && storageScheme_ == StorageOpScheme::FacilityDemandLeveling) {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + " = " + state.dataIPShortCut->cAlphaArgs(15));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(15), state.dataIPShortCut->cAlphaArgs(15)));
             } else {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + " = blank field.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = blank field.", state.dataIPShortCut->cAlphaFieldNames(15)));
             }
             ShowContinueError(state, "Schedule not found; Must be entered and valid when Storage Operation Scheme = FacilityDemandLeveling");
             errorsFound = true;
@@ -1000,7 +1022,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         numGenerators = numNums / 2; // note IDD needs Min Fields = 6
         if (mod((numAlphas - 1 + numNums), 5) != 0) ++numGenerators;
         int alphaCount = 2;
-        for (auto genCount = 1; genCount <= numGenerators; ++genCount) {
+        for (int genCount = 1; genCount <= numGenerators; ++genCount) {
             // call constructor in place
             generatorsPresent_ = true;
             elecGenCntrlObj.emplace_back(new GeneratorController(state,
@@ -1017,12 +1039,13 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         // issue #5299 check for non-zero values in thermal electric ratio if gen op scheme is ThermalFollow*
         if (genOperationScheme_ == GeneratorOpScheme::ThermalFollow || genOperationScheme_ == GeneratorOpScheme::ThermalFollowLimitElectrical) {
             // check to make sure the user didn't input zeros for thermalToElectricControlRatio
-            for (auto &g : elecGenCntrlObj) {
+            for (auto const &g : elecGenCntrlObj) {
                 if (g->nominalThermElectRatio <= 0.0) {
                     ShowWarningError(state,
-                                     "Generator operation needs to be based on following thermal loads and needs values for Rated Thermal to "
-                                     "Electrical Power Ratio in " +
-                                         state.dataIPShortCut->cCurrentModuleObject + " named " + state.dataIPShortCut->cAlphaArgs(1));
+                                     format("Generator operation needs to be based on following thermal loads and needs values for Rated Thermal to "
+                                            "Electrical Power Ratio in {} named {}",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            state.dataIPShortCut->cAlphaArgs(1)));
                 }
             }
         }
@@ -1039,7 +1062,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             for (const auto &generatorController : elecGenCntrlObj) {
                 if (generatorController->generatorType != GeneratorType::PVWatts) {
                     errorsFound = true;
-                    ShowSevereError(state, std::string{routineName} + "ElectricLoadCenter:Distribution=\"" + name_ + "\",");
+                    ShowSevereError(state, format("{}ElectricLoadCenter:Distribution=\"{}\",", routineName, name_));
                     ShowContinueError(state, "ElectricLoadCenter:Inverter:PVWatts can only be used with Generator:PVWatts");
                     ShowContinueError(state,
                                       format("\"{}\" is of type {}",
@@ -1069,8 +1092,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
         int transformerItemNum =
             state.dataInputProcessing->inputProcessor->getObjectItemNum(state, state.dataIPShortCut->cCurrentModuleObject, transformerName_);
-        int iOStat;
         if (transformerItemNum > 0) {
+            int iOStat;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      transformerItemNum,
@@ -1087,12 +1110,15 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
                                             "LoadCenterPowerConditioning")) { // this is the right kind of transformer
                 transformerObj = std::make_unique<ElectricTransformer>(state, transformerName_);
             } else {
-                ShowWarningError(state,
-                                 "Transformer named " + transformerName_ + " associated with the load center named " + name_ + " should have " +
-                                     state.dataIPShortCut->cAlphaFieldNames(3) + " set to LoadCenterPowerConditioning.");
+                ShowWarningError(
+                    state,
+                    format("Transformer named {} associated with the load center named {} should have {} set to LoadCenterPowerConditioning.",
+                           transformerName_,
+                           name_,
+                           state.dataIPShortCut->cAlphaFieldNames(3)));
             }
         } else {
-            ShowSevereError(state, "Transformer named " + transformerName_ + ", was not found for the load center named " + name_);
+            ShowSevereError(state, format("Transformer named {}, was not found for the load center named {}", transformerName_, name_));
             errorsFound = true;
         }
     }
@@ -1159,7 +1185,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     }
 
     if (errorsFound) {
-        ShowFatalError(state, std::string{routineName} + "Preceding errors terminate program.");
+        ShowFatalError(state, format("{}Preceding errors terminate program.", routineName));
     }
 }
 
@@ -1429,9 +1455,9 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state,
         // The TRACK CUSTOM METER scheme tries to have the generators meet all of the
         //   electrical demand from a meter, it can also be a user-defined Custom Meter
         //   and PV is ignored.
-        customMeterDemand = GetInstantMeterValue(state, demandMeterPtr_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
-                            GetInstantMeterValue(state, demandMeterPtr_, OutputProcessor::TimeStepType::System) /
-                                (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        customMeterDemand =
+            GetInstantMeterValue(state, demandMeterPtr_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
+            GetInstantMeterValue(state, demandMeterPtr_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
 
         remainingLoad = customMeterDemand;
         loadCenterElectricLoad = remainingLoad;
@@ -1624,9 +1650,9 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state,
     // sum up generator production
     genElectProdRate = 0.0;
     genElectricProd = 0.0;
-    for (auto &g : elecGenCntrlObj) {
+    for (auto const &g : elecGenCntrlObj) {
         genElectProdRate += g->electProdRate;
-        g->electricityProd = g->electProdRate * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        g->electricityProd = g->electProdRate * (state.dataHVACGlobal->TimeStepSysSec);
         genElectricProd += g->electricityProd;
     }
 }
@@ -1678,8 +1704,7 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state,
         // Get meter rate
         subpanelFeedInRequest =
             GetInstantMeterValue(state, trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
-            GetInstantMeterValue(state, trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::System) /
-                (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+            GetInstantMeterValue(state, trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
         subpanelDrawRequest = 0.0;
         break;
     }
@@ -1917,17 +1942,21 @@ void ElectPowerLoadCenter::setupLoadCenterMeterIndices(EnergyPlusData &state)
 {
     demandMeterPtr_ = EnergyPlus::GetMeterIndex(state, demandMeterName_);
     if ((demandMeterPtr_ == 0) && (genOperationScheme_ == GeneratorOpScheme::TrackMeter)) { // throw error
-        ShowFatalError(state,
-                       "ElectPowerLoadCenter::setupLoadCenterMeterIndices  Did not find Meter named: " + demandMeterName_ +
-                           " in ElectricLoadCenter:Distribution named " + name_);
+        ShowFatalError(
+            state,
+            format("ElectPowerLoadCenter::setupLoadCenterMeterIndices  Did not find Meter named: {} in ElectricLoadCenter:Distribution named {}",
+                   demandMeterName_,
+                   name_));
     }
 
     if (storageScheme_ == StorageOpScheme::MeterDemandStoreExcessOnSite) {
         trackStorageOpMeterIndex_ = EnergyPlus::GetMeterIndex(state, trackSorageOpMeterName_);
         if (trackStorageOpMeterIndex_ == 0) { //
-            ShowFatalError(state,
-                           "ElectPowerLoadCenter::setupLoadCenterMeterIndices  Did not find Meter named: " + trackSorageOpMeterName_ +
-                               " in ElectricLoadCenter:Distribution named " + name_);
+            ShowFatalError(
+                state,
+                format("ElectPowerLoadCenter::setupLoadCenterMeterIndices  Did not find Meter named: {} in ElectricLoadCenter:Distribution named {}",
+                       trackSorageOpMeterName_,
+                       name_));
         }
     }
 }
@@ -2009,7 +2038,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::ACBuss: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2025,7 +2054,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::ACBussStorage: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2043,7 +2072,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::DCBussInverter: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2061,7 +2090,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::DCBussInverterDCStorage: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2081,7 +2110,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::DCBussInverterACStorage: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2105,7 +2134,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     } // end switch
     thermalProdRate = 0.0;
     thermalProd = 0.0;
-    for (auto &gc : elecGenCntrlObj) {
+    for (auto const &gc : elecGenCntrlObj) {
         thermalProdRate += gc->thermProdRate;
         thermalProd += gc->thermalProd;
     }
@@ -2114,9 +2143,8 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
 Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
 {
     if (myCoGenSetupFlag_) {
-        bool plantNotFound = false;
         for (auto &g : elecGenCntrlObj) {
-            plantNotFound = false;
+            bool plantNotFound = false;
             PlantUtilities::ScanPlantLoopsForObject(state, g->compPlantName, g->compPlantType, g->cogenLocation, plantNotFound, _, _, _, _, _);
             if (!plantNotFound) g->plantInfoFound = true;
         }
@@ -2183,7 +2211,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
             state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(objectName));
         assert(ObjNum >= 0);
         if (ObjNum == 0) {
-            ShowFatalError(state, "Cannot find Generator:PVWatts " + objectName);
+            ShowFatalError(state, format("Cannot find Generator:PVWatts {}", objectName));
         }
         pvwattsGenerator = PVWatts::PVWattsGenerator::createFromIdfObj(state, ObjNum);
         pvwattsGenerator->setupOutputVariables(state);
@@ -2194,7 +2222,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
         compPlantType = DataPlant::PlantEquipmentType::Generator_FCExhaust;
         // and the name of plant component is not the same as the generator because of child object references, so fetch that name
-        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
+        auto *thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
         compPlantName = dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->ExhaustHX.Name;
         break;
     }
@@ -2208,26 +2236,28 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         break;
     }
     default: {
-        ShowSevereError(state, std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + " invalid entry.");
-        ShowContinueError(state, "Invalid " + objectType + " associated with generator = " + objectName);
+        ShowSevereError(state, format("{}{} invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject));
+        ShowContinueError(state, format("Invalid {} associated with generator = {}", objectType, objectName));
         break;
     }
     }
 
     availSched = availSchedName;
     if (availSched.empty()) {
-        availSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+        availSchedPtr = ScheduleManager::ScheduleAlwaysOn;
     } else {
         availSchedPtr = ScheduleManager::GetScheduleIndex(state, availSchedName);
         if (availSchedPtr <= 0) {
-            ShowSevereError(state, std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + ", invalid entry.");
-            ShowContinueError(state, "Invalid availability schedule = " + availSchedName);
+            ShowSevereError(state, format("{}{}, invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject));
+            ShowContinueError(state, format("Invalid availability schedule = {}", availSchedName));
             ShowContinueError(state, "Schedule was not found ");
         } else {
             if (generatorType == GeneratorType::PVWatts) {
                 ShowWarningError(state,
-                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject +
-                                     ", Availability Schedule for Generator:PVWatts '" + objectName + "' will be be ignored (runs all the time).");
+                                 format("{}{}, Availability Schedule for Generator:PVWatts '{}' will be be ignored (runs all the time).",
+                                        routineName,
+                                        state.dataIPShortCut->cCurrentModuleObject,
+                                        objectName));
             } else if (generatorType == GeneratorType::PV) {
                 // It should only warn if Performance type is SimplePV (DataPhotovoltaics::iSimplePVModel).
                 // Except you need GetPVInput to have run already etc
@@ -2243,9 +2273,11 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                 state.dataInputProcessing->inputProcessor->getObjectItem(state, objectType, PVNum, Alphas, NumAlphas, Numbers, NumNums, IOStat);
                 if (UtilityRoutines::SameString(Alphas(3), "PhotovoltaicPerformance:Simple")) {
                     ShowWarningError(state,
-                                     std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject +
-                                         ", Availability Schedule for Generator:Photovoltaics '" + objectName +
-                                         "' of Type PhotovoltaicPerformance:Simple will be be ignored (runs all the time).");
+                                     format("{}{}, Availability Schedule for Generator:Photovoltaics '{}' of Type PhotovoltaicPerformance:Simple "
+                                            "will be be ignored (runs all the time).",
+                                            routineName,
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            objectName));
                     ShowContinueError(state,
                                       "To limit this Generator:Photovoltaic's output, please use the Inverter's availability schedule instead.");
                 }
@@ -2292,7 +2324,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
     switch (generatorType) {
     case GeneratorType::ICEngine: {
 
-        auto thisICE = ICEngineElectricGenerator::ICEngineGeneratorSpecs::factory(state, name);
+        auto *thisICE = ICEngineElectricGenerator::ICEngineGeneratorSpecs::factory(state, name);
 
         // dummy vars
         PlantLocation L(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
@@ -2312,7 +2344,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
     }
     case GeneratorType::CombTurbine: {
 
-        auto thisCTE = CTElectricGenerator::CTGeneratorData::factory(state, name);
+        auto *thisCTE = CTElectricGenerator::CTGeneratorData::factory(state, name);
         // dummy vars
         PlantLocation L(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
         Real64 tempLoad = myElecLoadRequest;
@@ -2345,7 +2377,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         break;
     }
     case GeneratorType::FuelCell: {
-        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
+        auto *thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
         dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->SimFuelCellGenerator(state, runFlag, myElecLoadRequest, FirstHVACIteration);
         electProdRate = dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->Report.ACPowerGen;
         electricityProd = dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->Report.ACEnergyGen;
@@ -2356,7 +2388,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         break;
     }
     case GeneratorType::MicroCHP: {
-        auto thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, name);
+        auto *thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, name);
 
         // simulate
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct *>(thisMCHP)->InitMicroCHPNoNormalizeGenerators(state);
@@ -2377,7 +2409,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         break;
     }
     case GeneratorType::Microturbine: {
-        auto thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, name);
+        auto *thisMTG = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, name);
 
         // dummy vars
         PlantLocation L(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
@@ -2441,9 +2473,6 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
     nomVoltEfficiencyARR_.resize(6, 0.0);
 
     static constexpr std::string_view routineName = "DCtoACInverter constructor ";
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     // if/when add object class name to input object this can be simplified. for now search all possible types
     bool foundInverter = false;
@@ -2480,6 +2509,9 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
     }
 
     if (foundInverter) {
+        int NumAlphas; // Number of elements in the alpha array
+        int NumNums;   // Number of elements in the numeric array
+        int IOStat;    // IO Status when calling get input subroutine
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
@@ -2498,20 +2530,23 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
         // how to verify names are unique across objects? add to GlobalNames?
 
         if (modelType_ == InverterModelType::PVWatts) {
-            availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn;
+            availSchedPtr_ = ScheduleManager::ScheduleAlwaysOn;
             zoneNum_ = 0;
             heatLossesDestination_ = ThermalLossDestination::LostToOutside;
             zoneRadFract_ = 0;
         } else {
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn;
+                availSchedPtr_ = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (availSchedPtr_ == 0) {
                     ShowSevereError(state,
-                                    std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                                    format("{}{}=\"{}\", invalid entry.",
+                                           routineName,
+                                           state.dataIPShortCut->cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowContinueError(state,
+                                      format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
                     errorsFound = true;
                 }
             }
@@ -2524,9 +2559,12 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                 } else {
                     heatLossesDestination_ = ThermalLossDestination::LostToOutside;
                     ShowWarningError(state,
-                                     std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                         state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                                     format("{}{}=\"{}\", invalid entry.",
+                                            routineName,
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowContinueError(state,
+                                      format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                     ShowContinueError(state, "Zone name not found. Inverter heat losses will not be added to a zone");
                     // continue with simulation but inverter losses not sent to a zone.
                 }
@@ -2550,12 +2588,13 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
             break;
         }
         case InverterModelType::CurveFuncOfPower: {
-            curveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
+            curveNum_ = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (curveNum_ == 0) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
                 ShowContinueError(state, "Curve was not found");
                 errorsFound = true;
             }
@@ -2718,12 +2757,12 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
             } // end switch modelType
         }
     } else {
-        ShowSevereError(state, std::string{routineName} + " did not find inverter name = " + objectName);
+        ShowSevereError(state, format("{} did not find inverter name = {}", routineName, objectName));
         errorsFound = true;
     }
 
     if (errorsFound) {
-        ShowFatalError(state, std::string{routineName} + "Preceding errors terminate program.");
+        ShowFatalError(state, format("{}Preceding errors terminate program.", routineName));
     }
 }
 
@@ -2855,7 +2894,7 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
     case InverterModelType::CurveFuncOfPower: {
 
         Real64 normalizedPower = dCPowerIn_ / ratedPower_;
-        efficiency_ = CurveManager::CurveValue(state, curveNum_, normalizedPower);
+        efficiency_ = Curve::CurveValue(state, curveNum_, normalizedPower);
         efficiency_ = max(efficiency_, minEfficiency_);
         efficiency_ = min(efficiency_, maxEfficiency_);
 
@@ -2902,17 +2941,17 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
 void DCtoACInverter::simulate(EnergyPlusData &state, Real64 const powerIntoInverter)
 {
     dCPowerIn_ = powerIntoInverter;
-    dCEnergyIn_ = dCPowerIn_ * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    dCEnergyIn_ = dCPowerIn_ * (state.dataHVACGlobal->TimeStepSysSec);
     // check availability schedule
     if (ScheduleManager::GetCurrentScheduleValue(state, availSchedPtr_) > 0.0) {
 
         // now calculate Inverter based on model type
         calcEfficiency(state);
         aCPowerOut_ = efficiency_ * dCPowerIn_;
-        aCEnergyOut_ = aCPowerOut_ * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        aCEnergyOut_ = aCPowerOut_ * (state.dataHVACGlobal->TimeStepSysSec);
 
         if (aCPowerOut_ == 0.0) {
-            ancillACuseEnergy_ = standbyPower_ * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+            ancillACuseEnergy_ = standbyPower_ * (state.dataHVACGlobal->TimeStepSysSec);
             ancillACuseRate_ = standbyPower_;
         } else {
             ancillACuseRate_ = 0.0;
@@ -2927,10 +2966,10 @@ void DCtoACInverter::simulate(EnergyPlusData &state, Real64 const powerIntoInver
     }
     // update report variables
     conversionLossPower_ = dCPowerIn_ - aCPowerOut_;
-    conversionLossEnergy_ = conversionLossPower_ * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    conversionLossEnergy_ = conversionLossPower_ * (state.dataHVACGlobal->TimeStepSysSec);
     conversionLossEnergyDecrement_ = -1.0 * conversionLossEnergy_;
     thermLossRate_ = dCPowerIn_ - aCPowerOut_ + ancillACuseRate_;
-    thermLossEnergy_ = thermLossRate_ * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    thermLossEnergy_ = thermLossRate_ * (state.dataHVACGlobal->TimeStepSysSec);
     qdotConvZone_ = thermLossRate_ * (1.0 - zoneRadFract_);
     qdotRadZone_ = thermLossRate_ * zoneRadFract_;
 }
@@ -2944,15 +2983,15 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
 {
 
     static constexpr std::string_view routineName = "ACtoDCConverter constructor ";
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     // if/when add object class name to input object this can be simplified. for now search all possible types
 
     int testConvertIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Storage:Converter", objectName);
 
     if (testConvertIndex > 0) {
+        int NumAlphas; // Number of elements in the alpha array
+        int NumNums;   // Number of elements in the numeric array
+        int IOStat;    // IO Status when calling get input subroutine
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Storage:Converter";
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -2972,14 +3011,15 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
         // need a new general approach for verify names are unique across objects,  next gen GlobalNames
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn;
+            availSchedPtr_ = ScheduleManager::ScheduleAlwaysOn;
         } else {
             availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (availSchedPtr_ == 0) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
                 errorsFound = true;
             }
         }
@@ -2989,10 +3029,10 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "FunctionOfPower")) {
             modelType_ = ConverterModelType::CurveFuncOfPower;
         } else {
-            ShowSevereError(state,
-                            std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+            ShowSevereError(
+                state,
+                format("{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
             errorsFound = true;
         }
 
@@ -3004,12 +3044,13 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
 
         case ConverterModelType::CurveFuncOfPower: {
             maxPower_ = state.dataIPShortCut->rNumericArgs(2);
-            curveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
+            curveNum_ = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (curveNum_ == 0) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
                 ShowContinueError(state, "Curve was not found");
                 errorsFound = true;
             }
@@ -3032,10 +3073,11 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                 heatLossesDestination_ = ThermalLossDestination::LostToOutside;
             } else {
                 heatLossesDestination_ = ThermalLossDestination::LostToOutside;
-                ShowWarningError(state,
-                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                     "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
+                ShowWarningError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
                 ShowContinueError(state, "Zone name not found. Inverter heat losses will not be added to a zone");
                 // continue with simulation but inverter losses not sent to a zone.
             }
@@ -3141,12 +3183,12 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                 state, zoneNum_, name_, DataHeatBalance::IntGainType::ElectricLoadCenterConverter, &qdotConvZone_, nullptr, &qdotRadZone_);
         }
     } else {
-        ShowSevereError(state, std::string{routineName} + " did not find power converter name = " + objectName);
+        ShowSevereError(state, format("{} did not find power converter name = {}", routineName, objectName));
         errorsFound = true;
     }
 
     if (errorsFound) {
-        ShowFatalError(state, std::string{routineName} + "Preceding errors terminate program.");
+        ShowFatalError(state, format("{}Preceding errors terminate program.", routineName));
     }
 }
 
@@ -3205,7 +3247,7 @@ void ACtoDCConverter::calcEfficiency(EnergyPlusData &state)
     }
     case ConverterModelType::CurveFuncOfPower: {
         Real64 normalizedPower = aCPowerIn_ / maxPower_;
-        efficiency_ = CurveManager::CurveValue(state, curveNum_, normalizedPower);
+        efficiency_ = Curve::CurveValue(state, curveNum_, normalizedPower);
         break;
     }
     default:
@@ -3227,7 +3269,7 @@ void ACtoDCConverter::simulate(EnergyPlusData &state, Real64 const powerOutFromC
             dCPowerOut_ = aCPowerIn_ * efficiency_;
 
         if (dCPowerOut_ == 0.0) {
-            ancillACuseEnergy_ = standbyPower_ * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+            ancillACuseEnergy_ = standbyPower_ * (state.dataHVACGlobal->TimeStepSysSec);
             ancillACuseRate_ = standbyPower_;
         } else {
             ancillACuseRate_ = 0.0;
@@ -3242,13 +3284,13 @@ void ACtoDCConverter::simulate(EnergyPlusData &state, Real64 const powerOutFromC
     }
 
     // update and report
-    aCEnergyIn_ = aCPowerIn_ * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    dCEnergyOut_ = dCPowerOut_ * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    aCEnergyIn_ = aCPowerIn_ * (state.dataHVACGlobal->TimeStepSysSec);
+    dCEnergyOut_ = dCPowerOut_ * (state.dataHVACGlobal->TimeStepSysSec);
     conversionLossPower_ = aCPowerIn_ - dCPowerOut_;
-    conversionLossEnergy_ = conversionLossPower_ * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    conversionLossEnergy_ = conversionLossPower_ * (state.dataHVACGlobal->TimeStepSysSec);
     conversionLossEnergyDecrement_ = -1.0 * conversionLossEnergy_;
     thermLossRate_ = aCPowerIn_ - dCPowerOut_ + ancillACuseRate_;
-    thermLossEnergy_ = thermLossRate_ * (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+    thermLossEnergy_ = thermLossRate_ * (state.dataHVACGlobal->TimeStepSysSec);
     qdotConvZone_ = thermLossRate_ * (1.0 - zoneRadFract_);
     qdotRadZone_ = thermLossRate_ * zoneRadFract_;
 }
@@ -3272,13 +3314,9 @@ ElectricStorage::ElectricStorage( // main constructor
 {
 
     static constexpr std::string_view routineName = "ElectricStorage constructor ";
-    int numAlphas; // Number of elements in the alpha array
-    int numNums;   // Number of elements in the numeric array
-    int iOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     // if/when add object class name to input object this can be simplified. for now search all possible types
     bool foundStorage = false;
-    int testStorageIndex = 0;
     int storageIDFObjectNum = 0;
 
     const std::array<std::pair<std::string, StorageModelType>, 3> storageTypes{
@@ -3287,7 +3325,7 @@ ElectricStorage::ElectricStorage( // main constructor
          {"ElectricLoadCenter:Storage:LiIonNMCBattery", StorageModelType::LiIonNmcBattery}}};
 
     for (auto &item : storageTypes) {
-        testStorageIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, item.first, objectName);
+        int testStorageIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, item.first, objectName);
         if (testStorageIndex > 0) {
             foundStorage = true;
             storageIDFObjectNum = testStorageIndex;
@@ -3298,6 +3336,9 @@ ElectricStorage::ElectricStorage( // main constructor
     }
 
     if (foundStorage) {
+        int numAlphas; // Number of elements in the alpha array
+        int numNums;   // Number of elements in the numeric array
+        int iOStat;    // IO Status when calling get input subroutine
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                  storageIDFObjectNum,
@@ -3315,14 +3356,15 @@ ElectricStorage::ElectricStorage( // main constructor
         // how to verify names are unique across objects? add to GlobalNames?
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn;
+            availSchedPtr_ = ScheduleManager::ScheduleAlwaysOn;
         } else {
             availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (availSchedPtr_ == 0) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
                 errorsFound = true;
             }
         }
@@ -3334,10 +3376,11 @@ ElectricStorage::ElectricStorage( // main constructor
                 heatLossesDestination_ = ThermalLossDestination::LostToOutside;
             } else {
                 heatLossesDestination_ = ThermalLossDestination::LostToOutside;
-                ShowWarningError(state,
-                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                     "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                ShowWarningError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                 ShowContinueError(state, "Zone name not found. Storage heat losses will not be added to a zone");
                 // continue with simulation but storage losses not sent to a zone.
             }
@@ -3364,49 +3407,53 @@ ElectricStorage::ElectricStorage( // main constructor
         }
 
         case StorageModelType::KIBaMBattery: {
-            chargeCurveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4)); // voltage calculation for charging
+            chargeCurveNum_ = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4)); // voltage calculation for charging
             if (chargeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
                 errorsFound = true;
             } else if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " cannot be blank. But no entry found.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} cannot be blank. But no entry found.", state.dataIPShortCut->cAlphaFieldNames(4)));
                 errorsFound = true;
             } else {
-                errorsFound |= CurveManager::CheckCurveDims(state,
-                                                            chargeCurveNum_,                            // Curve index
-                                                            {1},                                        // Valid dimensions
-                                                            routineName,                                // Routine name
-                                                            state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                            name_,                                      // Object Name
-                                                            state.dataIPShortCut->cAlphaFieldNames(4)); // Field Name
+                errorsFound |= Curve::CheckCurveDims(state,
+                                                     chargeCurveNum_,                            // Curve index
+                                                     {1},                                        // Valid dimensions
+                                                     routineName,                                // Routine name
+                                                     state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                     name_,                                      // Object Name
+                                                     state.dataIPShortCut->cAlphaFieldNames(4)); // Field Name
             }
-            dischargeCurveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5)); // voltage calculation for discharging
+            dischargeCurveNum_ = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5)); // voltage calculation for discharging
             if (dischargeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
                 errorsFound = true;
             } else if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " cannot be blank. But no entry found.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} cannot be blank. But no entry found.", state.dataIPShortCut->cAlphaFieldNames(5)));
                 errorsFound = true;
             } else {
-                errorsFound |= CurveManager::CheckCurveDims(state,
-                                                            dischargeCurveNum_,                         // Curve index
-                                                            {1},                                        // Valid dimensions
-                                                            routineName,                                // Routine name
-                                                            state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                            name_,                                      // Object Name
-                                                            state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
+                errorsFound |= Curve::CheckCurveDims(state,
+                                                     dischargeCurveNum_,                         // Curve index
+                                                     {1},                                        // Valid dimensions
+                                                     routineName,                                // Routine name
+                                                     state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                     name_,                                      // Object Name
+                                                     state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
             }
 
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "Yes")) {
@@ -3414,38 +3461,44 @@ ElectricStorage::ElectricStorage( // main constructor
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "No")) {
                 lifeCalculation_ = BatteryDegradationModelType::LifeCalculationNo;
             } else {
-                ShowWarningError(state,
-                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                     "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
+                ShowWarningError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
                 ShowContinueError(state, "Yes or No should be selected. Default value No is used to continue simulation");
                 lifeCalculation_ = BatteryDegradationModelType::LifeCalculationNo;
             }
 
             if (lifeCalculation_ == BatteryDegradationModelType::LifeCalculationYes) {
-                lifeCurveNum_ = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // Battery life calculation
+                lifeCurveNum_ = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7)); // Battery life calculation
                 if (lifeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                     ShowSevereError(state,
-                                    std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
+                                    format("{}{}=\"{}\", invalid entry.",
+                                           routineName,
+                                           state.dataIPShortCut->cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
                     errorsFound = true;
                 } else if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                     ShowSevereError(state,
-                                    std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
+                                    format("{}{}=\"{}\", invalid entry.",
+                                           routineName,
+                                           state.dataIPShortCut->cCurrentModuleObject,
+                                           state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
-                                      "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + " cannot be blank when " +
-                                          state.dataIPShortCut->cAlphaArgs(6) + " = Yes. But no entry found.");
+                                      format("Invalid {} cannot be blank when {} = Yes. But no entry found.",
+                                             state.dataIPShortCut->cAlphaFieldNames(7),
+                                             state.dataIPShortCut->cAlphaArgs(6)));
                     errorsFound = true;
                 } else {
-                    errorsFound |= CurveManager::CheckCurveDims(state,
-                                                                lifeCurveNum_,                              // Curve index
-                                                                {1},                                        // Valid dimensions
-                                                                routineName,                                // Routine name
-                                                                state.dataIPShortCut->cCurrentModuleObject, // Object Type
-                                                                name_,                                      // Object Name
-                                                                state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
+                    errorsFound |= Curve::CheckCurveDims(state,
+                                                         lifeCurveNum_,                              // Curve index
+                                                         {1},                                        // Valid dimensions
+                                                         routineName,                                // Routine name
+                                                         state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                         name_,                                      // Object Name
+                                                         state.dataIPShortCut->cAlphaFieldNames(7)); // Field Name
                 }
 
                 cycleBinNum_ = state.dataIPShortCut->rNumericArgs(14);
@@ -3493,13 +3546,15 @@ ElectricStorage::ElectricStorage( // main constructor
             liIon_Vexp_ = state.dataIPShortCut->lNumericFieldBlanks(11) ? 3.53 : state.dataIPShortCut->rNumericArgs(11);
             liIon_Vnom_ = state.dataIPShortCut->lNumericFieldBlanks(12) ? 3.342 : state.dataIPShortCut->rNumericArgs(12);
             if (liIon_Vfull_ < liIon_Vexp_ || liIon_Vexp_ < liIon_Vnom_) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  state.dataIPShortCut->cNumericFieldNames(10) + " must be greater than " +
-                                      state.dataIPShortCut->cNumericFieldNames(11) + ",");
-                ShowContinueError(state, "which must be greater than " + state.dataIPShortCut->cNumericFieldNames(12) + ".");
+                                  format("{} must be greater than {},",
+                                         state.dataIPShortCut->cNumericFieldNames(10),
+                                         state.dataIPShortCut->cNumericFieldNames(11)));
+                ShowContinueError(state, format("which must be greater than {}.", state.dataIPShortCut->cNumericFieldNames(12)));
                 for (int i = 10; i <= 12; ++i) {
                     ShowContinueError(state,
                                       format("{} = {:.3R}", state.dataIPShortCut->cNumericFieldNames(i), state.dataIPShortCut->rNumericArgs(i)));
@@ -3513,12 +3568,14 @@ ElectricStorage::ElectricStorage( // main constructor
             liIon_Qnom_ =
                 state.dataIPShortCut->lNumericFieldBlanks(16) ? 0.976875 * liIon_Qfull_ : state.dataIPShortCut->rNumericArgs(16) * liIon_Qfull_;
             if (liIon_Qexp_ >= liIon_Qnom_) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  state.dataIPShortCut->cNumericFieldNames(16) + " must be greater than " +
-                                      state.dataIPShortCut->cNumericFieldNames(15) + ".");
+                                  format("{} must be greater than {}.",
+                                         state.dataIPShortCut->cNumericFieldNames(16),
+                                         state.dataIPShortCut->cNumericFieldNames(15)));
                 for (int i = 15; i <= 16; ++i) {
                     ShowContinueError(state,
                                       format("{} = {:.3R}", state.dataIPShortCut->cNumericFieldNames(i), state.dataIPShortCut->rNumericArgs(i)));
@@ -3745,11 +3802,11 @@ ElectricStorage::ElectricStorage( // main constructor
             } // switch storage model type
         }
     } else { // storage not found
-        ShowSevereError(state, std::string{routineName} + " did not find storage name = " + objectName);
+        ShowSevereError(state, format("{} did not find storage name = {}", routineName, objectName));
         errorsFound = true;
     }
     if (errorsFound) {
-        ShowFatalError(state, std::string{routineName} + "Preceding errors terminate program.");
+        ShowFatalError(state, format("{}Preceding errors terminate program.", routineName));
     }
 }
 
@@ -3815,11 +3872,11 @@ void ElectricStorage::reinitAtBeginEnvironment()
             count0_ = 1;            // Index 0 is for initial SOC, so new input starts from index 1.
             b10_[0] = startingSOC_; // the initial fractional SOC is stored as the reference
             x0_[0] = 0.0;
-            for (auto loop = 1; loop < maxRainflowArrayBounds_ + 1; ++loop) {
+            for (int loop = 1; loop < maxRainflowArrayBounds_ + 1; ++loop) {
                 b10_[loop] = 0.0;
                 x0_[loop] = 0.0;
             }
-            for (auto loop = 0; loop < cycleBinNum_; ++loop) {
+            for (int loop = 0; loop < cycleBinNum_; ++loop) {
                 oneNmb0_[loop] = 0.0;
                 nmb0_[loop] = 0.0;
             }
@@ -3856,11 +3913,11 @@ void ElectricStorage::reinitAtEndWarmup()
             count0_ = 1;            // Index 0 is for initial SOC, so new input starts from index 1.
             b10_[0] = startingSOC_; // the initial fractional SOC is stored as the reference
             x0_[0] = 0.0;
-            for (auto loop = 1; loop < maxRainflowArrayBounds_ + 1; ++loop) {
+            for (int loop = 1; loop < maxRainflowArrayBounds_ + 1; ++loop) {
                 b10_[loop] = 0.0;
                 x0_[loop] = 0.0;
             }
-            for (auto loop = 0; loop < cycleBinNum_; ++loop) {
+            for (int loop = 0; loop < cycleBinNum_; ++loop) {
                 oneNmb0_[loop] = 0.0;
                 nmb0_[loop] = 0.0;
             }
@@ -3922,9 +3979,9 @@ void ElectricStorage::timeCheckAndUpdate(EnergyPlusData &state)
 
                 batteryDamage_ = 0.0;
 
-                for (auto binNum = 0; binNum < cycleBinNum_; ++binNum) {
+                for (int binNum = 0; binNum < cycleBinNum_; ++binNum) {
                     //       Battery damage is calculated by accumulating the impact from each cycle.
-                    batteryDamage_ += oneNmb0_[binNum] / CurveManager::CurveValue(state, lifeCurveNum_, (double(binNum) / double(cycleBinNum_)));
+                    batteryDamage_ += oneNmb0_[binNum] / Curve::CurveValue(state, lifeCurveNum_, (double(binNum) / double(cycleBinNum_)));
                 }
             }
         } else if (storageModelMode_ == StorageModelType::LiIonNmcBattery) {
@@ -3995,10 +4052,10 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
         }
 
         // now check to see if charge would exceed capacity, and modify to just fill physical storage cap
-        if ((lastTimeStepStateOfCharge_ + powerCharge * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour * energeticEfficCharge_) >=
+        if ((lastTimeStepStateOfCharge_ + powerCharge * state.dataHVACGlobal->TimeStepSysSec * energeticEfficCharge_) >=
             (maxEnergyCapacity_ * controlSOCMaxFracLimit)) {
             powerCharge = ((maxEnergyCapacity_ * controlSOCMaxFracLimit) - lastTimeStepStateOfCharge_) /
-                          (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour * energeticEfficCharge_);
+                          (state.dataHVACGlobal->TimeStepSysSec * energeticEfficCharge_);
         }
     } // charging
 
@@ -4013,10 +4070,10 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
             powerDischarge = maxPowerDraw_;
         }
         // now check if will empty this timestep, power draw is amplified by energetic effic
-        if ((lastTimeStepStateOfCharge_ - powerDischarge * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour /
-                                              energeticEfficDischarge_) <= (maxEnergyCapacity_ * controlSOCMinFracLimit)) {
+        if ((lastTimeStepStateOfCharge_ - powerDischarge * state.dataHVACGlobal->TimeStepSysSec / energeticEfficDischarge_) <=
+            (maxEnergyCapacity_ * controlSOCMinFracLimit)) {
             powerDischarge = (lastTimeStepStateOfCharge_ - (maxEnergyCapacity_ * controlSOCMinFracLimit)) * energeticEfficDischarge_ /
-                             (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+                             (state.dataHVACGlobal->TimeStepSysSec);
         }
     }
 
@@ -4028,26 +4085,24 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
     if (charging) {
         pelIntoStorage_ = powerCharge;
         pelFromStorage_ = 0.0;
-        thisTimeStepStateOfCharge_ =
-            lastTimeStepStateOfCharge_ + powerCharge * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour * energeticEfficCharge_;
+        thisTimeStepStateOfCharge_ = lastTimeStepStateOfCharge_ + powerCharge * state.dataHVACGlobal->TimeStepSysSec * energeticEfficCharge_;
     }
     if (discharging) {
         pelIntoStorage_ = 0.0;
         pelFromStorage_ = powerDischarge;
-        thisTimeStepStateOfCharge_ = lastTimeStepStateOfCharge_ -
-                                     powerDischarge * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour / energeticEfficDischarge_;
+        thisTimeStepStateOfCharge_ = lastTimeStepStateOfCharge_ - powerDischarge * state.dataHVACGlobal->TimeStepSysSec / energeticEfficDischarge_;
         thisTimeStepStateOfCharge_ = max(thisTimeStepStateOfCharge_, 0.0);
     }
 
     // updates and reports
     electEnergyinStorage_ = thisTimeStepStateOfCharge_; //[J]
     storedPower_ = pelIntoStorage_;
-    storedEnergy_ = pelIntoStorage_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    storedEnergy_ = pelIntoStorage_ * state.dataHVACGlobal->TimeStepSysSec;
     decrementedEnergyStored_ = -1.0 * storedEnergy_;
     drawnPower_ = pelFromStorage_;
-    drawnEnergy_ = pelFromStorage_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    drawnEnergy_ = pelFromStorage_ * state.dataHVACGlobal->TimeStepSysSec;
     thermLossRate_ = max(storedPower_ * (1.0 - energeticEfficCharge_), drawnPower_ * (1.0 - energeticEfficDischarge_));
-    thermLossEnergy_ = thermLossRate_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    thermLossEnergy_ = thermLossRate_ * state.dataHVACGlobal->TimeStepSysSec;
 
     if (zoneNum_ > 0) { // set values for zone heat gains
         qdotConvZone_ = (1.0 - zoneRadFract_) * thermLossRate_;
@@ -4069,21 +4124,15 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
     Real64 Volt = 0.0;
 
     Real64 T0 = 0.0;
-    Real64 E0c = 0.0;
-    Real64 k = 0.0;
-    Real64 c = 0.0;
     Real64 qmaxf = 0.0;
     Real64 Ef = 0.0;
-    Real64 qmax = 0.0;
-    Real64 Pactual = 0.0;
     Real64 q0 = 0.0;
-    Real64 E0d = 0.0;
 
-    qmax = maxAhCapacity_;
-    E0c = chargedOCV_;
-    E0d = dischargedOCV_;
-    k = chargeConversionRate_;
-    c = availableFrac_;
+    Real64 qmax = maxAhCapacity_;
+    Real64 E0c = chargedOCV_;
+    Real64 E0d = dischargedOCV_;
+    Real64 k = chargeConversionRate_;
+    Real64 c = availableFrac_;
 
     if (charging) {
 
@@ -4110,7 +4159,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
         T0 = std::abs(qmax / I0);                                                                       // Initial Assumption
         qmaxf = qmax * k * c * T0 / (1.0 - std::exp(-k * T0) + c * (k * T0 - 1.0 + std::exp(-k * T0))); // Initial calculation of a function qmax(I)
         Real64 Xf = q0 / qmaxf;
-        Ef = E0d + CurveManager::CurveValue(state, chargeCurveNum_, Xf); // E0d+Ac*Xf+Cc*Xf/(Dc-Xf) (use curve)
+        Ef = E0d + Curve::CurveValue(state, chargeCurveNum_, Xf); // E0d+Ac*Xf+Cc*Xf/(Dc-Xf) (use curve)
         Volt = Ef - I0 * internalR_;
         Real64 Inew = 0.0;
         if (Volt != 0.0) {
@@ -4127,7 +4176,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
             T0 = Tnew;
             qmaxf = qmax * k * c * T0 / (1.0 - std::exp(-k * T0) + c * (k * T0 - 1.0 + std::exp(-k * T0)));
             Xf = q0 / qmaxf;
-            Ef = E0d + CurveManager::CurveValue(state, chargeCurveNum_, Xf); // E0d+Ac*Xf+Cc*Xf/(Dc-Xf) (use curve)
+            Ef = E0d + Curve::CurveValue(state, chargeCurveNum_, Xf); // E0d+Ac*Xf+Cc*Xf/(Dc-Xf) (use curve)
             Volt = Ef - I0 * internalR_;
             Inew = Pw / Volt;
             Tnew = std::abs(qmaxf / Inew); // ***Always positive here
@@ -4144,7 +4193,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
 
         if (std::abs(I0) <= std::abs(Imax)) {
             I0 = Pw / Volt;
-            Pactual = I0 * Volt;
+            // Pactual = I0 * Volt;
         } else {
             I0 = Imax;
             qmaxf = 80.0; // Initial assumption to solve the equation using iterative method
@@ -4184,8 +4233,9 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
         bool const ok = determineCurrentForBatteryDischarge(state, I0, T0, Volt, Pw, q0, dischargeCurveNum_, k, c, qmax, E0c, internalR_);
         if (!ok) {
             ShowFatalError(state,
-                           "ElectricLoadCenter:Storage:Battery named=\"" + name_ +
-                               "\". Battery discharge current could not be estimated due to iteration limit reached. ");
+                           format("ElectricLoadCenter:Storage:Battery named=\"{}\". Battery discharge current could not be estimated due to "
+                                  "iteration limit reached. ",
+                                  name_));
             // issue #5301, need more diagnostics for this.
         }
 
@@ -4197,7 +4247,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
         Imax = min(Imax, maxDischargeI_);
         if (std::abs(I0) <= Imax) {
             I0 = Pw / Volt;
-            Pactual = I0 * Volt;
+            // Pactual = I0 * Volt;
         } else {
             I0 = Imax;
             qmaxf = 10.0;        // Initial assumption to solve the equation using iterative method
@@ -4208,7 +4258,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
                 qmaxf = RHS;
             }
             Real64 Xf = (qmax - q0) / qmaxf;
-            Ef = E0c + CurveManager::CurveValue(state, dischargeCurveNum_, Xf);
+            Ef = E0c + Curve::CurveValue(state, dischargeCurveNum_, Xf);
             Volt = Ef - I0 * internalR_;
         }
         if (Volt < cutoffV_) {
@@ -4233,14 +4283,14 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
         thisTimeStepBound_ = max(0.0, newBound);
     }
 
-    Pactual = I0 * Volt;
+    // Pactual = I0 * Volt;
     Real64 TotalSOC = thisTimeStepAvailable_ + thisTimeStepBound_;
 
     // output1
     if (TotalSOC > q0) {
         storageMode_ = 2;
         storedPower_ = -1.0 * Volt * I0 * numBattery_; // Issue #5303, fix sign issue
-        storedEnergy_ = -1.0 * Volt * I0 * numBattery_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        storedEnergy_ = -1.0 * Volt * I0 * numBattery_ * state.dataHVACGlobal->TimeStepSysSec;
         decrementedEnergyStored_ = -1.0 * storedEnergy_;
         drawnPower_ = 0.0;
         drawnEnergy_ = 0.0;
@@ -4251,7 +4301,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
         storedEnergy_ = 0.0;
         decrementedEnergyStored_ = 0.0;
         drawnPower_ = Volt * I0 * numBattery_;
-        drawnEnergy_ = Volt * I0 * numBattery_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        drawnEnergy_ = Volt * I0 * numBattery_ * state.dataHVACGlobal->TimeStepSysSec;
 
     } else {
         storageMode_ = 0;
@@ -4267,7 +4317,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
     batteryCurrent_ = I0 * parallelNum_;
     batteryVoltage_ = Volt * seriesNum_;
     thermLossRate_ = internalR_ * pow_2(I0) * numBattery_;
-    thermLossEnergy_ = internalR_ * pow_2(I0) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour * numBattery_;
+    thermLossEnergy_ = internalR_ * pow_2(I0) * state.dataHVACGlobal->TimeStepSysSec * numBattery_;
 
     if (zoneNum_ > 0) { // set values for zone heat gains
         qdotConvZone_ = ((1.0 - zoneRadFract_) * thermLossRate_) * numBattery_;
@@ -4293,7 +4343,7 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     // Set the temperature the battery sees
     if (zoneNum_ > 0) {
         // If in a zone, use the zone temperature
-        battState.thermal->T_room = state.dataHeatBalFanSys->ZT(zoneNum_);
+        battState.thermal->T_room = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum_).ZT;
     } else {
         // If outside, use outdoor temperature
         battState.thermal->T_room = state.dataEnvrn->OutDryBulbTemp;
@@ -4347,12 +4397,12 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     batteryVoltage_ = ssc_battery_->V();
     batteryDamage_ = 1.0 - (ssc_battery_->charge_maximum_lifetime() / maxAhCapacity_);
     storedPower_ = powerCharge;
-    storedEnergy_ = storedPower_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    storedEnergy_ = storedPower_ * state.dataHVACGlobal->TimeStepSysSec;
     drawnPower_ = powerDischarge;
-    drawnEnergy_ = drawnPower_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    drawnEnergy_ = drawnPower_ * state.dataHVACGlobal->TimeStepSysSec;
     decrementedEnergyStored_ = -storedEnergy_;
     thermLossRate_ = battState2.thermal->heat_dissipated * 1000.0; // kW -> W
-    thermLossEnergy_ = thermLossRate_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    thermLossEnergy_ = thermLossRate_ * state.dataHVACGlobal->TimeStepSysSec;
     batteryTemperature_ = battState2.thermal->T_batt;
 
     // Zone Heat Gains
@@ -4411,7 +4461,7 @@ bool ElectricStorage::determineCurrentForBatteryDischarge(EnergyPlusData &state,
     Real64 qmaxf = qmax * k * c * curT0 /
                    (1.0 - std::exp(-k * curT0) + c * (k * curT0 - 1.0 + std::exp(-k * curT0))); // Initial calculation of a function qmax(I)
     Real64 Xf = (qmax - q0) / qmaxf;
-    Real64 Ef = E0c + CurveManager::CurveValue(state, CurveNum, Xf); // E0d+Ac*Xf+Cc*X/(Dc-Xf)
+    Real64 Ef = E0c + Curve::CurveValue(state, CurveNum, Xf); // E0d+Ac*Xf+Cc*X/(Dc-Xf)
     curVolt = Ef - curI0 * InternalR;
     Real64 Inew = Pw / curVolt;
     Real64 Tnew = qmaxf / Inew;
@@ -4430,7 +4480,7 @@ bool ElectricStorage::determineCurrentForBatteryDischarge(EnergyPlusData &state,
             Xf = 1.0;
         }
 
-        Ef = E0c + CurveManager::CurveValue(state, CurveNum, Xf); // E0c+Ad*Xf+Cd*X/(Dd-Xf)
+        Ef = E0c + Curve::CurveValue(state, CurveNum, Xf); // E0c+Ad*Xf+Cd*X/(Dd-Xf)
         curVolt = Ef - curI0 * InternalR;
         // add div by zero protection #5301
         if (curVolt != 0.0) {
@@ -4602,15 +4652,15 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
       thermalLossEnergy_(0.0), elecUseMeteredUtilityLosses_(0.0), powerConversionMeteredLosses_(0.0), qdotConvZone_(0.0), qdotRadZone_(0.0)
 {
     static constexpr std::string_view routineName = "ElectricTransformer constructor ";
-    int numAlphas; // Number of elements in the alpha array
-    int numNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     int transformerIDFObjectNum = 0;
     state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
 
     transformerIDFObjectNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Transformer", objectName);
     if (transformerIDFObjectNum > 0) {
+        int numAlphas; // Number of elements in the alpha array
+        int numNums;   // Number of elements in the numeric array
+        int IOStat;    // IO Status when calling get input subroutine
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                  transformerIDFObjectNum,
@@ -4626,14 +4676,15 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         name_ = state.dataIPShortCut->cAlphaArgs(1);
         // how to verify names are unique across objects? add to GlobalNames?
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            availSchedPtr_ = DataGlobalConstants::ScheduleAlwaysOn;
+            availSchedPtr_ = ScheduleManager::ScheduleAlwaysOn;
         } else {
             availSchedPtr_ = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (availSchedPtr_ == 0) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
                 errorsFound = true;
             }
         }
@@ -4648,10 +4699,10 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
             usageMode_ = TransformerUse::PowerBetweenLoadCenterAndBldg;
 
         } else {
-            ShowWarningError(state,
-                             std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                 "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+            ShowWarningError(
+                state,
+                format("{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
             errorsFound = true;
         }
 
@@ -4662,10 +4713,11 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                 heatLossesDestination_ = ThermalLossDestination::LostToOutside;
             } else {
                 heatLossesDestination_ = ThermalLossDestination::LostToOutside;
-                ShowWarningError(state,
-                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                     "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
+                ShowWarningError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
                 ShowContinueError(state, "Zone name not found. Transformer heat losses will not be added to a zone");
                 // continue with simulation but storage losses not sent to a zone.
             }
@@ -4679,10 +4731,10 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Aluminum")) {
             factorTempCoeff_ = 225.0;
         } else {
-            ShowSevereError(state,
-                            std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
+            ShowSevereError(
+                state,
+                format("{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
             errorsFound = true;
         }
         tempRise_ = state.dataIPShortCut->rNumericArgs(4);
@@ -4693,18 +4745,17 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "NominalEfficiency")) {
             performanceInputMode_ = TransformerPerformanceInput::EfficiencyMethod;
         } else {
-            ShowSevereError(state,
-                            std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
+            ShowSevereError(
+                state,
+                format("{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
             errorsFound = true;
         }
         if (ratedCapacity_ == 0) {
             if (performanceInputMode_ == TransformerPerformanceInput::LossesMethod) {
-                ShowWarningError(state,
-                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                     "\".");
-                ShowContinueError(state, "Specified " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
+                ShowWarningError(
+                    state, format("{}{}=\"{}\".", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Specified {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
                 ShowContinueError(state, format("Specified {} = {:.1R}", state.dataIPShortCut->cNumericFieldNames(2), ratedCapacity_));
                 ShowContinueError(state, "Transformer load and no load losses cannot be calculated with 0.0 rated capacity.");
                 ShowContinueError(state, "Simulation continues but transformer losses will be set to zero.");
@@ -4721,9 +4772,10 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
             if (state.dataIPShortCut->lNumericFieldBlanks(11)) {
                 maxPUL_ = ratedPUL_;
             } else if (maxPUL_ <= 0 || maxPUL_ > 1) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
                     state, format("Invalid {}=[{:.3R}].", state.dataIPShortCut->cNumericFieldNames(11), state.dataIPShortCut->rNumericArgs(11)));
                 ShowContinueError(state, "Entered value must be > 0 and <= 1.");
@@ -4736,10 +4788,11 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
             considerLosses_ = false;
         } else {
             if (usageMode_ == TransformerUse::PowerInFromGrid) {
-                ShowSevereError(state,
-                                std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7));
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}{}=\"{}\", invalid entry.", routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                ShowContinueError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
                 errorsFound = true;
             }
         }
@@ -4751,7 +4804,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
 
             // Provide warning if no meter is wired to a transformer used to get power from the grid
             if (numWiredMeters <= 0) {
-                ShowWarningError(state, std::string{routineName} + "ElectricLoadCenter:Transformer=\"" + name_ + "\":");
+                ShowWarningError(state, format("{}ElectricLoadCenter:Transformer=\"{}\":", routineName, name_));
                 ShowContinueError(state, "ISOLATED Transformer: No meter wired to a transformer used to input power from grid");
             }
 
@@ -4760,7 +4813,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
             specialMeter_.resize(numWiredMeters, false);
 
             // Meter check deferred because they may have not been "loaded" yet,
-            for (auto loopCount = 0; loopCount < numWiredMeters; ++loopCount) {
+            for (int loopCount = 0; loopCount < numWiredMeters; ++loopCount) {
                 wiredMeterNames_[loopCount] = UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(loopCount + numAlphaBeforeMeter + 1));
                 // Assign SpecialMeter as TRUE if the meter name is Electricity:Facility or Electricity:HVAC
                 if (UtilityRoutines::SameString(wiredMeterNames_[loopCount], "Electricity:Facility") ||
@@ -4897,12 +4950,12 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         }
 
     } else {
-        ShowSevereError(state, std::string{routineName} + " did not find transformer name = " + objectName);
+        ShowSevereError(state, format("{} did not find transformer name = {}", routineName, objectName));
         errorsFound = true;
     }
 
     if (errorsFound) {
-        ShowFatalError(state, std::string{routineName} + "Preceding errors terminate program.");
+        ShowFatalError(state, format("{}Preceding errors terminate program.", routineName));
     }
 }
 
@@ -4951,7 +5004,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
                 elecLoad +=
                     GetInstantMeterValue(state, wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
                     GetInstantMeterValue(state, wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::System) /
-                        (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+                        (state.dataHVACGlobal->TimeStepSysSec);
                 // PastElecLoad store the metered value in the previous time step. This value will be used to check whether
                 // a transformer is overloaded or not.
                 pastElecLoad += GetCurrentMeterValue(state, wiredMeterPtrs_[meterNum]) / state.dataGlobal->TimeStepZoneSec;
@@ -5007,7 +5060,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
         if ((pastElecLoad / ratedCapacity_) > 1.0) {
             if (overloadErrorIndex_ == 0) {
                 ShowSevereError(state, "Transformer Overloaded");
-                ShowContinueError(state, "Entered in ElectricLoadCenter:Transformer =" + name_);
+                ShowContinueError(state, format("Entered in ElectricLoadCenter:Transformer ={}", name_));
             }
             ShowRecurringSevereErrorAtEnd(state, "Transformer Overloaded: Entered in ElectricLoadCenter:Transformer =" + name_, overloadErrorIndex_);
         }
@@ -5043,14 +5096,14 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
         // are considered in utility cost. If transformer losses are not considered in utility cost, 0 is assigned
         // to the variable "%ElecUseUtility".
         if (considerLosses_) {
-            elecUseMeteredUtilityLosses_ = totalLossRate_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            elecUseMeteredUtilityLosses_ = totalLossRate_ * state.dataHVACGlobal->TimeStepSysSec;
         } else {
             elecUseMeteredUtilityLosses_ = 0.0;
         }
 
         // Transformer has two modes.If it works in one mode, the variable for meter output in the other mode
         // is assigned 0
-        totalLossEnergy_ = totalLossRate_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        totalLossEnergy_ = totalLossRate_ * state.dataHVACGlobal->TimeStepSysSec;
 
         break;
     }
@@ -5061,7 +5114,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
 
         if (powerOut_ < 0) powerOut_ = 0.0;
 
-        powerConversionMeteredLosses_ = -1.0 * totalLossRate_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        powerConversionMeteredLosses_ = -1.0 * totalLossRate_ * state.dataHVACGlobal->TimeStepSysSec;
 
         // Transformer has two modes.If it works in one mode, the variable for meter output in the other mode
         // is assigned 0
@@ -5082,16 +5135,16 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
     } else {
         efficiency_ = powerOut_ / powerIn_;
     }
-    noLoadLossEnergy_ = noLoadLossRate_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    loadLossEnergy_ = loadLossRate_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    noLoadLossEnergy_ = noLoadLossRate_ * state.dataHVACGlobal->TimeStepSysSec;
+    loadLossEnergy_ = loadLossRate_ * state.dataHVACGlobal->TimeStepSysSec;
 
-    energyIn_ = powerIn_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    energyOut_ = powerOut_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    energyIn_ = powerIn_ * state.dataHVACGlobal->TimeStepSysSec;
+    energyOut_ = powerOut_ * state.dataHVACGlobal->TimeStepSysSec;
 
     //   Thermal loss rate may not be equal to Total loss rate. This is the case when surplus power is less than the
     //    calculated total loss rate for a cogeneration transformer. That is why "PowerIn - PowerOut" is used below.
     thermalLossRate_ = powerIn_ - powerOut_;
-    thermalLossEnergy_ = thermalLossRate_ * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    thermalLossEnergy_ = thermalLossRate_ * state.dataHVACGlobal->TimeStepSysSec;
 
     if (zoneNum_ > 0) { // set values for zone heat gains
         qdotConvZone_ = (1.0 - zoneRadFrac_) * thermalLossRate_;
@@ -5111,7 +5164,7 @@ void ElectricTransformer::setupMeterIndices(EnergyPlusData &state)
             // Electricity such as ElectricityPurchased and ElectricityProduced.
             // It is not proper to have this check in GetInput routine because the meter index may have not been defined
             if (!has(GetMeterResourceType(state, wiredMeterPtrs_[meterNum]), "Electricity")) {
-                EnergyPlus::ShowFatalError(state, "Non-electricity meter used for " + name_);
+                EnergyPlus::ShowFatalError(state, format("Non-electricity meter used for {}", name_));
             }
         }
     }

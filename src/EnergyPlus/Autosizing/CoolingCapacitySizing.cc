@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,8 +67,6 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
         return 0.0;
     }
     this->preSize(state, _originalValue);
-    std::string DDNameFanPeak = "";
-    std::string dateTimeFanPeak = "";
     Real64 DesVolFlow = 0.0;
     Real64 CoilInTemp = -999.0;
     Real64 CoilInHumRat = -999.0;
@@ -189,7 +187,15 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             Real64 CoilInWetBulb =
                                 Psychrometrics::PsyTwbFnTdbWPb(state, CoilInTemp, CoilInHumRat, state.dataEnvrn->StdBaroPress, this->callingRoutine);
                             if (this->dataTotCapCurveIndex > 0) {
-                                TotCapTempModFac = CurveManager::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                                switch (state.dataCurveManager->PerfCurve(this->dataTotCapCurveIndex)->numDims) {
+                                case 1:
+                                    TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb);
+                                    break;
+                                case 2:
+                                default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
+                                    TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                                    break;
+                                }
                             } else if (this->dataTotCapCurveValue > 0) {
                                 TotCapTempModFac = this->dataTotCapCurveValue;
                             } else {
@@ -315,7 +321,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         (Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat) - Psychrometrics::PsyHFnTdbW(CoilOutTemp, CoilOutHumRat));
                 } else {
                     CheckSysSizing(state, this->compType, this->compName);
-                    auto &thisFinalSysSizing = this->finalSysSizing(this->curSysNum);
+                    auto const &thisFinalSysSizing = this->finalSysSizing(this->curSysNum);
                     DesVolFlow = this->dataFlowUsedForSizing;
                     Real64 NominalCapacityDes = 0.0;
                     if (thisFinalSysSizing.CoolingCapMethod == DataSizing::FractionOfAutosizedCoolingCapacity) {
@@ -430,7 +436,15 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             }
                         }
                         if (this->dataTotCapCurveIndex > 0) {
-                            TotCapTempModFac = CurveManager::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                            switch (state.dataCurveManager->PerfCurve(this->dataTotCapCurveIndex)->numDims) {
+                            case 1:
+                                TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb);
+                                break;
+                            case 2:
+                            default: // this default allows the simulation to continue, but will issue a warning, should be removed eventually
+                                TotCapTempModFac = Curve::CurveValue(state, this->dataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                                break;
+                            }
                         } else {
                             TotCapTempModFac = 1.0;
                         }
@@ -551,7 +565,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
         if (this->isEpJSON) this->sizingString = "cooling_design_capacity [W]";
     }
     if (this->dataScalableCapSizingON) {
-        auto const SELECT_CASE_var(this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::CoolingCapacitySizing));
+        int const SELECT_CASE_var(this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::CoolingCapacitySizing));
         if (SELECT_CASE_var == DataSizing::CapacityPerFloorArea) {
             this->sizingStringScalable = "(scaled by capacity / area) ";
         } else if (SELECT_CASE_var == DataSizing::FractionOfAutosizedHeatingCapacity ||

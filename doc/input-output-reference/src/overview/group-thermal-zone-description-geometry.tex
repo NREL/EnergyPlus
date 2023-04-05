@@ -218,6 +218,54 @@ The outdoor wind speed calculated at the height above ground of the zone centroi
   Zone,Sum,Space Total Internal Total Heating Energy {[}J{]}
 \item
   Zone,Average,Space Total Internal Total Heating Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Temperature {[}C{]}
+\item
+  Zone,Average,Space Mean Air Dewpoint Temperature {[}C{]}
+\item
+  Zone,Average,Space Mean Radiant Temperature {[}C{]}
+\item
+  Zone,Average,Space Operative Temperature {[}C{]}
+\item
+  HVAC,Average,Space Air Heat Balance Internal Convective Heat Gain Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance Surface Convection Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance InterSpace Air Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance Outdoor Air Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance System Air Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance System Convective Heat Gain Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance Air Energy Storage Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance Deviation Rate {[}W{]}
+\item
+  HVAC,Sum,Space Air System Sensible Heating Energy {[}J{]}
+\item
+  HVAC,Sum,Space Air System Sensible Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Space Air System Sensible Heating Rate {[}W{]}
+\item
+  HVAC,Average,Space Air System Sensible Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Humidity Ratio{[}kgWater/kgDryAir{]}
+\item
+  HVAC,Average,Space Air Relative Humidity{[}\%{]}
+\item
+  HVAC,Sum,Space Air System Latent Heating Energy {[}J{]}
+\item
+  HVAC,Sum,Space Air System Latent Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Space Air System Latent Heating Rate {[}W{]}
+\item
+  HVAC,Average,Space Air System Latent Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Space Air System Sensible Heat Ratio {[}{]}
+\item
+  HVAC,Average,Space Air Vapor Pressure Difference {[}Pa{]}
 \end{itemize}
 
 \subsubsection{Zone Thermal Outputs Overview}\label{zone-thermal-outputs}
@@ -321,7 +369,7 @@ These two variable outputs are/should be identical. However, note that they can 
 
 \paragraph{Zone Mean Air Temperature {[}C{]}}\label{zone-mean-air-temperature-c}
 
-From the code definition, the zone mean air temperature is the average temperature of the air temperatures at the system timestep. Remember that the zone heat balance represents a ``well stirred'' model for a zone, therefore there is only one mean air temperature to represent the air temperature for the zone.
+From the code definition, the zone mean air temperature is the average temperature of the air temperatures at the system timestep. Remember that the zone heat balance represents a ``well stirred'' model for a zone, therefore there is only one mean air temperature to represent the air temperature for the zone unless a non-mixing RoomAirModel is specified.
 
 \paragraph{Zone Air Temperature {[}C{]}}\label{zone-air-temperature-c}
 
@@ -345,7 +393,104 @@ Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature 
 
 \paragraph{Zone Air Heat Balance Internal Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-internal-convective-heat-gain-rate-w}
 
-The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watts, of heat transferred to the zone air from all types of internal gains, including people, lights, equipment etc. This and the following provide results on the load components of the zone air heat balance. This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watts, of heat transferred to the zone air from all types of internal gains from energyplus objects (e.g., people, lights, devices, appliances, equipment) listed in Tables \ref{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-constituents} and \ref{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-from-fenestration}. In addition to the convective heat gains listed in these tables, if a zone or a space is served by a zone HVAC equipment, i.e., the zone has no return air node, or served by an AirloopHVAC system that has cycling fan operating mode, then the convective heat gain specified to the return air is re-directed to the space or the zone air heat balance as convective internal heat gain. This and the following provide results on the load components of the zone air heat balance. This field is not multiplied by zone or group multipliers.
+
+\begin{longtable}[c]{@{}lc@{}}
+	\caption{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain Constituents} \label{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-constituents} \tabularnewline
+	\toprule
+	EnergyPlus Object &  Convective Heat Gain Type \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain Constituents} \tabularnewline
+	\toprule
+	EnergyPlus Object &  Convective Heat Gain Type \tabularnewline
+	\midrule
+	\endhead
+	
+	People     &     People    \tabularnewline
+	Lights     &     Lights    \tabularnewline
+	ElectricEquipment     &     ElectricEquipment    \tabularnewline
+	ElectricEquipment:ITE:AirCooled     &     ElectricEquipmentITEAirCooled    \tabularnewline
+	GasEquipment     &     GasEquipment    \tabularnewline
+	HotWaterEquipment     &     HotWaterEquipment    \tabularnewline
+	SteamEquipment     &     SteamEquipment    \tabularnewline
+	OtherEquipment     &     OtherEquipment    \tabularnewline
+	Refrigeration:Case     &     RefrigerationCase    \tabularnewline
+	Refrigeration:CompressorRack     &     RefrigerationCompressorRack    \tabularnewline
+	Refrigeration:System:Condenser:AirCooled     &     RefrigerationSystemAirCooledCondenser    \tabularnewline
+	Refrigeration:System:SuctionPipe     &     RefrigerationSystemSuctionPipe    \tabularnewline
+	Refrigeration:SecondarySystem:Receiver     &     RefrigerationSecondaryReceiver    \tabularnewline
+	Refrigeration:SecondarySystem:Pipe     &     RefrigerationSecondaryPipe    \tabularnewline
+	Refrigeration:WalkIn     &     RefrigerationWalkIn    \tabularnewline
+	Refrigeration:TranscriticalSystem:GasCooler:AirCooled     &     RefrigerationTransSysAirCooledGasCooler    \tabularnewline
+	Refrigeration:TranscriticalSystem:SuctionPipeMT     &     RefrigerationTransSysSuctionPipeMT    \tabularnewline
+	Refrigeration:TranscriticalSystem:SuctionPipeLT     &     RefrigerationTransSysSuctionPipeLT    \tabularnewline
+	WaterUse:Equipment     &     WaterUseEquipment    \tabularnewline
+	WaterHeater:Mixed     &     WaterHeaterMixed    \tabularnewline
+	WaterHeater:Stratified     &     WaterHeaterStratified    \tabularnewline
+	ZoneBaseboard:OutdoorTemperatureControlled     &     ZoneBaseboardOutdoorTemperatureControlled    \tabularnewline
+	ThermalStorage:ChilledWater:Mixed     &     ThermalStorageChilledWaterMixed    \tabularnewline
+	ThermalStorage:ChilledWater:Stratified     &     ThermalStorageChilledWaterStratified    \tabularnewline
+	Pipe:Indoor     &     PipeIndoor    \tabularnewline
+	Pump:VariableSpeed     &     Pump\textunderscore VarSpeed    \tabularnewline
+	Pump:ConstantSpeed     &     Pump\textunderscore ConSpeed    \tabularnewline
+	Pump:VariableSpeed:Condensate     &     Pump\textunderscore Cond    \tabularnewline
+	HeaderedPumps:VariableSpeed     &     PumpBank\textunderscore VarSpeed    \tabularnewline
+	HeaderedPumps:ConstantSpeed     &     PumpBank\textunderscore ConSpeed    \tabularnewline
+	PlantComponent:UserDefined     &     PlantComponentUserDefined    \tabularnewline
+	Coil:UserDefined     &     CoilUserDefined    \tabularnewline
+	ZoneHVAC:ForcedAir:UserDefined     &     ZoneHVACForcedAirUserDefined    \tabularnewline
+	AirTerminal:SingleDuct:UserDefined     &     AirTerminalUserDefined    \tabularnewline
+	Coil:Cooling:DX:SingleSpeed:ThermalStorage     &     PackagedTESCoilTank    \tabularnewline
+	Fan:SystemModel     &     FanSystemModel    \tabularnewline
+	Coil:Cooling:DX:SingleSpeed     &     SecCoolingDXCoilSingleSpeed    \tabularnewline
+	Coil:Heating:DX:SingleSpeed     &     SecHeatingDXCoilSingleSpeed    \tabularnewline
+	Coil:Cooling:DX:TwoSpeed     &     SecCoolingDXCoilTwoSpeed    \tabularnewline
+	Coil:Cooling:DX:MultiSpeed     &     SecCoolingDXCoilMultiSpeed    \tabularnewline
+	Coil:Heating:DX:MultiSpeed     &     SecHeatingDXCoilMultiSpeed    \tabularnewline
+	Generator:FuelCell     &     GeneratorFuelCell    \tabularnewline
+	Generator:MicroCHP     &     GeneratorMicroCHP    \tabularnewline
+	ElectricLoadCenter:Transformer     &     ElectricLoadCenterTransformer    \tabularnewline
+	ElectricLoadCenter:Inverter:Simple     &     ElectricLoadCenterInverterSimple    \tabularnewline
+	ElectricLoadCenter:Inverter:FunctionOfPower     &     ElectricLoadCenterInverterFunctionOfPower    \tabularnewline
+	ElectricLoadCenter:Inverter:LookUpTable     &     ElectricLoadCenterInverterLookUpTable    \tabularnewline
+	ElectricLoadCenter:Storage:LiIonNMCBattery     &     ElectricLoadCenterStorageLiIonNmcBattery    \tabularnewline
+	ElectricLoadCenter:Storage:Battery     &     ElectricLoadCenterStorageBattery    \tabularnewline
+	ElectricLoadCenter:Storage:Simple     &     ElectricLoadCenterStorageSimple    \tabularnewline
+	ElectricLoadCenter:Storage:Converter     &     ElectricLoadCenterConverter    \tabularnewline
+
+	\bottomrule
+
+\end{longtable}
+
+
+
+\begin{longtable}[c]{@{}lcc@{}}
+	\caption{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain from fenestration} \label{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-from-fenestration} \tabularnewline
+	\toprule
+	FenestrationSurface:Detailed Components &  Internal Convective Heat Gain Sources \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain Constituents} \tabularnewline
+	\toprule
+	FenestrationSurface:Detailed Components &  Internal Convective Heat Gain Sources \tabularnewline
+	\midrule
+	\endhead
+	
+	WindowProperty:FrameAndDivider &  Convective heat gain from window frame and divider  \tabularnewline
+	Construction:WindowEquivalentLayer  &  Other convective heat gain from equivalent layer window model \tabularnewline
+	Construction &  Natural convection heat gain from a gap \tabularnewline
+	  &             between glass and interior shade or blind \tabularnewline
+	Construction:ComplexFenestrationState &  Convective heat gain from air flow \tabularnewline
+	  &             through a gap between glass and interior shade or blind \tabularnewline
+
+
+	\bottomrule
+
+\end{longtable}
+
 
 \paragraph{Zone Air Heat Balance Surface Convection Rate {[}W{]}}\label{zone-air-heat-balance-surface-convection-rate-w}
 
@@ -464,19 +609,45 @@ These output variables express the sum of heat gain in Watts (for rate) or joule
 
 \paragraph{Space or Zone Total Internal Convective Heating Energy {[}J{]}}\label{zone-total-internal-convective-heating-energy-j}
 
-These output variables represent the sum of convective gains from specific sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes convective gain from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
+These output variables represent the sum of convective gains from specific sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes convective gain from Energyplus objects that are listed in Table \ref{table:space-or-zone-total-internal-heat-gain-constituents}: 
+
+\begin{longtable}[c]{@{}lcc@{}}
+	\caption{Space or Zone Total Internal Heat Gain Constituents} \label{table:space-or-zone-total-internal-heat-gain-constituents} \tabularnewline
+	\toprule
+	EnergyPlus Object &  Internal Heat Gain Type \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{Space or Zone Total Internal Heat Gain Constituents} \tabularnewline
+	\toprule
+	EnergyPlus Object &  Internal Heat Gain Type \tabularnewline
+	\midrule
+	\endhead
+	
+	People   &  People \tabularnewline
+	Lights   &  Lights \tabularnewline
+	ElectricEquipment   &  ElectricEquipment \tabularnewline
+	ElectricEquipment:ITE:AirCooled   &  ElectricEquipmentITEAirCooled \tabularnewline
+	GasEquipment   &  GasEquipment \tabularnewline
+	HotWaterEquipment   &  HotWaterEquipment \tabularnewline
+	SteamEquipment   &  SteamEquipment \tabularnewline
+	OtherEquipment   &  OtherEquipment \tabularnewline
+	
+	\bottomrule
+
+\end{longtable}
 
 \paragraph{Space or Zone Total Internal Latent Gain Rate {[}W{]}}\label{zone-total-internal-latent-gain-rate-w}
 
 \paragraph{Space or Zone Total Internal Latent Gain Energy {[}J{]}}\label{zone-total-internal-latent-gain-energy-j}
 
-These output variables represent the sum of latent gains from specific internal sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes latent gain from \hyperref[people]{People}, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
+These output variables represent the sum of latent gains from specific internal sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes latent gain from Energyplus objects that are listed in Table \ref{table:space-or-zone-total-internal-heat-gain-constituents}.
 
 \paragraph{Space or Zone Total Internal Total Heating Rate {[}W{]}}\label{zone-total-internal-total-heating-rate-w}
 
 \paragraph{Space or Zone Total Internal Total Heating Energy {[}J{]}}\label{zone-total-internal-total-heating-energy-j}
 
-These output variables represent the sum of all heat gains throughout the space or zone in Watts (for rate) or joules. This includes all heat gains from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
+These output variables represent the sum of all heat gains throughout the space or zone in Watts (for rate) or joules. This includes all heat gains from Energyplus objects that are listed in Table \ref{table:space-or-zone-total-internal-heat-gain-constituents}.
 
 \paragraph{Zone Exfiltration Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-heat-transfer-rate-w}
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -126,8 +126,8 @@ namespace RuntimeLanguageProcessor {
                        int StackNum,
                        int LineNum,
                        DataRuntimeLanguage::ErlKeywordParam Keyword,
-                       Optional_int_const Argument1 = _, // Erl variable index
-                       Optional_int_const Argument2 = _);
+                       ObjexxFCL::Optional_int_const Argument1 = _, // Erl variable index
+                       ObjexxFCL::Optional_int_const Argument2 = _);
 
     void AddError(EnergyPlusData &state,
                   int StackNum,            // index pointer to location in ErlStack structure
@@ -174,7 +174,7 @@ namespace RuntimeLanguageProcessor {
 
     void ReportRuntimeLanguage(EnergyPlusData &state);
 
-    ErlValueType SetErlValueNumber(Real64 Number, Optional<ErlValueType const> OrigValue = _);
+    ErlValueType SetErlValueNumber(Real64 Number, ObjexxFCL::Optional<ErlValueType const> OrigValue = _);
 
     ErlValueType StringValue(std::string const &String);
 
@@ -184,7 +184,7 @@ namespace RuntimeLanguageProcessor {
                         std::string const &VariableName, // variable name in Erl
                         int StackNum);
 
-    int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int StackNum, Optional<ErlValueType const> Value = _);
+    int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int StackNum, ObjexxFCL::Optional<ErlValueType const> Value = _);
 
     void SetupPossibleOperators(EnergyPlusData &state);
 

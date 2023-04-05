@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,7 +60,6 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -70,7 +69,9 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -587,7 +588,7 @@ TEST_F(ConvectionCoefficientsFixture, initExtConvCoeffAdjRatio)
     bool ErrorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);
@@ -601,10 +602,11 @@ TEST_F(ConvectionCoefficientsFixture, initExtConvCoeffAdjRatio)
     state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
-    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound); // this calls GetSurfaceData(), but will also calculate the zone volume which we need
+    EXPECT_FALSE(ErrorsFound);
 
     Real64 HMovInsul = 1.0;
-    DataSurfaces::SurfaceRoughness RoughSurf = DataSurfaces::SurfaceRoughness::VerySmooth;
+    Material::SurfaceRoughness RoughSurf = Material::SurfaceRoughness::VerySmooth;
     Real64 AbsThermSurf = 0.84;
     Real64 TempExt = -20.0;
     Real64 HExt;
@@ -805,7 +807,7 @@ TEST_F(ConvectionCoefficientsFixture, initIntConvCoeffAdjRatio)
     bool ErrorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);
@@ -819,13 +821,15 @@ TEST_F(ConvectionCoefficientsFixture, initIntConvCoeffAdjRatio)
     state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
-    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound); // this calls GetSurfaceData(), but will also calculate the zone volume which we need
+    EXPECT_FALSE(ErrorsFound);
 
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(7, 1.0);
 
     state->dataHeatBalSurf->SurfTempInTmp.dimension(7, 20.0);
-    state->dataHeatBalFanSys->MAT.dimension(1, 25.0);
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(1, 0.006);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.006;
     state->dataHeatBalSurf->SurfHConvInt.allocate(7);
     state->dataHeatBalSurf->SurfHConvInt(7) = 0.0;
 
@@ -888,8 +892,8 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -934,7 +938,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     }
 
     // Case 1 - Zone air warmer than surfaces
-    state->dataHeatBalFanSys->MAT(1) = 30.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 30.0;
 
     DynamicIntConvSurfaceClassification(*state, 1);
     EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(1), ConvectionConstants::InConvClass::A3_VertWalls));
@@ -983,7 +987,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(15), ConvectionConstants::InConvClass::A3_UnstableHoriz));
 
     // Case 2 - Zone air colder than surfaces
-    state->dataHeatBalFanSys->MAT(1) = 10.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 10.0;
 
     DynamicIntConvSurfaceClassification(*state, 1);
     EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(1), ConvectionConstants::InConvClass::A3_VertWalls));
@@ -1067,8 +1071,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
         state->dataHeatBalSurf->SurfInsideTempHist(1)(surf) = 20.0;
     }
 
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 30.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 30.0;
 
     // Case 1 - Low ACH (should default to CalcASHRAETARPNatural)
     Real64 ACH = 0.25;
@@ -1080,8 +1084,9 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     Hc = 0.0;
     state->dataSurface->Surface(SurfNum).CosTilt = -1;
 
-    HcExpectedValue = CalcASHRAETARPNatural(
-        state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
+    HcExpectedValue = CalcASHRAETARPNatural(state->dataHeatBalSurf->SurfInsideTempHist(1)(1),
+                                            state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT,
+                                            -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
     EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
@@ -1092,8 +1097,9 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     Hc = 0.0;
     state->dataSurface->Surface(SurfNum).CosTilt = 1;
 
-    HcExpectedValue = CalcASHRAETARPNatural(
-        state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
+    HcExpectedValue = CalcASHRAETARPNatural(state->dataHeatBalSurf->SurfInsideTempHist(1)(1),
+                                            state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT,
+                                            -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
     EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
@@ -1104,8 +1110,9 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     Hc = 0.0;
     state->dataSurface->Surface(SurfNum).CosTilt = 0;
 
-    HcExpectedValue = CalcASHRAETARPNatural(
-        state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
+    HcExpectedValue = CalcASHRAETARPNatural(state->dataHeatBalSurf->SurfInsideTempHist(1)(1),
+                                            state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT,
+                                            -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
     EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::RefAirTemp::ZoneMeanAirTemp);
@@ -1430,8 +1437,8 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -1487,8 +1494,8 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -1544,8 +1551,8 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -1601,8 +1608,8 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -1658,8 +1665,8 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -1715,8 +1722,8 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                      // expect no errors
 
     errorsFound = false;
     HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
@@ -2775,7 +2782,7 @@ TEST_F(ConvectionCoefficientsFixture, TestBlockenWindward)
     bool ErrorsFound(false);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);
@@ -3125,8 +3132,8 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
 
     bool ErrorsFound = false;
 
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);                                 // expect no errors
@@ -3346,8 +3353,8 @@ TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_WeirderShape)
 
     bool ErrorsFound = false;
 
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);                                 // expect no errors
@@ -3681,4 +3688,95 @@ TEST_F(ConvectionCoefficientsFixture, testTARPNaturalConvectionAlgorithm)
     expectedResult = 0.0;
     actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
     EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
+}
+
+TEST_F(ConvectionCoefficientsFixture, RoofExtConvectionCoefficient)
+{
+
+    state->dataSurface->Surface.allocate(1);
+    // 20 x 20 rectangle, centered on zero
+    state->dataSurface->Surface(1).Name = "Roof Surface";
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Vertex.dimension(4);
+    state->dataSurface->Surface(1).Class = EnergyPlus::DataSurfaces::SurfaceClass::Roof; // DataSurfaces::SurfaceClass::Roof
+    state->dataSurface->Surface(1).Tilt = 0.0;
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).Area = 400.0;
+    state->dataSurface->Surface(1).Vertex(1) = Vector(10.0, 10.0, 3.0);
+    state->dataSurface->Surface(1).Vertex(2) = Vector(-10.0, 10.0, 3.0);
+    state->dataSurface->Surface(1).Vertex(3) = Vector(-10.0, -10.0, 3.0);
+    state->dataSurface->Surface(1).Vertex(4) = Vector(10.0, -10.0, 3.0);
+    state->dataSurface->Surface(1).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Construction = 1;
+
+    ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+    EXPECT_DOUBLE_EQ(400.0, RoofGeo.Area);
+    EXPECT_DOUBLE_EQ(0.0, RoofGeo.Height);
+    EXPECT_DOUBLE_EQ(80.0, RoofGeo.Perimeter);
+    EXPECT_DOUBLE_EQ(0.0, RoofGeo.Tilt);
+    EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
+
+    // constructs with regular single layer material
+    state->dataConstruction->Construct.allocate(1);
+    state->dataHeatBal->TotConstructs = 1;
+    state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
+    state->dataConstruction->Construct(1).TotLayers = 1;
+    state->dataConstruction->Construct(1).LayerPoint.allocate(1);
+    state->dataConstruction->Construct(1).LayerPoint(1) = 1;
+
+    // define material
+    state->dataMaterial->TotMaterials = 1;
+    Material::MaterialChild *mat = new Material::MaterialChild;
+    state->dataMaterial->Material.push_back(mat);
+    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    thisMaterial_1->AbsorpThermalFront = 0.1;
+    thisMaterial_1->Roughness = Material::SurfaceRoughness::Rough;
+    thisMaterial_1->Name = "Roof_Material";
+    thisMaterial_1->group = Material::Group::Regular;
+
+    // set environment air conditions
+    state->dataEnvrn->OutBaroPress = 101325.0; // Pa
+    state->dataEnvrn->OutHumRat = 0.0075;      // kgH20/kgDryAir
+
+    // set convection coefficient calc parameters
+    int constexpr SurfNum = 1;
+    Real64 constexpr SurfTemp = 20.0;
+    Real64 constexpr AirTemp = 15.0;
+    Real64 constexpr WindAtZ = 2.0; // m/s
+    Real64 constexpr WindDirect = 0.0;
+    Real64 RoofArea = RoofGeo.Area;
+    Real64 RoofPerimeter = RoofGeo.Perimeter;
+
+    // test 1: calc exterior convection coefficient
+    // non zero roof area and non zero perimeter
+    Real64 Hf_result1 = CalcClearRoof(*state, SurfNum, SurfTemp, AirTemp, WindAtZ, WindDirect, RoofArea, RoofPerimeter);
+    EXPECT_NEAR(10.42, Hf_result1, 0.01); //
+    EXPECT_EQ(state->dataSurface->Surface(1).ExtBoundCond, EnergyPlus::DataSurfaces::ExternalEnvironment);
+    EXPECT_TRUE(compare_err_stream(""));
+
+    // test 2: calc exterior convection coefficient
+    // reset roof area and perimeter to 0.0 to generate error message
+    RoofArea = 0.0;
+    RoofPerimeter = 0.0;
+    Real64 Hf_result2 = CalcClearRoof(*state, SurfNum, SurfTemp, AirTemp, WindAtZ, WindDirect, RoofArea, RoofPerimeter);
+    EXPECT_NEAR(9.9999, Hf_result2, 0.0001);
+    EXPECT_EQ(state->dataSurface->Surface(1).ExtBoundCond, EnergyPlus::DataSurfaces::ExternalEnvironment);
+    // expect severe error message
+    EXPECT_TRUE(has_err_output(false));
+    std::string error_string =
+        delimited_string({"   ** Severe  ** CalcClearRoof: Convection model not evaluated (bad value for distance to roof edge)\n   **   ~~~   ** "
+                          "Value for distance to roof edge =0.000\n   **   ~~~   ** Occurs for surface named = Roof Surface\n   **   ~~~   ** "
+                          "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues"});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    // test 3: calc exterior convection coefficient
+    // reset ext boundary conditions to OtherSideCondModeledExt and expect no error
+    state->dataSurface->Surface(1).ExtBoundCond = EnergyPlus::DataSurfaces::OtherSideCondModeledExt;
+    RoofArea = 0.0;
+    RoofPerimeter = 0.0;
+    Real64 Hf_result3 = CalcClearRoof(*state, SurfNum, SurfTemp, AirTemp, WindAtZ, WindDirect, RoofArea, RoofPerimeter);
+    EXPECT_DOUBLE_EQ(9.9999, Hf_result3);
+    EXPECT_EQ(state->dataSurface->Surface(1).ExtBoundCond, EnergyPlus::DataSurfaces::OtherSideCondModeledExt);
+    EXPECT_TRUE(compare_err_stream(""));
 }

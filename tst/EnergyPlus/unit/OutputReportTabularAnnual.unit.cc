@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -302,6 +302,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 {
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataHVACGlobal->TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     state->dataOutputProcessor->NumEnergyMeters = 2;
     state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
