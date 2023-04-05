@@ -7899,7 +7899,7 @@ namespace Furnaces {
                                                       false);
                                 }
                                 //           Now solve again with tighter PLR limits
-                                auto f = // (AUTO_OK_LAMBDA)
+                                auto f2 = // (AUTO_OK_LAMBDA)
                                     [&state, FurnaceNum, FirstHVACIteration, OpMode, CompressorOp, SystemSensibleLoad](Real64 const PartLoadRatio) {
                                         return CalcFurnaceResidual(state,
                                                                    PartLoadRatio,
@@ -7913,7 +7913,7 @@ namespace Furnaces {
                                                                    0.0,  // par9_HXOnFlag,
                                                                    0.0); // par10_HeatingCoilPLR);
                                     };
-                                General::SolveRoot(state, HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, f, TempMinPLR, TempMaxPLR);
+                                General::SolveRoot(state, HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, f2, TempMinPLR, TempMaxPLR);
                                 if (state.dataFurnaces->ModifiedHeatCoilLoad > 0.0) {
                                     HeatCoilLoad = state.dataFurnaces->ModifiedHeatCoilLoad;
                                 } else {
@@ -8469,15 +8469,15 @@ namespace Furnaces {
                                                       CoolingHeatingPLRRatio);
                                 }
                                 //             tighter boundary of solution has been found, call RegulaFalsi a second time
-                                auto f = [&state,
-                                          FurnaceNum,
-                                          FirstHVACIteration,
-                                          OpMode,
-                                          CompressorOp,
-                                          par4_load,
-                                          par6_LatentSens,
-                                          par8_HXUnit,
-                                          par9_HtgCoilPLR](Real64 const PartLoadRatio) {
+                                auto f2 = [&state,
+                                           FurnaceNum,
+                                           FirstHVACIteration,
+                                           OpMode,
+                                           CompressorOp,
+                                           par4_load,
+                                           par6_LatentSens,
+                                           par8_HXUnit,
+                                           par9_HtgCoilPLR](Real64 const PartLoadRatio) {
                                     return CalcFurnaceResidual(state,
                                                                PartLoadRatio,
                                                                FurnaceNum,
@@ -8490,7 +8490,7 @@ namespace Furnaces {
                                                                par8_HXUnit,      // par9_HXOnFlag,
                                                                par9_HtgCoilPLR); // par10_HeatingCoilPLR);
                                 };
-                                General::SolveRoot(state, CoolErrorToler, MaxIter, SolFlag, LatentPartLoadRatio, f, TempMinPLR2, TempMaxPLR);
+                                General::SolveRoot(state, CoolErrorToler, MaxIter, SolFlag, LatentPartLoadRatio, f2, TempMinPLR2, TempMaxPLR);
                                 //             OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
                                 OnOffAirFlowRatio = state.dataFurnaces->OnOffAirFlowRatioSave;
                                 if (SolFlag == -1) {
