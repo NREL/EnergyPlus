@@ -7046,21 +7046,15 @@ namespace Furnaces {
         Real64 ActualSensibleOutput; // Actual furnace sensible capacity
         Real64 ActualLatentOutput;   // Actual furnace latent capacity = 0
         Real64 deltaT;               // Heater outlet temp minus design heater outlet temp
-        //  CHARACTER(len=20) :: ErrNum = ' '         ! For displaying error message in cooling
-        //  INTEGER,SAVE      :: ErrCount = 0
-        int OpMode; // Mode of Operation (fan cycling or fan continuous)
-        // Set local variables
 
         // Retrieve the load on the controlled zone
         auto &furnaceInNode = state.dataLoopNodes->Node(state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum);
-        auto &furnaceOutNode = state.dataLoopNodes->Node(state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum);
+        auto const &furnaceOutNode = state.dataLoopNodes->Node(state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum);
         int ControlZoneNode = state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone;
-        OpMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode;
+        int OpMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode; // fan operating mode
         state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = state.dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate;
         state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
-        //  OnOffAirFlowRatio = 1.0
 
-        //        auto &Node = state.dataLoopNodes->Node;
         // Calculate the Cp Air of zone
         Real64 cpair = PsyCpAirFnW(state.dataLoopNodes->Node(ControlZoneNode).HumRat);
 
