@@ -5902,9 +5902,9 @@ namespace Furnaces {
         // air flow rates. Use these flow rates during the Calc routines to set the average mass flow rates
         // based on PLR.
 
+        auto &furnace = state.dataFurnaces->Furnace(FurnaceNum);
         // Check for heat only furnace
-        if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != DataHVACGlobals::Furnace_HeatOnly &&
-            state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatOnly) {
+        if (furnace.FurnaceType_Num != DataHVACGlobals::Furnace_HeatOnly && furnace.FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatOnly) {
 
             // Set the system mass flow rates
             if (OpMode == DataHVACGlobals::ContFanCycCoil) {
@@ -5912,39 +5912,37 @@ namespace Furnaces {
                 // constant fan mode
                 if (state.dataFurnaces->HeatingLoad) {
                     //       IF a heating and moisture load exists, operate at the cooling mass flow rate ELSE operate at the heating flow rate
-                    if (MoistureLoad < 0.0 && state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
-                        state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
-                        state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio;
+                    if (MoistureLoad < 0.0 && furnace.Humidistat && furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
+                        state.dataFurnaces->CompOnMassFlow = furnace.MaxCoolAirMassFlow;
+                        state.dataFurnaces->CompOnFlowRatio = furnace.CoolingSpeedRatio;
                     } else {
-                        state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirMassFlow;
-                        state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).HeatingSpeedRatio;
+                        state.dataFurnaces->CompOnMassFlow = furnace.MaxHeatAirMassFlow;
+                        state.dataFurnaces->CompOnFlowRatio = furnace.HeatingSpeedRatio;
                     }
-                    state.dataFurnaces->Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
+                    furnace.LastMode = Furnaces::ModeOfOperation::HeatingMode;
                     //     IF a cooling load exists, operate at the cooling mass flow rate
                 } else if (state.dataFurnaces->CoolingLoad) {
-                    state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
-                    state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio;
-                    state.dataFurnaces->Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::CoolingMode;
+                    state.dataFurnaces->CompOnMassFlow = furnace.MaxCoolAirMassFlow;
+                    state.dataFurnaces->CompOnFlowRatio = furnace.CoolingSpeedRatio;
+                    furnace.LastMode = Furnaces::ModeOfOperation::CoolingMode;
                     //     If no load exists, set the compressor on mass flow rate.
                     //     Set equal the mass flow rate when no heating or cooling is needed if no moisture load exists.
                     //     If the user has set the off mass flow rate to 0, set according to the last operating mode.
                 } else {
-                    if (MoistureLoad < 0.0 && state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
-                        state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
-                        state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio;
+                    if (MoistureLoad < 0.0 && furnace.Humidistat && furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
+                        state.dataFurnaces->CompOnMassFlow = furnace.MaxCoolAirMassFlow;
+                        state.dataFurnaces->CompOnFlowRatio = furnace.CoolingSpeedRatio;
                     } else {
-                        state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirMassFlow;
-                        state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).HeatingSpeedRatio;
+                        state.dataFurnaces->CompOnMassFlow = furnace.MaxNoCoolHeatAirMassFlow;
+                        state.dataFurnaces->CompOnFlowRatio = furnace.HeatingSpeedRatio;
                         //         User may have entered a 0 for MaxNoCoolHeatAirMassFlow
                         if (state.dataFurnaces->CompOnMassFlow == 0.0) {
-                            if (state.dataFurnaces->Furnace(FurnaceNum).LastMode == Furnaces::ModeOfOperation::HeatingMode) {
-                                state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirMassFlow;
-                                state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).HeatingSpeedRatio;
+                            if (furnace.LastMode == Furnaces::ModeOfOperation::HeatingMode) {
+                                state.dataFurnaces->CompOnMassFlow = furnace.MaxHeatAirMassFlow;
+                                state.dataFurnaces->CompOnFlowRatio = furnace.HeatingSpeedRatio;
                             } else {
-                                state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
-                                state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio;
+                                state.dataFurnaces->CompOnMassFlow = furnace.MaxCoolAirMassFlow;
+                                state.dataFurnaces->CompOnFlowRatio = furnace.CoolingSpeedRatio;
                             }
                         }
                     }
@@ -5952,44 +5950,41 @@ namespace Furnaces {
 
                 //     Set the compressor or coil OFF mass flow rate based on LOGICAL flag
                 //     UseCompressorOnFlow is used when the user does not enter a value for no cooling or heating flow rate
-                if (state.dataFurnaces->Furnace(FurnaceNum).AirFlowControl == AirFlowControlConstFan::UseCompressorOnFlow) {
-                    if (state.dataFurnaces->Furnace(FurnaceNum).LastMode == Furnaces::ModeOfOperation::HeatingMode) {
-                        if (MoistureLoad < 0.0 && state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                            state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
-                            state.dataFurnaces->CompOffMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
-                            state.dataFurnaces->CompOffFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio;
+                if (furnace.AirFlowControl == AirFlowControlConstFan::UseCompressorOnFlow) {
+                    if (furnace.LastMode == Furnaces::ModeOfOperation::HeatingMode) {
+                        if (MoistureLoad < 0.0 && furnace.Humidistat && furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
+                            state.dataFurnaces->CompOffMassFlow = furnace.MaxCoolAirMassFlow;
+                            state.dataFurnaces->CompOffFlowRatio = furnace.CoolingSpeedRatio;
                         } else {
-                            state.dataFurnaces->CompOffMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirMassFlow;
-                            state.dataFurnaces->CompOffFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).HeatingSpeedRatio;
+                            state.dataFurnaces->CompOffMassFlow = furnace.MaxHeatAirMassFlow;
+                            state.dataFurnaces->CompOffFlowRatio = furnace.HeatingSpeedRatio;
                         }
                     } else {
-                        state.dataFurnaces->CompOffMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
-                        state.dataFurnaces->CompOffFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio;
+                        state.dataFurnaces->CompOffMassFlow = furnace.MaxCoolAirMassFlow;
+                        state.dataFurnaces->CompOffFlowRatio = furnace.CoolingSpeedRatio;
                     }
                     //     ELSE use the user specified value
                 } else {
-                    state.dataFurnaces->CompOffMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirMassFlow;
-                    state.dataFurnaces->CompOffFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).NoHeatCoolSpeedRatio;
+                    state.dataFurnaces->CompOffMassFlow = furnace.MaxNoCoolHeatAirMassFlow;
+                    state.dataFurnaces->CompOffFlowRatio = furnace.NoHeatCoolSpeedRatio;
                 }
             } else {
                 //     cycling fan mode
                 if (state.dataFurnaces->HeatingLoad ||
-                    (state.dataFurnaces->Furnace(FurnaceNum).Humidistat && MoistureLoad < 0.0 &&
-                     state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat)) {
+                    (furnace.Humidistat && MoistureLoad < 0.0 && furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat)) {
 
-                    if (state.dataFurnaces->Furnace(FurnaceNum).Humidistat && MoistureLoad < 0.0 &&
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
-                        state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
-                        state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio;
-                        state.dataFurnaces->Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::CoolingMode;
+                    if (furnace.Humidistat && MoistureLoad < 0.0 && furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
+                        state.dataFurnaces->CompOnMassFlow = furnace.MaxCoolAirMassFlow;
+                        state.dataFurnaces->CompOnFlowRatio = furnace.CoolingSpeedRatio;
+                        furnace.LastMode = Furnaces::ModeOfOperation::CoolingMode;
                     } else {
-                        state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirMassFlow;
-                        state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).HeatingSpeedRatio;
-                        state.dataFurnaces->Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
+                        state.dataFurnaces->CompOnMassFlow = furnace.MaxHeatAirMassFlow;
+                        state.dataFurnaces->CompOnFlowRatio = furnace.HeatingSpeedRatio;
+                        furnace.LastMode = Furnaces::ModeOfOperation::HeatingMode;
                     }
                 } else if (state.dataFurnaces->CoolingLoad) {
-                    state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
-                    state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio;
+                    state.dataFurnaces->CompOnMassFlow = furnace.MaxCoolAirMassFlow;
+                    state.dataFurnaces->CompOnFlowRatio = furnace.CoolingSpeedRatio;
                 } else {
                     state.dataFurnaces->CompOnMassFlow = 0.0;
                     state.dataFurnaces->CompOnFlowRatio = 0.0;
@@ -5999,11 +5994,11 @@ namespace Furnaces {
             }
         } else { //  Is a HeatOnly furnace
 
-            state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate;
-            state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).HeatingSpeedRatio;
+            state.dataFurnaces->CompOnMassFlow = furnace.DesignMassFlowRate;
+            state.dataFurnaces->CompOnFlowRatio = furnace.HeatingSpeedRatio;
             if (OpMode == DataHVACGlobals::ContFanCycCoil) {
-                state.dataFurnaces->CompOffMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirMassFlow;
-                state.dataFurnaces->CompOffFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).HeatingSpeedRatio;
+                state.dataFurnaces->CompOffMassFlow = furnace.MaxNoCoolHeatAirMassFlow;
+                state.dataFurnaces->CompOffFlowRatio = furnace.HeatingSpeedRatio;
             } else {
                 state.dataFurnaces->CompOffMassFlow = 0.0;
                 state.dataFurnaces->CompOffFlowRatio = 0.0;
@@ -6048,29 +6043,29 @@ namespace Furnaces {
         state.dataSize->DXCoolCap = 0.0;
         state.dataSize->UnitaryHeatCap = 0.0;
         state.dataSize->SuppHeatCap = 0.0;
+        auto &furnace = state.dataFurnaces->Furnace(FurnaceNum);
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
+        if (furnace.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex = furnace.FanIndex;
             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
             state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
-            state.dataSize->DataFanIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
+            state.dataSize->DataFanIndex = furnace.FanIndex;
         } else {
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum = furnace.FanIndex;
             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
             state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
-            state.dataSize->DataFanIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
+            state.dataSize->DataFanIndex = furnace.FanIndex;
         }
-        if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DataHVACGlobals::BlowThru) {
+        if (furnace.FanPlace == DataHVACGlobals::BlowThru) {
             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DataHVACGlobals::DrawThru) {
+        } else if (furnace.FanPlace == DataHVACGlobals::DrawThru) {
             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::FanPlacement::DrawThru;
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-            DXCoils::SimDXCoil(
-                state, BlankString, DataHVACGlobals::CompressorOperation::On, true, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, 1, 0.0);
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
-            int HXCC_Index = state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex;
+        if (furnace.CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
+            DXCoils::SimDXCoil(state, BlankString, DataHVACGlobals::CompressorOperation::On, true, furnace.CoolingCoilIndex, 1, 0.0);
+        } else if (furnace.CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
+            int HXCC_Index = furnace.CoolingCoilIndex;
             int childCCType_Num = state.dataHVACAssistedCC->HXAssistedCoil(HXCC_Index).CoolingCoilType_Num;
             if (childCCType_Num == DataHVACGlobals::CoilDX_Cooling) {
                 int childCCIndex = state.dataHVACAssistedCC->HXAssistedCoil(HXCC_Index).CoolingCoilIndex;
@@ -6080,64 +6075,55 @@ namespace Furnaces {
                 auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex];
                 newCoil.size(state);
             }
-            HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
-                                                                BlankString,
-                                                                true,
-                                                                DataHVACGlobals::CompressorOperation::On,
-                                                                0.0,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                                                1,
-                                                                false,
-                                                                1.0,
-                                                                false);
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
+            HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
+                state, BlankString, true, DataHVACGlobals::CompressorOperation::On, 0.0, furnace.CoolingCoilIndex, 1, false, 1.0, false);
+        } else if (furnace.CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
             WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
                                                             BlankString,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilSensDemand,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilLatentDemand,
+                                                            furnace.CoolingCoilIndex,
+                                                            furnace.CoolingCoilSensDemand,
+                                                            furnace.CoolingCoilLatentDemand,
                                                             0,
                                                             0.0,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
+                                                            furnace.MaxONOFFCyclesperHour,
+                                                            furnace.HPTimeConstant,
+                                                            furnace.FanDelayTime,
                                                             DataHVACGlobals::CompressorOperation::Off,
                                                             0.0,
                                                             FirstHVACIteration); // CoolPartLoadRatio
-            if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) {
+            if (furnace.HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) {
                 WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
                                                                 BlankString,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand,
+                                                                furnace.HeatingCoilIndex,
+                                                                furnace.HeatingCoilSensDemand,
                                                                 dummy,
                                                                 0.0,
                                                                 0.0,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
+                                                                furnace.MaxONOFFCyclesperHour,
+                                                                furnace.HPTimeConstant,
+                                                                furnace.FanDelayTime,
                                                                 DataHVACGlobals::CompressorOperation::Off,
                                                                 0.0,
                                                                 FirstHVACIteration);
             }
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit ||
-                   state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-            if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                IntegratedHeatPump::SizeIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex);
-                IHPCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).SCCoilIndex;
-                state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).NumOfSpeeds;
+        } else if (furnace.CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit ||
+                   furnace.CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+            if (furnace.bIsIHP) {
+                IntegratedHeatPump::SizeIHP(state, furnace.CoolingCoilIndex);
+                IHPCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(furnace.CoolingCoilIndex).SCCoilIndex;
+                furnace.NumOfSpeedCooling = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).NumOfSpeeds;
                 MulSpeedFlowScale = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).RatedAirVolFlowRate /
                                     state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex)
                                         .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).NormSpedLevel);
-                state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).CoolVolFlowScale =
-                    MulSpeedFlowScale;
+                state.dataIntegratedHP->IntegratedHeatPumps(furnace.CoolingCoilIndex).CoolVolFlowScale = MulSpeedFlowScale;
             } else {
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           BlankString,
-                                                          state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
+                                                          furnace.CoolingCoilIndex,
                                                           0,
-                                                          state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                                          state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                                          state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
+                                                          furnace.MaxONOFFCyclesperHour,
+                                                          furnace.HPTimeConstant,
+                                                          furnace.FanDelayTime,
                                                           DataHVACGlobals::CompressorOperation::Off,
                                                           0.0,
                                                           1,
@@ -6145,47 +6131,42 @@ namespace Furnaces {
                                                           0.0,
                                                           0.0,
                                                           0.0); // conduct the sizing operation in the VS WSHP
-                state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling =
-                    state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).NumOfSpeeds;
-                MulSpeedFlowScale =
-                    state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).RatedAirVolFlowRate /
-                    state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex)
-                        .MSRatedAirVolFlowRate(
-                            state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).NormSpedLevel);
-                IHPCoilIndex = state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex;
+                furnace.NumOfSpeedCooling = state.dataVariableSpeedCoils->VarSpeedCoil(furnace.CoolingCoilIndex).NumOfSpeeds;
+                MulSpeedFlowScale = state.dataVariableSpeedCoils->VarSpeedCoil(furnace.CoolingCoilIndex).RatedAirVolFlowRate /
+                                    state.dataVariableSpeedCoils->VarSpeedCoil(furnace.CoolingCoilIndex)
+                                        .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(furnace.CoolingCoilIndex).NormSpedLevel);
+                IHPCoilIndex = furnace.CoolingCoilIndex;
             }
 
-            for (Iter = 1; Iter <= state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling; ++Iter) {
-                state.dataFurnaces->Furnace(FurnaceNum).CoolVolumeFlowRate(Iter) =
+            for (Iter = 1; Iter <= furnace.NumOfSpeedCooling; ++Iter) {
+                furnace.CoolVolumeFlowRate(Iter) =
                     state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Iter) * MulSpeedFlowScale;
-                state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(Iter) =
+                furnace.CoolMassFlowRate(Iter) =
                     state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirMassFlowRate(Iter) * MulSpeedFlowScale;
-                state.dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio(Iter) =
+                furnace.MSCoolingSpeedRatio(Iter) =
                     state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Iter) /
-                    state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex)
-                        .MSRatedAirVolFlowRate(state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling);
+                    state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(furnace.NumOfSpeedCooling);
             }
 
-            if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
-                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+            if (furnace.HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
+                furnace.HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
-                    IntegratedHeatPump::SizeIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex);
-                    IHPCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).SHCoilIndex;
-                    state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).NumOfSpeeds;
+                if (furnace.bIsIHP) {
+                    IntegratedHeatPump::SizeIHP(state, furnace.CoolingCoilIndex);
+                    IHPCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(furnace.CoolingCoilIndex).SHCoilIndex;
+                    furnace.NumOfSpeedHeating = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).NumOfSpeeds;
                     MulSpeedFlowScale = state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).RatedAirVolFlowRate /
                                         state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex)
                                             .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).NormSpedLevel);
-                    state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).HeatVolFlowScale =
-                        MulSpeedFlowScale;
+                    state.dataIntegratedHP->IntegratedHeatPumps(furnace.CoolingCoilIndex).HeatVolFlowScale = MulSpeedFlowScale;
                 } else {
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               BlankString,
-                                                              state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
+                                                              furnace.HeatingCoilIndex,
                                                               0,
-                                                              state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                                              state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                                              state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
+                                                              furnace.MaxONOFFCyclesperHour,
+                                                              furnace.HPTimeConstant,
+                                                              furnace.FanDelayTime,
                                                               DataHVACGlobals::CompressorOperation::Off,
                                                               0.0,
                                                               1,
@@ -6193,276 +6174,236 @@ namespace Furnaces {
                                                               0.0,
                                                               0.0,
                                                               0.0); // conduct the sizing operation in the VS WSHP
-                    state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating =
-                        state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).NumOfSpeeds;
+                    furnace.NumOfSpeedHeating = state.dataVariableSpeedCoils->VarSpeedCoil(furnace.HeatingCoilIndex).NumOfSpeeds;
                     MulSpeedFlowScale =
-                        state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).RatedAirVolFlowRate /
-                        state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex)
-                            .MSRatedAirVolFlowRate(
-                                state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).NormSpedLevel);
-                    IHPCoilIndex = state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex;
+                        state.dataVariableSpeedCoils->VarSpeedCoil(furnace.HeatingCoilIndex).RatedAirVolFlowRate /
+                        state.dataVariableSpeedCoils->VarSpeedCoil(furnace.HeatingCoilIndex)
+                            .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(furnace.HeatingCoilIndex).NormSpedLevel);
+                    IHPCoilIndex = furnace.HeatingCoilIndex;
                 }
 
-                for (Iter = 1; Iter <= state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating; ++Iter) {
-                    state.dataFurnaces->Furnace(FurnaceNum).HeatVolumeFlowRate(Iter) =
+                for (Iter = 1; Iter <= furnace.NumOfSpeedHeating; ++Iter) {
+                    furnace.HeatVolumeFlowRate(Iter) =
                         state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Iter) * MulSpeedFlowScale;
-                    state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(Iter) =
+                    furnace.HeatMassFlowRate(Iter) =
                         state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirMassFlowRate(Iter) * MulSpeedFlowScale;
-                    state.dataFurnaces->Furnace(FurnaceNum).MSHeatingSpeedRatio(Iter) =
+                    furnace.MSHeatingSpeedRatio(Iter) =
                         state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(Iter) /
-                        state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex)
-                            .MSRatedAirVolFlowRate(state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating);
+                        state.dataVariableSpeedCoils->VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(furnace.NumOfSpeedHeating);
                 }
             }
 
-            if (state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating > 0) {
-                state.dataFurnaces->Furnace(FurnaceNum).IdleMassFlowRate =
-                    min(state.dataFurnaces->Furnace(FurnaceNum).HeatMassFlowRate(1), state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(1));
-                state.dataFurnaces->Furnace(FurnaceNum).IdleSpeedRatio = min(state.dataFurnaces->Furnace(FurnaceNum).MSHeatingSpeedRatio(1),
-                                                                             state.dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio(1));
-                state.dataFurnaces->Furnace(FurnaceNum).IdleVolumeAirRate =
-                    min(state.dataFurnaces->Furnace(FurnaceNum).HeatVolumeFlowRate(1), state.dataFurnaces->Furnace(FurnaceNum).CoolVolumeFlowRate(1));
+            if (furnace.NumOfSpeedHeating > 0) {
+                furnace.IdleMassFlowRate = min(furnace.HeatMassFlowRate(1), furnace.CoolMassFlowRate(1));
+                furnace.IdleSpeedRatio = min(furnace.MSHeatingSpeedRatio(1), furnace.MSCoolingSpeedRatio(1));
+                furnace.IdleVolumeAirRate = min(furnace.HeatVolumeFlowRate(1), furnace.CoolVolumeFlowRate(1));
             } else {
-                state.dataFurnaces->Furnace(FurnaceNum).IdleMassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).CoolMassFlowRate(1);
-                state.dataFurnaces->Furnace(FurnaceNum).IdleSpeedRatio = state.dataFurnaces->Furnace(FurnaceNum).MSCoolingSpeedRatio(1);
-                state.dataFurnaces->Furnace(FurnaceNum).IdleVolumeAirRate = state.dataFurnaces->Furnace(FurnaceNum).CoolVolumeFlowRate(1);
+                furnace.IdleMassFlowRate = furnace.CoolMassFlowRate(1);
+                furnace.IdleSpeedRatio = furnace.MSCoolingSpeedRatio(1);
+                furnace.IdleVolumeAirRate = furnace.CoolVolumeFlowRate(1);
             }
 
-            if (state.dataFurnaces->Furnace(FurnaceNum).OpMode == DataHVACGlobals::ContFanCycCoil) {
-                state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = state.dataFurnaces->Furnace(FurnaceNum).IdleVolumeAirRate;
-                state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirMassFlow = state.dataFurnaces->Furnace(FurnaceNum).IdleMassFlowRate;
-                state.dataFurnaces->Furnace(FurnaceNum).NoHeatCoolSpeedRatio = state.dataFurnaces->Furnace(FurnaceNum).IdleSpeedRatio;
+            if (furnace.OpMode == DataHVACGlobals::ContFanCycCoil) {
+                furnace.MaxNoCoolHeatAirVolFlow = furnace.IdleVolumeAirRate;
+                furnace.MaxNoCoolHeatAirMassFlow = furnace.IdleMassFlowRate;
+                furnace.NoHeatCoolSpeedRatio = furnace.IdleSpeedRatio;
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate == DataSizing::AutoSize) {
+        if (furnace.DesignFanVolFlowRate == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
-                CheckSysSizing(state,
-                               DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                               state.dataFurnaces->Furnace(FurnaceNum).Name);
+                CheckSysSizing(state, DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num), furnace.Name);
                 if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate =
-                        state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                    furnace.DesignFanVolFlowRate = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = 0.0;
+                    furnace.DesignFanVolFlowRate = 0.0;
                 }
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRateEMSOverrideOn) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate =
-                        state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRateEMSOverrideValue;
+                if (furnace.DesignFanVolFlowRateEMSOverrideOn) {
+                    furnace.DesignFanVolFlowRate = furnace.DesignFanVolFlowRateEMSOverrideValue;
                 }
 
                 BaseSizer::reportSizerOutput(state,
-                                             DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                             state.dataFurnaces->Furnace(FurnaceNum).Name,
+                                             DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                             furnace.Name,
                                              "Supply Air Flow Rate [m3/s]",
-                                             state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate);
+                                             furnace.DesignFanVolFlowRate);
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow == DataSizing::AutoSize) {
+        if (furnace.MaxHeatAirVolFlow == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
-                CheckSysSizing(state,
-                               DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                               state.dataFurnaces->Furnace(FurnaceNum).Name);
+                CheckSysSizing(state, DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num), furnace.Name);
                 if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
-                    state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow =
-                        state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                    furnace.MaxHeatAirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
-                    state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow = 0.0;
+                    furnace.MaxHeatAirVolFlow = 0.0;
                 }
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlowEMSOverrideOn) {
-                    state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow =
-                        state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlowEMSOverrideValue;
+                if (furnace.MaxHeatAirVolFlowEMSOverrideOn) {
+                    furnace.MaxHeatAirVolFlow = furnace.MaxHeatAirVolFlowEMSOverrideValue;
                 }
                 BaseSizer::reportSizerOutput(state,
-                                             DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                             state.dataFurnaces->Furnace(FurnaceNum).Name,
+                                             DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                             furnace.Name,
                                              "Supply Air Flow Rate During Heating Operation [m3/s]",
-                                             state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow);
+                                             furnace.MaxHeatAirVolFlow);
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow == DataSizing::AutoSize) {
+        if (furnace.MaxCoolAirVolFlow == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
-                CheckSysSizing(state,
-                               DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                               state.dataFurnaces->Furnace(FurnaceNum).Name);
+                CheckSysSizing(state, DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num), furnace.Name);
                 if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
-                    state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow =
-                        state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                    furnace.MaxCoolAirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
-                    state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow = 0.0;
+                    furnace.MaxCoolAirVolFlow = 0.0;
                 }
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlowEMSOverrideOn) {
-                    state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow =
-                        state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlowEMSOverrideValue;
+                if (furnace.MaxCoolAirVolFlowEMSOverrideOn) {
+                    furnace.MaxCoolAirVolFlow = furnace.MaxCoolAirVolFlowEMSOverrideValue;
                 }
 
                 BaseSizer::reportSizerOutput(state,
-                                             DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                             state.dataFurnaces->Furnace(FurnaceNum).Name,
+                                             DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                             furnace.Name,
                                              "Supply Air Flow Rate During Cooling Operation [m3/s]",
-                                             state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow);
+                                             furnace.MaxCoolAirVolFlow);
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow == DataSizing::AutoSize) {
+        if (furnace.MaxNoCoolHeatAirVolFlow == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
-                CheckSysSizing(state,
-                               DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                               state.dataFurnaces->Furnace(FurnaceNum).Name);
+                CheckSysSizing(state, DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num), furnace.Name);
                 if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
-                    state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow =
-                        state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                    furnace.MaxNoCoolHeatAirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
-                    state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = 0.0;
+                    furnace.MaxNoCoolHeatAirVolFlow = 0.0;
                 }
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlowEMSOverrideOn) {
-                    state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow =
-                        state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlowEMSOverrideValue;
+                if (furnace.MaxNoCoolHeatAirVolFlowEMSOverrideOn) {
+                    furnace.MaxNoCoolHeatAirVolFlow = furnace.MaxNoCoolHeatAirVolFlowEMSOverrideValue;
                 }
 
                 BaseSizer::reportSizerOutput(state,
-                                             DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                             state.dataFurnaces->Furnace(FurnaceNum).Name,
+                                             DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                             furnace.Name,
                                              "Supply Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
-                                             state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow);
+                                             furnace.MaxNoCoolHeatAirVolFlow);
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity == DataSizing::AutoSize) {
+        if (furnace.DesignHeatingCapacity == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
-                    state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
+                if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
+                    furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
 
-                    CheckSysSizing(state,
-                                   DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                   state.dataFurnaces->Furnace(FurnaceNum).Name);
+                    CheckSysSizing(state, DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num), furnace.Name);
 
-                    if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) {
-                        state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity =
-                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex)
-                                .RatedCapHeat;
+                    if (furnace.HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) {
+                        furnace.DesignHeatingCapacity = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(furnace.HeatingCoilIndex).RatedCapHeat;
                     } else {
-                        state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity = state.dataSize->DXCoolCap;
+                        furnace.DesignHeatingCapacity = state.dataSize->DXCoolCap;
                     }
 
                 } else {
 
-                    CheckSysSizing(state,
-                                   DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                   state.dataFurnaces->Furnace(FurnaceNum).Name);
+                    CheckSysSizing(state, DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num), furnace.Name);
 
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
+                    furnace.DesignHeatingCapacity = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
                 }
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity < DataHVACGlobals::SmallLoad) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity = 0.0;
+                if (furnace.DesignHeatingCapacity < DataHVACGlobals::SmallLoad) {
+                    furnace.DesignHeatingCapacity = 0.0;
                 }
 
                 BaseSizer::reportSizerOutput(state,
-                                             DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                             state.dataFurnaces->Furnace(FurnaceNum).Name,
+                                             DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                             furnace.Name,
                                              "Nominal Heating Capacity [W]",
-                                             state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity);
+                                             furnace.DesignHeatingCapacity);
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity == DataSizing::AutoSize) {
+        if (furnace.DesignCoolingCapacity == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
-                CheckSysSizing(state,
-                               DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                               state.dataFurnaces->Furnace(FurnaceNum).Name);
+                CheckSysSizing(state, DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num), furnace.Name);
                 if (state.dataSize->DXCoolCap >= DataHVACGlobals::SmallLoad) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity = state.dataSize->DXCoolCap;
+                    furnace.DesignCoolingCapacity = state.dataSize->DXCoolCap;
                 } else {
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity = 0.0;
+                    furnace.DesignCoolingCapacity = 0.0;
                 }
                 BaseSizer::reportSizerOutput(state,
-                                             DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                             state.dataFurnaces->Furnace(FurnaceNum).Name,
+                                             DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                             furnace.Name,
                                              "Nominal Cooling Capacity [W]",
-                                             state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity);
+                                             furnace.DesignCoolingCapacity);
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp == DataSizing::AutoSize) {
+        if (furnace.DesignMaxOutletTemp == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
-                CheckSysSizing(state,
-                               DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                               state.dataFurnaces->Furnace(FurnaceNum).Name);
-                state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp;
+                CheckSysSizing(state, DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num), furnace.Name);
+                furnace.DesignMaxOutletTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp;
                 BaseSizer::reportSizerOutput(state,
-                                             DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                             state.dataFurnaces->Furnace(FurnaceNum).Name,
+                                             DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                             furnace.Name,
                                              "Maximum Supply Air Temperature from Supplemental Heater [C]",
-                                             state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp);
+                                             furnace.DesignMaxOutletTemp);
             }
         }
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity == DataSizing::AutoSize) {
+        if (furnace.DesignSuppHeatingCapacity == DataSizing::AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {
 
-                CheckSysSizing(state,
-                               DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                               state.dataFurnaces->Furnace(FurnaceNum).Name);
-                if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
-                    state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
+                CheckSysSizing(state, DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num), furnace.Name);
+                if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
+                    furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
                     // set the supplemental heating capacity to the actual heating load
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity =
-                        state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
+                    furnace.DesignSuppHeatingCapacity = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
                     // if reheat needed for humidity control, make sure supplemental heating is at least as big
                     // as the cooling capacity
-                    if (state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
-                        state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity =
-                            max(state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity,
-                                state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity);
-                        if (state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity < DataHVACGlobals::SmallLoad) {
-                            state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity = 0.0;
+                    if (furnace.Humidistat && furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
+                        furnace.DesignSuppHeatingCapacity = max(furnace.DesignSuppHeatingCapacity, furnace.DesignCoolingCapacity);
+                        if (furnace.DesignSuppHeatingCapacity < DataHVACGlobals::SmallLoad) {
+                            furnace.DesignSuppHeatingCapacity = 0.0;
                         }
                     }
 
                 } else {
 
-                    if (state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
-                        state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity =
-                            state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity;
+                    if (furnace.Humidistat && furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
+                        furnace.DesignSuppHeatingCapacity = furnace.DesignCoolingCapacity;
                     } else {
-                        state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity = 0.0;
+                        furnace.DesignSuppHeatingCapacity = 0.0;
                     }
                 }
 
                 BaseSizer::reportSizerOutput(state,
-                                             DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                             state.dataFurnaces->Furnace(FurnaceNum).Name,
+                                             DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                             furnace.Name,
                                              "Supplemental Heating Coil Nominal Capacity [W]",
-                                             state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity);
+                                             furnace.DesignSuppHeatingCapacity);
             }
         }
 
-        state.dataSize->UnitaryHeatCap = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity;
-        state.dataSize->SuppHeatCap = state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity;
+        state.dataSize->UnitaryHeatCap = furnace.DesignHeatingCapacity;
+        state.dataSize->SuppHeatCap = furnace.DesignSuppHeatingCapacity;
     }
 
     // End Initialization Section of the Module
