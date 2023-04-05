@@ -1806,6 +1806,13 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::State,
                                 Surface(loop).Name);
             SetupOutputVariable(state,
+                                "Surface Outside Face Thermal Radiation to Surrounding Surfaces Heat Transfer Coefficient",
+                                OutputProcessor::Unit::W_m2K,
+                                state.dataHeatBalSurf->SurfHSrdSurfExt(loop),
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
+                                Surface(loop).Name);
+            SetupOutputVariable(state,
                                 "Surface Outside Face Thermal Radiation to Air Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHeatBalSurf->SurfQAirExtReport(loop),
@@ -5031,6 +5038,7 @@ void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, ObjexxFCL::Opt
                     state.dataHeatBalSurf->SurfHAirExt(surfNum) = state.dataHeatBalSurf->SurfHAirExt(repSurfNum);
                     state.dataHeatBalSurf->SurfHSkyExt(surfNum) = state.dataHeatBalSurf->SurfHSkyExt(repSurfNum);
                     state.dataHeatBalSurf->SurfHGrdExt(surfNum) = state.dataHeatBalSurf->SurfHGrdExt(repSurfNum);
+                    state.dataHeatBalSurf->SurfHSrdSurfExt(surfNum) = state.dataHeatBalSurf->SurfHSrdSurfExt(repSurfNum);
 
                     state.dataSurface->SurfTAirRef(surfNum) = state.dataSurface->SurfTAirRef(repSurfNum);
                     if (state.dataSurface->SurfTAirRef(surfNum) != DataSurfaces::RefAirTemp::Invalid) {
@@ -9496,18 +9504,10 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     } // ...end of outside heat balance cases IF-THEN block
 
     // multiply out linearized radiation coeffs for reporting
-    Real64 const HExtSurf_fac(-(state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * (TH11 - TSky) +
-                                state.dataHeatBalSurf->SurfHAirExt(SurfNum) * (TH11 - TempExt) +
-                                state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * (TH11 - TGround)));
-    Real64 QRadLWOutSrdSurfsRep;
-    QRadLWOutSrdSurfsRep = 0;
-    // Report LWR from surrounding surfaces for current exterior surf temp
-    // Current exterior surf temp would be used for the next step LWR calculation.
-    if (state.dataSurface->Surface(SurfNum).UseSurfPropertySrdSurfTemp) {
-        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-        QRadLWOutSrdSurfsRep = state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) * (TSrdSurfs - TH11);
-    }
-    state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(SurfNum) = HExtSurf_fac + QRadLWOutSrdSurfsRep;
+    Real64 const HExtSurf_fac(
+        -(state.dataHeatBalSurf->SurfHSkyExt(SurfNum) * (TH11 - TSky) + state.dataHeatBalSurf->SurfHAirExt(SurfNum) * (TH11 - TempExt) +
+          state.dataHeatBalSurf->SurfHGrdExt(SurfNum) * (TH11 - TGround) + state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) * (TH11 - TSrdSurfs)));
+    state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(SurfNum) = HExtSurf_fac;
 
     // Set the radiant system heat balance coefficients if this surface is also a radiant system
     if (construct.SourceSinkPresent) {
