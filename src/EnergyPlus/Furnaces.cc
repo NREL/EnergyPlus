@@ -7048,14 +7048,12 @@ namespace Furnaces {
         Real64 deltaT;               // Heater outlet temp minus design heater outlet temp
         //  CHARACTER(len=20) :: ErrNum = ' '         ! For displaying error message in cooling
         //  INTEGER,SAVE      :: ErrCount = 0
-        int FurnaceInletNode;  // Node number of furnace inlet
-        int FurnaceOutletNode; // Node number of furnace outlet
-        int OpMode;            // Mode of Operation (fan cycling or fan continuous)
+        int OpMode; // Mode of Operation (fan cycling or fan continuous)
         // Set local variables
 
         // Retrieve the load on the controlled zone
-        FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
-        FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
+        auto &furnaceInNode = state.dataLoopNodes->Node(state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum);
+        auto &furnaceOutNode = state.dataLoopNodes->Node(state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum);
         int ControlZoneNode = state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone;
         OpMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode;
         state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = state.dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate;
@@ -7069,19 +7067,19 @@ namespace Furnaces {
         if (FirstHVACIteration) {
             HeatCoilLoad = ZoneLoad;
             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-            state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
+            furnaceInNode.MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
         } else {
             // If Furnace runs then set HeatCoilLoad on Heating Coil and the Mass Flow
-            if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) &&
-                (state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate > 0.0) && (state.dataFurnaces->HeatingLoad)) {
+            if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) && (furnaceInNode.MassFlowRate > 0.0) &&
+                (state.dataFurnaces->HeatingLoad)) {
 
-                state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
+                furnaceInNode.MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
                 HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity;
                 SystemSensibleLoad = ZoneLoad;
 
                 // Get no load result
                 if (OpMode == CycFanCycCoil) {
-                    state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = 0.0;
+                    furnaceInNode.MassFlowRate = 0.0;
                 }
                 if (OpMode == ContFanCycCoil) {
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // The on/off fan will not cycle, so set part-load fraction = 1
@@ -7105,7 +7103,7 @@ namespace Furnaces {
                                   OnOffAirFlowRatio,
                                   false);
 
-                state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
+                furnaceInNode.MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
 
                 // Set fan part-load fraction equal to 1 while getting full load result
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
@@ -7133,15 +7131,14 @@ namespace Furnaces {
                     PartLoadRatio =
                         max(MinPLR, min(1.0, std::abs(SystemSensibleLoad - NoSensibleOutput) / std::abs(FullSensibleOutput - NoSensibleOutput)));
                     if (OpMode == CycFanCycCoil) {
-                        state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate =
-                            state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace * PartLoadRatio;
+                        furnaceInNode.MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace * PartLoadRatio;
                         HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity * PartLoadRatio;
                     } else { // ContFanCycCoil
-                        if (state.dataLoopNodes->Node(FurnaceOutletNode).Temp > state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp) {
-                            deltaT = state.dataLoopNodes->Node(FurnaceOutletNode).Temp - state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp;
+                        if (furnaceOutNode.Temp > state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp) {
+                            deltaT = furnaceOutNode.Temp - state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp;
                             if (HeatCoilLoad > state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity)
                                 HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity;
-                            HeatCoilLoad -= state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate * cpair * deltaT;
+                            HeatCoilLoad -= furnaceInNode.MassFlowRate * cpair * deltaT;
                         } else {
                             HeatCoilLoad = SystemSensibleLoad - NoSensibleOutput;
                         }
@@ -7155,9 +7152,7 @@ namespace Furnaces {
                     IterRelax = 0.9;              // relaxation factor for iterations
                     while (state.dataFurnaces->Iter <= MaxIter) {
 
-                        if (OpMode == CycFanCycCoil)
-                            state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate =
-                                state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace * PartLoadRatio;
+                        if (OpMode == CycFanCycCoil) furnaceInNode.MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace * PartLoadRatio;
                         CalcFurnaceOutput(state,
                                           FurnaceNum,
                                           FirstHVACIteration,
@@ -7179,12 +7174,12 @@ namespace Furnaces {
                             min(1.0,
                                 PartLoadRatio + IterRelax * (SystemSensibleLoad - ActualSensibleOutput) / (FullSensibleOutput - NoSensibleOutput)));
 
-                        //        limit the heating coil outlet air temperature to DesignMaxOutletTemp
-                        if (state.dataLoopNodes->Node(FurnaceOutletNode).Temp > state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp) {
-                            deltaT = state.dataLoopNodes->Node(FurnaceOutletNode).Temp - state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp;
+                        // limit the heating coil outlet air temperature to DesignMaxOutletTemp
+                        if (furnaceOutNode.Temp > state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp) {
+                            deltaT = furnaceOutNode.Temp - state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp;
                             if (HeatCoilLoad > state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity)
                                 HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity;
-                            HeatCoilLoad -= state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate * cpair * deltaT;
+                            HeatCoilLoad -= furnaceInNode.MassFlowRate * cpair * deltaT;
                             CalcFurnaceOutput(state,
                                               FurnaceNum,
                                               FirstHVACIteration,
@@ -7240,10 +7235,10 @@ namespace Furnaces {
                 //      IF (OpMode .EQ. CycFanCycCoil) THEN
                 //        Furnace(FurnaceNum)%MdotFurnace = Furnace(FurnaceNum)%MdotFurnace * PartLoadRatio
                 //      END IF
-                state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate;
+                state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = furnaceInNode.MassFlowRate;
 
             } else if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) &&
-                       (state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate > 0.0) && (OpMode == ContFanCycCoil)) {
+                       (furnaceInNode.MassFlowRate > 0.0) && (OpMode == ContFanCycCoil)) {
                 HeatCoilLoad = 0.0;
             } else { // no heating and no flow
                 state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = 0.0;
@@ -7253,8 +7248,8 @@ namespace Furnaces {
         } // End of the FirstHVACIteration control of the mass flow If block
 
         // Set the fan inlet node flow rates
-        state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRateMaxAvail = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
-        state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
+        furnaceInNode.MassFlowRateMaxAvail = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
+        furnaceInNode.MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
     }
 
     void CalcNewZoneHeatCoolFlowRates(EnergyPlusData &state,
@@ -7336,9 +7331,6 @@ namespace Furnaces {
         Real64 NoCoolOutput;         // Sensible output of AC with no cooling allowed (W)
         Real64 NoHeatOutput;         // Sensible output of heater with no heating allowed (W)
         Real64 NoLatentOutput;       // Latent output of AC with no cooling allowed (W)
-        int FurnaceInletNode;        // Inlet node to furnace or unitary system
-        int FurnaceOutletNode;       // Outlet node of furnace or unitary system
-        int OpMode;                  // Mode of Operation (fan cycling = 1 or fan continuous = 2)
         Real64 CoolErrorToler;       // Error tolerance in cooling mode
         Real64 HeatErrorToler;       // Error tolerance in heating mode
         Real64 ActualSensibleOutput; // Actual furnace sensible capacity
@@ -7363,10 +7355,10 @@ namespace Furnaces {
         bool &HumControl = state.dataFurnaces->HumControl;
 
         // Set local variables
-        FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
-        FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
+        int FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
+        int FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
         int ControlZoneNode = state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone;
-        OpMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode;
+        int OpMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode; // fan operating mode
         HumControl = false;
         // Calculate the Cp Air of zone
         Real64 cpair = PsyCpAirFnW(state.dataLoopNodes->Node(ControlZoneNode).HumRat);
