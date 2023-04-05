@@ -2141,7 +2141,7 @@ namespace Furnaces {
                             errFlag = true;
                             ErrorsFound = true;
                         }
-                        auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex];
+                        auto const &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex];
 
                         state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = newCoil.condInletNodeIndex;
 
@@ -5216,33 +5216,26 @@ namespace Furnaces {
         std::string FanType; // used in warning messages
         std::string FanName; // used in warning messages
 
-        int ZoneInSysIndex(0);                            // number of zone inlet nodes counter in an airloop
-        int NumAirLoopZones(0);                           // number of zone inlet nodes in an air loop
-        int ZoneInletNodeNum(0);                          // zone inlet nodes node number
         Real64 SumOfMassFlowRateMax(0.0);                 // the sum of mass flow rates at inlet to zones in an airloop
         Real64 CntrlZoneTerminalUnitMassFlowRateMax(0.0); // Maximum mass flow rate through controlled zone terminal unit
 
         bool ErrorsFound(false);                 // flag returned from mining call
         Real64 mdot(0.0);                        // local temporary for mass flow rate (kg/s)
         Real64 rho(0.0);                         // local for fluid density
-        int SteamIndex(0);                       // index of steam quality for steam heating coil
         Real64 SteamDensity(0.0);                // density of steam at 100C, used for steam heating coils
         Real64 CoilMaxVolFlowRate(0.0);          // coil fluid maximum volume flow rate
         Real64 QActual(0.0);                     // coil actual capacity
         Real64 SUPHEATERLOAD(0.0);               // SUPPLEMENTAL HEATER LOAD
         int NumOfSpeedCooling;                   // Number of speeds for cooling
         int NumOfSpeedHeating;                   // Number of speeds for heating
-        int InNode;                              // Inlet node number in MSHP loop
-        int OutNode;                             // Outlet node number in MSHP loop
         Real64 RhoAir;                           // Air density at InNode
-        int IHPIndex(0);                         // coil id of IHP coil
         Furnaces::ModeOfOperation OperatingMode; // track cooling, heating, and no cooling or heating modes
         Furnaces::ModeOfOperation OperatingModeMinusOne;
         Furnaces::ModeOfOperation OperatingModeMinusTwo;
         bool Oscillate; // detection of oscillating operating modes
 
-        InNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
-        OutNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
+        int InNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
+        int OutNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
 
         auto &Node = state.dataLoopNodes->Node;
 
@@ -5389,7 +5382,7 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow =
                         SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow > 0.0) {
-                        SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                        int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, RoutineName);
                         state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow *= SteamDensity;
                     }
@@ -5453,7 +5446,7 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow =
                         SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, ErrorsFound);
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
-                        SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                        int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, RoutineName);
                         state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow *= SteamDensity;
                     }
@@ -5524,7 +5517,7 @@ namespace Furnaces {
                         CoilMaxVolFlowRate =
                             SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                            int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, RoutineName);
                             state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
                         }
@@ -5566,7 +5559,7 @@ namespace Furnaces {
                         CoilMaxVolFlowRate =
                             SteamCoils::GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, ErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                            int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, RoutineName);
                             state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
                         }
@@ -5626,10 +5619,10 @@ namespace Furnaces {
         if (allocated(state.dataZoneEquip->ZoneEquipConfig) && state.dataFurnaces->MyCheckFlag(FurnaceNum)) {
             int zoneNum = state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum;
             int zoneInlet = state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode;
-            int coolingPriority = 0;
-            int heatingPriority = 0;
             // setup furnace zone equipment sequence information based on finding matching air terminal
             if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
+                int coolingPriority = 0;
+                int heatingPriority = 0;
                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex)
                     .getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
                 state.dataFurnaces->Furnace(FurnaceNum).ZoneSequenceCoolingNum = coolingPriority;
@@ -5651,11 +5644,11 @@ namespace Furnaces {
         }
 
         // Find the number of zones (zone Inlet Nodes) attached to an air loop from the air loop number
-        NumAirLoopZones =
+        int NumAirLoopZones =
             state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled + state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
         if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && state.dataFurnaces->MyFlowFracFlag(FurnaceNum)) {
             state.dataFurnaces->FlowFracFlagReady = true;
-            for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
+            for (int ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
                 // zone inlet nodes for cooling
                 if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled > 0) {
                     if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) == -999) {
@@ -5676,8 +5669,8 @@ namespace Furnaces {
         if (state.dataFurnaces->MyFlowFracFlag(FurnaceNum)) {
             if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && state.dataFurnaces->FlowFracFlagReady) {
                 SumOfMassFlowRateMax = 0.0; // initialize the sum of the maximum flows
-                for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
-                    ZoneInletNodeNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
+                for (int ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
+                    int ZoneInletNodeNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
                     SumOfMassFlowRateMax += Node(ZoneInletNodeNum).MassFlowRateMax;
                     if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZoneInSysIndex) ==
                         state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) {
@@ -5919,11 +5912,6 @@ namespace Furnaces {
             if (state.dataFurnaces->Furnace(FurnaceNum).CheckFanFlow) {
                 state.dataFurnaces->CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:VariableSpeed";
                 GetFanVolFlow(state, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow);
-
-                if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) // set max fan flow rate to the IHP collection
-                {
-                    IHPIndex = state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex;
-                }
 
                 if (state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow != DataSizing::AutoSize) {
                     //     Check fan versus system supply air flow rates
@@ -6577,7 +6565,6 @@ namespace Furnaces {
         using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ThisCtrlZoneNum;      // the controlled zone number of the control zone !!!
         int Iter;                 // iteration count
         Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
         int IHPCoilIndex(0);      // refer to cooling or heating coil in IHP
@@ -6585,7 +6572,6 @@ namespace Furnaces {
         bool anyRan;
         ManageEMS(state, EMSManager::EMSCallFrom::UnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
 
-        ThisCtrlZoneNum = 0;
         state.dataSize->DXCoolCap = 0.0;
         state.dataSize->UnitaryHeatCap = 0.0;
         state.dataSize->SuppHeatCap = 0.0;
