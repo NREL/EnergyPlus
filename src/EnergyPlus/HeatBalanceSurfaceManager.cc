@@ -9300,6 +9300,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
 
     Real64 TSky = state.dataEnvrn->SkyTemp;
     Real64 TGround = state.dataEnvrn->OutDryBulbTemp;
+    Real64 TSrdSurfs = 0.0;
 
     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
         int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
@@ -9309,12 +9310,11 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum != 0) {
             TGround = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum);
         }
+        TSrdSurfs = state.dataSurface->Surface(SurfNum).SrdSurfTemp;
     }
     if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp) {
         TGround = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsTempAvg;
     }
-
-    Real64 TSrdSurfs = state.dataSurface->Surface(SurfNum).SrdSurfTemp;
 
     // Now, calculate the outside surface temperature using the proper heat balance equation.
     // Each case has been separated out into its own IF-THEN block for clarity.  Additional

@@ -464,6 +464,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
     Real64 TSky = state.dataEnvrn->SkyTempKelvin;
     Real64 TGround = TAir;
 
+    HSrdSurf = 0.0;
     if (surface.SurfHasSurroundingSurfProperty) {
         int SrdSurfsNum = surface.SurfSurroundingSurfacesNum;
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
@@ -472,8 +473,6 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
         }
         if (surface.UseSurfPropertySrdSurfTemp) {
             HSrdSurf = SurroundingSurfacesRadCoeffAverage(state, SurfNum, TSurf, AbsExt);
-        } else {
-            HSrdSurf = 0.0;
         }
     }
     if (surface.UseSurfPropertyGndSurfTemp) {
