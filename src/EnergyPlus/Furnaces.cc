@@ -8811,7 +8811,6 @@ namespace Furnaces {
         Real64 constexpr MinPLR(0.0); // minimum part load ratio allowed
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 OnOffAirFlowRatio;           // Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
         Real64 ZoneSensLoadMet;             // Actual zone sensible load met by heat pump (W)
         Real64 ZoneLatLoadMet;              // Actual zone latent load met by heat pump (W)
         Real64 ZoneSensLoadMetFanONCompON;  // Max Zone sensible load heat pump can meet (W)
@@ -8822,31 +8821,26 @@ namespace Furnaces {
         // and fan heat (no coil output) (W)
         Real64 HPCoilSensDemand;   // Heat pump sensible demand
         Real64 HPCoilSensCapacity; // Heat pump sensible capacity
-        int FurnaceInletNode;      // heat pump Inlet node
-        int FurnaceOutletNode;     // heat pump Outlet node
 
-        int OpMode;                // Mode of Operation (fan cycling = 1 or fan continuous = 2)
-        bool HumControl;           // Logical flag signaling when dehumidification is required
-        Real64 SuppHeatCoilLoad;   // Load passed to supplemental heater (W)
-        Real64 CoolErrorToler;     // convergence tolerance used in cooling mode
-        Real64 HeatErrorToler;     // convergence tolerance used in heating mode
-        int SolFlag;               // flag returned from iteration routine to denote problems
-        std::array<Real64, 9> Par; // parameters passed to iteration routine
+        Real64 SuppHeatCoilLoad; // Load passed to supplemental heater (W)
+        Real64 CoolErrorToler;   // convergence tolerance used in cooling mode
+        Real64 HeatErrorToler;   // convergence tolerance used in heating mode
+        int SolFlag;             // flag returned from iteration routine to denote problems
 
-        auto &TotalZoneLatentLoad = state.dataFurnaces->TotalZoneLatentLoad;
-        auto &TotalZoneSensLoad = state.dataFurnaces->TotalZoneSensLoad;
-        auto &CoolPartLoadRatio = state.dataFurnaces->CoolPartLoadRatio;
-        auto &HeatPartLoadRatio = state.dataFurnaces->HeatPartLoadRatio;
-        auto &Dummy2 = state.dataFurnaces->Dummy2;
+        Real64 &TotalZoneLatentLoad = state.dataFurnaces->TotalZoneLatentLoad;
+        Real64 &TotalZoneSensLoad = state.dataFurnaces->TotalZoneSensLoad;
+        Real64 &CoolPartLoadRatio = state.dataFurnaces->CoolPartLoadRatio;
+        Real64 &HeatPartLoadRatio = state.dataFurnaces->HeatPartLoadRatio;
+        Real64 &Dummy2 = state.dataFurnaces->Dummy2;
+        Dummy2 = 0.0;
 
         // Set local variables
-        Dummy2 = 0.0;
-        OnOffAirFlowRatio = 1.0;
-        FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
-        FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
-        OpMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode;
+        Real64 OnOffAirFlowRatio = 1.0; // Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
+        int FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
+        int FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
+        int OpMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode; // fan operting mode
         state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = state.dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate;
-        HumControl = false;
+        bool HumControl = false; // Logical flag signaling when dehumidification is required
 
         //*********INITIAL CALCULATIONS****************
         // set the fan part load fraction
@@ -8982,17 +8976,7 @@ namespace Furnaces {
                 //         Calculate the sensible part load ratio through iteration
                 CoolErrorToler = state.dataFurnaces->Furnace(FurnaceNum).CoolingConvergenceTolerance;
                 SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
-                Par[0] = double(FurnaceNum);
-                Par[1] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                if (FirstHVACIteration) Par[1] = 1.0;
-                Par[2] = double(OpMode);
-                Par[3] = double(CompressorOp);
-                Par[4] = TotalZoneSensLoad;
-                Par[5] = 1.0;                         // FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
-                Par[6] = 1.0;                         // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
-                Par[7] = ZoneSensLoadMetFanONCompOFF; // Output with fan ON compressor OFF
-                Par[8] = 0.0;                         // HX is off for water-to-air HP
-                //         CoolErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
+                // CoolErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
                 auto f = [&state, FurnaceNum, FirstHVACIteration, OpMode, CompressorOp, TotalZoneSensLoad, ZoneSensLoadMetFanONCompOFF](
                              Real64 const PartLoadRatio) {
                     return CalcWaterToAirResidual(state,
@@ -9198,17 +9182,7 @@ namespace Furnaces {
                 //         Calculate the sensible part load ratio through iteration
                 HeatErrorToler = state.dataFurnaces->Furnace(FurnaceNum).HeatingConvergenceTolerance;
                 SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
-                Par[0] = double(FurnaceNum);
-                Par[1] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                if (FirstHVACIteration) Par[1] = 1.0;
-                Par[2] = double(OpMode);
-                Par[3] = double(CompressorOp);
-                Par[4] = TotalZoneSensLoad;
-                Par[5] = 0.0;                         // FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
-                Par[6] = 1.0;                         // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
-                Par[7] = ZoneSensLoadMetFanONCompOFF; // Output with fan ON compressor OFF
-                Par[8] = 0.0;                         // HX is OFF for water-to-air HP
-                //         HeatErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
+                // HeatErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
                 auto f = [&state, FurnaceNum, FirstHVACIteration, OpMode, CompressorOp, TotalZoneSensLoad, ZoneSensLoadMetFanONCompOFF](
                              Real64 const PartLoadRatio) {
                     return CalcWaterToAirResidual(state,
