@@ -142,21 +142,11 @@ namespace FluidProperties {
         Array1D_bool lAlphaFieldBlanks;    // logical for blank alpha fields
         Array1D_bool lNumericFieldBlanks;  // logical for blank numeric fields
         int NumNumbers;                    // States which number value to read from a "Numbers" line
-        int MaxAlphas;                     // maximum number of alphas
-        int MaxNumbers;                    // maximum number of numbers
         int Status;                        // Either 1 "object found" or -1 "not found" (also used as temp)
         int InData;
-        int NumOfFluidTempArrays;
-        int NumOfSatFluidPropArrays;
-        int NumOfSHFluidPropArrays;
-        int NumOfGlyFluidPropArrays;
         std::string TempsName;
         bool FirstSHMatch;
         bool ErrorsFound(false);
-        int Index;
-        int NumOfGlyConcs;
-        bool GlycolFound;
-        int NumOfOptionalInput;
         std::string CurrentModuleObject; // for ease in renaming.
         Real64 pTemp;
         int j;
@@ -613,8 +603,8 @@ namespace FluidProperties {
         Array1D<PressureSequence> PressurePtr;
         Array1D<FluidData> FluidNames;
 
-        MaxAlphas = 0;
-        MaxNumbers = 0;
+        int MaxAlphas = 0;
+        int MaxNumbers = 0;
         if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Name") > 0) {
             state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Name", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -626,25 +616,25 @@ namespace FluidProperties {
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        NumOfFluidTempArrays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Temperatures");
+        int NumOfFluidTempArrays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Temperatures");
         if (NumOfFluidTempArrays > 0) {
             state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Temperatures", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        NumOfSatFluidPropArrays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Saturated");
+        int NumOfSatFluidPropArrays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Saturated");
         if (NumOfSatFluidPropArrays > 0) {
             state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Saturated", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        NumOfSHFluidPropArrays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Superheated");
+        int NumOfSHFluidPropArrays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Superheated");
         if (NumOfSHFluidPropArrays > 0) {
             state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Superheated", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
             MaxNumbers = max(MaxNumbers, NumNumbers);
         }
-        NumOfGlyFluidPropArrays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Concentration");
+        int NumOfGlyFluidPropArrays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "FluidProperties:Concentration");
         if (NumOfGlyFluidPropArrays > 0) {
             state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "FluidProperties:Concentration", Status, NumAlphas, NumNumbers);
             MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -673,7 +663,7 @@ namespace FluidProperties {
         // long as the user only desires to simulate loops with water.  More than
         // one FluidName input is not allowed.
         CurrentModuleObject = "FluidProperties:Name";
-        NumOfOptionalInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumOfOptionalInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         FluidNames.allocate(NumOfOptionalInput);
 
@@ -2278,7 +2268,7 @@ namespace FluidProperties {
         CurrentModuleObject = "FluidProperties:GlycolConcentration";
         NumOfOptionalInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
-        NumOfGlyConcs = NumOfOptionalInput + 1;
+        int NumOfGlyConcs = NumOfOptionalInput + 1;
         state.dataFluidProps->GlycolData.allocate(NumOfGlyConcs);
         state.dataFluidProps->GlycolUsed.dimension(NumOfGlyConcs, false);
 
@@ -2329,7 +2319,7 @@ namespace FluidProperties {
                                                                      lAlphaFieldBlanks,
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
-            GlycolFound = false;
+            bool GlycolFound = false;
             if (UtilityRoutines::SameString(Alphas(2), EthyleneGlycol)) {
                 GlycolFound = true;
                 ++NumOfGlyConcs;
@@ -2454,7 +2444,7 @@ namespace FluidProperties {
 
             } else { // User-defined fluid
 
-                Index = state.dataFluidProps->GlycolData(Loop).GlycolIndex;
+                int Index = state.dataFluidProps->GlycolData(Loop).GlycolIndex;
 
                 // Specific heat data:
                 if (state.dataFluidProps->GlyRawData(Index).CpDataPresent) {
@@ -4705,23 +4695,18 @@ namespace FluidProperties {
         // Most properties requested (e.g., Specific Heat) must be > 0 but the tables may
         // be set up for symmetry and not be limited to just valid values.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int GlycolNum;
-        int IndexNum;
-        bool Failure;
-
-        for (GlycolNum = 1; GlycolNum <= state.dataFluidProps->NumOfGlycols; ++GlycolNum) {
+        for (int GlycolNum = 1; GlycolNum <= state.dataFluidProps->NumOfGlycols; ++GlycolNum) {
             auto &glycol = state.dataFluidProps->GlycolData(GlycolNum);
             if (glycol.CpDataPresent) {
                 // check for lowest non-zero value by referencing temp data
-                for (IndexNum = 1; IndexNum <= glycol.NumCpTempPts; ++IndexNum) {
+                for (int IndexNum = 1; IndexNum <= glycol.NumCpTempPts; ++IndexNum) {
                     if (glycol.CpValues(IndexNum) <= 0.0) continue;
                     glycol.CpLowTempIndex = IndexNum;
                     glycol.CpLowTempValue = glycol.CpTemps(IndexNum);
                     break;
                 }
                 // check for highest non-zero value by referencing temp data
-                for (IndexNum = glycol.NumCpTempPts; IndexNum >= 1; --IndexNum) {
+                for (int IndexNum = glycol.NumCpTempPts; IndexNum >= 1; --IndexNum) {
                     if (glycol.CpValues(IndexNum) <= 0.0) continue;
                     glycol.CpHighTempIndex = IndexNum;
                     glycol.CpHighTempValue = glycol.CpTemps(IndexNum);
@@ -4730,14 +4715,14 @@ namespace FluidProperties {
             }
             if (glycol.RhoDataPresent) {
                 // check for lowest non-zero value by referencing temp data
-                for (IndexNum = 1; IndexNum <= glycol.NumRhoTempPts; ++IndexNum) {
+                for (int IndexNum = 1; IndexNum <= glycol.NumRhoTempPts; ++IndexNum) {
                     if (glycol.RhoValues(IndexNum) <= 0.0) continue;
                     glycol.RhoLowTempIndex = IndexNum;
                     glycol.RhoLowTempValue = glycol.RhoTemps(IndexNum);
                     break;
                 }
                 // check for highest non-zero value  by referencing temp data
-                for (IndexNum = glycol.NumRhoTempPts; IndexNum >= 1; --IndexNum) {
+                for (int IndexNum = glycol.NumRhoTempPts; IndexNum >= 1; --IndexNum) {
                     if (glycol.RhoValues(IndexNum) <= 0.0) continue;
                     glycol.RhoHighTempIndex = IndexNum;
                     glycol.RhoHighTempValue = glycol.RhoTemps(IndexNum);
@@ -4746,14 +4731,14 @@ namespace FluidProperties {
             }
             if (glycol.CondDataPresent) {
                 // check for lowest non-zero value by referencing temp data
-                for (IndexNum = 1; IndexNum <= glycol.NumCondTempPts; ++IndexNum) {
+                for (int IndexNum = 1; IndexNum <= glycol.NumCondTempPts; ++IndexNum) {
                     if (glycol.CondValues(IndexNum) <= 0.0) continue;
                     glycol.CondLowTempIndex = IndexNum;
                     glycol.CondLowTempValue = glycol.CondTemps(IndexNum);
                     break;
                 }
                 // check for highest non-zero value  by referencing temp data
-                for (IndexNum = glycol.NumCondTempPts; IndexNum >= 1; --IndexNum) {
+                for (int IndexNum = glycol.NumCondTempPts; IndexNum >= 1; --IndexNum) {
                     if (glycol.CondValues(IndexNum) <= 0.0) continue;
                     glycol.CondHighTempIndex = IndexNum;
                     glycol.CondHighTempValue = glycol.CondTemps(IndexNum);
@@ -4762,37 +4747,33 @@ namespace FluidProperties {
             }
             if (glycol.ViscDataPresent) {
                 // check for lowest non-zero value by referencing temp data
-                for (IndexNum = 1; IndexNum <= glycol.NumViscTempPts; ++IndexNum) {
+                for (int IndexNum = 1; IndexNum <= glycol.NumViscTempPts; ++IndexNum) {
                     if (glycol.ViscValues(IndexNum) <= 0.0) continue;
                     glycol.ViscLowTempIndex = IndexNum;
                     glycol.ViscLowTempValue = glycol.ViscTemps(IndexNum);
                     break;
                 }
                 // check for highest non-zero value  by referencing temp data
-                for (IndexNum = glycol.NumViscTempPts; IndexNum >= 1; --IndexNum) {
+                for (int IndexNum = glycol.NumViscTempPts; IndexNum >= 1; --IndexNum) {
                     if (glycol.ViscValues(IndexNum) <= 0.0) continue;
                     glycol.ViscHighTempIndex = IndexNum;
                     glycol.ViscHighTempValue = glycol.ViscTemps(IndexNum);
                     break;
                 }
             }
-            Failure = false;
+            bool Failure = false;
             // Check to see that all are set to non-zero
             if (glycol.CpDataPresent) {
-                if (glycol.CpLowTempIndex == 0) Failure = true;
-                if (glycol.CpHighTempIndex == 0) Failure = true;
+                Failure = glycol.CpLowTempIndex == 0 || glycol.CpHighTempIndex == 0;
             }
             if (glycol.RhoDataPresent) {
-                if (glycol.RhoLowTempIndex == 0) Failure = true;
-                if (glycol.RhoHighTempIndex == 0) Failure = true;
+                Failure = glycol.RhoLowTempIndex == 0 || glycol.RhoHighTempIndex == 0;
             }
             if (glycol.CondDataPresent) {
-                if (glycol.CondLowTempIndex == 0) Failure = true;
-                if (glycol.CondHighTempIndex == 0) Failure = true;
+                Failure = glycol.CondLowTempIndex == 0 || glycol.CondHighTempIndex == 0;
             }
             if (glycol.ViscDataPresent) {
-                if (glycol.ViscLowTempIndex == 0) Failure = true;
-                if (glycol.ViscHighTempIndex == 0) Failure = true;
+                Failure = glycol.ViscLowTempIndex == 0 || glycol.ViscHighTempIndex == 0;
             }
             if (Failure) {
                 ShowSevereError(state,
@@ -4910,28 +4891,18 @@ namespace FluidProperties {
             bool Failure = false;
             // Check to see that all are set to non-zero
             if (refrig.NumPsPoints > 0) {
-                if (refrig.PsLowPresIndex == 0) Failure = true;
-                if (refrig.PsLowTempIndex == 0) Failure = true;
-                if (refrig.PsHighPresIndex == 0) Failure = true;
-                if (refrig.PsHighTempIndex == 0) Failure = true;
+                Failure = refrig.PsLowPresIndex == 0 || refrig.PsLowTempIndex == 0 || refrig.PsHighPresIndex == 0 || refrig.PsHighTempIndex == 0;
             }
             if (refrig.NumHPoints > 0) {
-                if (refrig.HfLowTempIndex == 0) Failure = true;
-                if (refrig.HfgLowTempIndex == 0) Failure = true;
-                if (refrig.HfHighTempIndex == 0) Failure = true;
-                if (refrig.HfgHighTempIndex == 0) Failure = true;
+                Failure = refrig.HfLowTempIndex == 0 || refrig.HfgLowTempIndex == 0 || refrig.HfHighTempIndex == 0 || refrig.HfgHighTempIndex == 0;
             }
             if (refrig.NumCpPoints > 0) {
-                if (refrig.CpfLowTempIndex == 0) Failure = true;
-                if (refrig.CpfgLowTempIndex == 0) Failure = true;
-                if (refrig.CpfHighTempIndex == 0) Failure = true;
-                if (refrig.CpfgHighTempIndex == 0) Failure = true;
+                Failure =
+                    refrig.CpfLowTempIndex == 0 || refrig.CpfgLowTempIndex == 0 || refrig.CpfHighTempIndex == 0 || refrig.CpfgHighTempIndex == 0;
             }
             if (refrig.NumRhoPoints > 0) {
-                if (refrig.RhofLowTempIndex == 0) Failure = true;
-                if (refrig.RhofgLowTempIndex == 0) Failure = true;
-                if (refrig.RhofHighTempIndex == 0) Failure = true;
-                if (refrig.RhofgHighTempIndex == 0) Failure = true;
+                Failure =
+                    refrig.RhofLowTempIndex == 0 || refrig.RhofgLowTempIndex == 0 || refrig.RhofHighTempIndex == 0 || refrig.RhofgHighTempIndex == 0;
             }
             if (Failure) {
                 ShowSevereError(
