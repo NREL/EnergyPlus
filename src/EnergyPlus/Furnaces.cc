@@ -8831,10 +8831,9 @@ namespace Furnaces {
         Real64 &TotalZoneSensLoad = state.dataFurnaces->TotalZoneSensLoad;
         Real64 &CoolPartLoadRatio = state.dataFurnaces->CoolPartLoadRatio;
         Real64 &HeatPartLoadRatio = state.dataFurnaces->HeatPartLoadRatio;
-        Real64 &Dummy2 = state.dataFurnaces->Dummy2;
-        Dummy2 = 0.0;
 
         // Set local variables
+        Real64 Dummy2 = 0.0;            // used as dummy heat and reheat coil load
         Real64 OnOffAirFlowRatio = 1.0; // Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
         int FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
         int FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
@@ -8857,13 +8856,10 @@ namespace Furnaces {
         // Calc Zone sensible loads for heating (+) and cooling (-)
         TotalZoneSensLoad = ZoneLoad;
 
-        // Set latent load for heating
         if (state.dataFurnaces->HeatingLoad) {
-            TotalZoneLatentLoad = 0.0;
-
-            // Set latent load for cooling and no sensible load condition
+            TotalZoneLatentLoad = 0.0; // Set latent load for heating
         } else {
-            TotalZoneLatentLoad = MoistureLoad;
+            TotalZoneLatentLoad = MoistureLoad; // Set latent load for cooling and no sensible load condition
         }
 
         //*********COOLING CALCULATIONS****************

@@ -580,7 +580,6 @@ struct FurnacesData : BaseGlobalStruct
     Real64 TotalZoneSensLoad;   // Total ZONE heating load (not including outside air) to be removed by furnace/unitary system
     Real64 CoolPartLoadRatio;   // Part load ratio (greater of sensible or latent part load ratio for cooling)
     Real64 HeatPartLoadRatio;   // Part load ratio (greater of sensible or latent part load ratio for cooling)
-    Real64 Dummy2 = 0.0;        // Dummy var. for generic calc. furnace output arg. (n/a for heat pump)
     int SpeedNum = 1;           // Speed number
     Real64 SupHeaterLoad = 0.0; // supplement heater load
 
@@ -626,7 +625,6 @@ struct FurnacesData : BaseGlobalStruct
         MySuppCoilPlantScanFlag.clear();
 
         HumControl = false;
-        Dummy2 = 0.0;
         SpeedNum = 1;
         SupHeaterLoad = 0.0;
     }
