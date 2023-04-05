@@ -6742,12 +6742,12 @@ namespace Furnaces {
         Real64 OutdoorDryBulbTemp; // secondary coil (condenser) entering dry bulb temperature
 
         Real64 &SystemSensibleLoad = state.dataFurnaces->SystemSensibleLoad;
-
+        auto &furnace = state.dataFurnaces->Furnace(FurnaceNum);
         // Set local variables
-        int FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
-        int FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
-        int ControlZoneNode = state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone;
-        int OpMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode; // fan operating mode
+        int FurnaceOutletNode = furnace.FurnaceOutletNodeNum;
+        int FurnaceInletNode = furnace.FurnaceInletNodeNum;
+        int ControlZoneNode = furnace.NodeNumOfControlledZone;
+        int OpMode = furnace.OpMode; // fan operating mode
         bool HumControl = false;
         // Calculate the Cp Air of zone
         Real64 cpair = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(ControlZoneNode).HumRat);
@@ -6758,21 +6758,17 @@ namespace Furnaces {
         ReheatCoilLoad = 0.0;
         PartLoadRatio = 0.0;
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir) {
-            if (state.dataDXCoils->DXCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex)
+        if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir) {
+            if (state.dataDXCoils->DXCoil(furnace.HeatingCoilIndex)
                     .IsSecondaryDXCoilInZone) { // assumes compressor is in same location as secondary coil
                 OutdoorDryBulbTemp =
-                    state.dataZoneTempPredictorCorrector
-                        ->zoneHeatBalance(state.dataDXCoils->DXCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).SecZonePtr)
-                        .ZT;
-            } else if (state.dataDXCoils->DXCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).IsSecondaryDXCoilInZone) {
+                    state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(furnace.HeatingCoilIndex).SecZonePtr).ZT;
+            } else if (state.dataDXCoils->DXCoil(furnace.CoolingCoilIndex).IsSecondaryDXCoilInZone) {
                 OutdoorDryBulbTemp =
-                    state.dataZoneTempPredictorCorrector
-                        ->zoneHeatBalance(state.dataDXCoils->DXCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).SecZonePtr)
-                        .ZT;
+                    state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataDXCoils->DXCoil(furnace.CoolingCoilIndex).SecZonePtr).ZT;
             } else {
-                if (state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum > 0) {
-                    OutdoorDryBulbTemp = state.dataLoopNodes->Node(state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum).Temp;
+                if (furnace.CondenserNodeNum > 0) {
+                    OutdoorDryBulbTemp = state.dataLoopNodes->Node(furnace.CondenserNodeNum).Temp;
                 } else {
                     OutdoorDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
                 }
@@ -6785,49 +6781,45 @@ namespace Furnaces {
 
             // Init for heating
             if (state.dataFurnaces->HeatingLoad) {
-                if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
-                    (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
-                     state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple)) {
-                    state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 1.0;
+                if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
+                    (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
+                     furnace.WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple)) {
+                    furnace.HeatPartLoadRatio = 1.0;
                     HeatCoilLoad = 0.0;
-                    state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand = 0.0;
-                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilSensDemand = 0.0;
-                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilLatentDemand = 0.0;
+                    furnace.HeatingCoilSensDemand = 0.0;
+                    furnace.CoolingCoilSensDemand = 0.0;
+                    furnace.CoolingCoilLatentDemand = 0.0;
                 } else { // for furnaces
-                    state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
+                    furnace.HeatPartLoadRatio = 0.0;
                     HeatCoilLoad = ZoneLoad;
-                    state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
-                    state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand = 0.0;
-                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilSensDemand = 0.0;
-                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilLatentDemand = 0.0;
+                    state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = furnace.MdotFurnace;
+                    furnace.HeatingCoilSensDemand = 0.0;
+                    furnace.CoolingCoilSensDemand = 0.0;
+                    furnace.CoolingCoilLatentDemand = 0.0;
                 }
                 ReheatCoilLoad = 0.0;
-                state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
+                furnace.CoolPartLoadRatio = 0.0;
 
                 // Init for cooling
             } else if (state.dataFurnaces->CoolingLoad) {
                 // air to air heat pumps
-                state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 1.0;
-                state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
+                furnace.CoolPartLoadRatio = 1.0;
+                furnace.HeatPartLoadRatio = 0.0;
                 HeatCoilLoad = 0.0;
                 ReheatCoilLoad = 0.0;
 
                 // Init for moisture load only
             } else {
-                state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
-                state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
+                furnace.CoolPartLoadRatio = 0.0;
+                furnace.HeatPartLoadRatio = 0.0;
                 HeatCoilLoad = 0.0;
                 ReheatCoilLoad = 0.0;
-                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand = 0.0;
-                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilSensDemand = 0.0;
-                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilLatentDemand = 0.0;
+                furnace.HeatingCoilSensDemand = 0.0;
+                furnace.CoolingCoilSensDemand = 0.0;
+                furnace.CoolingCoilLatentDemand = 0.0;
             }
 
-            SetAverageAirFlow(
-                state,
-                FurnaceNum,
-                max(state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio, state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio),
-                OnOffAirFlowRatio);
+            SetAverageAirFlow(state, FurnaceNum, max(furnace.HeatPartLoadRatio, furnace.CoolPartLoadRatio), OnOffAirFlowRatio);
             //  if dehumidification load exists (for heat pumps) turn on the supplmental heater
             if (state.dataFurnaces->HPDehumidificationLoadFlag) HumControl = true;
         } else { // not FirstHVACIteration
@@ -6835,15 +6827,15 @@ namespace Furnaces {
             Real64 &CoolCoilLoad = state.dataFurnaces->CoolCoilLoad;
             if (state.dataFurnaces->HeatingLoad) {
                 CoolCoilLoad = 0.0;
-                if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
-                    (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
-                     state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple)) {
+                if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
+                    (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
+                     furnace.WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple)) {
                     SystemSensibleLoad = ZoneLoad;
                     SystemMoistureLoad = 0.0;
                     HeatCoilLoad = 0.0;
-                    state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand = SystemSensibleLoad;
-                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilSensDemand = 0.0;
-                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilLatentDemand = 0.0;
+                    furnace.HeatingCoilSensDemand = SystemSensibleLoad;
+                    furnace.CoolingCoilSensDemand = 0.0;
+                    furnace.CoolingCoilLatentDemand = 0.0;
                 } else {
                     SystemMoistureLoad = MoistureLoad;
                     HeatCoilLoad = ZoneLoad;
@@ -6854,9 +6846,9 @@ namespace Furnaces {
                 CoolCoilLoad = ZoneLoad;
                 SystemMoistureLoad = MoistureLoad;
                 HeatCoilLoad = 0.0;
-                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilSensDemand = std::abs(CoolCoilLoad);
-                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilLatentDemand = std::abs(SystemMoistureLoad);
-                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand = 0.0;
+                furnace.CoolingCoilSensDemand = std::abs(CoolCoilLoad);
+                furnace.CoolingCoilLatentDemand = std::abs(SystemMoistureLoad);
+                furnace.HeatingCoilSensDemand = 0.0;
 
                 // Init for latent
             } else {
@@ -6864,32 +6856,31 @@ namespace Furnaces {
                 CoolCoilLoad = 0.0;
                 HeatCoilLoad = 0.0;
                 // set report variables
-                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilSensDemand = 0.0;
-                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilLatentDemand = SystemMoistureLoad;
-                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand = 0.0;
+                furnace.CoolingCoilSensDemand = 0.0;
+                furnace.CoolingCoilLatentDemand = SystemMoistureLoad;
+                furnace.HeatingCoilSensDemand = 0.0;
             }
             HeatingSensibleOutput = 0.0;
             HeatingLatentOutput = 0.0;
             ReheatCoilLoad = 0.0;
-            state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
-            state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
-            state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
-            state.dataFurnaces->Furnace(FurnaceNum).DehumidInducedHeatingDemandRate = 0.0;
+            furnace.CoolPartLoadRatio = 0.0;
+            furnace.HeatPartLoadRatio = 0.0;
+            furnace.CompPartLoadRatio = 0.0;
+            furnace.DehumidInducedHeatingDemandRate = 0.0;
 
             // When humidity control is used with cycling fan control and a heating load exists, if a moisture load
             // also exists, the heating PLR must be available for the cooling coil calculations.
             //*********** Heating Section ************
             // If Furnace runs with a heating load then set HeatCoilLoad on Heating Coil and the Mass Flow
             //         (Node(FurnaceInletNode)%MassFlowRate .gt. 0.0d0) .and. &
-            if ((ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) &&
-                (state.dataFurnaces->HeatingLoad)) {
+            if ((ScheduleManager::GetCurrentScheduleValue(state, furnace.SchedPtr) > 0.0) && (state.dataFurnaces->HeatingLoad)) {
 
                 //    Heat pumps only calculate a single PLR each time step (i.e. only cooling or heating allowed in a single time step)
-                if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
-                    (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
-                     state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple)) {
+                if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
+                    (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
+                     furnace.WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple)) {
 
-                    state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
+                    state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = furnace.MdotFurnace;
 
                     // Get no load result
                     if (OpMode == DataHVACGlobals::CycFanCycCoil) {
@@ -6902,8 +6893,8 @@ namespace Furnaces {
                     SetAverageAirFlow(state, FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
 
                     // Set the input parameters for CalcFurnaceOutput
-                    state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 0.0; // compressor off
-                    state.dataFurnaces->Furnace(FurnaceNum).WSHPRuntimeFrac = 0.0;
+                    furnace.CompPartLoadRatio = 0.0; // compressor off
+                    furnace.WSHPRuntimeFrac = 0.0;
 
                     CalcFurnaceOutput(state,
                                       FurnaceNum,
@@ -6920,10 +6911,10 @@ namespace Furnaces {
                                       false);
 
                     PartLoadRatio = 1.0;
-                    state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
+                    state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = furnace.MdotFurnace;
 
-                    state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 1.0; // compressor ON
-                    state.dataFurnaces->Furnace(FurnaceNum).WSHPRuntimeFrac = 1.0;
+                    furnace.CompPartLoadRatio = 1.0; // compressor ON
+                    furnace.WSHPRuntimeFrac = 1.0;
 
                     // Set fan part-load fraction equal to 1 while getting full load result
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
@@ -6949,8 +6940,7 @@ namespace Furnaces {
                     if (SystemSensibleLoad < FullSensibleOutput && SystemSensibleLoad > NoHeatOutput) {
 
                         // Calculate the part load ratio through iteration
-                        HeatErrorToler =
-                            state.dataFurnaces->Furnace(FurnaceNum).HeatingConvergenceTolerance; // Error tolerance for convergence from input deck
+                        HeatErrorToler = furnace.HeatingConvergenceTolerance; // Error tolerance for convergence from input deck
 
                         int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                         // HeatErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
@@ -6986,12 +6976,11 @@ namespace Furnaces {
                                                   OnOffAirFlowRatio,
                                                   false);
                                 if (std::abs(SystemSensibleLoad - TempHeatOutput) > DataHVACGlobals::SmallLoad) {
-                                    if (state.dataFurnaces->Furnace(FurnaceNum).DXHeatingMaxIterIndex == 0) {
-                                        ShowWarningMessage(
-                                            state,
-                                            format("Heating coil control failed to converge for {}:{}",
-                                                   DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                                   state.dataFurnaces->Furnace(FurnaceNum).Name));
+                                    if (furnace.DXHeatingMaxIterIndex == 0) {
+                                        ShowWarningMessage(state,
+                                                           format("Heating coil control failed to converge for {}:{}",
+                                                                  DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                                                  furnace.Name));
                                         ShowContinueError(state,
                                                           "  Iteration limit exceeded in calculating DX heating coil sensible part-load ratio.");
                                         ShowContinueErrorTimeStamp(
@@ -7003,20 +6992,19 @@ namespace Furnaces {
                                     }
                                     ShowRecurringWarningErrorAtEnd(
                                         state,
-                                        DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
-                                            state.dataFurnaces->Furnace(FurnaceNum).Name +
+                                        DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num) + " \"" + furnace.Name +
                                             "\" - Iteration limit exceeded in calculating DX sensible heating part-load ratio error continues. "
                                             "Sensible load statistics:",
-                                        state.dataFurnaces->Furnace(FurnaceNum).DXHeatingMaxIterIndex,
+                                        furnace.DXHeatingMaxIterIndex,
                                         SystemSensibleLoad,
                                         SystemSensibleLoad);
                                 }
                             } else if (SolFlag == -2) {
-                                if (state.dataFurnaces->Furnace(FurnaceNum).DXHeatingRegulaFalsiFailedIndex == 0) {
+                                if (furnace.DXHeatingRegulaFalsiFailedIndex == 0) {
                                     ShowWarningMessage(state,
                                                        format("Heating coil control failed for {}:{}",
-                                                              DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                                              state.dataFurnaces->Furnace(FurnaceNum).Name));
+                                                              DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                                              furnace.Name));
                                     ShowContinueError(state, "  DX sensible heating part-load ratio determined to be outside the range of 0-1.");
                                     ShowContinueErrorTimeStamp(
                                         state,
@@ -7025,54 +7013,50 @@ namespace Furnaces {
                                 }
                                 ShowRecurringWarningErrorAtEnd(
                                     state,
-                                    DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
-                                        state.dataFurnaces->Furnace(FurnaceNum).Name +
+                                    DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num) + " \"" + furnace.Name +
                                         "\" -  DX sensible heating part-load ratio out of range error continues. Sensible load statistics:",
-                                    state.dataFurnaces->Furnace(FurnaceNum).DXHeatingRegulaFalsiFailedIndex,
+                                    furnace.DXHeatingRegulaFalsiFailedIndex,
                                     SystemSensibleLoad,
                                     SystemSensibleLoad);
                             }
                         }
 
-                        state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = PartLoadRatio;
+                        furnace.HeatPartLoadRatio = PartLoadRatio;
                         //       Check if Heat Pump compressor is allowed to run based on outdoor temperature
-                        if (OutdoorDryBulbTemp > state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorHeating) {
-                            state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = PartLoadRatio;
+                        if (OutdoorDryBulbTemp > furnace.MinOATCompressorHeating) {
+                            furnace.CompPartLoadRatio = PartLoadRatio;
                         } else {
-                            state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
+                            furnace.CompPartLoadRatio = 0.0;
                         }
                     } else if (SystemSensibleLoad > FullSensibleOutput) {
                         //       SystemSensibleLoad is greater than full DX Heating coil output so heat pump runs entire
                         //       timestep and additional supplemental heating is required
-                        state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 1.0;
-                        if (OutdoorDryBulbTemp > state.dataFurnaces->Furnace(FurnaceNum).MinOATCompressorHeating) {
+                        furnace.HeatPartLoadRatio = 1.0;
+                        if (OutdoorDryBulbTemp > furnace.MinOATCompressorHeating) {
                             //       Check to see if Heat Pump compressor was allowed to run based on outdoor temperature
-                            state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 1.0;
+                            furnace.CompPartLoadRatio = 1.0;
                         } else {
-                            state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
+                            furnace.CompPartLoadRatio = 0.0;
                         }
                     } else if (SystemSensibleLoad < NoHeatOutput) {
                         //       SystemSensibleLoad is less than minimum DX Heating coil output so heat pump does not run and
                         //       the load will be met by the supplemental heater
-                        state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
-                        state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 1.0;
+                        furnace.CompPartLoadRatio = 0.0;
+                        furnace.HeatPartLoadRatio = 1.0;
                     }
-                    if (state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio == 1.0) {
+                    if (furnace.HeatPartLoadRatio == 1.0) {
                         //       Determine the load on the supplemental heating coil
-                        if ((SystemSensibleLoad - FullSensibleOutput) > state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity) {
-                            HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity;
-                            TempOutHeatingCoil = state.dataLoopNodes->Node(FurnaceOutletNode).Temp +
-                                                 HeatCoilLoad / (cpair * state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace);
+                        if ((SystemSensibleLoad - FullSensibleOutput) > furnace.DesignSuppHeatingCapacity) {
+                            HeatCoilLoad = furnace.DesignSuppHeatingCapacity;
+                            TempOutHeatingCoil = state.dataLoopNodes->Node(FurnaceOutletNode).Temp + HeatCoilLoad / (cpair * furnace.MdotFurnace);
                         } else if (SystemSensibleLoad < NoHeatOutput) {
                             HeatCoilLoad = max(0.0, SystemSensibleLoad); // BG 10/22/2008 need a case for when its all suppl heat
-                            TempOutHeatingCoil = state.dataLoopNodes->Node(FurnaceInletNode).Temp +
-                                                 HeatCoilLoad / (cpair * state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace);
+                            TempOutHeatingCoil = state.dataLoopNodes->Node(FurnaceInletNode).Temp + HeatCoilLoad / (cpair * furnace.MdotFurnace);
                         } else {
                             HeatCoilLoad = max(0.0, (SystemSensibleLoad - FullSensibleOutput));
-                            TempOutHeatingCoil = state.dataLoopNodes->Node(FurnaceOutletNode).Temp +
-                                                 HeatCoilLoad / (cpair * state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace);
+                            TempOutHeatingCoil = state.dataLoopNodes->Node(FurnaceOutletNode).Temp + HeatCoilLoad / (cpair * furnace.MdotFurnace);
                         }
-                        if (OutdoorDryBulbTemp > state.dataFurnaces->Furnace(FurnaceNum).MaxOATSuppHeat) {
+                        if (OutdoorDryBulbTemp > furnace.MaxOATSuppHeat) {
                             HeatCoilLoad = 0.0;
                             if (SystemSensibleLoad < NoHeatOutput) {
                                 TempOutHeatingCoil = state.dataLoopNodes->Node(FurnaceInletNode).Temp;
@@ -7080,13 +7064,13 @@ namespace Furnaces {
                                 TempOutHeatingCoil = state.dataLoopNodes->Node(FurnaceOutletNode).Temp;
                             }
                         }
-                        if ((TempOutHeatingCoil > state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp) && (HeatCoilLoad > 0.0)) {
+                        if ((TempOutHeatingCoil > furnace.DesignMaxOutletTemp) && (HeatCoilLoad > 0.0)) {
                             // deltaT = Furnace(FurnaceNum)%DesignMaxOutletTemp - Node(FurnaceOutletNode)%Temp
                             // BG 10/22/2008 above made no sense if DX heat is off and its all supplemental,
                             //  because Node(FurnaceOutletNode)%Temp will have been calc'd with full DX heat in last faux call to CalcFurnaceOutput
 
                             Real64 cpairSupply = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(FurnaceInletNode).HumRat);
-                            deltaT = (state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp - TempOutHeatingCoil);
+                            deltaT = (furnace.DesignMaxOutletTemp - TempOutHeatingCoil);
                             HeatCoilLoad += (state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate * cpairSupply * deltaT);
                             HeatCoilLoad = max(0.0, HeatCoilLoad);
                         }
@@ -7100,8 +7084,8 @@ namespace Furnaces {
                 } else { // else not a heatpump DX coil ** non-HP heating coils are not DX so testing if OutdoorDryBulbTemp < MinOATCompressorHeating
                          // is not necessary **
 
-                    state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
-                    HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity;
+                    state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = furnace.MdotFurnace;
+                    HeatCoilLoad = furnace.DesignHeatingCapacity;
                     SystemSensibleLoad = ZoneLoad;
 
                     // Get no load result
@@ -7131,7 +7115,7 @@ namespace Furnaces {
                                       false);
 
                     if (NoHeatOutput < SystemSensibleLoad) {
-                        state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
+                        state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = furnace.MdotFurnace;
 
                         // Set fan part-load fraction equal to 1 while getting full load result
                         state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
@@ -7167,7 +7151,7 @@ namespace Furnaces {
                             if (state.dataFurnaces->ModifiedHeatCoilLoad > 0.0) {
                                 HeatCoilLoad = state.dataFurnaces->ModifiedHeatCoilLoad;
                             } else {
-                                HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity;
+                                HeatCoilLoad = furnace.DesignHeatingCapacity;
                             }
                         } else if (NoHeatOutput >= SystemSensibleLoad) {
                             PartLoadRatio = 0.0;
@@ -7175,8 +7159,7 @@ namespace Furnaces {
                         } else {
 
                             // Calculate the part load ratio through iteration
-                            HeatErrorToler = state.dataFurnaces->Furnace(FurnaceNum)
-                                                 .HeatingConvergenceTolerance; // Error tolerance for convergence from input deck
+                            HeatErrorToler = furnace.HeatingConvergenceTolerance; // Error tolerance for convergence from input deck
 
                             int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                             // HeatErrorToler is in fraction load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
@@ -7201,7 +7184,7 @@ namespace Furnaces {
                             if (state.dataFurnaces->ModifiedHeatCoilLoad > 0.0) {
                                 HeatCoilLoad = state.dataFurnaces->ModifiedHeatCoilLoad;
                             } else {
-                                HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity * PartLoadRatio;
+                                HeatCoilLoad = furnace.DesignHeatingCapacity * PartLoadRatio;
                             }
                             if (SolFlag == -1) {
 
@@ -7212,7 +7195,7 @@ namespace Furnaces {
                                 while ((TempHeatOutput - SystemSensibleLoad) < 0.0 && TempMaxPLR < 1.0) {
                                     //             find upper limit of HeatingPLR
                                     TempMaxPLR += 0.1;
-                                    HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity * TempMaxPLR;
+                                    HeatCoilLoad = furnace.DesignHeatingCapacity * TempMaxPLR;
                                     CalcFurnaceOutput(state,
                                                       FurnaceNum,
                                                       FirstHVACIteration,
@@ -7235,7 +7218,7 @@ namespace Furnaces {
                                     //             find minimum limit of HeatingPLR
                                     TempMinPLR -= 0.01;
 
-                                    HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity * TempMinPLR;
+                                    HeatCoilLoad = furnace.DesignHeatingCapacity * TempMinPLR;
                                     CalcFurnaceOutput(state,
                                                       FurnaceNum,
                                                       FirstHVACIteration,
@@ -7269,7 +7252,7 @@ namespace Furnaces {
                                 if (state.dataFurnaces->ModifiedHeatCoilLoad > 0.0) {
                                     HeatCoilLoad = state.dataFurnaces->ModifiedHeatCoilLoad;
                                 } else {
-                                    HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity * PartLoadRatio;
+                                    HeatCoilLoad = furnace.DesignHeatingCapacity * PartLoadRatio;
                                 }
                                 CalcFurnaceOutput(state,
                                                   FurnaceNum,
@@ -7287,12 +7270,11 @@ namespace Furnaces {
 
                                 //           After iterating with tighter boundaries, if still out of tolerance, show warning.
                                 if (SolFlag == -1 && std::abs(SystemSensibleLoad - TempHeatOutput) > DataHVACGlobals::SmallLoad) {
-                                    if (state.dataFurnaces->Furnace(FurnaceNum).HeatingMaxIterIndex == 0) {
-                                        ShowWarningMessage(
-                                            state,
-                                            format("Heating coil control failed to converge for {}:{}",
-                                                   DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                                   state.dataFurnaces->Furnace(FurnaceNum).Name));
+                                    if (furnace.HeatingMaxIterIndex == 0) {
+                                        ShowWarningMessage(state,
+                                                           format("Heating coil control failed to converge for {}:{}",
+                                                                  DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                                                  furnace.Name));
                                         ShowContinueError(state, "  Iteration limit exceeded in calculating heating coil sensible part-load ratio.");
                                         ShowContinueErrorTimeStamp(state,
                                                                    format("Sensible load to be met by heating coil = {:.2T} (watts), sensible output "
@@ -7300,22 +7282,20 @@ namespace Furnaces {
                                                                           SystemSensibleLoad,
                                                                           TempHeatOutput));
                                     }
-                                    ShowRecurringWarningErrorAtEnd(
-                                        state,
-                                        DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
-                                            state.dataFurnaces->Furnace(FurnaceNum).Name +
-                                            "\" - Iteration limit exceeded in calculating sensible heating part-load "
-                                            "ratio error continues. Sensible load statistics:",
-                                        state.dataFurnaces->Furnace(FurnaceNum).HeatingMaxIterIndex,
-                                        SystemSensibleLoad,
-                                        SystemSensibleLoad);
+                                    ShowRecurringWarningErrorAtEnd(state,
+                                                                   DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num) + " \"" + furnace.Name +
+                                                                       "\" - Iteration limit exceeded in calculating sensible heating part-load "
+                                                                       "ratio error continues. Sensible load statistics:",
+                                                                   furnace.HeatingMaxIterIndex,
+                                                                   SystemSensibleLoad,
+                                                                   SystemSensibleLoad);
                                 }
                             } else if (SolFlag == -2) {
-                                if (state.dataFurnaces->Furnace(FurnaceNum).HeatingRegulaFalsiFailedIndex == 0) {
+                                if (furnace.HeatingRegulaFalsiFailedIndex == 0) {
                                     ShowWarningMessage(state,
                                                        format("Heating coil control failed for {}:{}",
-                                                              DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                                              state.dataFurnaces->Furnace(FurnaceNum).Name));
+                                                              DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                                              furnace.Name));
                                     ShowContinueError(state, "  Sensible heating part-load ratio determined to be outside the range of 0-1.");
                                     ShowContinueErrorTimeStamp(
                                         state,
@@ -7324,10 +7304,9 @@ namespace Furnaces {
                                 }
                                 ShowRecurringWarningErrorAtEnd(
                                     state,
-                                    DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
-                                        state.dataFurnaces->Furnace(FurnaceNum).Name +
+                                    DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num) + " \"" + furnace.Name +
                                         "\" -  Sensible heating part-load ratio out of range error continues. Sensible load statistics:",
-                                    state.dataFurnaces->Furnace(FurnaceNum).HeatingRegulaFalsiFailedIndex,
+                                    furnace.HeatingRegulaFalsiFailedIndex,
                                     SystemSensibleLoad,
                                     SystemSensibleLoad);
                             }
@@ -7336,7 +7315,7 @@ namespace Furnaces {
                     } else { // ELSE from IF(FullSensibleOutput.GT.NoSensibleOutput)THEN above
                         // Set part load ratio to 1 and run heater at design heating capacity
                         PartLoadRatio = 1.0;
-                        HeatCoilLoad = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity;
+                        HeatCoilLoad = furnace.DesignHeatingCapacity;
                     }
 
                 } // End of IF HeatPump
@@ -7345,14 +7324,14 @@ namespace Furnaces {
 
             // Non-heat pump systems do not set a heating PLR, set it here for use with the DX cooling coil calculations.
             // Set this variable back to 0 for non-heat pump systems at the end of this routine.
-            state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = max(PartLoadRatio, state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio);
+            furnace.HeatPartLoadRatio = max(PartLoadRatio, furnace.HeatPartLoadRatio);
             CalcFurnaceOutput(state,
                               FurnaceNum,
                               FirstHVACIteration,
                               OpMode,
                               CompressorOp,
                               0.0,
-                              state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio,
+                              furnace.HeatPartLoadRatio,
                               HeatCoilLoad,
                               0.0,
                               HeatingSensibleOutput,
@@ -7360,9 +7339,9 @@ namespace Furnaces {
                               OnOffAirFlowRatio,
                               false);
 
-            if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
-                (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
-                 state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple && state.dataFurnaces->CoolingLoad)) {
+            if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
+                (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
+                 furnace.WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple && state.dataFurnaces->CoolingLoad)) {
                 HeatingSensibleOutput = 0.0;
                 HeatingLatentOutput = 0.0;
             }
@@ -7370,12 +7349,10 @@ namespace Furnaces {
             // Simulate if scheduled ON and cooling load or if a moisture load exists when using a humidistat
             // Check of HeatingLatentOutput is used to reduce overshoot during simultaneous heating and cooling
             // Setback flag is used to avoid continued RH control when Tstat is setback (RH should float down)
-            if ((ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0 &&
-                 state.dataFurnaces->CoolingLoad) ||
-                (state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                 state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat &&
+            if ((ScheduleManager::GetCurrentScheduleValue(state, furnace.SchedPtr) > 0.0 && state.dataFurnaces->CoolingLoad) ||
+                (furnace.Humidistat && furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat &&
                  (SystemMoistureLoad < 0.0 || (SystemMoistureLoad >= 0.0 && HeatingLatentOutput > SystemMoistureLoad &&
-                                               !state.dataZoneEnergyDemand->Setback(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum))))) {
+                                               !state.dataZoneEnergyDemand->Setback(furnace.ControlZoneNum))))) {
 
                 //     For cooling operation, the first step is to set the HX operation flag in case a HX assisted coil is used.
                 //      (if a HX assisted coil is not used, this flag is not used. It's only used in the CALL to SimHXAssistedCoolingCoil)
@@ -7384,8 +7361,8 @@ namespace Furnaces {
                 //           For dehumidification control option Multimode, the system is operated first with the HX off.
                 //           If the moisture load is not met, the HX will then be turned on and the system is re-simulated.
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat ||
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::None) {
+                if (furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat ||
+                    furnace.DehumidControlType_Num == DehumidificationControlMode::None) {
                     HXUnitOn = true;
                 } else {
                     HXUnitOn = false;
@@ -7396,20 +7373,18 @@ namespace Furnaces {
                 //     Set the inlet mass flow rate based on user specified coil OFF flow rate
                 PartLoadRatio = 0.0;
 
-                state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 0.0; // compressor off
-                state.dataFurnaces->Furnace(FurnaceNum).WSHPRuntimeFrac = 0.0;
+                furnace.CompPartLoadRatio = 0.0; // compressor off
+                furnace.WSHPRuntimeFrac = 0.0;
 
                 //     SetAverageAirFlow calculates the operating mass flow rate based on PLR and the user specified inputs
                 //     for MaxCoolAirMassFlow and MaxNoCoolHeatAirMassFlow.
                 //     Air flow rate is set according to max of cooling and heating PLR if heating and latent load exists.
-                if (OpMode == DataHVACGlobals::CycFanCycCoil && state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio > 0.0 &&
-                    state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat &&
+                if (OpMode == DataHVACGlobals::CycFanCycCoil && furnace.HeatPartLoadRatio > 0.0 && furnace.Humidistat &&
+                    furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat &&
                     (SystemMoistureLoad < 0.0 || (SystemMoistureLoad >= 0.0 && HeatingLatentOutput > SystemMoistureLoad &&
-                                                  !state.dataZoneEnergyDemand->Setback(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)))) {
-                    CoolingHeatingPLRRatio = min(1.0, PartLoadRatio / state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio);
-                    SetAverageAirFlow(
-                        state, FurnaceNum, max(PartLoadRatio, state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio), OnOffAirFlowRatio);
+                                                  !state.dataZoneEnergyDemand->Setback(furnace.ControlZoneNum)))) {
+                    CoolingHeatingPLRRatio = min(1.0, PartLoadRatio / furnace.HeatPartLoadRatio);
+                    SetAverageAirFlow(state, FurnaceNum, max(PartLoadRatio, furnace.HeatPartLoadRatio), OnOffAirFlowRatio);
 
                 } else {
                     CoolingHeatingPLRRatio = 1.0;
@@ -7435,14 +7410,14 @@ namespace Furnaces {
                 //     Don't calculate full load output if no load output can meet sensible load
                 if (NoCoolOutput >= CoolCoilLoad && (CoolCoilLoad != 0.0 || state.dataFurnaces->HPDehumidificationLoadFlag)) {
                     //       Set full mass flow rate for full load calculation
-                    state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
+                    state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = furnace.MdotFurnace;
 
                     // Set fan part-load fraction equal to 1 while getting full load result
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
                     OnOffAirFlowRatio = 1.0;
                     PartLoadRatio = 1.0;
-                    state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 1.0; // compressor ON
-                    state.dataFurnaces->Furnace(FurnaceNum).WSHPRuntimeFrac = 1.0;
+                    furnace.CompPartLoadRatio = 1.0; // compressor ON
+                    furnace.WSHPRuntimeFrac = 1.0;
 
                     // Get full load result (coils simulated full ON)
                     CalcFurnaceOutput(state,
@@ -7482,8 +7457,7 @@ namespace Furnaces {
                         } else {
 
                             // Calculate the sensible part load ratio through iteration
-                            CoolErrorToler = state.dataFurnaces->Furnace(FurnaceNum)
-                                                 .CoolingConvergenceTolerance; // Error tolerance for convergence from input deck
+                            CoolErrorToler = furnace.CoolingConvergenceTolerance; // Error tolerance for convergence from input deck
                             int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                             Real64 par8_HXFlag = HXUnitOn ? 1.0 : 0.0;
                             // CoolErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
@@ -7521,12 +7495,11 @@ namespace Furnaces {
                                                       HXUnitOn);
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (std::abs(CoolCoilLoad - TempCoolOutput) > DataHVACGlobals::SmallLoad) {
-                                            if (state.dataFurnaces->Furnace(FurnaceNum).SensibleMaxIterIndex == 0) {
-                                                ShowWarningMessage(
-                                                    state,
-                                                    format("Cooling coil control failed to converge for {}:{}",
-                                                           DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                                           state.dataFurnaces->Furnace(FurnaceNum).Name));
+                                            if (furnace.SensibleMaxIterIndex == 0) {
+                                                ShowWarningMessage(state,
+                                                                   format("Cooling coil control failed to converge for {}:{}",
+                                                                          DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                                                          furnace.Name));
                                                 ShowContinueError(
                                                     state, "  Iteration limit exceeded in calculating DX cooling coil sensible part-load ratio.");
                                                 ShowContinueErrorTimeStamp(state,
@@ -7535,35 +7508,32 @@ namespace Furnaces {
                                                                                   CoolCoilLoad,
                                                                                   TempCoolOutput));
                                             }
-                                            ShowRecurringWarningErrorAtEnd(
-                                                state,
-                                                DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
-                                                    state.dataFurnaces->Furnace(FurnaceNum).Name +
-                                                    "\" - Iteration limit exceeded in calculating sensible cooling "
-                                                    "part-load ratio error continues. Sensible load statistics:",
-                                                state.dataFurnaces->Furnace(FurnaceNum).SensibleMaxIterIndex,
-                                                CoolCoilLoad,
-                                                CoolCoilLoad);
+                                            ShowRecurringWarningErrorAtEnd(state,
+                                                                           DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num) + " \"" +
+                                                                               furnace.Name +
+                                                                               "\" - Iteration limit exceeded in calculating sensible cooling "
+                                                                               "part-load ratio error continues. Sensible load statistics:",
+                                                                           furnace.SensibleMaxIterIndex,
+                                                                           CoolCoilLoad,
+                                                                           CoolCoilLoad);
                                         }
                                     }
                                 } else if (SolFlag == -2) {
                                     if (!state.dataGlobal->WarmupFlag) {
-                                        if (state.dataFurnaces->Furnace(FurnaceNum).SensibleRegulaFalsiFailedIndex == 0) {
-                                            ShowWarningMessage(
-                                                state,
-                                                format("Cooling coil control failed for {}:{}",
-                                                       DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                                       state.dataFurnaces->Furnace(FurnaceNum).Name));
+                                        if (furnace.SensibleRegulaFalsiFailedIndex == 0) {
+                                            ShowWarningMessage(state,
+                                                               format("Cooling coil control failed for {}:{}",
+                                                                      DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                                                      furnace.Name));
                                             ShowContinueError(state, "  Cooling sensible part-load ratio determined to be outside the range of 0-1.");
                                             ShowContinueErrorTimeStamp(state, format("  Cooling sensible load = {:.2T}", CoolCoilLoad));
                                         }
                                         ShowRecurringWarningErrorAtEnd(
                                             state,
-                                            DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
-                                                state.dataFurnaces->Furnace(FurnaceNum).Name +
+                                            DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num) + " \"" + furnace.Name +
                                                 "\" - Cooling sensible part-load ratio out of range error continues. Sensible cooling load "
                                                 "statistics:",
-                                            state.dataFurnaces->Furnace(FurnaceNum).SensibleRegulaFalsiFailedIndex,
+                                            furnace.SensibleRegulaFalsiFailedIndex,
                                             CoolCoilLoad,
                                             CoolCoilLoad);
                                     }
@@ -7582,7 +7552,7 @@ namespace Furnaces {
                                       OpMode,
                                       CompressorOp,
                                       PartLoadRatio,
-                                      state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio,
+                                      furnace.HeatPartLoadRatio,
                                       0.0,
                                       0.0,
                                       TempCoolOutput,
@@ -7595,20 +7565,19 @@ namespace Furnaces {
                     //       IF this furnace uses MultiMode control AND there is a moisture load AND the moisture load met by the furnace in
                     //       cooling only mode above is sufficient to meet the moisture demand OR there is no sensible load (PLR=0 from above)
                     //       then set LatentPartLoadRatio to 0 (no additional dehumidification is required).
-                    if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode &&
+                    if (furnace.DehumidControlType_Num == DehumidificationControlMode::Multimode &&
                         ((SystemMoistureLoad < 0.0 && TempLatentOutput < SystemMoistureLoad) || PartLoadRatio == 0.0)) {
                         LatentPartLoadRatio = 0.0;
                         //       ELSE calculate a new PLR for valid dehumidification control types if a moisture load exists.
-                    } else if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num != DehumidificationControlMode::None &&
-                               (SystemMoistureLoad < 0.0 ||
-                                (SystemMoistureLoad >= 0.0 && TempLatentOutput > SystemMoistureLoad &&
-                                 !state.dataZoneEnergyDemand->Setback(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)))) {
+                    } else if (furnace.DehumidControlType_Num != DehumidificationControlMode::None &&
+                               (SystemMoistureLoad < 0.0 || (SystemMoistureLoad >= 0.0 && TempLatentOutput > SystemMoistureLoad &&
+                                                             !state.dataZoneEnergyDemand->Setback(furnace.ControlZoneNum)))) {
 
                         //         IF the furnace uses dehumidification control MultiMode, turn on the HX and calculate the latent output with
                         //         the HX ON to compare to the moisture load predicted by the humidistat.
-                        if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode) {
+                        if (furnace.DehumidControlType_Num == DehumidificationControlMode::Multimode) {
                             HXUnitOn = true;
-                            state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
+                            state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = furnace.MdotFurnace;
                             // Set fan part-load fraction equal to 1 while getting full load result
                             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
                             OnOffAirFlowRatio = 1.0;
@@ -7633,13 +7602,13 @@ namespace Furnaces {
 
                         if (TempLatentOutput > SystemMoistureLoad) {
                             //           Set full mass flow rate for full load calculation
-                            state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
+                            state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = furnace.MdotFurnace;
 
                             // Set fan part-load fraction equal to 1 while getting full load result
                             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
                             OnOffAirFlowRatio = 1.0;
-                            state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 1.0; // compressor ON
-                            state.dataFurnaces->Furnace(FurnaceNum).WSHPRuntimeFrac = 1.0;
+                            furnace.CompPartLoadRatio = 1.0; // compressor ON
+                            furnace.WSHPRuntimeFrac = 1.0;
 
                             // Get full load result (coils simulated full ON)
                             CalcFurnaceOutput(state,
@@ -7659,35 +7628,33 @@ namespace Furnaces {
 
                         // check bounds on latent output prior to iteration using RegulaFalsi
                         if (TempLatentOutput > SystemMoistureLoad ||
-                            (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode &&
-                             TempCoolOutput > CoolCoilLoad)) {
+                            (furnace.DehumidControlType_Num == DehumidificationControlMode::Multimode && TempCoolOutput > CoolCoilLoad)) {
                             LatentPartLoadRatio = 1.0;
                         } else if (NoLatentOutput < SystemMoistureLoad || HeatingLatentOutput < SystemMoistureLoad) {
                             LatentPartLoadRatio = 0.0;
                         } else {
 
-                            CoolErrorToler = state.dataFurnaces->Furnace(FurnaceNum).CoolingConvergenceTolerance; // Error tolerance for convergence
+                            CoolErrorToler = furnace.CoolingConvergenceTolerance; // Error tolerance for convergence
 
                             int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                             // Multimode always controls to meet the SENSIBLE load (however, HXUnitOn is now TRUE)
                             Real64 par4_load;
-                            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode) {
+                            if (furnace.DehumidControlType_Num == DehumidificationControlMode::Multimode) {
                                 par4_load = CoolCoilLoad;
                             } else {
                                 par4_load = SystemMoistureLoad;
                             }
                             // Multimode always controls to meet the SENSIBLE load (however, HXUnitOn is now TRUE)
                             Real64 par6_LatentSens;
-                            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode) {
+                            if (furnace.DehumidControlType_Num == DehumidificationControlMode::Multimode) {
                                 par6_LatentSens = 1.0;
                             } else {
                                 par6_LatentSens = 0.0;
                             }
                             Real64 par8_HXUnit = HXUnitOn ? 1.0 : 0.0;
                             Real64 par9_HtgCoilPLR;
-                            if (OpMode == DataHVACGlobals::CycFanCycCoil && state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio > 0.0 &&
-                                par6_LatentSens == 0.0) {
-                                par9_HtgCoilPLR = state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio;
+                            if (OpMode == DataHVACGlobals::CycFanCycCoil && furnace.HeatPartLoadRatio > 0.0 && par6_LatentSens == 0.0) {
+                                par9_HtgCoilPLR = furnace.HeatPartLoadRatio;
                             } else {
                                 par9_HtgCoilPLR = 0.0;
                             }
@@ -7733,7 +7700,7 @@ namespace Furnaces {
                                         //                 Par(10) = Furnace(FurnaceNum)%HeatPartLoadRatio
                                         //                 OpMode = CycFan and Furnace(FurnaceNum)%HeatPartLoadRatio must be > 0 for Part(10) to be
                                         //                 greater than 0
-                                        CoolingHeatingPLRRatio = min(1.0, TempMaxPLR / state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio);
+                                        CoolingHeatingPLRRatio = min(1.0, TempMaxPLR / furnace.HeatPartLoadRatio);
                                     } else {
                                         CoolingHeatingPLRRatio = 1.0;
                                     }
@@ -7769,7 +7736,7 @@ namespace Furnaces {
                                         //                 the PLR to be 0, otherwise RegulaFalsi can fail when a heating and moisture load exists and
                                         //                 heating PLR > latent PLR.
                                         TempMinPLR2 = max(0.0000000001, TempMinPLR);
-                                        CoolingHeatingPLRRatio = min(1.0, TempMinPLR2 / state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio);
+                                        CoolingHeatingPLRRatio = min(1.0, TempMinPLR2 / furnace.HeatPartLoadRatio);
                                     } else {
                                         TempMinPLR2 = TempMinPLR;
                                         CoolingHeatingPLRRatio = 1.0;
@@ -7822,8 +7789,7 @@ namespace Furnaces {
                                         //                 Par(10) = Furnace(FurnaceNum)%HeatPartLoadRatio
                                         //                 OpMode = CycFan and Furnace(FurnaceNum)%HeatPartLoadRatio must be > 0 for Part(10) to be
                                         //                 greater than 0
-                                        CoolingHeatingPLRRatio =
-                                            min(1.0, LatentPartLoadRatio / state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio);
+                                        CoolingHeatingPLRRatio = min(1.0, LatentPartLoadRatio / furnace.HeatPartLoadRatio);
                                     } else {
                                         CoolingHeatingPLRRatio = 1.0;
                                     }
@@ -7845,12 +7811,11 @@ namespace Furnaces {
                                     if (std::abs((SystemMoistureLoad - TempLatentOutput) / SystemMoistureLoad) > CoolErrorToler &&
                                         std::abs(SystemMoistureLoad - TempLatentOutput) > 10.0) {
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (state.dataFurnaces->Furnace(FurnaceNum).LatentMaxIterIndex == 0) {
-                                                ShowWarningMessage(
-                                                    state,
-                                                    format("Cooling coil control failed to converge for {}:{}",
-                                                           DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                                           state.dataFurnaces->Furnace(FurnaceNum).Name));
+                                            if (furnace.LatentMaxIterIndex == 0) {
+                                                ShowWarningMessage(state,
+                                                                   format("Cooling coil control failed to converge for {}:{}",
+                                                                          DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                                                          furnace.Name));
                                                 ShowContinueError(state,
                                                                   "  Iteration limit exceeded in calculating cooling coil latent part-load ratio.");
                                                 ShowContinueError(
@@ -7865,22 +7830,20 @@ namespace Furnaces {
                                             }
                                             ShowRecurringWarningErrorAtEnd(
                                                 state,
-                                                DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
-                                                    state.dataFurnaces->Furnace(FurnaceNum).Name +
+                                                DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num) + " \"" + furnace.Name +
                                                     "\" - Iteration limit exceeded in calculating latent part-load ratio error continues. Latent "
                                                     "load convergence error (percent) statistics follow.",
-                                                state.dataFurnaces->Furnace(FurnaceNum).LatentMaxIterIndex,
+                                                furnace.LatentMaxIterIndex,
                                                 100.0 * std::abs((SystemMoistureLoad - TempLatentOutput) / SystemMoistureLoad),
                                                 100.0 * std::abs((SystemMoistureLoad - TempLatentOutput) / SystemMoistureLoad));
                                         }
                                     }
                                 } else if (SolFlag == -2) {
-                                    if (state.dataFurnaces->Furnace(FurnaceNum).LatentRegulaFalsiFailedIndex2 == 0) {
-                                        ShowWarningMessage(
-                                            state,
-                                            format("Cooling coil control failed for {}:{}",
-                                                   DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                                   state.dataFurnaces->Furnace(FurnaceNum).Name));
+                                    if (furnace.LatentRegulaFalsiFailedIndex2 == 0) {
+                                        ShowWarningMessage(state,
+                                                           format("Cooling coil control failed for {}:{}",
+                                                                  DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                                                  furnace.Name));
                                         ShowContinueError(state,
                                                           format("  Latent part-load ratio determined to be outside the range of {:.3T} to {:.3T}.",
                                                                  TempMinPLR,
@@ -7890,29 +7853,27 @@ namespace Furnaces {
                                     }
                                     ShowRecurringWarningErrorAtEnd(
                                         state,
-                                        DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
-                                            state.dataFurnaces->Furnace(FurnaceNum).Name +
+                                        DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num) + " \"" + furnace.Name +
                                             "\" - Cooling sensible part-load ratio out of range error continues. System moisture load statistics:",
-                                        state.dataFurnaces->Furnace(FurnaceNum).LatentRegulaFalsiFailedIndex2,
+                                        furnace.LatentRegulaFalsiFailedIndex2,
                                         SystemMoistureLoad,
                                         SystemMoistureLoad);
                                     LatentPartLoadRatio = TempMinPLR;
                                 }
                             } else if (SolFlag == -2) {
-                                if (state.dataFurnaces->Furnace(FurnaceNum).LatentRegulaFalsiFailedIndex == 0) {
+                                if (furnace.LatentRegulaFalsiFailedIndex == 0) {
                                     ShowWarningMessage(state,
                                                        format("Cooling coil control failed for {}:{}",
-                                                              DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
-                                                              state.dataFurnaces->Furnace(FurnaceNum).Name));
+                                                              DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num),
+                                                              furnace.Name));
                                     ShowContinueError(state, "  Latent part-load ratio determined to be outside the range of 0-1.");
                                     ShowContinueErrorTimeStamp(state, "A PLR of 0 will be used and the simulation continues.");
                                 }
                                 ShowRecurringWarningErrorAtEnd(
                                     state,
-                                    DataHVACGlobals::cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + " \"" +
-                                        state.dataFurnaces->Furnace(FurnaceNum).Name +
+                                    DataHVACGlobals::cFurnaceTypes(furnace.FurnaceType_Num) + " \"" + furnace.Name +
                                         "\" - Latent part-load ratio out of range or 0-1 error continues. System moisture load statistics:",
-                                    state.dataFurnaces->Furnace(FurnaceNum).LatentRegulaFalsiFailedIndex,
+                                    furnace.LatentRegulaFalsiFailedIndex,
                                     SystemMoistureLoad,
                                     SystemMoistureLoad);
                                 LatentPartLoadRatio = 0.0;
@@ -7943,10 +7904,10 @@ namespace Furnaces {
 
                     //       IF a humidistat is used and there is a moisture load, check if the latent PLR is greater than the (sensible) PLR
                     //        IF(LatentPartLoadRatio .GT. PartLoadRatio .and. SystemMoistureLoad .lt. 0.0 .and. Furnace(FurnaceNum)%Humidistat) THEN
-                    if (LatentPartLoadRatio > PartLoadRatio && state.dataFurnaces->Furnace(FurnaceNum).Humidistat) {
+                    if (LatentPartLoadRatio > PartLoadRatio && furnace.Humidistat) {
                         // For dehumidification mode CoolReheat, compare the Sensible and Latent PLR values, if latentPLR is greater
                         // than PLR (sensible), then overcooling is required and reheat will be activated using the HumControl flag.
-                        if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
+                        if (furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
                             PartLoadRatio = LatentPartLoadRatio;
                             HumControl = true;
                         }
@@ -7954,16 +7915,16 @@ namespace Furnaces {
                         // greater than PLR (sensible), then use the latent PLR to control the unit.
                         // For MultiMode control, the latent PLR is found by enabling the HX and calculating a PLR required to meet the
                         // sensible load. Overcooling is not required, and reheat will not be activated using the HumControl flag.
-                        if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode) {
+                        if (furnace.DehumidControlType_Num == DehumidificationControlMode::Multimode) {
                             PartLoadRatio = LatentPartLoadRatio;
                         }
                     }
 
-                    state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = PartLoadRatio;
+                    furnace.CoolPartLoadRatio = PartLoadRatio;
                     if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
-                        state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
+                        furnace.CompPartLoadRatio = 0.0;
                     } else {
-                        state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = PartLoadRatio;
+                        furnace.CompPartLoadRatio = PartLoadRatio;
                     }
 
                 } else { // ELSE from IF(FullSensibleOutput.LT.NoCoolOutput)THEN above
@@ -7978,28 +7939,27 @@ namespace Furnaces {
                     // Additional logic is used here to make sure the coil actually turned on, e.g., if DX coil PLR > 0 then set to 1,
                     // otherwise 0 (to make sure coil is actually ON and not off due to schedule, OAT, or other reason).
                     // The global variable DXCoilPartLoadRatio(DXCoilNum) is not yet used for the WSHP to make the same check.
-                    if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
-                        state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
-                        state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
+                    if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
+                        furnace.CoolPartLoadRatio = 0.0;
+                        furnace.CompPartLoadRatio = 0.0;
                     } else {
-                        if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
+                        if (furnace.CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
 
                             // VS coil issue here...
-                            if (state.dataDXCoils->DXCoilPartLoadRatio(state.dataFurnaces->Furnace(FurnaceNum).ActualDXCoilIndexForHXAssisted) >
-                                0.0) {
-                                state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 1.0;
-                                state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 1.0;
+                            if (state.dataDXCoils->DXCoilPartLoadRatio(furnace.ActualDXCoilIndexForHXAssisted) > 0.0) {
+                                furnace.CoolPartLoadRatio = 1.0;
+                                furnace.CompPartLoadRatio = 1.0;
                             } else {
-                                state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
-                                state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
+                                furnace.CoolPartLoadRatio = 0.0;
+                                furnace.CompPartLoadRatio = 0.0;
                             }
                         } else {
-                            if (state.dataDXCoils->DXCoilPartLoadRatio(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex) > 0.0) {
-                                state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 1.0;
-                                state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 1.0;
+                            if (state.dataDXCoils->DXCoilPartLoadRatio(furnace.CoolingCoilIndex) > 0.0) {
+                                furnace.CoolPartLoadRatio = 1.0;
+                                furnace.CompPartLoadRatio = 1.0;
                             } else {
-                                state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
-                                state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
+                                furnace.CoolPartLoadRatio = 0.0;
+                                furnace.CompPartLoadRatio = 0.0;
                             }
                         }
                     }
@@ -8007,33 +7967,32 @@ namespace Furnaces {
 
                 //     Calculate the reheat coil output
                 if (HumControl) { // HumControl = .TRUE. if a Humidistat is installed and dehumdification control type is CoolReheat
-                    if (state.dataFurnaces->Furnace(FurnaceNum).ZoneSequenceHeatingNum > 0) {
-                        QToHeatSetPt = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
-                                            .SequencedOutputRequiredToHeatingSP(state.dataFurnaces->Furnace(FurnaceNum).ZoneSequenceHeatingNum) /
-                                        state.dataFurnaces->Furnace(FurnaceNum).ControlZoneMassFlowFrac);
+                    if (furnace.ZoneSequenceHeatingNum > 0) {
+                        QToHeatSetPt = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(furnace.ControlZoneNum)
+                                            .SequencedOutputRequiredToHeatingSP(furnace.ZoneSequenceHeatingNum) /
+                                        furnace.ControlZoneMassFlowFrac);
                     } else {
-                        QToHeatSetPt = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)
-                                            .OutputRequiredToHeatingSP /
-                                        state.dataFurnaces->Furnace(FurnaceNum).ControlZoneMassFlowFrac);
+                        QToHeatSetPt = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(furnace.ControlZoneNum).OutputRequiredToHeatingSP /
+                                        furnace.ControlZoneMassFlowFrac);
                     }
                     //       Cooling mode or floating condition and dehumidification is required
                     if (QToHeatSetPt < 0.0) {
                         //         Calculate the reheat coil load wrt the heating setpoint temperature. Reheat coil picks up
                         //         the entire excess sensible cooling (DX cooling coil and impact of outdoor air).
                         ReheatCoilLoad = max(0.0, (QToHeatSetPt - ActualSensibleOutput));
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidInducedHeatingDemandRate = ReheatCoilLoad;
+                        furnace.DehumidInducedHeatingDemandRate = ReheatCoilLoad;
                         //       Heating mode and dehumidification is required
                     } else {
                         //         Calculate the reheat coil load as the sensible capacity of the DX cooling coil only. Let
                         //         the heating coil pick up the load due to outdoor air.
                         ReheatCoilLoad = max(0.0, (ActualSensibleOutput - NoCoolOutput) * (-1.0));
                         //         Dehumidification is not required
-                        if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
-                            (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
-                             state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple)) {
+                        if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
+                            (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
+                             furnace.WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple)) {
                             ReheatCoilLoad = max(QToHeatSetPt, QToHeatSetPt - ActualSensibleOutput);
                         }
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidInducedHeatingDemandRate = max(0.0, ActualSensibleOutput * (-1.0));
+                        furnace.DehumidInducedHeatingDemandRate = max(0.0, ActualSensibleOutput * (-1.0));
                     }
                 } else {
                     //       No humidistat installed
@@ -8052,58 +8011,50 @@ namespace Furnaces {
             if (HumControl && SystemMoistureLoad < 0.0) {
                 if (OpMode == DataHVACGlobals::CycFanCycCoil) {
                     //       set the flow rate at the maximum of the cooling and heating PLR's
-                    SetAverageAirFlow(
-                        state,
-                        FurnaceNum,
-                        max(state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio, state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio),
-                        OnOffAirFlowRatio);
+                    SetAverageAirFlow(state, FurnaceNum, max(furnace.CoolPartLoadRatio, furnace.HeatPartLoadRatio), OnOffAirFlowRatio);
                 } else {
                     //       ELSE set the flow rate at the cooling PLR
-                    SetAverageAirFlow(state, FurnaceNum, state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio, OnOffAirFlowRatio);
+                    SetAverageAirFlow(state, FurnaceNum, furnace.CoolPartLoadRatio, OnOffAirFlowRatio);
                 }
             } else {
-                SetAverageAirFlow(
-                    state,
-                    FurnaceNum,
-                    max(state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio, state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio),
-                    OnOffAirFlowRatio);
+                SetAverageAirFlow(state, FurnaceNum, max(furnace.CoolPartLoadRatio, furnace.HeatPartLoadRatio), OnOffAirFlowRatio);
             }
-            state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate;
+            furnace.MdotFurnace = state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate;
 
-            if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
-                (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
-                 state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple)) {
+            if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir ||
+                (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
+                 furnace.WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple)) {
             } else {
                 // Non-HeatPump (non-DX) heating coils do not set PLR, reset to 0 here. This variable was set for non-DX
                 // coils to allow the SetAverageAirFlow CALL above to set the correct air mass flow rate. See this
                 // IF block above in heating section. HeatPLR is not set in the ELSE part of the IF (only HeatCoilLoad is set).
-                state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
+                furnace.HeatPartLoadRatio = 0.0;
             }
 
             //*********HVAC Scheduled OFF*************
             // No heating or cooling or dehumidification
             //!!LKL discrepancy with < 0?
-            if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) == 0.0 ||
+            if (ScheduleManager::GetCurrentScheduleValue(state, furnace.SchedPtr) == 0.0 ||
                 state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate == 0.0) {
-                state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = 0.0;
+                furnace.MdotFurnace = 0.0;
                 CoolCoilLoad = 0.0;
                 HeatCoilLoad = 0.0;
                 ReheatCoilLoad = 0.0;
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // System off, so set on/off fan part-load fraction = 1
-                state.dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
-                state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
-                state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
+                furnace.CoolPartLoadRatio = 0.0;
+                furnace.HeatPartLoadRatio = 0.0;
+                furnace.CompPartLoadRatio = 0.0;
                 // set report variables
-                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilSensDemand = 0.0;
-                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilLatentDemand = 0.0;
-                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand = 0.0;
+                furnace.CoolingCoilSensDemand = 0.0;
+                furnace.CoolingCoilLatentDemand = 0.0;
+                furnace.HeatingCoilSensDemand = 0.0;
             }
 
         } // End of the FirstHVACIteration control of the mass flow If block
 
         // Set the fan inlet node flow rates
-        state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRateMaxAvail = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
-        state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
+        state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRateMaxAvail = furnace.MdotFurnace;
+        state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = furnace.MdotFurnace;
     }
 
     void CalcWaterToAirHeatPump(EnergyPlusData &state,
