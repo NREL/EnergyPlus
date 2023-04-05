@@ -10852,7 +10852,6 @@ namespace Furnaces {
         Real64 TempOutput;          // unit output when iteration limit exceeded [W]
         Real64 NoCompOutput;        // output when no active compressor [W]
         int SolFla;                 // Flag of RegulaFalsi solver
-        std::array<Real64, 10> Par; // Parameters passed to RegulaFalsi
         Real64 QCoilActual;         // coil load actually delivered returned to calling component
         int i;                      // Speed index
         int ErrCountCyc(0);         // Counter used to minimize the occurrence of output warnings
@@ -10963,20 +10962,6 @@ namespace Furnaces {
 
         if ((QZnReq < -SmallLoad && NoCompOutput - QZnReq > SmallLoad) || (QZnReq > SmallLoad && QZnReq - NoCompOutput > SmallLoad)) {
             if ((QZnReq > SmallLoad && QZnReq < FullOutput) || (QZnReq < (-1.0 * SmallLoad) && QZnReq > FullOutput)) {
-
-                Par[0] = FurnaceNum;
-                Par[1] = ZoneNum;
-                if (FirstHVACIteration) {
-                    Par[2] = 1.0;
-                } else {
-                    Par[2] = 0.0;
-                }
-                Par[3] = OpMode;
-                Par[4] = QZnReq;
-                Par[5] = OnOffAirFlowRatio;
-                Par[6] = SupHeaterLoad;
-                Par[8] = static_cast<int>(CompressorOp);
-                Par[9] = 1.0;
                 // Check whether the low speed coil can meet the load or not
                 CalcVarSpeedHeatPump(state,
                                      FurnaceNum,
@@ -11071,7 +11056,6 @@ namespace Furnaces {
                             }
                         }
                     }
-                    Par[7] = SpeedNum;
                     auto f = [&state, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, SpeedNum, CompressorOp](
                                  Real64 const SpeedRatio) {
                         return VSHPSpeedResidual(
@@ -11136,20 +11120,6 @@ namespace Furnaces {
                 }
             }
             if (QLatReq - LatOutput > SmallLoad) {
-                Par[0] = FurnaceNum;
-                Par[1] = ZoneNum;
-                if (FirstHVACIteration) {
-                    Par[2] = 1.0;
-                } else {
-                    Par[2] = 0.0;
-                }
-                Par[3] = OpMode;
-                Par[4] = QLatReq;
-                Par[5] = OnOffAirFlowRatio;
-                Par[6] = SupHeaterLoad;
-                Par[7] = SpeedNum;
-                Par[8] = static_cast<int>(CompressorOp);
-                Par[9] = 0.0;
                 if (SpeedNum < 2) {
                     auto f = // (AUTO_OK_LAMBDA)
                         [&state, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](Real64 const PartLoadFrac) {
