@@ -10692,11 +10692,9 @@ namespace Furnaces {
                 ReheatCoilLoad = max(0.0, (QToHeatSetPt - ActualSensibleOutput));
                 state.dataFurnaces->Furnace(FurnaceNum).DehumidInducedHeatingDemandRate = ReheatCoilLoad;
                 //       Heating mode and dehumidification is required
-            } else if (QToHeatSetPt >= 0.0) {
+            } else {
                 ReheatCoilLoad = max(QToHeatSetPt, QToHeatSetPt - ActualSensibleOutput);
                 state.dataFurnaces->Furnace(FurnaceNum).DehumidInducedHeatingDemandRate = max(0.0, ActualSensibleOutput * (-1.0));
-            } else {
-                ReheatCoilLoad = 0.0;
             }
 
             SupHeaterLoad = 0.0;
