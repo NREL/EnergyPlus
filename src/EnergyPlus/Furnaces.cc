@@ -877,8 +877,6 @@ namespace Furnaces {
         int HeatingCoilOutletNode;     // Used for node checking warning messages
         int SupHeatCoilInletNode;      // Used for node checking warning messages
         int SupHeatCoilOutletNode;     // Used for node checking warning messages
-        int ReheatCoilInletNode;       // Used for node checking warning messages
-        int ReheatCoilOutletNode;      // Used for node checking warning messages
         Real64 FanVolFlowRate;         // Fan Max Flow Rate from Fan object (for comparisons to validity)
         int FurnaceType_Num;           // Integer equivalent of Furnace or UnitarySystem "type"
         std::string CoolingCoilType;   // Used in mining function CALLS
@@ -1576,8 +1574,8 @@ namespace Furnaces {
             CoolingCoilOutletNode = 0;
             HeatingCoilInletNode = 0;
             HeatingCoilOutletNode = 0;
-            ReheatCoilInletNode = 0;
-            ReheatCoilOutletNode = 0;
+            int ReheatCoilInletNode = 0;
+            int ReheatCoilOutletNode = 0;
             CoolingCoilType = ' ';
             CoolingCoilName = ' ';
             HeatingCoilType = ' ';
