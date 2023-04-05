@@ -249,7 +249,7 @@ namespace Curve {
 
     void BtwxtMessageCallback(Btwxt::MsgLevel messageType, std::string message, void *contextPtr);
 
-    void ResetPerformanceCurveOutput(EnergyPlusData &state);
+    void ResetPerformanceCurveOutput(const EnergyPlusData &state);
 
     Real64 CurveValue(EnergyPlusData &state,
                       int CurveIndex, // index of curve in curve array

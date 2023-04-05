@@ -472,8 +472,6 @@ namespace DataZoneEquipment {
 
     void GetZoneEquipmentData(EnergyPlusData &state);
 
-    void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
-
     bool CheckZoneEquipmentList(EnergyPlusData &state,
                                 std::string_view ComponentType, // Type of component
                                 std::string_view ComponentName, // Name of component

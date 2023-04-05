@@ -11021,8 +11021,6 @@ namespace Furnaces {
         Real64 LowOutput;           // unit full output at low speed [W]
         Real64 TempOutput;          // unit output when iteration limit exceeded [W]
         Real64 NoCompOutput;        // output when no active compressor [W]
-        Real64 LatOutput;           // latent capacity output
-        Real64 ErrorToler;          // error tolerance
         int SolFla;                 // Flag of RegulaFalsi solver
         std::array<Real64, 10> Par; // Parameters passed to RegulaFalsi
         Real64 QCoilActual;         // coil load actually delivered returned to calling component
@@ -11035,9 +11033,9 @@ namespace Furnaces {
         PartLoadFrac = 0.0;
         SpeedRatio = 0.0;
         SpeedNum = 1;
-        LatOutput = 0.0;
+        Real64 LatOutput = 0.0;
         Real64 noLatOutput = 0.0;
-        ErrorToler = 0.001; // Error tolerance for convergence from input deck
+        Real64 ErrorToler = 0.001; // Error tolerance for convergence from input deck
 
         if (GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) == 0.0) return;
 
@@ -11116,7 +11114,6 @@ namespace Furnaces {
                 state.dataFurnaces->Furnace(FurnaceNum).CompSpeedNum = SpeedNum;
                 return;
             }
-            ErrorToler = 0.001; // Error tolerance for convergence from input deck
         } else if (QZnReq < (-1.0 * SmallLoad)) {
             if (QZnReq <= FullOutput) {
                 PartLoadFrac = 1.0;
@@ -11126,14 +11123,12 @@ namespace Furnaces {
                 state.dataFurnaces->Furnace(FurnaceNum).CompSpeedNum = SpeedNum;
                 return;
             }
-            ErrorToler = 0.001; // Error tolerance for convergence from input deck
         } else {
             if (QZnReq >= FullOutput) {
                 PartLoadFrac = 1.0;
                 SpeedRatio = 1.0;
                 // may need supplemental heating so don't return in heating mode
             }
-            ErrorToler = 0.001; // Error tolerance for convergence from input deck
         }
 
         if ((QZnReq < -SmallLoad && NoCompOutput - QZnReq > SmallLoad) || (QZnReq > SmallLoad && QZnReq - NoCompOutput > SmallLoad)) {
@@ -11454,7 +11449,7 @@ namespace Furnaces {
                               Real64 const QZnReq,       // Zone load (W)
                               Real64 const QLatReq,      // Zone latent load []
                               Real64 &OnOffAirFlowRatio, // Ratio of compressor ON airflow to AVERAGE airflow over timestep
-                              Real64 &SupHeaterLoad      // supplemental heater load (W)
+                              Real64 const SupHeaterLoad // supplemental heater load (W)
     )
     {
         // SUBROUTINE INFORMATION:
@@ -12655,7 +12650,7 @@ namespace Furnaces {
                     errFlag = true;
                     ErrorsFound = true;
                 }
-                auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex_DX];
+                auto const &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex_DX];
                 furnace.MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
             } else if (UtilityRoutines::SameString(ChildCoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
                 int childCCIndex_VS = state.dataHVACAssistedCC->HXAssistedCoil(furnace.CoolingCoilIndex).CoolingCoilIndex;
