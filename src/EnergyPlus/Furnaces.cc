@@ -109,7 +109,6 @@ namespace Furnaces {
     //                      B. Nigusse, FSEC, Jan 2012 - added steam and hot water heating coils as an option
     //                      Bo Shen, ORNL, March 2012 - added variable-speed water source heat pump cooling and heating coils, using curve-fits
     //                      Bo Shen, ORNL, July 2012 - added variable-speed air source heat pump cooling and heating coils, using curve-fits
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // To encapsulate the data and algorithms required to
@@ -161,12 +160,7 @@ namespace Furnaces {
     //                     to the output node (actual simulation of these coils is done on the final simulation of the
     //                     child components in SimFurnace).
     //                     Fan is simulated based on placement (drawthru or blowthru).
-    // REFERENCES:
 
-    // OTHER NOTES:
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
@@ -185,33 +179,6 @@ namespace Furnaces {
     static constexpr std::string_view BlankString;
 
     constexpr std::string_view fluidNameSteam("STEAM");
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Calculate routines to check convergence
-
-    // Supporting routines for module
-
-    // modules for variable speed heat pump
-
-    // Reporting routines for module
-
-    // Object Data
-
-    // Utility routines for module
-    // na
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
 
     // Functions
 
@@ -777,7 +744,6 @@ namespace Furnaces {
         //                      controlled zone from the input field.
         //                      Bo Shen, March 2012, add inputs for VS WSHP,
         //                      Bo Shen, ORNL, July 2012 - added variable-speed air source heat pump cooling and heating coils, using curve-fits
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Obtains input data for fans and coils and stores it in the Furnace data structures
@@ -834,9 +800,7 @@ namespace Furnaces {
         int GetObjectNum;              // The index to each specific object name
         int NumFields;                 // Total number of fields in object
         int NumAlphas;                 // Total number of alpha fields in object
-        int MaxAlphas;                 // Maximum number of alpha fields in all objects
         int NumNumbers;                // Total number of numeric fields in object
-        int MaxNumbers;                // Maximum number of numeric fields in all objects
         int IOStatus;                  // Function call status
         Array1D<Real64> Numbers;       // Numeric data
         Array1D_string Alphas;         // Alpha data
@@ -851,17 +815,6 @@ namespace Furnaces {
         std::string CompSetHeatOutlet;
         bool ErrorsFound(false);       // If errors detected in input
         bool IsNotOK;                  // Flag to verify name
-        int NumHeatOnly;               // Number of heat only furnaces
-        int NumHeatCool;               // Number of heat/cool furnaces
-        int HeatOnlyNum;               // Index to heat only furnaces
-        int HeatCoolNum;               // Index to heat/cool furnaces
-        int NumUnitaryHeatOnly;        // Number of heat only unitary systems
-        int NumUnitaryHeatCool;        // Number of heat/cool unitary systems
-        int UnitaryHeatOnlyNum;        // Index to heat only furnaces
-        int UnitaryHeatCoolNum;        // Index to heat/cool unitary systems
-        int NumWaterToAirHeatPump;     // Number of water-to-air heat pumps
-        int NumHeatPump;               // Number of air-to-air or water-to-air heat pumps
-        int HeatPumpNum;               // Index to air-to-air heat pumps
         bool AirNodeFound;             // Used to determine if control zone is valid
         bool AirLoopFound;             // Used to determine if control zone is served by furnace air loop
         int BranchNum;                 // Used to determine if control zone is served by furnace air loop
@@ -895,46 +848,45 @@ namespace Furnaces {
         Real64 SteamDensity;           // density of steam at 100C
         int DXCoilIndex;               // Index to DX coil in HXAssited object
         std::string IHPCoilName;       // IHP cooling coil name
-        int IHPCoilIndex(0);           // IHP cooling coil id
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         DataLoopNode::ConnectionObjectType currentModuleObjectType;
 
         state.dataFurnaces->GetFurnaceInputFlag = false;
-        MaxNumbers = 0;
-        MaxAlphas = 0;
+        int MaxNumbers = 0;
+        int MaxAlphas = 0;
 
         CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatOnly";
-        NumHeatOnly = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumHeatOnly = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatCool";
-        NumHeatCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumHeatCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatOnly";
-        NumUnitaryHeatOnly = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumUnitaryHeatOnly = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool";
-        NumUnitaryHeatCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumUnitaryHeatCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:AirToAir";
-        NumHeatPump = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumHeatPump = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:WaterToAir";
-        NumWaterToAirHeatPump = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        int NumWaterToAirHeatPump = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -954,10 +906,10 @@ namespace Furnaces {
         }
         state.dataFurnaces->CheckEquipName.dimension(state.dataFurnaces->NumFurnaces, true);
 
-        IHPCoilIndex = 0;
+        int IHPCoilIndex = 0;
 
         // Get the data for the HeatOnly Furnace
-        for (HeatOnlyNum = 1; HeatOnlyNum <= NumHeatOnly + NumUnitaryHeatOnly; ++HeatOnlyNum) {
+        for (int HeatOnlyNum = 1; HeatOnlyNum <= NumHeatOnly + NumUnitaryHeatOnly; ++HeatOnlyNum) {
 
             FanInletNode = 0;
             FanOutletNode = 0;
@@ -1565,7 +1517,7 @@ namespace Furnaces {
         } // End of the HeatOnly Furnace Loop
 
         // Get the data for the HeatCool Furnace or UnitarySystem
-        for (HeatCoolNum = 1; HeatCoolNum <= NumHeatCool + NumUnitaryHeatCool; ++HeatCoolNum) {
+        for (int HeatCoolNum = 1; HeatCoolNum <= NumHeatCool + NumUnitaryHeatCool; ++HeatCoolNum) {
 
             FanInletNode = 0;
             FanOutletNode = 0;
@@ -2964,7 +2916,7 @@ namespace Furnaces {
         } // End of the HeatCool Furnace Loop
 
         // Get the data for the Unitary System HeatPump AirToAir (UnitarySystem:HeatPump:AirToAir)
-        for (HeatPumpNum = 1; HeatPumpNum <= NumHeatPump; ++HeatPumpNum) {
+        for (int HeatPumpNum = 1; HeatPumpNum <= NumHeatPump; ++HeatPumpNum) {
 
             CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:AirToAir";
             FanInletNode = 0;
@@ -3964,7 +3916,7 @@ namespace Furnaces {
         } // End of the Unitary System HeatPump Loop
 
         // Get the Input for the Water to Air Heat Pump (UnitarySystem:HeatPump:WaterToAir)
-        for (HeatPumpNum = 1; HeatPumpNum <= NumWaterToAirHeatPump; ++HeatPumpNum) {
+        for (int HeatPumpNum = 1; HeatPumpNum <= NumWaterToAirHeatPump; ++HeatPumpNum) {
 
             CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:WaterToAir";
             FanInletNode = 0;
@@ -4857,7 +4809,7 @@ namespace Furnaces {
             ShowFatalError(state, "Errors found in getting Furnace or Unitary System input.");
         }
 
-        for (HeatOnlyNum = 1; HeatOnlyNum <= NumHeatOnly; ++HeatOnlyNum) {
+        for (int HeatOnlyNum = 1; HeatOnlyNum <= NumHeatOnly; ++HeatOnlyNum) {
             FurnaceNum = HeatOnlyNum;
             // Setup Report variables for the Furnace that are not reported in the components themselves
             SetupOutputVariable(state,
@@ -4878,7 +4830,7 @@ namespace Furnaces {
             }
         }
 
-        for (UnitaryHeatOnlyNum = NumHeatOnly + 1; UnitaryHeatOnlyNum <= NumHeatOnly + NumUnitaryHeatOnly; ++UnitaryHeatOnlyNum) {
+        for (int UnitaryHeatOnlyNum = NumHeatOnly + 1; UnitaryHeatOnlyNum <= NumHeatOnly + NumUnitaryHeatOnly; ++UnitaryHeatOnlyNum) {
             FurnaceNum = UnitaryHeatOnlyNum;
             // Setup Report variables for Unitary System that are not reported in the components themselves
             SetupOutputVariable(state,
@@ -4899,7 +4851,7 @@ namespace Furnaces {
             }
         }
 
-        for (HeatCoolNum = NumHeatOnly + NumUnitaryHeatOnly + 1; HeatCoolNum <= NumHeatOnly + NumUnitaryHeatOnly + NumHeatCool; ++HeatCoolNum) {
+        for (int HeatCoolNum = NumHeatOnly + NumUnitaryHeatOnly + 1; HeatCoolNum <= NumHeatOnly + NumUnitaryHeatOnly + NumHeatCool; ++HeatCoolNum) {
             FurnaceNum = HeatCoolNum;
             // Setup Report variables for the Furnace that are not reported in the components themselves
             SetupOutputVariable(state,
@@ -4949,7 +4901,7 @@ namespace Furnaces {
             }
         }
 
-        for (UnitaryHeatCoolNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + 1;
+        for (int UnitaryHeatCoolNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + 1;
              UnitaryHeatCoolNum <= NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool;
              ++UnitaryHeatCoolNum) {
             FurnaceNum = UnitaryHeatCoolNum;
@@ -5000,7 +4952,7 @@ namespace Furnaces {
             }
         }
 
-        for (HeatPumpNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + 1;
+        for (int HeatPumpNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + 1;
              HeatPumpNum <= state.dataFurnaces->NumFurnaces - NumWaterToAirHeatPump;
              ++HeatPumpNum) {
             FurnaceNum = HeatPumpNum;
@@ -5038,7 +4990,7 @@ namespace Furnaces {
             }
         }
 
-        for (HeatPumpNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + NumHeatPump + 1;
+        for (int HeatPumpNum = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + NumHeatPump + 1;
              HeatPumpNum <= state.dataFurnaces->NumFurnaces;
              ++HeatPumpNum) {
             FurnaceNum = HeatPumpNum;
@@ -5156,8 +5108,6 @@ namespace Furnaces {
         //                      Bo Shen, March 2012 - for VS WSHP
         //                      Bo Shen, ORNL, July 2012 - added variable-speed air source heat pump cooling and heating coils, using curve-fits
 
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the Furnace Components.
 
@@ -5168,12 +5118,9 @@ namespace Furnaces {
         // air flow rates during InitFurnace. Use these flow rates during the Calc routines to set the
         // average mass flow rates based on PLR.
 
-        // REFERENCES:
-
         // Using/Aliasing
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanSpeedRatioCurveIndex;
-
         using Fans::GetFanVolFlow;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSatDensityRefrig;
@@ -5184,18 +5131,9 @@ namespace Furnaces {
         using WaterCoils::GetCoilMaxWaterFlowRate;
         using WaterCoils::SimulateWaterCoilComponents;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr Small5WLoad(5.0);
         std::string_view constexpr RoutineName("InitFurnace");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool errFlag;          // error flag for mining functions
@@ -6387,8 +6325,6 @@ namespace Furnaces {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   Sep 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the Furnace Components.
@@ -6398,26 +6334,6 @@ namespace Furnaces {
         // in cooling, heating, and when no cooling or heating is needed. Set up the coil (comp) ON and OFF
         // air flow rates. Use these flow rates during the Calc routines to set the average mass flow rates
         // based on PLR.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         // Check for heat only furnace
         if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != Furnace_HeatOnly &&
@@ -6542,7 +6458,6 @@ namespace Furnaces {
         //                                                 flow fraction through controlled zone.
         //                      Bo Shen, March 2012, size the air flow rates at individual speed levels for VS WSHP
         //                      Bo Shen, ORNL, July 2012 - added variable-speed air source heat pump cooling and heating coils, using curve-fits
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for sizing Furnace Components for which nominal cpacities
@@ -6555,13 +6470,9 @@ namespace Furnaces {
         // and heating capacities of a DX heat pump system will be identical. In real life the ARI
         // heating and cooling capacities are close but not identical.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataSizing;
         using EMSManager::ManageEMS;
-
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using IntegratedHeatPump::SizeIHP;
         using VariableSpeedCoils::SimVariableSpeedCoils;
@@ -7003,7 +6914,6 @@ namespace Furnaces {
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Feb 2001
         //       MODIFIED       Don Shirey and R. Raustad, Mar 2001 & Mar 2003
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the coil outlet nodes by simulating a heat-only
@@ -7012,24 +6922,12 @@ namespace Furnaces {
         // METHODOLOGY EMPLOYED:
         // Determine the operating PLR to meet the zone sensible load.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace ScheduleManager;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr MaxIter(15);    // maximum number of iterations
         Real64 constexpr MinPLR(0.0); // minimum part load ratio allowed
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Error(1.0);
@@ -8712,7 +8610,6 @@ namespace Furnaces {
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Feb 2004
         //       MODIFIED       R. Raustad (Oct 2006) Revised iteration technique
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine manages the heat pump simulation
@@ -9303,7 +9200,6 @@ namespace Furnaces {
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   Sept 2001
         //       MODIFIED       Dec 2001
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates to sensible and latent loads met by the DX coils
@@ -9314,25 +9210,10 @@ namespace Furnaces {
         // Simulate each child object in the correct order for each system type. This routine is used in the
         // RegulaFalsi function CALL. Air mass flow rate is set each iteration based on PLR.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using WaterToAirHeatPump::SimWatertoAirHP;
         using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;       // Furnace inlet node temperature
@@ -9758,23 +9639,9 @@ namespace Furnaces {
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   Feb 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // To calculate the part-load ratio for cooling and heating coils
-
-        //   Parameter description example:
-        //       Par(1)  = REAL(FurnaceNum,r64) ! Index to furnace
-        //       Par(2)  = 0.0                  ! FirstHVACIteration FLAG, if 1.0 then TRUE, if 0.0 then FALSE
-        //       Par(3)  = REAL(OpMode,r64)     ! Fan control, if 1.0 then cycling fan, if 0.0 then continuous fan
-        //       Par(4)  = REAL(CompressorOp,r64)     ! Compressor control, if 1.0 then compressor ON, if 0.0 then compressor OFF
-        //       Par(5)  = CoolCoilLoad         ! Sensible or Latent load to be met by furnace
-        //       Par(6)  = 1.0                  ! Type of load FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
-        //       Par(7)  = 1.0                  ! Output calculation FLAG, 0.0 for latent capacity, 1.0 for sensible capacity
-        //       Par(8)  = OnOffAirFlowRatio    ! Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
-        //       Par(9)  = HXUnitOn             ! flag to enable HX, 1=ON and 2=OFF
-        //       Par(10) = HeatingCoilPLR       ! used to calculate latent degradation for cycling fan RH control
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CoolPartLoadRatio;      // DX cooling coil part load ratio
@@ -9886,22 +9753,10 @@ namespace Furnaces {
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   October 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // To calculate the part-load ratio for water to air HP's
         // this is used for parameter estimation WAHPs but not equation fit WAHPs
-
-        //   Parameter description example:
-        //     Par(1)  = REAL(FurnaceNum,r64) ! Index to furnace
-        //     Par(2)  = 0.0                  ! FirstHVACIteration FLAG, if 1.0 then TRUE, if 0.0 then FALSE
-        //     Par(3)  = REAL(OpMode,r64)     ! Fan control, if 1.0 then cycling fan, if 0.0 then continuous fan
-        //     Par(4)  = REAL(CompressorOp,r64)     ! Compressor control, if 1.0 then compressor ON, if 0.0 then compressor OFF
-        //     Par(5)  = CoolCoilLoad         ! Sensible or Latent load to be met by furnace
-        //     Par(6)  = 1.0                  ! Type of load FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
-        //     Par(7)  = 1.0                  ! Output calculation FLAG, 0.0 for latent capacity, 1.0 for sensible capacity
-        //     Par(8)  = ZoneSensLoadMetFanONCompOFF  ! Output with fan ON compressor OFF
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CoolPartLoadRatio; // DX cooling coil part load ratio
@@ -10025,8 +9880,6 @@ namespace Furnaces {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Set the average air mass flow rates using the part-load fraction of the HVAC system for this time step
@@ -10036,31 +9889,12 @@ namespace Furnaces {
         // The air flow rate in cooling, heating, and no cooling or heating can be different.
         // Calculate the air flow rate based on initializations made in InitFurnace.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int InletNode;              // inlet node number for furnace
-        Real64 AverageUnitMassFlow; // average supply air mass flow rate over time step
-
-        InletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
-
-        AverageUnitMassFlow = (PartLoadRatio * state.dataFurnaces->CompOnMassFlow) + ((1 - PartLoadRatio) * state.dataFurnaces->CompOffMassFlow);
+        int InletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
+        Real64 AverageUnitMassFlow =
+            (PartLoadRatio * state.dataFurnaces->CompOnMassFlow) + ((1 - PartLoadRatio) * state.dataFurnaces->CompOffMassFlow);
         if (state.dataFurnaces->CompOffFlowRatio > 0.0) {
             state.dataFurnaces->FanSpeedRatio =
                 (PartLoadRatio * state.dataFurnaces->CompOnFlowRatio) + ((1 - PartLoadRatio) * state.dataFurnaces->CompOffFlowRatio);
@@ -10097,16 +9931,11 @@ namespace Furnaces {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Kenneth Tang
         //       DATE WRITTEN   Apr 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the PLF based on the PLR. Parameters required are
         // thermostat cycling rate (Nmax), heat pump time constant (tau), and the fraction
         // of on-cycle power use (pr)
-
-        // METHODOLOGY EMPLOYED:
-        // NA
 
         // REFERENCES:
         // (1) Henderson, H. I., K. Rengarajan.1996. A Model to predict the latent capacity
@@ -10117,42 +9946,22 @@ namespace Furnaces {
         // Part Load Curves for Use in DOE-2.  Environmental Energy Technologies Division,
         // Ernest Orlando Lawrence Berkeley National Laboratory.
 
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 PartLoadFactor; // Part load factor
-        Real64 Nmax;           // Maximum cycling rate [cycles/hr]
-        Real64 tau;            // Heat pump time constant [s]
-        Real64 pr;             // On-cycle power use fraction [~]
-        Real64 error;          // Calculation error
-        Real64 PLF1;           // ith term of part load factor
         Real64 PLF2;           // (i+1)th term of part load factor
         Real64 A;              // Variable for simplify equation
-        int NumIteration;      // Iteration Counter
 
-        Nmax = state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour;
-        tau = state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant;
-        pr = state.dataFurnaces->Furnace(FurnaceNum).OnCyclePowerFraction;
+        Real64 Nmax = state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour;
+        Real64 tau = state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant;
+        Real64 pr = state.dataFurnaces->Furnace(FurnaceNum).OnCyclePowerFraction;
 
         // Initialize
         errFlag = false;
-        error = 1.0;
-        NumIteration = 0;
+        Real64 error = 1.0;
+        int NumIteration = 0;
 
         // Initial guess for part load fraction
-        PLF1 = 1.0;
+        Real64 PLF1 = 1.0;
 
         // Calculate PLF using successive substitution until convergence is achieved
         while (true) {
@@ -10222,8 +10031,6 @@ namespace Furnaces {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   Feb 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variable for the coils.
@@ -10298,8 +10105,6 @@ namespace Furnaces {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   January 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the four non dx heating coil types: Gas, Electric, hot water and steam.
@@ -10313,9 +10118,6 @@ namespace Furnaces {
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr ErrTolerance(0.001); // convergence limit for hotwater coil
@@ -11258,37 +11060,19 @@ namespace Furnaces {
         using IntegratedHeatPump::SimIHP;
         using VariableSpeedCoils::SimVariableSpeedCoils;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        //  INTEGER, PARAMETER  ::   On  = 1           ! Compressor on flag
-        //  INTEGER, PARAMETER  ::   Off = 2           ! Compressor off flag
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVMS TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int OutletNode;           // MSHP air outlet node
-        int InletNode;            // MSHP air inlet node
         Real64 AirMassFlow;       // Air mass flow rate [kg/s]
-        Real64 SavePartloadRatio; // part-load ratio
         Real64 SaveSpeedRatio;    // speed ratio
         Real64 QCoilActual;       // coil load actually delivered returned to calling component
-        Real64 ErrorToler;        // supplemental heating coil convergence tollerance
         bool SuppHeatingCoilFlag; // whether to turn on the supplemental heater
-        Real64 HeatCoilLoad;      // REQUIRED HEAT COIL LOAD
 
-        InletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
-        OutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
+        int InletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
+        int OutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
 
-        HeatCoilLoad = 0.0;
+        Real64 HeatCoilLoad = 0.0;
         state.dataFurnaces->SaveCompressorPLR = 0.0;
-        SavePartloadRatio = 0.0;
-        ErrorToler = 0.001;
+        Real64 SavePartloadRatio = 0.0;
+        Real64 ErrorToler = 0.001;
 
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
         SetVSHPAirFlow(state, FurnaceNum, PartLoadFrac, OnOffAirFlowRatio, SpeedNum, SpeedRatio);
@@ -11915,8 +11699,6 @@ namespace Furnaces {
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, based on HVACMultiSpeedHeatPump:MSHPCyclingResidual
         //       DATE WRITTEN   March, 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         //  Calculates residual function ((ActualOutput - QZnReq)/QZnReq)
@@ -11926,37 +11708,22 @@ namespace Furnaces {
         //  Calls CalcMSHeatPump to get ActualOutput at the given part load ratio
         //  and calculates the residual as defined above
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par[0] = FurnaceNum
-        // par[1] = Zone Num
-        // par[2] = FirstHVACIteration
-        // par[3] = OpMode
-        // par[4] = QZnReq, load to be met
-        // par[5] = OnOffAirFlowRatio
-        // par[6] = SupHeaterLoad
-        // par[7] = NOT USED
-        // par[8] = CompressorOp
-        // par[9] = 1.0 to meet sensible load
-        //        int FurnaceNum = int(Par[0]);
-        //        int ZoneNum = int(Par[1]);
-        //        bool FirstHVACIteration = (Par[2] == 1.0);
-        //        int OpMode = int(Par[3]);
-        //        Real64 LoadToBeMet = Par[4];
-        //        Real64 OnOffAirFlowRatio = Par[5];
-        //        Real64 SupHeaterLoad = Par[6];
-        //        CompressorOperation CompressorOp = static_cast<CompressorOperation>(Par[8]);
-        //        Real64 par9_SensLatFlag = Par[9];
+        // int FurnaceNum = int(Par[0]);
+        // int ZoneNum = int(Par[1]);
+        // bool FirstHVACIteration = (Par[2] == 1.0);
+        // int OpMode = int(Par[3]);
+        // Real64 LoadToBeMet = Par[4];
+        // Real64 OnOffAirFlowRatio = Par[5];
+        // Real64 SupHeaterLoad = Par[6];
+        // CompressorOperation CompressorOp = static_cast<CompressorOperation>(Par[8]);
+        // Real64 par9_SensLatFlag = Par[9];
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 QZnReq;          // zone sensible load (W)
-        Real64 QZnLat;          // zone latent load (W)
         Real64 ZoneSensLoadMet; // delivered sensible capacity of MSHP
         Real64 ZoneLatLoadMet;  // delivered latent capacity of MSHP
-        Real64 ResScale;        // Residual scale
 
-        QZnReq = 0.0;
-        QZnLat = 0.0;
+        Real64 QZnReq = 0.0;
+        Real64 QZnLat = 0.0;
         if (par9_SensLatFlag == 1.0) {
             QZnReq = LoadToBeMet;
         } else {
@@ -11977,7 +11744,7 @@ namespace Furnaces {
                              OnOffAirFlowRatio,
                              SupHeaterLoad);
 
-        ResScale = std::abs(LoadToBeMet);
+        Real64 ResScale = std::abs(LoadToBeMet);
         if (ResScale < 100.0) {
             ResScale = 100.0;
         } else {
@@ -12010,8 +11777,6 @@ namespace Furnaces {
         // FUNCTION INFORMATION:
         //       AUTHOR         Bo Shen, , based on HVACMultiSpeedHeatPump:MSHPVarSpeedgResidual
         //       DATE WRITTEN   March, 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         //  Calculates residual function ((ActualOutput - QZnReq)/QZnReq)
@@ -12072,17 +11837,10 @@ namespace Furnaces {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bo Shen, based on HVACMultiSpeedHeatPump:SetAverageAirFlow
         //       DATE WRITTEN   March, 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
+
         // PURPOSE OF THIS SUBROUTINE:
         // Set the average air mass flow rates using the part load fraction of the heat pump for this time step
         // Set OnOffAirFlowRatio to be used by DX coils
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using IntegratedHeatPump::GetAirMassFlowRateIHP;
@@ -12090,12 +11848,10 @@ namespace Furnaces {
         using IntegratedHeatPump::IHPOperationMode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int InletNode;              // inlet node number for PTHPNum
         Real64 AverageUnitMassFlow; // average supply air mass flow rate over time step
-        int OutNode;                // Outlet node number in MSHP loop
 
-        InletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
-        OutNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
+        int InletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
+        int OutNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
 
         state.dataHVACGlobal->MSHPMassFlowRateLow = 0.0;  // Mass flow rate at low speed
         state.dataHVACGlobal->MSHPMassFlowRateHigh = 0.0; // Mass flow rate at high speed
@@ -12309,10 +12065,6 @@ namespace Furnaces {
         }
 
         state.dataLoopNodes->Node(OutNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-
-        //  IF(ABS(Node(OutNode)%MassFlowRate - 0.435)  < 0.001) THEN
-        //    Node(OutNode)%MassFlowRate  = Node(InletNode)%MassFlowRate
-        //  END IF
     }
 
     void SetMinOATCompressor(EnergyPlusData &state,
