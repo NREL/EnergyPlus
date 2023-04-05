@@ -8699,7 +8699,7 @@ namespace Furnaces {
                         ReheatCoilLoad = max(0.0, (QToHeatSetPt - ActualSensibleOutput));
                         state.dataFurnaces->Furnace(FurnaceNum).DehumidInducedHeatingDemandRate = ReheatCoilLoad;
                         //       Heating mode and dehumidification is required
-                    } else if (QToHeatSetPt >= 0.0) {
+                    } else {
                         //         Calculate the reheat coil load as the sensible capacity of the DX cooling coil only. Let
                         //         the heating coil pick up the load due to outdoor air.
                         ReheatCoilLoad = max(0.0, (ActualSensibleOutput - NoCoolOutput) * (-1.0));
@@ -8710,8 +8710,6 @@ namespace Furnaces {
                             ReheatCoilLoad = max(QToHeatSetPt, QToHeatSetPt - ActualSensibleOutput);
                         }
                         state.dataFurnaces->Furnace(FurnaceNum).DehumidInducedHeatingDemandRate = max(0.0, ActualSensibleOutput * (-1.0));
-                    } else {
-                        ReheatCoilLoad = 0.0;
                     }
                 } else {
                     //       No humidistat installed
