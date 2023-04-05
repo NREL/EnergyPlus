@@ -8675,11 +8675,12 @@ namespace Furnaces {
         Real64 QActual;           // heating coil load met or delivered
         bool SuppHeatingCoilFlag; // .TRUE. if supplemental heating coil
 
-        int FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
-        int FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
-        int CoolingCoilType_Num = state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num;
-        Real64 WSHPRuntimeFrac = state.dataFurnaces->Furnace(FurnaceNum).WSHPRuntimeFrac; // Compressor runtime fraction
-        Real64 CompPartLoadRatio = state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio;
+        auto &furnace = state.dataFurnaces->Furnace(FurnaceNum);
+        int FurnaceOutletNode = furnace.FurnaceOutletNodeNum;
+        int FurnaceInletNode = furnace.FurnaceInletNodeNum;
+        int CoolingCoilType_Num = furnace.CoolingCoilType_Num;
+        Real64 WSHPRuntimeFrac = furnace.WSHPRuntimeFrac; // Compressor runtime fraction
+        Real64 CompPartLoadRatio = furnace.CompPartLoadRatio;
         state.dataFurnaces->ModifiedHeatCoilLoad = 0.0;
 
         if (present(CoolingHeatingPLRRat)) {
@@ -8698,24 +8699,24 @@ namespace Furnaces {
                 if (state.dataFurnaces->CoolHeatPLRRat > 0.0) {
                     state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate =
                         state.dataFurnaces->CompOnMassFlow * CoolPartLoadRatio / state.dataFurnaces->CoolHeatPLRRat;
-                    if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
+                    if (furnace.FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
                         SetAverageAirFlow(state, FurnaceNum, CoolPartLoadRatio / state.dataFurnaces->CoolHeatPLRRat, OnOffAirFlowRatio);
                     }
                 } else {
                     state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->CompOnMassFlow * CoolPartLoadRatio;
-                    if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
+                    if (furnace.FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
                         SetAverageAirFlow(state, FurnaceNum, max(HeatPartLoadRatio, CoolPartLoadRatio), OnOffAirFlowRatio);
                     }
                 }
             } else {
                 state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate =
                     state.dataFurnaces->CompOnMassFlow * max(HeatPartLoadRatio, CoolPartLoadRatio);
-                if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
+                if (furnace.FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
                     SetAverageAirFlow(state, FurnaceNum, max(HeatPartLoadRatio, CoolPartLoadRatio), OnOffAirFlowRatio);
                 }
             }
         } else {
-            if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
+            if (furnace.FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
                 SetAverageAirFlow(state, FurnaceNum, max(HeatPartLoadRatio, CoolPartLoadRatio), OnOffAirFlowRatio);
             }
         }
@@ -8724,18 +8725,17 @@ namespace Furnaces {
         state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRateMaxAvail = AirMassFlow;
 
         // Simulate the air-to-air heat pump
-        if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir) {
+        if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_AirToAir) {
             //   Simulate blow-thru fan and non-linear coils twice to update PLF used by the ONOFF Fan
-            if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DataHVACGlobals::BlowThru) {
-                Fans::SimulateFanComponents(
-                    state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+            if (furnace.FanPlace == DataHVACGlobals::BlowThru) {
+                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, furnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
                 if (CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                         BlankString,
                                                                         FirstHVACIteration,
                                                                         CompressorOp,
                                                                         CoolPartLoadRatio,
-                                                                        state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
+                                                                        furnace.CoolingCoilIndex,
                                                                         FanOpMode,
                                                                         HXUnitOn,
                                                                         OnOffAirFlowRatio,
@@ -8745,21 +8745,14 @@ namespace Furnaces {
                                        BlankString,
                                        CompressorOp,
                                        FirstHVACIteration,
-                                       state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
+                                       furnace.CoolingCoilIndex,
                                        FanOpMode,
                                        CoolPartLoadRatio,
                                        OnOffAirFlowRatio);
                 }
-                DXCoils::SimDXCoil(state,
-                                   BlankString,
-                                   CompressorOp,
-                                   FirstHVACIteration,
-                                   state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                   FanOpMode,
-                                   HeatPartLoadRatio,
-                                   OnOffAirFlowRatio);
-                Fans::SimulateFanComponents(
-                    state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+                DXCoils::SimDXCoil(
+                    state, BlankString, CompressorOp, FirstHVACIteration, furnace.HeatingCoilIndex, FanOpMode, HeatPartLoadRatio, OnOffAirFlowRatio);
+                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, furnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
             }
             //   Simulate cooling and heating coils
             if (CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
@@ -8768,36 +8761,23 @@ namespace Furnaces {
                                                                     FirstHVACIteration,
                                                                     CompressorOp,
                                                                     CoolPartLoadRatio,
-                                                                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
+                                                                    furnace.CoolingCoilIndex,
                                                                     FanOpMode,
                                                                     HXUnitOn,
                                                                     OnOffAirFlowRatio,
                                                                     state.dataFurnaces->EconomizerFlag);
             } else {
-                DXCoils::SimDXCoil(state,
-                                   BlankString,
-                                   CompressorOp,
-                                   FirstHVACIteration,
-                                   state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                   FanOpMode,
-                                   CoolPartLoadRatio,
-                                   OnOffAirFlowRatio);
+                DXCoils::SimDXCoil(
+                    state, BlankString, CompressorOp, FirstHVACIteration, furnace.CoolingCoilIndex, FanOpMode, CoolPartLoadRatio, OnOffAirFlowRatio);
             }
-            DXCoils::SimDXCoil(state,
-                               BlankString,
-                               CompressorOp,
-                               FirstHVACIteration,
-                               state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                               FanOpMode,
-                               HeatPartLoadRatio,
-                               OnOffAirFlowRatio);
+            DXCoils::SimDXCoil(
+                state, BlankString, CompressorOp, FirstHVACIteration, furnace.HeatingCoilIndex, FanOpMode, HeatPartLoadRatio, OnOffAirFlowRatio);
             //   Simulate the draw-thru fan
-            if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DataHVACGlobals::DrawThru) {
-                Fans::SimulateFanComponents(
-                    state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+            if (furnace.FanPlace == DataHVACGlobals::DrawThru) {
+                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, furnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
             }
             //   Simulate the supplemental heating coil
-            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat && ReheatCoilLoad > 0.0) {
+            if (furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat && ReheatCoilLoad > 0.0) {
                 SuppHeatingCoilFlag = true;
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, ReheatCoilLoad, FanOpMode, QActual);
             } else {
@@ -8806,23 +8786,22 @@ namespace Furnaces {
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, ReheatCoilLoad, FanOpMode, QActual);
             }
             // Simulate the parameter estimate water-to-air heat pump
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
-                   state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple) {
+        } else if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
+                   furnace.WatertoAirHPType == DataHVACGlobals::WatertoAir_Simple) {
             //    Simulate blow-thru fan and non-linear coils twice to update PLF used by the ONOFF Fan
-            if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DataHVACGlobals::BlowThru) {
-                Fans::SimulateFanComponents(
-                    state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+            if (furnace.FanPlace == DataHVACGlobals::BlowThru) {
+                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, furnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
                 // COIL:WATERTOAIRHPSIMPLE:COOLING
                 WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
                                                                 BlankString,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilSensDemand,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilLatentDemand,
+                                                                furnace.CoolingCoilIndex,
+                                                                furnace.CoolingCoilSensDemand,
+                                                                furnace.CoolingCoilLatentDemand,
                                                                 FanOpMode,
                                                                 WSHPRuntimeFrac,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
+                                                                furnace.MaxONOFFCyclesperHour,
+                                                                furnace.HPTimeConstant,
+                                                                furnace.FanDelayTime,
                                                                 CompressorOp,
                                                                 CoolPartLoadRatio,
                                                                 FirstHVACIteration); // CoolPartLoadRatio
@@ -8830,33 +8809,32 @@ namespace Furnaces {
                 // COIL:WATERTOAIRHPSIMPLE:HEATING
                 WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
                                                                 BlankString,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand,
+                                                                furnace.HeatingCoilIndex,
+                                                                furnace.HeatingCoilSensDemand,
                                                                 Dummy,
                                                                 FanOpMode,
                                                                 WSHPRuntimeFrac,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                                                state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
+                                                                furnace.MaxONOFFCyclesperHour,
+                                                                furnace.HPTimeConstant,
+                                                                furnace.FanDelayTime,
                                                                 CompressorOp,
                                                                 HeatPartLoadRatio,
                                                                 FirstHVACIteration); // HeatPartLoadRatio
                 //      Simulate the whole thing a second time so that the correct PLF required by the coils is used by the Fan. *******
-                Fans::SimulateFanComponents(
-                    state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, furnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
             }
             //    Simulate the cooling and heating coils
             // COIL:WATERTOAIRHPSIMPLE:COOLING
             WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
                                                             BlankString,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilSensDemand,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilLatentDemand,
+                                                            furnace.CoolingCoilIndex,
+                                                            furnace.CoolingCoilSensDemand,
+                                                            furnace.CoolingCoilLatentDemand,
                                                             FanOpMode,
                                                             WSHPRuntimeFrac,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
+                                                            furnace.MaxONOFFCyclesperHour,
+                                                            furnace.HPTimeConstant,
+                                                            furnace.FanDelayTime,
                                                             CompressorOp,
                                                             CoolPartLoadRatio,
                                                             FirstHVACIteration); // CoolPartLoadRatio
@@ -8864,24 +8842,23 @@ namespace Furnaces {
             // COIL:WATERTOAIRHPSIMPLE:HEATING
             WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
                                                             BlankString,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand,
+                                                            furnace.HeatingCoilIndex,
+                                                            furnace.HeatingCoilSensDemand,
                                                             Dummy,
                                                             FanOpMode,
                                                             WSHPRuntimeFrac,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                                            state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
+                                                            furnace.MaxONOFFCyclesperHour,
+                                                            furnace.HPTimeConstant,
+                                                            furnace.FanDelayTime,
                                                             CompressorOp,
                                                             HeatPartLoadRatio,
                                                             FirstHVACIteration); // HeatPartLoadRatio
             //     Simulate the draw-thru fan
-            if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DataHVACGlobals::BlowThru) {
-                Fans::SimulateFanComponents(
-                    state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+            if (furnace.FanPlace == DataHVACGlobals::BlowThru) {
+                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, furnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
             }
             //     Simulate the supplemental heating coil
-            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat && ReheatCoilLoad > 0.0) {
+            if (furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat && ReheatCoilLoad > 0.0) {
                 SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, ReheatCoilLoad, FanOpMode, QActual);
             } else {
@@ -8889,67 +8866,64 @@ namespace Furnaces {
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, FanOpMode, QActual);
             }
             // Simulate the detailed water-to-air heat pump
-        } else if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
-                   state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType == DataHVACGlobals::WatertoAir_ParEst) {
+        } else if (furnace.FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir &&
+                   furnace.WatertoAirHPType == DataHVACGlobals::WatertoAir_ParEst) {
             //    Simulate the draw-thru fan
-            if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DataHVACGlobals::BlowThru) {
-                Fans::SimulateFanComponents(
-                    state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+            if (furnace.FanPlace == DataHVACGlobals::BlowThru) {
+                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, furnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
             }
             //    Simulate the cooling and heating coils
             WaterToAirHeatPump::SimWatertoAirHP(state,
                                                 BlankString,
-                                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                                state.dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate,
+                                                furnace.CoolingCoilIndex,
+                                                furnace.DesignMassFlowRate,
                                                 FanOpMode,
                                                 FirstHVACIteration,
                                                 WSHPRuntimeFrac,
-                                                state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                                state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                                state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                                state.dataFurnaces->Furnace(FurnaceNum).InitHeatPump,
-                                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilSensDemand,
-                                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilLatentDemand,
+                                                furnace.MaxONOFFCyclesperHour,
+                                                furnace.HPTimeConstant,
+                                                furnace.FanDelayTime,
+                                                furnace.InitHeatPump,
+                                                furnace.CoolingCoilSensDemand,
+                                                furnace.CoolingCoilLatentDemand,
                                                 CompressorOp,
                                                 CoolPartLoadRatio);
             Dummy = 0.0;
             WaterToAirHeatPump::SimWatertoAirHP(state,
                                                 BlankString,
-                                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                                state.dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate,
+                                                furnace.HeatingCoilIndex,
+                                                furnace.DesignMassFlowRate,
                                                 FanOpMode,
                                                 FirstHVACIteration,
                                                 WSHPRuntimeFrac,
-                                                state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour,
-                                                state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant,
-                                                state.dataFurnaces->Furnace(FurnaceNum).FanDelayTime,
-                                                state.dataFurnaces->Furnace(FurnaceNum).InitHeatPump,
-                                                state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand,
+                                                furnace.MaxONOFFCyclesperHour,
+                                                furnace.HPTimeConstant,
+                                                furnace.FanDelayTime,
+                                                furnace.InitHeatPump,
+                                                furnace.HeatingCoilSensDemand,
                                                 Dummy,
                                                 CompressorOp,
                                                 HeatPartLoadRatio);
             //    Simulate the draw-thru fan
-            if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DataHVACGlobals::DrawThru) {
-                Fans::SimulateFanComponents(
-                    state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+            if (furnace.FanPlace == DataHVACGlobals::DrawThru) {
+                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, furnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
             }
             //    Simulate the supplemental heating coil
             HeatingCoils::SimulateHeatingCoilComponents(
-                state, BlankString, FirstHVACIteration, HeatCoilLoad, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, _, true, FanOpMode);
+                state, BlankString, FirstHVACIteration, HeatCoilLoad, furnace.SuppHeatCoilIndex, _, true, FanOpMode);
 
         } else { // ELSE it's not a heat pump
             //   Simulate blow-thru fan
-            if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DataHVACGlobals::BlowThru) {
+            if (furnace.FanPlace == DataHVACGlobals::BlowThru) {
 
-                Fans::SimulateFanComponents(
-                    state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, furnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
 
                 //     For non-linear coils, simulate coil to update PLF used by the ONOFF Fan
-                if (state.dataFurnaces->Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
-                    if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatOnly &&
-                        state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != DataHVACGlobals::Furnace_HeatOnly) {
+                if (furnace.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
+                    if (furnace.FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatOnly &&
+                        furnace.FurnaceType_Num != DataHVACGlobals::Furnace_HeatOnly) {
 
-                        if (!state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream) {
+                        if (!furnace.CoolingCoilUpstream) {
                             SuppHeatingCoilFlag = false; // if false simulates heating coil
                             CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, FanOpMode, QActual);
                         }
@@ -8960,7 +8934,7 @@ namespace Furnaces {
                                                                                 FirstHVACIteration,
                                                                                 CompressorOp,
                                                                                 CoolPartLoadRatio,
-                                                                                state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
+                                                                                furnace.CoolingCoilIndex,
                                                                                 FanOpMode,
                                                                                 HXUnitOn,
                                                                                 OnOffAirFlowRatio,
@@ -8970,7 +8944,7 @@ namespace Furnaces {
                                                BlankString,
                                                CompressorOp,
                                                FirstHVACIteration,
-                                               state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
+                                               furnace.CoolingCoilIndex,
                                                FanOpMode,
                                                CoolPartLoadRatio,
                                                OnOffAirFlowRatio,
@@ -8978,21 +8952,19 @@ namespace Furnaces {
                         }
                     }
 
-                    if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream) {
+                    if (furnace.CoolingCoilUpstream) {
                         SuppHeatingCoilFlag = false; // if false simulates heating coil
                         CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, FanOpMode, QActual);
                     }
-                    Fans::SimulateFanComponents(
-                        state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+                    Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, furnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
                 } // Simple OnOff fan
 
             } // Blow thru fan
 
             //   Simulate the cooling and heating coils
-            if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatOnly &&
-                state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num != DataHVACGlobals::Furnace_HeatOnly) {
+            if (furnace.FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatOnly && furnace.FurnaceType_Num != DataHVACGlobals::Furnace_HeatOnly) {
 
-                if (!state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream) {
+                if (!furnace.CoolingCoilUpstream) {
                     SuppHeatingCoilFlag = false; // if false simulates heating coil
                     CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, FanOpMode, QActual);
                 }
@@ -9003,7 +8975,7 @@ namespace Furnaces {
                                                                         FirstHVACIteration,
                                                                         CompressorOp,
                                                                         CoolPartLoadRatio,
-                                                                        state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
+                                                                        furnace.CoolingCoilIndex,
                                                                         FanOpMode,
                                                                         HXUnitOn,
                                                                         OnOffAirFlowRatio,
@@ -9013,7 +8985,7 @@ namespace Furnaces {
                                        BlankString,
                                        CompressorOp,
                                        FirstHVACIteration,
-                                       state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
+                                       furnace.CoolingCoilIndex,
                                        FanOpMode,
                                        CoolPartLoadRatio,
                                        OnOffAirFlowRatio,
@@ -9021,27 +8993,24 @@ namespace Furnaces {
                 }
             }
 
-            if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream) {
+            if (furnace.CoolingCoilUpstream) {
                 SuppHeatingCoilFlag = false; // if false simulates heating coil
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, FanOpMode, QActual);
             }
             //   Simulate the draw-thru fan
-            if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DataHVACGlobals::DrawThru) {
-                Fans::SimulateFanComponents(
-                    state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
+            if (furnace.FanPlace == DataHVACGlobals::DrawThru) {
+                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, furnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
             }
-            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat ||
-                state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex > 0) {
+            if (furnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat || furnace.SuppHeatCoilIndex > 0) {
                 SuppHeatingCoilFlag = true; // if truee simulates supplemental heating coil
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, ReheatCoilLoad, FanOpMode, QActual);
             }
         } // IF(Furnace(FurnaceNum)%FurnaceType_Num == UnitarySys_HeatPump_AirToAir)THEN
 
         // check the DesignMaxOutletTemp and reset if necessary (for Coil:Gas:Heating or Coil:Electric:Heating only)
-        if (state.dataLoopNodes->Node(state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp >
-            state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp) {
+        if (state.dataLoopNodes->Node(furnace.FurnaceOutletNodeNum).Temp > furnace.DesignMaxOutletTemp) {
             Wout = state.dataLoopNodes->Node(FurnaceOutletNode).HumRat;
-            Tout = state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp;
+            Tout = furnace.DesignMaxOutletTemp;
             state.dataFurnaces->ModifiedHeatCoilLoad =
                 HeatCoilLoad - (AirMassFlow * Psychrometrics::PsyCpAirFnW(Wout) * (state.dataLoopNodes->Node(FurnaceOutletNode).Temp - Tout));
             state.dataLoopNodes->Node(FurnaceOutletNode).Temp = Tout;
@@ -9056,20 +9025,20 @@ namespace Furnaces {
         CalcZoneSensibleLatentOutput(AirMassFlow,
                                      state.dataLoopNodes->Node(FurnaceOutletNode).Temp,
                                      state.dataLoopNodes->Node(FurnaceOutletNode).HumRat,
-                                     state.dataLoopNodes->Node(state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone).Temp,
-                                     state.dataLoopNodes->Node(state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat,
+                                     state.dataLoopNodes->Node(furnace.NodeNumOfControlledZone).Temp,
+                                     state.dataLoopNodes->Node(furnace.NodeNumOfControlledZone).HumRat,
                                      SensibleOutput,
                                      LatentOutput,
                                      TotalOutput);
-        SensibleLoadMet = SensibleOutput - state.dataFurnaces->Furnace(FurnaceNum).SenLoadLoss;
-        state.dataFurnaces->Furnace(FurnaceNum).SensibleLoadMet = SensibleLoadMet;
+        SensibleLoadMet = SensibleOutput - furnace.SenLoadLoss;
+        furnace.SensibleLoadMet = SensibleLoadMet;
 
-        if (state.dataFurnaces->Furnace(FurnaceNum).Humidistat) {
-            LatentLoadMet = LatentOutput - state.dataFurnaces->Furnace(FurnaceNum).LatLoadLoss;
+        if (furnace.Humidistat) {
+            LatentLoadMet = LatentOutput - furnace.LatLoadLoss;
         } else {
             LatentLoadMet = 0.0;
         }
-        state.dataFurnaces->Furnace(FurnaceNum).LatentLoadMet = LatentLoadMet;
+        furnace.LatentLoadMet = LatentLoadMet;
     }
 
     //        End of Update subroutines for the Furnace Module
