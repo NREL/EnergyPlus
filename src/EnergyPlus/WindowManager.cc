@@ -2518,12 +2518,8 @@ namespace WindowManager {
                     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
                         int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
                         auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-                        for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
-                            SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs =
-                                GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
-                            OutSrdIR += state.dataWindowManager->sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
-                        }
+                        SrdSurfTempAbs = state.dataSurface->Surface(SurfNum).SrdSurfTemp + Constant::KelvinConv;
+                        OutSrdIR = state.dataWindowManager->sigma * SrdSurfsProperty.SurfsViewFactorSum * pow_4(SrdSurfTempAbs);
                     }
                 }
                 if (surface.ExtWind) {             // Window is exposed to wind (and possibly rain)
@@ -2682,7 +2678,6 @@ namespace WindowManager {
 
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
                 // update SurfHSrdSurfExt if the windows has exterior shade or blind
                 state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) =
                     ConvectionCoefficients::SurroundingSurfacesRadCoeffAverage(state, SurfNum, Tsout, SurfOutsideEmiss);

@@ -1197,7 +1197,6 @@ namespace DataSurfaces {
         Real64 SkyViewFactor = 0.0;         // sky view factor
         Real64 GroundViewFactor = 0.0;      // ground view factor
         Real64 SurfsViewFactorSum = 0.0;    // surrounding surfaces view factor sum
-        Real64 SurfsTempAvg = 0.0;          // view factor weighted surrounding surfaces average temperature {C}
         int SkyTempSchNum = 0;              // schedule pointer
         int GroundTempSchNum = 0;           // schedule pointer
         int TotSurroundingSurface = 0;      // Total number of surrounding surfaces defined for an exterior surface

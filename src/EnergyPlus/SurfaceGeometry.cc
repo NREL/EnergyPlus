@@ -8395,6 +8395,9 @@ namespace SurfaceGeometry {
                         surface.SurfHasSurroundingSurfProperty = true;
                         surface.UseSurfPropertySrdSurfTemp = true;
                         surface.SurfSurroundingSurfacesNum = SurfLocalEnv.SurroundingSurfsPtr;
+                        if (state.dataSurface->SurroundingSurfsProperty(surface.SurfSurroundingSurfacesNum).SurfsViewFactorSum == 0.0) {
+                            surface.UseSurfPropertySrdSurfTemp = false;
+                        }
                     }
                     if (SurfLocalEnv.GroundSurfsPtr != 0) {
                         surface.IsSurfPropertyGndSurfacesDefined = true;

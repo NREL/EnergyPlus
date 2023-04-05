@@ -9032,11 +9032,9 @@ Real64 SurroundingSurfacesRadCoeffAverage(EnergyPlusData &state, int const SurfN
 {
     // compute surrounding surfaces view factor weighted radiation coefficient
     auto &SrdSurfsPro = state.dataSurface->SurroundingSurfsProperty(state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum);
-    Real64 SrdSurfsTK = SrdSurfsPro.SurfsTempAvg + Constant::KelvinConv;
+    Real64 SrdSurfsTK = state.dataSurface->Surface(SurfNum).SrdSurfTemp + Constant::KelvinConv;
     Real64 HSrdSurf = 0.0;
-    if (TSurfK == SrdSurfsTK) {
-        HSrdSurf = 0.0;
-    } else {
+    if (TSurfK != SrdSurfsTK) {
         HSrdSurf = Constant::StefanBoltzmann * AbsExt * SrdSurfsPro.SurfsViewFactorSum * (pow_4(TSurfK) - pow_4(SrdSurfsTK)) / (TSurfK - SrdSurfsTK);
     }
     return HSrdSurf;
