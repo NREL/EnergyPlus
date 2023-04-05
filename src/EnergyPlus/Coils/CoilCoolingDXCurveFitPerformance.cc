@@ -445,7 +445,6 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
     Real64 LoadFactor(0.0);                       // Fractional "on" time for last stage at the desired reduced capacity, (dimensionless)
     Real64 DegradationCoeff(0.0);                 // Degradation coeficient, (dimenssionless)
     Real64 OutdoorUnitInletAirDryBulbTempReduced; // Outdoor unit entering air dry-bulb temperature at reduced capacity [C]
-    int RedCapNum;                                // Integer counter for reduced capacity
 
     // *** SOME CONSTANTS FROM THE STANDARD
     // The AHRI standard specifies a nominal/default fan electric power consumption per rated air
@@ -557,7 +556,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
             mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
         this->standardRatingCoolingCapacity2023 =
             mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate2023 * mode.ratedEvapAirFlowRate;
-        for (RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
+        for (int RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
             // get the outdoor air dry bulb temperature for the reduced capacity test conditions
             if (ReducedPLR[RedCapNum] > 0.444) {
                 OutdoorUnitInletAirDryBulbTempReduced = 5.0 + 30.0 * ReducedPLR[RedCapNum];
