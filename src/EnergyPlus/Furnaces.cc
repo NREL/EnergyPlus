@@ -7357,7 +7357,6 @@ namespace Furnaces {
         Real64 TempHeatOutput;      // Temporary Sensible output of heating coil while iterating on PLR (W)
         Real64 TempLatentOutput;    // Temporary Latent output of AC at increasing PLR (W)
         //                                           ! (Temp variables are used to find min PLR for positive latent removal)
-        std::array<Real64, 10> Par;    // parameters passed to RegulaFalsi function
         Real64 TempMinPLR;             // Temporary min latent PLR when hum control is required and iter is exceeded
         Real64 TempMinPLR2;            // Temporary min latent PLR when cyc fan hum control is required and iter is exceeded
         Real64 TempMaxPLR;             // Temporary max latent PLR when hum control is required and iter is exceeded
@@ -7579,18 +7578,7 @@ namespace Furnaces {
                             state.dataFurnaces->Furnace(FurnaceNum).HeatingConvergenceTolerance; // Error tolerance for convergence from input deck
 
                         int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
-                        Par[0] = double(FurnaceNum);
-                        Par[1] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                        if (FirstHVACIteration) Par[1] = 1.0;
-                        Par[2] = double(OpMode);
-                        Par[3] = double(CompressorOp);
-                        Par[4] = SystemSensibleLoad;
-                        Par[5] = 0.0;               // FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
-                        Par[6] = 1.0;               // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
-                        Par[7] = OnOffAirFlowRatio; // Ratio of compressor ON mass flow rate to AVERAGE mass flow rate over time step
-                        Par[8] = 0.0;               // HXUnitOn is always false for HX
-                        Par[9] = 0.0;
-                        //         HeatErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
+                        // HeatErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
                         auto f = [&state, FurnaceNum, FirstHVACIteration, OpMode, CompressorOp, SystemSensibleLoad](Real64 const PartLoadRatio) {
                             return CalcFurnaceResidual(state,
                                                        PartLoadRatio,
@@ -7815,18 +7803,7 @@ namespace Furnaces {
                                                  .HeatingConvergenceTolerance; // Error tolerance for convergence from input deck
 
                             int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
-                            Par[0] = double(FurnaceNum);
-                            Par[1] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                            if (FirstHVACIteration) Par[1] = 1.0;
-                            Par[2] = double(OpMode);
-                            Par[3] = double(CompressorOp);
-                            Par[4] = SystemSensibleLoad;
-                            Par[5] = 0.0;               // FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
-                            Par[6] = 1.0;               // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
-                            Par[7] = OnOffAirFlowRatio; // Ratio of compressor ON mass flow rate to AVERAGE mass flow rate over time step
-                            Par[8] = 0.0;               // HXUnitOn is always false for HX
-                            Par[9] = 0.0;
-                            //         HeatErrorToler is in fraction load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
+                            // HeatErrorToler is in fraction load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
                             auto f = [&state, FurnaceNum, FirstHVACIteration, OpMode, CompressorOp, SystemSensibleLoad](Real64 const PartLoadRatio) {
                                 return CalcFurnaceResidual(state,
                                                            PartLoadRatio,
@@ -8129,24 +8106,8 @@ namespace Furnaces {
                             CoolErrorToler = state.dataFurnaces->Furnace(FurnaceNum)
                                                  .CoolingConvergenceTolerance; // Error tolerance for convergence from input deck
                             int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
-                            Par[0] = double(FurnaceNum);
-                            Par[1] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                            if (FirstHVACIteration) Par[1] = 1.0;
-                            Par[2] = double(OpMode);
-                            Par[3] = double(CompressorOp);
-                            Par[4] = CoolCoilLoad;
-                            Par[5] = 1.0;               // FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
-                            Par[6] = 1.0;               // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
-                            Par[7] = OnOffAirFlowRatio; // Ratio of compressor ON mass flow rate to AVERAGE mass flow rate over time step
                             Real64 par8_HXFlag = HXUnitOn ? 1.0 : 0.0;
-                            if (HXUnitOn) {
-                                Par[8] = 1.0;
-                            } else {
-                                Par[8] = 0.0;
-                            }
-                            //             Par(10) is the heating coil PLR, set this value to 0 for sensible PLR calculations.
-                            Par[9] = 0.0;
-                            //             CoolErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
+                            // CoolErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
                             auto f = [&state, FurnaceNum, FirstHVACIteration, OpMode, CompressorOp, CoolCoilLoad, par8_HXFlag](
                                          Real64 const PartLoadRatio) {
                                 return CalcFurnaceResidual(state,
@@ -8326,47 +8287,27 @@ namespace Furnaces {
                             CoolErrorToler = state.dataFurnaces->Furnace(FurnaceNum).CoolingConvergenceTolerance; // Error tolerance for convergence
 
                             int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
-                            Par[0] = double(FurnaceNum);
-                            Par[1] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
-                            if (FirstHVACIteration) Par[1] = 1.0;
-                            Par[2] = double(OpMode);
-                            Par[3] = double(CompressorOp);
-                            //           Multimode always controls to meet the SENSIBLE load (however, HXUnitOn is now TRUE)
+                            // Multimode always controls to meet the SENSIBLE load (however, HXUnitOn is now TRUE)
                             Real64 par4_load;
                             if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode) {
-                                Par[4] = CoolCoilLoad;
                                 par4_load = CoolCoilLoad;
                             } else {
-                                Par[4] = SystemMoistureLoad;
                                 par4_load = SystemMoistureLoad;
                             }
-                            Par[5] = 1.0; // FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
-                            //           Multimode always controls to meet the SENSIBLE load (however, HXUnitOn is now TRUE)
+                            // Multimode always controls to meet the SENSIBLE load (however, HXUnitOn is now TRUE)
                             Real64 par6_LatentSens;
                             if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode) {
                                 par6_LatentSens = 1.0;
-                                Par[6] = 1.0; // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
                             } else {
                                 par6_LatentSens = 0.0;
-                                Par[6] = 0.0;
                             }
-                            Par[7] = OnOffAirFlowRatio; // Ratio of compressor ON mass flow rate to AVERAGE mass flow rate over time step
                             Real64 par8_HXUnit = HXUnitOn ? 1.0 : 0.0;
-                            if (HXUnitOn) {
-                                Par[8] = 1.0;
-                            } else {
-                                Par[8] = 0.0;
-                            }
-                            //           Par(10) used only with cycling fan.
-                            //           Par(10) is the heating coil PLR, set this value only if there is a heating load (heating PLR > 0)
-                            //           and the latent PLR is being calculated. Otherwise set Par(10) to 0.
                             Real64 par9_HtgCoilPLR;
-                            if (OpMode == CycFanCycCoil && state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio > 0.0 && Par[6] == 0.0) {
+                            if (OpMode == CycFanCycCoil && state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio > 0.0 &&
+                                par6_LatentSens == 0.0) {
                                 par9_HtgCoilPLR = state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio;
-                                Par[9] = state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio;
                             } else {
                                 par9_HtgCoilPLR = 0.0;
-                                Par[9] = 0.0;
                             }
                             auto f = [&state,
                                       FurnaceNum,
@@ -8406,7 +8347,7 @@ namespace Furnaces {
                                     //               Set cooling to heating PLR for use with Subroutine CalcFurnaceOutput. IF Par(10) = 0,
                                     //               heating PLR = 0 so set the CoolingHeatingPLRRatio to 1 so the cooling PLR is used in the
                                     //               DX cooling coil calculations.
-                                    if (Par[9] > 0.0) {
+                                    if (par9_HtgCoilPLR > 0.0) {
                                         //                 Par(10) = Furnace(FurnaceNum)%HeatPartLoadRatio
                                         //                 OpMode = CycFan and Furnace(FurnaceNum)%HeatPartLoadRatio must be > 0 for Part(10) to be
                                         //                 greater than 0
@@ -8439,7 +8380,7 @@ namespace Furnaces {
                                     TempMinPLR -= 0.001;
 
                                     //               Set cooling to heating PLR for use with Subroutine CalcFurnaceOutput.
-                                    if (Par[9] > 0.0) {
+                                    if (par9_HtgCoilPLR > 0.0) {
                                         //                 Par(10) = Furnace(FurnaceNum)%HeatPartLoadRatio
                                         //                 OpMode = CycFan and Furnace(FurnaceNum)%HeatPartLoadRatio must be > 0 for Part(10) to be
                                         //                 greater than 0 Since the latent output of cycling fan systems is 0 at PLR=0, do not allow
@@ -8495,7 +8436,7 @@ namespace Furnaces {
                                 if (SolFlag == -1) {
 
                                     //               Set cooling to heating PLR for use with Subroutine CalcFurnaceOutput.
-                                    if (Par[9] > 0.0) {
+                                    if (par9_HtgCoilPLR > 0.0) {
                                         //                 Par(10) = Furnace(FurnaceNum)%HeatPartLoadRatio
                                         //                 OpMode = CycFan and Furnace(FurnaceNum)%HeatPartLoadRatio must be > 0 for Part(10) to be
                                         //                 greater than 0
