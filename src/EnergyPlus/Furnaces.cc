@@ -7358,7 +7358,6 @@ namespace Furnaces {
         Real64 TempLatentOutput;    // Temporary Latent output of AC at increasing PLR (W)
         //                                           ! (Temp variables are used to find min PLR for positive latent removal)
         std::array<Real64, 10> Par;    // parameters passed to RegulaFalsi function
-        int SolFlag;                   // return flag from RegulaFalsi
         Real64 TempMinPLR;             // Temporary min latent PLR when hum control is required and iter is exceeded
         Real64 TempMinPLR2;            // Temporary min latent PLR when cyc fan hum control is required and iter is exceeded
         Real64 TempMaxPLR;             // Temporary max latent PLR when hum control is required and iter is exceeded
@@ -7368,9 +7367,8 @@ namespace Furnaces {
         Real64 HeatingLatentOutput;
         Real64 OutdoorDryBulbTemp; // secondary coil (condenser) entering dry bulb temperature
 
-        auto &CoolCoilLoad = state.dataFurnaces->CoolCoilLoad;
-        auto &SystemSensibleLoad = state.dataFurnaces->SystemSensibleLoad;
-        auto &HumControl = state.dataFurnaces->HumControl;
+        Real64 &SystemSensibleLoad = state.dataFurnaces->SystemSensibleLoad;
+        bool &HumControl = state.dataFurnaces->HumControl;
 
         // Set local variables
         FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
@@ -7461,6 +7459,7 @@ namespace Furnaces {
             if (state.dataFurnaces->HPDehumidificationLoadFlag) HumControl = true;
         } else { // not FirstHVACIteration
             // Init for heating
+            Real64 &CoolCoilLoad = state.dataFurnaces->CoolCoilLoad;
             if (state.dataFurnaces->HeatingLoad) {
                 CoolCoilLoad = 0.0;
                 if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_AirToAir ||
@@ -7579,7 +7578,7 @@ namespace Furnaces {
                         HeatErrorToler =
                             state.dataFurnaces->Furnace(FurnaceNum).HeatingConvergenceTolerance; // Error tolerance for convergence from input deck
 
-                        SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
+                        int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                         Par[0] = double(FurnaceNum);
                         Par[1] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
                         if (FirstHVACIteration) Par[1] = 1.0;
@@ -7815,7 +7814,7 @@ namespace Furnaces {
                             HeatErrorToler = state.dataFurnaces->Furnace(FurnaceNum)
                                                  .HeatingConvergenceTolerance; // Error tolerance for convergence from input deck
 
-                            SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
+                            int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                             Par[0] = double(FurnaceNum);
                             Par[1] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
                             if (FirstHVACIteration) Par[1] = 1.0;
@@ -8129,7 +8128,7 @@ namespace Furnaces {
                             // Calculate the sensible part load ratio through iteration
                             CoolErrorToler = state.dataFurnaces->Furnace(FurnaceNum)
                                                  .CoolingConvergenceTolerance; // Error tolerance for convergence from input deck
-                            SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
+                            int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                             Par[0] = double(FurnaceNum);
                             Par[1] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
                             if (FirstHVACIteration) Par[1] = 1.0;
@@ -8326,7 +8325,7 @@ namespace Furnaces {
 
                             CoolErrorToler = state.dataFurnaces->Furnace(FurnaceNum).CoolingConvergenceTolerance; // Error tolerance for convergence
 
-                            SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
+                            int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                             Par[0] = double(FurnaceNum);
                             Par[1] = 0.0; // FLAG, if 1.0 then FirstHVACIteration equals TRUE, if 0.0 then FirstHVACIteration equals false
                             if (FirstHVACIteration) Par[1] = 1.0;
