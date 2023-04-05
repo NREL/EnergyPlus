@@ -8825,8 +8825,6 @@ namespace Furnaces {
         int FurnaceInletNode;      // heat pump Inlet node
         int FurnaceOutletNode;     // heat pump Outlet node
 
-        int OASysInletNode;        // node number of return air inlet to OA sys
-        int OASysOutletNode;       // node number of mixed air outlet of OA sys
         int OpMode;                // Mode of Operation (fan cycling = 1 or fan continuous = 2)
         bool HumControl;           // Logical flag signaling when dehumidification is required
         Real64 SuppHeatCoilLoad;   // Load passed to supplemental heater (W)
@@ -8846,10 +8844,6 @@ namespace Furnaces {
         OnOffAirFlowRatio = 1.0;
         FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
         FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
-        if (state.dataAirLoop->AirToOANodeInfo(AirLoopNum).OASysExists) {
-            OASysOutletNode = state.dataAirLoop->AirToOANodeInfo(AirLoopNum).OASysOutletNodeNum;
-            OASysInletNode = state.dataAirLoop->AirToOANodeInfo(AirLoopNum).OASysInletNodeNum;
-        }
         OpMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode;
         state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = state.dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate;
         HumControl = false;
@@ -9908,7 +9902,6 @@ namespace Furnaces {
         Real64 RuntimeFrac;            // heat pump runtime fraction
         Real64 CoolingHeatingPLRRatio; // ratio of cooling PLR to heating PLR, used for cycling fan RH control
         bool HXUnitOn;                 // flag to enable HX based on zone moisture load
-        bool errFlag;                  // flag denoting error in runtime calculation
 
         //        // Convert parameters to usable variables
         //        int FurnaceNum = int(Par(1));
@@ -9940,6 +9933,7 @@ namespace Furnaces {
 
         //  OnOffAirFlowRatio = Par(8)
         if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_WaterToAir) {
+            bool errFlag = false;
             HeatPumpRunFrac(state, FurnaceNum, PartLoadRatio, errFlag, RuntimeFrac);
             state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = PartLoadRatio;
             state.dataFurnaces->Furnace(FurnaceNum).WSHPRuntimeFrac = RuntimeFrac;
