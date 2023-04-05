@@ -12505,6 +12505,7 @@ namespace Furnaces {
                 }
             }
         }
+
         if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) == 0.0) || state.dataHVACGlobal->TurnFansOff ||
             (GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr) == 0.0 && !state.dataHVACGlobal->TurnFansOn)) {
             state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
