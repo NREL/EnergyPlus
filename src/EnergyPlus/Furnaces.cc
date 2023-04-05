@@ -2106,9 +2106,9 @@ namespace Furnaces {
                     }
 
                     // Get DX cooling coil capacity
+                    errFlag = false;
                     state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity =
                         HVACHXAssistedCoolingCoil::GetCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
-                    errFlag = false;
                     if (errFlag) {
                         ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                         ErrorsFound = true;
@@ -5208,13 +5208,10 @@ namespace Furnaces {
         Real64 LatentOutput;   // no load latent output (coils off) (W)
         Real64 QToCoolSetPt;   // sensible load to cooling setpoint (W)
         Real64 QToHeatSetPt;   // sensible load to heating setpoint (W)
-        int ZoneInNode;        // Zone inlet node number in the controlled zone
         // calculation (kg/kg)
         Real64 DeltaMassRate; // Difference of mass flow rate between
         // inlet node and system outlet node
         Real64 MassFlowRate; // mass flow rate to calculate loss
-        std::string FanType; // used in warning messages
-        std::string FanName; // used in warning messages
 
         Real64 SumOfMassFlowRateMax(0.0);                 // the sum of mass flow rates at inlet to zones in an airloop
         Real64 CntrlZoneTerminalUnitMassFlowRateMax(0.0); // Maximum mass flow rate through controlled zone terminal unit
@@ -5226,8 +5223,6 @@ namespace Furnaces {
         Real64 CoilMaxVolFlowRate(0.0);          // coil fluid maximum volume flow rate
         Real64 QActual(0.0);                     // coil actual capacity
         Real64 SUPHEATERLOAD(0.0);               // SUPPLEMENTAL HEATER LOAD
-        int NumOfSpeedCooling;                   // Number of speeds for cooling
-        int NumOfSpeedHeating;                   // Number of speeds for heating
         Real64 RhoAir;                           // Air density at InNode
         Furnaces::ModeOfOperation OperatingMode; // track cooling, heating, and no cooling or heating modes
         Furnaces::ModeOfOperation OperatingModeMinusOne;
@@ -5588,6 +5583,8 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).NoHeatCoolSpeedRatio = state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow /
                                                                                    state.dataFurnaces->Furnace(FurnaceNum).ActualFanVolFlowRate;
                 }
+                std::string FanType; // used in warning messages
+                std::string FanName; // used in warning messages
                 if (GetFanSpeedRatioCurveIndex(state, FanType, FanName, state.dataFurnaces->Furnace(FurnaceNum).FanIndex) > 0) {
                     if (state.dataFurnaces->Furnace(FurnaceNum).ActualFanVolFlowRate == state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow &&
                         state.dataFurnaces->Furnace(FurnaceNum).ActualFanVolFlowRate == state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow &&
@@ -5699,7 +5696,7 @@ namespace Furnaces {
 
         // Calculate air distribution losses
         if (!FirstHVACIteration && state.dataFurnaces->AirLoopPass == 1) {
-            ZoneInNode = state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode;
+            int ZoneInNode = state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode;
             MassFlowRate = Node(ZoneInNode).MassFlowRate / state.dataFurnaces->Furnace(FurnaceNum).ControlZoneMassFlowFrac;
             if (state.afn->distribution_simulated) {
                 DeltaMassRate = Node(state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum).MassFlowRate -
@@ -5906,8 +5903,8 @@ namespace Furnaces {
 
         if (state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling > 0) { // BoS, variable-speed water source hp
             // Furnace(FurnaceNum)%IdleMassFlowRate = RhoAir*Furnace(FurnaceNum)%IdleVolumeAirRate
-            NumOfSpeedCooling = state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling;
-            NumOfSpeedHeating = state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating;
+            int NumOfSpeedCooling = state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling;
+            int NumOfSpeedHeating = state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating;
             // IF MSHP system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than MSHP flow rates
             if (state.dataFurnaces->Furnace(FurnaceNum).CheckFanFlow) {
                 state.dataFurnaces->CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:VariableSpeed";
@@ -6567,7 +6564,7 @@ namespace Furnaces {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Iter;                 // iteration count
         Real64 MulSpeedFlowScale; // variable speed air flow scaling factor
-        int IHPCoilIndex(0);      // refer to cooling or heating coil in IHP
+        int IHPCoilIndex;         // refer to cooling or heating coil in IHP
         Real64 dummy(0.0);
         bool anyRan;
         ManageEMS(state, EMSManager::EMSCallFrom::UnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
