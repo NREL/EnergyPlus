@@ -247,6 +247,10 @@ namespace Furnaces {
         Array1D<Furnaces::ModeOfOperation> iterationMode; // keep track of previous iteration mode (i.e., cooling or heating)
         bool FirstPass;                                   // used to determine when first call is made
 
+        int ErrCountCyc = 0;  // Counter used to minimize the occurrence of output warnings
+        int ErrCountVar = 0;  // Counter used to minimize the occurrence of output warnings
+        int ErrCountVar2 = 0; // Counter used to minimize the occurrence of output warnings
+
         FurnaceEquipConditions()
             : FurnaceType_Num(0), FurnaceIndex(0), SchedPtr(0), FanSchedPtr(0), FanAvailSchedPtr(0), ControlZoneNum(0), ZoneSequenceCoolingNum(0),
               ZoneSequenceHeatingNum(0), CoolingCoilType_Num(0), CoolingCoilIndex(0), ActualDXCoilIndexForHXAssisted(0), CoolingCoilUpstream(true),
@@ -455,7 +459,7 @@ namespace Furnaces {
                            DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
                            int const OpMode,                                  // operating mode: CycFanCycCoil | ContFanCycCoil
                            Real64 &QZnReq,                                    // cooling or heating output needed by zone [W]
-                           Real64 &QLatReq,                                   // latent cooling output needed by zone [W]
+                           Real64 QLatReq,                                    // latent cooling output needed by zone [W]
                            int const ZoneNum,                                 // Index to zone number
                            int &SpeedNum,                                     // Speed number
                            Real64 &SpeedRatio,                                // unit speed ratio for DX coils
@@ -575,7 +579,6 @@ struct FurnacesData : BaseGlobalStruct
     // used to be statics
     Real64 CoolCoilLoad;        // Negative value means cooling required
     Real64 SystemSensibleLoad;  // Positive value means heating required
-    bool HumControl = false;    // Logical flag signaling when dehumidification is required
     Real64 TotalZoneLatentLoad; // Total ZONE latent load (not including outside air) to be removed by furnace/unitary system
     Real64 TotalZoneSensLoad;   // Total ZONE heating load (not including outside air) to be removed by furnace/unitary system
     Real64 CoolPartLoadRatio;   // Part load ratio (greater of sensible or latent part load ratio for cooling)
@@ -624,7 +627,6 @@ struct FurnacesData : BaseGlobalStruct
         MyPlantScanFlag.clear();
         MySuppCoilPlantScanFlag.clear();
 
-        HumControl = false;
         SpeedNum = 1;
         SupHeaterLoad = 0.0;
     }

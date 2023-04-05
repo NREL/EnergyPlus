@@ -7344,14 +7344,13 @@ namespace Furnaces {
         Real64 OutdoorDryBulbTemp; // secondary coil (condenser) entering dry bulb temperature
 
         Real64 &SystemSensibleLoad = state.dataFurnaces->SystemSensibleLoad;
-        bool &HumControl = state.dataFurnaces->HumControl;
 
         // Set local variables
         int FurnaceOutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
         int FurnaceInletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum;
         int ControlZoneNode = state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone;
         int OpMode = state.dataFurnaces->Furnace(FurnaceNum).OpMode; // fan operating mode
-        HumControl = false;
+        bool HumControl = false;
         // Calculate the Cp Air of zone
         Real64 cpair = PsyCpAirFnW(state.dataLoopNodes->Node(ControlZoneNode).HumRat);
         NoHeatOutput = 0.0;
@@ -10817,7 +10816,7 @@ namespace Furnaces {
                            CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
                            int const OpMode,                       // operating mode: CycFanCycCoil | ContFanCycCoil
                            Real64 &QZnReq,                         // cooling or heating output needed by zone [W]
-                           Real64 &QLatReq,                        // latent cooling output needed by zone [W]
+                           Real64 QLatReq,                         // latent cooling output needed by zone [W]
                            int const ZoneNum,                      // Index to zone number
                            int &SpeedNum,                          // Speed number
                            Real64 &SpeedRatio,                     // unit speed ratio for DX coils
@@ -10847,15 +10846,13 @@ namespace Furnaces {
         int constexpr MaxIte(500); // maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 FullOutput;          // unit full output when compressor is operating [W]
-        Real64 LowOutput;           // unit full output at low speed [W]
-        Real64 TempOutput;          // unit output when iteration limit exceeded [W]
-        Real64 NoCompOutput;        // output when no active compressor [W]
-        int SolFla;                 // Flag of RegulaFalsi solver
-        Real64 QCoilActual;         // coil load actually delivered returned to calling component
-        int i;                      // Speed index
-        int ErrCountCyc(0);         // Counter used to minimize the occurrence of output warnings
-        int ErrCountVar(0);         // Counter used to minimize the occurrence of output warnings
+        Real64 FullOutput;   // unit full output when compressor is operating [W]
+        Real64 LowOutput;    // unit full output at low speed [W]
+        Real64 TempOutput;   // unit output when iteration limit exceeded [W]
+        Real64 NoCompOutput; // output when no active compressor [W]
+        int SolFla;          // Flag of RegulaFalsi solver
+        Real64 QCoilActual;  // coil load actually delivered returned to calling component
+        int i;               // Speed index
         IHPOperationMode IHPMode(IHPOperationMode::Idle);
 
         SupHeaterLoad = 0.0;
@@ -10988,14 +10985,13 @@ namespace Furnaces {
                     General::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
-                            if (ErrCountCyc == 0) {
-                                ++ErrCountCyc;
+                            if (state.dataFurnaces->Furnace(FurnaceNum).ErrCountCyc == 0) {
+                                ++state.dataFurnaces->Furnace(FurnaceNum).ErrCountCyc;
                                 ShowWarningError(state,
                                                  format("Iteration limit exceeded calculating VS WSHP unit cycling ratio, for unit={}",
                                                         state.dataFurnaces->Furnace(FurnaceNum).Name));
                                 ShowContinueErrorTimeStamp(state, format("Cycling ratio returned={:.2R}", PartLoadFrac));
                             } else {
-                                ++ErrCountCyc;
                                 ShowRecurringWarningErrorAtEnd(
                                     state,
                                     state.dataFurnaces->Furnace(FurnaceNum).Name +
@@ -11064,14 +11060,13 @@ namespace Furnaces {
                     General::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, f, 1.0e-10, 1.0);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
-                            if (ErrCountVar == 0) {
-                                ++ErrCountVar;
+                            if (state.dataFurnaces->Furnace(FurnaceNum).ErrCountVar == 0) {
+                                ++state.dataFurnaces->Furnace(FurnaceNum).ErrCountVar;
                                 ShowWarningError(state,
                                                  format("Iteration limit exceeded calculating VS WSHP unit speed ratio, for unit={}",
                                                         state.dataFurnaces->Furnace(FurnaceNum).Name));
                                 ShowContinueErrorTimeStamp(state, format("Speed ratio returned=[{:.2R}], Speed number ={}", SpeedRatio, SpeedNum));
                             } else {
-                                ++ErrCountVar;
                                 ShowRecurringWarningErrorAtEnd(
                                     state,
                                     state.dataFurnaces->Furnace(FurnaceNum).Name +
@@ -11145,14 +11140,13 @@ namespace Furnaces {
                 }
                 if (SolFla == -1) {
                     if (!state.dataGlobal->WarmupFlag) {
-                        if (ErrCountVar == 0) {
-                            ++ErrCountVar;
+                        if (state.dataFurnaces->Furnace(FurnaceNum).ErrCountVar2 == 0) {
+                            ++state.dataFurnaces->Furnace(FurnaceNum).ErrCountVar2;
                             ShowWarningError(state,
                                              format("Iteration limit exceeded calculating VS WSHP unit speed ratio, for unit={}",
                                                     state.dataFurnaces->Furnace(FurnaceNum).Name));
                             ShowContinueErrorTimeStamp(state, format("Speed ratio returned=[{:.2R}], Speed number ={}", SpeedRatio, SpeedNum));
                         } else {
-                            ++ErrCountVar;
                             ShowRecurringWarningErrorAtEnd(state,
                                                            state.dataFurnaces->Furnace(FurnaceNum).Name +
                                                                "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
