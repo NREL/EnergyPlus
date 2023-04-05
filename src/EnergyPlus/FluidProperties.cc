@@ -4711,92 +4711,92 @@ namespace FluidProperties {
         bool Failure;
 
         for (GlycolNum = 1; GlycolNum <= state.dataFluidProps->NumOfGlycols; ++GlycolNum) {
-            if (state.dataFluidProps->GlycolData(GlycolNum).CpDataPresent) {
+            auto &glycol = state.dataFluidProps->GlycolData(GlycolNum);
+            if (glycol.CpDataPresent) {
                 // check for lowest non-zero value by referencing temp data
-                for (IndexNum = 1; IndexNum <= state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts; ++IndexNum) {
-                    if (state.dataFluidProps->GlycolData(GlycolNum).CpValues(IndexNum) <= 0.0) continue;
-                    state.dataFluidProps->GlycolData(GlycolNum).CpLowTempIndex = IndexNum;
-                    state.dataFluidProps->GlycolData(GlycolNum).CpLowTempValue = state.dataFluidProps->GlycolData(GlycolNum).CpTemps(IndexNum);
+                for (IndexNum = 1; IndexNum <= glycol.NumCpTempPts; ++IndexNum) {
+                    if (glycol.CpValues(IndexNum) <= 0.0) continue;
+                    glycol.CpLowTempIndex = IndexNum;
+                    glycol.CpLowTempValue = glycol.CpTemps(IndexNum);
                     break;
                 }
                 // check for highest non-zero value by referencing temp data
-                for (IndexNum = state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts; IndexNum >= 1; --IndexNum) {
-                    if (state.dataFluidProps->GlycolData(GlycolNum).CpValues(IndexNum) <= 0.0) continue;
-                    state.dataFluidProps->GlycolData(GlycolNum).CpHighTempIndex = IndexNum;
-                    state.dataFluidProps->GlycolData(GlycolNum).CpHighTempValue = state.dataFluidProps->GlycolData(GlycolNum).CpTemps(IndexNum);
+                for (IndexNum = glycol.NumCpTempPts; IndexNum >= 1; --IndexNum) {
+                    if (glycol.CpValues(IndexNum) <= 0.0) continue;
+                    glycol.CpHighTempIndex = IndexNum;
+                    glycol.CpHighTempValue = glycol.CpTemps(IndexNum);
                     break;
                 }
             }
-            if (state.dataFluidProps->GlycolData(GlycolNum).RhoDataPresent) {
+            if (glycol.RhoDataPresent) {
                 // check for lowest non-zero value by referencing temp data
-                for (IndexNum = 1; IndexNum <= state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts; ++IndexNum) {
-                    if (state.dataFluidProps->GlycolData(GlycolNum).RhoValues(IndexNum) <= 0.0) continue;
-                    state.dataFluidProps->GlycolData(GlycolNum).RhoLowTempIndex = IndexNum;
-                    state.dataFluidProps->GlycolData(GlycolNum).RhoLowTempValue = state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(IndexNum);
+                for (IndexNum = 1; IndexNum <= glycol.NumRhoTempPts; ++IndexNum) {
+                    if (glycol.RhoValues(IndexNum) <= 0.0) continue;
+                    glycol.RhoLowTempIndex = IndexNum;
+                    glycol.RhoLowTempValue = glycol.RhoTemps(IndexNum);
                     break;
                 }
                 // check for highest non-zero value  by referencing temp data
-                for (IndexNum = state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts; IndexNum >= 1; --IndexNum) {
-                    if (state.dataFluidProps->GlycolData(GlycolNum).RhoValues(IndexNum) <= 0.0) continue;
-                    state.dataFluidProps->GlycolData(GlycolNum).RhoHighTempIndex = IndexNum;
-                    state.dataFluidProps->GlycolData(GlycolNum).RhoHighTempValue = state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(IndexNum);
+                for (IndexNum = glycol.NumRhoTempPts; IndexNum >= 1; --IndexNum) {
+                    if (glycol.RhoValues(IndexNum) <= 0.0) continue;
+                    glycol.RhoHighTempIndex = IndexNum;
+                    glycol.RhoHighTempValue = glycol.RhoTemps(IndexNum);
                     break;
                 }
             }
-            if (state.dataFluidProps->GlycolData(GlycolNum).CondDataPresent) {
+            if (glycol.CondDataPresent) {
                 // check for lowest non-zero value by referencing temp data
-                for (IndexNum = 1; IndexNum <= state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts; ++IndexNum) {
-                    if (state.dataFluidProps->GlycolData(GlycolNum).CondValues(IndexNum) <= 0.0) continue;
-                    state.dataFluidProps->GlycolData(GlycolNum).CondLowTempIndex = IndexNum;
-                    state.dataFluidProps->GlycolData(GlycolNum).CondLowTempValue = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(IndexNum);
+                for (IndexNum = 1; IndexNum <= glycol.NumCondTempPts; ++IndexNum) {
+                    if (glycol.CondValues(IndexNum) <= 0.0) continue;
+                    glycol.CondLowTempIndex = IndexNum;
+                    glycol.CondLowTempValue = glycol.CondTemps(IndexNum);
                     break;
                 }
                 // check for highest non-zero value  by referencing temp data
-                for (IndexNum = state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts; IndexNum >= 1; --IndexNum) {
-                    if (state.dataFluidProps->GlycolData(GlycolNum).CondValues(IndexNum) <= 0.0) continue;
-                    state.dataFluidProps->GlycolData(GlycolNum).CondHighTempIndex = IndexNum;
-                    state.dataFluidProps->GlycolData(GlycolNum).CondHighTempValue = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(IndexNum);
+                for (IndexNum = glycol.NumCondTempPts; IndexNum >= 1; --IndexNum) {
+                    if (glycol.CondValues(IndexNum) <= 0.0) continue;
+                    glycol.CondHighTempIndex = IndexNum;
+                    glycol.CondHighTempValue = glycol.CondTemps(IndexNum);
                     break;
                 }
             }
-            if (state.dataFluidProps->GlycolData(GlycolNum).ViscDataPresent) {
+            if (glycol.ViscDataPresent) {
                 // check for lowest non-zero value by referencing temp data
-                for (IndexNum = 1; IndexNum <= state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts; ++IndexNum) {
-                    if (state.dataFluidProps->GlycolData(GlycolNum).ViscValues(IndexNum) <= 0.0) continue;
-                    state.dataFluidProps->GlycolData(GlycolNum).ViscLowTempIndex = IndexNum;
-                    state.dataFluidProps->GlycolData(GlycolNum).ViscLowTempValue = state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(IndexNum);
+                for (IndexNum = 1; IndexNum <= glycol.NumViscTempPts; ++IndexNum) {
+                    if (glycol.ViscValues(IndexNum) <= 0.0) continue;
+                    glycol.ViscLowTempIndex = IndexNum;
+                    glycol.ViscLowTempValue = glycol.ViscTemps(IndexNum);
                     break;
                 }
                 // check for highest non-zero value  by referencing temp data
-                for (IndexNum = state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts; IndexNum >= 1; --IndexNum) {
-                    if (state.dataFluidProps->GlycolData(GlycolNum).ViscValues(IndexNum) <= 0.0) continue;
-                    state.dataFluidProps->GlycolData(GlycolNum).ViscHighTempIndex = IndexNum;
-                    state.dataFluidProps->GlycolData(GlycolNum).ViscHighTempValue = state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(IndexNum);
+                for (IndexNum = glycol.NumViscTempPts; IndexNum >= 1; --IndexNum) {
+                    if (glycol.ViscValues(IndexNum) <= 0.0) continue;
+                    glycol.ViscHighTempIndex = IndexNum;
+                    glycol.ViscHighTempValue = glycol.ViscTemps(IndexNum);
                     break;
                 }
             }
             Failure = false;
             // Check to see that all are set to non-zero
-            if (state.dataFluidProps->GlycolData(GlycolNum).CpDataPresent) {
-                if (state.dataFluidProps->GlycolData(GlycolNum).CpLowTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->GlycolData(GlycolNum).CpHighTempIndex == 0) Failure = true;
+            if (glycol.CpDataPresent) {
+                if (glycol.CpLowTempIndex == 0) Failure = true;
+                if (glycol.CpHighTempIndex == 0) Failure = true;
             }
-            if (state.dataFluidProps->GlycolData(GlycolNum).RhoDataPresent) {
-                if (state.dataFluidProps->GlycolData(GlycolNum).RhoLowTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->GlycolData(GlycolNum).RhoHighTempIndex == 0) Failure = true;
+            if (glycol.RhoDataPresent) {
+                if (glycol.RhoLowTempIndex == 0) Failure = true;
+                if (glycol.RhoHighTempIndex == 0) Failure = true;
             }
-            if (state.dataFluidProps->GlycolData(GlycolNum).CondDataPresent) {
-                if (state.dataFluidProps->GlycolData(GlycolNum).CondLowTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->GlycolData(GlycolNum).CondHighTempIndex == 0) Failure = true;
+            if (glycol.CondDataPresent) {
+                if (glycol.CondLowTempIndex == 0) Failure = true;
+                if (glycol.CondHighTempIndex == 0) Failure = true;
             }
-            if (state.dataFluidProps->GlycolData(GlycolNum).ViscDataPresent) {
-                if (state.dataFluidProps->GlycolData(GlycolNum).ViscLowTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->GlycolData(GlycolNum).ViscHighTempIndex == 0) Failure = true;
+            if (glycol.ViscDataPresent) {
+                if (glycol.ViscLowTempIndex == 0) Failure = true;
+                if (glycol.ViscHighTempIndex == 0) Failure = true;
             }
             if (Failure) {
                 ShowSevereError(state,
-                                format("InitializeGlycolTempLimits: Required values for Glycol={} are all zeroes for some data types.",
-                                       state.dataFluidProps->GlycolData(GlycolNum).Name));
+                                format("InitializeGlycolTempLimits: Required values for Glycol={} are all zeroes for some data types.", glycol.Name));
                 ErrorsFound = true;
             }
         }
@@ -4818,124 +4818,125 @@ namespace FluidProperties {
         // be set up for symmetry and not be limited to just valid values.
 
         for (int RefrigNum = 1; RefrigNum <= state.dataFluidProps->NumOfRefrigerants; ++RefrigNum) {
-            for (int IndexNum = 1; IndexNum <= state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints; ++IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).PsValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).PsLowPresIndex = IndexNum;
-                state.dataFluidProps->RefrigData(RefrigNum).PsLowPresValue = state.dataFluidProps->RefrigData(RefrigNum).PsValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).PsLowTempValue = state.dataFluidProps->RefrigData(RefrigNum).PsTemps(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).PsLowTempIndex = IndexNum;
+            auto &refrig = state.dataFluidProps->RefrigData(RefrigNum);
+            for (int IndexNum = 1; IndexNum <= refrig.NumPsPoints; ++IndexNum) {
+                if (refrig.PsValues(IndexNum) <= 0.0) continue;
+                refrig.PsLowPresIndex = IndexNum;
+                refrig.PsLowPresValue = refrig.PsValues(IndexNum);
+                refrig.PsLowTempValue = refrig.PsTemps(IndexNum);
+                refrig.PsLowTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints; IndexNum >= 1; --IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).PsValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).PsHighPresIndex = IndexNum;
-                state.dataFluidProps->RefrigData(RefrigNum).PsHighPresValue = state.dataFluidProps->RefrigData(RefrigNum).PsValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).PsHighTempValue = state.dataFluidProps->RefrigData(RefrigNum).PsTemps(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).PsHighTempIndex = IndexNum;
+            for (int IndexNum = refrig.NumPsPoints; IndexNum >= 1; --IndexNum) {
+                if (refrig.PsValues(IndexNum) <= 0.0) continue;
+                refrig.PsHighPresIndex = IndexNum;
+                refrig.PsHighPresValue = refrig.PsValues(IndexNum);
+                refrig.PsHighTempValue = refrig.PsTemps(IndexNum);
+                refrig.PsHighTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = 1; IndexNum <= state.dataFluidProps->RefrigData(RefrigNum).NumHPoints; ++IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).HfValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).HfLowTempValue = state.dataFluidProps->RefrigData(RefrigNum).HfValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).HfLowTempIndex = IndexNum;
+            for (int IndexNum = 1; IndexNum <= refrig.NumHPoints; ++IndexNum) {
+                if (refrig.HfValues(IndexNum) <= 0.0) continue;
+                refrig.HfLowTempValue = refrig.HfValues(IndexNum);
+                refrig.HfLowTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = state.dataFluidProps->RefrigData(RefrigNum).NumHPoints; IndexNum >= 1; --IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).HfValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).HfHighTempValue = state.dataFluidProps->RefrigData(RefrigNum).HfValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).HfHighTempIndex = IndexNum;
+            for (int IndexNum = refrig.NumHPoints; IndexNum >= 1; --IndexNum) {
+                if (refrig.HfValues(IndexNum) <= 0.0) continue;
+                refrig.HfHighTempValue = refrig.HfValues(IndexNum);
+                refrig.HfHighTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = 1; IndexNum <= state.dataFluidProps->RefrigData(RefrigNum).NumHPoints; ++IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).HfgValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).HfgLowTempValue = state.dataFluidProps->RefrigData(RefrigNum).HfgValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).HfgLowTempIndex = IndexNum;
+            for (int IndexNum = 1; IndexNum <= refrig.NumHPoints; ++IndexNum) {
+                if (refrig.HfgValues(IndexNum) <= 0.0) continue;
+                refrig.HfgLowTempValue = refrig.HfgValues(IndexNum);
+                refrig.HfgLowTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = state.dataFluidProps->RefrigData(RefrigNum).NumHPoints; IndexNum >= 1; --IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).HfgValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).HfgHighTempValue = state.dataFluidProps->RefrigData(RefrigNum).HfgValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).HfgHighTempIndex = IndexNum;
+            for (int IndexNum = refrig.NumHPoints; IndexNum >= 1; --IndexNum) {
+                if (refrig.HfgValues(IndexNum) <= 0.0) continue;
+                refrig.HfgHighTempValue = refrig.HfgValues(IndexNum);
+                refrig.HfgHighTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = 1; IndexNum <= state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints; ++IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).CpfValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).CpfLowTempValue = state.dataFluidProps->RefrigData(RefrigNum).CpfValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).CpfLowTempIndex = IndexNum;
+            for (int IndexNum = 1; IndexNum <= refrig.NumCpPoints; ++IndexNum) {
+                if (refrig.CpfValues(IndexNum) <= 0.0) continue;
+                refrig.CpfLowTempValue = refrig.CpfValues(IndexNum);
+                refrig.CpfLowTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints; IndexNum >= 1; --IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).CpfValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).CpfHighTempValue = state.dataFluidProps->RefrigData(RefrigNum).CpfValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).CpfHighTempIndex = IndexNum;
+            for (int IndexNum = refrig.NumCpPoints; IndexNum >= 1; --IndexNum) {
+                if (refrig.CpfValues(IndexNum) <= 0.0) continue;
+                refrig.CpfHighTempValue = refrig.CpfValues(IndexNum);
+                refrig.CpfHighTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = 1; IndexNum <= state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints; ++IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).CpfgValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).CpfgLowTempValue = state.dataFluidProps->RefrigData(RefrigNum).CpfgValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).CpfgLowTempIndex = IndexNum;
+            for (int IndexNum = 1; IndexNum <= refrig.NumCpPoints; ++IndexNum) {
+                if (refrig.CpfgValues(IndexNum) <= 0.0) continue;
+                refrig.CpfgLowTempValue = refrig.CpfgValues(IndexNum);
+                refrig.CpfgLowTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints; IndexNum >= 1; --IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).CpfgValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).CpfgHighTempValue = state.dataFluidProps->RefrigData(RefrigNum).CpfgValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).CpfgHighTempIndex = IndexNum;
+            for (int IndexNum = refrig.NumCpPoints; IndexNum >= 1; --IndexNum) {
+                if (refrig.CpfgValues(IndexNum) <= 0.0) continue;
+                refrig.CpfgHighTempValue = refrig.CpfgValues(IndexNum);
+                refrig.CpfgHighTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = 1; IndexNum <= state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints; ++IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).RhofValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).RhofLowTempValue = state.dataFluidProps->RefrigData(RefrigNum).RhofValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).RhofLowTempIndex = IndexNum;
+            for (int IndexNum = 1; IndexNum <= refrig.NumRhoPoints; ++IndexNum) {
+                if (refrig.RhofValues(IndexNum) <= 0.0) continue;
+                refrig.RhofLowTempValue = refrig.RhofValues(IndexNum);
+                refrig.RhofLowTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints; IndexNum >= 1; --IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).RhofValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).RhofHighTempValue = state.dataFluidProps->RefrigData(RefrigNum).RhofValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).RhofHighTempIndex = IndexNum;
+            for (int IndexNum = refrig.NumRhoPoints; IndexNum >= 1; --IndexNum) {
+                if (refrig.RhofValues(IndexNum) <= 0.0) continue;
+                refrig.RhofHighTempValue = refrig.RhofValues(IndexNum);
+                refrig.RhofHighTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = 1; IndexNum <= state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints; ++IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).RhofgValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).RhofgLowTempValue = state.dataFluidProps->RefrigData(RefrigNum).RhofgValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).RhofgLowTempIndex = IndexNum;
+            for (int IndexNum = 1; IndexNum <= refrig.NumRhoPoints; ++IndexNum) {
+                if (refrig.RhofgValues(IndexNum) <= 0.0) continue;
+                refrig.RhofgLowTempValue = refrig.RhofgValues(IndexNum);
+                refrig.RhofgLowTempIndex = IndexNum;
                 break;
             }
-            for (int IndexNum = state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints; IndexNum >= 1; --IndexNum) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).RhofgValues(IndexNum) <= 0.0) continue;
-                state.dataFluidProps->RefrigData(RefrigNum).RhofgHighTempValue = state.dataFluidProps->RefrigData(RefrigNum).RhofgValues(IndexNum);
-                state.dataFluidProps->RefrigData(RefrigNum).RhofgHighTempIndex = IndexNum;
+            for (int IndexNum = refrig.NumRhoPoints; IndexNum >= 1; --IndexNum) {
+                if (refrig.RhofgValues(IndexNum) <= 0.0) continue;
+                refrig.RhofgHighTempValue = refrig.RhofgValues(IndexNum);
+                refrig.RhofgHighTempIndex = IndexNum;
                 break;
             }
             bool Failure = false;
             // Check to see that all are set to non-zero
-            if (state.dataFluidProps->RefrigData(RefrigNum).NumPsPoints > 0) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).PsLowPresIndex == 0) Failure = true;
-                if (state.dataFluidProps->RefrigData(RefrigNum).PsLowTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->RefrigData(RefrigNum).PsHighPresIndex == 0) Failure = true;
-                if (state.dataFluidProps->RefrigData(RefrigNum).PsHighTempIndex == 0) Failure = true;
+            if (refrig.NumPsPoints > 0) {
+                if (refrig.PsLowPresIndex == 0) Failure = true;
+                if (refrig.PsLowTempIndex == 0) Failure = true;
+                if (refrig.PsHighPresIndex == 0) Failure = true;
+                if (refrig.PsHighTempIndex == 0) Failure = true;
             }
-            if (state.dataFluidProps->RefrigData(RefrigNum).NumHPoints > 0) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).HfLowTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->RefrigData(RefrigNum).HfgLowTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->RefrigData(RefrigNum).HfHighTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->RefrigData(RefrigNum).HfgHighTempIndex == 0) Failure = true;
+            if (refrig.NumHPoints > 0) {
+                if (refrig.HfLowTempIndex == 0) Failure = true;
+                if (refrig.HfgLowTempIndex == 0) Failure = true;
+                if (refrig.HfHighTempIndex == 0) Failure = true;
+                if (refrig.HfgHighTempIndex == 0) Failure = true;
             }
-            if (state.dataFluidProps->RefrigData(RefrigNum).NumCpPoints > 0) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).CpfLowTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->RefrigData(RefrigNum).CpfgLowTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->RefrigData(RefrigNum).CpfHighTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->RefrigData(RefrigNum).CpfgHighTempIndex == 0) Failure = true;
+            if (refrig.NumCpPoints > 0) {
+                if (refrig.CpfLowTempIndex == 0) Failure = true;
+                if (refrig.CpfgLowTempIndex == 0) Failure = true;
+                if (refrig.CpfHighTempIndex == 0) Failure = true;
+                if (refrig.CpfgHighTempIndex == 0) Failure = true;
             }
-            if (state.dataFluidProps->RefrigData(RefrigNum).NumRhoPoints > 0) {
-                if (state.dataFluidProps->RefrigData(RefrigNum).RhofLowTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->RefrigData(RefrigNum).RhofgLowTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->RefrigData(RefrigNum).RhofHighTempIndex == 0) Failure = true;
-                if (state.dataFluidProps->RefrigData(RefrigNum).RhofgHighTempIndex == 0) Failure = true;
+            if (refrig.NumRhoPoints > 0) {
+                if (refrig.RhofLowTempIndex == 0) Failure = true;
+                if (refrig.RhofgLowTempIndex == 0) Failure = true;
+                if (refrig.RhofHighTempIndex == 0) Failure = true;
+                if (refrig.RhofgHighTempIndex == 0) Failure = true;
             }
             if (Failure) {
-                ShowSevereError(state,
-                                format("InitializeRefrigerantLimits: Required values for Refrigerant={} are all zeroes for some data types.",
-                                       state.dataFluidProps->RefrigData(RefrigNum).Name));
+                ShowSevereError(
+                    state,
+                    format("InitializeRefrigerantLimits: Required values for Refrigerant={} are all zeroes for some data types.", refrig.Name));
                 ErrorsFound = true;
             }
         }
@@ -4969,278 +4970,214 @@ namespace FluidProperties {
         state.dataFluidProps->GetInput = false; // input has already been gotten
 
         for (int GlycolNum = 1; GlycolNum <= state.dataFluidProps->NumOfGlycols; ++GlycolNum) {
+            auto &glycol = state.dataFluidProps->GlycolData(GlycolNum);
             int GlycolIndex = 0; // used in routine calls -- value is returned when first 0
             // Lay out the basic values:
-            if (!state.dataFluidProps->GlycolData(GlycolNum).GlycolName.empty()) {
-                print(state.files.debug,
-                      "Glycol={}, Mixture fluid={}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).Name,
-                      state.dataFluidProps->GlycolData(GlycolNum).GlycolName);
+            if (!glycol.GlycolName.empty()) {
+                print(state.files.debug, "Glycol={}, Mixture fluid={}\n", glycol.Name, glycol.GlycolName);
             } else {
-                print(state.files.debug, "Glycol={}\n", state.dataFluidProps->GlycolData(GlycolNum).Name);
+                print(state.files.debug, "Glycol={}\n", glycol.Name);
             }
-            print(state.files.debug, "Concentration:,{:.2R}\n", state.dataFluidProps->GlycolData(GlycolNum).Concentration);
-            if (state.dataFluidProps->GlycolData(GlycolNum).CpDataPresent) {
+            print(state.files.debug, "Concentration:,{:.2R}\n", glycol.Concentration);
+            if (glycol.CpDataPresent) {
                 print(state.files.debug,
                       "Specific Heat Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).CpLowTempValue,
-                      state.dataFluidProps->GlycolData(GlycolNum).CpLowTempIndex,
-                      state.dataFluidProps->GlycolData(GlycolNum).CpHighTempValue,
-                      state.dataFluidProps->GlycolData(GlycolNum).CpHighTempIndex);
+                      glycol.CpLowTempValue,
+                      glycol.CpLowTempIndex,
+                      glycol.CpHighTempValue,
+                      glycol.CpHighTempIndex);
                 print(state.files.debug, "{}", "Temperatures:");
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
-                    print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop));
+                for (int Loop = 1; Loop <= glycol.NumCpTempPts - 1; ++Loop) {
+                    print(state.files.debug, ",{:.2R}", glycol.CpTemps(Loop));
                 }
-                print(state.files.debug,
-                      ",{}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).CpTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts));
+                print(state.files.debug, ",{}\n", glycol.CpTemps(glycol.NumCpTempPts));
                 print(state.files.debug, "{}", "Specific Heat:");
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
-                    print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CpValues(Loop));
+                for (int Loop = 1; Loop <= glycol.NumCpTempPts - 1; ++Loop) {
+                    print(state.files.debug, ",{:.2R}", glycol.CpValues(Loop));
                 }
-                print(state.files.debug,
-                      ",{}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).CpValues(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts));
+                print(state.files.debug, ",{}\n", glycol.CpValues(glycol.NumCpTempPts));
             }
-            if (state.dataFluidProps->GlycolData(GlycolNum).RhoDataPresent) {
+            if (glycol.RhoDataPresent) {
                 print(state.files.debug,
                       "Density Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).RhoLowTempValue,
-                      state.dataFluidProps->GlycolData(GlycolNum).RhoLowTempIndex,
-                      state.dataFluidProps->GlycolData(GlycolNum).RhoHighTempValue,
-                      state.dataFluidProps->GlycolData(GlycolNum).RhoHighTempIndex);
+                      glycol.RhoLowTempValue,
+                      glycol.RhoLowTempIndex,
+                      glycol.RhoHighTempValue,
+                      glycol.RhoHighTempIndex);
                 print(state.files.debug, "{}", "Temperatures:");
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
-                    print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop));
+                for (int Loop = 1; Loop <= glycol.NumRhoTempPts - 1; ++Loop) {
+                    print(state.files.debug, ",{:.2R}", glycol.RhoTemps(Loop));
                 }
-                print(state.files.debug,
-                      ",{}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts));
+                print(state.files.debug, ",{}\n", glycol.RhoTemps(glycol.NumRhoTempPts));
                 print(state.files.debug, "{}", "Density:");
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
-                    print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).RhoValues(Loop));
+                for (int Loop = 1; Loop <= glycol.NumRhoTempPts - 1; ++Loop) {
+                    print(state.files.debug, ",{:.2R}", glycol.RhoValues(Loop));
                 }
-                print(state.files.debug,
-                      ",{}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts));
+                print(state.files.debug, ",{}\n", glycol.RhoTemps(glycol.NumRhoTempPts));
             }
-            if (state.dataFluidProps->GlycolData(GlycolNum).CondDataPresent) {
+            if (glycol.CondDataPresent) {
                 print(state.files.debug,
                       "Conductivity Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).CondLowTempValue,
-                      state.dataFluidProps->GlycolData(GlycolNum).CondLowTempIndex,
-                      state.dataFluidProps->GlycolData(GlycolNum).CondHighTempValue,
-                      state.dataFluidProps->GlycolData(GlycolNum).CondHighTempIndex);
+                      glycol.CondLowTempValue,
+                      glycol.CondLowTempIndex,
+                      glycol.CondHighTempValue,
+                      glycol.CondHighTempIndex);
                 print(state.files.debug, "{}", "Temperatures:");
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
-                    print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop));
+                for (int Loop = 1; Loop <= glycol.NumCondTempPts - 1; ++Loop) {
+                    print(state.files.debug, ",{:.2R}", glycol.CondTemps(Loop));
                 }
-                print(state.files.debug,
-                      ",{}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts));
+                print(state.files.debug, ",{}\n", glycol.CondTemps(glycol.NumCondTempPts));
                 print(state.files.debug, "{}", "Conductivity:");
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
-                    print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CondValues(Loop));
+                for (int Loop = 1; Loop <= glycol.NumCondTempPts - 1; ++Loop) {
+                    print(state.files.debug, ",{:.2R}", glycol.CondValues(Loop));
                 }
-                print(state.files.debug,
-                      ",{}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).CondValues(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts));
+                print(state.files.debug, ",{}\n", glycol.CondValues(glycol.NumCondTempPts));
             }
-            if (state.dataFluidProps->GlycolData(GlycolNum).ViscDataPresent) {
+            if (glycol.ViscDataPresent) {
                 print(state.files.debug,
                       "Viscosity Data points:,Low Temperature=,{:.2R},Index=,{},High Temperature=,{:.2R},Index=,{}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).ViscLowTempValue,
-                      state.dataFluidProps->GlycolData(GlycolNum).ViscLowTempIndex,
-                      state.dataFluidProps->GlycolData(GlycolNum).ViscHighTempValue,
-                      state.dataFluidProps->GlycolData(GlycolNum).ViscHighTempIndex);
+                      glycol.ViscLowTempValue,
+                      glycol.ViscLowTempIndex,
+                      glycol.ViscHighTempValue,
+                      glycol.ViscHighTempIndex);
                 print(state.files.debug, "{}", "Temperatures:");
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
-                    print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop));
+                for (int Loop = 1; Loop <= glycol.NumViscTempPts - 1; ++Loop) {
+                    print(state.files.debug, ",{:.2R}", glycol.ViscTemps(Loop));
                 }
-                print(state.files.debug,
-                      ",{}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts));
+                print(state.files.debug, ",{}\n", glycol.ViscTemps(glycol.NumViscTempPts));
                 print(state.files.debug, "{}", "Viscosity:");
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
-                    print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).ViscValues(Loop));
+                for (int Loop = 1; Loop <= glycol.NumViscTempPts - 1; ++Loop) {
+                    print(state.files.debug, ",{:.2R}", glycol.ViscValues(Loop));
                 }
-                print(state.files.debug,
-                      ",{}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).ViscValues(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts));
+                print(state.files.debug, ",{}\n", glycol.ViscValues(glycol.NumViscTempPts));
             }
             // ============================================
             // Glycol Results, using out of bounds to out of bounds values in calling
             // ============================================
 
             // ========= Specific Heat from Temperatures
-            print(state.files.debug, "Glycol={} **** Results ****\n", state.dataFluidProps->GlycolData(GlycolNum).Name);
-            if (state.dataFluidProps->GlycolData(GlycolNum).CpDataPresent) {
+            print(state.files.debug, "Glycol={} **** Results ****\n", glycol.Name);
+            if (glycol.CpDataPresent) {
                 print(state.files.debug, "Specific Heat Results at Temperatures:");
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CpTemps(1) - incr);
+                print(state.files.debug, ",{:.2R}", glycol.CpTemps(1) - incr);
 
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
-                    print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop));
-                    Temperature =
-                        state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop) +
-                        (state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop + 1) - state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop)) /
-                            2.0;
+                for (int Loop = 1; Loop <= glycol.NumCpTempPts - 1; ++Loop) {
+                    print(state.files.debug, ",{:.2R}", glycol.CpTemps(Loop));
+                    Temperature = glycol.CpTemps(Loop) + (glycol.CpTemps(Loop + 1) - glycol.CpTemps(Loop)) / 2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug,
-                      ",{:.2R}",
-                      state.dataFluidProps->GlycolData(GlycolNum).CpTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts));
-                print(state.files.debug,
-                      ",{:.2R}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).CpTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts) + incr);
+                print(state.files.debug, ",{:.2R}", glycol.CpTemps(glycol.NumCpTempPts));
+                print(state.files.debug, ",{:.2R}\n", glycol.CpTemps(glycol.NumCpTempPts) + incr);
                 print(state.files.debug, "Specific Heat:");
-                Temperature = state.dataFluidProps->GlycolData(GlycolNum).CpTemps(1) - incr;
-                ReturnValue = GetSpecificHeatGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                Temperature = glycol.CpTemps(1) - incr;
+                ReturnValue = GetSpecificHeatGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}", ReturnValue);
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts - 1; ++Loop) {
-                    Temperature = state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop);
-                    ReturnValue =
-                        GetSpecificHeatGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                for (int Loop = 1; Loop <= glycol.NumCpTempPts - 1; ++Loop) {
+                    Temperature = glycol.CpTemps(Loop);
+                    ReturnValue = GetSpecificHeatGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.2R}", ReturnValue);
-                    Temperature =
-                        state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop) +
-                        (state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop + 1) - state.dataFluidProps->GlycolData(GlycolNum).CpTemps(Loop)) /
-                            2.0;
-                    ReturnValue =
-                        GetSpecificHeatGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    Temperature = glycol.CpTemps(Loop) + (glycol.CpTemps(Loop + 1) - glycol.CpTemps(Loop)) / 2.0;
+                    ReturnValue = GetSpecificHeatGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.2R}", ReturnValue);
                 }
-                Temperature = state.dataFluidProps->GlycolData(GlycolNum).CpTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts);
-                ReturnValue = GetSpecificHeatGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                Temperature = glycol.CpTemps(glycol.NumCpTempPts);
+                ReturnValue = GetSpecificHeatGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}", ReturnValue);
-                Temperature = state.dataFluidProps->GlycolData(GlycolNum).CpTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCpTempPts) + incr;
-                ReturnValue = GetSpecificHeatGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                Temperature = glycol.CpTemps(glycol.NumCpTempPts) + incr;
+                ReturnValue = GetSpecificHeatGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.2R}\n", ReturnValue);
             }
 
             // ========= Density from Temperatures
-            if (state.dataFluidProps->GlycolData(GlycolNum).RhoDataPresent) {
+            if (glycol.RhoDataPresent) {
                 print(state.files.debug, "Density Results at Temperatures:");
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(1) - incr);
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
-                    print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop));
-                    Temperature =
-                        state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop) + (state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop + 1) -
-                                                                                      state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop)) /
-                                                                                         2.0;
+                print(state.files.debug, ",{:.2R}", glycol.RhoTemps(1) - incr);
+                for (int Loop = 1; Loop <= glycol.NumRhoTempPts - 1; ++Loop) {
+                    print(state.files.debug, ",{:.2R}", glycol.RhoTemps(Loop));
+                    Temperature = glycol.RhoTemps(Loop) + (glycol.RhoTemps(Loop + 1) - glycol.RhoTemps(Loop)) / 2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug,
-                      ",{}",
-                      state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts));
-                print(state.files.debug,
-                      ",{:.2R}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts) + incr);
+                print(state.files.debug, ",{}", glycol.RhoTemps(glycol.NumRhoTempPts));
+                print(state.files.debug, ",{:.2R}\n", glycol.RhoTemps(glycol.NumRhoTempPts) + incr);
                 print(state.files.debug, "Density:");
-                Temperature = state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(1) - incr;
-                ReturnValue = GetDensityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                Temperature = glycol.RhoTemps(1) - incr;
+                ReturnValue = GetDensityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.3R}", ReturnValue);
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts - 1; ++Loop) {
-                    Temperature = state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop);
-                    ReturnValue = GetDensityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                for (int Loop = 1; Loop <= glycol.NumRhoTempPts - 1; ++Loop) {
+                    Temperature = glycol.RhoTemps(Loop);
+                    ReturnValue = GetDensityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.3R}", ReturnValue);
-                    Temperature =
-                        state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop) + (state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop + 1) -
-                                                                                      state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(Loop)) /
-                                                                                         2.0;
-                    ReturnValue = GetDensityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    Temperature = glycol.RhoTemps(Loop) + (glycol.RhoTemps(Loop + 1) - glycol.RhoTemps(Loop)) / 2.0;
+                    ReturnValue = GetDensityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.3R}", ReturnValue);
                 }
-                Temperature = state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts);
-                ReturnValue = GetDensityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                Temperature = glycol.RhoTemps(glycol.NumRhoTempPts);
+                ReturnValue = GetDensityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.3R}", ReturnValue);
-                Temperature = state.dataFluidProps->GlycolData(GlycolNum).RhoTemps(state.dataFluidProps->GlycolData(GlycolNum).NumRhoTempPts) + incr;
-                ReturnValue = GetDensityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                Temperature = glycol.RhoTemps(glycol.NumRhoTempPts) + incr;
+                ReturnValue = GetDensityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.3R}\n", ReturnValue);
             }
 
             // ========= Conductivity from Temperatures
-            if (state.dataFluidProps->GlycolData(GlycolNum).CondDataPresent) {
+            if (glycol.CondDataPresent) {
                 print(state.files.debug, "Conductivity Results at Temperatures:");
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CondTemps(1) - incr);
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
-                    print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop));
-                    Temperature = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop) +
-                                  (state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop + 1) -
-                                   state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop)) /
-                                      2.0;
+                print(state.files.debug, ",{:.2R}", glycol.CondTemps(1) - incr);
+                for (int Loop = 1; Loop <= glycol.NumCondTempPts - 1; ++Loop) {
+                    print(state.files.debug, ",{:.2R}", glycol.CondTemps(Loop));
+                    Temperature = glycol.CondTemps(Loop) + (glycol.CondTemps(Loop + 1) - glycol.CondTemps(Loop)) / 2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug,
-                      ",{:.2R}",
-                      state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts));
-                print(state.files.debug,
-                      ",{:.2R}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts) + incr);
+                print(state.files.debug, ",{:.2R}", glycol.CondTemps(glycol.NumCondTempPts));
+                print(state.files.debug, ",{:.2R}\n", glycol.CondTemps(glycol.NumCondTempPts) + incr);
                 print(state.files.debug, "Conductivity:");
-                Temperature = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(1) - incr;
-                ReturnValue = GetConductivityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                Temperature = glycol.CondTemps(1) - incr;
+                ReturnValue = GetConductivityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.3R}", ReturnValue);
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts - 1; ++Loop) {
-                    Temperature = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop);
-                    ReturnValue =
-                        GetConductivityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                for (int Loop = 1; Loop <= glycol.NumCondTempPts - 1; ++Loop) {
+                    Temperature = glycol.CondTemps(Loop);
+                    ReturnValue = GetConductivityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.3R}", ReturnValue);
-                    Temperature = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop) +
-                                  (state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop + 1) -
-                                   state.dataFluidProps->GlycolData(GlycolNum).CondTemps(Loop)) /
-                                      2.0;
-                    ReturnValue =
-                        GetConductivityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    Temperature = glycol.CondTemps(Loop) + (glycol.CondTemps(Loop + 1) - glycol.CondTemps(Loop)) / 2.0;
+                    ReturnValue = GetConductivityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.3R}", ReturnValue);
                 }
-                Temperature = state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts);
-                ReturnValue = GetConductivityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                Temperature = glycol.CondTemps(glycol.NumCondTempPts);
+                ReturnValue = GetConductivityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.3R}", ReturnValue);
-                Temperature =
-                    state.dataFluidProps->GlycolData(GlycolNum).CondTemps(state.dataFluidProps->GlycolData(GlycolNum).NumCondTempPts) + incr;
-                ReturnValue = GetConductivityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                Temperature = glycol.CondTemps(glycol.NumCondTempPts) + incr;
+                ReturnValue = GetConductivityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.3R}\n", ReturnValue);
             }
 
             // ========= Viscosity from Temperatures
-            if (state.dataFluidProps->GlycolData(GlycolNum).ViscDataPresent) {
+            if (glycol.ViscDataPresent) {
                 print(state.files.debug, "Viscosity Results at Temperatures:");
-                print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(1) - incr);
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
-                    print(state.files.debug, ",{:.2R}", state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop));
-                    Temperature = state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop) +
-                                  (state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop + 1) -
-                                   state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop)) /
-                                      2.0;
+                print(state.files.debug, ",{:.2R}", glycol.ViscTemps(1) - incr);
+                for (int Loop = 1; Loop <= glycol.NumViscTempPts - 1; ++Loop) {
+                    print(state.files.debug, ",{:.2R}", glycol.ViscTemps(Loop));
+                    Temperature = glycol.ViscTemps(Loop) + (glycol.ViscTemps(Loop + 1) - glycol.ViscTemps(Loop)) / 2.0;
                     print(state.files.debug, ",{:.2R}", Temperature);
                 }
-                print(state.files.debug,
-                      ",{:.2R}",
-                      state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts));
-                print(state.files.debug,
-                      ",{:.2R}\n",
-                      state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts) + incr);
+                print(state.files.debug, ",{:.2R}", glycol.ViscTemps(glycol.NumViscTempPts));
+                print(state.files.debug, ",{:.2R}\n", glycol.ViscTemps(glycol.NumViscTempPts) + incr);
                 print(state.files.debug, "Viscosity:");
-                Temperature = state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(1) - incr;
-                ReturnValue = GetViscosityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                Temperature = glycol.ViscTemps(1) - incr;
+                ReturnValue = GetViscosityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.4R}", ReturnValue);
-                for (int Loop = 1; Loop <= state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts - 1; ++Loop) {
-                    Temperature = state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop);
-                    ReturnValue = GetViscosityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                for (int Loop = 1; Loop <= glycol.NumViscTempPts - 1; ++Loop) {
+                    Temperature = glycol.ViscTemps(Loop);
+                    ReturnValue = GetViscosityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.4R}", ReturnValue);
-                    Temperature = state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop) +
-                                  (state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop + 1) -
-                                   state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(Loop)) /
-                                      2.0;
-                    ReturnValue = GetViscosityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                    Temperature = glycol.ViscTemps(Loop) + (glycol.ViscTemps(Loop + 1) - glycol.ViscTemps(Loop)) / 2.0;
+                    ReturnValue = GetViscosityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                     print(state.files.debug, ",{:.4R}", ReturnValue);
                 }
-                Temperature = state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts);
-                ReturnValue = GetViscosityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                Temperature = glycol.ViscTemps(glycol.NumViscTempPts);
+                ReturnValue = GetViscosityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.4R}", ReturnValue);
-                Temperature =
-                    state.dataFluidProps->GlycolData(GlycolNum).ViscTemps(state.dataFluidProps->GlycolData(GlycolNum).NumViscTempPts) + incr;
-                ReturnValue = GetViscosityGlycol(state, state.dataFluidProps->GlycolData(GlycolNum).Name, Temperature, GlycolIndex, RoutineName);
+                Temperature = glycol.ViscTemps(glycol.NumViscTempPts) + incr;
+                ReturnValue = GetViscosityGlycol(state, glycol.Name, Temperature, GlycolIndex, RoutineName);
                 print(state.files.debug, ",{:.4R}\n", ReturnValue);
             }
         }
