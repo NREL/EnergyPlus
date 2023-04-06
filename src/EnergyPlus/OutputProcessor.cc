@@ -1004,7 +1004,6 @@ namespace OutputProcessor {
                     AddMeter(state, state.dataIPShortCut->cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
                     op->EnergyMeters(op->NumEnergyMeters).TypeOfMeter = MtrType::Custom;
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-                    errFlag = false;
                     int eMeterResource =
                         getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2)));
                     if (static_cast<Constant::eResource>(eMeterResource) == Constant::eResource::Invalid) {
@@ -1264,7 +1263,6 @@ namespace OutputProcessor {
                     op->EnergyMeters(op->NumEnergyMeters).SourceMeter = WhichMeter;
 
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-                    errFlag = false;
                     int eMeterResource =
                         getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2)));
                     if (static_cast<Constant::eResource>(eMeterResource) == Constant::eResource::Invalid) {
