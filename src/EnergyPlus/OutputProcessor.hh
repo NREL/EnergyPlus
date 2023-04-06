@@ -604,6 +604,9 @@ namespace OutputProcessor {
 
     void GetCustomMeterInput(EnergyPlusData &state, bool &ErrorsFound);
 
+    void
+    GetStandardMeterResourceType(EnergyPlusData &state, std::string &OutResourceType, std::string const &UserInputResourceType, bool &ErrorsFound);
+
     void AddMeter(EnergyPlusData &state,
                   std::string const &Name,         // Name for the meter
                   OutputProcessor::Unit MtrUnits,  // Units for the meter
