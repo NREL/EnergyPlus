@@ -1227,7 +1227,12 @@ namespace OutputProcessor {
         bool error_found = false;
 
         for (auto const &meterType : resource_map) {
-            GetStandardMeterResourceType(*state, out_resource_type, meterType.first, error_found);
+            int eMeterResource = getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(meterType.first));
+            if (static_cast<Constant::eResource>(eMeterResource) == Constant::eResource::Invalid) {
+                ShowSevereError(*state, format("Illegal OutResourceType (for Meters) Entered={}", meterType.first));
+                error_found = true;
+            }
+            out_resource_type = Constant::eResourceNames[eMeterResource];
             EXPECT_EQ(meterType.second, out_resource_type);
             EXPECT_FALSE(error_found);
         }
@@ -1237,7 +1242,12 @@ namespace OutputProcessor {
         auto const meterType = "BAD INPUT";
         out_resource_type = "BAD INPUT";
 
-        GetStandardMeterResourceType(*state, out_resource_type, meterType, error_found);
+        int eMeterResource = getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(meterType));
+        if (static_cast<Constant::eResource>(eMeterResource) == Constant::eResource::Invalid) {
+            ShowSevereError(*state, format("Illegal OutResourceType (for Meters) Entered={}", meterType));
+            error_found = true;
+        }
+        out_resource_type = Constant::eResourceNames[eMeterResource];
 
         EXPECT_EQ(meterType, out_resource_type);
         EXPECT_TRUE(error_found);
