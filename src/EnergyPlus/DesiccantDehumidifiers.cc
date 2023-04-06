@@ -136,7 +136,6 @@ namespace DesiccantDehumidifiers {
         //                      for Gas Research Institute
         //       DATE WRITTEN   March 2001
         //       MODIFIED       June 2007, R. Raustad, Added new dehumidifier type -- DESICCANT DEHUMIDIFIER
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Manage the simulation of an air dehumidifier
