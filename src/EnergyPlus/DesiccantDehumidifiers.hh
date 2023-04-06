@@ -304,10 +304,6 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct
     Array1D<DesiccantDehumidifiers::DesiccantDehumidifierData> DesicDehum;
     std::unordered_map<std::string, std::string> UniqueDesicDehumNames;
 
-    int MaxNums = 0;           // Maximum number of numeric input fields
-    int MaxAlphas = 0;         // Maximum number of alpha input fields
-    int TotalArgs = 0;         // Total number of alpha and numeric arguments (max) for a certain object in the input file
-    Real64 SteamDensity = 0.0; // density of steam at 100C
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
     Real64 QRegen = 0.0;          // required coil load passed to sim heating coil routine (W)

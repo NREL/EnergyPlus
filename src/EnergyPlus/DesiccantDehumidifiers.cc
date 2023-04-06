@@ -224,7 +224,6 @@ namespace DesiccantDehumidifiers {
         static std::string const dehumidifierDesiccantNoFans("Dehumidifier:Desiccant:NoFans");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int DesicDehumNum;              // Current desiccant dehumidifier number
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int IOStatus;                   // Used in GetObjectItem
@@ -250,10 +249,7 @@ namespace DesiccantDehumidifiers {
         int SteamIndex;                 // steam coil Index
         bool RegairHeatingCoilFlag;     // local error flag
 
-        auto &MaxNums(state.dataDesiccantDehumidifiers->MaxNums);
-        auto &MaxAlphas(state.dataDesiccantDehumidifiers->MaxAlphas);
-        auto &TotalArgs(state.dataDesiccantDehumidifiers->TotalArgs);
-        auto &SteamDensity(state.dataDesiccantDehumidifiers->SteamDensity);
+        int TotalArgs = 0;
 
         state.dataDesiccantDehumidifiers->NumSolidDesicDehums =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, dehumidifierDesiccantNoFans);
@@ -267,8 +263,8 @@ namespace DesiccantDehumidifiers {
         state.dataDesiccantDehumidifiers->GetInputDesiccantDehumidifier = false;
 
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, dehumidifierDesiccantNoFans, TotalArgs, NumAlphas, NumNumbers);
-        MaxNums = max(MaxNums, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
+        int MaxNums = NumNumbers;
+        int MaxAlphas = NumAlphas;
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "Dehumidifier:Desiccant:System", TotalArgs, NumAlphas, NumNumbers);
         MaxNums = max(MaxNums, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -297,7 +293,7 @@ namespace DesiccantDehumidifiers {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            DesicDehumNum = DesicDehumIndex;
+            int DesicDehumNum = DesicDehumIndex;
 
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataDesiccantDehumidifiers->UniqueDesicDehumNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
@@ -477,7 +473,7 @@ namespace DesiccantDehumidifiers {
                     desicDehum.MaxCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, desicDehum.RegenCoilIndex, errFlag);
                     if (desicDehum.MaxCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        SteamDensity = FluidProperties::GetSatDensityRefrig(
+                        Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(
                             state, fluidNameSteam, state.dataDesiccantDehumidifiers->TempSteamIn, 1.0, SteamIndex, dehumidifierDesiccantNoFans);
                         desicDehum.MaxCoilFluidFlow *= SteamDensity;
                     }
@@ -653,7 +649,7 @@ namespace DesiccantDehumidifiers {
 
             CurrentModuleObject = "Dehumidifier:Desiccant:System";
 
-            DesicDehumNum = DesicDehumIndex + state.dataDesiccantDehumidifiers->NumSolidDesicDehums;
+            int DesicDehumNum = DesicDehumIndex + state.dataDesiccantDehumidifiers->NumSolidDesicDehums;
             auto &desicDehum = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum);
 
             desicDehum.DehumType = CurrentModuleObject;
@@ -1001,7 +997,7 @@ namespace DesiccantDehumidifiers {
                         desicDehum.MaxCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, desicDehum.RegenCoilIndex, errFlag);
                         if (desicDehum.MaxCoilFluidFlow > 0.0) {
                             SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                            SteamDensity = FluidProperties::GetSatDensityRefrig(
+                            Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(
                                 state, fluidNameSteam, state.dataDesiccantDehumidifiers->TempSteamIn, 1.0, SteamIndex, dehumidifierDesiccantNoFans);
                             desicDehum.MaxCoilFluidFlow *= SteamDensity;
                         }
@@ -1452,7 +1448,7 @@ namespace DesiccantDehumidifiers {
         }
 
         // SET UP OUTPUTS
-        for (DesicDehumNum = 1; DesicDehumNum <= state.dataDesiccantDehumidifiers->NumSolidDesicDehums; ++DesicDehumNum) {
+        for (int DesicDehumNum = 1; DesicDehumNum <= state.dataDesiccantDehumidifiers->NumSolidDesicDehums; ++DesicDehumNum) {
             auto &desicDehum = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum);
             // Setup Report variables for the Desiccant Dehumidifiers
             SetupOutputVariable(state,
