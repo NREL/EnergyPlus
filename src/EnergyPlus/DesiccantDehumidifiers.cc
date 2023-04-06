@@ -123,6 +123,7 @@ namespace DesiccantDehumidifiers {
     //              (Please see copyright and disclaimer information at end of module)
 
     static std::string const fluidNameSteam("STEAM");
+    Real64 constexpr TempSteamIn = 100.0;
 
     void SimDesiccantDehumidifier(EnergyPlusData &state,
                                   std::string const &CompName,   // name of the dehumidifier unit
@@ -474,7 +475,7 @@ namespace DesiccantDehumidifiers {
                     if (desicDehum.MaxCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(
-                            state, fluidNameSteam, state.dataDesiccantDehumidifiers->TempSteamIn, 1.0, SteamIndex, dehumidifierDesiccantNoFans);
+                            state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, dehumidifierDesiccantNoFans);
                         desicDehum.MaxCoilFluidFlow *= SteamDensity;
                     }
 
@@ -998,7 +999,7 @@ namespace DesiccantDehumidifiers {
                         if (desicDehum.MaxCoilFluidFlow > 0.0) {
                             SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                             Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(
-                                state, fluidNameSteam, state.dataDesiccantDehumidifiers->TempSteamIn, 1.0, SteamIndex, dehumidifierDesiccantNoFans);
+                                state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, dehumidifierDesiccantNoFans);
                             desicDehum.MaxCoilFluidFlow *= SteamDensity;
                         }
 
@@ -1698,7 +1699,7 @@ namespace DesiccantDehumidifiers {
                     if (desicDehum.MaxCoilFluidFlow > 0.0) {
                         int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         Real64 FluidDensity = FluidProperties::GetSatDensityRefrig(
-                            state, fluidNameSteam, state.dataDesiccantDehumidifiers->TempSteamIn, 1.0, SteamIndex, RoutineName);
+                            state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
                         desicDehum.MaxCoilFluidFlow *= FluidDensity;
                     }
                 }
@@ -1807,7 +1808,7 @@ namespace DesiccantDehumidifiers {
                             if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                                 int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                                 Real64 FluidDensity = FluidProperties::GetSatDensityRefrig(
-                                    state, fluidNameSteam, state.dataDesiccantDehumidifiers->TempSteamIn, 1.0, SteamIndex, RoutineName);
+                                    state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
                                 desicDehum.MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
                             }
                         }

@@ -297,7 +297,6 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct
     int NumDesicDehums = 0;                    // number of desiccant dehumidifiers of all types
     int NumSolidDesicDehums = 0;               // number of solid desiccant dehumidifiers
     int NumGenericDesicDehums = 0;             // number of generic desiccant dehumidifiers
-    Real64 TempSteamIn = 100.0;                // steam coil steam inlet temperature
     bool GetInputDesiccantDehumidifier = true; // First time, input is "gotten"
     bool InitDesiccantDehumidifierOneTimeFlag = true;
     bool MySetPointCheckFlag = true; // I think this actually needs to be a vector or a member variable on the struct, not just a single bool
