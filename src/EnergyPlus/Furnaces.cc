@@ -695,9 +695,6 @@ namespace Furnaces {
         // METHODOLOGY EMPLOYED:
         // Uses "Get" routines to read in data.
 
-        // Locals
-        std::string_view CurrentModuleObject; // Object type for getting and error messages
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         std::string_view constexpr getUnitaryHeatOnly("GetUnitaryHeatOnly");
         std::string_view constexpr getAirLoopHVACHeatCoolInput("GetAirLoopHVACHeatCoolInput");
@@ -760,7 +757,7 @@ namespace Furnaces {
         int MaxNumbers = 0;
         int MaxAlphas = 0;
 
-        CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatOnly";
+        std::string_view CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatOnly";
         int NumHeatOnly = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
