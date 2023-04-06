@@ -7463,26 +7463,53 @@ namespace FluidProperties {
                                  std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
-        std::uint64_t constexpr Grid_Shift = 64 - 12 - t_sh_precision_bits;
+        // Get the input if we haven't already
+        if (state.dataFluidProps->GetInput) {
+            GetFluidPropertiesData(state);
+            state.dataFluidProps->GetInput = false;
+        }
 
-        double const t(Temperature + 1000 * GlycolIndex);
+        // If no glycols, no fluid properties can be evaluated
+        int GlycolNum(0);
+        if (state.dataFluidProps->NumOfGlycols == 0)
+            ReportFatalGlycolErrors(
+                state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
+
+        // If glycol index has not yet been found for this fluid, find its value now
+        if (GlycolIndex > 0) {
+            GlycolNum = GlycolIndex;
+        } else { // Find which glycol (index) is being requested
+            GlycolNum = FindGlycol(state, Glycol);
+            if (GlycolNum == 0) {
+                ReportFatalGlycolErrors(
+                    state, state.dataFluidProps->NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom);
+            }
+            GlycolIndex = GlycolNum;
+        }
+
+        int constexpr SpecificHeatPrecisionBits = 24;
+        std::uint64_t constexpr SpecificHeatMask = (FluidPropsGlycolData::SpecificHeatCacheSize - 1);
+        std::uint64_t constexpr SpecificHeatShift = 64 - 12 - SpecificHeatPrecisionBits;
+
+        double const t = Temperature;
 
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
         DISABLE_WARNING_UNINITIALIZED
         // cppcheck-suppress invalidPointerCast
-        std::uint64_t const T_tag(*reinterpret_cast<std::uint64_t const *>(&t) >> Grid_Shift);
+        std::uint64_t const tagTemp = *reinterpret_cast<std::uint64_t const *>(&t) >> SpecificHeatShift;
         DISABLE_WARNING_POP
 
-        std::uint64_t const hash(T_tag & t_sh_cache_mask);
-        auto &cTsh(state.dataFluidProps->cached_t_sh[hash]);
+        std::uint64_t const hash = tagTemp & SpecificHeatMask;
+        auto &glycol = state.dataFluidProps->GlycolData(GlycolIndex);
+	auto &cacheEntry = glycol.specificHeatCache[hash];
 
-        if (cTsh.iT != T_tag) {
-            cTsh.iT = T_tag;
-            cTsh.sh = GetSpecificHeatGlycol_raw(state, Glycol, Temperature, GlycolIndex, CalledFrom);
+        if (cacheEntry.tagTemp != tagTemp) {
+            cacheEntry.tagTemp = tagTemp;
+            cacheEntry.specificHeat = GetSpecificHeatGlycol_raw(state, Glycol, Temperature, GlycolIndex, CalledFrom);
         }
 
-        return cTsh.sh; // saturation pressure {Pascals}
+        return cacheEntry.specificHeat; // saturation pressure {Pascals}
     }
 
     Real64 GetSpecificHeatGlycol_raw(EnergyPlusData &state,

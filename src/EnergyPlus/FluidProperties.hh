@@ -93,12 +93,6 @@ namespace FluidProperties {
     constexpr static std::string_view EthyleneGlycol("EthyleneGlycol");
     constexpr static std::string_view PropyleneGlycol("PropyleneGlycol");
 
-#ifdef EP_cache_GlycolSpecificHeat
-    int constexpr t_sh_cache_size = 1024 * 1024;
-    int constexpr t_sh_precision_bits = 24;
-    std::uint64_t constexpr t_sh_cache_mask = (t_sh_cache_size - 1);
-#endif
-
     struct FluidPropsRefrigerantData
     {
         // Members
@@ -249,6 +243,15 @@ namespace FluidProperties {
         Array1D<Real64> ViscTemps;  // Temperatures for viscosity of glycol
         Array1D<Real64> ViscValues; // viscosity values (mPa-s)
 
+#ifdef EP_cache_GlycolSpecificHeat
+        struct SpecificHeatCacheEntry {
+            std::uint64_t tagTemp = 0;
+            Real64 specificHeat = 0.0;
+        };
+
+        static int constexpr SpecificHeatCacheSize = 1024;
+        std::array<SpecificHeatCacheEntry, SpecificHeatCacheSize> specificHeatCache;
+#endif
         // Default Constructor
         FluidPropsGlycolData()
             : GlycolIndex(0), Concentration(1.0), CpDataPresent(false), CpLowTempValue(0.0), CpHighTempValue(0.0), CpLowTempIndex(0),
@@ -328,18 +331,6 @@ namespace FluidProperties {
               DensityLowErrIndex(0), DensityHighErrIndex(0), DensityLowErrCount(0), ConductivityLowErrIndex(0), ConductivityHighErrIndex(0),
               ConductivityLowErrCount(0), ConductivityHighErrCount(0), ViscosityLowErrIndex(0), ViscosityHighErrIndex(0), ViscosityLowErrCount(0),
               ViscosityHighErrCount(0)
-        {
-        }
-    };
-
-    struct cached_tsh
-    {
-        // Members
-        std::uint64_t iT;
-        Real64 sh;
-
-        // Default Constructor
-        cached_tsh() : iT(1000), sh(0.0)
         {
         }
     };
@@ -658,9 +649,6 @@ struct FluidPropertiesData : BaseGlobalStruct
     int TempRangeErrCountGetInterpolatedSatProp = 0;
     int TempRangeErrIndexGetInterpolatedSatProp = 0;
 
-#ifdef EP_cache_GlycolSpecificHeat
-    std::array<FluidProperties::cached_tsh, FluidProperties::t_sh_cache_size> cached_t_sh;
-#endif
 
     void clear_state() override
     {
