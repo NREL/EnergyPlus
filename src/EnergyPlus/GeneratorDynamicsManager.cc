@@ -167,7 +167,6 @@ namespace GeneratorDynamicsManager {
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   February-March 2007  (replaced July 2006 attempt)
         //       MODIFIED       Dec 2009, check and constrain with flow available from plant
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // provide a service to other generators to make decisions, mostly temporal, or cross-timestep issues
@@ -788,8 +787,6 @@ namespace GeneratorDynamicsManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // check if change in fuel flow rate is okay
@@ -798,14 +795,13 @@ namespace GeneratorDynamicsManager {
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 MdotFuel;
         Real64 MaxMdot;
         Real64 MinMdot;
         int DynaCntrlNum(0);
 
         ConstrainedIncreasingMdot = false;
         ConstrainedDecreasingMdot = false;
-        MdotFuel = FuelFlowRequest;
+        Real64 MdotFuel = FuelFlowRequest;
 
         // get index from GeneratorNum
         switch (GeneratorType) {
@@ -848,7 +844,6 @@ namespace GeneratorDynamicsManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec 2009
-        //       MODIFIED       na
         //       RE-ENGINEERED  B. Griffith, Sept 2010, plant upgrade
 
         // PURPOSE OF THIS FUNCTION:
@@ -857,9 +852,6 @@ namespace GeneratorDynamicsManager {
         // METHODOLOGY EMPLOYED:
         // apply contraints imposed by plant according to flow lock, first HVAC iteration etc.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using Curve::CurveValue;
         using PlantUtilities::SetComponentFlowRate;
@@ -867,28 +859,11 @@ namespace GeneratorDynamicsManager {
         // Return value
         Real64 FuncDetermineCWMdotForInternalFlowControl;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 MdotCW;
-        int InletNode;
-        int OutletNode;
-
-        InletNode = state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID;
-        OutletNode = state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantOutletNodeID;
+        int InletNode = state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID;
+        int OutletNode = state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantOutletNodeID;
 
         // first evaluate curve
-        MdotCW = CurveValue(state, state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WaterFlowCurveID, Pnetss, TcwIn);
+        Real64 MdotCW = CurveValue(state, state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WaterFlowCurveID, Pnetss, TcwIn);
 
         // now apply constraints
         MdotCW = max(0.0, MdotCW);
