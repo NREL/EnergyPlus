@@ -1593,7 +1593,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
         int NumComp = state.dataZoneEquip->ReturnAirPath(BCount).NumOfComponents;
         print(state.files.bnd, "   #Components on Return Air Path,{}\n", NumComp);
 
-        std::string AirPathNodeName = state.dataLoopNodes->NodeID(state.dataZoneEquip->ReturnAirPath(BCount).OutletNodeNum);
+        std::string const &AirPathNodeName = state.dataLoopNodes->NodeID(state.dataZoneEquip->ReturnAirPath(BCount).OutletNodeNum);
 
         int MixerCount = 0;
         for (int Count = 1; Count <= NumComp; ++Count) {
