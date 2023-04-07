@@ -158,21 +158,7 @@ void ControlCompOutput(EnergyPlusData &state,
     // meet the zone load.
 
     // METHODOLOGY EMPLOYED:
-    // Currently this is using an intervasl halving scheme to a control tolerance
-
-    // Using/Aliasing
-    using namespace DataLoopNode;
-    using BaseboardRadiator::SimHWConvective;
-    using FanCoilUnits::Calc4PipeFanCoil;
-
-    using HWBaseboardRadiator::CalcHWBaseboard;
-    using PlantUtilities::SetActuatedBranchFlowRate;
-    using Psychrometrics::PsyCpAirFnW;
-    using SteamBaseboardRadiator::CalcSteamBaseboard;
-    using UnitHeater::CalcUnitHeaterComponents;
-    using UnitVentilator::CalcUnitVentilatorComponents;
-    using VentilatedSlab::CalcVentilatedSlabComps;
-    using WaterCoils::SimulateWaterCoilComponents;
+    // Currently this is using an interval halving scheme to a control tolerance
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     // Iteration maximum for reheat control
@@ -309,12 +295,12 @@ void ControlCompOutput(EnergyPlusData &state,
                 }
                 // Set the Actuated node MassFlowRate with zero value
                 if (plantLoc.loopNum) { // this is a plant component
-                    SetActuatedBranchFlowRate(state,
-                                              ZoneController.CalculatedSetPoint,
-                                              ActuatedNode,
-                                              plantLoc,
-                                              false); // Autodesk:OPTIONAL LoopSide, BranchIndex used without PRESENT check
-                } else {                              // assume not a plant component
+                    PlantUtilities::SetActuatedBranchFlowRate(state,
+                                                              ZoneController.CalculatedSetPoint,
+                                                              ActuatedNode,
+                                                              plantLoc,
+                                                              false); // Autodesk:OPTIONAL LoopSide, BranchIndex used without PRESENT check
+                } else {                                              // assume not a plant component
                     state.dataLoopNodes->Node(ActuatedNode).MassFlowRate = ZoneController.CalculatedSetPoint;
                 }
                 return;
@@ -417,12 +403,12 @@ void ControlCompOutput(EnergyPlusData &state,
 
         // Set the Actuated node MassFlowRate with the new value
         if (plantLoc.loopNum) { // this is a plant component
-            SetActuatedBranchFlowRate(state,
-                                      ZoneController.CalculatedSetPoint,
-                                      ActuatedNode,
-                                      plantLoc,
-                                      false); // Autodesk:OPTIONAL LoopSide, BranchIndex used without PRESENT check
-        } else {                              // assume not a plant component, leave alone
+            PlantUtilities::SetActuatedBranchFlowRate(state,
+                                                      ZoneController.CalculatedSetPoint,
+                                                      ActuatedNode,
+                                                      plantLoc,
+                                                      false); // Autodesk:OPTIONAL LoopSide, BranchIndex used without PRESENT check
+        } else {                                              // assume not a plant component, leave alone
             state.dataLoopNodes->Node(ActuatedNode).MassFlowRate = ZoneController.CalculatedSetPoint;
         }
 
@@ -441,10 +427,10 @@ void ControlCompOutput(EnergyPlusData &state,
         switch (SimCompNum) {      // Tuned If block changed to switch
         case ParallelPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
             // simulate series piu reheat coil
-            SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
+            WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
-            CpAir =
-                PsyCpAirFnW(state.dataLoopNodes->Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            CpAir = Psychrometrics::PsyCpAirFnW(
+                state.dataLoopNodes->Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             LoadMet = CpAir * state.dataLoopNodes->Node(TempOutNode).MassFlowRate *
                       (state.dataLoopNodes->Node(TempOutNode).Temp -
                        state.dataLoopNodes->Node(TempInNode).Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
@@ -453,10 +439,10 @@ void ControlCompOutput(EnergyPlusData &state,
 
         case SeriesPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
             // simulate series piu reheat coil
-            SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
+            WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
-            CpAir =
-                PsyCpAirFnW(state.dataLoopNodes->Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            CpAir = Psychrometrics::PsyCpAirFnW(
+                state.dataLoopNodes->Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             LoadMet = CpAir * state.dataLoopNodes->Node(TempOutNode).MassFlowRate *
                       (state.dataLoopNodes->Node(TempOutNode).Temp -
                        state.dataLoopNodes->Node(TempInNode).Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
@@ -465,9 +451,9 @@ void ControlCompOutput(EnergyPlusData &state,
 
         case HeatingCoilWaterNum: // 'COIL:HEATING:WATER'
             // Simulate reheat coil for the VAV system
-            SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
+            WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
-            CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(TempOutNode).HumRat);
+            CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(TempOutNode).HumRat);
             if (present(AirMassFlow)) {
                 LoadMet = AirMassFlow * CpAir * state.dataLoopNodes->Node(TempOutNode).Temp;
                 ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
@@ -482,28 +468,28 @@ void ControlCompOutput(EnergyPlusData &state,
 
         case BBWaterConvOnlyNum: // 'ZONEHVAC:BASEBOARD:CONVECTIVE:WATER'
             // Simulate baseboard
-            SimHWConvective(state, CompNum, LoadMet);
+            BaseboardRadiator::SimHWConvective(state, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
         case BBSteamRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM'
             // Simulate baseboard
-            CalcSteamBaseboard(state, CompNum, LoadMet);
+            SteamBaseboardRadiator::CalcSteamBaseboard(state, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
         case BBWaterRadConvNum: // 'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER'
             // Simulate baseboard
-            CalcHWBaseboard(state, CompNum, LoadMet);
+            HWBaseboardRadiator::CalcHWBaseboard(state, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
         case FourPipeFanCoilNum: // 'ZONEHVAC:FOURPIPEFANCOIL'
             // Simulate fancoil unit
-            Calc4PipeFanCoil(state, CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet);
+            FanCoilUnits::Calc4PipeFanCoil(state, CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
@@ -518,21 +504,21 @@ void ControlCompOutput(EnergyPlusData &state,
 
         case UnitHeaterNum: // 'ZONEHVAC:UNITHEATER'
             // Simulate unit heater components
-            CalcUnitHeaterComponents(state, CompNum, FirstHVACIteration, LoadMet);
+            UnitHeater::CalcUnitHeaterComponents(state, CompNum, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
         case UnitVentilatorNum: // 'ZONEHVAC:UNITVENTILATOR'
             // Simulate unit ventilator components
-            CalcUnitVentilatorComponents(state, CompNum, FirstHVACIteration, LoadMet);
+            UnitVentilator::CalcUnitVentilatorComponents(state, CompNum, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
 
         case VentilatedSlabNum: // 'ZONEHVAC:VENTILATEDSLAB'
             // Simulate unit ventilator components
-            CalcVentilatedSlabComps(state, CompNum, FirstHVACIteration, LoadMet);
+            VentilatedSlab::CalcVentilatedSlabComps(state, CompNum, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
@@ -861,13 +847,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     // REFERENCES:
     // Nat. Vent. equations from ASHRAE HoF 2001 Chapt. 26
 
-    // Using/Aliasing
-    using ConvectionCoefficients::InitExteriorConvectionCoeff;
-    using DataSurfaces::SurfaceData;
-    using Psychrometrics::PsyCpAirFnW;
-    using Psychrometrics::PsyRhoAirFnPbTdbW;
-    using Psychrometrics::PsyWFnTdbTwbPb;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr g(9.807);          // gravitational constant (m/s**2)
     Real64 constexpr nu(15.66e-6);      // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
@@ -936,10 +915,10 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     //    LocalWetBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutWetBulbTemp ) / sum( Surface( SurfPtrARR ).Area );
     LocalWetBulbTemp = sum_produc_area_wetbulb / sum_area;
 
-    LocalOutHumRat = PsyWFnTdbTwbPb(state, LocalOutDryBulbTemp, LocalWetBulbTemp, state.dataEnvrn->OutBaroPress, RoutineName);
+    LocalOutHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, LocalOutDryBulbTemp, LocalWetBulbTemp, state.dataEnvrn->OutBaroPress, RoutineName);
 
-    RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
-    CpAir = PsyCpAirFnW(LocalOutHumRat);
+    RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
+    CpAir = Psychrometrics::PsyCpAirFnW(LocalOutHumRat);
     if (!state.dataEnvrn->IsRain) {
         Tamb = LocalOutDryBulbTemp;
     } else { // when raining we use wetbulb not drybulb
@@ -963,7 +942,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         // Initializations for this surface
         HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
-        InitExteriorConvectionCoeff(
+        ConvectionCoefficients::InitExteriorConvectionCoeff(
             state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         int ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
         AbsThermSurf =
@@ -1005,7 +984,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     }
     Array1D<Real64> Area(
         array_sub(state.dataSurface->Surface,
-                  &SurfaceData::Area,
+                  &DataSurfaces::SurfaceData::Area,
                   SurfPtrARR)); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
     // now figure area-weighted averages from underlying surfaces.
     //    Vwind = sum( LocalWindArr * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
@@ -1030,10 +1009,10 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     if (state.dataEnvrn->IsRain) HExt = 1000.0;
 
     //    Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    Tso = sum_product_sub(state.dataHeatBalSurf->SurfOutsideTempHist(1), state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) /
+    Tso = sum_product_sub(state.dataHeatBalSurf->SurfOutsideTempHist(1), state.dataSurface->Surface, &DataSurfaces::SurfaceData::Area, SurfPtrARR) /
           A; // Autodesk:F2C++ Functions handle array subscript usage
     //    Isc = sum( SurfQRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) /
+    Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &DataSurfaces::SurfaceData::Area, SurfPtrARR) /
           A; // Autodesk:F2C++ Functions handle array subscript usage
 
     TmeanK = 0.5 * (TmpTsBaf + Tso) + Constant::KelvinConv;
@@ -1181,14 +1160,11 @@ void CalcBasinHeaterPower(EnergyPlusData &state,
     // for the entire simulation timestep whenever the outdoor temperature is below setpoint
     // and water is not flowing through the evaporative cooled equipment.
 
-    // Using/Aliasing
-    using ScheduleManager::GetCurrentScheduleValue;
-
     Power = 0.0;
     // Operate basin heater anytime outdoor temperature is below setpoint and water is not flowing through the equipment
     // IF schedule exists, basin heater performance can be scheduled OFF
     if (SchedulePtr > 0) {
-        Real64 BasinHeaterSch = GetCurrentScheduleValue(state, SchedulePtr);
+        Real64 BasinHeaterSch = ScheduleManager::GetCurrentScheduleValue(state, SchedulePtr);
         if (Capacity > 0.0 && BasinHeaterSch > 0.0) {
             Power = max(0.0, Capacity * (SetPointTemp - state.dataEnvrn->OutDryBulbTemp));
         }
@@ -1209,9 +1185,6 @@ void TestAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine tests supply, return and overall air path integrity.
-
-    // Using/Aliasing
-    using namespace DataLoopNode;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool errFlag;
@@ -1277,10 +1250,6 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine tests supply air path integrity and displays the loop for each branch.
     // Also, input and output nodes.
-
-    // Using/Aliasing
-    using namespace DataLoopNode;
-    using namespace DataZoneEquipment;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string PrimaryAirLoopName; // Air Loop to which this supply air path is connected
@@ -1568,14 +1537,6 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     //  plenums, for example).  Similarly, Same return plenum can't be in two air loops nor as two independent
     //  return plenums in one return air path.
 
-    // Using/Aliasing
-    using namespace DataLoopNode;
-    using namespace DataZoneEquipment;
-    using namespace ZonePlenum;
-    using HVACSingleDuctInduc::FourPipeInductionUnitHasMixer;
-    using PoweredInductionUnits::PIUnitHasMixer;
-    using PurchasedAirManager::CheckPurchasedAirForReturnPlenum;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string PrimaryAirLoopName; // Air Loop to which this return air path is connected
     Array1D_bool FoundReturnPlenum;
@@ -1825,7 +1786,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     }
     if (state.dataZonePlenum->NumZoneSupplyPlenums == 0 && state.dataZonePlenum->NumZoneReturnPlenums == 0) {
         if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ReturnPlenum") > 0) {
-            GetZonePlenumInput(state);
+            ZonePlenum::GetZonePlenumInput(state);
         }
     }
 
@@ -1852,7 +1813,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                 }
             }
         }
-        if (CheckPurchasedAirForReturnPlenum(state, Count1)) FoundReturnPlenum(Count1) = true;
+        if (PurchasedAirManager::CheckPurchasedAirForReturnPlenum(state, Count1)) FoundReturnPlenum(Count1) = true;
     }
     FoundNames.deallocate();
     FoundNames.allocate(state.dataMixerComponent->NumMixers);
@@ -1876,11 +1837,12 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
         }
         if (!FoundZoneMixer(Count1)) { // could be as child on other items
             // PIU Units
-            if (PIUnitHasMixer(state, state.dataMixerComponent->MixerCond(Count1).MixerName)) FoundZoneMixer(Count1) = true;
+            if (PoweredInductionUnits::PIUnitHasMixer(state, state.dataMixerComponent->MixerCond(Count1).MixerName)) FoundZoneMixer(Count1) = true;
         }
         if (!FoundZoneMixer(Count1)) { // could be as child on other items
             // fourPipeInduction units
-            if (FourPipeInductionUnitHasMixer(state, state.dataMixerComponent->MixerCond(Count1).MixerName)) FoundZoneMixer(Count1) = true;
+            if (HVACSingleDuctInduc::FourPipeInductionUnitHasMixer(state, state.dataMixerComponent->MixerCond(Count1).MixerName))
+                FoundZoneMixer(Count1) = true;
         }
         if (!FoundZoneMixer(Count1)) { // could be as child on other items
             // Exhaust Systems
