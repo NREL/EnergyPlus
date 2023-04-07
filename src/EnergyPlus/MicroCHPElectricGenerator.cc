@@ -861,7 +861,6 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
 
     GeneratorDynamicsManager::ManageGeneratorControlState(state,
                                                           GeneratorType::MicroCHP,
-                                                          this->Name,
                                                           this->DynamicsControlID,
                                                           RunFlagElectCenter,
                                                           RunFlagPlant,
@@ -870,8 +869,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                                                           AllowedLoad,
                                                           CurrentOpMode,
                                                           PLRforSubtimestepStartUp,
-                                                          PLRforSubtimestepShutDown,
-                                                          FirstHVACIteration);
+                                                          PLRforSubtimestepShutDown);
 
     if (RunFlagElectCenter || RunFlagPlant) RunFlag = true;
 
@@ -970,9 +968,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
 
             GeneratorDynamicsManager::ManageGeneratorFuelFlow(state,
                                                               GeneratorType::MicroCHP,
-                                                              this->Name,
                                                               this->DynamicsControlID,
-                                                              RunFlag,
                                                               MdotFuel,
                                                               MdotFuelAllowed,
                                                               ConstrainedIncreasingNdot,
@@ -1083,15 +1079,8 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
         bool ConstrainedDecreasingNdot(false);
         Real64 MdotFuelAllowed = 0.0;
 
-        GeneratorDynamicsManager::ManageGeneratorFuelFlow(state,
-                                                          GeneratorType::MicroCHP,
-                                                          this->Name,
-                                                          this->DynamicsControlID,
-                                                          RunFlag,
-                                                          MdotFuel,
-                                                          MdotFuelAllowed,
-                                                          ConstrainedIncreasingNdot,
-                                                          ConstrainedDecreasingNdot);
+        GeneratorDynamicsManager::ManageGeneratorFuelFlow(
+            state, GeneratorType::MicroCHP, this->DynamicsControlID, MdotFuel, MdotFuelAllowed, ConstrainedIncreasingNdot, ConstrainedDecreasingNdot);
 
         if (ConstrainedIncreasingNdot || ConstrainedDecreasingNdot) { // recalculate Pnetss with new NdotFuel with iteration
             MdotFuel = MdotFuelAllowed;

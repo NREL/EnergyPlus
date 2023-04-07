@@ -87,7 +87,6 @@ namespace GeneratorDynamicsManager {
     //  given load request data
     //   models requiring calculations across timesteps
 
-    using namespace DataGenerators;
     void SetupGeneratorControlStateManager(EnergyPlusData &state, int const GenNum) // index of generator to setup
     {
         // SUBROUTINE INFORMATION:
@@ -148,18 +147,16 @@ namespace GeneratorDynamicsManager {
     }
 
     void ManageGeneratorControlState(EnergyPlusData &state,
-                                     GeneratorType const GeneratorType,                 // type of Generator
-                                     [[maybe_unused]] std::string const &GeneratorName, // user specified name of Generator
-                                     int const GeneratorNum,                            // Generator number
-                                     bool const RunFlagElectCenter,                 // TRUE when Generator operating per electric load center request
-                                     bool const RunFlagPlant,                       // TRUE when generator operating per Plant request (always false)
-                                     Real64 const ElecLoadRequest,                  // Generator Electrical power demand
-                                     Real64 const ThermalLoadRequest,               // cogenerator Thermal power demand
-                                     Real64 &ElecLoadProvided,                      // power allowed
-                                     DataGenerators::OperatingMode &OperatingMode,  // operating mode
-                                     Real64 &PLRforSubtimestepStartUp,              // part load ratio for switch to normal from start up
-                                     Real64 &PLRforSubtimestepShutDown,             // part load ratio for switch from cool down to other
-                                     [[maybe_unused]] bool const FirstHVACIteration // True is this is first HVAC iteration
+                                     GeneratorType const GeneratorType,            // type of Generator
+                                     int const GeneratorNum,                       // Generator number
+                                     bool const RunFlagElectCenter,                // TRUE when Generator operating per electric load center request
+                                     bool const RunFlagPlant,                      // TRUE when generator operating per Plant request (always false)
+                                     Real64 const ElecLoadRequest,                 // Generator Electrical power demand
+                                     Real64 const ThermalLoadRequest,              // cogenerator Thermal power demand
+                                     Real64 &ElecLoadProvided,                     // power allowed
+                                     DataGenerators::OperatingMode &OperatingMode, // operating mode
+                                     Real64 &PLRforSubtimestepStartUp,             // part load ratio for switch to normal from start up
+                                     Real64 &PLRforSubtimestepShutDown             // part load ratio for switch from cool down to other
     )
     {
 
@@ -216,8 +213,6 @@ namespace GeneratorDynamicsManager {
         Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-        using ScheduleManager::GetCurrentScheduleValue;
-        using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool RunFlag;                           // true if generator supposed to run
@@ -228,17 +223,8 @@ namespace GeneratorDynamicsManager {
         Real64 MaxPel;                          // working variable for max allowed by transient constraint
         Real64 MinPel;                          // working variabel for min allowed by transient constraint
         Real64 PelInput;                        // holds initial value of IN var
-        Real64 Pel;
         DataGenerators::OperatingMode newOpMode(DataGenerators::OperatingMode::Invalid);
-        Real64 SchedVal;
         Real64 ElectLoadForThermalRequest;
-        bool ConstrainedMaxP;           // true if request was altered because of max power limit
-        bool ConstrainedMinP;           // true if request was altered because of min power limit
-        bool ConstrainedIncreasingPdot; // true if request was altered because of power rate of change up
-        bool ConstrainedDecreasingPdot; // true if request was altered because of power rate of change down
-        bool ConstrainedByPlant;        // true if request was altered because of cooling water problem
-        bool PLRStartUp;                // true if subtimestep issue involving startup
-        bool PLRShutDown;
         auto &InletCWnode = state.dataGenerator->InletCWnode;
         auto &InternalFlowControl = state.dataGenerator->InternalFlowControl;
         auto &TcwIn = state.dataGenerator->TcwIn;
@@ -248,13 +234,13 @@ namespace GeneratorDynamicsManager {
         // inits
         PLRforSubtimestepStartUp = 1.0;
         PLRforSubtimestepShutDown = 0.0;
-        ConstrainedMaxP = false;
-        ConstrainedMinP = false;
-        ConstrainedIncreasingPdot = false;
-        ConstrainedDecreasingPdot = false;
-        ConstrainedByPlant = false;
-        PLRStartUp = false;
-        PLRShutDown = false;
+        bool ConstrainedMaxP = false;           // true if request was altered because of max power limit
+        bool ConstrainedMinP = false;           // true if request was altered because of min power limit
+        bool ConstrainedIncreasingPdot = false; // true if request was altered because of power rate of change up
+        bool ConstrainedDecreasingPdot = false; // true if request was altered because of power rate of change down
+        bool ConstrainedByPlant = false;        // true if request was altered because of cooling water problem
+        bool PLRStartUp = false;                // true if subtimestep issue involving startup
+        bool PLRShutDown = false;
         InternalFlowControl = false;
 
         // get index for this generator in dynamics control structure
@@ -292,9 +278,9 @@ namespace GeneratorDynamicsManager {
         }
 
         // check availability schedule
-        SchedVal = GetCurrentScheduleValue(state, state.dataGenerator->GeneratorDynamics(DynaCntrlNum).AvailabilitySchedID);
+        Real64 SchedVal = ScheduleManager::GetCurrentScheduleValue(state, state.dataGenerator->GeneratorDynamics(DynaCntrlNum).AvailabilitySchedID);
 
-        Pel = PelInput;
+        Real64 Pel = PelInput;
 
         // get data to check if sufficient flow available from Plant
         if (InternalFlowControl && (SchedVal > 0.0)) {
@@ -773,14 +759,12 @@ namespace GeneratorDynamicsManager {
     }
 
     void ManageGeneratorFuelFlow(EnergyPlusData &state,
-                                 GeneratorType const GeneratorType,                 // type of Generator
-                                 [[maybe_unused]] std::string const &GeneratorName, // user specified name of Generator
-                                 int const GeneratorNum,                            // Generator number
-                                 [[maybe_unused]] bool const RunFlag,               // TRUE when Generator operating
-                                 Real64 const FuelFlowRequest,                      // Generator demand mdot kg/ s
-                                 Real64 &FuelFlowProvided,                          // allowed after constraints kg/s
-                                 bool &ConstrainedIncreasingMdot,                   // true if request was altered because of fuel rate of change up
-                                 bool &ConstrainedDecreasingMdot                    // true if request was altered because of fuel rate of change down
+                                 GeneratorType const GeneratorType, // type of Generator
+                                 int const GeneratorNum,            // Generator number
+                                 Real64 const FuelFlowRequest,      // Generator demand mdot kg/ s
+                                 Real64 &FuelFlowProvided,          // allowed after constraints kg/s
+                                 bool &ConstrainedIncreasingMdot,   // true if request was altered because of fuel rate of change up
+                                 bool &ConstrainedDecreasingMdot    // true if request was altered because of fuel rate of change down
     )
     {
 
@@ -852,10 +836,6 @@ namespace GeneratorDynamicsManager {
         // METHODOLOGY EMPLOYED:
         // apply contraints imposed by plant according to flow lock, first HVAC iteration etc.
 
-        // Using/Aliasing
-        using Curve::CurveValue;
-        using PlantUtilities::SetComponentFlowRate;
-
         // Return value
         Real64 FuncDetermineCWMdotForInternalFlowControl;
 
@@ -863,14 +843,14 @@ namespace GeneratorDynamicsManager {
         int OutletNode = state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantOutletNodeID;
 
         // first evaluate curve
-        Real64 MdotCW = CurveValue(state, state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WaterFlowCurveID, Pnetss, TcwIn);
+        Real64 MdotCW = Curve::CurveValue(state, state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WaterFlowCurveID, Pnetss, TcwIn);
 
         // now apply constraints
         MdotCW = max(0.0, MdotCW);
 
         // make sure plant can provide, utility call may change flow
         if (state.dataCHPElectGen->MicroCHP(GeneratorNum).CWPlantLoc.loopNum > 0) { // protect early calls
-            SetComponentFlowRate(state, MdotCW, InletNode, OutletNode, state.dataCHPElectGen->MicroCHP(GeneratorNum).CWPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, MdotCW, InletNode, OutletNode, state.dataCHPElectGen->MicroCHP(GeneratorNum).CWPlantLoc);
         }
 
         FuncDetermineCWMdotForInternalFlowControl = MdotCW;
