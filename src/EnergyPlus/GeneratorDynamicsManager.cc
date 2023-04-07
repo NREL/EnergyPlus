@@ -484,7 +484,7 @@ namespace GeneratorDynamicsManager {
                          (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
                             Constant::HoursInDay;
                 }
-            } else if ((SchedVal != 0.0) && (RunFlag)) {
+            } else {
 
                 newOpMode = DataGenerators::OperatingMode::Normal;
             }
