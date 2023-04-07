@@ -742,10 +742,8 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             OutSrdIR = 0;
             if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                 if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                    int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-                    auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
                     SrdSurfTempAbs = state.dataSurface->Surface(SurfNum).SrdSurfTemp + Constant::KelvinConv;
-                    OutSrdIR = Constant::StefanBoltzmann * SrdSurfsProperty.SurfsViewFactorSum * pow_4(SrdSurfTempAbs);
+                    OutSrdIR = Constant::StefanBoltzmann * state.dataSurface->Surface(SurfNum).ViewFactorSrdSurfs * pow_4(SrdSurfTempAbs);
                 }
             }
             if (state.dataSurface->Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)

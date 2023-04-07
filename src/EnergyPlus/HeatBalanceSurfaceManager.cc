@@ -9917,7 +9917,7 @@ void GetSurroundingSurfacesTemperatureAverage(EnergyPlusData &state)
             SrdSurfaceTemp = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
             SrdSurfaceTempSum += SrdSurfViewFactor * pow_4(SrdSurfaceTemp);
         }
-        surface.SrdSurfTemp = root_4(SrdSurfaceTempSum / SrdSurfsProperty.SurfsViewFactorSum) - Constant::KelvinConv;
+        surface.SrdSurfTemp = root_4(SrdSurfaceTempSum / surface.ViewFactorSrdSurfs) - Constant::KelvinConv;
     }
 }
 

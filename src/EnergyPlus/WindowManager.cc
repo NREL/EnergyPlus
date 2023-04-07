@@ -2516,10 +2516,8 @@ namespace WindowManager {
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-                        auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
                         SrdSurfTempAbs = state.dataSurface->Surface(SurfNum).SrdSurfTemp + Constant::KelvinConv;
-                        OutSrdIR = state.dataWindowManager->sigma * SrdSurfsProperty.SurfsViewFactorSum * pow_4(SrdSurfTempAbs);
+                        OutSrdIR = state.dataWindowManager->sigma * state.dataSurface->Surface(SurfNum).ViewFactorSrdSurfs * pow_4(SrdSurfTempAbs);
                     }
                 }
                 if (surface.ExtWind) {             // Window is exposed to wind (and possibly rain)
@@ -2681,8 +2679,7 @@ namespace WindowManager {
                 // update SurfHSrdSurfExt if the windows has exterior shade or blind
                 state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) =
                     ConvectionCoefficients::SurroundingSurfacesRadCoeffAverage(state, SurfNum, Tsout, SurfOutsideEmiss);
-                rad_out_lw_srd_per_area =
-                    state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) * (state.dataSurface->Surface(SurfNum).SrdSurfTemp - SurfOutsideTemp);
+                rad_out_lw_srd_per_area = state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) * (surface.SrdSurfTemp - SurfOutsideTemp);
             }
         }
 

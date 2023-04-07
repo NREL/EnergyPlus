@@ -566,6 +566,7 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.LinkedOutAirNode = state.dataSurface->Surface(SurfNum).SurfLinkedOutAirNode;
     calcHashKey.OutsideHeatSourceTermSchedule = OutsideHeatSourceTermSchedule;
     calcHashKey.InsideHeatSourceTermSchedule = InsideHeatSourceTermSchedule;
+    calcHashKey.ViewFactorSrdSurfs = state.dataSurface->Surface(SurfNum).ViewFactorSrdSurfs;
 }
 
 void SurfaceData::set_representative_surface(EnergyPlusData &state, const int SurfNum)
