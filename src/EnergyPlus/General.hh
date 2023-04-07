@@ -141,7 +141,7 @@ namespace General {
 
     std::string CreateSysTimeIntervalString(EnergyPlusData &state);
 
-    int nthDayOfWeekOfMonth(EnergyPlusData &state,
+    int nthDayOfWeekOfMonth(const EnergyPlusData &state,
                             int dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
                             int nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
                             int monthNumber // January = 1
