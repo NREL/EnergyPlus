@@ -234,12 +234,7 @@ namespace GeneratorDynamicsManager {
         // inits
         PLRforSubtimestepStartUp = 1.0;
         PLRforSubtimestepShutDown = 0.0;
-        bool ConstrainedMaxP = false;           // true if request was altered because of max power limit
-        bool ConstrainedMinP = false;           // true if request was altered because of min power limit
-        bool ConstrainedIncreasingPdot = false; // true if request was altered because of power rate of change up
-        bool ConstrainedDecreasingPdot = false; // true if request was altered because of power rate of change down
-        bool ConstrainedByPlant = false;        // true if request was altered because of cooling water problem
-        bool PLRStartUp = false;                // true if subtimestep issue involving startup
+        bool PLRStartUp = false; // true if subtimestep issue involving startup
         bool PLRShutDown = false;
         InternalFlowControl = false;
 
