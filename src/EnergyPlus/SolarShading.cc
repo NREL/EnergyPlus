@@ -10483,17 +10483,17 @@ void SkyDifSolarShading(EnergyPlusData &state)
     // sky or ground.
 
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        auto &surface = state.dataSurface->Surface(SurfNum);
         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
             state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
-            state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSolarShading->SurfDifShdgRatioIsoSky(SurfNum);
+            surface.ViewFactorSkyIR *= state.dataSolarShading->SurfDifShdgRatioIsoSky(SurfNum);
         } else {
-            state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, 1, SurfNum);
+            surface.ViewFactorSkyIR *= state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, 1, SurfNum);
         }
-        state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR;
+        surface.ViewFactorGroundIR = 1.0 - surface.ViewFactorSkyIR;
 
-        if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-            state.dataSurface->Surface(SurfNum).ViewFactorGroundIR =
-                1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR - state.dataSurface->Surface(SurfNum).ViewFactorSrdSurfs;
+        if (surface.SurfHasSurroundingSurfProperty) {
+            surface.ViewFactorGroundIR = 1.0 - surface.ViewFactorSkyIR - surface.ViewFactorSrdSurfs;
         }
     }
 
