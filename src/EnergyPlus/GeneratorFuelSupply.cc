@@ -114,18 +114,15 @@ namespace GeneratorFuelSupply {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //  INTEGER                     :: GeneratorNum !Generator counter
-        int NumAlphas;                 // Number of elements in the alpha array
-        int NumNums;                   // Number of elements in the numeric array
-        int IOStat;                    // IO Status when calling get input subroutine
         Array1D_string AlphArray(25);  // character string data
         Array1D<Real64> NumArray(200); // numeric data TODO deal with allocatable for extensible
-        bool ErrorsFound(false);       // error flag
-        int FuelSupNum;
-        int ConstitNum;
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         if (state.dataGeneratorFuelSupply->MyOneTimeFlag) {
-            cCurrentModuleObject = "Generator:FuelSupply";
+            int NumAlphas; // Number of elements in the alpha array
+            int NumNums;   // Number of elements in the numeric array
+            int IOStat;    // IO Status when calling get input subroutine
+            bool ErrorsFound = false;
+            std::string cCurrentModuleObject = "Generator:FuelSupply";
             int NumGeneratorFuelSups = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             if (NumGeneratorFuelSups <= 0) {
@@ -135,7 +132,7 @@ namespace GeneratorFuelSupply {
 
             state.dataGenerator->FuelSupply.allocate(NumGeneratorFuelSups);
 
-            for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
+            for (int FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          FuelSupNum,
@@ -220,7 +217,7 @@ namespace GeneratorFuelSupply {
                         ErrorsFound = true;
                     }
 
-                    for (ConstitNum = 1; ConstitNum <= NumFuelConstit; ++ConstitNum) {
+                    for (int ConstitNum = 1; ConstitNum <= NumFuelConstit; ++ConstitNum) {
                         state.dataGenerator->FuelSupply(FuelSupNum).ConstitName(ConstitNum) = AlphArray(ConstitNum + 6);
                         state.dataGenerator->FuelSupply(FuelSupNum).ConstitMolalFract(ConstitNum) = NumArray(ConstitNum + 6);
                     }
