@@ -121,7 +121,6 @@ namespace GeneratorFuelSupply {
         Array1D<Real64> NumArray(200); // numeric data TODO deal with allocatable for extensible
         bool ErrorsFound(false);       // error flag
         int FuelSupNum;
-        std::string ObjMSGName;
         int ConstitNum;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
@@ -152,7 +151,6 @@ namespace GeneratorFuelSupply {
                 UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataGenerator->FuelSupply(FuelSupNum).Name = AlphArray(1);
-                ObjMSGName = cCurrentModuleObject + " Named " + AlphArray(1);
                 if (UtilityRoutines::SameString("TemperatureFromAirNode", AlphArray(2))) {
                     state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode = DataGenerators::FuelTemperatureMode::FuelInTempFromNode;
                 } else if (UtilityRoutines::SameString("Scheduled", AlphArray(2))) {
@@ -275,7 +273,6 @@ namespace GeneratorFuelSupply {
         Real64 O2Stoic;               // stochiometric oxygen coef in chemical equation (15)
         Real64 CO2ProdStoic;          // product gases carbon dioxide coeff
         Real64 H2OProdStoic;          // product gases water coeff
-        int thisGasID;                // working index in Gas phase data structure
         Real64 LHVi;                  // working var for lower heating value calc
         Real64 HHVi;                  // working var for higher heating value calc
         //  INTEGER   :: thisConstituent
@@ -607,7 +604,7 @@ namespace GeneratorFuelSupply {
             for (int i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
 
                 std::string thisName = state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitName(i);
-                thisGasID =
+                int thisGasID =
                     UtilityRoutines::FindItem(thisName, state.dataGenerator->GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName);
                 state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i) = thisGasID;
 
@@ -637,7 +634,7 @@ namespace GeneratorFuelSupply {
             // Calculate LHV for an NdotFuel of 1.0
             LHVfuel = 0.0;
             for (int i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
-                thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
+                int thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
                 if (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens == 0.0) {
                     LHVi = 0.0;
                 } else {
@@ -654,7 +651,7 @@ namespace GeneratorFuelSupply {
             // Calculate HHV for an NdotFuel of 1.0
             HHVfuel = 0.0;
             for (int i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
-                thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
+                int thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
                 if (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens == 0.0) {
                     HHVi = 0.0;
                 } else {
@@ -672,7 +669,7 @@ namespace GeneratorFuelSupply {
             // Calculate Molecular Weight for this fuel
             MWfuel = 0.0;
             for (int i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
-                thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
+                int thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
                 MWfuel += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) *
                           state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).MolecularWeight;
             }
