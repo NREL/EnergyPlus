@@ -1437,7 +1437,7 @@ namespace OutputProcessor {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2006
-        //       MODIFIED       na
+        //       MODIFIED       Dareum Nam, April 2023, revised the function by using enumaration value
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -1445,158 +1445,31 @@ namespace OutputProcessor {
         // the standard resource type.
 
         ErrorsFound = false;
+        std::string const &meterType = UtilityRoutines::MakeUPPERCase(UserInputResourceType);
 
-        // Basic ResourceType for Meters
-        {
-            std::string const &meterType = UserInputResourceType;
+        int eMeterResource = getEnumerationValue(Constant::eResourceNamesUC, meterType);
 
-            if (meterType == "ELECTRICITY") {
-                OutResourceType = "Electricity";
-
-            } else if (meterType == "NATURALGAS") {
-                OutResourceType = "NaturalGas";
-
-            } else if (meterType == "GASOLINE") {
-                OutResourceType = "Gasoline";
-
-            } else if (meterType == "DIESEL") {
-                OutResourceType = "Diesel";
-
-            } else if (meterType == "COAL") {
-                OutResourceType = "Coal";
-
-            } else if (meterType == "FUELOILNO1") {
-                OutResourceType = "FuelOilNo1";
-
-            } else if (meterType == "FUELOILNO2") {
-                OutResourceType = "FuelOilNo2";
-
-            } else if (meterType == "PROPANE") {
-                OutResourceType = "Propane";
-
-            } else if (meterType == "WATER" || meterType == "H2O") {
-                OutResourceType = "Water"; // this is water "use"
-
-            } else if (meterType == "ONSITEWATER" || meterType == "WATERPRODUCED" || meterType == "ONSITE WATER") {
-                OutResourceType = "OnSiteWater"; // these are for supply record keeping
-
-            } else if (meterType == "MAINSWATER" || meterType == "WATERSUPPLY") {
-                OutResourceType = "MainsWater"; // record keeping
-
-            } else if (meterType == "RAINWATER" || meterType == "PRECIPITATION") {
-                OutResourceType = "RainWater"; // record keeping
-
-            } else if (meterType == "WELLWATER" || meterType == "GROUNDWATER") {
-                OutResourceType = "WellWater"; // record keeping
-
-            } else if (meterType == "CONDENSATE") {
-                OutResourceType = "Condensate"; // record keeping
-
-            } else if (meterType == "ENERGYTRANSFER" || meterType == "ENERGYXFER" || meterType == "XFER") {
-                OutResourceType = "EnergyTransfer";
-
-            } else if (meterType == "STEAM") {
-                OutResourceType = "Steam";
-
-            } else if (meterType == "DISTRICTCOOLING") {
-                OutResourceType = "DistrictCooling";
-
-            } else if (meterType == "DISTRICTHEATING") {
-                OutResourceType = "DistrictHeating";
-
-            } else if (meterType == "ELECTRICITYPRODUCED") {
-                OutResourceType = "ElectricityProduced";
-
-            } else if (meterType == "ELECTRICITYPURCHASED") {
-                OutResourceType = "ElectricityPurchased";
-
-            } else if (meterType == "ELECTRICITYSURPLUSSOLD") {
-                OutResourceType = "ElectricitySurplusSold";
-
-            } else if (meterType == "ELECTRICITYNET") {
-                OutResourceType = "ElectricityNet";
-
-            } else if (meterType == "SOLARWATER") {
-                OutResourceType = "SolarWater";
-
-            } else if (meterType == "SOLARAIR") {
-                OutResourceType = "SolarAir";
-
-            } else if (meterType == "SO2") {
-                OutResourceType = "SO2";
-
-            } else if (meterType == "NOX") {
-                OutResourceType = "NOx";
-
-            } else if (meterType == "N2O") {
-                OutResourceType = "N2O";
-
-            } else if (meterType == "PM") {
-                OutResourceType = "PM";
-
-            } else if (meterType == "PM2.5") {
-                OutResourceType = "PM2.5";
-
-            } else if (meterType == "PM10") {
-                OutResourceType = "PM10";
-
-            } else if (meterType == "CO") {
-                OutResourceType = "CO";
-
-            } else if (meterType == "CO2") {
-                OutResourceType = "CO2";
-
-            } else if (meterType == "CH4") {
-                OutResourceType = "CH4";
-
-            } else if (meterType == "NH3") {
-                OutResourceType = "NH3";
-
-            } else if (meterType == "NMVOC") {
-                OutResourceType = "NMVOC";
-
-            } else if (meterType == "HG") {
-                OutResourceType = "Hg";
-
-            } else if (meterType == "PB") {
-                OutResourceType = "Pb";
-
-            } else if (meterType == "NUCLEAR HIGH") {
-                OutResourceType = "Nuclear High";
-
-            } else if (meterType == "NUCLEAR LOW") {
-                OutResourceType = "Nuclear Low";
-
-            } else if (meterType == "WATERENVIRONMENTALFACTORS") {
-                OutResourceType = "WaterEnvironmentalFactors";
-
-            } else if (meterType == "CARBON EQUIVALENT") {
-                OutResourceType = "Carbon Equivalent";
-
-            } else if (meterType == "SOURCE") {
-                OutResourceType = "Source";
-
-            } else if (meterType == "PLANTLOOPHEATINGDEMAND") {
-                OutResourceType = "PlantLoopHeatingDemand";
-
-            } else if (meterType == "PLANTLOOPCOOLINGDEMAND") {
-                OutResourceType = "PlantLoopCoolingDemand";
-
-            } else if (meterType == "GENERIC") { // only used by custom meters
-                OutResourceType = "Generic";
-
-            } else if (meterType == "OTHERFUEL1") { // other fuel type (defined by user)
-                OutResourceType = "OtherFuel1";
-
-            } else if (meterType == "OTHERFUEL2") { // other fuel type (defined by user)
-                OutResourceType = "OtherFuel2";
-
+        if (eMeterResource == static_cast<int>(Constant::eResource::Invalid)) {
+            if (meterType == "H2O") {
+                eMeterResource = static_cast<int>(Constant::eResource::Water);
+            } else if (meterType == "WATERPRODUCED" || meterType == "ONSITE WATER") {
+                eMeterResource = static_cast<int>(Constant::eResource::OnSiteWater);
+            } else if (meterType == "WATERSUPPLY") {
+                eMeterResource = static_cast<int>(Constant::eResource::MainsWater);
+            } else if (meterType == "PRECIPITATION") {
+                eMeterResource = static_cast<int>(Constant::eResource::RainWater);
+            } else if (meterType == "GROUNDWATER") {
+                eMeterResource = static_cast<int>(Constant::eResource::WellWater);
+            } else if (meterType == "ENERGYXFER" || meterType == "XFER") {
+                eMeterResource = static_cast<int>(Constant::eResource::EnergyTransfer);
             } else {
                 ShowSevereError(state,
                                 format("GetStandardMeterResourceType: Illegal OutResourceType (for Meters) Entered={}", UserInputResourceType));
                 ErrorsFound = true;
+                return;
             }
         }
+        OutResourceType = Constant::eResourceNames[eMeterResource];
     }
 
     void AddMeter(EnergyPlusData &state,

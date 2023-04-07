@@ -110,6 +110,7 @@ namespace Constant {
         Condensate,
         WaterEnvironmentalFactors,
         Source,
+        Generic, // only used by custom meters
         SO2,
         NOx,
         N2O,
@@ -177,7 +178,7 @@ namespace Constant {
         eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
         eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
         eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
-        eFuel::Invalid};
+        eFuel::Invalid,         eFuel::Invalid};
 
     constexpr std::array<eResource, static_cast<int>(eFuel::Num)> eFuel2eResource = {eResource::Electricity,
                                                                                      eResource::NaturalGas,
@@ -193,14 +194,14 @@ namespace Constant {
                                                                                      eResource::DistrictHeating};
 
     constexpr std::array<ePollutant, static_cast<int>(eResource::Num)> eResource2ePollutant = {
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid, ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid, ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid, ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid, ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid, ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::SO2,     ePollutant::NOx,         ePollutant::N2O,       ePollutant::PM,      ePollutant::PM2_5,
-        ePollutant::PM10,    ePollutant::CO,      ePollutant::CO2,         ePollutant::CH4,       ePollutant::NH3,     ePollutant::NMVOC,
-        ePollutant::Hg,      ePollutant::Pb,      ePollutant::NuclearHigh, ePollutant::NuclearLow};
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::SO2,     ePollutant::NOx,         ePollutant::N2O,       ePollutant::PM,
+        ePollutant::PM2_5,   ePollutant::PM10,    ePollutant::CO,      ePollutant::CO2,         ePollutant::CH4,       ePollutant::NH3,
+        ePollutant::NMVOC,   ePollutant::Hg,      ePollutant::Pb,      ePollutant::NuclearHigh, ePollutant::NuclearLow};
 
     constexpr std::array<eResource, static_cast<int>(ePollutant::Num)> ePollutant2eResource = {eResource::SO2,
                                                                                                eResource::NOx,
@@ -249,6 +250,7 @@ namespace Constant {
                                                                                                         "CONDENSATE",
                                                                                                         "WATERENVIRONMENTALFACTORS",
                                                                                                         "SOURCE",
+                                                                                                        "GENERIC",
                                                                                                         "SO2",
                                                                                                         "NOX",
                                                                                                         "N2O",
@@ -296,6 +298,7 @@ namespace Constant {
                                                                                                       "Condensate",
                                                                                                       "WaterEnvironmentalFactors",
                                                                                                       "Source",
+                                                                                                      "Generic",
                                                                                                       "SO2",
                                                                                                       "NOx",
                                                                                                       "N2O",
