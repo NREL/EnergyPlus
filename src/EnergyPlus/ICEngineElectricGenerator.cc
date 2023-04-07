@@ -700,19 +700,19 @@ namespace ICEngineElectricGenerator {
 
         // Calculate Energy
         // Generator output (J)
-        Real64 ElectricEnergyGen = elecPowerGenerated * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ElectricEnergyGen = elecPowerGenerated * state.dataHVACGlobal->TimeStepSysSec;
 
         // IC ENGINE fuel use (J)
-        Real64 FuelEnergyUsed = fuelEnergyUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 FuelEnergyUsed = fuelEnergyUseRate * state.dataHVACGlobal->TimeStepSysSec;
 
         // water jacket heat recovered (J)
-        Real64 jacketEnergyRec = QJacketRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 jacketEnergyRec = QJacketRec * state.dataHVACGlobal->TimeStepSysSec;
 
         // lube oil cooler heat recovered (J)
-        Real64 lubeOilEnergyRec = QLubeOilRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 lubeOilEnergyRec = QLubeOilRec * state.dataHVACGlobal->TimeStepSysSec;
 
         // exhaust gas heat recovered (J)
-        Real64 exhaustEnergyRec = QExhaustRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 exhaustEnergyRec = QExhaustRec * state.dataHVACGlobal->TimeStepSysSec;
         this->ElecPowerGenerated = elecPowerGenerated;
         this->ElecEnergyGenerated = ElectricEnergyGen;
         this->QJacketRecovered = QJacketRec;
@@ -887,7 +887,7 @@ namespace ICEngineElectricGenerator {
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp,
+                                                           Constant::InitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 

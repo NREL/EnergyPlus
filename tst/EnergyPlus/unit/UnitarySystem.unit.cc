@@ -136,7 +136,7 @@ protected:
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 21;
         state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
         state->dataHeatBal->Zone(1).SystemZoneNodeNumber = state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
-        state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+        state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         state->dataZoneEquip->ZoneEquipList(1).Name = "ZONE2EQUIPMENT";
         int maxEquipCount = 1;
         state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes = maxEquipCount;
@@ -5018,7 +5018,7 @@ Schedule:Compact,
     thisSys.m_LastMode = UnitarySystems::HeatingMode;
     thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
     thisSys.m_NoLoadAirFlowRateRatio = 0.2;
-    thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisSys.m_FanAvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
     thisSys.AirInNode = 1;
 
     thisSys.m_HeatMassFlowRate[1] = 0.25;
@@ -5518,7 +5518,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     thisSys.m_LastMode = UnitarySystems::HeatingMode;
     thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
     thisSys.m_NoLoadAirFlowRateRatio = 0.2;
-    thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisSys.m_FanAvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
     thisSys.AirInNode = 1;
     thisSys.m_HeatMassFlowRate[1] = 0.25;
     thisSys.m_MSHeatingSpeedRatio[1] = 0.25;
@@ -5561,7 +5561,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state->dataWaterCoils->CheckEquipName.allocate(1);
     state->dataWaterCoils->NumWaterCoils = 1;
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
-    state->dataWaterCoils->WaterCoil(1).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataWaterCoils->WaterCoil(1).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     state->dataWaterCoils->WaterCoil(1).Name = "Water Heating Coil";
     state->dataWaterCoils->WaterCoil(1).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
     state->dataWaterCoils->WaterCoil(1).DesAirVolFlowRate = 1.0;
@@ -5665,7 +5665,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     thisSys.m_LastMode = UnitarySystems::HeatingMode;
     thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
     thisSys.m_NoLoadAirFlowRateRatio = 0.2;
-    thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisSys.m_FanAvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
     thisSys.AirInNode = 1;
     thisSys.m_HeatMassFlowRate[1] = 0.25;
     thisSys.m_MSHeatingSpeedRatio[1] = 0.25;
@@ -5704,7 +5704,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     state->dataWaterCoils->CheckEquipName.allocate(1);
     state->dataWaterCoils->NumWaterCoils = 1;
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
-    state->dataWaterCoils->WaterCoil(1).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataWaterCoils->WaterCoil(1).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     state->dataWaterCoils->WaterCoil(1).Name = "Water Cooling Coil";
     state->dataWaterCoils->WaterCoil(1).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
     state->dataWaterCoils->WaterCoil(1).WaterCoilModel = WaterCoils::CoilModel::CoolingSimple;
@@ -14234,7 +14234,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_TRUE(compare_enums(UnitarySys::UnitarySysCtrlType::Load, thisSys->m_ControlType));       // checks control type
     EXPECT_TRUE(compare_enums(UnitarySys::DehumCtrlType::None, thisSys->m_DehumidControlType_Num)); // checks Dehumidification Control type
     EXPECT_EQ(UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone), thisSys->ControlZoneNum); // checks zone ID
-    EXPECT_EQ(DataGlobalConstants::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                              // checks availability schedule name
+    EXPECT_EQ(ScheduleManager::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                                  // checks availability schedule name
     EXPECT_EQ("NODE 29", state->dataLoopNodes->NodeID(thisSys->AirInNode));                                     // checks air inlet node name
     EXPECT_EQ("NODE 30", state->dataLoopNodes->NodeID(thisSys->AirOutNode));                                    // checks air outlet node name
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, thisSys->m_FanType_Num);                                    // checks fan object type "FAN:ONOFF"
@@ -17841,7 +17841,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
 TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTest)
 {
     state->dataHVACGlobal->TimeStepSys = 0.25;
-    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     state->dataLoopNodes->Node.allocate(2);
     UnitarySys thisSys;
     thisSys.AirInNode = 1;
@@ -19413,7 +19413,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     thisSys.m_HeatMassFlowRate.resize(1);
     thisSys.m_CoolMassFlowRate.resize(1);
     thisSys.m_LastMode = UnitarySystems::CoolingMode;
-    thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisSys.m_FanAvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
     thisSys.m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
 
     // cooling load
@@ -19437,7 +19437,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
 
     state->dataWaterCoils->CheckEquipName.allocate(1);
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
-    state->dataWaterCoils->WaterCoil(1).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataWaterCoils->WaterCoil(1).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     state->dataWaterCoils->WaterCoil(1).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
     state->dataWaterCoils->WaterCoil(1).WaterCoilModel = WaterCoils::CoilModel::CoolingSimple;
     state->dataWaterCoils->WaterCoil(1).DesAirVolFlowRate = 1.0;
@@ -19665,7 +19665,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     thisSys.m_LastMode = UnitarySystems::CoolingMode;
     thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
     thisSys.m_NoLoadAirFlowRateRatio = 0.2;
-    thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisSys.m_FanAvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
     thisSys.m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
 
     // cooling load
@@ -19689,7 +19689,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
 
     state->dataWaterCoils->CheckEquipName.allocate(1);
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
-    state->dataWaterCoils->WaterCoil(1).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataWaterCoils->WaterCoil(1).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     state->dataWaterCoils->WaterCoil(1).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
     state->dataWaterCoils->WaterCoil(1).WaterCoilModel = WaterCoils::CoilModel::CoolingSimple;
     state->dataWaterCoils->WaterCoil(1).DesAirVolFlowRate = 1.0;
@@ -19932,7 +19932,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     thisSys.m_LastMode = UnitarySystems::CoolingMode;
     thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
     thisSys.m_NoLoadAirFlowRateRatio = 0.2;
-    thisSys.m_FanAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisSys.m_FanAvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
     thisSys.m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
 
     // cooling load
@@ -19957,7 +19957,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     state->dataWaterCoils->CheckEquipName.allocate(2);
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
     for (int i = 1; i <= 2; ++i) {
-        state->dataWaterCoils->WaterCoil(i).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+        state->dataWaterCoils->WaterCoil(i).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         state->dataWaterCoils->WaterCoil(i).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
         state->dataWaterCoils->WaterCoil(i).WaterCoilModel = WaterCoils::CoilModel::CoolingSimple;
         state->dataWaterCoils->WaterCoil(i).DesAirVolFlowRate = 1.0;

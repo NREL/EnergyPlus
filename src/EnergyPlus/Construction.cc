@@ -184,12 +184,9 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
     Real64 dxn;        // Intermediate calculation of nodal spacing
     Real64 dxtmp;      // Intermediate calculation variable ( = 1/dx/cap)
     Real64 dyn;        // Nodal spacing in the direction perpendicular to the main direction
-    bool CTFConvrg;    // Set after CTFs are calculated, based on whether there are too many CTF terms
     Real64 SumXi;      // Summation of all of the Xi terms (inside CTFs) for a construction
     Real64 SumYi;      // Summation of all of the Xi terms (cross CTFs) for a construction
     Real64 SumZi;      // Summation of all of the Xi terms (outside CTFs) for a construction
-
-    int ipts1; // Intermediate calculation for number of nodes per layer
 
     Real64 DeltaTimestep; // zone timestep in seconds, for local check of properties
 
@@ -493,7 +490,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                 } else {
                     dxn = std::sqrt(2.0 * (rk(Layer) / rho(Layer) / cp(Layer)) * this->CTFTimeStep);
 
-                    ipts1 = int(dl(Layer) / dxn); // number of nodes=thickness/spacing
+                    int ipts1 = int(dl(Layer) / dxn); // number of nodes=thickness/spacing
 
                     // Limit the upper and lower bounds of the number of
                     // nodes to MaxCTFTerms and MinNodes respectively.
@@ -504,10 +501,6 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                         Nodes(Layer) = MinNodes;
                     } else { // Calculated number of nodes ok
                         Nodes(Layer) = ipts1;
-                    }
-
-                    if (this->SolutionDimensions > 1) {
-                        if (ipts1 > Construction::MaxCTFTerms / 2) ipts1 = Construction::MaxCTFTerms / 2;
                     }
 
                     dx(Layer) = dl(Layer) / double(Nodes(Layer)); // calc node spacing
@@ -621,7 +614,9 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
             // which characterizes the heat transfer inside the
             // building element.
 
-            CTFConvrg = false; // Initialize loop control logical
+            // Initialize loop control logical
+            // Set after CTFs are calculated, based on whether there are too many CTF terms
+            bool CTFConvrg = false;
 
             this->AExp.allocate(this->rcmax, this->rcmax);
             this->AExp = 0.0;
@@ -1124,7 +1119,6 @@ void ConstructionProps::calculateExponentialMatrix()
     Array2D<Real64> AMat1; // AMat factored by (delt/2^k)
     Array2D<Real64> AMato; // AMat raised to the previous power (power of AMat1-1)
     Array2D<Real64> AMatN; // Current value of AMat raised to power n (n = 1,2...)
-    bool Backup;           // Used when numerics get to small in Exponentiation
     Real64 CheckVal;       // Used to avoid possible overflow from Double->REAL(r64)->Integer
     Real64 fact;           // Intermediate calculation variable (delt/2^k)
     int i;                 // Loop counter
@@ -1246,8 +1240,8 @@ void ConstructionProps::calculateExponentialMatrix()
                     // Make sure the next term won't cause an underflow.  If it will end up being
                     // so small as to go below TinyLimit, then ignore it since it won't add anything
                     // to AMatN anyway.
-                    if (std::abs(AMat1(ic, ict)) > DataGlobalConstants::rTinyValue) {
-                        if (std::abs(AMato(ict, ir)) > std::abs(double(i) * DataGlobalConstants::rTinyValue / AMat1(ic, ict)))
+                    if (std::abs(AMat1(ic, ict)) > Constant::rTinyValue) {
+                        if (std::abs(AMato(ict, ir)) > std::abs(double(i) * Constant::rTinyValue / AMat1(ic, ict)))
                             AMatN(ic, ir) += AMato(ict, ir) * AMat1(ic, ict) / double(i);
                     }
                 }
@@ -1263,7 +1257,7 @@ void ConstructionProps::calculateExponentialMatrix()
         for (ir = 1; ir <= this->rcmax; ++ir) {
             for (ic = 1; ic <= this->rcmax; ++ic) {
                 // Test of limit criteria:
-                if (std::abs(this->AExp(ic, ir)) > DataGlobalConstants::rTinyValue) { // Next line divides by AExp entry so it
+                if (std::abs(this->AExp(ic, ir)) > Constant::rTinyValue) { // Next line divides by AExp entry so it
                     // must be checked to avoid dividing by zero.
                     // If the ratio between any current element in the power
                     // of AMat and its corresponding element in AExp is
@@ -1303,14 +1297,14 @@ void ConstructionProps::calculateExponentialMatrix()
 
         // Use AMato to store the old values of AExp
         AMato = this->AExp;
-        Backup = true;
+        bool Backup = true; // Used when numerics get to small in Exponentiation
         this->AExp = 0.0;
 
         // Multiply the old value of AExp (AMato) by itself and store in AExp.
         for (ir = 1; ir <= this->rcmax; ++ir) {
             for (ic = 1; ic <= this->rcmax; ++ic) {
                 for (idm = 1; idm <= this->rcmax; ++idm) {
-                    if (std::abs(AMato(idm, ir) * AMato(ic, idm)) > DataGlobalConstants::rTinyValue) {
+                    if (std::abs(AMato(idm, ir) * AMato(ic, idm)) > Constant::rTinyValue) {
                         this->AExp(ic, ir) += AMato(idm, ir) * AMato(ic, idm);
                         Backup = false;
                     }
@@ -1681,8 +1675,8 @@ void ConstructionProps::calculateFinalCoefficients()
                 for (int is = 1; is <= this->rcmax; ++is) {
                     // Make sure the next term won't cause an underflow.  If it will end up being so small
                     // as to go below TinyLimit, then ignore it since it won't add anything to PhiR0 anyway.
-                    if (std::abs(Rnew(ic, is)) > DataGlobalConstants::rTinyValue) {
-                        if (std::abs(this->AExp(is, ir)) > std::abs(DataGlobalConstants::rTinyValue / Rnew(ic, is)))
+                    if (std::abs(Rnew(ic, is)) > Constant::rTinyValue) {
+                        if (std::abs(this->AExp(is, ir)) > std::abs(Constant::rTinyValue / Rnew(ic, is)))
                             PhiR0(ic, ir) += this->AExp(is, ir) * Rnew(ic, is);
                     }
                 }

@@ -51,7 +51,7 @@
                 heating, cooling, lighting, ventilating, and other energy flows. EnergyPlus is a stand-alone simulation
                 engine
                 without a ‘user friendly’ graphical interface. EnergyPlus reads input and writes output as text files,
-                although as of 9.3, EnergyPlus started becoming a library.
+                although as of 9.3, EnergyPlus became a library.
             </div>
             <div class="col-md-2"></div>
         </div>
@@ -91,9 +91,9 @@
     <h2>* Version Numbers *</h2>
     <p>
         EnergyPlus historically used version numbers that varied the major number and sometimes the minor
-        number. Starting with the March 2022 release, we are moving forward with a more modern version numbering scheme.
-        The EnergyPlus version will be based on the year and the release number. The March 2022 release is
-        EnergyPlus 22.1 and the Fall release will be EnergyPlus 22.2. If additional major releases are created
+        number. Starting with the March 2022 release, we moved forward with a more modern version numbering scheme.
+        The EnergyPlus version will be based on the year and the release number. The March 2022 release was
+        EnergyPlus 22.1, the Fall release was EnergyPlus 22.2, and so on. If additional major releases are created
         for some reason, they would increment the release number further. Rare intermediate releases may be numbered
         with a patch number such as 22.1.1.
     </p>
@@ -206,7 +206,7 @@
     <p>
         The install includes the IDFVersionUpdater program and the necessary programs to convert from the previous
         version (including .rvi and .mvi files) to the current version. The install also includes the necessary programs
-        to convert from older versions back to v7.2.0. For versions older than v7.2.0, first we applaud your dedication
+        to convert from older versions back to v9.0.0. For versions older than that, first we applaud your dedication
         to EnergyPlus that stretches for quite some time, and second you will need to visit the
         <a href="https://energyplushelp.freshdesk.com/support/solutions/folders/67000241428">Helpdesk</a> to request
         multiple conversion set of programs.
@@ -249,56 +249,24 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9051">9051</a></td>
-            <td>Allow Coil:WaterHeating:Desuperheater to use Coil:Cooling:DX</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9394">9394</a></td>
+            <td>Subdivide Heat Balance by Space</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9156">9156</a></td>
-            <td>Enhancement to Resilience Metrics</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9405">9405</a></td>
+            <td>Gas-Fired Absorption Heat Pump (GAHP) model</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9392">9392</a></td>
-            <td>Add staging actuator to Coil:Heating:Electric:MultiStage</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9594">9594</a></td>
+            <td>NewFeature: Implement Model for Building-Integrated Photovoltaic Thermal (BIPVT)</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9402">9402</a></td>
-            <td>Allow running just load calculations and no full simulations</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9755">9755</a></td>
+            <td>Modeling Dynamic Coating for Opaque Surfaces</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9404">9404</a></td>
-            <td>Enhancement to Simplified Shading</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9406">9406</a></td>
-            <td>New Feature - Latent Sizing</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9409">9409</a></td>
-            <td>New Feature Multiple Ground Temperature and Ground Reflectance</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9463">9463</a></td>
-            <td>Add ASHRAE Standard 205 Chiller object </td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9465">9465</a></td>
-            <td>AirflowNetwork Duct Autosizing</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9480">9480</a></td>
-            <td>7038 90.1 metric</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9564">9564</a></td>
-            <td>Support Space for Infiltration and Ventilation</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9571">9571</a></td>
-            <td>Luminance-based window shading control per 90.1 Appendix C requirements</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9595">9595</a></td>
-            <td>Support Space for Mixing and CrossMixing</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9848">9848</a></td>
+            <td>Add ISO 8601 format support to native CSV and JSON output</td>
         </tr>
     </table>
     <h3><a id="PerformanceFeatures"></a>Runtime Performance Enhancing Developments</h3>
@@ -308,16 +276,12 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9561">9561</a></td>
-            <td>9560 eliminate loop for surface heat transfer algorithm and replace with select reset</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9623">9623</a></td>
+            <td>Enhance perf logging</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9600">9600</a></td>
-            <td>Update MovingAvg function</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9634">9634</a></td>
-            <td>Use currDifSolarRad, currBeamSolarRad to hold adjusted solar and other cleanups in the incident solar multiplier feature</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9782">9782</a></td>
+            <td>Refactor loops for zone sizing array initialization</td>
         </tr>
     </table>
     <h3><a id="RefactoringEfforts"></a>Targeted Refactoring Efforts</h3>
@@ -327,56 +291,68 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9149">9149</a></td>
-            <td>Coil refactoring Heat Exchanger Assisted DX Cooling Coil</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9670">9670</a></td>
+            <td>Quick SolveRoot cleanup</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9273">9273</a></td>
-            <td>ZoneHVAC:PackagedTerminalAirConditioner transition to UnitarySystem</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9693">9693</a></td>
+            <td>Clean up Par arrays in SolveRoot calls</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9323">9323</a></td>
-            <td>Enum Refactor & Remove `SELECT_CASE_var`</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9765">9765</a></td>
+            <td>Refactor int to enum as a follow up to previous code changes</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9399">9399</a></td>
-            <td>Move DataHVACGlobals::SetPointType to enum and switch/case</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9766">9766</a></td>
+            <td>Solve root cleanups continued</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9413">9413</a></td>
-            <td>Remove `select_case_var`s & `enum` cleanup</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9770">9770</a></td>
+            <td>Quick curve manager cleanup</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9429">9429</a></td>
-            <td>AirflowNetwork Refactor</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9779">9779</a></td>
+            <td>Curve Manager Round 2</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9449">9449</a></td>
-            <td>Switch AFN simulation control from ints to an enum</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9782">9782</a></td>
+            <td>Refactor loops for zone sizing array initialization</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9452">9452</a></td>
-            <td>Refactor and Cleanup OutputReports.cc</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9812">9812</a></td>
+            <td>MaterialProperties Refactoring step 2</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9454">9454</a></td>
-            <td>Expose EPVector resize method, change allocation handling</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9823">9823</a></td>
+            <td>Quick cleaning in General.cc</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9535">9535</a></td>
-            <td>Update GHE Interpolation Routine </td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9854">9854</a></td>
+            <td>Refactor in RefrigeratedCase and new unit test process_idf for string_view</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9537">9537</a></td>
-            <td>Implement 9418 ITE environment class addition and code specifications update</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9868">9868</a></td>
+            <td>Remove Scalar Auto Refs -- Pass1</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9557">9557</a></td>
-            <td>Test SetupOutputVariable changes to accept std::string_view type for parameters</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9872">9872</a></td>
+            <td>Remove Scalar Auto Refs -- pass 2</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9584">9584</a></td>
-            <td>Clean up array references in sizing code to speed up code execution</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9886">9886</a></td>
+            <td>Fix Bad Auto: Part 3</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9892">9892</a></td>
+            <td>Fix Bad Auto 4 (with a bonus)</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9896">9896</a></td>
+            <td>Fix Bad Auto: Part 2 (Take 2)</td>
+        </tr>
+        <tr>
+            <td>(many!)</td>
+            <td>Cleaning up CppCheck-identified issues in many files!</td>
         </tr>
     </table>
 

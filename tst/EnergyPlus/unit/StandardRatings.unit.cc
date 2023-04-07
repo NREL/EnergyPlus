@@ -62,6 +62,7 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
@@ -101,7 +102,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 1600.0;
     Coil.RatedCOP(1) = 4.0;
@@ -297,7 +298,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 1600.0;
     Coil.RatedCOP(1) = 4.0;
@@ -484,7 +485,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     Coil.Name = "HeatingCoilDXSingleSpeedAutosize";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 1600.0;
     Coil.RatedCOP(1) = 3.8; //

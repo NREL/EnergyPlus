@@ -203,8 +203,8 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
     // Nodes have been found (TOTAL NODE NUMBER) or when HVAC warmup is
     // complete, whichever condition is reached first.
 
-    auto &Node(state.dataLoopNodes->Node);
-    auto &NodeID(state.dataLoopNodes->NodeID);
+    auto &Node = state.dataLoopNodes->Node;
+    auto &NodeID = state.dataLoopNodes->NodeID;
 
     if (!state.dataNodeInputMgr->NodeVarsSetup) {
         if (!state.dataErrTracking->AbortProcessing) {
@@ -1012,7 +1012,7 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
 
     if (state.dataNodeInputMgr->CalcMoreNodeInfoMyOneTimeFlag) {
         RhoAirStdInit = state.dataEnvrn->StdRhoAir;
-        RhoWaterStdInit = RhoH2O(DataGlobalConstants::InitConvTemp);
+        RhoWaterStdInit = RhoH2O(Constant::InitConvTemp);
         state.dataNodeInputMgr->NodeWetBulbRepReq.allocate(state.dataLoopNodes->NumOfNodes);
         NodeWetBulbSchedPtr.allocate(state.dataLoopNodes->NumOfNodes);
         NodeRelHumidityRepReq.allocate(state.dataLoopNodes->NumOfNodes);
@@ -1158,7 +1158,7 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
                                            nodeReportingStrings[iNode - 1]);
                 rhoStd = GetDensityGlycol(state,
                                           nodeFluidNames[iNode - 1],
-                                          DataGlobalConstants::InitConvTemp,
+                                          Constant::InitConvTemp,
                                           state.dataLoopNodes->Node(iNode).FluidIndex,
                                           nodeReportingStrings[iNode - 1]);
                 rho = GetDensityGlycol(state,
@@ -1269,7 +1269,7 @@ void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound)
     for (int NodeNum = 1; NodeNum <= state.dataLoopNodes->NumOfNodes; ++NodeNum) {
         if (state.dataLoopNodes->MarkedNode(NodeNum).IsMarked) {
             if (state.dataNodeInputMgr->NodeRef(NodeNum) == 0) {
-                auto objType =
+                std::string_view objType =
                     BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(state.dataLoopNodes->MarkedNode(NodeNum).ObjectType)];
                 ShowSevereError(state, format("Node=\"{}\" did not find reference by another object.", state.dataLoopNodes->NodeID(NodeNum)));
                 ShowContinueError(state,

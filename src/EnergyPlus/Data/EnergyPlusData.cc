@@ -127,7 +127,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataGenerator = std::make_unique<GeneratorsData>();
     this->dataGeneratorFuelSupply = std::make_unique<GeneratorFuelSupplyData>();
     this->dataGlobal = std::make_unique<DataGlobal>();
-    this->dataGlobalConst = std::make_unique<DataGlobalConstantsData>();
     this->dataGlobalNames = std::make_unique<GlobalNamesData>();
     this->dataGrndTempModelMgr = std::make_unique<GroundTemperatureManagerData>();
     this->dataGroundHeatExchanger = std::make_unique<GroundHeatExchangerData>();
@@ -386,7 +385,6 @@ void EnergyPlusData::clear_state()
     this->dataGenerator->clear_state();
     this->dataGeneratorFuelSupply->clear_state();
     this->dataGlobal->clear_state();
-    this->dataGlobalConst->clear_state();
     this->dataGlobalNames->clear_state();
     this->dataGrndTempModelMgr->clear_state();
     this->dataGroundHeatExchanger->clear_state();

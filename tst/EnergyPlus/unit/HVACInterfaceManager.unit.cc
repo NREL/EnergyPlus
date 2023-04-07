@@ -70,7 +70,7 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     using namespace DataHVACGlobals;
     Real64 TankOutletTemp;
     state->dataHVACGlobal->TimeStepSys = 1;
-    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     // Set Up PlantLoop Variables

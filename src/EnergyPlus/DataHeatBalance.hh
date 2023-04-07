@@ -448,30 +448,30 @@ namespace DataHeatBalance {
         // For now, only including fields that are new to Space to avoid excess changes
         // due to case differences between existing space and zone field names.
         std::string Name;
-        Real64 CeilingHeight = DataGlobalConstants::AutoCalculate; // Ceiling Height entered by user [m] or calculated
-        Real64 Volume = DataGlobalConstants::AutoCalculate;        // Volume entered by user [m3] or calculated
-        Real64 ExtGrossWallArea = 0.0;                             // Exterior Wall Area for Zone (Gross)
-        Real64 ExteriorTotalSurfArea = 0.0;                        // Total surface area of all exterior surfaces for Zone
-        int SystemZoneNodeNumber = 0;                              // This is the zone or space node number for the system for a controlled zone
+        Real64 CeilingHeight = Constant::AutoCalculate; // Ceiling Height entered by user [m] or calculated
+        Real64 Volume = Constant::AutoCalculate;        // Volume entered by user [m3] or calculated
+        Real64 ExtGrossWallArea = 0.0;                  // Exterior Wall Area for Zone (Gross)
+        Real64 ExteriorTotalSurfArea = 0.0;             // Total surface area of all exterior surfaces for Zone
+        int SystemZoneNodeNumber = 0;                   // This is the zone or space node number for the system for a controlled zone
     };
 
     struct SpaceData : ZoneSpaceData
     {
-        int zoneNum = 0;                                                  // Pointer to Zone wich contains this space
-        Real64 userEnteredFloorArea = DataGlobalConstants::AutoCalculate; // User input floor area for this space
-        std::string spaceType = "General";                                // Space type tag
-        int spaceTypeNum = 0;                                             // Points to spaceType for this space
-        EPVector<std::string> tags;                                       // Optional tags for reporting
-        EPVector<int> surfaces;                                           // Pointers to surfaces in this space
-        Real64 calcFloorArea = 0.0;                                       // Calculated floor area used for this space
-        Real64 floorArea = 0.0;                                           // Floor area used for this space
-        bool hasFloor = false;                                            // Has "Floor" surface
-        Real64 fracZoneFloorArea = 0.0;                                   // fraction of total floor area for all spaces in zone
-        Real64 fracZoneVolume = 0.0;                                      // fraction of total volume for all spaces in zone
-        Real64 extWindowArea = 0.0;                                       // Exterior Window Area for space
-        Real64 totalSurfArea = 0.0;                                       // Total surface area for space
-        int radiantEnclosureNum = 0;                                      // Radiant exchange enclosure this space belongs to
-        int solarEnclosureNum = 0;                                        // Solar distribution enclosure this space belongs to
+        int zoneNum = 0;                                       // Pointer to Zone wich contains this space
+        Real64 userEnteredFloorArea = Constant::AutoCalculate; // User input floor area for this space
+        std::string spaceType = "General";                     // Space type tag
+        int spaceTypeNum = 0;                                  // Points to spaceType for this space
+        EPVector<std::string> tags;                            // Optional tags for reporting
+        EPVector<int> surfaces;                                // Pointers to surfaces in this space
+        Real64 calcFloorArea = 0.0;                            // Calculated floor area used for this space
+        Real64 floorArea = 0.0;                                // Floor area used for this space
+        bool hasFloor = false;                                 // Has "Floor" surface
+        Real64 fracZoneFloorArea = 0.0;                        // fraction of total floor area for all spaces in zone
+        Real64 fracZoneVolume = 0.0;                           // fraction of total volume for all spaces in zone
+        Real64 extWindowArea = 0.0;                            // Exterior Window Area for space
+        Real64 totalSurfArea = 0.0;                            // Total surface area for space
+        int radiantEnclosureNum = 0;                           // Radiant exchange enclosure this space belongs to
+        int solarEnclosureNum = 0;                             // Solar distribution enclosure this space belongs to
         Real64 totOccupants = 0.0;     // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
         Real64 minOccupants = 0.0;     // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
         Real64 maxOccupants = 0.0;     // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
@@ -577,7 +577,7 @@ namespace DataHeatBalance {
         Real64 OriginZ = 0.0;   // Z origin  [m]
         int OfType = 1;         // 1=Standard Zone, Not yet used:
         // 2=Plenum Zone, 11=Solar Wall, 12=Roof Pond
-        Real64 UserEnteredFloorArea = DataGlobalConstants::AutoCalculate; // User input floor area for this zone
+        Real64 UserEnteredFloorArea = Constant::AutoCalculate; // User input floor area for this zone
         // Calculated after input
         Real64 FloorArea = 0.0;            // Floor area used for area based internal gains and outputs
         Real64 CalcFloorArea = 0.0;        // Calculated floor area excluding air boundary surfaces
@@ -709,7 +709,7 @@ namespace DataHeatBalance {
 
         void SetOutBulbTempAt(EnergyPlusData &state);
 
-        void SetWindSpeedAt(EnergyPlusData &state, Real64 fac);
+        void SetWindSpeedAt(EnergyPlusData const &state, Real64 fac);
 
         void SetWindDirAt(Real64 fac);
 

@@ -339,10 +339,10 @@ struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct
 
     // Default Constructor
     WaterToAirHeatPumpSimpleData()
-        : CelsiustoKelvin(DataGlobalConstants::KelvinConv), NumWatertoAirHPs(0), AirflowErrPointer(0), GetCoilsInputFlag(true),
-          SourceSideMassFlowRate(0.0), SourceSideInletTemp(0.0), SourceSideInletEnth(0.0), LoadSideInletDBTemp(0.0), LoadSideInletWBTemp(0.0),
-          LoadSideInletHumRat(0.0), LoadSideInletEnth(0.0), LoadSideOutletDBTemp(0.0), LoadSideOutletHumRat(0.0), QLatRated(0.0), QLatActual(0.0),
-          Winput(0.0), MyOneTimeFlag(true), firstTime(true)
+        : CelsiustoKelvin(Constant::KelvinConv), NumWatertoAirHPs(0), AirflowErrPointer(0), GetCoilsInputFlag(true), SourceSideMassFlowRate(0.0),
+          SourceSideInletTemp(0.0), SourceSideInletEnth(0.0), LoadSideInletDBTemp(0.0), LoadSideInletWBTemp(0.0), LoadSideInletHumRat(0.0),
+          LoadSideInletEnth(0.0), LoadSideOutletDBTemp(0.0), LoadSideOutletHumRat(0.0), QLatRated(0.0), QLatActual(0.0), Winput(0.0),
+          MyOneTimeFlag(true), firstTime(true)
     {
     }
 };

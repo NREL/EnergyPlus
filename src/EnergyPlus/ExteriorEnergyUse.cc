@@ -116,13 +116,10 @@ namespace ExteriorEnergyUse {
         std::string_view constexpr RoutineName("GetExteriorEnergyUseInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Item;                // Item to be "gotten"
         int NumAlphas;           // Number of Alphas for each GetObjectItem call
         int NumNumbers;          // Number of Numbers for each GetObjectItem call
         int IOStatus;            // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        int NumFuelEq;           // Temporary -- number of ExteriorFuelEquipment statements
-        int NumWtrEq;            // Temporary -- number of ExteriorWaterEquipment statements
         std::string TypeString;  // Fuel Type string (returned from Validation)
         std::string EndUseSubcategoryName;
         Real64 SchMax; // Max value of schedule for item
@@ -131,8 +128,8 @@ namespace ExteriorEnergyUse {
         state.dataExteriorEnergyUse->NumExteriorLights = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Exterior:Lights");
         state.dataExteriorEnergyUse->ExteriorLights.allocate(state.dataExteriorEnergyUse->NumExteriorLights);
 
-        NumFuelEq = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Exterior:FuelEquipment");
-        NumWtrEq = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Exterior:WaterEquipment");
+        int NumFuelEq = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Exterior:FuelEquipment");
+        int NumWtrEq = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Exterior:WaterEquipment");
         state.dataExteriorEnergyUse->ExteriorEquipment.allocate(NumFuelEq + NumWtrEq);
         state.dataExteriorEnergyUse->UniqueExteriorEquipNames.reserve(NumFuelEq + NumWtrEq);
 
@@ -140,9 +137,8 @@ namespace ExteriorEnergyUse {
         state.dataExteriorEnergyUse->NumExteriorEqs = 0;
 
         // =================================  Get Exterior Lights
-        std::string_view cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-        cCurrentModuleObject = "Exterior:Lights";
-        for (Item = 1; Item <= state.dataExteriorEnergyUse->NumExteriorLights; ++Item) {
+        std::string_view cCurrentModuleObject = "Exterior:Lights";
+        for (int Item = 1; Item <= state.dataExteriorEnergyUse->NumExteriorLights; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
@@ -288,7 +284,7 @@ namespace ExteriorEnergyUse {
         // =================================  Get Exterior Fuel Equipment
 
         cCurrentModuleObject = "Exterior:FuelEquipment";
-        for (Item = 1; Item <= NumFuelEq; ++Item) {
+        for (int Item = 1; Item <= NumFuelEq; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
@@ -449,7 +445,7 @@ namespace ExteriorEnergyUse {
         // =================================  Get Exterior Water Equipment
 
         cCurrentModuleObject = "Exterior:WaterEquipment";
-        for (Item = 1; Item <= NumWtrEq; ++Item) {
+        for (int Item = 1; Item <= NumWtrEq; ++Item) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Item,
@@ -734,7 +730,7 @@ namespace ExteriorEnergyUse {
             if (!state.dataGlobal->WarmupFlag) {
                 //      IF (DoOutputReporting .AND.  WriteTabularFiles .and. (KindOfSim == ksRunPeriodWeather)) THEN !for weather simulations only
                 if (state.dataGlobal->DoOutputReporting &&
-                    (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
+                    (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumua the total electricity used for each ExteriorLights object
                     state.dataExteriorEnergyUse->ExteriorLights(Item).SumConsumption += state.dataExteriorEnergyUse->ExteriorLights(Item).CurrentUse;
                     // for tabular report, accumulate the time when each ExteriorLights has consumption

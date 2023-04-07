@@ -81,12 +81,9 @@ namespace EnergyPlus::ChillerAbsorption {
 // MODULE INFORMATION:
 //       AUTHOR         Dan Fisher
 //       DATE WRITTEN   Nov. 2000
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
-// This module simulates the performance of the BLAST
-// absorbers.
+// This module simulates the performance of the BLAST absorbers.
 
 // METHODOLOGY EMPLOYED:
 // Once the PlantLoopManager determines that the BLAST absorber
@@ -109,7 +106,7 @@ const char *moduleObjectType("Chiller:Absorption");
 const char *fluidNameWater = "WATER";
 const char *fluidNameSteam = "STEAM";
 
-PlantComponent *BLASTAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+BLASTAbsorberSpecs *BLASTAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data
     if (state.dataChillerAbsorber->getInput) {
@@ -117,11 +114,10 @@ PlantComponent *BLASTAbsorberSpecs::factory(EnergyPlusData &state, std::string c
         state.dataChillerAbsorber->getInput = false;
     }
     // Now look for this particular object
-    for (auto &thisAbs : state.dataChillerAbsorber->absorptionChillers) {
-        if (thisAbs.Name == objectName) {
-            return &thisAbs;
-        }
-    }
+    auto thisAbs = std::find_if(state.dataChillerAbsorber->absorptionChillers.begin(),
+                                state.dataChillerAbsorber->absorptionChillers.end(),
+                                [&objectName](const BLASTAbsorberSpecs &myAbs) { return myAbs.Name == objectName; });
+    if (thisAbs != state.dataChillerAbsorber->absorptionChillers.end()) return thisAbs;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalBlastAbsorberFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
@@ -776,7 +772,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
 
     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                   DataGlobalConstants::CWInitConvTemp,
+                                                   Constant::CWInitConvTemp,
                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                    RoutineName);
 
@@ -786,7 +782,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
 
     rho = FluidProperties::GetDensityGlycol(state,
                                             state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                            DataGlobalConstants::CWInitConvTemp,
+                                            Constant::CWInitConvTemp,
                                             state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                             RoutineName);
 
@@ -800,7 +796,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
         if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidName,
-                                                    DataGlobalConstants::HWInitConvTemp,
+                                                    Constant::HWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidIndex,
                                                     RoutineName);
 
@@ -845,8 +841,6 @@ void BLASTAbsorberSpecs::initialize(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   September 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for initializations of the Electric Chiller components
@@ -907,7 +901,6 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     //       DATE WRITTEN   March 2008
     //       MODIFIED:      R. Raustad May 2008 - added generator node sizing
     //                      November 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for sizing Constant COP Chiller Components for which capacities and flow rates
@@ -976,13 +969,13 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
 
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             tmpNomCap =
@@ -1150,7 +1143,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             tmpCondVolFlowRate =
@@ -1390,12 +1383,12 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidName,
-                                                                   DataGlobalConstants::HWInitConvTemp,
+                                                                   Constant::HWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::HWInitConvTemp,
+                                                               Constant::HWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
 
@@ -1425,7 +1418,6 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
     //       MODIFIED       Apr. 1999, May 2000- Taecheol Kim
     //                      May. 2008, R. Raustad, Added generator nodes
     //                      Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // simulate a vapor compression Absorber using the BLAST model
@@ -1776,10 +1768,10 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
     } // IF(GeneratorInletNode .GT. 0)THEN
 
     // convert power to energy
-    this->GeneratorEnergy = this->QGenerator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->PumpingEnergy = this->PumpingPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->GeneratorEnergy = this->QGenerator * state.dataHVACGlobal->TimeStepSysSec;
+    this->EvaporatorEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSysSec;
+    this->CondenserEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSysSec;
+    this->PumpingEnergy = this->PumpingPower * state.dataHVACGlobal->TimeStepSysSec;
 }
 
 void BLASTAbsorberSpecs::updateRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag)

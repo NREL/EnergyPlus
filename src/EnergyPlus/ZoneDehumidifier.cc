@@ -259,7 +259,7 @@ namespace ZoneDehumidifier {
 
             // A2,  \field Availability Schedule Name
             if (lAlphaBlanks(2)) {
-                state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr =
                     GetScheduleIndex(state, Alphas(2)); // Convert schedule name to pointer
@@ -812,7 +812,7 @@ namespace ZoneDehumidifier {
             WaterRemovalVolRate = WaterRemovalRateFactor * state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedWaterRemoval;
 
             WaterRemovalMassRate =
-                WaterRemovalVolRate / (24.0 * DataGlobalConstants::SecInHour * 1000.0) *
+                WaterRemovalVolRate / (24.0 * Constant::SecInHour * 1000.0) *
                 RhoH2O(max((InletAirTemp - 11.0), 1.0)); //(L/d)/(24 hr/day *3600 sec/hr * 1000 L/m3) | Density of water, minimum temp = 1.0C
 
             if (WaterRemovalMassRate > 0.0) {

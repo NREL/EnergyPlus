@@ -310,6 +310,8 @@ namespace DataHVACGlobals {
     int constexpr ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir(37);
     int constexpr ZoneEquipTypeOf_AirLoopHVACReturnAir(38);
 
+    int constexpr MaxSpeedLevels = 10;
+
     extern Array1D_string const cFanTypes;
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;

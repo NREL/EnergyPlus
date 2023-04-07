@@ -793,7 +793,7 @@ struct WindowEquivalentLayerData : BaseGlobalStruct
 {
 
     // Data
-    Real64 const RadiansToDeg; // Conversion for Radians to Degrees: Not using DataGlobalConstants::Pi() to avoid initialization order bug
+    Real64 const RadiansToDeg; // Conversion for Radians to Degrees: Not using Constant::Pi() to avoid initialization order bug
     Real64 const PAtmSeaLevel; // Standard atmospheric pressure at sea level (Pa)
     int const hipRHO;          // return reflectance
     int const hipTAU;          // return transmittance
