@@ -91,9 +91,6 @@ namespace GeneratorFuelSupply {
     // REFERENCES:
     // Annex 42 documentation
 
-    // Using/Aliasing
-    using namespace DataGenerators;
-
     void GetGeneratorFuelSupplyInput(EnergyPlusData &state)
     {
 
@@ -592,8 +589,8 @@ namespace GeneratorFuelSupply {
             for (int i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
 
                 std::string const &thisName = state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitName(i);
-                int thisGasID =
-                    UtilityRoutines::FindItem(thisName, state.dataGenerator->GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName);
+                int thisGasID = UtilityRoutines::FindItem(
+                    thisName, state.dataGenerator->GasPhaseThermoChemistryData, &DataGenerators::GasPropertyDataStruct::ConstituentName);
                 state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i) = thisGasID;
 
                 if (thisGasID == 0) {
