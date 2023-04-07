@@ -234,7 +234,7 @@ namespace GeneratorFuelSupply {
 
             // now make calls to Setup
 
-            for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
+            for (int FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
                 SetupFuelConstituentData(state, FuelSupNum, ErrorsFound);
             }
 
