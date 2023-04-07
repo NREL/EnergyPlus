@@ -157,7 +157,7 @@ constexpr std::array<std::string_view, static_cast<int>(RptKey::Num)> RptKeyName
     "COSTINFO", "DXF", "DXF:WIREFRAME", "VRML", "VERTICES", "DETAILS", "DETAILSWITHVERTICES", "LINES"};
 
 // A second version that does not require a payload -- use lambdas
-void SolveRoot(EnergyPlusData &state,
+void SolveRoot(const EnergyPlusData &state,
                Real64 Eps,   // required absolute accuracy
                int MaxIte,   // maximum number of allowed iterations
                int &Flag,    // integer storing exit status
@@ -335,10 +335,6 @@ void ProcessDateString(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int FstNum{};
     bool errFlag{};
-    int NumTokens{};
-    int TokenDay{};
-    int TokenMonth{};
-    int TokenWeekday{};
 
     FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
     DateType = WeatherManager::DateType::Invalid;
@@ -356,6 +352,10 @@ void ProcessDateString(EnergyPlusData &state,
             DateType = WeatherManager::DateType::LastDayInMonth;
         }
     } else {
+        int NumTokens{};
+        int TokenDay{};
+        int TokenMonth{};
+        int TokenWeekday{};
         // Error when processing as number, try x/x
         if (!present(PYear)) {
             DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
@@ -415,10 +415,6 @@ void DetermineDateTokens(EnergyPlusData &state,
     std::string CurrentString = String;
     int Loop{};
     Array1D_string Fields(3);
-    int NumField1{};
-    int NumField2{};
-    int NumField3{};
-    bool errFlag{};
     bool InternalError = false;
     bool WkDayInMonth = false;
 
@@ -453,6 +449,10 @@ void DetermineDateTokens(EnergyPlusData &state,
         ErrorsFound = true;
     } else {
         Loop = 0;
+        bool errFlag = false;
+        int NumField1;
+        int NumField2;
+        int NumField3;
         while (Loop < 3) { // Max of 3 fields
             if (CurrentString == BlankString) break;
             size_t Pos = index(CurrentString, ' ');
@@ -803,7 +803,7 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
 }
 
 // returns the Julian date for the first, second, etc. day of week for a given month
-int nthDayOfWeekOfMonth(EnergyPlusData &state,
+int nthDayOfWeekOfMonth(const EnergyPlusData &state,
                         int const dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
                         int const nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
                         int const monthNumber // January = 1
@@ -1101,21 +1101,17 @@ void ScanForReports(EnergyPlusData &state,
     // First time routine is called, all the viable combinations/settings for the reports are
     // stored in SAVEd variables.  Later callings will retrieve those.
 
-    // Using/Aliasing
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumReports;
-    int RepNum;
-    int NumNames;
-    int NumNumbers;
-    int IOStat;
-    auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-
     if (state.dataGeneral->GetReportInput) {
 
+        int NumNames;
+        int NumNumbers;
+        int IOStat;
+        int RepNum;
+
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Output:Surfaces:List";
 
-        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         enum
         {

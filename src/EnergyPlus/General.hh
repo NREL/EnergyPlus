@@ -72,7 +72,7 @@ namespace WeatherManager {
 namespace General {
 
     // A second version that does not require a payload -- use lambdas
-    void SolveRoot(EnergyPlusData &state,
+    void SolveRoot(const EnergyPlusData &state,
                    Real64 Eps,   // required absolute accuracy
                    int MaxIte,   // maximum number of allowed iterations
                    int &Flag,    // integer storing exit status
