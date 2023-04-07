@@ -251,7 +251,7 @@ namespace GeneratorFuelSupply {
         // METHODOLOGY EMPLOYED:
         // Hardcoded data from NIST is filled into data structure one time only
 
-        int NumHardCodedConstituents = 14; // number of gases included in data
+        int constexpr NumHardCodedConstituents = 14; // number of gases included in data
 
         if (!allocated(state.dataGenerator->GasPhaseThermoChemistryData)) {
             state.dataGenerator->GasPhaseThermoChemistryData.allocate(NumHardCodedConstituents);
