@@ -341,7 +341,7 @@ void ControlCompOutput(EnergyPlusData &state,
                 ZoneInterHalf.MaxResult = 1.0;
                 ZoneInterHalf.MinResult = 0.0;
                 // MaxResult is greater than MinResult so simulation control algorithm may proceed normally
-            } else if (ZoneInterHalf.MaxResult > ZoneInterHalf.MinResult) {
+            } else {
                 // Now check to see if the setpoint is outside the endpoints of the control range
                 // First check to see if the water is too cold and if so set to the minimum flow.
                 if (ZoneController.SetPoint <= ZoneInterHalf.MinResult) {
@@ -366,13 +366,13 @@ void ControlCompOutput(EnergyPlusData &state,
                     ZoneInterHalf.MaxResult = 1.0;
                     ZoneInterHalf.MinResult = 0.0;
                     // If between the max and mid set to new flow and raise min to mid
-                } else if ((ZoneController.SetPoint < ZoneInterHalf.MaxResult) && (ZoneController.SetPoint >= ZoneInterHalf.MidResult)) {
+                } else if (ZoneController.SetPoint >= ZoneInterHalf.MidResult) {
                     ZoneController.CalculatedSetPoint = (ZoneInterHalf.MaxFlow + ZoneInterHalf.MidFlow) / 2.0;
                     ZoneInterHalf.MinFlow = ZoneInterHalf.MidFlow;
                     ZoneInterHalf.MinResult = ZoneInterHalf.MidResult;
                     ZoneInterHalf.MidFlow = (ZoneInterHalf.MaxFlow + ZoneInterHalf.MidFlow) / 2.0;
                     // If between the min and mid set to new flow and lower Max to mid
-                } else if ((ZoneController.SetPoint < ZoneInterHalf.MidResult) && (ZoneController.SetPoint > ZoneInterHalf.MinResult)) {
+                } else {
                     ZoneController.CalculatedSetPoint = (ZoneInterHalf.MinFlow + ZoneInterHalf.MidFlow) / 2.0;
                     ZoneInterHalf.MaxFlow = ZoneInterHalf.MidFlow;
                     ZoneInterHalf.MaxResult = ZoneInterHalf.MidResult;
@@ -684,12 +684,9 @@ void CheckThisAirSystemForSizing(EnergyPlusData &state, int const AirLoopNum, bo
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ThisAirSysSizineInputLoop;
-
     AirLoopWasSized = false;
     if (state.dataSize->SysSizingRunDone) {
-        for (ThisAirSysSizineInputLoop = 1; ThisAirSysSizineInputLoop <= state.dataSize->NumSysSizInput; ++ThisAirSysSizineInputLoop) {
+        for (int ThisAirSysSizineInputLoop = 1; ThisAirSysSizineInputLoop <= state.dataSize->NumSysSizInput; ++ThisAirSysSizineInputLoop) {
             if (state.dataSize->SysSizInput(ThisAirSysSizineInputLoop).AirLoopNum == AirLoopNum) {
                 AirLoopWasSized = true;
                 break;
@@ -744,12 +741,9 @@ void CheckThisZoneForSizing(EnergyPlusData &state,
     // utility routine to see if a particular zone has a Sizing:Zone object for it
     // and that sizing was done.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ThisSizingInput;
-
     ZoneWasSized = false;
     if (state.dataSize->ZoneSizingRunDone) {
-        for (ThisSizingInput = 1; ThisSizingInput <= state.dataSize->NumZoneSizingInput; ++ThisSizingInput) {
+        for (int ThisSizingInput = 1; ThisSizingInput <= state.dataSize->NumZoneSizingInput; ++ThisSizingInput) {
             if (state.dataSize->ZoneSizingInput(ThisSizingInput).ZoneNum == ZoneNum) {
                 ZoneWasSized = true;
                 break;
@@ -923,10 +917,8 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     int ThisSurf;                 // do loop counter
     int NumSurfs;                 // number of underlying HT surfaces associated with UTSC
     Real64 TmpTsBaf;              // baffle temperature
-    int SurfPtr;                  // index of surface in main surface structure
     Real64 HMovInsul;             // dummy for call to InitExteriorConvectionCoeff
     Real64 HExt;                  // dummy for call to InitExteriorConvectionCoeff
-    int ConstrNum;                // index of construction in main construction structure
     Real64 AbsThermSurf;          // thermal emmittance of underlying wall.
     Real64 TsoK;                  // underlying surface temperature in Kelvin
     Real64 TsBaffK;               // baffle temperature in Kelvin  (lagged)
@@ -987,13 +979,13 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     HExtARR.dimension(NumSurfs, 0.0);
 
     for (ThisSurf = 1; ThisSurf <= NumSurfs; ++ThisSurf) {
-        SurfPtr = SurfPtrARR(ThisSurf);
+        int SurfPtr = SurfPtrARR(ThisSurf);
         // Initializations for this surface
         HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
         InitExteriorConvectionCoeff(
             state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
-        ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
+        int ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
         AbsThermSurf =
             dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
                 ->AbsorpThermal;
@@ -1385,14 +1377,12 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Count;
-    std::string AirPathNodeName;    // Air Path Inlet Node Name
     std::string PrimaryAirLoopName; // Air Loop to which this supply air path is connected
     Array1D_bool FoundSupplyPlenum;
     Array1D_bool FoundZoneSplitter;
     Array1D_string FoundNames;
     int NumErr(0); // Error Counter //Autodesk:Init Initialization added
     int BCount;
-    int Found;
     int Count1;
     int Count2;
 
@@ -1421,7 +1411,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     for (BCount = 1; BCount <= state.dataZoneEquip->NumSupplyAirPaths; ++BCount) {
 
         // Determine which air loop this supply air path is connected to
-        Found = 0;
+        int Found = 0;
         for (Count1 = 1; Count1 <= state.dataHVACGlobal->NumPrimaryAirSys; ++Count1) {
             PrimaryAirLoopName = state.dataAirLoop->AirToZoneNodeInfo(Count1).AirLoopName;
             Found = 0;
@@ -1437,7 +1427,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
         print(state.files.bnd, " Supply Air Path,{},{},{}\n", BCount, state.dataZoneEquip->SupplyAirPath(BCount).Name, PrimaryAirLoopName);
         print(state.files.bnd, "   #Components on Supply Air Path,{}\n", state.dataZoneEquip->SupplyAirPath(BCount).NumOfComponents);
 
-        AirPathNodeName = state.dataLoopNodes->NodeID(state.dataZoneEquip->SupplyAirPath(BCount).InletNodeNum);
+        std::string AirPathNodeName = state.dataLoopNodes->NodeID(state.dataZoneEquip->SupplyAirPath(BCount).InletNodeNum);
 
         for (Count = 1; Count <= state.dataZoneEquip->SupplyAirPath(BCount).NumOfComponents; ++Count) {
 
@@ -1688,20 +1678,16 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
     int Count;
-    std::string AirPathNodeName;    // Air Path Inlet Node Name
     std::string PrimaryAirLoopName; // Air Loop to which this return air path is connected
     Array1D_bool FoundReturnPlenum;
     Array1D_bool FoundZoneMixer;
     Array1D_string FoundNames;
     int NumErr; // Error Counter
     int BCount;
-    int Found;
     int Count1;
     int Count2;
     Array1D_int AllNodes;
-    int MixerCount;
     int Count3;
-    int NumComp;
     int CountNodes;
 
     // Formats
@@ -1733,7 +1719,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
 
     for (BCount = 1; BCount <= state.dataZoneEquip->NumReturnAirPaths; ++BCount) {
         //             Determine which air loop this supply air path is connected to
-        Found = 0;
+        int Found = 0;
         for (Count1 = 1; Count1 <= state.dataHVACGlobal->NumPrimaryAirSys; ++Count1) {
             PrimaryAirLoopName = state.dataAirLoop->AirToZoneNodeInfo(Count1).AirLoopName;
             Found = 0;
@@ -1748,12 +1734,12 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
 
         print(state.files.bnd, " Return Air Path,{},{},{}\n", BCount, state.dataZoneEquip->ReturnAirPath(BCount).Name, PrimaryAirLoopName);
 
-        NumComp = state.dataZoneEquip->ReturnAirPath(BCount).NumOfComponents;
+        int NumComp = state.dataZoneEquip->ReturnAirPath(BCount).NumOfComponents;
         print(state.files.bnd, "   #Components on Return Air Path,{}\n", NumComp);
 
-        AirPathNodeName = state.dataLoopNodes->NodeID(state.dataZoneEquip->ReturnAirPath(BCount).OutletNodeNum);
+        std::string AirPathNodeName = state.dataLoopNodes->NodeID(state.dataZoneEquip->ReturnAirPath(BCount).OutletNodeNum);
 
-        MixerCount = 0;
+        int MixerCount = 0;
         for (Count = 1; Count <= NumComp; ++Count) {
             print(state.files.bnd,
                   "   Return Air Path Component,{},{},{},{}\n",
