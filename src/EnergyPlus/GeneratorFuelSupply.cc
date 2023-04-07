@@ -251,16 +251,6 @@ namespace GeneratorFuelSupply {
         // METHODOLOGY EMPLOYED:
         // Hardcoded data from NIST is filled into data structure one time only
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 LHVfuel;      // lower heating value of fuel, working var
-        Real64 HHVfuel;      // higher heating value of fuel, working var
-        Real64 O2Stoic;      // stochiometric oxygen coef in chemical equation (15)
-        Real64 CO2ProdStoic; // product gases carbon dioxide coeff
-        Real64 H2OProdStoic; // product gases water coeff
-        Real64 LHVi;         // working var for lower heating value calc
-        Real64 HHVi;         // working var for higher heating value calc
-        Real64 MWfuel;
-
         int NumHardCodedConstituents = 14; // number of gases included in data
 
         if (!allocated(state.dataGenerator->GasPhaseThermoChemistryData)) {
@@ -575,11 +565,11 @@ namespace GeneratorFuelSupply {
             // now calculate LHV of fuel for entire simulation
 
             // sum over each constituent
-            O2Stoic = 0.0;
-            CO2ProdStoic = 0.0;
-            H2OProdStoic = 0.0;
-            int CO2dataID = 1;   // hard-coded above
-            int WaterDataID = 4; // hard-coded above
+            Real64 O2Stoic = 0.0;      // stochiometric oxygen coef in chemical equation (15)
+            Real64 CO2ProdStoic = 0.0; // product gases carbon dioxide coeff
+            Real64 H2OProdStoic = 0.0; // product gases water coeff
+            int CO2dataID = 1;         // hard-coded above
+            int WaterDataID = 4;       // hard-coded above
             // Loop over fuel constituents and do one-time setup
             for (int i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
 
@@ -612,7 +602,8 @@ namespace GeneratorFuelSupply {
             state.dataGenerator->FuelSupply(FuelSupplyNum).H2OProductGasCoef = H2OProdStoic;
 
             // Calculate LHV for an NdotFuel of 1.0
-            LHVfuel = 0.0;
+            Real64 LHVfuel = 0.0;
+            Real64 LHVi; // working var for lower heating value calc
             for (int i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
                 int thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
                 if (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens == 0.0) {
@@ -629,7 +620,8 @@ namespace GeneratorFuelSupply {
             state.dataGenerator->FuelSupply(FuelSupplyNum).LHV = LHVfuel;
 
             // Calculate HHV for an NdotFuel of 1.0
-            HHVfuel = 0.0;
+            Real64 HHVfuel = 0.0;
+            Real64 HHVi; // working var for higher heating value calc
             for (int i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
                 int thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
                 if (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens == 0.0) {
@@ -647,7 +639,7 @@ namespace GeneratorFuelSupply {
             }
 
             // Calculate Molecular Weight for this fuel
-            MWfuel = 0.0;
+            Real64 MWfuel = 0.0;
             for (int i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
                 int thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
                 MWfuel += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) *
