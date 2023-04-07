@@ -100,12 +100,6 @@ namespace GeneratorFuelSupply {
         //       RE-ENGINEERED  this module extracted from older SOFC module for
         //                      reuse with both Annex 42 models,
 
-        // Using/Aliasing
-        using Curve::GetCurveIndex;
-        using DataLoopNode::ObjectIsNotParent;
-        using NodeInputManager::GetOnlySingleNode;
-        using ScheduleManager::GetScheduleIndex;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //  INTEGER                     :: GeneratorNum !Generator counter
         Array1D_string AlphArray(25);  // character string data
@@ -153,17 +147,18 @@ namespace GeneratorFuelSupply {
                 }
 
                 state.dataGenerator->FuelSupply(FuelSupNum).NodeName = AlphArray(3);
-                state.dataGenerator->FuelSupply(FuelSupNum).NodeNum = GetOnlySingleNode(state,
-                                                                                        AlphArray(3),
-                                                                                        ErrorsFound,
-                                                                                        DataLoopNode::ConnectionObjectType::GeneratorFuelSupply,
-                                                                                        AlphArray(1),
-                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::ConnectionType::Sensor,
-                                                                                        NodeInputManager::CompFluidStream::Primary,
-                                                                                        ObjectIsNotParent);
+                state.dataGenerator->FuelSupply(FuelSupNum).NodeNum =
+                    NodeInputManager::GetOnlySingleNode(state,
+                                                        AlphArray(3),
+                                                        ErrorsFound,
+                                                        DataLoopNode::ConnectionObjectType::GeneratorFuelSupply,
+                                                        AlphArray(1),
+                                                        DataLoopNode::NodeFluidType::Air,
+                                                        DataLoopNode::ConnectionType::Sensor,
+                                                        NodeInputManager::CompFluidStream::Primary,
+                                                        DataLoopNode::ObjectIsNotParent);
 
-                state.dataGenerator->FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
+                state.dataGenerator->FuelSupply(FuelSupNum).SchedNum = ScheduleManager::GetScheduleIndex(state, AlphArray(4));
                 if ((state.dataGenerator->FuelSupply(FuelSupNum).SchedNum == 0) &&
                     (state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode == DataGenerators::FuelTemperatureMode::FuelInTempSchedule)) {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
@@ -172,7 +167,7 @@ namespace GeneratorFuelSupply {
                     ErrorsFound = true;
                 }
 
-                state.dataGenerator->FuelSupply(FuelSupNum).CompPowerCurveID = GetCurveIndex(state, AlphArray(5));
+                state.dataGenerator->FuelSupply(FuelSupNum).CompPowerCurveID = Curve::GetCurveIndex(state, AlphArray(5));
                 if (state.dataGenerator->FuelSupply(FuelSupNum).CompPowerCurveID == 0) {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
                     ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, AlphArray(1)));
