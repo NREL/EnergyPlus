@@ -333,8 +333,8 @@ void ProcessDateString(EnergyPlusData &state,
     // the proper month and day for that date string.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int FstNum{};
-    bool errFlag{};
+    int FstNum;
+    bool errFlag;
 
     FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
     DateType = WeatherManager::DateType::Invalid;
@@ -352,10 +352,10 @@ void ProcessDateString(EnergyPlusData &state,
             DateType = WeatherManager::DateType::LastDayInMonth;
         }
     } else {
-        int NumTokens{};
-        int TokenDay{};
-        int TokenMonth{};
-        int TokenWeekday{};
+        int NumTokens = 0;
+        int TokenDay = 0;
+        int TokenMonth = 0;
+        int TokenWeekday = 0;
         // Error when processing as number, try x/x
         if (!present(PYear)) {
             DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
@@ -413,7 +413,6 @@ void DetermineDateTokens(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string CurrentString = String;
-    int Loop{};
     Array1D_string Fields(3);
     bool InternalError = false;
     bool WkDayInMonth = false;
@@ -426,7 +425,7 @@ void DetermineDateTokens(EnergyPlusData &state,
     if (present(TokenYear)) TokenYear = 0;
     // Take out separator characters, other extraneous stuff
 
-    for (Loop = 0; Loop < NumSingleChars; ++Loop) {
+    for (int Loop = 0; Loop < NumSingleChars; ++Loop) {
         size_t Pos = index(CurrentString, SingleChars[Loop]);
         while (Pos != std::string::npos) {
             CurrentString[Pos] = ' ';
@@ -434,7 +433,7 @@ void DetermineDateTokens(EnergyPlusData &state,
         }
     }
 
-    for (Loop = 0; Loop < NumDoubleChars; ++Loop) {
+    for (int Loop = 0; Loop < NumDoubleChars; ++Loop) {
         size_t Pos = index(CurrentString, DoubleChars[Loop]);
         while (Pos != std::string::npos) {
             CurrentString.replace(Pos, 2, "  ");
@@ -448,7 +447,7 @@ void DetermineDateTokens(EnergyPlusData &state,
         ShowSevereError(state, format("Invalid date field={}", String));
         ErrorsFound = true;
     } else {
-        Loop = 0;
+        int Loop = 0;
         bool errFlag = false;
         int NumField1;
         int NumField2;

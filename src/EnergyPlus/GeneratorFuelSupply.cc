@@ -122,7 +122,7 @@ namespace GeneratorFuelSupply {
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine
             bool ErrorsFound = false;
-            std::string cCurrentModuleObject = "Generator:FuelSupply";
+            std::string const cCurrentModuleObject = "Generator:FuelSupply";
             int NumGeneratorFuelSups = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
             if (NumGeneratorFuelSups <= 0) {
@@ -600,7 +600,7 @@ namespace GeneratorFuelSupply {
             // Loop over fuel constituents and do one-time setup
             for (int i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
 
-                std::string thisName = state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitName(i);
+                std::string const &thisName = state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitName(i);
                 int thisGasID =
                     UtilityRoutines::FindItem(thisName, state.dataGenerator->GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName);
                 state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i) = thisGasID;
