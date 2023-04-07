@@ -84,9 +84,6 @@ namespace EnergyPlus::General {
 // contains routines (most likely numeric) that may be needed in several parts
 // of EnergyPlus
 
-// Using/Aliasing
-using DataHVACGlobals::Bisection;
-
 // MODULE PARAMETER DEFINITIONS
 static constexpr std::string_view BlankString;
 
