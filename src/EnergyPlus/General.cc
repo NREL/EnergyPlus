@@ -79,8 +79,6 @@ namespace EnergyPlus::General {
 // MODULE INFORMATION:
 //       AUTHOR         Fred Buhl, Linda Lawrie
 //       DATE WRITTEN   December 2001
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // contains routines (most likely numeric) that may be needed in several parts
@@ -325,8 +323,6 @@ void ProcessDateString(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   December 1999
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine will process a date from a string and determine
@@ -391,8 +387,6 @@ void DetermineDateTokens(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   August 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is invoked for date fields that appear to be strings (give
@@ -586,8 +580,6 @@ void ValidateMonthDay(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   August 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine validates a potential Day, Month values, produces an error
@@ -596,10 +588,7 @@ void ValidateMonthDay(EnergyPlusData &state,
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::array<int, 12> EndMonthDay = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool InternalError;
-
-    InternalError = false;
+    bool InternalError = false;
     if (Month < 1 || Month > 12) InternalError = true;
     if (!InternalError) {
         if (Day < 1 || Day > EndMonthDay[Month - 1]) InternalError = true;
@@ -621,15 +610,11 @@ int OrdinalDay(int const Month,        // Month, 1..12
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   September 1997
-    //       MODIFIED       na
     //       RE-ENGINEERED  from JDAYF in BLAST/IBLAST
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine returns the appropriate Julian Day value for the input
     // Month and Day.
-
-    // Return value
-    int JulianDay;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static constexpr std::array<int, 12> EndDayofMonth = {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
@@ -637,21 +622,19 @@ int OrdinalDay(int const Month,        // Month, 1..12
 
     if (Month == 1) {
         //                                       CASE 1: JANUARY
-        JulianDay = Day;
+        return Day;
 
     } else if (Month == 2) {
         //                                       CASE 2: FEBRUARY
-        JulianDay = Day + EndDayofMonth[0];
+        return Day + EndDayofMonth[0];
 
     } else if ((Month >= 3) && (Month <= 12)) {
         //                                       CASE 3: REMAINING MONTHS
-        JulianDay = Day + EndDayofMonth[Month - 2] + LeapYearValue;
+        return Day + EndDayofMonth[Month - 2] + LeapYearValue;
 
     } else {
-        JulianDay = 0;
+        return 0;
     }
-
-    return JulianDay;
 }
 
 void InvOrdinalDay(int const Number, int &PMonth, int &PDay, int const LeapYr)
@@ -660,8 +643,6 @@ void InvOrdinalDay(int const Number, int &PMonth, int &PDay, int const LeapYr)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   December 1999
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine performs and inverse Julian Day
@@ -717,8 +698,6 @@ bool BetweenDates(int const TestDate,  // Date to test
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   June 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function returns true if the TestDate is between
@@ -732,14 +711,11 @@ bool BetweenDates(int const TestDate,  // Date to test
     // REFERENCES:
     // Adapted from BLAST BTWEEN function.
 
-    // Return value
-    bool BetweenDates;
-
-    BetweenDates = false; // Default case
+    bool BetweenDates = false; // Default case
 
     if (StartDate <= EndDate) { // Start Date <= End Date
         if (TestDate >= StartDate && TestDate <= EndDate) BetweenDates = true;
-    } else { // EndDate <= StartDate
+    } else { // EndDate < StartDate
         if (TestDate <= EndDate || TestDate >= StartDate) BetweenDates = true;
     }
 
@@ -752,19 +728,13 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   April 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
-    // This function creates the current time interval of the system
-    // time step.
+    // This function creates the current time interval of the system time step.
 
     // Using/Aliasing
     Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-    // Return value
-    std::string OutputString;
 
     Real64 constexpr FracToMin(60.0);
 
@@ -796,9 +766,7 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
     if (TimeStmpE[3] == ' ') {
         TimeStmpE[3] = '0';
     }
-    OutputString = TimeStmpS + " - " + TimeStmpE;
-
-    return OutputString;
+    return TimeStmpS + " - " + TimeStmpE;
 }
 
 // returns the Julian date for the first, second, etc. day of week for a given month
@@ -811,13 +779,11 @@ int nthDayOfWeekOfMonth(const EnergyPlusData &state,
     // J. Glazer - August 2017
     int firstDayOfMonth = OrdinalDay(monthNumber, 1, state.dataEnvrn->CurrentYearIsLeapYear);
     int dayOfWeekForFirstDay = (state.dataEnvrn->RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7;
-    int jdatForNth;
     if (dayOfWeek >= dayOfWeekForFirstDay) {
-        jdatForNth = firstDayOfMonth + (dayOfWeek - dayOfWeekForFirstDay) + 7 * (nthTime - 1);
+        return firstDayOfMonth + (dayOfWeek - dayOfWeekForFirstDay) + 7 * (nthTime - 1);
     } else {
-        jdatForNth = firstDayOfMonth + ((dayOfWeek + 7) - dayOfWeekForFirstDay) + 7 * (nthTime - 1);
+        return firstDayOfMonth + ((dayOfWeek + 7) - dayOfWeekForFirstDay) + 7 * (nthTime - 1);
     }
-    return jdatForNth;
 }
 
 Real64 SafeDivide(Real64 const a, Real64 const b)
@@ -825,18 +791,14 @@ Real64 SafeDivide(Real64 const a, Real64 const b)
 
     // returns a / b while preventing division by zero
 
-    // Return value
-    Real64 c;
-
     // Locals
     Real64 constexpr SMALL(1.E-10);
 
     if (std::abs(b) >= SMALL) {
-        c = a / b;
+        return a / b;
     } else {
-        c = a / sign(SMALL, b);
+        return a / sign(SMALL, b);
     }
-    return c;
 }
 
 void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed back to the calling routine
@@ -853,8 +815,6 @@ void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed b
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   March 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Iterately solves for the value of X which satisfies Y(X)=0.
@@ -912,26 +872,18 @@ int FindNumberInList(int const WhichNumber, Array1A_int const ListOfItems, int c
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   September 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up a number(integer) in a similar list of
-    // items and returns the index of the item in the list, if
-    // found.
-
-    // Return value
-    int FindNumberInList;
+    // items and returns the index of the item in the list, if found.
 
     // Argument array dimensioning
     ListOfItems.dim(_);
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Count;
+    // Return value
+    int FindNumberInList = 0;
 
-    FindNumberInList = 0;
-
-    for (Count = 1; Count <= NumItems; ++Count) {
+    for (int Count = 1; Count <= NumItems; ++Count) {
         if (WhichNumber == ListOfItems(Count)) {
             FindNumberInList = Count;
             break;
@@ -952,8 +904,6 @@ void DecodeMonDayHrMin(int const Item, // word containing encoded month, day, ho
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine decodes the "packed" integer representation of
@@ -971,10 +921,7 @@ void DecodeMonDayHrMin(int const Item, // word containing encoded month, day, ho
     static constexpr int DecDay(100 * 100);
     static constexpr int DecHr(100);
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int TmpItem;
-
-    TmpItem = Item;
+    int TmpItem = Item;
     Month = TmpItem / DecMon;
     TmpItem = (TmpItem - Month * DecMon);
     Day = TmpItem / DecDay;
@@ -994,8 +941,6 @@ void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, h
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine encodes the "packed" integer representation of
@@ -1017,8 +962,6 @@ std::string CreateTimeString(Real64 const Time) // Time in seconds
     // FUNCTION INFORMATION:
     //       AUTHOR         Dimitri Curtil
     //       DATE WRITTEN   January 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function creates the time stamp string from the time value specified in seconds.
@@ -1048,8 +991,6 @@ void ParseTime(Real64 const Time, // Time value in seconds
     // FUNCTION INFORMATION:
     //       AUTHOR         Dimitri Curtil
     //       DATE WRITTEN   January 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This subroutine decomposes a time value specified in seconds
@@ -1089,8 +1030,6 @@ void ScanForReports(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine scans for the global "reports" settings, such as Variable Dictionary,
@@ -1415,8 +1354,6 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   December 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine checks "global" objects (that is, ones with ZoneList used in the name
