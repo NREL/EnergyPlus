@@ -82,8 +82,6 @@ namespace GeneratorFuelSupply {
     // MODULE INFORMATION:
     //       AUTHOR         B Griffith
     //       DATE WRITTEN   July 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // METHODOLOGY EMPLOYED:
     // data defined in DataGenerators.cc
@@ -102,7 +100,6 @@ namespace GeneratorFuelSupply {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   July 2006,
-        //       MODIFIED       na
         //       RE-ENGINEERED  this module extracted from older SOFC module for
         //                      reuse with both Annex 42 models,
 
@@ -254,7 +251,6 @@ namespace GeneratorFuelSupply {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B Griffith
         //       DATE WRITTEN   Aug 2005,
-        //       MODIFIED       na
         //       RE-ENGINEERED  July/Aug 2006, extracted to own module. added liquid fuel option
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -264,21 +260,16 @@ namespace GeneratorFuelSupply {
         // Hardcoded data from NIST is filled into data structure one time only
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumHardCodedConstituents; // number of gases included in data
-        Real64 LHVfuel;               // lower heating value of fuel, working var
-        Real64 HHVfuel;               // higher heating value of fuel, working var
-        Real64 O2Stoic;               // stochiometric oxygen coef in chemical equation (15)
-        Real64 CO2ProdStoic;          // product gases carbon dioxide coeff
-        Real64 H2OProdStoic;          // product gases water coeff
-        Real64 LHVi;                  // working var for lower heating value calc
-        Real64 HHVi;                  // working var for higher heating value calc
-        //  INTEGER   :: thisConstituent
+        Real64 LHVfuel;      // lower heating value of fuel, working var
+        Real64 HHVfuel;      // higher heating value of fuel, working var
+        Real64 O2Stoic;      // stochiometric oxygen coef in chemical equation (15)
+        Real64 CO2ProdStoic; // product gases carbon dioxide coeff
+        Real64 H2OProdStoic; // product gases water coeff
+        Real64 LHVi;         // working var for lower heating value calc
+        Real64 HHVi;         // working var for higher heating value calc
         Real64 MWfuel;
-        // unused  REAL(r64) :: DelfHfuel
-        // unused  REAL(r64) :: h_i
-        // unused  REAL(r64) :: LHV
 
-        NumHardCodedConstituents = 14;
+        int NumHardCodedConstituents = 14; // number of gases included in data
 
         if (!allocated(state.dataGenerator->GasPhaseThermoChemistryData)) {
             state.dataGenerator->GasPhaseThermoChemistryData.allocate(NumHardCodedConstituents);
