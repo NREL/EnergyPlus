@@ -245,7 +245,7 @@ namespace FluidProperties {
 
 #ifdef EP_cache_GlycolSpecificHeat
         struct SpecificHeatCacheEntry {
-            std::uint64_t tagTemp = 0;
+            std::uint64_t tagTemp = 0x8000000000000000; // Initialize with something that is not a valid tag
             Real64 specificHeat = 0.0;
         };
 
