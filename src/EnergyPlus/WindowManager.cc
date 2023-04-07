@@ -2515,9 +2515,9 @@ namespace WindowManager {
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                        SrdSurfTempAbs = state.dataSurface->Surface(SurfNum).SrdSurfTemp + Constant::KelvinConv;
-                        OutSrdIR = state.dataWindowManager->sigma * state.dataSurface->Surface(SurfNum).ViewFactorSrdSurfs * pow_4(SrdSurfTempAbs);
+                    if (state.dataSurface->Surface(SurfNum).UseSurfPropertySrdSurfTemp) {
+                        SrdSurfTempAbs = surface.SrdSurfTemp + Constant::KelvinConv;
+                        OutSrdIR = state.dataWindowManager->sigma * surface.ViewFactorSrdSurfs * pow_4(SrdSurfTempAbs);
                     }
                 }
                 if (surface.ExtWind) {             // Window is exposed to wind (and possibly rain)
@@ -2675,7 +2675,7 @@ namespace WindowManager {
         Real64 rad_out_lw_srd_per_area = 0;
 
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-            if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
+            if (state.dataSurface->Surface(SurfNum).UseSurfPropertySrdSurfTemp) {
                 // update SurfHSrdSurfExt if the windows has exterior shade or blind
                 state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) =
                     ConvectionCoefficients::SurroundingSurfacesRadCoeffAverage(state, SurfNum, Tsout, SurfOutsideEmiss);
