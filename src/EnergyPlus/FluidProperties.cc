@@ -7487,7 +7487,7 @@ namespace FluidProperties {
             GlycolIndex = GlycolNum;
         }
 
-        int constexpr SpecificHeatPrecisionBits = 24;
+        int constexpr SpecificHeatPrecisionBits = 16;
         std::uint64_t constexpr SpecificHeatMask = (FluidPropsGlycolData::SpecificHeatCacheSize - 1);
         std::uint64_t constexpr SpecificHeatShift = 64 - 12 - SpecificHeatPrecisionBits;
 
