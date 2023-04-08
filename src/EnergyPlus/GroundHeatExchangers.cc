@@ -1519,8 +1519,6 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // calculates g-functions for the slinky ground heat exchanger model
@@ -1738,8 +1736,6 @@ Real64 GLHESlinky::midFieldResponseFunction(int const m, int const n, int const 
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the temperature response of from one mid-field point to another
@@ -1763,8 +1759,6 @@ Real64 GLHESlinky::distance(int const m, int const n, int const m1, int const n1
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the distance between any two points on any two loops
@@ -1806,8 +1800,6 @@ Real64 GLHESlinky::distanceToFictRing(int const m, int const n, int const m1, in
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the distance between any two points between real and fictitious rings
@@ -1840,8 +1832,6 @@ Real64 GLHESlinky::distToCenter(int const m, int const n, int const m1, int cons
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the center-to-center distance between rings
@@ -1856,8 +1846,6 @@ inline bool GLHEBase::isEven(int const val)
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Determines if an integer is even
@@ -1876,8 +1864,6 @@ Real64 GLHESlinky::integral(int const m, int const n, int const m1, int const n1
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Integrates the temperature response at one point based on
@@ -1923,8 +1909,6 @@ Real64 GLHESlinky::doubleIntegral(int const m, int const n, int const m1, int co
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Integrates the temperature response at one point based on
@@ -1969,8 +1953,6 @@ void GLHEVert::getAnnualTimeConstant()
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // calculate annual time constant for ground conduction
@@ -1988,8 +1970,6 @@ void GLHESlinky::getAnnualTimeConstant()
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // calculate annual time constant for ground conduction
@@ -2005,7 +1985,6 @@ void GLHEBase::calcGroundHeatExchanger(EnergyPlusData &state)
     //       AUTHOR:          Dan Fisher
     //       DATE WRITTEN:    August, 2000
     //       MODIFIED         Arun Murugappan
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This is the main routine to simulate the operation of vertical
@@ -2313,8 +2292,6 @@ void GLHEBase::updateGHX(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED:        na
-    //       RE-ENGINEERED:   na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Updates the outlet node and check for out of bounds temperatures
@@ -2365,8 +2342,6 @@ void GLHEBase::calcAggregateLoad(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Arun Murugappan
     //       DATE WRITTEN:    August, 2000
-    //       MODIFIED:        na
-    //       RE-ENGINEERED:   na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Manages the heat transfer history.
@@ -2430,7 +2405,6 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
     //       AUTHOR:          Dan Fisher
     //       DATE WRITTEN:    August, 2000
     //       MODIFIED         Arun Murugappan
-    //       RE-ENGINEERED    na
 
     // GET NUMBER OF ALL EQUIPMENT TYPES
     state.dataGroundHeatExchanger->numVerticalGLHEs =
