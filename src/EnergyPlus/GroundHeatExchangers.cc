@@ -116,7 +116,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
 // MODULE PARAMETER DEFINITIONS
 constexpr Real64 hrsPerMonth = 730.0; // Number of hours in month
-constexpr Real64 maxTSinHr = 60;      // Max number of time step in a hour
+constexpr Real64 maxTSinHr = 60.0;    // Max number of time step in a hour
 static constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
 
 //******************************************************************************
@@ -539,12 +539,17 @@ GLHEVertProps::GLHEVertProps(EnergyPlusData &state, std::string const &objName, 
 std::shared_ptr<GLHEVertProps> GetVertProps(EnergyPlusData &state, std::string const &objectName)
 {
     // Check if this instance of this model has already been retrieved
-    for (auto const &thisProp : state.dataGroundHeatExchanger->vertPropsVector) {
-        // Check if the type and name match
-        if (objectName == thisProp->name) {
-            return thisProp;
-        }
-    }
+    auto thisObj = std::find_if(state.dataGroundHeatExchanger->vertPropsVector.begin(),
+                                state.dataGroundHeatExchanger->vertPropsVector.end(),
+                                [&objectName](const std::shared_ptr<GLHEVertProps> &myObj) { return myObj->name == objectName; });
+    if (thisObj != state.dataGroundHeatExchanger->vertPropsVector.end()) return *thisObj;
+
+    // for (auto const &thisProp : state.dataGroundHeatExchanger->vertPropsVector) {
+    //    // Check if the type and name match
+    //    if (objectName == thisProp->name) {
+    //        return thisProp;
+    //    }
+    //}
 
     ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Properties, Name={} - not found.", objectName));
     ShowFatalError(state, "Preceding errors cause program termination");
@@ -558,12 +563,17 @@ std::shared_ptr<GLHEVertProps> GetVertProps(EnergyPlusData &state, std::string c
 std::shared_ptr<GLHEVertSingle> GetSingleBH(EnergyPlusData &state, std::string const &objectName)
 {
     // Check if this instance of this model has already been retrieved
-    for (auto const &thisBH : state.dataGroundHeatExchanger->singleBoreholesVector) {
-        // Check if the type and name match
-        if (objectName == thisBH->name) {
-            return thisBH;
-        }
-    }
+    auto thisObj = std::find_if(state.dataGroundHeatExchanger->singleBoreholesVector.begin(),
+                                state.dataGroundHeatExchanger->singleBoreholesVector.end(),
+                                [&objectName](const std::shared_ptr<GLHEVertSingle> &myObj) { return myObj->name == objectName; });
+    if (thisObj != state.dataGroundHeatExchanger->singleBoreholesVector.end()) return *thisObj;
+
+    // for (auto const &thisBH : state.dataGroundHeatExchanger->singleBoreholesVector) {
+    //    // Check if the type and name match
+    //    if (objectName == thisBH->name) {
+    //        return thisBH;
+    //    }
+    //}
 
     ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Single, Name={} - not found.", objectName));
     ShowFatalError(state, "Preceding errors cause program termination");
@@ -577,12 +587,17 @@ std::shared_ptr<GLHEVertSingle> GetSingleBH(EnergyPlusData &state, std::string c
 std::shared_ptr<GLHEVertArray> GetVertArray(EnergyPlusData &state, std::string const &objectName)
 {
     // Check if this instance of this model has already been retrieved
-    for (auto const &thisProp : state.dataGroundHeatExchanger->vertArraysVector) {
-        // Check if the type and name match
-        if (objectName == thisProp->name) {
-            return thisProp;
-        }
-    }
+    auto thisObj = std::find_if(state.dataGroundHeatExchanger->vertArraysVector.begin(),
+                                state.dataGroundHeatExchanger->vertArraysVector.end(),
+                                [&objectName](const std::shared_ptr<GLHEVertArray> &myObj) { return myObj->name == objectName; });
+    if (thisObj != state.dataGroundHeatExchanger->vertArraysVector.end()) return *thisObj;
+
+    // for (auto const &thisProp : state.dataGroundHeatExchanger->vertArraysVector) {
+    //    // Check if the type and name match
+    //    if (objectName == thisProp->name) {
+    //        return thisProp;
+    //    }
+    //}
 
     ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:Vertical:Array, Name={} - not found.", objectName));
     ShowFatalError(state, "Preceding errors cause program termination");
@@ -596,12 +611,17 @@ std::shared_ptr<GLHEVertArray> GetVertArray(EnergyPlusData &state, std::string c
 std::shared_ptr<GLHEResponseFactors> GetResponseFactor(EnergyPlusData &state, std::string const &objectName)
 {
     // Check if this instance of this model has already been retrieved
-    for (auto const &thisRF : state.dataGroundHeatExchanger->responseFactorsVector) {
-        // Check if the type and name match
-        if (objectName == thisRF->name) {
-            return thisRF;
-        }
-    }
+    auto thisObj = std::find_if(state.dataGroundHeatExchanger->responseFactorsVector.begin(),
+                                state.dataGroundHeatExchanger->responseFactorsVector.end(),
+                                [&objectName](const std::shared_ptr<GLHEResponseFactors> &myObj) { return myObj->name == objectName; });
+    if (thisObj != state.dataGroundHeatExchanger->responseFactorsVector.end()) return *thisObj;
+
+    // for (auto const &thisRF : state.dataGroundHeatExchanger->responseFactorsVector) {
+    //    // Check if the type and name match
+    //    if (objectName == thisRF->name) {
+    //        return thisRF;
+    //    }
+    //}
 
     ShowSevereError(state, fmt::format("Object=GroundHeatExchanger:ResponseFactors, Name={} - not found.", objectName));
     ShowFatalError(state, "Preceding errors cause program termination");
@@ -794,24 +814,34 @@ void GLHEBase::simulate(EnergyPlusData &state,
 
 //******************************************************************************
 
-PlantComponent *GLHEBase::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
+GLHEBase *GLHEBase::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
 {
     if (state.dataGroundHeatExchanger->GetInput) {
         GetGroundHeatExchangerInput(state);
         state.dataGroundHeatExchanger->GetInput = false;
     }
     if (objectType == DataPlant::PlantEquipmentType::GrndHtExchgSystem) {
-        for (auto &ghx : state.dataGroundHeatExchanger->verticalGLHE) {
-            if (ghx.name == objectName) {
-                return &ghx;
-            }
-        }
+        auto thisObj = std::find_if(state.dataGroundHeatExchanger->verticalGLHE.begin(),
+                                    state.dataGroundHeatExchanger->verticalGLHE.end(),
+                                    [&objectName](const GLHEBase &myObj) { return myObj.name == objectName; });
+        if (thisObj != state.dataGroundHeatExchanger->verticalGLHE.end()) return &(*thisObj);
+
+        // for (auto &ghx : state.dataGroundHeatExchanger->verticalGLHE) {
+        //    if (ghx.name == objectName) {
+        //        return &ghx;
+        //    }
+        //}
     } else if (objectType == DataPlant::PlantEquipmentType::GrndHtExchgSlinky) {
-        for (auto &ghx : state.dataGroundHeatExchanger->slinkyGLHE) {
-            if (ghx.name == objectName) {
-                return &ghx;
-            }
-        }
+        auto thisObj = std::find_if(state.dataGroundHeatExchanger->slinkyGLHE.begin(),
+                                    state.dataGroundHeatExchanger->slinkyGLHE.end(),
+                                    [&objectName](const GLHEBase &myObj) { return myObj.name == objectName; });
+        if (thisObj != state.dataGroundHeatExchanger->slinkyGLHE.end()) return &(*thisObj);
+
+        // for (auto &ghx : state.dataGroundHeatExchanger->slinkyGLHE) {
+        //    if (ghx.name == objectName) {
+        //        return &ghx;
+        //    }
+        //}
     }
 
     // If we didn't find it, fatal
@@ -1512,7 +1542,7 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
     // calculates g-functions for the slinky ground heat exchanger model
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    constexpr Real64 tLg_min = -2;
+    constexpr Real64 tLg_min = -2.0;
     constexpr Real64 tLg_grid = 0.25;
     constexpr Real64 ts = 3600.0;
     constexpr Real64 convertYearsToSeconds = 356.0 * 24.0 * 60.0 * 60.0;
@@ -2353,7 +2383,6 @@ void GLHEBase::calcAggregateLoad(EnergyPlusData &state)
         }
         this->QnHr = eoshift(this->QnHr, -1, SumQnHr);
         this->LastHourN = eoshift(this->LastHourN, -1, state.dataGroundHeatExchanger->N);
-        this->prevHour = state.dataGroundHeatExchanger->locHourOfDay;
     }
 
     // CHECK IF A MONTH PASSES...
@@ -2369,6 +2398,7 @@ void GLHEBase::calcAggregateLoad(EnergyPlusData &state)
         SumQnMonth /= hrsPerMonth;
         this->QnMonthlyAgg(MonthNum) = SumQnMonth;
     }
+    this->prevHour = state.dataGroundHeatExchanger->locHourOfDay;
 }
 
 //******************************************************************************
@@ -2643,7 +2673,7 @@ Real64 GLHEVert::calcHXResistance(EnergyPlusData &state)
     if (this->massFlowRate <= 0.0) {
         return 0;
     } else {
-        constexpr const char *RoutineName("calcBHResistance");
+        std::string_view const RoutineName = "calcBHResistance";
 
         Real64 const cpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,

@@ -299,7 +299,7 @@ namespace GroundHeatExchangers {
                       Real64 &CurLoad,
                       bool RunFlag) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
+        static GLHEBase *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
 
         virtual Real64 getGFunc(Real64) = 0;
 
