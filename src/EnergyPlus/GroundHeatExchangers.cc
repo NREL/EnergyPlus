@@ -89,7 +89,6 @@ namespace EnergyPlus::GroundHeatExchangers {
 //       MODIFIED       B. Griffith, Sept 2010,plant upgrades
 //                      Matt Mitchell, February 2015. Added Slinky GHX.
 //                                                    Moved models to object-oriented design.
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // The module contains the data structures and routines to simulate the
@@ -1011,7 +1010,7 @@ void GLHEVert::calcGFunctions(EnergyPlusData &state)
 void GLHEVert::setupTimeVectors()
 {
 
-    constexpr int numDaysInYear(365);
+    constexpr int numDaysInYear = 365;
     constexpr Real64 lnttsStepSize = 0.5;
 
     // Minimum simulation time for which finite line source method is applicable
@@ -1513,11 +1512,9 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
     // calculates g-functions for the slinky ground heat exchanger model
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 tLg_max(0.0);
     constexpr Real64 tLg_min(-2);
     constexpr Real64 tLg_grid(0.25);
     constexpr Real64 ts(3600);
-    Real64 tLg;
     constexpr Real64 convertYearsToSeconds(356 * 24 * 60 * 60);
     Real64 fraction;
     Array2D<Real64> valStored({0, this->numTrenches}, {0, this->numCoils}, -1.0);
@@ -1530,7 +1527,7 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
     this->Y0.allocate(this->numTrenches);
 
     // Calculate the number of g-functions required
-    tLg_max = std::log10(this->maxSimYears * convertYearsToSeconds / ts);
+    Real64 tLg_max = std::log10(this->maxSimYears * convertYearsToSeconds / ts);
     int NPairs = static_cast<int>((tLg_max - tLg_min) / (tLg_grid) + 1);
 
     // Allocate and setup g-function arrays
@@ -1572,7 +1569,7 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
 
     // Calculate the corresponding time of each temperature response factor
     for (int NT = 1; NT <= NPairs; ++NT) {
-        tLg = tLg_min + tLg_grid * (NT - 1);
+        Real64 tLg = tLg_min + tLg_grid * (NT - 1);
         Real64 t = std::pow(10, tLg) * ts;
 
         // Set the average temperature response of the whole field to zero
@@ -1690,8 +1687,6 @@ GLHESlinky::nearFieldResponseFunction(int const m, int const n, int const m1, in
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the temperature response of from one near-field point to another
@@ -1862,10 +1857,10 @@ Real64 GLHESlinky::integral(int const m, int const n, int const m1, int const n1
     // Simpson's 1/3 rule of integration
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 sumIntF(0.0);
-    Real64 theta(0.0);
-    constexpr Real64 theta1(0.0);
-    constexpr Real64 theta2(2 * Constant::Pi);
+    Real64 sumIntF = 0.0;
+    Real64 theta = 0.0;
+    constexpr Real64 theta1 = 0.0;
+    constexpr Real64 theta2 = 2 * Constant::Pi;
     Array1D<Real64> f(J0, 0.0);
 
     Real64 h = (theta2 - theta1) / (J0 - 1);
@@ -1907,10 +1902,10 @@ Real64 GLHESlinky::doubleIntegral(int const m, int const n, int const m1, int co
     // Simpson's 1/3 rule of integration
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    constexpr Real64 eta1(0.0);
-    constexpr Real64 eta2(2 * Constant::Pi);
+    constexpr Real64 eta1 = 0.0;
+    constexpr Real64 eta2 = 2 * Constant::Pi;
 
-    Real64 sumIntF(0.0);
+    Real64 sumIntF = 0.0;
     Array1D<Real64> g(I0, 0.0);
 
     Real64 h = (eta2 - eta1) / (I0 - 1);
@@ -1946,7 +1941,7 @@ void GLHEVert::getAnnualTimeConstant()
     // PURPOSE OF THIS SUBROUTINE:
     // calculate annual time constant for ground conduction
 
-    constexpr Real64 hrInYear(8760);
+    constexpr Real64 hrInYear = 8760;
 
     this->timeSS = (pow_2(this->bhLength) / (9.0 * this->soil.diffusivity)) / Constant::SecInHour / hrInYear;
     this->timeSSFactor = this->timeSS * 8760.0;
@@ -2283,8 +2278,7 @@ void GLHEBase::updateGHX(EnergyPlusData &state)
 
     // SUBROUTINE ARGUMENT DEFINITIONS
     constexpr const char *RoutineName("UpdateGroundHeatExchanger");
-
-    constexpr Real64 deltaTempLimit(100.0); // temp limit for warnings
+    constexpr Real64 deltaTempLimit = 100.0; // temp limit for warnings
 
     PlantUtilities::SafeCopyPlantNode(state, this->inletNodeNum, this->outletNodeNum);
 
@@ -2588,10 +2582,8 @@ void GLHEBase::setupOutput(EnergyPlusData &state)
 Real64 GLHEVert::calcBHAverageResistance(EnergyPlusData &state)
 {
     // Calculates the average thermal resistance of the borehole using the first-order multipole method.
-
     // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
     // for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy.187:790-806.
-
     // Equation 13
 
     Real64 const beta = 2 * Constant::Pi * this->grout.k * calcPipeResistance(state);
@@ -2611,10 +2603,8 @@ Real64 GLHEVert::calcBHAverageResistance(EnergyPlusData &state)
 Real64 GLHEVert::calcBHTotalInternalResistance(EnergyPlusData &state)
 {
     // Calculates the total internal thermal resistance of the borehole using the first-order multipole method.
-
     // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
     // for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy. 187:790-806.
-
     // Equation 26
 
     Real64 beta = 2 * Constant::Pi * this->grout.k * calcPipeResistance(state);
@@ -2635,10 +2625,8 @@ Real64 GLHEVert::calcBHTotalInternalResistance(EnergyPlusData &state)
 Real64 GLHEVert::calcBHGroutResistance(EnergyPlusData &state)
 {
     // Calculates grout resistance. Use for validation.
-
     // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
     // for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy. 187:790-806.
-
     // Equation 3
 
     return calcBHAverageResistance(state) - calcPipeResistance(state) / 2.0;
@@ -2649,10 +2637,8 @@ Real64 GLHEVert::calcBHGroutResistance(EnergyPlusData &state)
 Real64 GLHEVert::calcHXResistance(EnergyPlusData &state)
 {
     // Calculates the effective thermal resistance of the borehole assuming a uniform heat flux.
-
     // Javed, S. & Spitler, J.D. Calculation of Borehole Thermal Resistance. In 'Advances in
     // Ground-Source Heat Pump Systems,' pp. 84. Rees, S.J. ed. Cambridge, MA. Elsevier Ltd. 2016.
-
     // Eq: 3-67
 
     if (this->massFlowRate <= 0.0) {
@@ -2675,7 +2661,6 @@ Real64 GLHEVert::calcHXResistance(EnergyPlusData &state)
 Real64 GLHEVert::calcPipeConductionResistance()
 {
     // Calculates the thermal resistance of a pipe, in [K/(W/m)].
-
     // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
     // for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy. 187:790-806.
 
@@ -2687,7 +2672,6 @@ Real64 GLHEVert::calcPipeConductionResistance()
 Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
 {
     // Calculates the convection resistance using Gnielinski and Petukov, in [K/(W/m)]
-
     // Gneilinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
     // International Chemical Engineering 16(1976), pp. 359-368.
 
@@ -2746,7 +2730,6 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
 Real64 GLHEVert::frictionFactor(Real64 const reynoldsNum)
 {
     // Calculates the friction factor in smooth tubes
-
     // Petukov, B.S. 1970. 'Heat transfer and friction in turbulent pipe flow with variable physical properties.'
     // In Advances in Heat Transfer, ed. T.F. Irvine and J.P. Hartnett, Vol. 6. New York Academic Press.
 
@@ -2773,7 +2756,6 @@ Real64 GLHEVert::frictionFactor(Real64 const reynoldsNum)
 Real64 GLHEVert::calcPipeResistance(EnergyPlusData &state)
 {
     // Calculates the combined conduction and convection pipe resistance
-
     // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
     // for Grouted Single U-tube Ground Heat Exchangers.' J. Energy Engineering. Draft in progress.
 
@@ -2866,19 +2848,16 @@ Real64 GLHEBase::interpGFunc(Real64 const x_val) const
 
     auto const &x = this->myRespFactors->LNTTS;
     auto const &y = this->myRespFactors->GFNC;
-
-    auto const &x_begin = x.begin();
-    auto const &x_end = x.end();
-    auto const &upper_it = std::upper_bound(x_begin, x_end, x_val);
+    auto const &upper_it = std::upper_bound(x.begin(), x.end(), x_val);
 
     int l_idx = 0;
     int u_idx = 0;
 
-    if (upper_it == x_begin) {
+    if (upper_it == x.begin()) {
         // Linear extrapolation beyond the lower bound
         l_idx = 0;
         u_idx = 1;
-    } else if (upper_it == x_end) {
+    } else if (upper_it == x.end()) {
         // Linear extrapolation beyond the upper bound
         u_idx = x.size() - 1;
         l_idx = u_idx - 1;
@@ -2903,15 +2882,11 @@ Real64 GLHESlinky::getGFunc(Real64 const time)
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Gets the g-function for slinky GHXs
-    // Note: Base 10 here.
+    // Gets the g-function for slinky GHXs Note: Base 10 here.
 
     Real64 LNTTS = std::log10(time);
-
     return interpGFunc(LNTTS);
 }
 
@@ -2922,12 +2897,9 @@ Real64 GLHEVert::getGFunc(Real64 const time)
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Matt Mitchell
     //       DATE WRITTEN:    February, 2015
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Gets the g-function for vertical GHXs
-    // Note: Base e here.
+    // Gets the g-function for vertical GHXs Note: Base e here.
 
     Real64 LNTTS = std::log(time);
     Real64 gFuncVal = interpGFunc(LNTTS);
@@ -2948,14 +2920,11 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
     //       AUTHOR:          Dan Fisher
     //       DATE WRITTEN:    August, 2000
     //       MODIFIED         Arun Murugappan
-    //       RE-ENGINEERED    na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                        (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed) *
                       Constant::SecInHour;
-
-    // Init more variables
 
     if (this->myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         this->initEnvironment(state, currTime);
@@ -2990,9 +2959,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
 
 void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const CurTime)
 {
-
     constexpr const char *RoutineName("initEnvironment");
-
     this->myEnvrnFlag = false;
 
     Real64 fluidDensity = FluidProperties::GetDensityGlycol(state,
