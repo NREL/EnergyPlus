@@ -463,7 +463,6 @@ void GetControllerInput(EnergyPlusData &state)
     int NumAlphas;
     int NumNums;
     int NumArgs;
-    int IOStat;
     bool ActuatorNodeNotFound; // true if no water coil inlet node match for actuator node
     Array1D<Real64> NumArray;
     Array1D_string AlphArray;
@@ -518,6 +517,7 @@ void GetControllerInput(EnergyPlusData &state)
 
     // Now find and load all of the simple controllers.
     if (NumSimpleControllers > 0) {
+        int IOStat;
         for (int Num = 1; Num <= NumSimpleControllers; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -2725,7 +2725,7 @@ void CheckCoilWaterInletNode(EnergyPlusData &state,
     }
 
     NodeNotFound = true;
-    for (auto &ControllerProps : state.dataHVACControllers->ControllerProps) {
+    for (auto const &ControllerProps : state.dataHVACControllers->ControllerProps) {
         if (ControllerProps.ActuatedNode == WaterInletNodeNum) {
             NodeNotFound = false;
         }
