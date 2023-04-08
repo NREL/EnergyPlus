@@ -2447,8 +2447,6 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
     //       MODIFIED         Arun Murugappan
     //       RE-ENGINEERED    na
 
-    bool errorsFound = false;
-
     // GET NUMBER OF ALL EQUIPMENT TYPES
     state.dataGroundHeatExchanger->numVerticalGLHEs =
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:System");
@@ -2468,7 +2466,6 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         ShowContinueError(state, "Simulation indicated these objects were found, but input processor doesn't find any");
         ShowContinueError(state, "Check inputs for GroundHeatExchanger:System and GroundHeatExchanger:Slinky");
         ShowContinueError(state, "Also check plant/branch inputs for references to invalid/deleted objects");
-        errorsFound = true;
     }
 
     if (state.dataGroundHeatExchanger->numVertProps > 0) {
@@ -2826,7 +2823,7 @@ Real64 GLHEVert::frictionFactor(Real64 const reynoldsNum)
 
     if (reynoldsNum < lower_limit) {
         return 64.0 / reynoldsNum; // pure laminar flow
-    } else if (lower_limit <= reynoldsNum && reynoldsNum < upper_limit) {
+    } else if (reynoldsNum < upper_limit) {
         // pure laminar flow
         Real64 const f_low = 64.0 / reynoldsNum;
         // pure turbulent flow
