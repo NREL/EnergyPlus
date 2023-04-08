@@ -1081,10 +1081,6 @@ void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(ObjexxFCL::Optional<int const
     Real64 Lat_fus;
     Real64 Cp_transient;
     // other variables
-    Real64 frzAllIce;
-    Real64 frzIceTrans;
-    Real64 frzLiqTrans;
-    Real64 frzAllLiq;
     Real64 rhoCP_soil;
 
     // These vary by domain now, so we must be careful to retrieve them every time
@@ -1114,10 +1110,10 @@ void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(ObjexxFCL::Optional<int const
     auto &thisCell = cellArray(cell);
 
     //'set some temperatures here for generalization -- these could be set in the input file
-    frzAllIce = -0.5;
-    frzIceTrans = -0.4;
-    frzLiqTrans = -0.1;
-    frzAllLiq = 0.0;
+    Real64 frzAllIce = -0.5;
+    Real64 frzIceTrans = -0.4;
+    Real64 frzLiqTrans = -0.1;
+    Real64 frzAllLiq = 0.0;
 
     //'calculate this cell's new Cp value based on the cell temperature
     if (thisCell.temperature >= frzAllLiq) {

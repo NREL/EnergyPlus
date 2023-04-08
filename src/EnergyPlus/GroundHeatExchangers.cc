@@ -1076,7 +1076,7 @@ void GLHEVert::calcUniformHeatFluxGFunctions(EnergyPlusData &state)
 void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
 {
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr const char *RoutineName("calcShortTimestepGFunctions");
+    std::string_view const RoutineName = "calcShortTimestepGFunctions";
 
     enum class CellType
     {
@@ -1992,7 +1992,7 @@ void GLHEBase::calcGroundHeatExchanger(EnergyPlusData &state)
     //   for Vertical Ground Loop Heat Exchangers.' ASHRAE Transactions. 105(2): 475-485.
 
     // SUBROUTINE ARGUMENT DEFINITIONS
-    constexpr const char *RoutineName("CalcGroundHeatExchanger");
+    std::string_view const RoutineName = "CalcGroundHeatExchanger";
 
     // LOCAL PARAMETERS
     Real64 fluidAveTemp;
