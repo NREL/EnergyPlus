@@ -492,26 +492,13 @@ GLHEResponseFactors::GLHEResponseFactors(EnergyPlusData &state, std::string cons
         tmpGvals.push_back(var.at("g_function_g_value").get<Real64>());
     }
 
-    bool errorsFound = false;
-
-    if (tmpLntts.size() == tmpLntts.size()) {
-        this->numGFuncPairs = static_cast<int>(tmpLntts.size());
-    } else {
-        errorsFound = true;
-        ShowSevereError(state, format("Errors found processing response factor input for Response Factor= {}", this->name));
-        ShowSevereError(state, "Uneven number of g-function pairs");
-    }
-
+    this->numGFuncPairs = static_cast<int>(tmpLntts.size());
     this->LNTTS.dimension(this->numGFuncPairs, 0.0);
     this->GFNC.dimension(this->numGFuncPairs, 0.0);
 
     for (size_t i = 1; i <= tmpLntts.size(); ++i) {
         this->LNTTS(i) = tmpLntts[i - 1];
         this->GFNC(i) = tmpGvals[i - 1];
-    }
-
-    if (errorsFound) {
-        ShowFatalError(state, format("Errors found in processing input for {}", this->moduleName));
     }
 }
 
@@ -2417,6 +2404,7 @@ void GLHEBase::calcAggregateLoad(EnergyPlusData &state)
         }
         this->QnHr = eoshift(this->QnHr, -1, SumQnHr);
         this->LastHourN = eoshift(this->LastHourN, -1, state.dataGroundHeatExchanger->N);
+        this->prevHour = state.dataGroundHeatExchanger->locHourOfDay;
     }
 
     // CHECK IF A MONTH PASSES...
@@ -2431,9 +2419,6 @@ void GLHEBase::calcAggregateLoad(EnergyPlusData &state)
         }
         SumQnMonth /= hrsPerMonth;
         this->QnMonthlyAgg(MonthNum) = SumQnMonth;
-    }
-    if (this->prevHour != state.dataGroundHeatExchanger->locHourOfDay) {
-        this->prevHour = state.dataGroundHeatExchanger->locHourOfDay;
     }
 }
 
@@ -2718,11 +2703,11 @@ Real64 GLHEVert::calcHXResistance(EnergyPlusData &state)
 
     using FluidProperties::GetSpecificHeatGlycol;
 
-    constexpr const char *RoutineName("calcBHResistance");
-
     if (this->massFlowRate <= 0.0) {
         return 0;
     } else {
+        constexpr const char *RoutineName("calcBHResistance");
+
         Real64 const cpFluid = GetSpecificHeatGlycol(state,
                                                      state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                      this->inletTemp,
