@@ -168,14 +168,6 @@ namespace EnergyPlus::HVACControllers {
 // See DataSystemVariables.cc for the definitions of the environment variables used to debug
 // the air loop simulation.
 
-// USE STATEMENTS:
-// Use statements for data only modules
-// Using/Aliasing
-using namespace DataLoopNode;
-using DataHVACGlobals::SmallWaterVolFlow;
-using namespace DataHVACControllers;
-using namespace DataRootFinder;
-
 // Number of significant digits to display in error messages for floating-point numbers
 constexpr int NumSigDigits = 15;
 constexpr std::array<std::string_view, static_cast<int>(CtrlVarType::Num)> ctrlVarNamesUC = {
@@ -206,7 +198,7 @@ void ManageControllers(EnergyPlusData &state,
                        int &ControllerIndex,
                        bool const FirstHVACIteration,
                        int const AirLoopNum,
-                       ControllerOperation const Operation,
+                       DataHVACControllers::ControllerOperation const Operation,
                        bool &IsConvergedFlag,
                        bool &IsUpToDateFlag,
                        bool const BypassOAController,
@@ -319,7 +311,7 @@ void ManageControllers(EnergyPlusData &state,
     // determine controllerProps%MaxAvailActuated.
     // Plant upgrades for V7 added init to these cases because MassFlowRateMaxAvail is better controlled
     switch (Operation) {
-    case ControllerOperation::ColdStart: {
+    case DataHVACControllers::ControllerOperation::ColdStart: {
         // For temperature and humidity control reset humidity control override if it was set
         if (controllerProps.HumRatCtrlOverride) {
             controllerProps.HumRatCtrlOverride = false;
@@ -338,13 +330,13 @@ void ManageControllers(EnergyPlusData &state,
         // Update the current Controller to the outlet nodes
         UpdateController(state, ControlNum);
     } break;
-    case ControllerOperation::WarmRestart: {
+    case DataHVACControllers::ControllerOperation::WarmRestart: {
         // If a iControllerOpWarmRestart call, set the actuator inlet flows to previous solution
         ResetController(state, ControlNum, true, IsConvergedFlag);
         // Update the current Controller to the outlet nodes
         UpdateController(state, ControlNum);
     } break;
-    case ControllerOperation::Iterate: {
+    case DataHVACControllers::ControllerOperation::Iterate: {
         // With the correct ControlNum Initialize all Controller related parameters
         InitController(state, ControlNum, IsConvergedFlag);
 
@@ -364,7 +356,7 @@ void ManageControllers(EnergyPlusData &state,
         CheckTempAndHumRatCtrl(state, ControlNum, IsConvergedFlag);
 
     } break;
-    case ControllerOperation::End: {
+    case DataHVACControllers::ControllerOperation::End: {
         // With the correct ControlNum Initialize all Controller related parameters
         InitController(state, ControlNum, IsConvergedFlag);
 
@@ -520,7 +512,7 @@ void GetControllerInput(EnergyPlusData &state)
                                                                              DataLoopNode::NodeFluidType::Blank,
                                                                              DataLoopNode::ConnectionType::Sensor,
                                                                              NodeInputManager::CompFluidStream::Primary,
-                                                                             ObjectIsNotParent);
+                                                                             DataLoopNode::ObjectIsNotParent);
             controllerProps.ActuatedNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                AlphArray(6),
                                                                                ErrorsFound,
@@ -529,7 +521,7 @@ void GetControllerInput(EnergyPlusData &state)
                                                                                DataLoopNode::NodeFluidType::Blank,
                                                                                DataLoopNode::ConnectionType::Actuator,
                                                                                NodeInputManager::CompFluidStream::Primary,
-                                                                               ObjectIsNotParent);
+                                                                               DataLoopNode::ObjectIsNotParent);
             controllerProps.Offset = NumArray(1);
             controllerProps.MaxVolFlowActuated = NumArray(2);
             controllerProps.MinVolFlowActuated = NumArray(3);
@@ -733,7 +725,7 @@ void ResetController(EnergyPlusData &state, int const ControlNum, bool const DoW
 
     // Reset root finder
     // This is independent of the processing in InitializeRootFinder() performed in Calc() routine.
-    rootFinders.StatusFlag = RootFinderStatus::None;
+    rootFinders.StatusFlag = DataRootFinder::RootFinderStatus::None;
     rootFinders.CurrentMethodType = DataRootFinder::RootFinderMethod::None;
 
     rootFinders.CurrentPoint.DefinedFlag = false;
@@ -795,7 +787,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
             int SensedNode = controllerProps.SensedNode;
             switch (controllerProps.ControlVar) {
             case HVACControllers::CtrlVarType::Temperature: { // 'Temperature'
-                if (state.dataLoopNodes->Node(SensedNode).TempSetPoint == SensedNodeFlagValue) {
+                if (state.dataLoopNodes->Node(SensedNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowSevereError(state,
                                         format("HVACControllers: Missing temperature setpoint for controller type={} Name=\"{}\"",
@@ -824,7 +816,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                     }
                 } else {
                     //           Warn if humidity setpoint is detected (only for cooling coils) and control variable is TEMP.
-                    if (state.dataLoopNodes->Node(SensedNode).HumRatMax != SensedNodeFlagValue &&
+                    if (state.dataLoopNodes->Node(SensedNode).HumRatMax != DataLoopNode::SensedNodeFlagValue &&
                         controllerProps.Action == ControllerAction::Reverse) {
                         ShowWarningError(
                             state,
@@ -842,9 +834,9 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
             case HVACControllers::CtrlVarType::HumidityRatio: { // 'HumidityRatio'
                 controllerProps.HumRatCntrlType = GetHumidityRatioVariableType(state, SensedNode);
                 if ((thisController.HumRatCntrlType == CtrlVarType::HumRat &&
-                     state.dataLoopNodes->Node(SensedNode).HumRatSetPoint == SensedNodeFlagValue) ||
+                     state.dataLoopNodes->Node(SensedNode).HumRatSetPoint == DataLoopNode::SensedNodeFlagValue) ||
                     (thisController.HumRatCntrlType == CtrlVarType::MaxHumRat &&
-                     state.dataLoopNodes->Node(SensedNode).HumRatMax == SensedNodeFlagValue)) {
+                     state.dataLoopNodes->Node(SensedNode).HumRatMax == DataLoopNode::SensedNodeFlagValue)) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowSevereError(state,
                                         format("HVACControllers: Missing humidity ratio setpoint for controller type={} Name=\"{}\"",
@@ -884,7 +876,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                 }
             } break;
             case HVACControllers::CtrlVarType::TemperatureAndHumidityRatio: { // 'TemperatureAndHumidityRatio'
-                if (state.dataLoopNodes->Node(SensedNode).TempSetPoint == SensedNodeFlagValue) {
+                if (state.dataLoopNodes->Node(SensedNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowSevereError(state,
                                         format("HVACControllers: Missing temperature setpoint for controller type={} Name=\"{}\"",
@@ -912,7 +904,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                         }
                     }
                 }
-                if (state.dataLoopNodes->Node(SensedNode).HumRatMax == SensedNodeFlagValue) {
+                if (state.dataLoopNodes->Node(SensedNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowSevereError(state,
                                         format("HVACControllers: Missing maximum humidity ratio setpoint for controller type={} Name=\"{}\"",
@@ -942,7 +934,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                 }
             } break;
             case HVACControllers::CtrlVarType::Flow: { // 'Flow'
-                if (state.dataLoopNodes->Node(SensedNode).MassFlowRateSetPoint == SensedNodeFlagValue) {
+                if (state.dataLoopNodes->Node(SensedNode).MassFlowRateSetPoint == DataLoopNode::SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowSevereError(state,
                                         format("HVACControllers: Missing mass flow rate setpoint for controller type={} Name=\"{}\"",
@@ -1194,7 +1186,7 @@ void SizeController(EnergyPlusData &state, int const ControlNum)
             }
         }
 
-        if (controllerProps.MaxVolFlowActuated < SmallWaterVolFlow) {
+        if (controllerProps.MaxVolFlowActuated < DataHVACGlobals::SmallWaterVolFlow) {
             controllerProps.MaxVolFlowActuated = 0.0;
         }
         BaseSizer::reportSizerOutput(state,
@@ -1212,8 +1204,8 @@ void SizeController(EnergyPlusData &state, int const ControlNum)
         //   So we divide .001 by the air mass flow rate estimated from the water volumetric flow rate to come up
         //   with a temperature tolerance that won't exceed the loop energy error tolerance (10 W).
         // Finally we need to take into account the fact that somebody might change the energy tolerance.
-        controllerProps.Offset =
-            (0.001 / (2100.0 * max(controllerProps.MaxVolFlowActuated, SmallWaterVolFlow))) * (DataConvergParams::HVACEnergyToler / 10.0);
+        controllerProps.Offset = (0.001 / (2100.0 * max(controllerProps.MaxVolFlowActuated, DataHVACGlobals::SmallWaterVolFlow))) *
+                                 (DataConvergParams::HVACEnergyToler / 10.0);
         // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
         controllerProps.Offset = min(0.1 * DataConvergParams::HVACTemperatureToler, controllerProps.Offset);
         BaseSizer::reportSizerOutput(
@@ -1380,9 +1372,9 @@ void FindRootSimpleController(EnergyPlusData &state,
     // Process root finder if converged or error
     // Map root finder status onto controller mode
     switch (rootFinders.StatusFlag) {
-    case RootFinderStatus::None:
-    case RootFinderStatus::WarningNonMonotonic:
-    case RootFinderStatus::WarningSingular: {
+    case DataRootFinder::RootFinderStatus::None:
+    case DataRootFinder::RootFinderStatus::WarningNonMonotonic:
+    case DataRootFinder::RootFinderStatus::WarningSingular: {
         // We need to keep iterating...
         int PreviousSolutionIndex;
         IsConvergedFlag = false;
@@ -1422,23 +1414,23 @@ void FindRootSimpleController(EnergyPlusData &state,
         }
 
     } break;
-    case RootFinderStatus::OK:
-    case RootFinderStatus::OKRoundOff: {
+    case DataRootFinder::RootFinderStatus::OK:
+    case DataRootFinder::RootFinderStatus::OKRoundOff: {
         // Indicate convergence with base value (used to obtain DeltaSensed!)
         ExitCalcController(state, ControlNum, rootFinders.XCandidate, ControllerMode::Active, IsConvergedFlag, IsUpToDateFlag);
     } break;
-    case RootFinderStatus::OKMin: {
+    case DataRootFinder::RootFinderStatus::OKMin: {
         // Indicate convergence with min value
         // Should be the same as ControllerProps(ControlNum)%MinAvailActuated
         ExitCalcController(state, ControlNum, rootFinders.MinPoint.X, ControllerMode::MinActive, IsConvergedFlag, IsUpToDateFlag);
     } break;
-    case RootFinderStatus::OKMax: {
+    case DataRootFinder::RootFinderStatus::OKMax: {
         // Indicate convergence with max value
         // Should be the same as ControllerProps(ControlNum)%MaxAvailActuated
         ExitCalcController(state, ControlNum, rootFinders.MaxPoint.X, ControllerMode::MaxActive, IsConvergedFlag, IsUpToDateFlag);
 
     } break;
-    case RootFinderStatus::ErrorSingular: {
+    case DataRootFinder::RootFinderStatus::ErrorSingular: {
         // Indicate inactive mode with min actuated value
         // NOTE: Original code returned Node(ActuatedNode)%MassFlowRateMinAvail
         //       This was not portable in case the actuated variable was NOT a mass flow rate!
@@ -1450,7 +1442,7 @@ void FindRootSimpleController(EnergyPlusData &state,
 
         // Abnormal case: should never happen
     } break;
-    case RootFinderStatus::ErrorRange: {
+    case DataRootFinder::RootFinderStatus::ErrorRange: {
         ShowSevereError(state, format("FindRootSimpleController: Root finder failed at {}", CreateHVACStepFullString(state)));
         ShowContinueError(state, format(" Controller name=\"{}\"", ControllerName));
         ShowContinueError(state,
@@ -1461,7 +1453,7 @@ void FindRootSimpleController(EnergyPlusData &state,
 
         // Abnormal case: should never happen
     } break;
-    case RootFinderStatus::ErrorBracket: {
+    case DataRootFinder::RootFinderStatus::ErrorBracket: {
         ShowSevereError(state, format("FindRootSimpleController: Root finder failed at {}", CreateHVACStepFullString(state)));
         ShowContinueError(state, format(" Controller name={}", controllerProps.ControllerName));
         ShowContinueError(state, fmt::format(" Controller action={}", state.dataHVACCtrl->ActionTypes[static_cast<int>(controllerProps.Action)]));
@@ -1487,7 +1479,7 @@ void FindRootSimpleController(EnergyPlusData &state,
         //         - If y(xMin) < ySetPoint && y(xMax) > y(xMin), then  x = xMin
         //         - If y(xMin) > ySetPoint && y(xMax) > y(xMin), then  x = xMax
     } break;
-    case RootFinderStatus::ErrorSlope: {
+    case DataRootFinder::RootFinderStatus::ErrorSlope: {
         if (!state.dataGlobal->WarmupFlag && controllerProps.BadActionErrCount == 0) {
             ++controllerProps.BadActionErrCount;
             ShowSevereError(state, format("FindRootSimpleController: Controller error for controller = \"{}\"", ControllerName));
@@ -1869,7 +1861,7 @@ void ExitCalcController(EnergyPlusData &state,
 
 void TrackAirLoopControllers(EnergyPlusData &state,
                              int const AirLoopNum,
-                             ControllerWarmRestart const WarmRestartStatus,
+                             DataHVACControllers::ControllerWarmRestart const WarmRestartStatus,
                              int const AirLoopIterMax,
                              int const AirLoopIterTot,
                              int const AirLoopNumCalls)
@@ -1904,10 +1896,10 @@ void TrackAirLoopControllers(EnergyPlusData &state,
     ++airLoopStats.NumCalls;
 
     switch (WarmRestartStatus) {
-    case ControllerWarmRestart::Success: {
+    case DataHVACControllers::ControllerWarmRestart::Success: {
         ++airLoopStats.NumSuccessfulWarmRestarts;
     } break;
-    case ControllerWarmRestart::Fail: {
+    case DataHVACControllers::ControllerWarmRestart::Fail: {
         ++airLoopStats.NumFailedWarmRestarts;
     } break;
     default: {
@@ -2311,7 +2303,7 @@ void TraceIndividualController(EnergyPlusData &state,
                                int const ControlNum,
                                bool const FirstHVACIteration,
                                int const AirLoopPass,
-                               ControllerOperation const Operation, // Operation to execute
+                               DataHVACControllers::ControllerOperation const Operation, // Operation to execute
                                bool const IsConvergedFlag)
 {
 
@@ -2365,8 +2357,8 @@ void TraceIndividualController(EnergyPlusData &state,
 
     // Write detailed diagnostic
     switch (Operation) {
-    case ControllerOperation::ColdStart:
-    case ControllerOperation::WarmRestart: {
+    case DataHVACControllers::ControllerOperation::ColdStart:
+    case DataHVACControllers::ControllerOperation::WarmRestart: {
         print(TraceFile,
               "{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{},{},{},{},{:.10T},",
               state.dataLoopNodes->Node(SensedNode).MassFlowRate,
@@ -2388,7 +2380,7 @@ void TraceIndividualController(EnergyPlusData &state,
         // Finally skip line
         print(TraceFile, "\n");
     } break;
-    case ControllerOperation::Iterate: {
+    case DataHVACControllers::ControllerOperation::Iterate: {
         // Masss flow rate
         // Convergence analysis
 
@@ -2415,7 +2407,7 @@ void TraceIndividualController(EnergyPlusData &state,
         print(TraceFile, "\n");
 
     } break;
-    case ControllerOperation::End: {
+    case DataHVACControllers::ControllerOperation::End: {
         // Masss flow rate
         // Convergence analysis
         print(TraceFile,
