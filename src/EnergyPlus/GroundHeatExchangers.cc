@@ -558,7 +558,7 @@ GLHEVertProps::GLHEVertProps(EnergyPlusData &state, std::string const &objName, 
 std::shared_ptr<GLHEVertProps> GetVertProps(EnergyPlusData &state, std::string const &objectName)
 {
     // Check if this instance of this model has already been retrieved
-    for (auto &thisProp : state.dataGroundHeatExchanger->vertPropsVector) {
+    for (auto const &thisProp : state.dataGroundHeatExchanger->vertPropsVector) {
         // Check if the type and name match
         if (objectName == thisProp->name) {
             return thisProp;
@@ -577,7 +577,7 @@ std::shared_ptr<GLHEVertProps> GetVertProps(EnergyPlusData &state, std::string c
 std::shared_ptr<GLHEVertSingle> GetSingleBH(EnergyPlusData &state, std::string const &objectName)
 {
     // Check if this instance of this model has already been retrieved
-    for (auto &thisBH : state.dataGroundHeatExchanger->singleBoreholesVector) {
+    for (auto const &thisBH : state.dataGroundHeatExchanger->singleBoreholesVector) {
         // Check if the type and name match
         if (objectName == thisBH->name) {
             return thisBH;
@@ -596,7 +596,7 @@ std::shared_ptr<GLHEVertSingle> GetSingleBH(EnergyPlusData &state, std::string c
 std::shared_ptr<GLHEVertArray> GetVertArray(EnergyPlusData &state, std::string const &objectName)
 {
     // Check if this instance of this model has already been retrieved
-    for (auto &thisProp : state.dataGroundHeatExchanger->vertArraysVector) {
+    for (auto const &thisProp : state.dataGroundHeatExchanger->vertArraysVector) {
         // Check if the type and name match
         if (objectName == thisProp->name) {
             return thisProp;
@@ -615,7 +615,7 @@ std::shared_ptr<GLHEVertArray> GetVertArray(EnergyPlusData &state, std::string c
 std::shared_ptr<GLHEResponseFactors> GetResponseFactor(EnergyPlusData &state, std::string const &objectName)
 {
     // Check if this instance of this model has already been retrieved
-    for (auto &thisRF : state.dataGroundHeatExchanger->responseFactorsVector) {
+    for (auto const &thisRF : state.dataGroundHeatExchanger->responseFactorsVector) {
         // Check if the type and name match
         if (objectName == thisRF->name) {
             return thisRF;
@@ -741,9 +741,9 @@ BuildAndGetResponseFactorsObjectFromSingleBHs(EnergyPlusData &state, std::vector
 
 //******************************************************************************
 
-void SetupBHPointsForResponseFactorsObject(std::shared_ptr<GLHEResponseFactors> &thisRF)
+void SetupBHPointsForResponseFactorsObject(const std::shared_ptr<GLHEResponseFactors> &thisRF)
 {
-    for (auto &thisBH : thisRF->myBorholes) {
+    for (auto const &thisBH : thisRF->myBorholes) {
 
         // Using Simpson's rule the number of points (n+1) must be odd, therefore an even number of panels is required
         // Starting from i = 0 to i <= NumPanels produces an odd number of points
@@ -1059,7 +1059,7 @@ void GLHEVert::setupTimeVectors()
     this->myRespFactors->GFNC.dimension(tempLNTTS.size(), 0.0);
 
     int index = 1;
-    for (auto &thisLNTTS : tempLNTTS) {
+    for (auto const &thisLNTTS : tempLNTTS) {
         this->myRespFactors->time(index) = exp(thisLNTTS) * t_s;
         this->myRespFactors->LNTTS(index) = thisLNTTS;
         ++index;
@@ -1284,8 +1284,8 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
             if (cell_index == 0) {
                 // heat flux BC
 
-                auto &thisCell = Cells[cell_index];
-                auto &eastCell = Cells[cell_index + 1];
+                auto const &thisCell = Cells[cell_index];
+                auto const &eastCell = Cells[cell_index + 1];
 
                 Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * Constant::Pi * thisCell.conductivity);
                 Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * Constant::Pi * eastCell.conductivity);
@@ -1311,9 +1311,9 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
             } else {
                 // all other cells
 
-                auto &westCell = Cells[cell_index - 1];
-                auto &thisCell = Cells[cell_index];
-                auto &eastCell = Cells[cell_index + 1];
+                auto const &westCell = Cells[cell_index - 1];
+                auto const &eastCell = Cells[cell_index + 1];
+                auto const &thisCell = Cells[cell_index];
 
                 Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * Constant::Pi * thisCell.conductivity);
                 Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * Constant::Pi * eastCell.conductivity);
@@ -1342,8 +1342,8 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
         // calculate bh wall temp
         Real64 T_bhWall = 0.0;
         for (int cell_index = 0; cell_index < num_cells; ++cell_index) {
-            auto &leftCell = Cells[cell_index];
-            auto &rightCell = Cells[cell_index + 1];
+            auto const &leftCell = Cells[cell_index];
+            auto const &rightCell = Cells[cell_index + 1];
 
             if (leftCell.type == CellType::GROUT && rightCell.type == CellType::SOIL) {
 
@@ -1460,7 +1460,7 @@ void GLHEVert::makeThisGLHECacheStruct()
 
     auto &d_bh_data = d["BH Data"];
     int i = 0;
-    for (auto &thisBH : this->myRespFactors->myBorholes) {
+    for (auto const &thisBH : this->myRespFactors->myBorholes) {
         ++i;
         auto &d_bh = d_bh_data[fmt::format("BH {}", i)];
         d_bh["X-Location"] = thisBH->xLoc;
@@ -2790,7 +2790,7 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
     Real64 nusseltNum = 0.0;
     if (reynoldsNum < lower_limit) {
         nusseltNum = 4.01; // laminar mean(4.36, 3.66)
-    } else if (lower_limit <= reynoldsNum && reynoldsNum < upper_limit) {
+    } else if (reynoldsNum < upper_limit) {
         Real64 constexpr nu_low = 4.01;               // laminar
         Real64 const f = frictionFactor(reynoldsNum); // turbulent
         Real64 const prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
