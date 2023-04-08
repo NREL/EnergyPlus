@@ -754,7 +754,6 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
     // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger events.
 
-    using SetPointManager::CtrlVarType;
     using SetPointManager::GetHumidityRatioVariableType;
 
     static constexpr std::string_view RoutineName("InitController");
@@ -828,9 +827,9 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
             } break;
             case HVACControllers::CtrlVarType::HumidityRatio: { // 'HumidityRatio'
                 controllerProps.HumRatCntrlType = GetHumidityRatioVariableType(state, SensedNode);
-                if ((thisController.HumRatCntrlType == CtrlVarType::HumRat &&
+                if ((thisController.HumRatCntrlType == SetPointManager::CtrlVarType::HumRat &&
                      state.dataLoopNodes->Node(SensedNode).HumRatSetPoint == DataLoopNode::SensedNodeFlagValue) ||
-                    (thisController.HumRatCntrlType == CtrlVarType::MaxHumRat &&
+                    (thisController.HumRatCntrlType == SetPointManager::CtrlVarType::MaxHumRat &&
                      state.dataLoopNodes->Node(SensedNode).HumRatMax == DataLoopNode::SensedNodeFlagValue)) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowSevereError(state,
@@ -858,7 +857,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                         }
                     }
 
-                } else if (thisController.HumRatCntrlType == CtrlVarType::MinHumRat) {
+                } else if (thisController.HumRatCntrlType == SetPointManager::CtrlVarType::MinHumRat) {
                     ShowSevereError(state,
                                     format("HVACControllers: incorrect humidity ratio setpoint for controller type={} Name=\"{}\"",
                                            controllerProps.ControllerType,
@@ -1104,7 +1103,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
         // Done once per HVAC step
         if (!thisController.IsSetPointDefinedFlag) {
             switch (thisController.HumRatCntrlType) {
-            case CtrlVarType::MaxHumRat: {
+            case SetPointManager::CtrlVarType::MaxHumRat: {
                 thisController.SetPointValue = state.dataLoopNodes->Node(SensedNode).HumRatMax;
             } break;
             default: {
