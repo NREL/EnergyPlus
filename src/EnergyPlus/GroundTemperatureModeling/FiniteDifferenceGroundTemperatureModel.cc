@@ -92,7 +92,6 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     int NumNums;
     int NumAlphas;
     int IOStat;
-    bool ErrorsFound = false;
 
     // New shared pointer for this model object
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
@@ -125,7 +124,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
         }
     }
 
-    if (found && !ErrorsFound) {
+    if (found) {
         state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
 
         // Simulate
@@ -188,7 +187,6 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     Real64 horizSolarRad_num;
     Real64 airDensity_num;
     Real64 annualAveAirTemp_num;
-    int denominator;
 
     // Save current environment so we can revert back when done
     int Envrn_reset = state.dataWeatherManager->Envrn;
@@ -264,7 +262,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
         windSpeed_num = 0.0;
         horizSolarRad_num = 0.0;
         airDensity_num = 0.0;
-        denominator = 0;
+        int denominator = 0;
 
         auto &tdwd = weatherDataArray(state.dataGlobal->DayOfSim); // "This day weather data"
 
@@ -414,7 +412,7 @@ void FiniteDiffGroundTempsModel::developMesh()
             // Constant thickness mesh here
             thisCell.thickness = surfaceLayerCellThickness;
 
-        } else if (i > surfaceLayerNumCells && i <= (centerLayerNumCells + surfaceLayerNumCells)) {
+        } else if (i <= (centerLayerNumCells + surfaceLayerNumCells)) {
             // Geometric expansion/contraction here
             int numCenterCell = i - surfaceLayerNumCells;
 
@@ -424,7 +422,7 @@ void FiniteDiffGroundTempsModel::developMesh()
                 thisCell.thickness =
                     cellArray((surfaceLayerNumCells + (centerLayerNumCells / 2)) - (numCenterCell - (centerLayerNumCells / 2))).thickness;
             }
-        } else if (i > (centerLayerNumCells + surfaceLayerNumCells)) {
+        } else {
             // Constant thickness mesh here
             thisCell.thickness = deepLayerCellThickness;
         }
@@ -1184,14 +1182,12 @@ void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(ObjexxFCL::Optional<int const
         rhoCP_soil = rhoCp_soil_liq_1;
     } else if (thisCell.temperature <= frzAllIce) {
         rhoCP_soil = rhoCP_soil_ice;
-    } else if ((thisCell.temperature < frzAllLiq) && (thisCell.temperature > frzLiqTrans)) {
+    } else if (thisCell.temperature > frzLiqTrans) {
         rhoCP_soil = rhoCp_soil_liq_1 + (rhoCP_soil_transient - rhoCP_soil_liq) / (frzAllLiq - frzLiqTrans) * (frzAllLiq - thisCell.temperature);
-    } else if ((thisCell.temperature <= frzLiqTrans) && (thisCell.temperature >= frzIceTrans)) {
+    } else if (thisCell.temperature >= frzIceTrans) {
         rhoCP_soil = rhoCP_soil_transient;
-    } else if ((thisCell.temperature < frzIceTrans) && (thisCell.temperature > frzAllIce)) {
-        rhoCP_soil = rhoCP_soil_ice + (rhoCP_soil_transient - rhoCP_soil_ice) / (frzIceTrans - frzAllIce) * (thisCell.temperature - frzAllIce);
     } else {
-        assert(false); // Shouldn't get here
+        rhoCP_soil = rhoCP_soil_ice + (rhoCP_soil_transient - rhoCP_soil_ice) / (frzIceTrans - frzAllIce) * (thisCell.temperature - frzAllIce);
     }
 
     thisCell.props.rhoCp = baseDensity * baseSpecificHeat; // rhoCP_soil;
