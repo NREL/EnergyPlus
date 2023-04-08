@@ -77,16 +77,10 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Read input and creates instance of finite difference ground temp model
 
-    // USE STATEMENTS:
-    using namespace GroundTemperatureManager;
-
-    // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool found = false;
     int NumNums;
@@ -147,8 +141,6 @@ void FiniteDiffGroundTempsModel::initAndSim(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Initalizes and simulated finite difference ground temps model
@@ -167,17 +159,11 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Finds correct environment for reading all weather data. Loops over all weather data in weather file
     // and data structure containing daily average of required weather data.
 
-    // USE STATEMENTS:
-    using namespace DataEnvironment;
-
-    // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
     bool Available; // an environment is available to process
     bool ErrorsFound;
@@ -368,13 +354,9 @@ void FiniteDiffGroundTempsModel::developMesh()
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Creates static mesh used for model
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // Surface layer parameters
     Real64 surfaceLayerThickness = 2.0;
@@ -454,14 +436,11 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Simulates model, repeating years, until steady-periodic temperatures are determined.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
     timeStepInSeconds = Constant::SecsInDay;
     bool convergedFinal = false;
 
@@ -519,16 +498,14 @@ void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature(EnergyPlusData &st
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Determines heat transfer to surface. Updates surface cell temperature.
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 numerator(0.0);
-    Real64 denominator(0.0);
-    Real64 resistance(0.0);
+    Real64 numerator = 0.0;
+    Real64 denominator = 0.0;
+    Real64 resistance = 0.0;
     Real64 incidentHeatGain;
     Real64 incidentSolar_MJhrmin;
     Real64 evapotransHeatLoss_Wm2;
@@ -550,12 +527,12 @@ void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature(EnergyPlusData &st
     Real64 latentHeatVaporization;
     Real64 evapotransHeatLoss_MJhrmin;
 
-    Real64 constexpr rho_water(998.0);      // [kg/m3]
-    Real64 constexpr airSpecificHeat(1003); // '[J/kg-K]
+    Real64 constexpr rho_water = 998.0;      // [kg/m3]
+    Real64 constexpr airSpecificHeat = 1003; // '[J/kg-K]
     // evapotranspiration parameters
-    Real64 constexpr absor_Corrected(0.77);
-    Real64 const convert_Wm2_To_MJhrmin(3600.0 / 1000000.0);
-    Real64 const convert_MJhrmin_To_Wm2(1.0 / convert_Wm2_To_MJhrmin);
+    Real64 constexpr absor_Corrected = 0.77;
+    Real64 const convert_Wm2_To_MJhrmin = 3600.0 / 1000000.0;
+    Real64 const convert_MJhrmin_To_Wm2 = 1.0 / convert_Wm2_To_MJhrmin;
 
     auto &thisCell = cellArray(1);
     auto &cellBelow_thisCell = cellArray(2);
@@ -663,16 +640,14 @@ void FiniteDiffGroundTempsModel::updateGeneralDomainCellTemperature(int const ce
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Update cell temperature based on HT from cells above and below
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 numerator(0.0);
-    Real64 denominator(0.0);
-    Real64 resistance(0.0);
+    Real64 numerator = 0.0;
+    Real64 denominator = 0.0;
+    Real64 resistance = 0.0;
 
     auto &thisCell = cellArray(cell);
     auto &cellAbove_thisCell = cellArray(cell - 1);
@@ -707,8 +682,6 @@ void FiniteDiffGroundTempsModel::updateBottomCellTemperature()
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Updates bottom cell temperature based on earth heat flux HT from cell above
@@ -719,11 +692,11 @@ void FiniteDiffGroundTempsModel::updateBottomCellTemperature()
     //  IPCC scoping meeting on renewable energy sources: 59-80.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 numerator(0.0);
-    Real64 denominator(0.0);
-    Real64 resistance(0.0);
+    Real64 numerator = 0.0;
+    Real64 denominator = 0.0;
+    Real64 resistance = 0.0;
     Real64 HTBottom;
-    Real64 geothermalGradient(0.025); // C/m
+    Real64 constexpr geothermalGradient = 0.025; // C/m
 
     auto &thisCell = cellArray(totalNumCells);
     auto &cellAbove_thisCell = cellArray(totalNumCells - 1);
@@ -754,8 +727,6 @@ bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence(EnergyPlusData
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Checks final temperature convergence
@@ -789,8 +760,6 @@ bool FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Checks iteration temperature convergence
@@ -817,17 +786,10 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Initalizes model using Kusuda-Achenbach model.
     // Average ground temp initialized to average annual air temperature
-
-    // USE STATEMENTS:
-    using namespace GroundTemperatureManager;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // Temporary KA model for initialization
     auto tempModel = std::make_unique<KusudaGroundTempsModel>(); // (AUTO_OK) Why does this have to be a unique_ptr?
@@ -874,8 +836,6 @@ void FiniteDiffGroundTempsModel::updateIterationTemperatures()
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Updates iteration temperatures for convergence checks
@@ -892,8 +852,6 @@ void FiniteDiffGroundTempsModel::updateTimeStepTemperatures(EnergyPlusData &stat
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Updates timestep temperatures for convergence checks.
@@ -916,8 +874,6 @@ void FiniteDiffGroundTempsModel::doStartOfTimeStepInits()
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Updates cell properties for each timestep
@@ -947,8 +903,6 @@ Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Interpolates between days and depths to find correct ground temperature
@@ -1066,14 +1020,9 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Retrieves ground tempeature when input time is in seconds
-
-    // Using
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     depth = _depth;
 
@@ -1093,8 +1042,6 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &s
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Returns ground temperature when input time is in months
@@ -1122,16 +1069,11 @@ void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(ObjexxFCL::Optional<int const
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Edwin Lee
     //       DATE WRITTEN   Summer 2011
-    //       MODIFIED       Matt Mitchell, Summer 2015
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Evaluates the soil properties
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 Theta_ice;
-    Real64 Theta_liq;
-    Real64 Theta_sat;
     Real64 rho_ice;
     Real64 rho_liq;
     Real64 CP_liq;
@@ -1146,11 +1088,11 @@ void FiniteDiffGroundTempsModel::evaluateSoilRhoCp(ObjexxFCL::Optional<int const
     Real64 rhoCP_soil;
 
     // These vary by domain now, so we must be careful to retrieve them every time
-    Theta_liq = waterContent;
-    Theta_sat = saturatedWaterContent;
+    Real64 Theta_liq = waterContent;
+    Real64 Theta_sat = saturatedWaterContent;
 
     // Assumption
-    Theta_ice = Theta_liq;
+    Real64 Theta_ice = Theta_liq;
 
     if (present(InitOnly)) {
         //'Cp (freezing) calculations

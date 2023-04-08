@@ -69,14 +69,9 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Reads input and creates instance of Kusuda ground temps model
-
-    // USE STATEMENTS:
-    using namespace GroundTemperatureManager;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -84,7 +79,6 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     int NumNums;
     int NumAlphas;
     int IOStat;
-    bool ErrorsFound = false;
 
     // New shared pointer for this model object
     std::shared_ptr<KusudaGroundTempsModel> thisModel(new KusudaGroundTempsModel());
@@ -127,7 +121,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
                 Real64 minSurfTemp(100);  // Set high month 1 temp will be lower and actually get updated
                 Real64 maxSurfTemp(-100); // Set low initially but will get updated
 
-                std::shared_ptr<BaseGroundTempsModel> shallowObj = GetGroundTempModelAndInit(
+                std::shared_ptr<BaseGroundTempsModel> shallowObj = GroundTemperatureManager::GetGroundTempModelAndInit(
                     state,
                     static_cast<std::string>(
                         GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(GroundTempObjType::SiteShallowGroundTemp)]),
@@ -167,7 +161,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
         }
     }
 
-    if (found && !ErrorsFound) {
+    if (found) {
         state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
@@ -184,8 +178,6 @@ Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData &state)
 {
     // AUTHOR         Matt Mitchell
     // DATE WRITTEN   June 2015
-    // MODIFIED       na
-    // RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Returns a ground temperature
@@ -193,22 +185,13 @@ Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Kusuda and Achenbach correlation is used
 
-    // Using/Aliasing
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 term1;
-    Real64 term2;
-    Real64 secsInYear;
-    Real64 retVal;
+    Real64 secsInYear = Constant::SecsInDay * state.dataWeatherManager->NumDaysInYear;
 
-    secsInYear = Constant::SecsInDay * state.dataWeatherManager->NumDaysInYear;
+    Real64 term1 = -depth * std::sqrt(Constant::Pi / (secsInYear * groundThermalDiffisivity));
+    Real64 term2 = (2 * Constant::Pi / secsInYear) *
+                   (simTimeInSeconds - phaseShiftInSecs - (depth / 2) * std::sqrt(secsInYear / (Constant::Pi * groundThermalDiffisivity)));
 
-    term1 = -depth * std::sqrt(Constant::Pi / (secsInYear * groundThermalDiffisivity));
-    term2 = (2 * Constant::Pi / secsInYear) *
-            (simTimeInSeconds - phaseShiftInSecs - (depth / 2) * std::sqrt(secsInYear / (Constant::Pi * groundThermalDiffisivity)));
-
-    retVal = aveGroundTemp - aveGroundTempAmplitude * std::exp(term1) * std::cos(term2);
-
-    return retVal;
+    return aveGroundTemp - aveGroundTempAmplitude * std::exp(term1) * std::cos(term2);
 }
 
 //******************************************************************************
@@ -218,13 +201,10 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &stat
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Returns the ground temperature when input time is in seconds
 
-    // Using/Aliasing
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 secondsInYear = state.dataWeatherManager->NumDaysInYear * Constant::SecsInDay;
 
@@ -247,10 +227,7 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
-    // Using/Aliasing
     // PURPOSE OF THIS SUBROUTINE:
     // Returns the ground temperature when input time is in months
 
