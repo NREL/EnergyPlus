@@ -225,30 +225,25 @@ namespace GeneratorDynamicsManager {
         Real64 PelInput;                        // holds initial value of IN var
         DataGenerators::OperatingMode newOpMode(DataGenerators::OperatingMode::Invalid);
         Real64 ElectLoadForThermalRequest;
-        auto &InletCWnode = state.dataGenerator->InletCWnode;
-        auto &InternalFlowControl = state.dataGenerator->InternalFlowControl;
-        auto &TcwIn = state.dataGenerator->TcwIn;
-        auto &TrialMdotcw = state.dataGenerator->TrialMdotcw;
-        auto &LimitMinMdotcw = state.dataGenerator->LimitMinMdotcw;
 
         // inits
         PLRforSubtimestepStartUp = 1.0;
         PLRforSubtimestepShutDown = 0.0;
         bool PLRStartUp = false; // true if subtimestep issue involving startup
         bool PLRShutDown = false;
-        InternalFlowControl = false;
+        state.dataGenerator->InternalFlowControl = false;
 
         // get index for this generator in dynamics control structure
         switch (GeneratorType) {
         case GeneratorType::MicroCHP: {
             DynaCntrlNum = state.dataCHPElectGen->MicroCHP(GeneratorNum).DynamicsControlID;
             // OutletCWnode = MicroCHPElectricGenerator::MicroCHP(GeneratorNum)%PlantOutletNodeID
-            InletCWnode = state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID;
-            TcwIn = state.dataLoopNodes->Node(state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID).Temp;
+            state.dataGenerator->InletCWnode = state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID;
+            state.dataGenerator->TcwIn = state.dataLoopNodes->Node(state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID).Temp;
             if (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.InternalFlowControl) {
-                InternalFlowControl = true;
+                state.dataGenerator->InternalFlowControl = true;
             }
-            LimitMinMdotcw = state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.MinWaterMdot;
+            state.dataGenerator->LimitMinMdotcw = state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.MinWaterMdot;
         } break;
         case GeneratorType::FuelCell: {
             // not yet
@@ -278,10 +273,10 @@ namespace GeneratorDynamicsManager {
         Real64 Pel = PelInput;
 
         // get data to check if sufficient flow available from Plant
-        if (InternalFlowControl && (SchedVal > 0.0)) {
-            TrialMdotcw = FuncDetermineCWMdotForInternalFlowControl(state, GeneratorNum, Pel, TcwIn);
+        if (state.dataGenerator->InternalFlowControl && (SchedVal > 0.0)) {
+            state.dataGenerator->TrialMdotcw = FuncDetermineCWMdotForInternalFlowControl(state, GeneratorNum, Pel, state.dataGenerator->TcwIn);
         } else {
-            TrialMdotcw = state.dataLoopNodes->Node(InletCWnode).MassFlowRate;
+            state.dataGenerator->TrialMdotcw = state.dataLoopNodes->Node(state.dataGenerator->InletCWnode).MassFlowRate;
         }
 
         // determine current operating mode.
@@ -292,7 +287,7 @@ namespace GeneratorDynamicsManager {
             if (SchedVal == 0.0) {
                 newOpMode = DataGenerators::OperatingMode::Off;
 
-            } else if (((SchedVal != 0.0) && (!RunFlag)) || (TrialMdotcw < LimitMinMdotcw)) {
+            } else if (((SchedVal != 0.0) && (!RunFlag)) || (state.dataGenerator->TrialMdotcw < state.dataGenerator->LimitMinMdotcw)) {
                 newOpMode = DataGenerators::OperatingMode::Standby;
             } else if ((SchedVal != 0.0) && (RunFlag)) {
 
@@ -361,7 +356,7 @@ namespace GeneratorDynamicsManager {
                         newOpMode = DataGenerators::OperatingMode::Off;
                     }
                 }
-            } else if (((SchedVal != 0.0) && (!RunFlag)) || (TrialMdotcw < LimitMinMdotcw)) {
+            } else if (((SchedVal != 0.0) && (!RunFlag)) || (state.dataGenerator->TrialMdotcw < state.dataGenerator->LimitMinMdotcw)) {
                 // to standby unless cool down time period is needed
                 if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay == 0.0) {
                     newOpMode = DataGenerators::OperatingMode::Standby;
@@ -432,7 +427,7 @@ namespace GeneratorDynamicsManager {
         } break;
         case DataGenerators::OperatingMode::Normal: {
             // possible Future states {CoolDown, standby, off}
-            if (((SchedVal == 0.0) || (!RunFlag)) || (TrialMdotcw < LimitMinMdotcw)) {
+            if (((SchedVal == 0.0) || (!RunFlag)) || (state.dataGenerator->TrialMdotcw < state.dataGenerator->LimitMinMdotcw)) {
                 // is cool down time delay longer than timestep?
                 if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay == 0.0) {
                     if (SchedVal != 0.0) {
@@ -495,7 +490,7 @@ namespace GeneratorDynamicsManager {
                 } else {
                     newOpMode = DataGenerators::OperatingMode::Off;
                 }
-            } else if (((SchedVal != 0.0) && (!RunFlag)) || (TrialMdotcw < LimitMinMdotcw)) {
+            } else if (((SchedVal != 0.0) && (!RunFlag)) || (state.dataGenerator->TrialMdotcw < state.dataGenerator->LimitMinMdotcw)) {
                 // probably goes to standby but could be stuck in cool down for awhile
                 if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay > 0.0) {
                     // calculate time for end of cool down period
