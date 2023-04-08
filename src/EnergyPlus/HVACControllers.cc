@@ -211,7 +211,7 @@ void ManageControllers(EnergyPlusData &state,
                        ControllerOperation const Operation,
                        bool &IsConvergedFlag,
                        bool &IsUpToDateFlag,
-                       bool &BypassOAController,
+                       bool const BypassOAController,
                        ObjexxFCL::Optional_bool AllowWarmRestartFlag)
 {
 
@@ -2552,7 +2552,7 @@ Real64 GetPreviousHVACTime(const EnergyPlusData &state)
     return PreviousHVACTime * Constant::SecInHour;
 }
 
-std::string CreateHVACTimeString(EnergyPlusData &state)
+std::string CreateHVACTimeString(const EnergyPlusData &state)
 {
 
     // FUNCTION INFORMATION:
@@ -2567,7 +2567,7 @@ std::string CreateHVACTimeString(EnergyPlusData &state)
     return state.dataEnvrn->CurMnDy + ' ' + stripped(Buffer);
 }
 
-std::string CreateHVACStepFullString(EnergyPlusData &state)
+std::string CreateHVACStepFullString(const EnergyPlusData &state)
 {
 
     // FUNCTION INFORMATION:
@@ -2583,7 +2583,7 @@ std::string CreateHVACStepFullString(EnergyPlusData &state)
     return state.dataEnvrn->EnvironmentName + ", " + MakeHVACTimeIntervalString(state);
 }
 
-std::string MakeHVACTimeIntervalString(EnergyPlusData &state)
+std::string MakeHVACTimeIntervalString(const EnergyPlusData &state)
 {
 
     // FUNCTION INFORMATION:

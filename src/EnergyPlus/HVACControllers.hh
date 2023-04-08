@@ -235,7 +235,7 @@ namespace HVACControllers {
                            DataHVACControllers::ControllerOperation Operation,
                            bool &IsConvergedFlag,
                            bool &IsUpToDateFlag,
-                           bool &BypassOAController,
+                           bool const BypassOAController,
                            ObjexxFCL::Optional_bool AllowWarmRestartFlag = _);
 
     void GetControllerInput(EnergyPlusData &state);
@@ -319,11 +319,11 @@ namespace HVACControllers {
 
     Real64 GetPreviousHVACTime(const EnergyPlusData &state);
 
-    std::string CreateHVACTimeString(EnergyPlusData &state);
+    std::string CreateHVACTimeString(const EnergyPlusData &state);
 
-    std::string CreateHVACStepFullString(EnergyPlusData &state);
+    std::string CreateHVACStepFullString(const EnergyPlusData &state);
 
-    std::string MakeHVACTimeIntervalString(EnergyPlusData &state);
+    std::string MakeHVACTimeIntervalString(const EnergyPlusData &state);
 
     void CheckControllerListOrder(EnergyPlusData &state);
 
