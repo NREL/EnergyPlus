@@ -754,11 +754,6 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
     // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger events.
 
-    using EMSManager::CheckIfNodeSetPointManagedByEMS;
-    using FluidProperties::GetDensityGlycol;
-    using PlantUtilities::ScanPlantLoopsForNodeNum;
-    using PlantUtilities::SetActuatedBranchFlowRate;
-    using RootFinder::SetupRootFinder;
     using SetPointManager::CtrlVarType;
     using SetPointManager::GetHumidityRatioVariableType;
 
@@ -800,7 +795,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         // call to check node is actuated by EMS
-                        CheckIfNodeSetPointManagedByEMS(
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
                             state, SensedNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
@@ -848,7 +843,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                                           "setpoint at the controller sensed node.");
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
-                        CheckIfNodeSetPointManagedByEMS(
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
                             state, SensedNode, EMSManager::SPControlType::HumidityRatioSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
@@ -889,7 +884,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         // call to check node is actuated by EMS
-                        CheckIfNodeSetPointManagedByEMS(
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
                             state, SensedNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
@@ -917,7 +912,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         // call to check node is actuated by EMS
-                        CheckIfNodeSetPointManagedByEMS(
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
                             state, SensedNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
@@ -947,7 +942,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         // call to check node is actuated by EMS
-                        CheckIfNodeSetPointManagedByEMS(
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
                             state, SensedNode, EMSManager::SPControlType::MassFlowRateSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
@@ -972,7 +967,8 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
     }
 
     if (allocated(state.dataPlnt->PlantLoop) && MyPlantIndexsFlag(ControlNum)) {
-        ScanPlantLoopsForNodeNum(state, thisController.ControllerName, thisController.ActuatedNode, thisController.ActuatedNodePlantLoc);
+        PlantUtilities::ScanPlantLoopsForNodeNum(
+            state, thisController.ControllerName, thisController.ActuatedNode, thisController.ActuatedNodePlantLoc);
         MyPlantIndexsFlag(ControlNum) = false;
     }
 
@@ -995,27 +991,27 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
         // Setup root finder after sizing calculation
         switch (thisController.Action) {
         case ControllerAction::NormalAction: {
-            SetupRootFinder(state,
-                            state.dataHVACControllers->RootFinders(ControlNum),
-                            DataRootFinder::Slope::Increasing,
-                            DataRootFinder::RootFinderMethod::Brent,
-                            DataPrecisionGlobals::constant_zero,
-                            1.0e-6,
-                            thisController.Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
-                                                    // ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for
-                                                    // Y variables
+            RootFinder::SetupRootFinder(state,
+                                        state.dataHVACControllers->RootFinders(ControlNum),
+                                        DataRootFinder::Slope::Increasing,
+                                        DataRootFinder::RootFinderMethod::Brent,
+                                        DataPrecisionGlobals::constant_zero,
+                                        1.0e-6,
+                                        thisController.Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
+                                                                // ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for
+                                                                // Y variables
 
         } break;
         case ControllerAction::Reverse: {
-            SetupRootFinder(state,
-                            state.dataHVACControllers->RootFinders(ControlNum),
-                            DataRootFinder::Slope::Decreasing,
-                            DataRootFinder::RootFinderMethod::Brent,
-                            DataPrecisionGlobals::constant_zero,
-                            1.0e-6,
-                            thisController.Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
-                                                    // ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for
-                                                    // Y variables
+            RootFinder::SetupRootFinder(state,
+                                        state.dataHVACControllers->RootFinders(ControlNum),
+                                        DataRootFinder::Slope::Decreasing,
+                                        DataRootFinder::RootFinderMethod::Brent,
+                                        DataPrecisionGlobals::constant_zero,
+                                        1.0e-6,
+                                        thisController.Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
+                                                                // ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for
+                                                                // Y variables
         } break;
         default: {
             ShowFatalError(state, R"(InitController: Invalid controller action. Valid choices are "Normal" or "Reverse")");
@@ -1032,11 +1028,11 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
     // Do the Begin Environment initializations
     if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ControlNum)) {
 
-        Real64 rho = GetDensityGlycol(state,
-                                      state.dataPlnt->PlantLoop(thisController.ActuatedNodePlantLoc.loopNum).FluidName,
-                                      Constant::CWInitConvTemp,
-                                      state.dataPlnt->PlantLoop(thisController.ActuatedNodePlantLoc.loopNum).FluidIndex,
-                                      RoutineName);
+        Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                       state.dataPlnt->PlantLoop(thisController.ActuatedNodePlantLoc.loopNum).FluidName,
+                                                       Constant::CWInitConvTemp,
+                                                       state.dataPlnt->PlantLoop(thisController.ActuatedNodePlantLoc.loopNum).FluidIndex,
+                                                       RoutineName);
 
         thisController.MinActuated = rho * thisController.MinVolFlowActuated;
         thisController.MaxActuated = rho * thisController.MaxVolFlowActuated;
@@ -1057,7 +1053,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
         MyEnvrnFlag(ControlNum) = true;
     }
 
-    SetActuatedBranchFlowRate(state, thisController.NextActuatedValue, ActuatedNode, thisController.ActuatedNodePlantLoc, false);
+    PlantUtilities::SetActuatedBranchFlowRate(state, thisController.NextActuatedValue, ActuatedNode, thisController.ActuatedNodePlantLoc, false);
 
     // Do the following initializations (every time step): This should be the info from
     // the previous components outlets or the node data in this section.
