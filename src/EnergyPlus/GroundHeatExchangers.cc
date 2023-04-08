@@ -1485,10 +1485,7 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
 void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
 {
 
-    // For convenience
-    using json = nlohmann::json;
-
-    json cached_json;
+    nlohmann::json cached_json;
     if (FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
         // file exists -- add data
         // open file
