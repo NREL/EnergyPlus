@@ -115,8 +115,8 @@ namespace EnergyPlus::GroundHeatExchangers {
 //   Ground Heat Exchanger.' Applied Energy. Vol 114, 57-69.
 
 // MODULE PARAMETER DEFINITIONS
-constexpr Real64 hrsPerMonth(730.0); // Number of hours in month
-constexpr Real64 maxTSinHr(60);      // Max number of time step in a hour
+constexpr Real64 hrsPerMonth = 730.0; // Number of hours in month
+constexpr Real64 maxTSinHr = 60;      // Max number of time step in a hour
 static constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
 
 //******************************************************************************
@@ -831,7 +831,7 @@ std::vector<Real64> GLHEVert::distances(MyCartesian const &point_i, MyCartesian 
     sumVals.push_back(pow_2(point_i.y - point_j.y));
     sumVals.push_back(pow_2(point_i.z - point_j.z));
 
-    Real64 sumTot = 0;
+    Real64 sumTot = 0.0;
     std::vector<Real64> retVals;
     std::for_each(sumVals.begin(), sumVals.end(), [&](Real64 n) { sumTot += n; });
     retVals.push_back(std::sqrt(sumTot));
@@ -840,7 +840,7 @@ std::vector<Real64> GLHEVert::distances(MyCartesian const &point_i, MyCartesian 
     sumVals.pop_back();
     sumVals.push_back(pow_2(point_i.z - (-point_j.z)));
 
-    sumTot = 0;
+    sumTot = 0.0;
     std::for_each(sumVals.begin(), sumVals.end(), [&](Real64 n) { sumTot += n; });
     retVals.push_back(std::sqrt(sumTot));
 
@@ -868,10 +868,10 @@ Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSi
     // The first point, last point, odd points, and even points. Then multiply the odd/even points by their respective coefficient for the
     // Simpson's method. After that, all points are summed together and divided by 3.
 
-    Real64 sum_f = 0;
+    Real64 sum_f = 0.0;
     int i = 0;
     int const lastIndex_j = static_cast<int>(bh_j->pointLocations_j.size() - 1u);
-    for (auto &point_j : bh_j->pointLocations_j) {
+    for (auto const &point_j : bh_j->pointLocations_j) {
         std::vector<Real64> dists = distances(point_i, point_j);
         Real64 const f = calcResponse(dists, currTime);
 
@@ -925,7 +925,7 @@ Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std
         Real64 sum_f = 0;
         int i = 0;
         int const lastIndex = static_cast<int>(bh_i->pointLocations_i.size() - 1u);
-        for (auto &thisPoint : bh_i->pointLocations_i) {
+        for (auto const &thisPoint : bh_i->pointLocations_i) {
 
             Real64 f = integral(thisPoint, bh_j, currTime);
 
@@ -1055,9 +1055,9 @@ void GLHEVert::calcUniformHeatFluxGFunctions(EnergyPlusData &state)
 
     // Calculate the g-functions
     for (size_t lntts_index = 1; lntts_index <= this->myRespFactors->LNTTS.size(); ++lntts_index) {
-        for (auto &bh_i : this->myRespFactors->myBorholes) {
+        for (auto const &bh_i : this->myRespFactors->myBorholes) {
             Real64 sum_T_ji = 0;
-            for (auto &bh_j : this->myRespFactors->myBorholes) {
+            for (auto const &bh_j : this->myRespFactors->myBorholes) {
                 sum_T_ji += doubleIntegral(bh_i, bh_j, this->myRespFactors->time(lntts_index));
             }
             this->myRespFactors->GFNC(lntts_index) += sum_T_ji;
@@ -1133,7 +1133,7 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
 
     // setup soil layer geometry
     constexpr int num_soil_cells = 500;
-    constexpr Real64 radius_soil = 10;
+    constexpr Real64 radius_soil = 10.0;
     Real64 const soil_cell_thickness = (radius_soil - radius_grout) / num_soil_cells;
 
     // use design flow rate
@@ -1238,9 +1238,9 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
     Real64 constexpr lntts_max_for_short_timestep = -9.0;
     Real64 const t_s = pow_2(this->bhLength) / (9.0 * this->soil.diffusivity);
 
-    Real64 constexpr time_step = 500;
+    Real64 constexpr time_step = 500.0;
     Real64 const time_max_for_short_timestep = exp(lntts_max_for_short_timestep) * t_s;
-    Real64 total_time = 0;
+    Real64 total_time = 0.0;
 
     Real64 constexpr heat_flux = 40.4;
 
@@ -1512,10 +1512,10 @@ void GLHESlinky::calcGFunctions(EnergyPlusData &state)
     // calculates g-functions for the slinky ground heat exchanger model
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    constexpr Real64 tLg_min(-2);
-    constexpr Real64 tLg_grid(0.25);
-    constexpr Real64 ts(3600);
-    constexpr Real64 convertYearsToSeconds(356 * 24 * 60 * 60);
+    constexpr Real64 tLg_min = -2;
+    constexpr Real64 tLg_grid = 0.25;
+    constexpr Real64 ts = 3600.0;
+    constexpr Real64 convertYearsToSeconds = 356.0 * 24.0 * 60.0 * 60.0;
     Real64 fraction;
     Array2D<Real64> valStored({0, this->numTrenches}, {0, this->numCoils}, -1.0);
     int I0;
@@ -2277,7 +2277,7 @@ void GLHEBase::updateGHX(EnergyPlusData &state)
     // Updates the outlet node and check for out of bounds temperatures
 
     // SUBROUTINE ARGUMENT DEFINITIONS
-    constexpr const char *RoutineName("UpdateGroundHeatExchanger");
+    std::string_view const RoutineName = "UpdateGroundHeatExchanger";
     constexpr Real64 deltaTempLimit = 100.0; // temp limit for warnings
 
     PlantUtilities::SafeCopyPlantNode(state, this->inletNodeNum, this->outletNodeNum);
@@ -2403,7 +2403,7 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
 
     if (state.dataGroundHeatExchanger->numVertProps > 0) {
 
-        std::string currObj = "GroundHeatExchanger:Vertical:Properties";
+        std::string const currObj = "GroundHeatExchanger:Vertical:Properties";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(currObj);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -2423,7 +2423,7 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
 
     if (state.dataGroundHeatExchanger->numResponseFactors > 0) {
 
-        std::string currObj = "GroundHeatExchanger:ResponseFactors";
+        std::string const currObj = "GroundHeatExchanger:ResponseFactors";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(currObj);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -2443,7 +2443,7 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
 
     if (state.dataGroundHeatExchanger->numVertArray > 0) {
 
-        std::string currObj = "GroundHeatExchanger:Vertical:Array";
+        std::string const currObj = "GroundHeatExchanger:Vertical:Array";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(currObj);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -2463,7 +2463,7 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
 
     if (state.dataGroundHeatExchanger->numSingleBorehole > 0) {
 
-        std::string currObj = "GroundHeatExchanger:Vertical:Single";
+        std::string const currObj = "GroundHeatExchanger:Vertical:Single";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(currObj);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -2483,7 +2483,7 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
 
     if (state.dataGroundHeatExchanger->numVerticalGLHEs > 0) {
 
-        std::string currObj = "GroundHeatExchanger:System";
+        std::string const currObj = "GroundHeatExchanger:System";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(currObj);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -2501,10 +2501,9 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
     }
 
     // SLINKY GLHE
-
     if (state.dataGroundHeatExchanger->numSlinkyGLHEs > 0) {
 
-        std::string currObj = "GroundHeatExchanger:Slinky";
+        std::string const currObj = "GroundHeatExchanger:Slinky";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(currObj);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -2733,7 +2732,7 @@ Real64 GLHEVert::frictionFactor(Real64 const reynoldsNum)
     // Petukov, B.S. 1970. 'Heat transfer and friction in turbulent pipe flow with variable physical properties.'
     // In Advances in Heat Transfer, ed. T.F. Irvine and J.P. Hartnett, Vol. 6. New York Academic Press.
 
-    // limits picked be within about 1% of actual values
+    // limits picked to be within about 1% of actual values
     constexpr Real64 lower_limit = 1500;
     constexpr Real64 upper_limit = 5000;
 
@@ -2758,7 +2757,6 @@ Real64 GLHEVert::calcPipeResistance(EnergyPlusData &state)
     // Calculates the combined conduction and convection pipe resistance
     // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
     // for Grouted Single U-tube Ground Heat Exchangers.' J. Energy Engineering. Draft in progress.
-
     // Equation 3
 
     return calcPipeConductionResistance() + calcPipeConvectionResistance(state);
@@ -2777,14 +2775,14 @@ Real64 GLHESlinky::calcHXResistance(EnergyPlusData &state)
     //    Calculates the resistance of the slinky HX from the fluid to the outer tube wall.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr const char *RoutineName("CalcSlinkyGroundHeatExchanger");
+    std::string_view const RoutineName = "CalcSlinkyGroundHeatExchanger";
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 nusseltNum;
     Real64 Rconv;
-    constexpr Real64 A(3150);
-    constexpr Real64 B(350);
-    constexpr Real64 laminarNusseltNo(4.364);
+    constexpr Real64 A = 3150;
+    constexpr Real64 B = 350;
+    constexpr Real64 laminarNusseltNo = 4.364;
 
     Real64 cpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -2959,7 +2957,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
 
 void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const CurTime)
 {
-    constexpr const char *RoutineName("initEnvironment");
+    std::string_view const RoutineName = "initEnvironment";
     this->myEnvrnFlag = false;
 
     Real64 fluidDensity = FluidProperties::GetDensityGlycol(state,
@@ -3009,14 +3007,12 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
     //       AUTHOR:          Dan Fisher
     //       DATE WRITTEN:    August, 2000
     //       MODIFIED         Arun Murugappan
-    //       RE-ENGINEERED    na
 
     Real64 CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                       (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed) *
                      Constant::SecInHour;
 
     // Init more variables
-
     if (this->myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         this->initEnvironment(state, CurTime);
     }
@@ -3036,8 +3032,7 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
 void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const CurTime)
 {
 
-    constexpr const char *RoutineName("initEnvironment");
-
+    std::string_view const RoutineName = "initEnvironment";
     this->myEnvrnFlag = false;
 
     Real64 fluidDensity = FluidProperties::GetDensityGlycol(state,

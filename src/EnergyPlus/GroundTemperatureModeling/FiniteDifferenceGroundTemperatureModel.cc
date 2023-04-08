@@ -695,7 +695,6 @@ void FiniteDiffGroundTempsModel::updateBottomCellTemperature()
     Real64 numerator = 0.0;
     Real64 denominator = 0.0;
     Real64 resistance = 0.0;
-    Real64 HTBottom;
     Real64 constexpr geothermalGradient = 0.025; // C/m
 
     auto &thisCell = cellArray(totalNumCells);
@@ -713,7 +712,7 @@ void FiniteDiffGroundTempsModel::updateBottomCellTemperature()
     denominator += thisCell.beta / resistance;
 
     // Geothermal gradient heat transfer
-    HTBottom = geothermalGradient * thisCell.props.conductivity * thisCell.conductionArea;
+    Real64 HTBottom = geothermalGradient * thisCell.props.conductivity * thisCell.conductionArea;
 
     numerator += thisCell.beta * HTBottom;
 
@@ -911,7 +910,6 @@ Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
     // Interpolation variables
     int i0;         // First day
     int i1;         // Next day
-    int j0;         // Cell index with depth less than y-depth
     int j1;         // Next cell index (with depth greater than y-depth
     Real64 T_i0_j0; // Temp at int( x-day ); cell lower_bound( y-depth )
     Real64 T_i1_j0; // Temp at int( x-day ) + 1; cell lower_bound( y-depth )
@@ -920,7 +918,6 @@ Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
     Real64 T_ix_j0; // Temp at x-day; cell lower_bound( y-depth )
     Real64 T_ix_j1; // Temp at x-day; cell lower_bound( y-depth ) + 1
     Real64 T_ix_jy; // Final Temperature--Temp at x-day; y-depth
-    Real64 dayFrac; // Fraction of day
 
     if (depth < 0.0) {
         depth = 0.0;
@@ -928,13 +925,13 @@ Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
 
     // Get index of nearest cell with depth less than depth
     auto it = std::lower_bound(cellDepths.begin(), cellDepths.end(), depth);
-    j0 = std::distance(cellDepths.begin(), it);
+    int j0 = std::distance(cellDepths.begin(), it); // Cell index with depth less than y-depth
 
     // Compensate for 1-based array
     ++j0;
 
     // Fraction of day
-    dayFrac = simTimeInDays - int(simTimeInDays);
+    Real64 dayFrac = simTimeInDays - int(simTimeInDays); // Fraction of day
 
     if (j0 < totalNumCells - 1) {
         // All depths within domain
