@@ -2281,15 +2281,12 @@ void GLHEBase::updateGHX(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // Updates the outlet node and check for out of bounds temperatures
 
-    // Using/Aliasing
-    using PlantUtilities::SafeCopyPlantNode;
-
     // SUBROUTINE ARGUMENT DEFINITIONS
     constexpr const char *RoutineName("UpdateGroundHeatExchanger");
 
     constexpr Real64 deltaTempLimit(100.0); // temp limit for warnings
 
-    SafeCopyPlantNode(state, this->inletNodeNum, this->outletNodeNum);
+    PlantUtilities::SafeCopyPlantNode(state, this->inletNodeNum, this->outletNodeNum);
 
     state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->outletTemp;
     state.dataLoopNodes->Node(this->outletNodeNum).Enthalpy =
@@ -2694,9 +2691,6 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
     // Gneilinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
     // International Chemical Engineering 16(1976), pp. 359-368.
 
-    using FluidProperties::GetConductivityGlycol;
-    using FluidProperties::GetViscosityGlycol;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr const char *RoutineName("calcPipeConvectionResistance");
 
@@ -2708,16 +2702,16 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
                                                                   this->inletTemp,
                                                                   state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                   RoutineName);
-    Real64 const kFluid = GetConductivityGlycol(state,
-                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                this->inletTemp,
-                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
-                                                RoutineName);
-    Real64 const fluidViscosity = GetViscosityGlycol(state,
-                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                     this->inletTemp,
-                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
-                                                     RoutineName);
+    Real64 const kFluid = FluidProperties::GetConductivityGlycol(state,
+                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                 this->inletTemp,
+                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                 RoutineName);
+    Real64 const fluidViscosity = FluidProperties::GetViscosityGlycol(state,
+                                                                      state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                      this->inletTemp,
+                                                                      state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                      RoutineName);
 
     // Smoothing fit limits
     constexpr Real64 lower_limit = 2000;
@@ -2796,15 +2790,9 @@ Real64 GLHESlinky::calcHXResistance(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   February, 2015
-    //       MODIFIED
-    //       RE-ENGINEERED
 
     // PURPOSE OF THIS SUBROUTINE:
-    //    Calculates the resistance of the slinky HX from the fluid to the
-    //    outer tube wall.
-
-    using FluidProperties::GetConductivityGlycol;
-    using FluidProperties::GetViscosityGlycol;
+    //    Calculates the resistance of the slinky HX from the fluid to the outer tube wall.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr const char *RoutineName("CalcSlinkyGroundHeatExchanger");
@@ -2821,21 +2809,21 @@ Real64 GLHESlinky::calcHXResistance(EnergyPlusData &state)
                                                             this->inletTemp,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             RoutineName);
-    Real64 kFluid = GetConductivityGlycol(state,
-                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                          this->inletTemp,
-                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
-                                          RoutineName);
+    Real64 kFluid = FluidProperties::GetConductivityGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                           this->inletTemp,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                           RoutineName);
     Real64 fluidDensity = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             this->inletTemp,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             RoutineName);
-    Real64 fluidViscosity = GetViscosityGlycol(state,
-                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                               this->inletTemp,
-                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
-                                               RoutineName);
+    Real64 fluidViscosity = FluidProperties::GetViscosityGlycol(state,
+                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                this->inletTemp,
+                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                RoutineName);
 
     // calculate mass flow rate
     Real64 singleSlinkyMassFlowRate = this->massFlowRate / this->numTrenches;
@@ -2962,10 +2950,6 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
     //       MODIFIED         Arun Murugappan
     //       RE-ENGINEERED    na
 
-    // Using/Aliasing
-    using PlantUtilities::RegulateCondenserCompFlowReqOp;
-    using PlantUtilities::SetComponentFlowRate;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                        (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed) *
@@ -2994,9 +2978,9 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
 
     this->tempGround /= 5;
 
-    this->massFlowRate = RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->designMassFlow);
+    this->massFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->designMassFlow);
 
-    SetComponentFlowRate(state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->plantLoc);
+    PlantUtilities::SetComponentFlowRate(state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->plantLoc);
 
     // Reset local environment init flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;
@@ -3038,12 +3022,10 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
 
 void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
 {
-
-    using PlantUtilities::ScanPlantLoopsForObject;
-
     // Locate the hx on the plant loops for later usage
     bool errFlag = false;
-    ScanPlantLoopsForObject(state, this->name, DataPlant::PlantEquipmentType::GrndHtExchgSystem, this->plantLoc, errFlag, _, _, _, _, _);
+    PlantUtilities::ScanPlantLoopsForObject(
+        state, this->name, DataPlant::PlantEquipmentType::GrndHtExchgSystem, this->plantLoc, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }
@@ -3062,11 +3044,6 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
     //       MODIFIED         Arun Murugappan
     //       RE-ENGINEERED    na
 
-    // Using/Aliasing
-    using PlantUtilities::RegulateCondenserCompFlowReqOp;
-    using PlantUtilities::SetComponentFlowRate;
-    using namespace GroundTemperatureManager;
-
     Real64 CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                       (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed) *
                      Constant::SecInHour;
@@ -3079,9 +3056,9 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
 
     this->tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
 
-    this->massFlowRate = RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->designMassFlow);
+    this->massFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->designMassFlow);
 
-    SetComponentFlowRate(state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->plantLoc);
+    PlantUtilities::SetComponentFlowRate(state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->plantLoc);
 
     // Reset local environment init flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;
@@ -3123,11 +3100,10 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const CurTime)
 
 void GLHESlinky::oneTimeInit_new(EnergyPlusData &state)
 {
-    using PlantUtilities::ScanPlantLoopsForObject;
-
     // Locate the hx on the plant loops for later usage
     bool errFlag = false;
-    ScanPlantLoopsForObject(state, this->name, DataPlant::PlantEquipmentType::GrndHtExchgSlinky, this->plantLoc, errFlag, _, _, _, _, _);
+    PlantUtilities::ScanPlantLoopsForObject(
+        state, this->name, DataPlant::PlantEquipmentType::GrndHtExchgSlinky, this->plantLoc, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }
