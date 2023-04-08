@@ -754,8 +754,6 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
     // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger events.
 
-    using SetPointManager::GetHumidityRatioVariableType;
-
     static constexpr std::string_view RoutineName("InitController");
 
     auto &thisController = state.dataHVACControllers->ControllerProps(ControlNum);
@@ -826,7 +824,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                 }
             } break;
             case HVACControllers::CtrlVarType::HumidityRatio: { // 'HumidityRatio'
-                controllerProps.HumRatCntrlType = GetHumidityRatioVariableType(state, SensedNode);
+                controllerProps.HumRatCntrlType = SetPointManager::GetHumidityRatioVariableType(state, SensedNode);
                 if ((thisController.HumRatCntrlType == SetPointManager::CtrlVarType::HumRat &&
                      state.dataLoopNodes->Node(SensedNode).HumRatSetPoint == DataLoopNode::SensedNodeFlagValue) ||
                     (thisController.HumRatCntrlType == SetPointManager::CtrlVarType::MaxHumRat &&
