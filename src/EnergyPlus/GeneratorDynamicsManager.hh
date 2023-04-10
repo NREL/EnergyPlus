@@ -65,7 +65,6 @@ namespace GeneratorDynamicsManager {
     void SetupGeneratorControlStateManager(EnergyPlusData &state, int const GenNum); // index of generator to setup
 
     void ManageGeneratorControlState(EnergyPlusData &state,
-                                     GeneratorType const GeneratorType,            // type of Generator
                                      int const GeneratorNum,                       // Generator number
                                      bool const RunFlagElectCenter,                // TRUE when Generator operating per electric load center request
                                      bool const RunFlagPlant,                      // TRUE when generator operating per Plant request (always false)
@@ -78,12 +77,11 @@ namespace GeneratorDynamicsManager {
     );
 
     void ManageGeneratorFuelFlow(EnergyPlusData &state,
-                                 GeneratorType const GeneratorType, // type of Generator
-                                 int const GeneratorNum,            // Generator number
-                                 Real64 const FuelFlowRequest,      // Generator demand mdot kg/ s
-                                 Real64 &FuelFlowProvided,          // allowed after constraints kg/s
-                                 bool &ConstrainedIncreasingMdot,   // true if request was altered because of fuel rate of change up
-                                 bool &ConstrainedDecreasingMdot    // true if request was altered because of fuel rate of change down
+                                 int const GeneratorNum,          // Generator number
+                                 Real64 const FuelFlowRequest,    // Generator demand mdot kg/ s
+                                 Real64 &FuelFlowProvided,        // allowed after constraints kg/s
+                                 bool &ConstrainedIncreasingMdot, // true if request was altered because of fuel rate of change up
+                                 bool &ConstrainedDecreasingMdot  // true if request was altered because of fuel rate of change down
     );
 
     Real64 FuncDetermineCWMdotForInternalFlowControl(EnergyPlusData &state,

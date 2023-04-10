@@ -326,10 +326,9 @@ void ProcessDateString(EnergyPlusData &state,
     // the proper month and day for that date string.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int FstNum;
     bool errFlag;
 
-    FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
+    int FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
     DateType = WeatherManager::DateType::Invalid;
     if (!errFlag) {
         // Entered single number, do inverse JDay
@@ -735,21 +734,14 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
 
     Real64 constexpr FracToMin(60.0);
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 ActualTimeS; // Start of current interval (HVAC time step)
-    Real64 ActualTimeE; // End of current interval (HVAC time step)
-    int ActualTimeHrS;
-    //  INTEGER ActualTimeHrE
-    int ActualTimeMinS;
-
     //  ActualTimeS=INT(CurrentTime)+(SysTimeElapsed+(CurrentTime - INT(CurrentTime)))
     // CR6902  ActualTimeS=INT(CurrentTime-TimeStepZone)+SysTimeElapsed
     // [DC] TODO: Improve display accuracy up to fractional seconds using hh:mm:ss.0 format
-    ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
-    ActualTimeE = ActualTimeS + TimeStepSys;
-    ActualTimeHrS = int(ActualTimeS);
+    Real64 ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
+    Real64 ActualTimeE = ActualTimeS + TimeStepSys;
+    int ActualTimeHrS = int(ActualTimeS);
     //  ActualTimeHrE=INT(ActualTimeE)
-    ActualTimeMinS = nint((ActualTimeS - ActualTimeHrS) * FracToMin);
+    int ActualTimeMinS = nint((ActualTimeS - ActualTimeHrS) * FracToMin);
 
     if (ActualTimeMinS == 60) {
         ++ActualTimeHrS;
@@ -825,8 +817,6 @@ void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed b
     Real64 constexpr small(1.e-9); // Small Number used to approximate zero
     Real64 constexpr Perturb(0.1); // Perturbation applied to X to initialize iteration
 
-    Real64 DY; // Linear fit result
-
     // Check for convergence by comparing change in X
     if (Iter != 1) {
         if (std::abs(X0 - X1) < Tol || Y0 == 0.0) {
@@ -850,7 +840,7 @@ void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed b
     } else {
 
         // New guess calculated from LINEAR FIT of most recent two points
-        DY = Y0 - Y1;
+        Real64 DY = Y0 - Y1;
         if (std::abs(DY) < small) {
             DY = small;
         }
@@ -877,17 +867,13 @@ int FindNumberInList(int const WhichNumber, Array1A_int const ListOfItems, int c
     // Argument array dimensioning
     ListOfItems.dim(_);
 
-    // Return value
-    int FindNumberInList = 0;
-
     for (int Count = 1; Count <= NumItems; ++Count) {
         if (WhichNumber == ListOfItems(Count)) {
-            FindNumberInList = Count;
-            break;
+            return Count;
         }
     }
 
-    return FindNumberInList;
+    return 0;
 }
 
 void DecodeMonDayHrMin(int const Item, // word containing encoded month, day, hour, minute
@@ -996,8 +982,8 @@ void ParseTime(Real64 const Time, // Time value in seconds
     // - seconds < 60
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int constexpr MinToSec(60);
-    int const HourToSec(MinToSec * 60);
+    int constexpr MinToSec = 60;
+    int constexpr HourToSec = 60 * 60;
 
     // Get number of hours
     // This might undershoot the actual number of hours. See DO WHILE loop.

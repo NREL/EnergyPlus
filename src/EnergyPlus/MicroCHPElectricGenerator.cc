@@ -860,7 +860,6 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
     bool RunFlag(false);
 
     GeneratorDynamicsManager::ManageGeneratorControlState(state,
-                                                          GeneratorType::MicroCHP,
                                                           this->DynamicsControlID,
                                                           RunFlagElectCenter,
                                                           RunFlagPlant,
@@ -966,13 +965,8 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             bool ConstrainedDecreasingNdot(false);
             Real64 MdotFuelAllowed = 0.0;
 
-            GeneratorDynamicsManager::ManageGeneratorFuelFlow(state,
-                                                              GeneratorType::MicroCHP,
-                                                              this->DynamicsControlID,
-                                                              MdotFuel,
-                                                              MdotFuelAllowed,
-                                                              ConstrainedIncreasingNdot,
-                                                              ConstrainedDecreasingNdot);
+            GeneratorDynamicsManager::ManageGeneratorFuelFlow(
+                state, this->DynamicsControlID, MdotFuel, MdotFuelAllowed, ConstrainedIncreasingNdot, ConstrainedDecreasingNdot);
 
             if (ConstrainedIncreasingNdot || ConstrainedDecreasingNdot) { // recalculate Pnetss with new NdotFuel with iteration
                 MdotFuel = MdotFuelAllowed;
@@ -1080,7 +1074,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
         Real64 MdotFuelAllowed = 0.0;
 
         GeneratorDynamicsManager::ManageGeneratorFuelFlow(
-            state, GeneratorType::MicroCHP, this->DynamicsControlID, MdotFuel, MdotFuelAllowed, ConstrainedIncreasingNdot, ConstrainedDecreasingNdot);
+            state, this->DynamicsControlID, MdotFuel, MdotFuelAllowed, ConstrainedIncreasingNdot, ConstrainedDecreasingNdot);
 
         if (ConstrainedIncreasingNdot || ConstrainedDecreasingNdot) { // recalculate Pnetss with new NdotFuel with iteration
             MdotFuel = MdotFuelAllowed;

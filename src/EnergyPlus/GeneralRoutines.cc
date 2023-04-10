@@ -162,14 +162,14 @@ void ControlCompOutput(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     // Iteration maximum for reheat control
-    static int constexpr MaxIter(25);
-    static Real64 const iter_fac(1.0 / std::pow(2, MaxIter - 3));
-    int constexpr iReverseAction(1);
-    int constexpr iNormalAction(2);
+    static int constexpr MaxIter = 25;
+    static Real64 const iter_fac = 1.0 / std::pow(2, MaxIter - 3);
+    int constexpr iReverseAction = 1;
+    int constexpr iNormalAction = 2;
 
     // Note - order in routine must match order below
     //  Plus -- order in ListOfComponents array must be in sorted order.
-    int constexpr NumComponents(11);
+    int constexpr NumComponents = 11;
     static Array1D_string const ListOfComponents(NumComponents,
                                                  {"AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",
                                                   "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",
@@ -187,17 +187,7 @@ void ControlCompOutput(EnergyPlusData &state,
     // Interval Half Type used for Controller
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Iter(0);  // Iteration limit for the interval halving process
-    Real64 CpAir; // specific heat of air (J/kg-C)
-    bool Converged;
-    Real64 Denom;   // the denominator of the control signal
-    Real64 LoadMet; // Actual output of unit (watts)
-    // INTEGER, SAVE    :: ErrCount=0  ! Number of times that the maximum iterations was exceeded
-    // INTEGER, SAVE    :: ErrCount1=0 ! for recurring error
-    bool WaterCoilAirFlowControl; // True if controlling air flow through water coil, water flow fixed
-    int SimCompNum;               // internal number for case statement
-    Real64 HalvingPrec(0.0);      // precision of halving algorithm
-    bool BBConvergeCheckFlag;     // additional check on convergence specifically for radiant/convective baseboard units
+    int SimCompNum; // internal number for case statement
 
     // Object Data
     auto &ZoneInterHalf = state.dataGeneralRoutines->ZoneInterHalf;
@@ -210,11 +200,12 @@ void ControlCompOutput(EnergyPlusData &state,
         ControlCompTypeNum = SimCompNum;
     }
 
-    Iter = 0;
-    Converged = false;
-    WaterCoilAirFlowControl = false;
-    LoadMet = 0.0;
-    HalvingPrec = 0.0;
+    int Iter = 0; // Iteration limit for the interval halving process
+    bool Converged = false;
+    bool WaterCoilAirFlowControl = false; // True if controlling air flow through water coil, water flow fixed
+    Real64 LoadMet = 0.0;                 // Actual output of unit (watts)
+    Real64 HalvingPrec = 0.0;             // precision of halving algorithm
+    Real64 CpAir;
 
     // At the beginning of every time step the value is reset to the User Input
     ZoneController.SetPoint = 0.0;
@@ -413,7 +404,7 @@ void ControlCompOutput(EnergyPlusData &state,
         }
 
         // The denominator of the control signal should be no less than 100 watts
-        Denom = sign(max(std::abs(QZnReq), 100.0), QZnReq);
+        Real64 Denom = sign(max(std::abs(QZnReq), 100.0), QZnReq);
         if (present(Action)) {
             if (Action == iNormalAction) {
                 Denom = max(std::abs(QZnReq), 100.0);
@@ -541,7 +532,7 @@ void ControlCompOutput(EnergyPlusData &state,
             break;
         }
         if (!Converged) {
-            BBConvergeCheckFlag = BBConvergeCheck(SimCompNum, ZoneInterHalf.MaxFlow, ZoneInterHalf.MinFlow);
+            bool BBConvergeCheckFlag = BBConvergeCheck(SimCompNum, ZoneInterHalf.MaxFlow, ZoneInterHalf.MinFlow);
             if (BBConvergeCheckFlag) {
                 // Set to converged controller
                 Converged = true;
@@ -612,7 +603,7 @@ bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const Mi
     bool BBConvergeCheck;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static Real64 constexpr BBIterLimit(0.00001);
+    static Real64 constexpr BBIterLimit = 0.00001;
 
     if (SimCompNum != BBSteamRadConvNum && SimCompNum != BBWaterRadConvNum) {
         // For all zone equipment except radiant/convective baseboard (steam and water) units:
@@ -848,11 +839,11 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     // Nat. Vent. equations from ASHRAE HoF 2001 Chapt. 26
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 constexpr g(9.807);          // gravitational constant (m/s**2)
-    Real64 constexpr nu(15.66e-6);      // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
-    Real64 constexpr k(0.0267);         // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
-    Real64 constexpr Sigma(5.6697e-08); // Stefan-Boltzmann constant
-    static constexpr std::string_view RoutineName("CalcPassiveExteriorBaffleGap");
+    Real64 constexpr g = 9.807;          // gravitational constant (m/s**2)
+    Real64 constexpr nu = 15.66e-6;      // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
+    Real64 constexpr k = 0.0267;         // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
+    Real64 constexpr Sigma = 5.6697e-08; // Stefan-Boltzmann constant
+    static constexpr std::string_view RoutineName = "CalcPassiveExteriorBaffleGap";
     // INTERFACE BLOCK SPECIFICATIONS:
 
     // DERIVED TYPE DEFINITIONS:
@@ -868,32 +859,8 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Array1D<Real64> LocalWindArr;
 
     // local working variables
-    Real64 RhoAir;                // density of air
-    Real64 CpAir;                 // specific heat of air
     Real64 Tamb;                  // outdoor drybulb
-    Real64 A;                     // projected area of baffle from sum of underlying surfaces
-    Real64 HcPlen;                // surface convection heat transfer coefficient for plenum surfaces
-    int ThisSurf;                 // do loop counter
-    int NumSurfs;                 // number of underlying HT surfaces associated with UTSC
-    Real64 TmpTsBaf;              // baffle temperature
-    Real64 HMovInsul;             // dummy for call to InitExteriorConvectionCoeff
-    Real64 HExt;                  // dummy for call to InitExteriorConvectionCoeff
-    Real64 AbsThermSurf;          // thermal emmittance of underlying wall.
-    Real64 TsoK;                  // underlying surface temperature in Kelvin
-    Real64 TsBaffK;               // baffle temperature in Kelvin  (lagged)
-    Real64 Vwind;                 // localized, and area-weighted average for wind speed
-    Real64 HrSky;                 // radiation coeff for sky, area-weighted average
-    Real64 HrGround;              // radiation coeff for ground, area-weighted average
-    Real64 HrAtm;                 // radiation coeff for air (bulk atmosphere), area-weighted average
-    Real64 Isc;                   // Incoming combined solar radiation, area-weighted average
-    Real64 HrPlen;                // radiation coeff for plenum surfaces, area-weighted average
-    Real64 Tso;                   // temperature of underlying surface, area-weighted average
-    Real64 TmeanK;                // average of surface temps , for Beta in Grashoff no.
-    Real64 Gr;                    // Grasshof number for natural convection calc
-    Real64 VdotWind;              // volume flow rate of nat. vent due to wind
     Real64 VdotThermal;           // Volume flow rate of nat. vent due to buoyancy
-    Real64 VdotVent;              // total volume flow rate of nat vent
-    Real64 MdotVent;              // total mass flow rate of nat vent
     Real64 NuPlen;                // Nusselt No. for plenum Gap
     Real64 LocalOutDryBulbTemp;   // OutDryBulbTemp for here
     Real64 LocalWetBulbTemp;      // OutWetBulbTemp for here
@@ -917,19 +884,18 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
 
     LocalOutHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, LocalOutDryBulbTemp, LocalWetBulbTemp, state.dataEnvrn->OutBaroPress, RoutineName);
 
-    RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
-    CpAir = Psychrometrics::PsyCpAirFnW(LocalOutHumRat);
+    Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
+    Real64 CpAir = Psychrometrics::PsyCpAirFnW(LocalOutHumRat);
     if (!state.dataEnvrn->IsRain) {
         Tamb = LocalOutDryBulbTemp;
     } else { // when raining we use wetbulb not drybulb
         Tamb = LocalWetBulbTemp;
     }
-    //    A = sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-    A = sum_area;
-    TmpTsBaf = TsBaffle;
+    Real64 A = sum_area;        // projected area of baffle from sum of underlying surfaces
+    Real64 TmpTsBaf = TsBaffle; // baffle temperature
 
     // loop through underlying surfaces and collect needed data
-    NumSurfs = size(SurfPtrARR);
+    int NumSurfs = size(SurfPtrARR); // number of underlying HT surfaces associated with UTSC
     HSkyARR.dimension(NumSurfs, 0.0);
     HGroundARR.dimension(NumSurfs, 0.0);
     HAirARR.dimension(NumSurfs, 0.0);
@@ -937,19 +903,19 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     HPlenARR.dimension(NumSurfs, 0.0);
     HExtARR.dimension(NumSurfs, 0.0);
 
-    for (ThisSurf = 1; ThisSurf <= NumSurfs; ++ThisSurf) {
+    for (int ThisSurf = 1; ThisSurf <= NumSurfs; ++ThisSurf) {
         int SurfPtr = SurfPtrARR(ThisSurf);
         // Initializations for this surface
-        HMovInsul = 0.0;
+        Real64 HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
         ConvectionCoefficients::InitExteriorConvectionCoeff(
             state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         int ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
-        AbsThermSurf =
+        Real64 AbsThermSurf =
             dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
                 ->AbsorpThermal;
-        TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + Constant::KelvinConv;
-        TsBaffK = TmpTsBaf + Constant::KelvinConv;
+        Real64 TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + Constant::KelvinConv;
+        Real64 TsBaffK = TmpTsBaf + Constant::KelvinConv;
         if (TsBaffK == TsoK) {        // avoid divide by zero
             HPlenARR(ThisSurf) = 0.0; // no net heat transfer if same temperature
         } else {
@@ -987,44 +953,37 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                   &DataSurfaces::SurfaceData::Area,
                   SurfPtrARR)); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
     // now figure area-weighted averages from underlying surfaces.
-    //    Vwind = sum( LocalWindArr * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    Vwind = sum(LocalWindArr * Area) / A;
+    Real64 Vwind = sum(LocalWindArr * Area) / A; // area weighted average of wind velocity
     LocalWindArr.deallocate();
-    //    HrSky = sum( HSkyARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    HrSky = sum(HSkyARR * Area) / A;
+    Real64 HrSky = sum(HSkyARR * Area) / A; // radiation coeff for sky, area-weighted average
     HSkyARR.deallocate();
-    //    HrGround = sum( HGroundARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    HrGround = sum(HGroundARR * Area) / A;
+    Real64 HrGround = sum(HGroundARR * Area) / A; // radiation coeff for ground, area-weighted average
     HGroundARR.deallocate();
-    //    HrAtm = sum( HAirARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    HrAtm = sum(HAirARR * Area) / A;
+    Real64 HrAtm = sum(HAirARR * Area) / A; // radiation coeff for air (bulk atmosphere), area-weighted average
     HAirARR.deallocate();
-    //    HrPlen = sum( HPlenARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    HrPlen = sum(HPlenARR * Area) / A;
+    Real64 HrPlen = sum(HPlenARR * Area) / A; // radiation coeff for plenum surfaces, area-weighted average
     HPlenARR.deallocate();
-    //    HExt = sum( HExtARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    HExt = sum(HExtARR * Area) / A;
+    Real64 HExt = sum(HExtARR * Area) / A; // dummy for call to InitExteriorConvectionCoeff
     HExtARR.deallocate();
 
     if (state.dataEnvrn->IsRain) HExt = 1000.0;
 
-    //    Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    Tso = sum_product_sub(state.dataHeatBalSurf->SurfOutsideTempHist(1), state.dataSurface->Surface, &DataSurfaces::SurfaceData::Area, SurfPtrARR) /
-          A; // Autodesk:F2C++ Functions handle array subscript usage
-    //    Isc = sum( SurfQRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &DataSurfaces::SurfaceData::Area, SurfPtrARR) /
-          A; // Autodesk:F2C++ Functions handle array subscript usage
-
-    TmeanK = 0.5 * (TmpTsBaf + Tso) + Constant::KelvinConv;
-
-    Gr = g * pow_3(GapThick) * std::abs(Tso - TmpTsBaf) * pow_2(RhoAir) / (TmeanK * pow_2(nu));
+    // temperature of underlying surface, area-weighted average
+    Real64 Tso =
+        sum_product_sub(state.dataHeatBalSurf->SurfOutsideTempHist(1), state.dataSurface->Surface, &DataSurfaces::SurfaceData::Area, SurfPtrARR) / A;
+    // Incoming combined solar radiation, area-weighted average
+    Real64 Isc =
+        sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &DataSurfaces::SurfaceData::Area, SurfPtrARR) / A;
+    // average of surface temps , for Beta in Grashoff no.
+    Real64 TmeanK = 0.5 * (TmpTsBaf + Tso) + Constant::KelvinConv;
+    // Grasshof number for natural convection calc
+    Real64 Gr = g * pow_3(GapThick) * std::abs(Tso - TmpTsBaf) * pow_2(RhoAir) / (TmeanK * pow_2(nu));
 
     PassiveGapNusseltNumber(AspRat, Tilt, TmpTsBaf, Tso, Gr, NuPlen); // intentionally switch Tso to Tsi
-
-    HcPlen = NuPlen * (k / GapThick);
+    Real64 HcPlen = NuPlen * (k / GapThick);                          // surface convection heat transfer coefficient for plenum surfaces
 
     // now model natural ventilation of plenum gap.
-    VdotWind = Cv * (VentArea / 2.0) * Vwind;
+    Real64 VdotWind = Cv * (VentArea / 2.0) * Vwind; // volume flow rate of nat. vent due to wind
 
     if (TaGap > Tamb) {
         VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (TaGap - Tamb) / (TaGap + Constant::KelvinConv));
@@ -1038,8 +997,8 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         }
     }
 
-    VdotVent = VdotWind + VdotThermal;
-    MdotVent = VdotVent * RhoAir;
+    Real64 VdotVent = VdotWind + VdotThermal; // total volume flow rate of nat vent
+    Real64 MdotVent = VdotVent * RhoAir;      // total mass flow rate of nat vent
 
     // now calculate baffle temperature
     if (!ICSCollectorIsOn) {
@@ -1097,10 +1056,6 @@ void PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height 
 
     Real64 tiltr = Tilt * Constant::DegToRadians;
     Real64 Ra = Gr * Pr; // Rayleigh number
-
-    // if (Ra > 2.0e6) {
-    //    // write(*,*)' error, outside range of Rayleigh number'
-    //}
 
     if (Ra <= 1.0e4) {
         gnu901 = 1.0 + 1.7596678e-10 * std::pow(Ra, 2.2984755); // eq. 51
@@ -1256,7 +1211,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     Array1D_bool FoundSupplyPlenum;
     Array1D_bool FoundZoneSplitter;
     Array1D_string FoundNames;
-    int NumErr(0); // Error Counter //Autodesk:Init Initialization added
+    int NumErr = 0; // Error Counter //Autodesk:Init Initialization added
 
     // Do by Paths
     ShowMessage(state, "Testing Individual Supply Air Path Integrity");
@@ -1542,16 +1497,14 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     Array1D_bool FoundReturnPlenum;
     Array1D_bool FoundZoneMixer;
     Array1D_string FoundNames;
-    int NumErr; // Error Counter
     Array1D_int AllNodes;
-    int CountNodes;
 
     // Formats
 
     // Do by Paths
     ShowMessage(state, "Testing Individual Return Air Path Integrity");
     ErrFound = false;
-    NumErr = 0;
+    int NumErr = 0;
 
     print(state.files.bnd, "{}\n", "! ===============================================================");
     static constexpr std::string_view Format_700("! <#Return Air Paths>,<Number of Return Air Paths>");
@@ -1617,7 +1570,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
         }
 
         AllNodes = 0;
-        CountNodes = 0;
+        int CountNodes = 0;
 
         if (NumComp > 0) {
 
