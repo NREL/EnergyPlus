@@ -2626,9 +2626,8 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
     }
 
     if (state.dataGlobal->BeginEnvrnFlag && state.dataMixedAir->OAControllerMyEnvrnFlag(OAControllerNum)) {
-        Real64 RhoAirStdInit = state.dataEnvrn->StdRhoAir;
-        thisOAController.MinOAMassFlowRate = thisOAController.MinOA * RhoAirStdInit;
-        thisOAController.MaxOAMassFlowRate = thisOAController.MaxOA * RhoAirStdInit;
+        thisOAController.MinOAMassFlowRate = thisOAController.MinOA * state.dataEnvrn->StdRhoAir;
+        thisOAController.MaxOAMassFlowRate = thisOAController.MaxOA * state.dataEnvrn->StdRhoAir;
         state.dataMixedAir->OAControllerMyEnvrnFlag(OAControllerNum) = false;
         state.dataLoopNodes->Node(thisOAController.OANode).MassFlowRateMax = thisOAController.MaxOAMassFlowRate;
 
@@ -3296,12 +3295,6 @@ void InitOAMixer(EnergyPlusData &state, int const OAMixerNum)
     state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate = state.dataLoopNodes->Node(RelNode).MassFlowRate;
 }
 
-// End of Initialization Section of the Module
-//******************************************************************************
-
-// Beginning Calculation Section of the Module
-//******************************************************************************
-
 void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration)
 {
 
@@ -3341,7 +3334,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         AirLoopCyclingFan = false;
     }
 
-    this->OALimitingFactor = limitFactorNone; // oa controller limiting factor
+    this->OALimitingFactor = static_cast<int>(OALimitFactor::None); // oa controller limiting factor
 
     // Check for no flow
     if (this->MixMassFlow <= SmallMassFlow) {
@@ -3394,7 +3387,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         MinOASchedVal = GetCurrentScheduleValue(state, this->MinOASchPtr);
         MinOASchedVal = min(max(MinOASchedVal, 0.0), 1.0);
         OutAirMinFrac *= MinOASchedVal;
-        this->OALimitingFactor = limitFactorLimits;
+        this->OALimitingFactor = static_cast<int>(OALimitFactor::Limits);
     }
 
     // Get mechanical ventilation
@@ -3448,7 +3441,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
     }
     if (MechVentOutsideAirMinFrac > OutAirMinFrac) {
         OutAirMinFrac = MechVentOutsideAirMinFrac;
-        this->OALimitingFactor = limitFactorDCV;
+        this->OALimitingFactor = static_cast<int>(OALimitFactor::DCV);
     }
 
     OutAirMinFrac = min(max(OutAirMinFrac, 0.0), 1.0);
@@ -3489,7 +3482,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
     if (this->ControllerType_Num == MixedAirControllerType::ControllerOutsideAir) {
         if (this->ExhMassFlow > this->OAMassFlow) {
             this->OAMassFlow = this->ExhMassFlow;
-            this->OALimitingFactor = limitFactorExhaust;
+            this->OALimitingFactor = static_cast<int>(OALimitFactor::Exhaust);
         }
     }
 
@@ -3500,7 +3493,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
             Real64 minOASchedMassFlowRate = this->MinOAMassFlowRate * MinOASchedVal;
             if (minOASchedMassFlowRate > this->OAMassFlow) {
                 this->OAMassFlow = minOASchedMassFlowRate;
-                this->OALimitingFactor = limitFactorLimits;
+                this->OALimitingFactor = static_cast<int>(OALimitFactor::Limits);
             }
         }
     }
@@ -3513,7 +3506,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         Real64 minOAFracMassFlowRate = this->MixMassFlow * MinOAflowfracVal;
         if (minOAFracMassFlowRate > this->OAMassFlow) {
             this->OAMassFlow = minOAFracMassFlowRate;
-            this->OALimitingFactor = limitFactorLimits;
+            this->OALimitingFactor = static_cast<int>(OALimitFactor::Limits);
         }
     }
 
@@ -3526,7 +3519,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         OutAirMinFrac = min(MaxOAflowfracVal, OutAirMinFrac);
         if (currentMaxOAMassFlowRate < this->OAMassFlow) {
             this->OAMassFlow = currentMaxOAMassFlowRate;
-            this->OALimitingFactor = limitFactorLimits;
+            this->OALimitingFactor = static_cast<int>(OALimitFactor::Limits);
         }
     }
 
@@ -3536,29 +3529,29 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         Real64 maxOAMassFlow = this->MaxOAMassFlowRate * max(1.0, OASignal);
         if (maxOAMassFlow < this->OAMassFlow) {
             this->OAMassFlow = maxOAMassFlow;
-            this->OALimitingFactor = limitFactorLimits;
+            this->OALimitingFactor = static_cast<int>(OALimitFactor::Limits);
         }
     } else {
         if (this->MaxOAMassFlowRate < this->OAMassFlow) {
             this->OAMassFlow = this->MaxOAMassFlowRate;
-            this->OALimitingFactor = limitFactorLimits;
+            this->OALimitingFactor = static_cast<int>(OALimitFactor::Limits);
         }
     }
 
     if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && (this->ManageDemand) && (this->OAMassFlow > this->DemandLimitFlowRate)) {
         this->OAMassFlow = this->DemandLimitFlowRate;
-        this->OALimitingFactor = limitFactorDemandLimit;
+        this->OALimitingFactor = static_cast<int>(OALimitFactor::DemandLimit);
     }
     if (this->EMSOverrideOARate) {
         this->OAMassFlow = this->EMSOARateValue;
-        this->OALimitingFactor = limitFactorEMS;
+        this->OALimitingFactor = static_cast<int>(OALimitFactor::EMS);
     }
 
     // Don't let OA flow be > mixed air flow.
     // Seems if RAB (return air bypass) that this should be don't let OA flow be > design supply flow but that causes other issues
     if (this->MixMassFlow < this->OAMassFlow) {
         this->OAMassFlow = this->MixMassFlow;
-        this->OALimitingFactor = limitFactorMixedAir;
+        this->OALimitingFactor = static_cast<int>(OALimitFactor::MixedAir);
     }
 
     // save the min outside air flow fraction and max outside air mass flow rate
@@ -4523,7 +4516,7 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
         if (this->MixMassFlow > 0.0) {
             //   calculate the actual ratio of outside air to mixed air so the magnitude of OA during high humidity control is correct
             OASignal = max(OutAirMinFrac, (this->HighRHOAFlowRatio * this->MaxOAMassFlowRate / this->MixMassFlow));
-            this->OALimitingFactor = limitFactorHighHum;
+            this->OALimitingFactor = static_cast<int>(OALimitFactor::HighHum);
         }
     }
 
@@ -4538,11 +4531,11 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
         //}
         if (MaximumOAFracBySetPoint < OASignal) {
             OASignal = MaximumOAFracBySetPoint;
-            this->OALimitingFactor = limitFactorLimits;
+            this->OALimitingFactor = static_cast<int>(OALimitFactor::Limits);
         }
         if (OutAirMinFrac > OASignal) {
             OASignal = OutAirMinFrac;
-            this->OALimitingFactor = limitFactorLimits;
+            this->OALimitingFactor = static_cast<int>(OALimitFactor::Limits);
         }
     }
 
@@ -4588,7 +4581,7 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
             this->EconomizerStatus = 1;
             this->EconoActive = true;
             if ((OASignal > OutAirMinFrac) && !HighHumidityOperationFlag) {
-                this->OALimitingFactor = limitFactorEconomizer;
+                this->OALimitingFactor = static_cast<int>(OALimitFactor::Economizer);
             }
         } else {
             // Economizer is disabled
@@ -4600,7 +4593,7 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
     // Night ventilation control overrides economizer and high humidity control.
     if (AirLoopNightVent) {
         OASignal = 1.0;
-        this->OALimitingFactor = limitFactorNightVent;
+        this->OALimitingFactor = static_cast<int>(OALimitFactor::NightVent);
     }
 
     // Set high humidity control report variable and status flag
