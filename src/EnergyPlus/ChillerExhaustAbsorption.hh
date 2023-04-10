@@ -180,7 +180,7 @@ namespace ChillerExhaustAbsorption {
         Real64 ExhHeatRecPotentialHeat = 0.0;  // reporting: Heat Recovery Potential during heating
         Real64 ExhHeatRecPotentialCool = 0.0;  // reporting: Heat Recovery Potential during cooling
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static ExhaustAbsorberSpecs *factory(EnergyPlusData &state, std::string const &objectName);
 
         void
         simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
