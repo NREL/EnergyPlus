@@ -245,8 +245,8 @@ namespace MixedAir {
         int NumFaultyEconomizer = 0;                           // total number of economizer faults
         int CountMechVentFrac = 0;                             // Count when OA min fraction > mech vent fraction
         int IndexMechVentFrac = 0;                             // Index when OA min fraction > mech vent fraction
-        int OALimitingFactor = 0; // OA controller limiting factor: 0=none, 1=limits, 2=exhaust flow, 3=economizer, 4=DCV, 5=high hum, 6=night vent,
-                                  // 7=demand limiting, 8=EMS
+        OALimitFactor OALimitingFactor = OALimitFactor::None;  // OA controller limiting factor
+        int OALimitingFactorReport = 0;                        // OA controller limiting factor - integer for reporting
 
         void CalcOAController(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration);
 
