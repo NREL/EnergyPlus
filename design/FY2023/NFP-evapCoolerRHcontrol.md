@@ -14,10 +14,7 @@ Enhancement of Evaporative Cooler in EnergyPlus
 As global climate change continues, the frequency, duration and intensity of heatwaves could increase. As an affordable and energy efficient cooling option [1], evaporative cooling could become more prevalent in the future, especially in hot and dry climates. As a result, it is crucial to provide accurate and more user-friendly simulation support for prototyping new evaporative coolers and their applications. With this motivation, this EnergyPlus feature is proposed to provide an additional relative humidity-driven control option.
 
 ![zoneEvapCoolerDiagram](zoneEvapCoolerDiagram.png)
-<p style="text-align: center;"> Figure 1. Conceptual diagram of a direct evaporative cooler[^1]  (left), an example of a zone-level direct evaporative cooler[^2] (right).</p>
-
-[^1]: Source: https://basc.pnnl.gov/resource-guides/evaporative-cooling-systems#edit-group-description
-[^2]: Source: https://www.nytimes.com/wirecutter/blog/do-swamp-coolers-work/
+<p style="text-align: center;"> Figure 1. Conceptual diagram of a direct evaporative cooler [source](https://basc.pnnl.gov/resource-guides/evaporative-cooling-systems#edit-group-description) (left), an example of a zone-level direct evaporative cooler[source](https://www.nytimes.com/wirecutter/blog/do-swamp-coolers-work/) (right).</p>
 
 The enhancement was motivated by discussions with the CBE research group at UC Berkeley: Hui Zhang, Roberto Rugani, and Maria Andre.
 
@@ -29,7 +26,7 @@ The introduction of excessive moisture is one of the potential issues of direct 
 
 ## Approach
 
-To enable a RH control, two *AvailabilityManager:\* * objects will be added *AvailabilityManager:HighRHTurnOff* and *AvailabilityManager:HighTemperatureLowRHTurnOn*.
+To enable a RH control, two *AvailabilityManager:\** objects will be added *AvailabilityManager:HighRHTurnOff* and *AvailabilityManager:HighTemperatureLowRHTurnOn*.
 
 ## Testing/Validation/Data Source(s)
 
@@ -37,7 +34,7 @@ This feature will be tested and demonstrated with a test file derived from 1Zone
 
 ## IDD Object changes
 
-Two *AvailabilityManager:\* * objects, *AvailabilityManager:HighRHTurnOff* and *AvailabilityManager:HighTemperatureLowRHTurnOn* will be added to enable RH control of the direct evaporative cooling.
+Two *AvailabilityManager:\** objects, *AvailabilityManager:HighRHTurnOff* and *AvailabilityManager:HighTemperatureLowRHTurnOn* will be added to enable RH control of the direct evaporative cooling.
 
     AvailabilityManager:HighRHTurnOff,
           \memo Overrides fan/pump schedules depending on relative humidity at sensor node.
@@ -79,12 +76,12 @@ Two *AvailabilityManager:\* * objects, *AvailabilityManager:HighRHTurnOff* and *
 These two corresponds two the following control methods
 * When the evaporative cooling system is always on, it will be shut down when temperature is too low or humidity is too high, using the following two availability managers 
 
-    AvailabilityManager:LowTemperatureTurnOff
-    AvailabilityManager:HighRHTurnOff (to be added in this feature)
+        AvailabilityManager:LowTemperatureTurnOff
+        AvailabilityManager:HighRHTurnOff (to be added in this feature)
  
 * When the evaporative cooling system is always off, it will be turned on when temperature is too high and humidity is low enough. This will be realized using the following availability manager
 
-    AvailabilityManager:HighTemperatureLowRHTurnOn (to be added in this feature)
+        AvailabilityManager:HighTemperatureLowRHTurnOn (to be added in this feature)
 
 ## Proposed additions to Meters:
 
