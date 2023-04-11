@@ -10743,3 +10743,68 @@ TEST_F(EnergyPlusFixture, CalculatZoneVolume_WithoutAirBoundaries)
     EXPECT_EQ(zone3.CeilingHeight, 2.0);
     EXPECT_EQ(zone3.Volume, 8.0);
 }
+
+TEST_F(EnergyPlusFixture, Fix_checkSubSurfAzTiltNorm_Test)
+{
+    // Unit Test for Pull Request 9905 that fixes a few potential problems described Issue 9893
+    SurfaceData BaseSurface;
+    SurfaceData SubSurface;
+    bool surfaceError;
+
+    // Test Base surf and subsurf normal vectors assignment
+    surfaceError = false;
+
+    BaseSurface.Vertex.dimension(4);
+
+    BaseSurface.Vertex = {
+        DataVectorTypes::Vector(0, 0, 0), DataVectorTypes::Vector(1, 0, 0), DataVectorTypes::Vector(1, 1, 0), DataVectorTypes::Vector(0, 1, 0)};
+    Vectors::CreateNewellSurfaceNormalVector(BaseSurface.Vertex, BaseSurface.Vertex.size(), BaseSurface.NewellSurfaceNormalVector);
+    Vectors::DetermineAzimuthAndTilt(BaseSurface.Vertex,
+                                     BaseSurface.Vertex.size(),
+                                     BaseSurface.Azimuth,
+                                     BaseSurface.Tilt,
+                                     BaseSurface.lcsx,
+                                     BaseSurface.lcsy,
+                                     BaseSurface.lcsz,
+                                     BaseSurface.GrossArea,
+                                     BaseSurface.NewellSurfaceNormalVector);
+
+    SubSurface.Vertex.dimension(4);
+
+    SubSurface.Vertex = {DataVectorTypes::Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 1, 0.0003), Vector(0, 1, 0.0003)};
+    Vectors::CreateNewellSurfaceNormalVector(SubSurface.Vertex, SubSurface.Vertex.size(), SubSurface.NewellSurfaceNormalVector);
+    Vectors::DetermineAzimuthAndTilt(SubSurface.Vertex,
+                                     SubSurface.Vertex.size(),
+                                     SubSurface.Azimuth,
+                                     SubSurface.Tilt,
+                                     SubSurface.lcsx,
+                                     SubSurface.lcsy,
+                                     SubSurface.lcsz,
+                                     SubSurface.GrossArea,
+                                     SubSurface.NewellSurfaceNormalVector);
+
+    bool sameSurfNormal(false);
+
+    // This is the sameSurfNormal test used in checkSubSurfAzTiltNorm()
+    Vectors::CompareTwoVectors(BaseSurface.NewellSurfaceNormalVector, SubSurface.NewellSurfaceNormalVector, sameSurfNormal, 0.001);
+
+    // The surface normals are not exactly the same
+    EXPECT_GE(std::abs(BaseSurface.NewellSurfaceNormalVector.y - SubSurface.NewellSurfaceNormalVector.y), 1e-5);
+    EXPECT_GE(std::abs(BaseSurface.NewellSurfaceNormalVector.z - SubSurface.NewellSurfaceNormalVector.z), 1e-10);
+
+    // But should pass the sameSurfNormal test
+    EXPECT_TRUE(sameSurfNormal);
+
+    checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
+
+    // These should pass
+    EXPECT_FALSE(surfaceError);
+    EXPECT_FALSE(has_err_output());
+
+    // Without the fix in PR 9905 the following would fail since they are not assigned to be exactly the same
+    EXPECT_DOUBLE_EQ(BaseSurface.lcsz.z, SubSurface.lcsz.z);
+    // The following two lines might pass in the original code, but probably not a consistent outcome
+    // In the new code (after PR 9905 fix, they should be consistently passing the tests
+    EXPECT_DOUBLE_EQ(BaseSurface.lcsz.y, SubSurface.lcsz.y);
+    EXPECT_DOUBLE_EQ(BaseSurface.lcsz.x, SubSurface.lcsz.x);
+}
