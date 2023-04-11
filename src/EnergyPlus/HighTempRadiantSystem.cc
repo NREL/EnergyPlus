@@ -303,7 +303,7 @@ namespace HighTempRadiantSystem {
 
             state.dataHighTempRadSys->HighTempRadSys(Item).SchedName = state.dataIPShortCut->cAlphaArgs(2);
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr == 0) {

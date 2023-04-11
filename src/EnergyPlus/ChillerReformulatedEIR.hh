@@ -213,7 +213,7 @@ namespace ChillerReformulatedEIR {
         Real64 HeatRecMassFlow = 0.0;    // Heat reclaim mass flow rate [kg/s]
         DataBranchAirLoopPlant::ControlType EquipFlowCtrl = DataBranchAirLoopPlant::ControlType::Invalid;
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static ReformulatedEIRChillerSpecs *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,

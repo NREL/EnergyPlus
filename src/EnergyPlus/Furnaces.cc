@@ -1007,7 +1007,7 @@ namespace Furnaces {
 
             state.dataFurnaces->Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
@@ -1619,7 +1619,7 @@ namespace Furnaces {
 
             state.dataFurnaces->Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
@@ -3004,7 +3004,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatPump_AirToAir;
             state.dataFurnaces->Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
@@ -4004,7 +4004,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatPump_WaterToAir;
             state.dataFurnaces->Furnace(FurnaceNum).Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
@@ -5365,7 +5365,7 @@ namespace Furnaces {
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
                                                state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum).FluidName,
-                                               DataGlobalConstants::HWInitConvTemp,
+                                               Constant::HWInitConvTemp,
                                                state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow *= rho;
@@ -5430,7 +5430,7 @@ namespace Furnaces {
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
                                                state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum).FluidName,
-                                               DataGlobalConstants::HWInitConvTemp,
+                                               Constant::HWInitConvTemp,
                                                state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow *= rho;
@@ -5507,7 +5507,7 @@ namespace Furnaces {
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(state,
                                                    state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum).FluidName,
-                                                   DataGlobalConstants::HWInitConvTemp,
+                                                   Constant::HWInitConvTemp,
                                                    state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum).FluidIndex,
                                                    RoutineName);
                             state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
@@ -5550,7 +5550,7 @@ namespace Furnaces {
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(state,
                                                    state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum).FluidName,
-                                                   DataGlobalConstants::HWInitConvTemp,
+                                                   Constant::HWInitConvTemp,
                                                    state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum).FluidIndex,
                                                    RoutineName);
                             state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
@@ -12506,7 +12506,8 @@ namespace Furnaces {
             }
         }
 
-        if (GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) == 0.0) {
+        if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) == 0.0) || state.dataHVACGlobal->TurnFansOff ||
+            (GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).FanAvailSchedPtr) == 0.0 && !state.dataHVACGlobal->TurnFansOn)) {
             state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
             OnOffAirFlowRatio = 0.0;
         } else {

@@ -189,7 +189,7 @@ namespace ChillerElectricEIR {
         bool IPLVFlag = true;
         DataBranchAirLoopPlant::ControlType EquipFlowCtrl = DataBranchAirLoopPlant::ControlType::Invalid;
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static ElectricEIRChillerSpecs *factory(EnergyPlusData &state, std::string const &objectName);
 
         void setupOutputVars(EnergyPlusData &state);
 

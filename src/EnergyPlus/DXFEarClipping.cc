@@ -128,7 +128,7 @@ namespace DXFEarClipping {
             }
         }
 
-        if (std::abs(anglesum - DataGlobalConstants::TwoPi) <= epsilon) {
+        if (std::abs(anglesum - Constant::TwoPi) <= epsilon) {
             InPolygon = true;
         }
 
@@ -247,7 +247,7 @@ namespace DXFEarClipping {
                     }
                     ShowMessage(state, format(" number of triangles found={:12}", ncount));
                     for (int j = 1; j <= nrangles; ++j) {
-                        ShowMessage(state, format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * DataGlobalConstants::RadToDeg));
+                        ShowMessage(state, format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * Constant::RadToDeg));
                     }
                 }
                 break; // while loop
@@ -339,7 +339,7 @@ namespace DXFEarClipping {
         angle = std::acos(t);
 
         if (x2 * y1 - y2 * x1 < 0.0E+00) {
-            angle = 2.0E+00 * DataGlobalConstants::Pi - angle;
+            angle = 2.0E+00 * Constant::Pi - angle;
         }
 
         return angle;
@@ -475,7 +475,7 @@ namespace DXFEarClipping {
 
             Real64 ang = angle_2dvector(vertex(svert).x, vertex(svert).y, vertex(mvert).x, vertex(mvert).y, vertex(evert).x, vertex(evert).y);
 
-            if (ang > DataGlobalConstants::Pi) { // sufficiently close to 180 degrees.
+            if (ang > Constant::Pi) { // sufficiently close to 180 degrees.
                 ++nrverts;
                 r_vertices(nrverts) = mvert;
                 rangles(nrverts) = ang;
@@ -553,7 +553,7 @@ namespace DXFEarClipping {
         Real64 const alpha = surfazimuth;
 
         Real64 const alpha180 = 180.0 - alpha; // amount to rotate
-        Real64 const alphrad = alpha180 / DataGlobalConstants::RadToDeg;
+        Real64 const alphrad = alpha180 / Constant::RadToDeg;
         Real64 const cos_alphrad = std::cos(alphrad);
         Real64 const sin_alphrad = std::sin(alphrad);
 
@@ -592,7 +592,7 @@ namespace DXFEarClipping {
         // Subroutine local variable declarations:
 
         Real64 const alpha = -surftilt;
-        Real64 const alphrad = alpha / DataGlobalConstants::RadToDeg;
+        Real64 const alphrad = alpha / Constant::RadToDeg;
         Real64 const cos_alphrad = std::cos(alphrad);
         Real64 const sin_alphrad = std::sin(alphrad);
 
