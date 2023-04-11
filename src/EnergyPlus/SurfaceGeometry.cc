@@ -3036,13 +3036,13 @@ namespace SurfaceGeometry {
         // Check if base surface and subsurface have the same normal
         Vectors::CompareTwoVectors(baseSurface.NewellSurfaceNormalVector, subSurface.NewellSurfaceNormalVector, sameSurfNormal, 0.001);
         if (sameSurfNormal) { // copy lcs vectors
-            // Prior logic tested for azimuth difference < 30 and then skipped this - this caused large diffs in
-            // CmplxGlz_MeasuredDeflectionAndShading Restoring that check here but will require further investigation (MJW Dec 2015)
-            if (std::abs(baseSurface.Azimuth - subSurface.Azimuth) > warningTolerance) {
-                subSurface.lcsx = baseSurface.lcsx;
-                subSurface.lcsy = baseSurface.lcsy;
-                subSurface.lcsz = baseSurface.lcsz;
-            }
+                              // Prior logic tested for azimuth difference < 30 and then skipped this - this caused large diffs in
+                              // CmplxGlz_MeasuredDeflectionAndShading Restoring that check here but will require further investigation (MJW Dec 2015)
+                              // if (std::abs(baseSurface.Azimuth - subSurface.Azimuth) > warningTolerance) {
+            subSurface.lcsx = baseSurface.lcsx;
+            subSurface.lcsy = baseSurface.lcsy;
+            subSurface.lcsz = baseSurface.lcsz;
+            // }
         } else {
             // // Not sure what this does, but keeping for now (MJW Dec 2015)
             // if (std::abs(subSurface.Azimuth - 360.0) < 0.01) {
