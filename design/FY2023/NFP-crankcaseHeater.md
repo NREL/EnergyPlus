@@ -136,7 +136,7 @@ The added optional field is:
     Ai, \field Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
         \note A Curve:* or Table:Lookup object encoding the relationship between
         \note the crankcase heater capacity and the outdoor air temperature. When this field is 
-        !missing or empty, constant crankcase heater capacity will be assumed.
+        \note missing or empty, constant crankcase heater capacity will be assumed.
 
 For the following idd objects with the "Crankcase Heater Power per Compressor"
 field, the addition of an optional capacity curve field will be combined in a
