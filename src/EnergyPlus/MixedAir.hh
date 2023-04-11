@@ -315,9 +315,8 @@ namespace MixedAir {
         Real64 Evz = 1.0;      // zone ventilation efficiency
         Real64 SysDesOA = 0.0; // System design OA
 
-        void CalcMechVentController(EnergyPlusData &state,
-                                    Real64 &SysSA,             // System supply air mass flow rate [kg/s]
-                                    Real64 &MechVentOAMassFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
+        Real64 CalcMechVentController(EnergyPlusData &state,
+                                      Real64 &SysSA // System supply air mass flow rate [kg/s]
         );
     };
 

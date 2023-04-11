@@ -5411,7 +5411,7 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPCap)
     state->dataMixedAir->VentilationMechanical(1).SysDesOA = ExpectedOAMassFlow; // Set design outdoor air flow rate
     state->dataSize->CurSysNum = 1;                                              // Only one system in this instance
     state->dataEnvrn->StdRhoAir = 1;                                             // Standard air density assumed to be 1 kg/m3 (simplification)
-    state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
+    OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
 
     EXPECT_NEAR(
         ExpectedOAMassFlow, OAMassFlow, 0.001); // Expect to cap the system OA to the desing OA air flow, OAMassFlow without the cap is ~0.86 m3/s
@@ -5508,7 +5508,7 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPNoCap)
     state->dataMixedAir->VentilationMechanical(1).SysDesOA = ExpectedOAMassFlow; // Set design outdoor air flow rate
     state->dataSize->CurSysNum = 1;                                              // Only one system in this instance
     state->dataEnvrn->StdRhoAir = 1;                                             // Standard air density assumed to be 1 kg/m3 (simplification)
-    state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
+    OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
 
     EXPECT_TRUE(OAMassFlow >
                 ExpectedOAMassFlow); // Expect that the system OA is greater than the desing OA air flow, OAMassFlow without the cap is ~0.86 m3/s
@@ -5603,7 +5603,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ACHflow)
     state->dataMixedAir->VentilationMechanical(1).SysDesOA = ExpectedOAMassFlow; // Set design outdoor air flow rate
     state->dataSize->CurSysNum = 1;                                              // Only one system in this instance
     state->dataEnvrn->StdRhoAir = 1;                                             // Standard air density assumed to be 1 kg/m3 (simplification)
-    state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
+    OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
 
     EXPECT_NEAR(OAMassFlow, ExpectedOAMassFlow, AllowableTolerance);
 }
@@ -5646,22 +5646,19 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     GetOAControllerInputs(*state);
 
     // Case 1 - System OA method = IndoorAirQualityProcedure, SOAM_IAQP, controls to OutputRequiredToCO2SP
-    OAMassFlow = 0.0;
     EXPECT_EQ(SysOAMethod::IAQP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
-    state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
+    OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
     EXPECT_EQ(0.5, OAMassFlow);
 
     // Case 2 - System OA method = IndoorAirQualityProcedureGenericContaminant, SOAM_IAQPGC, controls to OutputRequiredToGCSP
-    OAMassFlow = 0.0;
     state->dataMixedAir->VentilationMechanical(1).SystemOAMethod = SysOAMethod::IAQPGC;
-    state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
+    OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
     EXPECT_EQ(1.5, OAMassFlow);
 
     // Case 3 - System OA method = IndoorAirQualityProcedureCombined, SOAM_IAQPCOM, controls to greater of total OutputRequiredToCO2SP and
     // OutputRequiredToGCSP
-    OAMassFlow = 0.0;
     state->dataMixedAir->VentilationMechanical(1).SystemOAMethod = SysOAMethod::IAQPCOM;
-    state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
+    OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
     EXPECT_EQ(1.5, OAMassFlow);
 
     // Case 4 - System OA method = IndoorAirQualityProcedureCombined, SOAM_IAQPCOM, set zone OA schedules to alwaysoff
@@ -5670,9 +5667,8 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     state->dataMixedAir->VentilationMechanical(1).ZoneOASchPtr(1) = 1;
     state->dataMixedAir->VentilationMechanical(1).ZoneOASchPtr(2) = 1;
 
-    OAMassFlow = 0.0;
     state->dataMixedAir->VentilationMechanical(1).SystemOAMethod = SysOAMethod::IAQPCOM;
-    state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
+    OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
     EXPECT_EQ(0.0, OAMassFlow);
 
     state->dataContaminantBalance->ZoneSysContDemand.deallocate();
@@ -5873,24 +5869,21 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
     // Total for all zones = 1951.5 m3/s
 
     // Case 1 - All zones as initially set up
-    OAMassFlow = 0.0;
-    state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
+    OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
     EXPECT_NEAR(1951.5, OAMassFlow, 0.00001);
 
     // Case 2 - Turn off Zone 4-6
-    OAMassFlow = 0.0;
     state->dataScheduleMgr->Schedule(4).CurrentValue = 0.0;
     state->dataScheduleMgr->Schedule(5).CurrentValue = 0.0;
     state->dataScheduleMgr->Schedule(6).CurrentValue = 0.0;
-    state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
+    OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
     EXPECT_NEAR(41.0, OAMassFlow, 0.00001);
 
     // Case 3 - Turn off remaining zones
-    OAMassFlow = 0.0;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0.0;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 0.0;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 0.0;
-    state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
+    OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
     EXPECT_EQ(0.0, OAMassFlow);
 
     state->dataHeatBal->ZoneIntGain.deallocate();

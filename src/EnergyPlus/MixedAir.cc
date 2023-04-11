@@ -3390,8 +3390,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         this->OALimitingFactor = OALimitFactor::Limits;
     }
 
-    // Get mechanical ventilation
-    Real64 MechVentOAMassFlow = 0.0;        // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
+    // Get outside air mass flow rate calculated by mechanical ventilation object [kg/s]
     Real64 MechVentOutsideAirMinFrac = 0.0; // fraction of OA specified by mechanical ventilation object
     if (AirLoopNum > 0 && this->VentMechObjectNum != 0) {
         auto &curAirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo(AirLoopNum));
@@ -3406,14 +3405,15 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
             SysSA = curAirLoopFlow.SupFlow;
         }
 
-        state.dataMixedAir->VentilationMechanical(this->VentMechObjectNum).CalcMechVentController(state, SysSA, MechVentOAMassFlow);
-        MechVentOutsideAirMinFrac = MechVentOAMassFlow / curAirLoopFlow.DesSupply;
+        this->MechVentOAMassFlowRequest = state.dataMixedAir->VentilationMechanical(this->VentMechObjectNum).CalcMechVentController(state, SysSA);
+        MechVentOutsideAirMinFrac = this->MechVentOAMassFlowRequest / curAirLoopFlow.DesSupply;
         if (curAirLoopFlow.FanPLR > 0.0) {
             MechVentOutsideAirMinFrac *= curAirLoopFlow.FanPLR;
-            MechVentOAMassFlow *= curAirLoopFlow.FanPLR;
+            this->MechVentOAMassFlowRequest *= curAirLoopFlow.FanPLR;
         }
+    } else {
+        this->MechVentOAMassFlowRequest = 0.0;
     }
-    this->MechVentOAMassFlowRequest = MechVentOAMassFlow;
     //****** use greater of Mechanical Ventilation Outside Air fraction and OutAirMinFrac
     if ((MechVentOutsideAirMinFrac > 0.0) && (OutAirMinFrac > MechVentOutsideAirMinFrac)) {
         if (!state.dataGlobal->WarmupFlag) {
@@ -3473,8 +3473,8 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
 
     // Do not allow OA to be below Ventilation:Mechanical flow rate or above mixed mass flow rate
     if (AirLoopNum > 0 && VentMechObjectNum != 0) {
-        if (MechVentOAMassFlow > this->OAMassFlow) {
-            this->OAMassFlow = min(MechVentOAMassFlow, this->MixMassFlow);
+        if (this->MechVentOAMassFlowRequest > this->OAMassFlow) {
+            this->OAMassFlow = min(this->MechVentOAMassFlowRequest, this->MixMassFlow);
         }
     }
 
@@ -3630,10 +3630,8 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
     this->OALimitingFactorReport = static_cast<int>(OALimitingFactor);
 }
 
-void VentilationMechanicalProps::CalcMechVentController(
-    EnergyPlusData &state,
-    Real64 &SysSA,             // System supply air mass flow rate [kg/s]
-    Real64 &MechVentOAMassFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
+Real64 VentilationMechanicalProps::CalcMechVentController(EnergyPlusData &state,
+                                                          Real64 &SysSA // System supply air mass flow rate [kg/s]
 )
 {
     static constexpr std::string_view RoutineName("CalcMechVentController: ");
@@ -3655,7 +3653,7 @@ void VentilationMechanicalProps::CalcMechVentController(
     Real64 ZoneOAMin = 0.0;         // Minimum Zone OA flow rate when the zone is unoccupied (i.e. ZoneOAPeople = 0)
     Real64 ZoneOAMax = 0.0;         // Maximum Zone OA flow rate (ZoneOAPeople + ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)])
     Real64 CO2PeopleGeneration = 0; // CO2 generation from people at design level
-    MechVentOAMassFlow = 0.0;
+    Real64 MechVentOAMassFlow = 0.0;
 
     // Apply mechanical ventilation only when it is available/allowed
     if (GetCurrentScheduleValue(state, this->SchPtr) > 0) {
@@ -4208,10 +4206,8 @@ void VentilationMechanicalProps::CalcMechVentController(
             // Finally calc the system supply OA mass flow rate
             MechVentOAMassFlow = SysOA * state.dataEnvrn->StdRhoAir;
         }
-
-    } else {
-        MechVentOAMassFlow = 0.0;
     }
+    return MechVentOAMassFlow;
 }
 
 void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
