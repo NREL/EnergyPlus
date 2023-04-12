@@ -301,23 +301,21 @@ namespace SurfaceGeometry {
 
         // these include building north axis and Building Rotation for Appendix G
         state.dataSurfaceGeometry->CosBldgRelNorth =
-            std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+            std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
         state.dataSurfaceGeometry->SinBldgRelNorth =
-            std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+            std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
 
         // these are only for Building Rotation for Appendix G when using world coordinate system
-        state.dataSurfaceGeometry->CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
-        state.dataSurfaceGeometry->SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
+        state.dataSurfaceGeometry->CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
+        state.dataSurfaceGeometry->SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
 
         state.dataSurfaceGeometry->CosZoneRelNorth.allocate(state.dataGlobal->NumOfZones);
         state.dataSurfaceGeometry->SinZoneRelNorth.allocate(state.dataGlobal->NumOfZones);
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
-            state.dataSurfaceGeometry->CosZoneRelNorth(ZoneNum) =
-                std::cos(-state.dataHeatBal->Zone(ZoneNum).RelNorth * DataGlobalConstants::DegToRadians);
-            state.dataSurfaceGeometry->SinZoneRelNorth(ZoneNum) =
-                std::sin(-state.dataHeatBal->Zone(ZoneNum).RelNorth * DataGlobalConstants::DegToRadians);
+            state.dataSurfaceGeometry->CosZoneRelNorth(ZoneNum) = std::cos(-state.dataHeatBal->Zone(ZoneNum).RelNorth * Constant::DegToRadians);
+            state.dataSurfaceGeometry->SinZoneRelNorth(ZoneNum) = std::sin(-state.dataHeatBal->Zone(ZoneNum).RelNorth * Constant::DegToRadians);
         }
         GetSurfaceData(state, ErrorsFound);
 
@@ -1384,10 +1382,10 @@ namespace SurfaceGeometry {
                     ConvectionCoefficients::GetSurfConvOrientation(state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Tilt);
 
                 // Sine and cosine of azimuth and tilt
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).SinAzim = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians);
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians);
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).SinTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians);
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).CosTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians);
+                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).SinAzim = std::sin(SurfWorldAz * Constant::DegToRadians);
+                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).CosAzim = std::cos(SurfWorldAz * Constant::DegToRadians);
+                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).SinTilt = std::sin(SurfTilt * Constant::DegToRadians);
+                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).CosTilt = std::cos(SurfTilt * Constant::DegToRadians);
                 // Outward normal unit vector (pointing away from room)
                 state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).OutNormVec =
                     state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).NewellSurfaceNormalVector;
@@ -2422,7 +2420,7 @@ namespace SurfaceGeometry {
             }
             ErrCount = 0;
             for (auto &thisSpace : state.dataHeatBal->space) {
-                if (thisSpace.userEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
+                if (thisSpace.userEnteredFloorArea != Constant::AutoCalculate) {
                     // Check entered vs calculated
                     if (thisSpace.userEnteredFloorArea > 0.0) { // User entered Space floor area,
                         // produce message if not near calculated
@@ -2469,7 +2467,7 @@ namespace SurfaceGeometry {
                     thisZone.CalcFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
                     thisZone.HasFloor |= state.dataHeatBal->space(spaceNum).hasFloor;
                 }
-                if (thisZone.UserEnteredFloorArea != DataGlobalConstants::AutoCalculate) {
+                if (thisZone.UserEnteredFloorArea != Constant::AutoCalculate) {
                     // Check entered vs calculated
                     if (thisZone.UserEnteredFloorArea > 0.0) { // User entered zone floor area,
                         // produce message if not near calculated
@@ -3500,7 +3498,7 @@ namespace SurfaceGeometry {
                         state.dataSurface->ShadingTransmittanceVaries = true;
                     }
                 }
-                if (state.dataIPShortCut->lNumericFieldBlanks(1) || state.dataIPShortCut->rNumericArgs(1) == DataGlobalConstants::AutoCalculate) {
+                if (state.dataIPShortCut->lNumericFieldBlanks(1) || state.dataIPShortCut->rNumericArgs(1) == Constant::AutoCalculate) {
                     numSides = (NumNumbers - 1) / 3;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = numSides;
                     if (mod(NumNumbers - 1, 3) != 0) {
@@ -4252,8 +4250,8 @@ namespace SurfaceGeometry {
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = state.dataIPShortCut->rNumericArgs(1);
                 if (state.dataIPShortCut->lNumericFieldBlanks(1))
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = DataGlobalConstants::AutoCalculate;
-                if (state.dataIPShortCut->lNumericFieldBlanks(2) || state.dataIPShortCut->rNumericArgs(2) == DataGlobalConstants::AutoCalculate) {
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = Constant::AutoCalculate;
+                if (state.dataIPShortCut->lNumericFieldBlanks(2) || state.dataIPShortCut->rNumericArgs(2) == Constant::AutoCalculate) {
                     numSides = (SurfaceNumProp - 2) / 3;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = numSides;
                     if (mod(SurfaceNumProp - 2, 3) != 0) {
@@ -4640,7 +4638,7 @@ namespace SurfaceGeometry {
                 }
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar = false;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtWind = false;
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = DataGlobalConstants::AutoCalculate;
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = Constant::AutoCalculate;
 
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == ExternalEnvironment) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar = true;
@@ -4838,10 +4836,10 @@ namespace SurfaceGeometry {
 
         SurfAzimuth = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth;
         SurfTilt = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt;
-        CosSurfAzimuth = std::cos(SurfAzimuth * DataGlobalConstants::DegToRadians);
-        SinSurfAzimuth = std::sin(SurfAzimuth * DataGlobalConstants::DegToRadians);
-        CosSurfTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians);
-        SinSurfTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians);
+        CosSurfAzimuth = std::cos(SurfAzimuth * Constant::DegToRadians);
+        SinSurfAzimuth = std::sin(SurfAzimuth * Constant::DegToRadians);
+        CosSurfTilt = std::cos(SurfTilt * Constant::DegToRadians);
+        SinSurfTilt = std::sin(SurfTilt * Constant::DegToRadians);
         if (!SurfWorldCoordSystem) {
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone > 0) {
                 Xb = XCoord * state.dataSurfaceGeometry->CosZoneRelNorth(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone) -
@@ -5303,9 +5301,9 @@ namespace SurfaceGeometry {
             }
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = state.dataIPShortCut->rNumericArgs(1);
             if (state.dataIPShortCut->lNumericFieldBlanks(1))
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = DataGlobalConstants::AutoCalculate;
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = Constant::AutoCalculate;
 
-            if (state.dataIPShortCut->lNumericFieldBlanks(3) || state.dataIPShortCut->rNumericArgs(3) == DataGlobalConstants::AutoCalculate) {
+            if (state.dataIPShortCut->lNumericFieldBlanks(3) || state.dataIPShortCut->rNumericArgs(3) == Constant::AutoCalculate) {
                 state.dataIPShortCut->rNumericArgs(3) = (SurfaceNumProp - 3) / 3;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = state.dataIPShortCut->rNumericArgs(3);
                 if (mod(SurfaceNumProp - 3, 3) != 0) {
@@ -6386,10 +6384,10 @@ namespace SurfaceGeometry {
 
         SurfAzimuth = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth;
         SurfTilt = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt;
-        CosSurfAzimuth = std::cos(SurfAzimuth * DataGlobalConstants::DegToRadians);
-        SinSurfAzimuth = std::sin(SurfAzimuth * DataGlobalConstants::DegToRadians);
-        CosSurfTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians);
-        SinSurfTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians);
+        CosSurfAzimuth = std::cos(SurfAzimuth * Constant::DegToRadians);
+        SinSurfAzimuth = std::sin(SurfAzimuth * Constant::DegToRadians);
+        CosSurfTilt = std::cos(SurfTilt * Constant::DegToRadians);
+        SinSurfTilt = std::sin(SurfTilt * Constant::DegToRadians);
         BaseCosSurfAzimuth = state.dataSurfaceGeometry->SurfaceTmp(BaseSurfNum).CosAzim;
         BaseSinSurfAzimuth = state.dataSurfaceGeometry->SurfaceTmp(BaseSurfNum).SinAzim;
         BaseCosSurfTilt = state.dataSurfaceGeometry->SurfaceTmp(BaseSurfNum).CosTilt;
@@ -6673,7 +6671,7 @@ namespace SurfaceGeometry {
                     state.dataSurface->ShadingTransmittanceVaries = true;
                 }
             }
-            if (state.dataIPShortCut->lNumericFieldBlanks(1) || state.dataIPShortCut->rNumericArgs(1) == DataGlobalConstants::AutoCalculate) {
+            if (state.dataIPShortCut->lNumericFieldBlanks(1) || state.dataIPShortCut->rNumericArgs(1) == Constant::AutoCalculate) {
                 state.dataIPShortCut->rNumericArgs(1) = (NumNumbers - 1) / 3;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = state.dataIPShortCut->rNumericArgs(1);
                 if (mod(NumNumbers - 1, 3) != 0) {
@@ -7008,13 +7006,13 @@ namespace SurfaceGeometry {
                                Zp * state.dataSurfaceGeometry->SurfaceTmp(BaseSurfNum).SinTilt;
 
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosAzim =
-                            std::cos(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth * DataGlobalConstants::DegToRadians);
+                            std::cos(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth * Constant::DegToRadians);
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinAzim =
-                            std::sin(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth * DataGlobalConstants::DegToRadians);
+                            std::sin(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth * Constant::DegToRadians);
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt =
-                            std::cos(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt * DataGlobalConstants::DegToRadians);
+                            std::cos(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt * Constant::DegToRadians);
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinTilt =
-                            std::sin(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt * DataGlobalConstants::DegToRadians);
+                            std::sin(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt * Constant::DegToRadians);
 
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = 4;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.allocate(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
@@ -7122,13 +7120,13 @@ namespace SurfaceGeometry {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth =
                             state.dataSurfaceGeometry->SurfaceTmp(Found).Azimuth - (180.0 - state.dataIPShortCut->rNumericArgs(9));
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosAzim =
-                            std::cos(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth * DataGlobalConstants::DegToRadians);
+                            std::cos(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth * Constant::DegToRadians);
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinAzim =
-                            std::sin(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth * DataGlobalConstants::DegToRadians);
+                            std::sin(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth * Constant::DegToRadians);
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt =
-                            std::cos(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt * DataGlobalConstants::DegToRadians);
+                            std::cos(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt * Constant::DegToRadians);
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinTilt =
-                            std::sin(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt * DataGlobalConstants::DegToRadians);
+                            std::sin(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt * Constant::DegToRadians);
 
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = 4;
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.allocate(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
@@ -9606,11 +9604,11 @@ namespace SurfaceGeometry {
                 ConvectionCoefficients::GetSurfConvOrientation(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt);
 
             // Sine and cosine of azimuth and tilt
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinAzim = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians);
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround == DataGlobalConstants::AutoCalculate) {
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinAzim = std::sin(SurfWorldAz * Constant::DegToRadians);
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosAzim = std::cos(SurfWorldAz * Constant::DegToRadians);
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinTilt = std::sin(SurfTilt * Constant::DegToRadians);
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt = std::cos(SurfTilt * Constant::DegToRadians);
+            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround == Constant::AutoCalculate) {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround =
                     0.5 * (1.0 - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
             }
@@ -9852,10 +9850,10 @@ namespace SurfaceGeometry {
                 ConvectionCoefficients::GetSurfConvOrientation(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt);
 
             // Sine and cosine of azimuth and tilt
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinAzim = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians);
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinAzim = std::sin(SurfWorldAz * Constant::DegToRadians);
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosAzim = std::cos(SurfWorldAz * Constant::DegToRadians);
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinTilt = std::sin(SurfTilt * Constant::DegToRadians);
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt = std::cos(SurfTilt * Constant::DegToRadians);
             // Outward normal unit vector (pointing away from room)
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector;
             for (n = 1; n <= 3; ++n) {
@@ -11181,7 +11179,7 @@ namespace SurfaceGeometry {
             }
             alpF++;
 
-            if (state.dataIPShortCut->lNumericFieldBlanks(numF) || state.dataIPShortCut->rNumericArgs(numF) == DataGlobalConstants::AutoCalculate) {
+            if (state.dataIPShortCut->lNumericFieldBlanks(numF) || state.dataIPShortCut->rNumericArgs(numF) == Constant::AutoCalculate) {
                 // Autocalculate deep-ground depth (see KivaManager::defineDefaultFoundation() for actual calculation)
                 state.dataSurfaceGeometry->kivaManager.settings.deepGroundDepth = 40.0;
                 state.dataSurfaceGeometry->kivaManager.settings.autocalculateDeepGroundDepth = true;
@@ -12483,7 +12481,7 @@ namespace SurfaceGeometry {
             } else if (areOppositeWallsSame(state, ZoneStruct, oppositeWallArea, distanceBetweenOppositeWalls)) {
                 CalcVolume = oppositeWallArea * distanceBetweenOppositeWalls;
                 volCalcMethod = ZoneVolumeCalcMethod::OpWallAreaTimesDistance;
-            } else if (thisZone.Volume == DataGlobalConstants::AutoCalculate) { // no user entered zone volume
+            } else if (thisZone.Volume == Constant::AutoCalculate) { // no user entered zone volume
                 ShowSevereError(state,
                                 format("For zone: {} it is not possible to calculate the volume from the surrounding surfaces so either provide the "
                                        "volume value or define all the surfaces to fully enclose the zone.",
@@ -13376,10 +13374,10 @@ namespace SurfaceGeometry {
             // Retrieve base surface info
             Real64 const baseSurfWorldAz = state.dataSurface->Surface(ThisBaseSurface).Azimuth;
             Real64 const baseSurfTilt = state.dataSurface->Surface(ThisBaseSurface).Tilt;
-            Real64 const BaseCosAzimuth = std::cos(baseSurfWorldAz * DataGlobalConstants::DegToRadians);
-            Real64 const BaseSinAzimuth = std::sin(baseSurfWorldAz * DataGlobalConstants::DegToRadians);
-            Real64 const BaseCosTilt = std::cos(baseSurfTilt * DataGlobalConstants::DegToRadians);
-            Real64 const BaseSinTilt = std::sin(baseSurfTilt * DataGlobalConstants::DegToRadians);
+            Real64 const BaseCosAzimuth = std::cos(baseSurfWorldAz * Constant::DegToRadians);
+            Real64 const BaseSinAzimuth = std::sin(baseSurfWorldAz * Constant::DegToRadians);
+            Real64 const BaseCosTilt = std::cos(baseSurfTilt * Constant::DegToRadians);
+            Real64 const BaseSinTilt = std::sin(baseSurfTilt * Constant::DegToRadians);
             Real64 const BaseXLLC = state.dataSurface->Surface(ThisBaseSurface).Vertex(2).x;
             Real64 const BaseYLLC = state.dataSurface->Surface(ThisBaseSurface).Vertex(2).y;
             Real64 const BaseZLLC = state.dataSurface->Surface(ThisBaseSurface).Vertex(2).z;
@@ -15491,7 +15489,7 @@ namespace SurfaceGeometry {
                             newAirBoundaryMixing.scheduleIndex = state.dataConstruction->Construct(surf.Construction).AirBoundaryMixingSched;
                             Real64 mixingVolume = state.dataConstruction->Construct(surf.Construction).AirBoundaryACH *
                                                   min(state.dataHeatBal->space(spaceNum1).Volume, state.dataHeatBal->space(spaceNum2).Volume) /
-                                                  DataGlobalConstants::SecInHour;
+                                                  Constant::SecInHour;
                             newAirBoundaryMixing.mixingVolumeFlowRate = mixingVolume;
                             state.dataHeatBal->airBoundaryMixing.push_back(newAirBoundaryMixing);
                         }
@@ -15889,12 +15887,12 @@ namespace SurfaceGeometry {
 
         using namespace Vectors;
 
-        Real64 Diagonal1; // Length of diagonal of 4-sided figure from vertex 1 to vertex 3 (m)
-        Real64 Diagonal2; // Length of diagonal of 4-sided figure from vertex 2 to vertex 4 (m)
-        Real64 DotProd;   // Dot product of two adjacent sides - to test for right angle
-        Real64 const cos89deg = std::cos(89.0 * DataGlobalConstants::DegToRadians); // tolerance for right angle
-        Vector Vect32;                                                              // normalized vector from vertex 3 to vertex 2
-        Vector Vect21;                                                              // normalized vector from vertex 2 to vertex 1
+        Real64 Diagonal1;                                                // Length of diagonal of 4-sided figure from vertex 1 to vertex 3 (m)
+        Real64 Diagonal2;                                                // Length of diagonal of 4-sided figure from vertex 2 to vertex 4 (m)
+        Real64 DotProd;                                                  // Dot product of two adjacent sides - to test for right angle
+        Real64 const cos89deg = std::cos(89.0 * Constant::DegToRadians); // tolerance for right angle
+        Vector Vect32;                                                   // normalized vector from vertex 3 to vertex 2
+        Vector Vect21;                                                   // normalized vector from vertex 2 to vertex 1
 
         Diagonal1 = VecLength(state.dataSurface->Surface(ThisSurf).Vertex(1) - state.dataSurface->Surface(ThisSurf).Vertex(3));
         Diagonal2 = VecLength(state.dataSurface->Surface(ThisSurf).Vertex(2) - state.dataSurface->Surface(ThisSurf).Vertex(4));
@@ -15964,10 +15962,10 @@ namespace SurfaceGeometry {
 
         SurfWorldAz = state.dataSurface->Surface(SurfNum).Azimuth;
         SurfTilt = state.dataSurface->Surface(SurfNum).Tilt;
-        BaseCosAzimuth = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians);
-        BaseSinAzimuth = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians);
-        BaseCosTilt = std::cos(SurfTilt * DataGlobalConstants::DegToRadians);
-        BaseSinTilt = std::sin(SurfTilt * DataGlobalConstants::DegToRadians);
+        BaseCosAzimuth = std::cos(SurfWorldAz * Constant::DegToRadians);
+        BaseSinAzimuth = std::sin(SurfWorldAz * Constant::DegToRadians);
+        BaseCosTilt = std::cos(SurfTilt * Constant::DegToRadians);
+        BaseSinTilt = std::sin(SurfTilt * Constant::DegToRadians);
         NumSurfSides = state.dataSurface->Surface(SurfNum).Sides;
 
         // Calculate WidthMax and HeightMax

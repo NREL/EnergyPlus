@@ -52,7 +52,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus::DataGlobalConstants {
+namespace EnergyPlus::Constant {
 
 ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
 {
@@ -370,4 +370,4 @@ std::string GetResourceTypeChar(ResourceType const ResourceTypeNum)
     }
 }
 
-} // namespace EnergyPlus::DataGlobalConstants
+} // namespace EnergyPlus::Constant

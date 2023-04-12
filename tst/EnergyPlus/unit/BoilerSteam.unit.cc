@@ -67,7 +67,6 @@ using namespace EnergyPlus::BoilerSteam;
 using namespace EnergyPlus::DataBranchAirLoopPlant;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::Psychrometrics;
 
 TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
@@ -95,7 +94,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
     GetBoilerInput(*state);
     auto &thisBoiler = state->dataBoilerSteam->Boiler((int)state->dataBoilerSteam->Boiler.size());
     EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
-    EXPECT_TRUE(compare_enums(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS")));
+    EXPECT_TRUE(compare_enums(thisBoiler.FuelType, Constant::AssignResourceTypeNum("NATURALGAS")));
     EXPECT_EQ(thisBoiler.BoilerMaxOperPress, 160000);
     EXPECT_EQ(thisBoiler.NomEffic, 0.8);
     EXPECT_EQ(thisBoiler.TempUpLimitBoilerOut, 115);

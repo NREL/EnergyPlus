@@ -92,8 +92,6 @@ namespace EnergyPlus::ChillerReformulatedEIR {
 // MODULE INFORMATION:
 //       AUTHOR         Lixing Gu
 //       DATE WRITTEN   August 2006
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 //       MODIFIED
 //       Aug.  2014, Rongpeng Zhang, added An additional part-load performance curve type
@@ -113,7 +111,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
 // 1. Hydeman, M., P. Sreedharan, N. Webb, and S. Blanc. 2002. "Development and Testing of a Reformulated
 //    Regression-Based Electric Chiller Model". ASHRAE Transactions, HI-02-18-2, Vol 108, Part 2, pp. 1118-1127.
 
-PlantComponent *ReformulatedEIRChillerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+ReformulatedEIRChillerSpecs *ReformulatedEIRChillerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data if it hasn't been done already
     if (state.dataChillerReformulatedEIR->GetInputREIR) {
@@ -121,11 +119,10 @@ PlantComponent *ReformulatedEIRChillerSpecs::factory(EnergyPlusData &state, std:
         state.dataChillerReformulatedEIR->GetInputREIR = false;
     }
     // Now look for this particular object in the list
-    for (auto &obj : state.dataChillerReformulatedEIR->ElecReformEIRChiller) {
-        if (obj.Name == objectName) {
-            return &obj;
-        }
-    }
+    auto thisObj = std::find_if(state.dataChillerReformulatedEIR->ElecReformEIRChiller.begin(),
+                                state.dataChillerReformulatedEIR->ElecReformEIRChiller.end(),
+                                [&objectName](const ReformulatedEIRChillerSpecs &myObj) { return myObj.Name == objectName; });
+    if (thisObj != state.dataChillerReformulatedEIR->ElecReformEIRChiller.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalReformulatedElectEIRChillerFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
@@ -174,8 +171,6 @@ void ReformulatedEIRChillerSpecs::simulate(
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Lixing Gu
     //       DATE WRITTEN   July 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  This is the reformulated EIR chiller model driver. It gets the input for the
@@ -219,7 +214,6 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Lixing Gu, FSEC
     //       DATE WRITTEN:    July 2006
-
     //       MODIFIED
     //       Aug.  2014, Rongpeng Zhang, added an additional part-load performance curve type
 
@@ -993,8 +987,6 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Lixing Gu, FSEC
     //       DATE WRITTEN   July 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  This subroutine is for initializations of the Reformulated Electric EIR Chiller variables
@@ -1017,7 +1009,7 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
 
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::CWInitConvTemp,
+                                                       Constant::CWInitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 
@@ -1054,7 +1046,7 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
         if (this->HeatRecActive) {
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                    DataGlobalConstants::HWInitConvTemp,
+                                                    Constant::HWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                     RoutineName);
             this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -1118,7 +1110,6 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
     //       DATE WRITTEN   June 2004
     //       MODIFIED       July 2006, L. Gu, modified for reformulated EIR chiller
     //                      November 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  This subroutine is for sizing Reformulated Electric EIR Chiller Components for which capacities and flow rates
@@ -1225,12 +1216,12 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
             }
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 RefCapFT = Curve::CurveValue(state, this->ChillerCapFTIndex, SizingEvapOutletTemp, SizingCondOutletTemp);
@@ -1291,7 +1282,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
         if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1639,8 +1630,6 @@ void ReformulatedEIRChillerSpecs::control(EnergyPlusData &state, Real64 &MyLoad,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Lixing Gu, FSEC
     //       DATE WRITTEN   July 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Simulate a vapor compression chiller using the reformulated model developed by Mark Hydeman
@@ -1773,7 +1762,6 @@ void ReformulatedEIRChillerSpecs::calcHeatRecovery(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Lixing Gu, FSEC
     //       DATE WRITTEN:    July 2006
-    //       MODIFIED:        na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  Calculate the heat recovered from the chiller condenser
@@ -1894,10 +1882,10 @@ void ReformulatedEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyL
         state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
         // Set node flow rates;  for these load based models
         // assume that sufficient evaporator flow rate is available
-        this->ChillerFalseLoad = this->ChillerFalseLoadRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ChillerFalseLoad = this->ChillerFalseLoadRate * state.dataHVACGlobal->TimeStepSysSec;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSysSec;
+        this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSysSec;
+        this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSysSec;
         this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
         this->CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
@@ -1910,7 +1898,7 @@ void ReformulatedEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyL
         if (this->HeatRecActive) {
 
             PlantUtilities::SafeCopyPlantNode(state, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
-            this->EnergyHeatRecovery = this->QHeatRecovery * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->EnergyHeatRecovery = this->QHeatRecovery * state.dataHVACGlobal->TimeStepSysSec;
             state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
             this->HeatRecInletTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
             this->HeatRecOutletTemp = state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp;
@@ -1925,8 +1913,6 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Lixing Gu, FSEC
     //       DATE WRITTEN   July 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     //       MODIFIED
     //       Aug. 2014, Rongpeng Zhang, added an additional part-load performance curve type

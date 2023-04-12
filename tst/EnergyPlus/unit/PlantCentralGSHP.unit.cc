@@ -74,7 +74,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
 
     state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).WrapperPerformanceObjectType = "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR";
     state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).WrapperIdenticalObjectNum = 2;
-    state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).CHSchedPtr = ScheduleManager::ScheduleAlwaysOn;
     state->dataPlantCentralGSHP->Wrapper(1).ChillerHeaterNums = 2;
     state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater.allocate(2);
     // First test in SizeWrapper, so need to set that
@@ -139,19 +139,19 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     // Calculate expected values
     Real64 rho_evap = FluidProperties::GetDensityGlycol(*state,
                                                         state->dataPlnt->PlantLoop(PltSizNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state->dataPlnt->PlantLoop(PltSizNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 
     Real64 Cp_evap = FluidProperties::GetSpecificHeatGlycol(*state,
                                                             state->dataPlnt->PlantLoop(PltSizNum).FluidName,
-                                                            DataGlobalConstants::CWInitConvTemp,
+                                                            Constant::CWInitConvTemp,
                                                             state->dataPlnt->PlantLoop(PltSizNum).FluidIndex,
                                                             "ChillerHeater_Autosize_TEST");
 
     Real64 rho_cond = FluidProperties::GetDensityGlycol(*state,
                                                         state->dataPlnt->PlantLoop(PltSizCondNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state->dataPlnt->PlantLoop(PltSizCondNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 
@@ -360,5 +360,5 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
     PlantCentralGSHP::GetWrapperInput(*state);
 
     // verify that under this scenario of not finding a schedule match, ScheduleAlwaysOn is the treated default
-    EXPECT_EQ(state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).CHSchedPtr, DataGlobalConstants::ScheduleAlwaysOn);
+    EXPECT_EQ(state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).CHSchedPtr, ScheduleManager::ScheduleAlwaysOn);
 }

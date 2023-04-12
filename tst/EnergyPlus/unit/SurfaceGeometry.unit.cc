@@ -495,8 +495,8 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
@@ -957,8 +957,8 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     EXPECT_FALSE(ErrorsFound);
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
@@ -2812,8 +2812,8 @@ TEST_F(EnergyPlusFixture, MakeRectangularVertices)
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(zoneNum);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(zoneNum);
-    state->dataSurfaceGeometry->CosZoneRelNorth(zoneNum) = std::cos(-state->dataHeatBal->Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(zoneNum) = std::sin(-state->dataHeatBal->Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(zoneNum) = std::cos(-state->dataHeatBal->Zone(zoneNum).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(zoneNum) = std::sin(-state->dataHeatBal->Zone(zoneNum).RelNorth * Constant::DegToRadians);
 
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
@@ -4031,8 +4031,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
     state->dataSurfaceGeometry->CosZoneRelNorth(2) = state->dataSurfaceGeometry->CosZoneRelNorth(1);
     state->dataSurfaceGeometry->SinZoneRelNorth(2) = state->dataSurfaceGeometry->SinZoneRelNorth(1);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
@@ -9661,12 +9661,12 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
     // Space 1 has a floor surface of area 1.0, user-entered floor area is blank
     // Space 2 has a floor surface of area 2.0, user-entered floor area is blank
     EXPECT_EQ(state->dataHeatBal->space(1).Name, "SPACE 1A");
-    EXPECT_NEAR(state->dataHeatBal->space(1).userEnteredFloorArea, DataGlobalConstants::AutoCalculate, 0.001);
+    EXPECT_NEAR(state->dataHeatBal->space(1).userEnteredFloorArea, Constant::AutoCalculate, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(1).calcFloorArea, 1.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(1).floorArea, 10.0, 0.001);
 
     EXPECT_EQ(state->dataHeatBal->space(2).Name, "SPACE 1B");
-    EXPECT_NEAR(state->dataHeatBal->space(2).userEnteredFloorArea, DataGlobalConstants::AutoCalculate, 0.001);
+    EXPECT_NEAR(state->dataHeatBal->space(2).userEnteredFloorArea, Constant::AutoCalculate, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(2).calcFloorArea, 2.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(2).floorArea, 20.0, 0.001);
 
@@ -9680,7 +9680,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
     // Zone 3 consists of Space 3, user-entered floor area is blank
     // Space 3 has a floor surface of area 1.0, user-entered floor is 5.0
     EXPECT_EQ(state->dataHeatBal->Zone(3).Name, "ZONE 3");
-    EXPECT_NEAR(state->dataHeatBal->Zone(3).UserEnteredFloorArea, DataGlobalConstants::AutoCalculate, 0.001);
+    EXPECT_NEAR(state->dataHeatBal->Zone(3).UserEnteredFloorArea, Constant::AutoCalculate, 0.001);
     EXPECT_NEAR(state->dataHeatBal->Zone(3).CalcFloorArea, 5.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->Zone(3).FloorArea, 5.0, 0.001);
     EXPECT_EQ(state->dataHeatBal->space(3).Name, "SPACE 3");
@@ -9695,7 +9695,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
     EXPECT_NEAR(state->dataHeatBal->Zone(2).CalcFloorArea, 1.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->Zone(2).FloorArea, 20.0, 0.001);
     EXPECT_EQ(state->dataHeatBal->space(4).Name, "ZONE 2");
-    EXPECT_NEAR(state->dataHeatBal->space(4).userEnteredFloorArea, DataGlobalConstants::AutoCalculate, 0.001);
+    EXPECT_NEAR(state->dataHeatBal->space(4).userEnteredFloorArea, Constant::AutoCalculate, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(4).calcFloorArea, 1.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(4).floorArea, 20.0, 0.001);
 }
@@ -9850,8 +9850,8 @@ TEST_F(EnergyPlusFixture, ZoneFloorAreaTest)
     EXPECT_FALSE(ErrorsFound);
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
@@ -10269,8 +10269,8 @@ TEST_F(EnergyPlusFixture, Wrong_Window_Construction)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 

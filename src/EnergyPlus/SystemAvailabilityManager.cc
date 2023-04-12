@@ -588,7 +588,7 @@ namespace SystemAvailabilityManager {
                 nightCycleMgr.Name = cAlphaArgs(1);
                 nightCycleMgr.MgrType = DataPlant::SystemAvailabilityType::NightCycle;
                 nightCycleMgr.TempTolRange = rNumericArgs(1);
-                CyclingTimeSteps = nint((rNumericArgs(2) / DataGlobalConstants::SecInHour) * double(state.dataGlobal->NumOfTimeStepInHour));
+                CyclingTimeSteps = nint((rNumericArgs(2) / Constant::SecInHour) * double(state.dataGlobal->NumOfTimeStepInHour));
                 CyclingTimeSteps = max(1, CyclingTimeSteps);
                 nightCycleMgr.CyclingTimeSteps = CyclingTimeSteps;
                 nightCycleMgr.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));

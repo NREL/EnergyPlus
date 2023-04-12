@@ -159,50 +159,6 @@ Real64 OutWetBulbTempAt(EnergyPlusData &state, Real64 const Z) // Height above g
     return LocalOutWetBulbTemp;
 }
 
-Real64 OutDewPointTempAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   March 2007
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculates outdoor dew point temperature at a given altitude.
-
-    // METHODOLOGY EMPLOYED:
-    // 1976 U.S. Standard Atmosphere.
-    // copied from outwetbulbtempat
-
-    // REFERENCES:
-    // 1976 U.S. Standard Atmosphere. 1976. U.S. Government Printing Office, Washington, D.C.
-
-    // Return value
-    Real64 LocalOutDewPointTemp; // Return result for function (C)
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 BaseTemp; // Base temperature at Z = 0 (C)
-
-    BaseTemp = state.dataEnvrn->OutDewPointTemp + state.dataEnvrn->WeatherFileTempModCoeff;
-
-    if (state.dataEnvrn->SiteTempGradient == 0.0) {
-        LocalOutDewPointTemp = state.dataEnvrn->OutDewPointTemp;
-    } else if (Z <= 0.0) {
-        LocalOutDewPointTemp = BaseTemp;
-    } else {
-        LocalOutDewPointTemp = BaseTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
-    }
-
-    if (LocalOutDewPointTemp < -100.0) {
-        ShowSevereError(state, "OutDewPointTempAt: outdoor dewpoint temperature < -100 C");
-        ShowContinueError(state, format("...check heights, this height=[{:.0R}].", Z));
-        ShowFatalError(state, "Program terminates due to preceding condition(s).");
-    }
-
-    return LocalOutDewPointTemp;
-}
-
 Real64 WindSpeedAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
 {
 
@@ -271,7 +227,7 @@ Real64 OutBaroPressAt(EnergyPlusData &state, Real64 const Z) // Height above gro
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 BaseTemp; // Base temperature at Z
 
-    BaseTemp = OutDryBulbTempAt(state, Z) + DataGlobalConstants::KelvinConv;
+    BaseTemp = OutDryBulbTempAt(state, Z) + Constant::KelvinConv;
 
     if (Z <= 0.0) {
         LocalAirPressure = 0.0;
@@ -298,7 +254,7 @@ void SetOutBulbTempAt_error(EnergyPlusData &state, std::string const &Settings, 
     ShowFatalError(state, "Program terminates due to preceding condition(s).");
 }
 
-void SetWindSpeedAt(EnergyPlusData &state,
+void SetWindSpeedAt(EnergyPlusData const &state,
                     int const NumItems,
                     const Array1D<Real64> &Heights,
                     Array1D<Real64> &LocalWindSpeed,
@@ -308,8 +264,6 @@ void SetWindSpeedAt(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   June 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Routine provides facility for doing bulk Set Windspeed at Height.

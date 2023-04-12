@@ -3689,3 +3689,94 @@ TEST_F(ConvectionCoefficientsFixture, testTARPNaturalConvectionAlgorithm)
     actualResult = CalcASHRAETARPNatural(surfT, ambT, cosTilt);
     EXPECT_NEAR(actualResult, expectedResult, allowableTolerance);
 }
+
+TEST_F(ConvectionCoefficientsFixture, RoofExtConvectionCoefficient)
+{
+
+    state->dataSurface->Surface.allocate(1);
+    // 20 x 20 rectangle, centered on zero
+    state->dataSurface->Surface(1).Name = "Roof Surface";
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Vertex.dimension(4);
+    state->dataSurface->Surface(1).Class = EnergyPlus::DataSurfaces::SurfaceClass::Roof; // DataSurfaces::SurfaceClass::Roof
+    state->dataSurface->Surface(1).Tilt = 0.0;
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).Area = 400.0;
+    state->dataSurface->Surface(1).Vertex(1) = Vector(10.0, 10.0, 3.0);
+    state->dataSurface->Surface(1).Vertex(2) = Vector(-10.0, 10.0, 3.0);
+    state->dataSurface->Surface(1).Vertex(3) = Vector(-10.0, -10.0, 3.0);
+    state->dataSurface->Surface(1).Vertex(4) = Vector(10.0, -10.0, 3.0);
+    state->dataSurface->Surface(1).ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Construction = 1;
+
+    ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo = getRoofGeometryInformation(*state);
+    EXPECT_DOUBLE_EQ(400.0, RoofGeo.Area);
+    EXPECT_DOUBLE_EQ(0.0, RoofGeo.Height);
+    EXPECT_DOUBLE_EQ(80.0, RoofGeo.Perimeter);
+    EXPECT_DOUBLE_EQ(0.0, RoofGeo.Tilt);
+    EXPECT_DOUBLE_EQ(0.0, RoofGeo.Azimuth);
+
+    // constructs with regular single layer material
+    state->dataConstruction->Construct.allocate(1);
+    state->dataHeatBal->TotConstructs = 1;
+    state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
+    state->dataConstruction->Construct(1).TotLayers = 1;
+    state->dataConstruction->Construct(1).LayerPoint.allocate(1);
+    state->dataConstruction->Construct(1).LayerPoint(1) = 1;
+
+    // define material
+    state->dataMaterial->TotMaterials = 1;
+    Material::MaterialChild *mat = new Material::MaterialChild;
+    state->dataMaterial->Material.push_back(mat);
+    auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    thisMaterial_1->AbsorpThermalFront = 0.1;
+    thisMaterial_1->Roughness = Material::SurfaceRoughness::Rough;
+    thisMaterial_1->Name = "Roof_Material";
+    thisMaterial_1->group = Material::Group::Regular;
+
+    // set environment air conditions
+    state->dataEnvrn->OutBaroPress = 101325.0; // Pa
+    state->dataEnvrn->OutHumRat = 0.0075;      // kgH20/kgDryAir
+
+    // set convection coefficient calc parameters
+    int constexpr SurfNum = 1;
+    Real64 constexpr SurfTemp = 20.0;
+    Real64 constexpr AirTemp = 15.0;
+    Real64 constexpr WindAtZ = 2.0; // m/s
+    Real64 constexpr WindDirect = 0.0;
+    Real64 RoofArea = RoofGeo.Area;
+    Real64 RoofPerimeter = RoofGeo.Perimeter;
+
+    // test 1: calc exterior convection coefficient
+    // non zero roof area and non zero perimeter
+    Real64 Hf_result1 = CalcClearRoof(*state, SurfNum, SurfTemp, AirTemp, WindAtZ, WindDirect, RoofArea, RoofPerimeter);
+    EXPECT_NEAR(10.42, Hf_result1, 0.01); //
+    EXPECT_EQ(state->dataSurface->Surface(1).ExtBoundCond, EnergyPlus::DataSurfaces::ExternalEnvironment);
+    EXPECT_TRUE(compare_err_stream(""));
+
+    // test 2: calc exterior convection coefficient
+    // reset roof area and perimeter to 0.0 to generate error message
+    RoofArea = 0.0;
+    RoofPerimeter = 0.0;
+    Real64 Hf_result2 = CalcClearRoof(*state, SurfNum, SurfTemp, AirTemp, WindAtZ, WindDirect, RoofArea, RoofPerimeter);
+    EXPECT_NEAR(9.9999, Hf_result2, 0.0001);
+    EXPECT_EQ(state->dataSurface->Surface(1).ExtBoundCond, EnergyPlus::DataSurfaces::ExternalEnvironment);
+    // expect severe error message
+    EXPECT_TRUE(has_err_output(false));
+    std::string error_string =
+        delimited_string({"   ** Severe  ** CalcClearRoof: Convection model not evaluated (bad value for distance to roof edge)\n   **   ~~~   ** "
+                          "Value for distance to roof edge =0.000\n   **   ~~~   ** Occurs for surface named = Roof Surface\n   **   ~~~   ** "
+                          "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues"});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    // test 3: calc exterior convection coefficient
+    // reset ext boundary conditions to OtherSideCondModeledExt and expect no error
+    state->dataSurface->Surface(1).ExtBoundCond = EnergyPlus::DataSurfaces::OtherSideCondModeledExt;
+    RoofArea = 0.0;
+    RoofPerimeter = 0.0;
+    Real64 Hf_result3 = CalcClearRoof(*state, SurfNum, SurfTemp, AirTemp, WindAtZ, WindDirect, RoofArea, RoofPerimeter);
+    EXPECT_DOUBLE_EQ(9.9999, Hf_result3);
+    EXPECT_EQ(state->dataSurface->Surface(1).ExtBoundCond, EnergyPlus::DataSurfaces::OtherSideCondModeledExt);
+    EXPECT_TRUE(compare_err_stream(""));
+}

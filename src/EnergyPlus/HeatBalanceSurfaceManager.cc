@@ -5668,7 +5668,7 @@ void CalcThermalResilience(EnergyPlusData &state)
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 const ZoneW = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRatAvg;
             Real64 const ZoneT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTAV;
-            Real64 const TDewPointK = Psychrometrics::PsyTdpFnWPb(state, ZoneW, state.dataEnvrn->OutBaroPress) + DataGlobalConstants::KelvinConv;
+            Real64 const TDewPointK = Psychrometrics::PsyTdpFnWPb(state, ZoneW, state.dataEnvrn->OutBaroPress) + Constant::KelvinConv;
             Real64 const e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
             Real64 const h = 5.0 / 9.0 * (e - 10.0);
             Real64 const Humidex = ZoneT + h;
@@ -5743,7 +5743,7 @@ void ReportThermalResilience(EnergyPlusData &state)
     }
 
     // Count hours only during weather simulation periods
-    if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
+    if (Constant::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
         // use default value if there are no user inputs
         Real64 ColdTempThresh = 15.56;
         Real64 HeatTempThresh = 30.0;
@@ -6283,7 +6283,7 @@ void ReportCO2Resilience(EnergyPlusData &state)
         }
     }
 
-    if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
+    if (Constant::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
             state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
@@ -6374,7 +6374,7 @@ void ReportVisualResilience(EnergyPlusData &state)
         }
     }
 
-    if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
+    if (Constant::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
             state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
@@ -7065,8 +7065,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     //  Allow for modification of TemperatureCoefficient with unitary sine wave.
                     Real64 ConstantTempCoef; // Temperature Coefficient as input or modified using sine wave COP mod
                     if (state.dataSurface->OSC(OPtr).SinusoidalConstTempCoef) { // Sine wave C4
-                        ConstantTempCoef =
-                            std::sin(2 * DataGlobalConstants::Pi * state.dataGlobal->CurrentTime / state.dataSurface->OSC(OPtr).SinusoidPeriod);
+                        ConstantTempCoef = std::sin(2 * Constant::Pi * state.dataGlobal->CurrentTime / state.dataSurface->OSC(OPtr).SinusoidPeriod);
                     } else {
                         ConstantTempCoef = state.dataSurface->OSC(OPtr).ConstTempCoef;
                     }
@@ -7417,7 +7416,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
                         int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
                         // Absolute temperature of the outside surface of an exterior surface
-                        Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + DataGlobalConstants::KelvinConv;
+                        Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + Constant::KelvinConv;
                         for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
                              SrdSurfNum++) {
                             // View factor of a surrounding surface
@@ -7426,9 +7425,9 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                             Real64 SrdSurfTempAbs =
                                 GetCurrentScheduleValue(
                                     state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                DataGlobalConstants::KelvinConv;
+                                Constant::KelvinConv;
                             state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +=
-                                DataGlobalConstants::StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
+                                Constant::StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
                         }
                     }
 
@@ -7728,7 +7727,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
         if (state.dataHeatBal->AnyKiva) {
             for (auto const &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
-                state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) = kivaSurf.second.results.Trad - DataGlobalConstants::KelvinConv;
+                state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) = kivaSurf.second.results.Trad - Constant::KelvinConv;
             }
         }
 
@@ -8058,7 +8057,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     } else if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Kiva) {
                         // Read Kiva results for each surface
                         state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
-                            state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv;
+                            state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - Constant::KelvinConv;
 
                         TH11 = 0.0;
                     }
@@ -8140,8 +8139,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                                            // time) | Convection and damping term
                 state.dataHeatBalSurf->SurfTempIn(SurfNum) = state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
 
-                Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann *
-                                          pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum) + DataGlobalConstants::KelvinConv));
+                Real64 const Sigma_Temp_4(Constant::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::KelvinConv));
 
                 // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                 if (state.dataHeatBalSurf->AnyRadiantSystems(SurfNum))
@@ -8833,8 +8831,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                                                    // conduction from the outside surface | Coefficient for conduction (current
                                                                    // time) | Convection and damping term
                         state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTempInTmp(surfNum);
-                        Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann *
-                                                  pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum) + DataGlobalConstants::KelvinConv));
+                        Real64 const Sigma_Temp_4(Constant::StefanBoltzmann *
+                                                  pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum) + Constant::KelvinConv));
 
                         // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                         if (state.dataHeatBalSurf->AnyRadiantSystems(surfNum))
@@ -9504,12 +9502,12 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
             Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
             Real64 SrdSurfTempAbs =
                 GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                DataGlobalConstants::KelvinConv;
+                Constant::KelvinConv;
             QRadLWOutSrdSurfsRep +=
-                DataGlobalConstants::StefanBoltzmann *
+                Constant::StefanBoltzmann *
                 dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
                     ->AbsorpThermal *
-                SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TH11 + DataGlobalConstants::KelvinConv));
+                SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TH11 + Constant::KelvinConv));
         }
     }
     state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(SurfNum) = HExtSurf_fac + QRadLWOutSrdSurfsRep;
@@ -9638,8 +9636,7 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
     state.dataHeatBal->ExtVentedCavity(CavNum).HcPlen = HcPlen;
     state.dataHeatBal->ExtVentedCavity(CavNum).PassiveACH =
         (MdotVent / RhoAir) *
-        (1.0 / (state.dataHeatBal->ExtVentedCavity(CavNum).ProjArea * state.dataHeatBal->ExtVentedCavity(CavNum).PlenGapThick)) *
-        DataGlobalConstants::SecInHour;
+        (1.0 / (state.dataHeatBal->ExtVentedCavity(CavNum).ProjArea * state.dataHeatBal->ExtVentedCavity(CavNum).PlenGapThick)) * Constant::SecInHour;
     state.dataHeatBal->ExtVentedCavity(CavNum).PassiveMdotVent = MdotVent;
     state.dataHeatBal->ExtVentedCavity(CavNum).PassiveMdotWind = VdotWind * RhoAir;
     state.dataHeatBal->ExtVentedCavity(CavNum).PassiveMdotTherm = VdotThermal * RhoAir;
@@ -9831,14 +9828,14 @@ void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
             if (GndSurfViewFactor == 0.0) continue;
             if (GndSurfsProperty.GndSurfs(gSurfNum).TempSchPtr == 0) continue;
             GndSurfaceTemp = ScheduleManager::GetCurrentScheduleValue(state, GndSurfsProperty.GndSurfs(gSurfNum).TempSchPtr);
-            GndSurfaceTempSum += GndSurfViewFactor * pow_4(GndSurfaceTemp + DataGlobalConstants::KelvinConv);
+            GndSurfaceTempSum += GndSurfViewFactor * pow_4(GndSurfaceTemp + Constant::KelvinConv);
         }
         if (GndSurfaceTempSum == 0.0) {
             GndSurfsProperty.SurfsTempAvg = 0.0;
             state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp = false;
             continue;
         }
-        GndSurfsProperty.SurfsTempAvg = root_4(GndSurfaceTempSum / GndSurfsProperty.SurfsViewFactorSum) - DataGlobalConstants::KelvinConv;
+        GndSurfsProperty.SurfsTempAvg = root_4(GndSurfaceTempSum / GndSurfsProperty.SurfsViewFactorSum) - Constant::KelvinConv;
     }
 }
 

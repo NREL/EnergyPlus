@@ -4172,7 +4172,7 @@ namespace AirflowNetwork {
                 }
 
                 if (lAlphaBlanks(5)) {
-                    PressureControllerData(i).AvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    PressureControllerData(i).AvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     PressureControllerData(i).AvailSchedPtr = GetScheduleIndex(m_state, Alphas(5));
                     if (PressureControllerData(i).AvailSchedPtr == 0) {
@@ -6550,7 +6550,7 @@ namespace AirflowNetwork {
         PressureSetFlag = 0;
 
         if (NumOfPressureControllers == 1) {
-            if (PressureControllerData(1).AvailSchedPtr == DataGlobalConstants::ScheduleAlwaysOn) {
+            if (PressureControllerData(1).AvailSchedPtr == ScheduleManager::ScheduleAlwaysOn) {
                 PressureSetFlag = PressureControllerData(1).ControlTypeSet;
             } else {
                 if (GetCurrentScheduleValue(m_state, PressureControllerData(1).AvailSchedPtr) > 0.0) {
@@ -6984,7 +6984,7 @@ namespace AirflowNetwork {
                     // Wind-pressure coefficients for vertical facades, low-rise building
 
                     if (UtilityRoutines::SameString(simulation_control.BldgType, "LowRise") && FacadeNum <= 4) {
-                        IncRad = IncAng * DataGlobalConstants::DegToRadians;
+                        IncRad = IncAng * Constant::DegToRadians;
                         Real64 const cos_IncRad_over_2(std::cos(IncRad / 2.0));
                         vals[windDirNum - 1] = 0.6 * std::log(1.248 - 0.703 * std::sin(IncRad / 2.0) - 1.175 * pow_2(std::sin(IncRad)) +
                                                               0.131 * pow_3(std::sin(2.0 * IncRad * SideRatioFac)) + 0.769 * cos_IncRad_over_2 +
@@ -7060,7 +7060,7 @@ namespace AirflowNetwork {
                     DelAng = mod(IncAng, 10.0);
                     WtAng = 1.0 - DelAng / 10.0;
                     // Wind-pressure coefficients for vertical facades, low-rise building
-                    IncRad = IncAng * DataGlobalConstants::DegToRadians;
+                    IncRad = IncAng * Constant::DegToRadians;
                     valsByFacade[FacadeNum - 1][windDirNum - 1] =
                         0.6 * std::log(1.248 - 0.703 * std::sin(IncRad / 2.0) - 1.175 * pow_2(std::sin(IncRad)) +
                                        0.131 * pow_3(std::sin(2.0 * IncRad * SideRatioFac)) + 0.769 * std::cos(IncRad / 2.0) +
@@ -7201,7 +7201,7 @@ namespace AirflowNetwork {
             Real64 Tair_IP = Tair * 1.8 + 32.0;     // Convert C to F
             Real64 mdot_IP = mdot * 2.20462 * 3600; // Convert kg/s to lb/hr
             Real64 Dh_IP = Dh * 3.28084;            // Convert m to ft
-            Real64 Ai_IP = pow_2(Dh_IP) * DataGlobalConstants::Pi / 4;
+            Real64 Ai_IP = pow_2(Dh_IP) * Constant::Pi / 4;
 
             Real64 CorrelationCoeff = 0.00368 + 1.5e-6 * (Tair_IP - 80);
             Real64 MassFlux = mdot_IP / Ai_IP; // lb/hr-ft2
@@ -7252,8 +7252,8 @@ namespace AirflowNetwork {
             // Free convection
             Real64 Pr = properties.prandtl_number(Pamb, (Ts + Tamb) / 2, Wamb);
             Real64 KinVisc = properties.kinematic_viscosity(Pamb, (Ts + Tamb) / 2, Wamb);
-            Real64 Beta = 2.0 / ((Tamb + DataGlobalConstants::KelvinConv) + (Ts + DataGlobalConstants::KelvinConv));
-            Real64 Gr = DataGlobalConstants::GravityConstant * Beta * std::abs(Ts - Tamb) * pow_3(Dh) / pow_2(KinVisc);
+            Real64 Beta = 2.0 / ((Tamb + Constant::KelvinConv) + (Ts + Constant::KelvinConv));
+            Real64 Gr = Constant::GravityConstant * Beta * std::abs(Ts - Tamb) * pow_3(Dh) / pow_2(KinVisc);
             Real64 Ra = Gr * Pr;
             Real64 Nu_free(0);
 
@@ -7408,11 +7408,11 @@ namespace AirflowNetwork {
                 Real64 UThermal(10); // Initialize. This will get updated.
                 Real64 UThermal_iter = 0;
                 Real64 Tsurr = Tamb;
-                Real64 Tsurr_K = Tsurr + DataGlobalConstants::KelvinConv;
+                Real64 Tsurr_K = Tsurr + Constant::KelvinConv;
                 Real64 Tin = AirflowNetworkNodeSimu(LF).TZ;
                 Real64 TDuctSurf = (Tamb + Tin) / 2.0;
-                Real64 TDuctSurf_K = TDuctSurf + DataGlobalConstants::KelvinConv;
-                Real64 DuctSurfArea = DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).hydraulicDiameter * DataGlobalConstants::Pi;
+                Real64 TDuctSurf_K = TDuctSurf + Constant::KelvinConv;
+                Real64 DuctSurfArea = DisSysCompDuctData(TypeNum).L * DisSysCompDuctData(TypeNum).hydraulicDiameter * Constant::Pi;
 
                 // If user defined view factors not present, calculate air-to-air heat transfer
                 if (AirflowNetworkLinkageData(i).LinkageViewFactorObjectNum == 0) {
@@ -7500,7 +7500,7 @@ namespace AirflowNetwork {
                             int ZoneSurfNum = VFObj.LinkageSurfaceData(j).SurfaceNum;
 
                             Real64 TSurfj = m_state.dataHeatBalSurf->SurfOutsideTempHist(1)(ZoneSurfNum);
-                            Real64 TSurfj_K = TSurfj + DataGlobalConstants::KelvinConv;
+                            Real64 TSurfj_K = TSurfj + Constant::KelvinConv;
 
                             Real64 ZoneSurfEmissivity =
                                 m_state.dataConstruction->Construct(m_state.dataSurface->Surface(ZoneSurfNum).Construction).InsideAbsorpThermal;
@@ -7515,7 +7515,7 @@ namespace AirflowNetwork {
                             Real64 ZoneSurfResistance = (1 - ZoneSurfEmissivity) / (ZoneSurfArea * ZoneSurfEmissivity);
 
                             VFObj.LinkageSurfaceData(j).SurfaceResistanceFactor =
-                                DataGlobalConstants::StefanBoltzmann / (DuctSurfResistance + SpaceResistance + ZoneSurfResistance);
+                                Constant::StefanBoltzmann / (DuctSurfResistance + SpaceResistance + ZoneSurfResistance);
 
                             Real64 hrj = VFObj.LinkageSurfaceData(j).SurfaceResistanceFactor * (TDuctSurf_K + TSurfj_K) *
                                          (pow_2(TDuctSurf_K) + pow_2(TSurfj_K)) / DuctSurfArea;
@@ -7525,7 +7525,7 @@ namespace AirflowNetwork {
                         }
 
                         Tsurr = (hOut * Tamb + hrjTj_sum) / (hOut + hrj_sum); // Surroundings temperature [C]
-                        Tsurr_K = Tsurr + DataGlobalConstants::KelvinConv;
+                        Tsurr_K = Tsurr + Constant::KelvinConv;
 
                         Real64 RThermTotal = RThermConvIn + RThermConduct + 1 / (hOut + hrj_sum);
                         UThermal = pow(RThermTotal, -1);
@@ -7534,19 +7534,19 @@ namespace AirflowNetwork {
                         Tin_ave = Tsurr + (Tin - Tsurr) * (1 / NTU) * (1 - exp(-NTU));
 
                         TDuctSurf = Tin_ave - UThermal * (RThermConvIn + RThermConduct) * (Tin_ave - Tsurr);
-                        TDuctSurf_K = TDuctSurf + DataGlobalConstants::KelvinConv;
+                        TDuctSurf_K = TDuctSurf + Constant::KelvinConv;
                     }
 
                     for (int j = 1; j <= VFObj.LinkageSurfaceData.u(); ++j) {
                         int ZoneSurfNum = VFObj.LinkageSurfaceData(j).SurfaceNum;
                         Real64 TSurfj = m_state.dataHeatBalSurf->SurfOutsideTempHist(1)(ZoneSurfNum);
-                        Real64 TSurfj_K = TSurfj + DataGlobalConstants::KelvinConv;
+                        Real64 TSurfj_K = TSurfj + Constant::KelvinConv;
                         VFObj.LinkageSurfaceData(j).SurfaceRadLoad = VFObj.LinkageSurfaceData(j).SurfaceResistanceFactor *
                                                                      (pow_4(TDuctSurf_K) - pow_4(TSurfj_K)); // Radiant load for this surface [W]
                         int SurfNum = VFObj.LinkageSurfaceData(j).SurfaceNum;
                         Real64 ZoneSurfaceArea = m_state.dataSurface->Surface(SurfNum).Area;
                         m_state.dataHeatBalFanSys->QRadSurfAFNDuct(SurfNum) += VFObj.LinkageSurfaceData(j).SurfaceRadLoad * TimeStepSys *
-                                                                               DataGlobalConstants::SecInHour /
+                                                                               Constant::SecInHour /
                                                                                ZoneSurfaceArea; // Energy to each surface per unit area [J/m2]
                         VFObj.QRad += VFObj.LinkageSurfaceData(j).SurfaceRadLoad; // Total radiant load from all surfaces for this system timestep [W]
                     }
@@ -7578,13 +7578,11 @@ namespace AirflowNetwork {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                Ei = General::epexp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter *
-                                        DataGlobalConstants::Pi,
+                Ei = General::epexp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Constant::Pi,
                                     (DirSign * AirflowNetworkLinkSimu(i).FLOW * CpAir));
                 Tamb = AirflowNetworkNodeSimu(LT).TZ;
                 if (!LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
-                    Ei = General::epexp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter *
-                                            DataGlobalConstants::Pi,
+                    Ei = General::epexp(-0.001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Constant::Pi,
                                         (AirflowNetworkLinkSimu(i).FLOW2 * CpAir));
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir;
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * CpAir * Ei;
@@ -7845,7 +7843,7 @@ namespace AirflowNetwork {
                     DirSign = -1.0;
                 }
                 Ei = General::epexp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L *
-                                        DisSysCompDuctData(TypeNum).hydraulicDiameter * DataGlobalConstants::Pi,
+                                        DisSysCompDuctData(TypeNum).hydraulicDiameter * Constant::Pi,
                                     (DirSign * AirflowNetworkLinkSimu(i).FLOW));
                 if (AirflowNetworkLinkageData(i).ZoneNum < 0) {
                     Wamb = m_state.dataEnvrn->OutHumRat;
@@ -7856,7 +7854,7 @@ namespace AirflowNetwork {
                 }
                 if (!LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
                     Ei = General::epexp(-DisSysCompDuctData(TypeNum).UMoisture * DisSysCompDuctData(TypeNum).L *
-                                            DisSysCompDuctData(TypeNum).hydraulicDiameter * DataGlobalConstants::Pi,
+                                            DisSysCompDuctData(TypeNum).hydraulicDiameter * Constant::Pi,
                                         (AirflowNetworkLinkSimu(i).FLOW2));
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
@@ -7878,15 +7876,14 @@ namespace AirflowNetwork {
                     LT = AirflowNetworkLinkageData(i).NodeNums[0];
                     DirSign = -1.0;
                 }
-                Ei = General::epexp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter *
-                                        DataGlobalConstants::Pi,
+                Ei = General::epexp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Constant::Pi,
                                     (DirSign * AirflowNetworkLinkSimu(i).FLOW));
                 Wamb = AirflowNetworkNodeSimu(LT).WZ;
                 if (!LoopOnOffFlag(AirflowNetworkLinkageData(i).AirLoopNum) && AirflowNetworkLinkSimu(i).FLOW <= 0.0) {
 
-                    Ei = General::epexp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter *
-                                            DataGlobalConstants::Pi,
-                                        (AirflowNetworkLinkSimu(i).FLOW2));
+                    Ei =
+                        General::epexp(-0.0001 * DisSysCompTermUnitData(TypeNum).L * DisSysCompTermUnitData(TypeNum).hydraulicDiameter * Constant::Pi,
+                                       (AirflowNetworkLinkSimu(i).FLOW2));
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2);
                     MA((LT - 1) * AirflowNetworkNumOfNodes + LF) = -std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Ei;
                     MV(LT) += std::abs(AirflowNetworkLinkSimu(i).FLOW2) * Wamb * (1.0 - Ei);
@@ -8620,7 +8617,7 @@ namespace AirflowNetwork {
             onceSurfFlag.dimension(AirflowNetworkNumOfLinks, false);
             onetime = true;
         }
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
+        ReportingConstant = TimeStepSys * Constant::SecInHour;
 
         m_state.dataHeatBal->ZoneTotalExfiltrationHeatLoss = 0.0;
 
@@ -11652,9 +11649,9 @@ namespace AirflowNetwork {
                     if (std::abs(IncAng) > 180.0) IncAng -= 360.0;
                     if (UtilityRoutines::SameString(simulation_control.WPCCntr, "SurfaceAverageCalculation")) {
                         if (std::abs(IncAng) <= 67.5) {
-                            PiFormula(windDirNum) = 0.44 * sign(std::sin(2.67 * std::abs(IncAng) * DataGlobalConstants::Pi / 180.0), IncAng);
+                            PiFormula(windDirNum) = 0.44 * sign(std::sin(2.67 * std::abs(IncAng) * Constant::Pi / 180.0), IncAng);
                         } else if (std::abs(IncAng) <= 180.0) {
-                            PiFormula(windDirNum) = -0.69 * sign(std::sin((288 - 1.6 * std::abs(IncAng)) * DataGlobalConstants::Pi / 180.0), IncAng);
+                            PiFormula(windDirNum) = -0.69 * sign(std::sin((288 - 1.6 * std::abs(IncAng)) * Constant::Pi / 180.0), IncAng);
                         }
                         SigmaFormula(windDirNum) = 0.423 - 0.00163 * std::abs(IncAng);
                         DeltaCp(ZnNum).WindDir(windDirNum) =
@@ -11737,8 +11734,7 @@ namespace AirflowNetwork {
 
         Real64 CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
         Real64 RhoAir = PsyRhoAirFnPbTdbW(m_state, m_state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
-        Real64 InfilVolume =
-            ((exchangeData(ZoneNum).SumMCp + exchangeData(ZoneNum).SumMVCp) / CpAir / RhoAir) * TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 InfilVolume = ((exchangeData(ZoneNum).SumMCp + exchangeData(ZoneNum).SumMVCp) / CpAir / RhoAir) * TimeStepSys * Constant::SecInHour;
         Real64 ACH = InfilVolume / (TimeStepSys * m_state.dataHeatBal->Zone(ZoneNum).Volume);
 
         return ACH;
@@ -12208,11 +12204,11 @@ namespace AirflowNetwork {
                     Real64 Velocity = 0.0;
                     Real64 flowrate = DisSysCompCVFData(1).FlowRate / m_state.dataEnvrn->StdRhoAir;
                     if (simulation_control.ductSizing.method == DuctSizingMethod::MaxVelocity) {
-                        SupplyTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
-                        SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * DataGlobalConstants::Pi;
+                        SupplyTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / Constant::Pi);
+                        SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * Constant::Pi;
                     } else {
-                        Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
-                        Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
+                        Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / Constant::Pi);
+                        Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / Constant::Pi);
                         auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
                         Real64 const deltaP = simulation_control.ductSizing.supply_trunk_pressure_loss;
                         Real64 const MassFlowRate = DisSysCompCVFData(1).FlowRate;
@@ -12245,17 +12241,17 @@ namespace AirflowNetwork {
                                 "using velocity at 5m/s.");
                         }
                         if (SolFla < 0) {
-                            SupplyTrunkD = sqrt(4.0 * flowrate / 5.0 / DataGlobalConstants::Pi) * factor;
+                            SupplyTrunkD = sqrt(4.0 * flowrate / 5.0 / Constant::Pi) * factor;
                         } else {
                             SupplyTrunkD = hydraulicDiameter * factor;
                         }
-                        SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * DataGlobalConstants::Pi;
+                        SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * Constant::Pi;
                         Velocity = flowrate / SupplyTrunkArea;
                     }
                     if (simulation_control.ductSizing.method == DuctSizingMethod::VelocityAndLoss) {
                         if (Velocity > simulation_control.ductSizing.max_velocity) {
-                            SupplyTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
-                            SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * DataGlobalConstants::Pi;
+                            SupplyTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / Constant::Pi);
+                            SupplyTrunkArea = SupplyTrunkD * SupplyTrunkD / 4.0 * Constant::Pi;
                             ShowWarningError(
                                 m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Supply Trunk size");
                             ShowContinueError(
@@ -12327,11 +12323,11 @@ namespace AirflowNetwork {
                     Real64 Velocity;
                     Real64 flowrate = MdotBranch / m_state.dataEnvrn->StdRhoAir;
                     if (simulation_control.ductSizing.method == DuctSizingMethod::MaxVelocity) {
-                        SupplyBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
-                        SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * DataGlobalConstants::Pi;
+                        SupplyBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / Constant::Pi);
+                        SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * Constant::Pi;
                     } else {
-                        Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
-                        Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
+                        Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / Constant::Pi);
+                        Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / Constant::Pi);
                         auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
                         Real64 const deltaP = simulation_control.ductSizing.supply_branch_pressure_loss;
                         auto f = [&thisState, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough](Real64 const D) {
@@ -12363,17 +12359,17 @@ namespace AirflowNetwork {
                                 "using velocity at 5m/s.");
                         }
                         if (SolFla < 0) {
-                            SupplyBranchD = sqrt(4.0 * flowrate / 5.0 / DataGlobalConstants::Pi) * factor;
+                            SupplyBranchD = sqrt(4.0 * flowrate / 5.0 / Constant::Pi) * factor;
                         } else {
                             SupplyBranchD = hydraulicDiameter * factor;
                         }
-                        SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * DataGlobalConstants::Pi;
+                        SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * Constant::Pi;
                         Velocity = flowrate / SupplyBranchArea;
                     }
                     if (simulation_control.ductSizing.method == DuctSizingMethod::VelocityAndLoss) {
                         if (Velocity > simulation_control.ductSizing.max_velocity) {
-                            SupplyBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
-                            SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * DataGlobalConstants::Pi;
+                            SupplyBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / Constant::Pi);
+                            SupplyBranchArea = SupplyBranchD * SupplyBranchD / 4.0 * Constant::Pi;
                             ShowWarningError(
                                 m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Supply Branch size");
                             ShowContinueError(
@@ -12449,11 +12445,11 @@ namespace AirflowNetwork {
                     Real64 Velocity;
                     Real64 flowrate = DisSysCompCVFData(1).FlowRate / m_state.dataEnvrn->StdRhoAir;
                     if (simulation_control.ductSizing.method == DuctSizingMethod::MaxVelocity) {
-                        ReturnTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
-                        ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * DataGlobalConstants::Pi;
+                        ReturnTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / Constant::Pi);
+                        ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * Constant::Pi;
                     } else {
-                        Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
-                        Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
+                        Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / Constant::Pi);
+                        Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / Constant::Pi);
                         auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
                         Real64 const deltaP = simulation_control.ductSizing.return_trunk_pressure_loss;
                         Real64 const massFlowRate = DisSysCompCVFData(1).FlowRate;
@@ -12486,17 +12482,17 @@ namespace AirflowNetwork {
                                 "using velocity at 5m/s.");
                         }
                         if (SolFla < 0) {
-                            ReturnTrunkD = sqrt(4.0 * flowrate / 5.0 / DataGlobalConstants::Pi) * factor;
+                            ReturnTrunkD = sqrt(4.0 * flowrate / 5.0 / Constant::Pi) * factor;
                         } else {
                             ReturnTrunkD = hydraulicDiameter * factor;
                         }
-                        ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * DataGlobalConstants::Pi;
+                        ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * Constant::Pi;
                         Velocity = flowrate / SupplyBranchArea;
                     }
                     if (simulation_control.ductSizing.method == DuctSizingMethod::VelocityAndLoss) {
                         if (Velocity > simulation_control.ductSizing.max_velocity) {
-                            ReturnTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
-                            ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * DataGlobalConstants::Pi;
+                            ReturnTrunkD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / Constant::Pi);
+                            ReturnTrunkArea = ReturnTrunkD * ReturnTrunkD / 4.0 * Constant::Pi;
                             ShowWarningError(
                                 m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Return Trunk size");
                             ShowContinueError(
@@ -12569,11 +12565,11 @@ namespace AirflowNetwork {
                     Real64 Velocity;
                     Real64 flowrate = MdotBranch / m_state.dataEnvrn->StdRhoAir;
                     if (simulation_control.ductSizing.method == DuctSizingMethod::MaxVelocity) {
-                        ReturnBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
-                        ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * DataGlobalConstants::Pi;
+                        ReturnBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / Constant::Pi);
+                        ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * Constant::Pi;
                     } else {
-                        Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / DataGlobalConstants::Pi);
-                        Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / DataGlobalConstants::Pi);
+                        Real64 MaxDiameter = sqrt(4.0 * flowrate / MinVelocity / Constant::Pi);
+                        Real64 MinDiameter = sqrt(4.0 * flowrate / MaxVelocity / Constant::Pi);
                         auto &thisState = m_state; // can't use m_state directly in the capture list, just create a reference
                         Real64 const deltaP = simulation_control.ductSizing.return_branch_pressure_loss;
                         auto f = [&thisState, deltaP, MdotBranch, SumLength, DynamicLoss, MaxRough](Real64 const D) {
@@ -12605,17 +12601,17 @@ namespace AirflowNetwork {
                                 "using velocity at 5m/s.");
                         }
                         if (SolFla < 0) {
-                            ReturnBranchD = sqrt(4.0 * flowrate / 5.0 / DataGlobalConstants::Pi) * factor;
+                            ReturnBranchD = sqrt(4.0 * flowrate / 5.0 / Constant::Pi) * factor;
                         } else {
                             ReturnBranchD = hydraulicDiameter * factor;
                         }
-                        ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * DataGlobalConstants::Pi;
+                        ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * Constant::Pi;
                         Velocity = flowrate / ReturnBranchArea;
                     }
                     if (simulation_control.ductSizing.method == DuctSizingMethod::VelocityAndLoss) {
                         if (Velocity > simulation_control.ductSizing.max_velocity) {
-                            ReturnBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / DataGlobalConstants::Pi);
-                            ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * DataGlobalConstants::Pi;
+                            ReturnBranchD = sqrt(4.0 * flowrate / simulation_control.ductSizing.max_velocity / Constant::Pi);
+                            ReturnBranchArea = ReturnBranchD * ReturnBranchD / 4.0 * Constant::Pi;
                             ShowWarningError(
                                 m_state, "AirflowNetwork Duct Sizing: Duct Sizing Method = PressureLossWithMaximumVelocity for Return Branch size");
                             ShowContinueError(
@@ -12738,7 +12734,7 @@ namespace AirflowNetwork {
         ld = TotalL / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
-        A = hydraulicDiameter * hydraulicDiameter / 4.0 * DataGlobalConstants::Pi;
+        A = hydraulicDiameter * hydraulicDiameter / 4.0 * Constant::Pi;
         Real64 viscosity{AirflowNetwork::AIRDYNAMICVISCOSITY_CONSTEXPR(20)};
         velocity = flowrate / A;
 
@@ -13565,7 +13561,7 @@ namespace AirflowNetwork {
                     C = CCF(n) * CEF(n);
                 } else {
                     //            IF (CCF(N) .EQ. 0.0d0) CCF(N)=TINY(CCF(N))  ! 1.0E-40
-                    if (CCF(n) == 0.0) CCF(n) = DataGlobalConstants::rTinyValue; // 1.0E-40 (Epsilon)
+                    if (CCF(n) == 0.0) CCF(n) = Constant::rTinyValue; // 1.0E-40 (Epsilon)
                     PCF(n) = CCF(n);
                     C = CCF(n);
                 }
