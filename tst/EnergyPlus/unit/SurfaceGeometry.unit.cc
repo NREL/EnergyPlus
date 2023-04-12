@@ -10771,7 +10771,10 @@ TEST_F(EnergyPlusFixture, Fix_checkSubSurfAzTiltNorm_Test)
 
     SubSurface.Vertex.dimension(4);
 
-    SubSurface.Vertex = {DataVectorTypes::Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 1, 0.0003), Vector(0, 1, 0.0003)};
+    SubSurface.Vertex = {DataVectorTypes::Vector(0, 0, 0),
+                         DataVectorTypes::Vector(1, 0, 0),
+                         DataVectorTypes::Vector(1, 1, 0.0003),
+                         DataVectorTypes::Vector(0, 1, 0.0003)};
     Vectors::CreateNewellSurfaceNormalVector(SubSurface.Vertex, SubSurface.Vertex.size(), SubSurface.NewellSurfaceNormalVector);
     Vectors::DetermineAzimuthAndTilt(SubSurface.Vertex,
                                      SubSurface.Vertex.size(),
