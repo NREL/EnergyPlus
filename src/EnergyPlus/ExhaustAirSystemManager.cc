@@ -675,13 +675,13 @@ namespace ExhaustAirSystemManager {
         }
 
         for (int ExhaustControlNum = 1; ExhaustControlNum <= state.dataZoneEquip->NumZoneExhaustControls; ++ExhaustControlNum) {
-            CalcZoneHVACExhaustControl(state, ExhaustControlNum, _);
+            CalcZoneHVACExhaustControl(state, ExhaustControlNum);
         }
 
         // report results if needed
     }
 
-    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, ObjexxFCL::Optional<bool const> FlowRatio)
+    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, Real64 const FlowRatio)
     {
         // Calculate a zonehvac exhaust control system
 
@@ -695,7 +695,7 @@ namespace ExhaustAirSystemManager {
         Real64 Tin = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisExhCtrl.ZoneNum).ZT;
         Real64 thisExhCtrlAvailScheVal = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum);
 
-        if (present(FlowRatio)) {
+        if (FlowRatio != 0.0) {
             thisExhCtrl.BalancedFlow *= FlowRatio;
             thisExhCtrl.UnbalancedFlow *= FlowRatio;
 
