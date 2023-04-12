@@ -312,9 +312,9 @@ void GetBoilerInput(EnergyPlusData &state)
 
         thisBoiler.ParasiticElecLoad = state.dataIPShortCut->rNumericArgs(8);
         thisBoiler.ParasiticFuelCapacity = state.dataIPShortCut->rNumericArgs(10);
-        if (thisBoiler.FuelType == Constant::ResourceType::Electricity)
-        {
-            ShowWarningError(state,fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+        if (thisBoiler.FuelType == Constant::ResourceType::Electricity) {
+            ShowWarningError(
+                state, fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("{} should be zero when the fuel type is electricity.", state.dataIPShortCut->cNumericFieldNames(10)));
             ShowContinueError(state, "It will be ignored and the simulation continues.");
             thisBoiler.ParasiticFuelCapacity = 0.0;
