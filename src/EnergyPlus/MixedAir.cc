@@ -3640,19 +3640,18 @@ Real64 VentilationMechanicalProps::CalcMechVentController(EnergyPlusData &state,
     // new local variables for DCV
     // Zone OA flow rate based on each calculation method [m3/s]
     std::array<Real64, static_cast<int>(DataSizing::OAFlowCalcMethod::Num)> ZoneOACalc{0.0};
-    Real64 ZoneOABZ;                // Zone breathing-zone OA flow rate [m3/s]
-    Real64 ZoneOA;                  // Zone OA flow rate [m3/s]
-    Real64 ZoneOAFrac;              // Zone OA fraction (as a fraction of actual supply air flow rate)
-    Real64 SysOAuc;                 // System uncorrected OA flow rate
-    Real64 SysOA;                   // System supply OA volume flow rate [m3/s]
-    Real64 SysEv;                   // System ventilation efficiency
-    Real64 NodeTemp;                // node temperature
-    Real64 NodeHumRat;              // node humidity ratio
-    Real64 ZoneMaxCO2 = 0.0;        // Breathing-zone CO2 concentartion
-    Real64 ZoneMinCO2 = 0.0;        // Minimum CO2 concentration in zone
-    Real64 ZoneOAMin = 0.0;         // Minimum Zone OA flow rate when the zone is unoccupied (i.e. ZoneOAPeople = 0)
-    Real64 ZoneOAMax = 0.0;         // Maximum Zone OA flow rate (ZoneOAPeople + ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)])
-    Real64 CO2PeopleGeneration = 0; // CO2 generation from people at design level
+    Real64 ZoneOABZ;         // Zone breathing-zone OA flow rate [m3/s]
+    Real64 ZoneOA;           // Zone OA flow rate [m3/s]
+    Real64 ZoneOAFrac;       // Zone OA fraction (as a fraction of actual supply air flow rate)
+    Real64 SysOAuc;          // System uncorrected OA flow rate
+    Real64 SysOA;            // System supply OA volume flow rate [m3/s]
+    Real64 SysEv;            // System ventilation efficiency
+    Real64 NodeTemp;         // node temperature
+    Real64 NodeHumRat;       // node humidity ratio
+    Real64 ZoneMaxCO2 = 0.0; // Breathing-zone CO2 concentartion
+    Real64 ZoneMinCO2 = 0.0; // Minimum CO2 concentration in zone
+    Real64 ZoneOAMin = 0.0;  // Minimum Zone OA flow rate when the zone is unoccupied (i.e. ZoneOAPeople = 0)
+    Real64 ZoneOAMax = 0.0;  // Maximum Zone OA flow rate (ZoneOAPeople + ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerArea)])
     Real64 MechVentOAMassFlow = 0.0;
 
     // Apply mechanical ventilation only when it is available/allowed
@@ -3790,16 +3789,6 @@ Real64 VentilationMechanicalProps::CalcMechVentController(EnergyPlusData &state,
                     } else {
                         ZoneOACalc[static_cast<int>(DataSizing::OAFlowCalcMethod::PerPerson)] =
                             curZone.TotOccupants * multiplier * this->ZoneOAPeopleRate(ZoneIndex);
-                        if (this->SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlDesOcc) {
-                            // Accumulate CO2 generation from people at design occupancy and current activity level
-                            for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-                                if (state.dataHeatBal->People(PeopleNum).ZonePtr != ZoneNum) continue;
-                                // Zone multipliers are applied later for CO2
-                                CO2PeopleGeneration += state.dataHeatBal->People(PeopleNum).NumberOfPeople *
-                                                       state.dataHeatBal->People(PeopleNum).CO2RateFactor *
-                                                       GetCurrentScheduleValue(state, state.dataHeatBal->People(PeopleNum).ActivityLevelPtr);
-                            }
-                        }
                     }
 
                     // Calc the zone OA flow rate based on the floor area component
@@ -3918,6 +3907,15 @@ Real64 VentilationMechanicalProps::CalcMechVentController(EnergyPlusData &state,
 
                                         // Calculate zone maximum target CO2 concentration in PPM
                                         if (this->SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlDesOcc) {
+                                            // Accumulate CO2 generation from people at design occupancy and current activity level
+                                            Real64 CO2PeopleGeneration = 0.0;
+                                            for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+                                                if (state.dataHeatBal->People(PeopleNum).ZonePtr != ZoneNum) continue;
+                                                CO2PeopleGeneration +=
+                                                    state.dataHeatBal->People(PeopleNum).NumberOfPeople *
+                                                    state.dataHeatBal->People(PeopleNum).CO2RateFactor *
+                                                    GetCurrentScheduleValue(state, state.dataHeatBal->People(PeopleNum).ActivityLevelPtr);
+                                            }
                                             ZoneMaxCO2 = state.dataContaminantBalance->OutdoorCO2 +
                                                          (CO2PeopleGeneration * curZone.Multiplier * curZone.ListMultiplier * 1.0e6) / ZoneOAMax;
                                         } else if (curZone.ZoneMaxCO2SchedIndex > 0.0) {
