@@ -73,7 +73,9 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 
 using namespace EnergyPlus::MixedAir;
@@ -5430,20 +5432,32 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPNoCap)
         "    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}",
         "    0.0003048006;            !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
         "ZoneHVAC:AirDistributionUnit,",
-        "    Zone1TermReheat,         !- Name",
-        "    Zone 1 PIU Air Outlet Node,  !- Air Distribution Unit Outlet Node Name",
-        "    AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type",
-        "    Zone 1 SPIU ATU;         !- Air Terminal Name",
+        "    Zone1ADU,                !- Name",
+        "    Zone 1 Air Supply Node,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    Zone 1 CV ATU;           !- Air Terminal Name",
         "ZoneHVAC:AirDistributionUnit,",
-        "    Zone2TermReheat,         !- Name",
-        "    Zone 2 Reheat Air Outlet Node,  !- Air Distribution Unit Outlet Node Name",
-        "    AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type",
-        "    Zone 2 VAV System;       !- Air Terminal Name",
+        "    Zone2ADU,                !- Name",
+        "    Zone 2 Air Supply Node,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    Zone 2 CV ATU;           !- Air Terminal Name",
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    Zone 1 CV ATU,           !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Zone 1 ATU Inlet Node,   !- Air Inlet Node Name",
+        "    Zone 1 Air Supply Node,  !- Air Outlet Node Name",
+        "    0.40;                    !- Maximum Air Flow Rate {m3/s}",
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    Zone 2 CV ATU,           !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Zone 2 ATU Inlet Node,   !- Air Inlet Node Name",
+        "    Zone 2 Air Supply Node,  !- Air Outlet Node Name",
+        "    0.70;                    !- Maximum Air Flow Rate {m3/s}",
         "ZoneHVAC:EquipmentList,",
         "    Zone1Equipment,          !- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
         "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
-        "    Zone1TermReheat,         !- Zone Equipment 1 Name",
+        "    Zone1ADU,                !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
         "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
@@ -5452,7 +5466,7 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPNoCap)
         "    Zone2Equipment,          !- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
         "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
-        "    Zone2TermReheat,         !- Zone Equipment 1 Name",
+        "    Zone2ADU,                !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
         "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
@@ -5460,14 +5474,14 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPNoCap)
         "ZoneHVAC:EquipmentConnections,",
         "    Zone 2,                  !- Zone Name",
         "    Zone1Equipment,          !- Zone Conditioning Equipment List Name",
-        "    Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name",
+        "    Zone 1 Air Supply Node,  !- Zone Air Inlet Node or NodeList Name",
         "    Zone1Exhausts,           !- Zone Air Exhaust Node or NodeList Name",
         "    Zone 1 Node,             !- Zone Air Node Name",
         "    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name",
         "ZoneHVAC:EquipmentConnections,",
         "    Zone 1,                  !- Zone Name",
         "    Zone2Equipment,          !- Zone Conditioning Equipment List Name",
-        "    Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name",
+        "    Zone 2 Air Supply Node,  !- Zone Air Inlet Node or NodeList Name",
         "    ,                        !- Zone Air Exhaust Node or NodeList Name",
         "    Zone 2 Node,             !- Zone Air Node Name",
         "    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name",
@@ -5486,32 +5500,95 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPNoCap)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    Real64 SysMassFlow(0.0);        // System supply mass flow rate [kg/s]
-    Real64 OAMassFlow(0.0);         // OA mass flow rate [kg/s]
-    Real64 ExpectedOAMassFlow(0.8); // System design OA flow rate
-    bool ErrorsFound(false);
+    Real64 OAMassFlow = 0.0; // OA mass flow rate [kg/s]
+    bool ErrorsFound = false;
 
     GetZoneData(*state, ErrorsFound);
     GetOARequirements(*state);
     GetZoneEquipment(*state);
     GetOAControllerInputs(*state);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
+    SingleDuct::GetSysInput(*state);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SysOAMethod::VRP, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
 
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(2);                // Necessary for CalcMechVentController
-    state->dataSize->SysSizingRunDone = true;                                    // Indicate that a system sizing run has been performed
-    state->dataHeatBal->Zone(1).TotOccupants = 15;                               // Zone 1 total number of people
-    state->dataHeatBal->Zone(2).TotOccupants = 12;                               // Zone 2 total number of people
-    state->dataHeatBal->Zone(1).FloorArea = 1500;                                // Zone 1 total floor area
-    state->dataHeatBal->Zone(2).FloorArea = 500;                                 // Zone 2 total floor area
-    state->dataSize->FinalSysSizing.allocate(1);                                 // Create instance of system sizing info
-    state->dataMixedAir->VentilationMechanical(1).SysDesOA = ExpectedOAMassFlow; // Set design outdoor air flow rate
-    state->dataSize->CurSysNum = 1;                                              // Only one system in this instance
-    state->dataEnvrn->StdRhoAir = 1;                                             // Standard air density assumed to be 1 kg/m3 (simplification)
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(2); // Necessary for CalcMechVentController
+    state->dataSize->SysSizingRunDone = true;                     // Indicate that a system sizing run has been performed
+    state->dataHeatBal->Zone(1).TotOccupants = 15;                // Zone 1 total number of people
+    state->dataHeatBal->Zone(2).TotOccupants = 12;                // Zone 2 total number of people
+    state->dataHeatBal->Zone(1).FloorArea = 1500;                 // Zone 1 total floor area
+    state->dataHeatBal->Zone(2).FloorArea = 500;                  // Zone 2 total floor area
+    state->dataSize->FinalSysSizing.allocate(1);                  // Create instance of system sizing info
+    state->dataSize->CurSysNum = 1;                               // Only one system in this instance
+    state->dataEnvrn->StdRhoAir = 1;                              // Standard air density assumed to be 1 kg/m3 (simplification)
+    state->dataEnvrn->OutBaroPress = 101325.0;
+
+    Real64 DesignOAMassFlow1 =
+        state->dataEnvrn->StdRhoAir * state->dataHeatBal->Zone(1).TotOccupants * 0.00944 + state->dataHeatBal->Zone(1).FloorArea * 0.0003048006;
+    Real64 DesignOAMassFlow2 =
+        state->dataEnvrn->StdRhoAir * state->dataHeatBal->Zone(2).TotOccupants * 0.00944 + state->dataHeatBal->Zone(2).FloorArea * 0.0003048006;
+    Real64 DesignOAMassFlow = DesignOAMassFlow1 + DesignOAMassFlow2;
+    Real64 SupplyMassFlow1 = DesignOAMassFlow1 / 0.5;
+    Real64 SupplyMassFlow2 = DesignOAMassFlow2 / 0.2;
+    Real64 SysMassFlow = SupplyMassFlow1 + SupplyMassFlow2; // System supply mass flow rate [kg/s]
+
+    // Set some terminal unit flow rates that are unbalanced so VRP will actually do something
+    int primaryInletNode1 = state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool(1).InNode; // primary node of zone terminal unit
+    state->dataLoopNodes->Node(primaryInletNode1).Temp = 15.0;
+    state->dataLoopNodes->Node(primaryInletNode1).HumRat = 0.001;
+    state->dataLoopNodes->Node(primaryInletNode1).MassFlowRate = SupplyMassFlow1;
+    int primaryInletNode2 = state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitCool(1).InNode; // primary node of zone terminal unit
+    state->dataLoopNodes->Node(primaryInletNode2).Temp = 15.0;
+    state->dataLoopNodes->Node(primaryInletNode2).HumRat = 0.001;
+    state->dataLoopNodes->Node(primaryInletNode2).MassFlowRate = SupplyMassFlow2;
+    int primaryOutletNode1 = state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool(1).OutNode; // primary node of zone terminal unit
+    state->dataLoopNodes->Node(primaryOutletNode1).Temp = 15.0;
+    state->dataLoopNodes->Node(primaryOutletNode1).HumRat = 0.001;
+    state->dataLoopNodes->Node(primaryOutletNode1).MassFlowRate = SupplyMassFlow1;
+    int primaryOutletNode2 = state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitCool(1).OutNode; // primary node of zone terminal unit
+    state->dataLoopNodes->Node(primaryOutletNode2).Temp = 15.0;
+    state->dataLoopNodes->Node(primaryOutletNode2).HumRat = 0.001;
+    state->dataLoopNodes->Node(primaryOutletNode2).MassFlowRate = SupplyMassFlow2;
+
+    state->dataMixedAir->VentilationMechanical(1).SysDesOA = DesignOAMassFlow; // Set design outdoor air flow rate
     OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
 
-    EXPECT_TRUE(OAMassFlow >
-                ExpectedOAMassFlow); // Expect that the system OA is greater than the desing OA air flow, OAMassFlow without the cap is ~0.86 m3/s
+    EXPECT_TRUE(OAMassFlow > DesignOAMassFlow); // Expect that the system OA is greater than the design OA air flow
+    EXPECT_TRUE(OAMassFlow < SysMassFlow);      // Expect that the system OA is less than the system air flow
+
+    // Extend test to cover the Max OA method
+    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowCalcMethod::Max;
+    DesignOAMassFlow1 =
+        state->dataEnvrn->StdRhoAir * max(state->dataHeatBal->Zone(1).TotOccupants * 0.00944, state->dataHeatBal->Zone(1).FloorArea * 0.0003048006);
+    DesignOAMassFlow2 =
+        state->dataEnvrn->StdRhoAir * max(state->dataHeatBal->Zone(2).TotOccupants * 0.00944, state->dataHeatBal->Zone(2).FloorArea * 0.0003048006);
+    DesignOAMassFlow = DesignOAMassFlow1 + DesignOAMassFlow2;
+    SupplyMassFlow1 = DesignOAMassFlow1 / 0.5;
+    SupplyMassFlow2 = DesignOAMassFlow2 / 0.2;
+    state->dataLoopNodes->Node(primaryInletNode1).MassFlowRate = SupplyMassFlow1;
+    state->dataLoopNodes->Node(primaryInletNode2).MassFlowRate = SupplyMassFlow2;
+    state->dataLoopNodes->Node(primaryOutletNode1).MassFlowRate = SupplyMassFlow1;
+    state->dataLoopNodes->Node(primaryOutletNode2).MassFlowRate = SupplyMassFlow2;
+    SysMassFlow = SupplyMassFlow1 + SupplyMassFlow2;                           // System supply mass flow rate [kg/s]
+    state->dataMixedAir->VentilationMechanical(1).SysDesOA = DesignOAMassFlow; // Set design outdoor air flow rate
+    OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
+
+    EXPECT_TRUE(OAMassFlow > DesignOAMassFlow); // Expect that the system OA is greater than the design OA air flow
+    EXPECT_TRUE(OAMassFlow < SysMassFlow);      // Expect that the system OA is less than the system air flow
+
+    // Starve one zone so that OAMassFlow = SysMassFlow
+    SupplyMassFlow1 = DesignOAMassFlow1 * 0.5;
+    SupplyMassFlow2 = DesignOAMassFlow2 / 0.2;
+    state->dataLoopNodes->Node(primaryInletNode1).MassFlowRate = SupplyMassFlow1;
+    state->dataLoopNodes->Node(primaryInletNode2).MassFlowRate = SupplyMassFlow2;
+    state->dataLoopNodes->Node(primaryOutletNode1).MassFlowRate = SupplyMassFlow1;
+    state->dataLoopNodes->Node(primaryOutletNode2).MassFlowRate = SupplyMassFlow2;
+    SysMassFlow = SupplyMassFlow1 + SupplyMassFlow2;                           // System supply mass flow rate [kg/s]
+    state->dataMixedAir->VentilationMechanical(1).SysDesOA = DesignOAMassFlow; // Set design outdoor air flow rate
+    OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
+
+    EXPECT_TRUE(OAMassFlow > DesignOAMassFlow); // Expect that the system OA is greater than the design OA air flow
+    EXPECT_TRUE(OAMassFlow == SysMassFlow);     // Expect that the system OA is less than the system air flow
 }
 
 TEST_F(EnergyPlusFixture, MechVentController_ACHflow)
