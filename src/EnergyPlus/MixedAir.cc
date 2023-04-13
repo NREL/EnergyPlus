@@ -3776,7 +3776,6 @@ Real64 VentilationMechanicalProps::CalcMechVentController(EnergyPlusData &state,
 
                     // Assign references
                     auto &curZone(state.dataHeatBal->Zone(ZoneNum));
-                    auto &curZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum));
                     auto &curZoneSysEnergyDemand(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneEquipConfigNum));
                     Real64 multiplier = curZone.Multiplier * curZone.ListMultiplier * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
 
@@ -4102,6 +4101,7 @@ Real64 VentilationMechanicalProps::CalcMechVentController(EnergyPlusData &state,
                     Real64 ZonePA = 0.0; // Zone primary air flow rate
                     Ep = 1.0;
                     if (ZoneEquipConfigNum > 0) {
+                        auto &curZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum));
                         for (int InNodeIndex = 1; InNodeIndex <= curZoneEquipConfig.NumInletNodes; ++InNodeIndex) {
                             // Assume primary air is always stored at the AirDistUnitCool (cooling deck if dual duct)
                             int PriNode = curZoneEquipConfig.AirDistUnitCool(InNodeIndex).InNode; // primary node of zone terminal unit
