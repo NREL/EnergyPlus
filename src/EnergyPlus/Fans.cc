@@ -1229,7 +1229,6 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     static constexpr std::string_view RoutineName("SizeFan: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 RatedPower;         // Rated fan power [W]
     Real64 DeltaPressTot;      // Total pressure rise across fan [N/m2 = Pa]
     Real64 FanOutletVelPress;  // Fan outlet velocity pressure [Pa]
     Real64 EulerNum;           // Fan Euler number [-]
@@ -1447,7 +1446,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         fan.VFDEff = max(fan.VFDEff, 0.01); // Minimum efficiency is 1% to avoid numerical errors
 
         // Calculate VFD "rated" input power using motor input power and VFD efficiency
-        RatedPower = fan.MotorInputPower / fan.VFDEff; //[W]
+        Real64 RatedPower = fan.MotorInputPower / fan.VFDEff; //[W]
 
         // Calculate combined fan system efficiency: includes fan, belt, motor, and VFD
         // Equivalent to fan%FanAirPower / fan%FanPower
@@ -1477,7 +1476,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, fan.FanName, fan.FanEff);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, fan.FanName, fan.DeltaPress);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, fan.FanName, FanVolFlow);
-    RatedPower = FanVolFlow * fan.DeltaPress / fan.FanEff; // total fan power
+    Real64 RatedPower = FanVolFlow * fan.DeltaPress / fan.FanEff; // total fan power
     if (fan.FanType_Num != DataHVACGlobals::FanType_ComponentModel) {
         fan.DesignPointFEI = HVACFan::FanSystem::report_fei(state, FanVolFlow, RatedPower, fan.DeltaPress, state.dataEnvrn->StdRhoAir);
     }
