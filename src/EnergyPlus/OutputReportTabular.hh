@@ -613,7 +613,7 @@ namespace OutputReportTabular {
                        bool &desConditionlinepassed,
                        bool &heatingDesignlinepassed,
                        bool &coolingDesignlinepassed,
-                       bool &isKoppen,
+                       bool isKoppen,
                        bool &insideLiquidPrecipitation);
 
     void FillWeatherPredefinedEntries(EnergyPlusData &state);
