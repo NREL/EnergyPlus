@@ -1816,7 +1816,6 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
     //                      Brent Griffith, May 2009 for EMS
     //                      Chandan Sharma, March 2011, FSEC: Added LocalTurnFansOn and LocalTurnFansOff
     //                      Rongpeng Zhang, April 2015, added faulty fan operations due to fouling air filters
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the simple on/off fan.
@@ -2303,25 +2302,24 @@ void UpdateFan(EnergyPlusData &state, int const FanNum)
     // Data is moved from the fan data structure to the fan outlet nodes.
 
     auto &fan = state.dataFans->Fan(FanNum);
-
-    int OutletNode = fan.OutletNodeNum;
-    int InletNode = fan.InletNodeNum;
+    auto &inletNode = state.dataLoopNodes->Node(fan.InletNodeNum);
+    auto &outletNode = state.dataLoopNodes->Node(fan.OutletNodeNum);
 
     // Set the outlet air nodes of the fan
-    state.dataLoopNodes->Node(OutletNode).MassFlowRate = fan.OutletAirMassFlowRate;
-    state.dataLoopNodes->Node(OutletNode).Temp = fan.OutletAirTemp;
-    state.dataLoopNodes->Node(OutletNode).HumRat = fan.OutletAirHumRat;
-    state.dataLoopNodes->Node(OutletNode).Enthalpy = fan.OutletAirEnthalpy;
+    outletNode.MassFlowRate = fan.OutletAirMassFlowRate;
+    outletNode.Temp = fan.OutletAirTemp;
+    outletNode.HumRat = fan.OutletAirHumRat;
+    outletNode.Enthalpy = fan.OutletAirEnthalpy;
     // Set the outlet nodes for properties that just pass through & not used
-    state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
-    state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
+    outletNode.Quality = inletNode.Quality;
+    outletNode.Press = inletNode.Press;
 
     // Set the Node Flow Control Variables from the Fan Control Variables
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = fan.MassFlowRateMaxAvail;
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = fan.MassFlowRateMinAvail;
+    outletNode.MassFlowRateMaxAvail = fan.MassFlowRateMaxAvail;
+    outletNode.MassFlowRateMinAvail = fan.MassFlowRateMinAvail;
 
     if (fan.FanType_Num == DataHVACGlobals::FanType_ZoneExhaust) {
-        state.dataLoopNodes->Node(InletNode).MassFlowRate = fan.InletAirMassFlowRate;
+        inletNode.MassFlowRate = fan.InletAirMassFlowRate;
         if (state.afn->AirflowNetworkNumOfExhFan == 0) {
             state.dataHVACGlobal->UnbalExhMassFlow = fan.InletAirMassFlowRate;
             if (fan.BalancedFractSchedNum > 0) {
@@ -2340,11 +2338,11 @@ void UpdateFan(EnergyPlusData &state, int const FanNum)
     }
 
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
+        outletNode.CO2 = inletNode.CO2;
     }
 
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
+        outletNode.GenContam = inletNode.GenContam;
     }
 }
 
@@ -2376,8 +2374,6 @@ void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanInde
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   June 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine sets an index for a given fan -- issues error message if that fan
@@ -2405,8 +2401,6 @@ void GetFanVolFlow(EnergyPlusData &state, int const FanIndex, Real64 &FanVolFlow
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   August 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gets the fan volumetric flow for use by zone equipment (e.g. Packaged Terminal Heat Pump)
@@ -2425,8 +2419,6 @@ Real64 GetFanPower(EnergyPlusData &state, int const FanIndex)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gets the fan power draw
@@ -2450,15 +2442,10 @@ void GetFanType(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   August 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine sets an integer type for a given fan -- issues error message if that fan
     // is not a legal fan.
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int FanIndex;
 
     auto &Fan(state.dataFans->Fan);
 
@@ -2467,7 +2454,7 @@ void GetFanType(EnergyPlusData &state,
         state.dataFans->GetFanInputFlag = false;
     }
 
-    FanIndex = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
+    int FanIndex = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
     if (FanIndex == 0) {
         if ((!ThisObjectType.empty()) && (!ThisObjectName.empty())) {
             ShowSevereError(state, fmt::format("GetFanType: {}=\"{}\", invalid Fan specified=\"{}\".", ThisObjectType, ThisObjectName, FanName));
@@ -2742,8 +2729,6 @@ void SetFanData(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   August 2014
-    //       MODIFIED
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function calculates and returns the design fan delta T from the fan input data
@@ -2752,8 +2737,6 @@ void SetFanData(EnergyPlusData &state,
     // Simple fan:  Qdot,tot = (Vdot*deltaP)/Eff,tot
     //              Qdot,air = Eff,mot*Qdot,tot + (Qdot,tot - Eff,mot*Qdot,tot)*Frac,mot-in-airstream
     //              Qdot,air = cp,air*rho,air*Vdot*deltaT
-
-    // REFERENCES: EnergyPlus Engineering Reference
 
     // Return value
     Real64 DesignDeltaT; // returned delta T of matched fan [delta deg C]
@@ -2803,14 +2786,8 @@ Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
     // Calculate the decrease of the fan air flow rate, given the fan curve
     // and the increase of fan pressure rise due to fouling air filters
 
-    // Using/Aliasing
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 FanFaultyAirFlowRate; // Fan Volume Flow Rate in the Faulty Case [m3/sec]
-    Real64 FanCalDeltaPress;     // Calculated Fan Delta Pressure for temp use [Pa]
-    Real64 FanCalDeltaPresstemp; // Calculated Fan Delta Pressure for temp use [Pa]
-
     // Check whether the fan curve covers the design operational point of the fan
-    FanCalDeltaPress = Curve::CurveValue(state, FanCurvePtr, FanDesignAirFlowRate);
+    Real64 FanCalDeltaPress = Curve::CurveValue(state, FanCurvePtr, FanDesignAirFlowRate); // [Pa]
     if ((FanCalDeltaPress < 0.9 * FanDesignDeltaPress) || (FanCalDeltaPress > 1.1 * FanDesignDeltaPress)) {
         ShowWarningError(state, format("The design operational point of the fan {} does not fall ", FanName));
         ShowContinueError(state, "on the fan curve provided in the FaultModel:Fouling:AirFilter object. ");
@@ -2818,8 +2795,8 @@ Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
     }
 
     // Calculate the Fan Volume Flow Rate in the Faulty Case
-    FanFaultyAirFlowRate = FanDesignAirFlowRate;
-    FanCalDeltaPresstemp = Curve::CurveValue(state, FanCurvePtr, FanFaultyAirFlowRate);
+    Real64 FanFaultyAirFlowRate = FanDesignAirFlowRate;                                        // Fan Volume Flow Rate in the Faulty Case [m3/sec]
+    Real64 FanCalDeltaPresstemp = Curve::CurveValue(state, FanCurvePtr, FanFaultyAirFlowRate); // Calculated Fan Delta Pressure for temp use [Pa]
     FanCalDeltaPress = FanCalDeltaPresstemp;
 
     while (FanCalDeltaPress < (FanDesignDeltaPress + FanFaultyDeltaPressInc)) {
@@ -2856,24 +2833,17 @@ Real64 FanDesHeatGain(EnergyPlusData &state,
     // Simple fan:  Qdot,tot = (Vdot*deltaP)/Eff,tot
     //              Qdot,air = Eff,mot*Qdot,tot + (Qdot,tot - Eff,mot*Qdot,tot)*Frac,mot-in-airstream
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 DeltaP;       // fan design pressure rise [N/m2]
-    Real64 TotEff;       // fan design total efficiency
-    Real64 MotEff;       // fan design motor efficiency
-    Real64 MotInAirFrac; // fraction of motor in the air stream
-    Real64 FanPowerTot;  // total fan power consumption [W]
-
     if (FanNum <= 0) {
         return 0.0;
     }
     auto const &fan = state.dataFans->Fan(FanNum);
 
     if (fan.FanType_Num != DataHVACGlobals::FanType_ComponentModel) {
-        DeltaP = fan.DeltaPress;
-        TotEff = fan.FanEff;
-        MotEff = fan.MotEff;
-        MotInAirFrac = fan.MotInAirFrac;
-        FanPowerTot = (FanVolFlow * DeltaP) / TotEff;
+        Real64 DeltaP = fan.DeltaPress; // fan design pressure rise [N/m2]
+        Real64 TotEff = fan.FanEff;     // fan design total efficiency
+        Real64 MotEff = fan.MotEff;     // fan design motor efficiency
+        Real64 MotInAirFrac = fan.MotInAirFrac;
+        Real64 FanPowerTot = (FanVolFlow * DeltaP) / TotEff;
         return MotEff * FanPowerTot + (FanPowerTot - MotEff * FanPowerTot) * MotInAirFrac;
     } else {
         if (!state.dataGlobal->SysSizingCalc && state.dataFans->MySizeFlag(FanNum)) {
