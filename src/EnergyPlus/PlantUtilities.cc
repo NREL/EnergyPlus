@@ -62,6 +62,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus::PlantUtilities {
@@ -2003,6 +2004,56 @@ bool verifyTwoNodeNumsOnSamePlantLoop(EnergyPlusData &state, int const nodeIndex
         }
     }
     return (matchedIndexA == matchedIndexB) && (matchedIndexA != 0); // only return true if both are equal and non-zero
+}
+
+Real64
+MinFlowIfBranchHasVSPump(EnergyPlusData &state, PlantLocation const &plantLoc, bool &foundBranchPump, bool &foundLoopPump, bool const setFlowStatus)
+{
+    Real64 branchPumpMinFlowLimit = 0.0;
+
+    int NumCompsOnThisBranch = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).TotalComponents;
+    for (int CompCounter = 1; CompCounter <= NumCompsOnThisBranch; ++CompCounter) {
+        auto &component(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Comp(CompCounter));
+        if (component.Type == DataPlant::PlantEquipmentType::PumpVariableSpeed ||
+            component.Type == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) {
+            foundBranchPump = true;
+            if (component.CompNum > 0) branchPumpMinFlowLimit = state.dataPumps->PumpEquip(component.CompNum).MassFlowRateMin;
+            break;
+        }
+    }
+
+    if (!foundBranchPump) {
+        // second, if no branch pump, search for variable speed pump on inlet branch
+        int NumCompsOnInletBranch = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(1).TotalComponents;
+        DataPlant::LoopSideLocation loopSide = setFlowStatus ? plantLoc.loopSideNum : DataPlant::LoopSideLocation::Supply;
+        for (int CompCounter = 1; CompCounter <= NumCompsOnInletBranch; ++CompCounter) {
+            auto &component(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(loopSide).Branch(1).Comp(CompCounter));
+            if (component.Type == DataPlant::PlantEquipmentType::PumpVariableSpeed ||
+                component.Type == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) {
+                foundLoopPump = true;
+                if (component.CompNum > 0) branchPumpMinFlowLimit = state.dataPumps->PumpEquip(component.CompNum).MassFlowRateMin;
+                break;
+            }
+        }
+    }
+
+    if (setFlowStatus) {
+        if (branchPumpMinFlowLimit > 0.0 && foundBranchPump) {
+            state.dataPlnt->PlantLoop(plantLoc.loopNum)
+                .LoopSide(plantLoc.loopSideNum)
+                .Branch(plantLoc.branchNum)
+                .Comp(plantLoc.compNum)
+                .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+        } else {
+            state.dataPlnt->PlantLoop(plantLoc.loopNum)
+                .LoopSide(plantLoc.loopSideNum)
+                .Branch(plantLoc.branchNum)
+                .Comp(plantLoc.compNum)
+                .FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+        }
+    }
+
+    return branchPumpMinFlowLimit;
 }
 
 } // namespace EnergyPlus::PlantUtilities

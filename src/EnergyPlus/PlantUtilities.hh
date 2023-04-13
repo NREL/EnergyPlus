@@ -203,6 +203,9 @@ namespace PlantUtilities {
 
     bool verifyTwoNodeNumsOnSamePlantLoop(EnergyPlusData &state, int nodeIndexA, int nodeIndexB);
 
+    Real64 MinFlowIfBranchHasVSPump(
+        EnergyPlusData &state, PlantLocation const &pLantLoc, bool &foundBranchPump, bool &foundLoopPump, bool const setFlowStatus);
+
     struct CriteriaData
     {
         // Members

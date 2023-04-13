@@ -313,8 +313,8 @@
 
   Curve:Quadratic,
     EIRCurveFuncPLR,         !- Name
-    1.0,                     !- Coefficient1 Constant
-    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient1 Constant
+    1.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
@@ -472,8 +472,8 @@
 
   Curve:Quadratic,
     EIRCurveFuncPLR2,        !- Name
-    1.0,                     !- Coefficient1 Constant
-    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient1 Constant
+    1.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x

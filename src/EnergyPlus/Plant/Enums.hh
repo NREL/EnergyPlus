@@ -241,6 +241,7 @@ enum class FlowMode
     Constant,
     NotModulated,
     LeavingSetpointModulated,
+    VariableSpeedPump,
     Num
 };
 
