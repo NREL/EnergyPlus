@@ -1217,7 +1217,6 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     //       DATE WRITTEN   September 2001
     //       MODIFIED       Craig Wray August 2010 - added fan, belt, motor, and VFD component sizing
     //                      August 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for sizing fans for which flow rates have not been
@@ -1230,23 +1229,18 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     static constexpr std::string_view RoutineName("SizeFan: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NVPerfNum;              // Index to night ventialation performance object
-    std::string equipName;      // Equipment name
-    Real64 RatedPower;          // Rated fan power [W]
-    Real64 DeltaPressTot;       // Total pressure rise across fan [N/m2 = Pa]
-    Real64 FanOutletVelPress;   // Fan outlet velocity pressure [Pa]
-    Real64 EulerNum;            // Fan Euler number [-]
-    Real64 NormalizedEulerNum;  // Normalized Fan Euler number [-]
-    Real64 FanDimFlow;          // Fan dimensionless airflow [-]
-    Real64 XbeltMax;            // Factor for belt max eff curve [ln hp]
-    Real64 FanTrqRatio;         // Ratio of fan torque to max fan torque [-]
-    Real64 MotorOutPwrRatio;    // Ratio of motor output power to max motor output power [-]
-    Real64 MotorPLEff;          // Motor normalized (part-load) efficiency [-]
-    Real64 VFDSpdRatio(0.0);    // Ratio of motor speed to motor max speed [-]
-    Real64 VFDOutPwrRatio(0.0); // Ratio of VFD output power to max VFD output power [-]
-    bool bPRINT = true;         // TRUE if sizing is reported to output (eio)
-    int FieldNum = 2;           // IDD numeric field number where input field description is found
-    int NumFansSized = 0;       // counter used to deallocate temporary string array after all fans have been sized
+    Real64 RatedPower;         // Rated fan power [W]
+    Real64 DeltaPressTot;      // Total pressure rise across fan [N/m2 = Pa]
+    Real64 FanOutletVelPress;  // Fan outlet velocity pressure [Pa]
+    Real64 EulerNum;           // Fan Euler number [-]
+    Real64 NormalizedEulerNum; // Normalized Fan Euler number [-]
+    Real64 FanDimFlow;         // Fan dimensionless airflow [-]
+    Real64 XbeltMax;           // Factor for belt max eff curve [ln hp]
+    Real64 FanTrqRatio;        // Ratio of fan torque to max fan torque [-]
+    Real64 MotorOutPwrRatio;   // Ratio of motor output power to max motor output power [-]
+    bool bPRINT = true;        // TRUE if sizing is reported to output (eio)
+    int FieldNum = 2;          // IDD numeric field number where input field description is found
+    int NumFansSized = 0;      // counter used to deallocate temporary string array after all fans have been sized
 
     auto &fan = state.dataFans->Fan(FanNum);
 
@@ -1408,6 +1402,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
             fan.MotorMaxEff = 1.0; // No curve specified - use constant efficiency
         }
 
+        Real64 MotorPLEff; // Motor normalized (part-load) efficiency [-]
         // Calculate motor part-load efficiency and input power using correlations and coefficients based on MotorMaster+ data
         MotorOutPwrRatio = fan.BeltInputPower / fan.MotorMaxOutPwr; //[-]
         if (fan.PLMotorEffCurveIndex != 0) {
@@ -1423,8 +1418,8 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate max VFD efficiency and input power using correlations and coefficients based on VFD type
         if ((fan.VFDEffType == "SPEED") && (fan.VFDEffCurveIndex != 0)) {
-            VFDSpdRatio = MotorSpeed / fan.MotorMaxSpd;                               //[-]
-            fan.VFDEff = Curve::CurveValue(state, fan.VFDEffCurveIndex, VFDSpdRatio); //[-]
+            Real64 VFDSpdRatio = MotorSpeed / fan.MotorMaxSpd; // Ratio of motor speed to motor max speed [-]
+            fan.VFDEff = Curve::CurveValue(state, fan.VFDEffCurveIndex, VFDSpdRatio);
         } else {
             if ((fan.VFDEffType == "POWER") && (fan.VFDEffCurveIndex != 0)) {
                 if (fan.VFDMaxOutPwr == DataSizing::AutoSize) {
@@ -1441,8 +1436,8 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
                     ShowContinueError(state, format("...Design VFD output power (without oversizing) [W]: {:.2R}", fan.MotorInputPower));
                 }
 
-                VFDOutPwrRatio = fan.MotorInputPower / fan.VFDMaxOutPwr;                     //[-]
-                fan.VFDEff = Curve::CurveValue(state, fan.VFDEffCurveIndex, VFDOutPwrRatio); //[-]
+                Real64 VFDOutPwrRatio = fan.MotorInputPower / fan.VFDMaxOutPwr; // Ratio of VFD output power to max VFD output power [-]
+                fan.VFDEff = Curve::CurveValue(state, fan.VFDEffCurveIndex, VFDOutPwrRatio);
             } else {
                 // No curve specified - use constant efficiency
                 fan.VFDMaxOutPwr = 0.0;
@@ -1476,30 +1471,27 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         BaseSizer::reportSizerOutput(state, fan.FanType, fan.FanName, "Design Combined Efficiency []", fan.FanEff);
     } // End fan component sizing
 
-    equipName = fan.FanName;
-
     // Rearrange order to match table and use FanVolFlow to calculate RatedPower
     // ALSO generates values if Component Model fan, for which DeltaPress and FanEff vary with flow
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, equipName, fan.FanType);
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, equipName, fan.FanEff);
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, equipName, fan.DeltaPress);
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, equipName, FanVolFlow);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, fan.FanName, fan.FanType);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, fan.FanName, fan.FanEff);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, fan.FanName, fan.DeltaPress);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, fan.FanName, FanVolFlow);
     RatedPower = FanVolFlow * fan.DeltaPress / fan.FanEff; // total fan power
     if (fan.FanType_Num != DataHVACGlobals::FanType_ComponentModel) {
         fan.DesignPointFEI = HVACFan::FanSystem::report_fei(state, FanVolFlow, RatedPower, fan.DeltaPress, state.dataEnvrn->StdRhoAir);
     }
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwr, equipName, RatedPower);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwr, fan.FanName, RatedPower);
     if (FanVolFlow != 0.0) {
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwrPerFlow, equipName, RatedPower / FanVolFlow);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPwrPerFlow, fan.FanName, RatedPower / FanVolFlow);
     }
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorIn, equipName, fan.MotInAirFrac);
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEndUse, equipName, fan.EndUseSubcategoryName);
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEnergyIndex, equipName, fan.DesignPointFEI);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorIn, fan.FanName, fan.MotInAirFrac);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEndUse, fan.FanName, fan.EndUseSubcategoryName);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEnergyIndex, fan.FanName, fan.DesignPointFEI);
 
-    NVPerfNum = fan.NVPerfNum;
-    if (NVPerfNum > 0) {
-        if (state.dataFans->NightVentPerf(NVPerfNum).MaxAirFlowRate == DataSizing::AutoSize) {
-            state.dataFans->NightVentPerf(NVPerfNum).MaxAirFlowRate = fan.MaxAirFlowRate;
+    if (fan.NVPerfNum > 0) {
+        if (state.dataFans->NightVentPerf(fan.NVPerfNum).MaxAirFlowRate == DataSizing::AutoSize) {
+            state.dataFans->NightVentPerf(fan.NVPerfNum).MaxAirFlowRate = fan.MaxAirFlowRate;
         }
     }
 
