@@ -91,3 +91,32 @@ TEST_F(EnergyPlusFixture, ConstructionInternalSource)
 
     EXPECT_NEAR(0.1524, state->dataConstruction->Construct(1).ThicknessPerpend, 0.0001);
 }
+
+TEST_F(EnergyPlusFixture, ConstructionInternalSourceEmptyField)
+{
+
+    // test whether empty "Two-Dimensional Temperature Calculation Position" causes reading errors
+    std::string const idf_objects = delimited_string({
+        "	ConstructionProperty:InternalHeatSource,	",
+        "	Radiant Source,          !- Name",
+        "	Slab Floor with Radiant, !- Construction Name",
+        "	4,                       !- Source Present After Layer Number",
+        "	4,                       !- Temperature Calculation Requested After Layer Number",
+        "	2,                       !- Dimensions for the CTF Calculation",
+        "	0.3048,                  !- Tube Spacing {m}",
+        "	;                        !- Two-Dimensional Temperature Calculation Position",
+        "	Construction,	",
+        "	Slab Floor with Radiant, !- Name",
+        "	CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer",
+        "	INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2",
+        "	GYP1,                    !- Layer 3",
+        "	GYP2,                    !- Layer 4",
+        "	FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 5",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool errorsFound(false);
+
+    GetConstructData(*state, errorsFound);
+}
