@@ -1229,17 +1229,9 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     static constexpr std::string_view RoutineName("SizeFan: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 DeltaPressTot;      // Total pressure rise across fan [N/m2 = Pa]
-    Real64 FanOutletVelPress;  // Fan outlet velocity pressure [Pa]
-    Real64 EulerNum;           // Fan Euler number [-]
-    Real64 NormalizedEulerNum; // Normalized Fan Euler number [-]
-    Real64 FanDimFlow;         // Fan dimensionless airflow [-]
-    Real64 XbeltMax;           // Factor for belt max eff curve [ln hp]
-    Real64 FanTrqRatio;        // Ratio of fan torque to max fan torque [-]
-    Real64 MotorOutPwrRatio;   // Ratio of motor output power to max motor output power [-]
-    bool bPRINT = true;        // TRUE if sizing is reported to output (eio)
-    int FieldNum = 2;          // IDD numeric field number where input field description is found
-    int NumFansSized = 0;      // counter used to deallocate temporary string array after all fans have been sized
+    bool bPRINT = true;   // TRUE if sizing is reported to output (eio)
+    int FieldNum = 2;     // IDD numeric field number where input field description is found
+    int NumFansSized = 0; // counter used to deallocate temporary string array after all fans have been sized
 
     auto &fan = state.dataFans->Fan(FanNum);
 
@@ -1283,9 +1275,9 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate max fan static pressure rise using max fan volumetric flow, std air density, air-handling system characteristics,
         //   and Sherman-Wray system curve model (assumes static pressure surrounding air distribution system is zero)
-        Real64 DuctStaticPress = Curve::CurveValue(state, fan.PressResetCurveIndex, FanVolFlow);        // Duct static pressure setpoint [Pa]
-        DeltaPressTot = Curve::CurveValue(state, fan.PressRiseCurveIndex, FanVolFlow, DuctStaticPress); // Max fan total pressure rise [Pa]
-        FanOutletVelPress = 0.5 * RhoAir * pow_2(FanVolFlow / fan.FanOutletArea);                       // Max fan outlet velocity pressure [Pa]
+        Real64 DuctStaticPress = Curve::CurveValue(state, fan.PressResetCurveIndex, FanVolFlow);               // Duct static pressure setpoint [Pa]
+        Real64 DeltaPressTot = Curve::CurveValue(state, fan.PressRiseCurveIndex, FanVolFlow, DuctStaticPress); // Max fan total pressure rise [Pa]
+        Real64 FanOutletVelPress = 0.5 * RhoAir * pow_2(FanVolFlow / fan.FanOutletArea); // Max fan outlet velocity pressure [Pa]
         // Outlet velocity pressure cannot exceed total pressure rise
         FanOutletVelPress = min(FanOutletVelPress, DeltaPressTot);
         fan.DeltaPress = DeltaPressTot - FanOutletVelPress; // Max fan static pressure rise [Pa]
@@ -1295,8 +1287,8 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate fan wheel efficiency at max fan volumetric flow and corresponding fan static pressure rise,
         //   using fan characteristics and Wray dimensionless fan static efficiency model
-        EulerNum = (fan.DeltaPress * pow_4(fan.FanWheelDia)) / (RhoAir * pow_2(FanVolFlow)); //[-]
-        NormalizedEulerNum = std::log10(EulerNum / fan.EuMaxEff);
+        Real64 EulerNum = (fan.DeltaPress * pow_4(fan.FanWheelDia)) / (RhoAir * pow_2(FanVolFlow)); //[-]
+        Real64 NormalizedEulerNum = std::log10(EulerNum / fan.EuMaxEff);
         if (NormalizedEulerNum <= 0.0) {
             fan.FanWheelEff = Curve::CurveValue(state, fan.PLFanEffNormCurveIndex, NormalizedEulerNum);
         } else {
@@ -1310,6 +1302,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         fan.FanShaftPower = (fan.FanAirPower / fan.FanWheelEff); //[W]
         fan.FanShaftPwrMax = fan.FanShaftPower;                  //[W]
 
+        Real64 FanDimFlow; // Fan dimensionless airflow [-]
         // Calculate fan shaft speed, motor speed, and fan torque using Wray dimensionless fan airflow model
         if (NormalizedEulerNum <= 0.0) {
             FanDimFlow = Curve::CurveValue(state, fan.DimFlowNormCurveIndex, NormalizedEulerNum); //[-]
@@ -1353,7 +1346,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Calculate belt max efficiency using correlations and coefficients based on AMCA data
         // Direct-drive is represented using curve coefficients such that "belt" max eff and PL eff = 1.0
-        XbeltMax = std::log(fan.FanShaftPwrMax / 746.0); // Natural log of belt output power in hp
+        Real64 XbeltMax = std::log(fan.FanShaftPwrMax / 746.0); // Natural log of belt output power in hp
         if (fan.BeltMaxEffCurveIndex != 0) {
             fan.BeltMaxEff = std::exp(Curve::CurveValue(state, fan.BeltMaxEffCurveIndex, XbeltMax)); //[-]
         } else {
@@ -1361,8 +1354,8 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         }
 
         // Calculate belt part-load drive efficiency and input power using correlations and coefficients based on ACEEE data
-        FanTrqRatio = fan.FanTrq / fan.BeltMaxTorque; //[-]
-        Real64 BeltPLEff;                             // Belt normalized (part-load) efficiency [-]
+        Real64 FanTrqRatio = fan.FanTrq / fan.BeltMaxTorque; //[-]
+        Real64 BeltPLEff;                                    // Belt normalized (part-load) efficiency [-]
         if ((FanTrqRatio <= fan.BeltTorqueTrans) && (fan.PLBeltEffReg1CurveIndex != 0)) {
             BeltPLEff = Curve::CurveValue(state, fan.PLBeltEffReg1CurveIndex, FanTrqRatio); //[-]
         } else {
@@ -1403,7 +1396,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         Real64 MotorPLEff; // Motor normalized (part-load) efficiency [-]
         // Calculate motor part-load efficiency and input power using correlations and coefficients based on MotorMaster+ data
-        MotorOutPwrRatio = fan.BeltInputPower / fan.MotorMaxOutPwr; //[-]
+        Real64 MotorOutPwrRatio = fan.BeltInputPower / fan.MotorMaxOutPwr; //[-]
         if (fan.PLMotorEffCurveIndex != 0) {
             MotorPLEff = Curve::CurveValue(state, fan.PLMotorEffCurveIndex, MotorOutPwrRatio); //[-]
         } else {
