@@ -192,10 +192,10 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
     }
     this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject && this->curSysNum <= this->numPrimaryAirSys) {
-        Real64 const FanCoolLoad = 0.0;
-        Real64 const TotCapTempModFac = 1.0;
-        Real64 const DXFlowPerCapMinRatio = 1.0;
-        Real64 const DXFlowPerCapMaxRatio = 1.0;
+        Real64 constexpr FanCoolLoad = 0.0;
+        Real64 constexpr TotCapTempModFac = 1.0;
+        Real64 constexpr DXFlowPerCapMinRatio = 1.0;
+        Real64 constexpr DXFlowPerCapMaxRatio = 1.0;
         state.dataRptCoilSelection->coilSelectionReportObj->setCoilHeatingCapacity(state,
                                                                                    this->compName,
                                                                                    this->compType,

@@ -4047,7 +4047,7 @@ void CalcTESWaterStorageTank(EnergyPlusData &state, int const TESCoilNum)
                                        : 0.0;
 
     // Source side flow rate, including effectiveness factor (kg/s)
-    Real64 const SourceMassFlowRate = 0.0;
+    Real64 constexpr SourceMassFlowRate = 0.0;
     // Loss coefficient to ambient environment (W/K)
     Real64 const LossCoeff = thisTESCoil.StorageUA;
     // heat exchange directly into tank from charging system [W]

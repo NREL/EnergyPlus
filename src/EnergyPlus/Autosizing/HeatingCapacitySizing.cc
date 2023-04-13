@@ -461,8 +461,8 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirTemp(state, this->compName, this->compType, CoilOutTemp);
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirHumRat(state, this->compName, this->compType, CoilOutHumRat);
         }
-        Real64 const FanCoolLoad = 0.0;
-        Real64 const TotCapTempModFac = 1.0;
+        Real64 constexpr FanCoolLoad = 0.0;
+        Real64 constexpr TotCapTempModFac = 1.0;
         state.dataRptCoilSelection->coilSelectionReportObj->setCoilHeatingCapacity(state,
                                                                                    this->compName,
                                                                                    this->compType,
