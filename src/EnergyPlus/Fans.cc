@@ -363,11 +363,7 @@ void GetFanInput(EnergyPlusData &state)
                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                     DataLoopNode::ObjectIsNotParent);
 
-        if (NumAlphas > 4) {
-            thisFan.EndUseSubcategoryName = cAlphaArgs(5);
-        } else {
-            thisFan.EndUseSubcategoryName = "General";
-        }
+        thisFan.EndUseSubcategoryName = (NumAlphas > 4) ? cAlphaArgs(5) : "General";
 
         BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Air Nodes");
 
@@ -430,10 +426,6 @@ void GetFanInput(EnergyPlusData &state)
             thisFan.FanMinAirFracMethod = DataHVACGlobals::MinFrac;
         } else if (UtilityRoutines::SameString(cAlphaArgs(3), "FixedFlowRate")) {
             thisFan.FanMinAirFracMethod = DataHVACGlobals::FixedMin;
-        } else {
-            ShowSevereError(state, format("{} should be either Fraction or FixedFlowRate.", cAlphaFieldNames(3)));
-            ShowContinueError(state, format("Occurs in {} object.", thisFan.FanName));
-            ErrorsFound = true;
         }
         thisFan.FanMinFrac = rNumericArgs(4);
         thisFan.FanFixedMin = rNumericArgs(5);
@@ -468,11 +460,7 @@ void GetFanInput(EnergyPlusData &state)
                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                     DataLoopNode::ObjectIsNotParent);
 
-        if (NumAlphas > 5) {
-            thisFan.EndUseSubcategoryName = cAlphaArgs(6);
-        } else {
-            thisFan.EndUseSubcategoryName = "General";
-        }
+        thisFan.EndUseSubcategoryName = (NumAlphas > 5) ? cAlphaArgs(6) : "General";
 
         BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Air Nodes");
 
@@ -565,11 +553,7 @@ void GetFanInput(EnergyPlusData &state)
                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                     DataLoopNode::ObjectIsNotParent);
 
-        if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
-            thisFan.EndUseSubcategoryName = cAlphaArgs(5);
-        } else {
-            thisFan.EndUseSubcategoryName = "General";
-        }
+        thisFan.EndUseSubcategoryName = (NumAlphas > 4 && !lAlphaFieldBlanks(5)) ? cAlphaArgs(5) : "General";
 
         if (NumAlphas > 5 && !lAlphaFieldBlanks(6)) {
             thisFan.FlowFractSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(6));
@@ -772,11 +756,7 @@ void GetFanInput(EnergyPlusData &state)
             thisFan.FanEffRatioCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(6));
         }
 
-        if (NumAlphas > 6 && !lAlphaFieldBlanks(7)) {
-            thisFan.EndUseSubcategoryName = cAlphaArgs(7);
-        } else {
-            thisFan.EndUseSubcategoryName = "General";
-        }
+        thisFan.EndUseSubcategoryName = (NumAlphas > 6 && !lAlphaFieldBlanks(7)) ? cAlphaArgs(7) : "General";
 
         BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(3), cAlphaArgs(4), "Air Nodes");
 
@@ -810,7 +790,6 @@ void GetFanInput(EnergyPlusData &state)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         NightVentPerf(NVPerfNum).FanName = cAlphaArgs(1);
         NightVentPerf(NVPerfNum).FanEff = rNumericArgs(1);
         NightVentPerf(NVPerfNum).DeltaPress = rNumericArgs(2);
@@ -940,11 +919,7 @@ void GetFanInput(EnergyPlusData &state)
         thisFan.PLMotorEffCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(17));    // Motor part-load eff curve
         thisFan.VFDEffCurveIndex = Curve::GetCurveIndex(state, cAlphaArgs(18));        // VFD eff curve
 
-        if (NumAlphas > 18) {
-            thisFan.EndUseSubcategoryName = cAlphaArgs(19);
-        } else {
-            thisFan.EndUseSubcategoryName = "General";
-        }
+        thisFan.EndUseSubcategoryName = (NumAlphas > 18) ? cAlphaArgs(19) : "General";
 
     } // end Number of Component Model FAN Loop
 
@@ -2541,26 +2516,6 @@ int GetFanInletNode(EnergyPlusData &state,
     }
 }
 
-[[maybe_unused]] int getFanInNodeIndex(EnergyPlusData &state,
-                                       int const FanIndex, // fan index
-                                       bool &ErrorsFound   // set to true if problem
-)
-{
-    // Obtains and Allocates fan related parameters from input file
-    if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
-        GetFanInput(state);
-        state.dataFans->GetFanInputFlag = false;
-    }
-
-    if (FanIndex != 0) {
-        return state.dataFans->Fan(FanIndex).InletNodeNum;
-    } else {
-        ShowSevereError(state, "getFanInNodeIndex: Could not find Fan");
-        ErrorsFound = true;
-        return 0;
-    }
-}
-
 int GetFanOutletNode(EnergyPlusData &state,
                      std::string const &FanType, // must match fan types in this module
                      std::string const &FanName, // must match fan names for the fan type
@@ -2720,54 +2675,6 @@ void SetFanData(EnergyPlusData &state,
         fan.MinAirFlowRate = MinAirVolFlow;
     }
 }
-
-[[maybe_unused]] Real64 FanDesDT(EnergyPlusData &state,
-                                 int const FanNum,                        // index of fan in Fan array
-                                 [[maybe_unused]] Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
-)
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   August 2014
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function calculates and returns the design fan delta T from the fan input data
-
-    // METHODOLOGY EMPLOYED:
-    // Simple fan:  Qdot,tot = (Vdot*deltaP)/Eff,tot
-    //              Qdot,air = Eff,mot*Qdot,tot + (Qdot,tot - Eff,mot*Qdot,tot)*Frac,mot-in-airstream
-    //              Qdot,air = cp,air*rho,air*Vdot*deltaT
-
-    // Return value
-    Real64 DesignDeltaT; // returned delta T of matched fan [delta deg C]
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 RhoAir;       // density of air [kg/m3]
-    Real64 CpAir;        // specific heat of air [J/kg-K]
-    Real64 DeltaP;       // fan design pressure rise [N/m2]
-    Real64 TotEff;       // fan design total efficiency
-    Real64 MotEff;       // fan design motor efficiency
-    Real64 MotInAirFrac; // fraction of motor in the air stream
-
-    auto const &Fan(state.dataFans->Fan);
-
-    if (FanNum == 0) {
-        DesignDeltaT = 0.0;
-    } else if (Fan(FanNum).FanType_Num != DataHVACGlobals::FanType_ComponentModel) {
-        DeltaP = Fan(FanNum).DeltaPress;
-        TotEff = Fan(FanNum).FanEff;
-        MotEff = Fan(FanNum).MotEff;
-        MotInAirFrac = Fan(FanNum).MotInAirFrac;
-        RhoAir = state.dataEnvrn->StdRhoAir;
-        CpAir = Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero);
-        DesignDeltaT = (DeltaP / (RhoAir * CpAir * TotEff)) * (MotEff + MotInAirFrac * (1.0 - MotEff));
-    } else {
-        DesignDeltaT = 0.0;
-    }
-
-    return DesignDeltaT;
-
-} // FanDesDT
 
 Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
                                     std::string const &FanName,          // name of the fan

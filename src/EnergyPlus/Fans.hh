@@ -262,11 +262,6 @@ namespace Fans {
                         bool &ErrorsFound         // set to true if problem
     );
 
-    [[maybe_unused]] int getFanInNodeIndex(EnergyPlusData &state,
-                                           int FanIndex,     // fan index
-                                           bool &ErrorsFound // set to true if problem
-    );
-
     int GetFanOutletNode(EnergyPlusData &state,
                          std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
@@ -291,11 +286,6 @@ namespace Fans {
                     std::string const &FanName,                          // Name of fan
                     ObjexxFCL::Optional<Real64 const> MaxAirVolFlow = _, // Fan air volumetric flow rate    [m3/s]
                     ObjexxFCL::Optional<Real64 const> MinAirVolFlow = _  // Fan air volumetric flow rate    [m3/s]
-    );
-
-    [[maybe_unused]] Real64 FanDesDT(EnergyPlusData &state,
-                                     int FanNum,       // index of fan in Fan array
-                                     Real64 FanVolFlow // fan volumetric flow rate [m3/s]
     );
 
     Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
