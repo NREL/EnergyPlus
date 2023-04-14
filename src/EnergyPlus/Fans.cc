@@ -1180,8 +1180,8 @@ void InitFan(EnergyPlusData &state,
     // Do a check and make sure that the max and min available(control) flow is
     // between the physical max and min for the Fan while operating.
 
-    auto &inletNode = state.dataLoopNodes->Node(fan.InletNodeNum);
-    auto &outletNode = state.dataLoopNodes->Node(fan.OutletNodeNum);
+    auto const &inletNode = state.dataLoopNodes->Node(fan.InletNodeNum);
+    auto const &outletNode = state.dataLoopNodes->Node(fan.OutletNodeNum);
 
     fan.MassFlowRateMaxAvail = min(outletNode.MassFlowRateMax, inletNode.MassFlowRateMaxAvail);
     fan.MassFlowRateMinAvail = min(max(outletNode.MassFlowRateMin, inletNode.MassFlowRateMinAvail), inletNode.MassFlowRateMaxAvail);
