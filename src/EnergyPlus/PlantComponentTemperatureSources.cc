@@ -109,7 +109,7 @@ namespace PlantComponentTemperatureSources {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WaterSourceSpecs::initialize(EnergyPlusData &state, Real64 &MyLoad)
+    void WaterSourceSpecs::initialize(EnergyPlusData &state, Real64 &MyLoad, bool Runflag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -196,6 +196,19 @@ namespace PlantComponentTemperatureSources {
                 this->MassFlowRate = min(this->MassFlowRate, this->EMSOverrideValueMassFlowRateMax);
             }
         }
+
+        if (this->tempSpecType == TempSpecType::OutletSetpointVariableFlow) {                                       // TRANE
+            if (state.dataLoopNodes->Node(this->OutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue) { // TRANE
+                this->BoundaryTemp = state.dataLoopNodes->Node(this->OutletNodeNum).TempSetPoint;                   // TRANE
+            } else {                                                                                                // TRANE
+                this->BoundaryTemp = this->InletTemp;                                                               // TRANE
+            }                                                                                                       // TRANE
+            if (Runflag) {                                                                                          // TRANE
+                this->MassFlowRate = MassFlowRateMax;                                                               // TRANE
+            } else {                                                                                                // TRANE
+                this->MassFlowRate = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;                    // TRANE
+            }                                                                                                       // TRANE
+        }                                                                                                           // TRANE
 
         PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
 
@@ -387,9 +400,9 @@ namespace PlantComponentTemperatureSources {
                                     [[maybe_unused]] const PlantLocation &calledFromLocation,
                                     [[maybe_unused]] bool FirstHVACIteration,
                                     Real64 &CurLoad,
-                                    [[maybe_unused]] bool RunFlag)
+                                    bool RunFlag)
     {
-        this->initialize(state, CurLoad);
+        this->initialize(state, CurLoad, RunFlag);
         this->calculate(state);
         this->update(state);
     }
@@ -411,7 +424,7 @@ namespace PlantComponentTemperatureSources {
     void WaterSourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
     {
         Real64 myLoad = 0.0;
-        this->initialize(state, myLoad);
+        this->initialize(state, myLoad, false);
         this->autosize(state);
     }
     void WaterSourceSpecs::oneTimeInit(EnergyPlusData &state)
@@ -541,6 +554,8 @@ namespace PlantComponentTemperatureSources {
                                              state.dataIPShortCut->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
+            } else if (state.dataIPShortCut->cAlphaArgs(4) == "OUTLETSETPOINTVARIABLEFLOW") {
+                state.dataPlantCompTempSrc->WaterSource(SourceNum).tempSpecType = TempSpecType::OutletSetpointVariableFlow;
             } else {
                 ShowSevereError(state, format("Input error for {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,

@@ -178,7 +178,8 @@ namespace PlantUtilities {
                                  ObjexxFCL::Optional<Real64 const> HighLimitTemp = _,
                                  ObjexxFCL::Optional_int CountMatchPlantLoops = _,
                                  ObjexxFCL::Optional_int_const InletNodeNumber = _,
-                                 ObjexxFCL::Optional_int_const SingleLoopSearch = _);
+                                 ObjexxFCL::Optional_int_const SingleLoopSearch = _,
+                                 ObjexxFCL::Optional_bool_const suppressErrors = _);
 
     void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                                   std::string_view const CallerName, // really used for error messages

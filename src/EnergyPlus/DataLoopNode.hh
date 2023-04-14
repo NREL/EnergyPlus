@@ -327,6 +327,7 @@ namespace DataLoopNode {
         PipingSystemUndergroundPipeCircuit,
         PlantComponentTemperatureSource,
         PlantComponentUserDefined,
+        PlantEquipmentOperationChillerHeaterChangeover,
         PlantEquipmentOperationComponentSetpoint,
         PlantEquipmentOperationOutdoorDewpointDifference,
         PlantEquipmentOperationOutdoorDrybulbDifference,

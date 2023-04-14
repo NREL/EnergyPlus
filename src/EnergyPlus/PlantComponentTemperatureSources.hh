@@ -72,6 +72,7 @@ namespace PlantComponentTemperatureSources {
         Invalid = -1,
         Constant,
         Schedule,
+        OutletSetpointVariableFlow,
         Num
     };
 
@@ -114,7 +115,7 @@ namespace PlantComponentTemperatureSources {
         // Destructor
         ~WaterSourceSpecs() = default;
 
-        void initialize(EnergyPlusData &state, Real64 &MyLoad);
+        void initialize(EnergyPlusData &state, Real64 &MyLoad, bool Runflag);
 
         void setupOutputVars(EnergyPlusData &state);
 

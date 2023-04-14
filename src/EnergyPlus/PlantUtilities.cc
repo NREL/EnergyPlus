@@ -1620,7 +1620,8 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
                              ObjexxFCL::Optional<Real64 const> HighLimitTemp,
                              ObjexxFCL::Optional_int CountMatchPlantLoops,
                              ObjexxFCL::Optional_int_const InletNodeNumber,
-                             ObjexxFCL::Optional_int_const SingleLoopSearch)
+                             ObjexxFCL::Optional_int_const SingleLoopSearch,
+                             ObjexxFCL::Optional_bool_const suppressErrors)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1705,7 +1706,12 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
         }
     }
 
-    if (!FoundComponent) {
+    bool skipErrors = false;
+    if (present(suppressErrors)) {
+        skipErrors = suppressErrors;
+    }
+
+    if (!FoundComponent && !skipErrors) {
         if (CompType != DataPlant::PlantEquipmentType::Invalid && CompType != DataPlant::PlantEquipmentType::Num) {
             if (!present(SingleLoopSearch)) {
                 ShowSevereError(state,

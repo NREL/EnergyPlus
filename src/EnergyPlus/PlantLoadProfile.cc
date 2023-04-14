@@ -301,6 +301,12 @@ void PlantProfileData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
 
+void PlantProfileData::getCurrentPower(EnergyPlusData &state, Real64 &power)
+{
+    power = this->Power;
+    return;
+}
+
 // Functions
 void GetPlantProfileInput(EnergyPlusData &state)
 {
