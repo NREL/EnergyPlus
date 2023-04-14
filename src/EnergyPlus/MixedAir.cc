@@ -3322,11 +3322,9 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
     static constexpr std::string_view RoutineName("CalcOAController: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 OASignal;                // Outside air flow rate fraction (0.0 to 1.0)
-    bool AirLoopCyclingFan;         // Type of air loop fan (TRUE if Fan:OnOff)
-    bool HighHumidityOperationFlag; // TRUE if zone humidistat senses a high humidity condition
-    Real64 MixedAirTempAtMinOAFlow; // - mixed air temperature at min flow rate, used for custom economizer control calculation
-    Real64 SysSA(0.0);              // System supply air mass flow rate [kg/s]
+    Real64 OASignal = 0.0;                  // Outside air flow rate fraction (0.0 to 1.0)
+    bool AirLoopCyclingFan = false;         // Type of air loop fan (TRUE if Fan:OnOff)
+    bool HighHumidityOperationFlag = false; // TRUE if zone humidistat senses a high humidity condition
 
     if (AirLoopNum > 0) {
         AirLoopCyclingFan = (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == CycFanCycCoil);
@@ -3397,6 +3395,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         auto &curAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
 
         // Get system supply air flow rate
+        Real64 SysSA = 0.0; // System supply air mass flow rate [kg/s]
         if (curAirLoopControlInfo.LoopFlowRateSet) {
             // if flow rate has been specified by a manager, set it to the specified value
             // DesSupply and SupFlow are mass flow rate in kg/s
@@ -3457,13 +3456,12 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         Real64 RecircMassFlowRateAtMinOAFlow = max(state.dataLoopNodes->Node(this->RetNode).MassFlowRate - ReliefMassFlowAtMinOA, 0.0);
         if ((RecircMassFlowRateAtMinOAFlow + curAirLoopFlow.MinOutAir) > 0.0) {
             Real64 RecircTemp = state.dataLoopNodes->Node(this->RetNode).Temp; // return air temp used for custom economizer control calculation
-            MixedAirTempAtMinOAFlow =
+            this->MixedAirTempAtMinOAFlow =
                 (RecircMassFlowRateAtMinOAFlow * RecircTemp + curAirLoopFlow.MinOutAir * state.dataLoopNodes->Node(this->OANode).Temp) /
                 (RecircMassFlowRateAtMinOAFlow + curAirLoopFlow.MinOutAir);
         } else {
-            MixedAirTempAtMinOAFlow = state.dataLoopNodes->Node(this->RetNode).Temp;
+            this->MixedAirTempAtMinOAFlow = state.dataLoopNodes->Node(this->RetNode).Temp;
         }
-        this->MixedAirTempAtMinOAFlow = MixedAirTempAtMinOAFlow;
     }
 
     // Economizer
@@ -3631,7 +3629,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
 }
 
 Real64 VentilationMechanicalProps::CalcMechVentController(EnergyPlusData &state,
-                                                          Real64 &SysSA // System supply air mass flow rate [kg/s]
+                                                          Real64 SysSA // System supply air mass flow rate [kg/s]
 )
 {
     static constexpr std::string_view RoutineName("CalcMechVentController: ");

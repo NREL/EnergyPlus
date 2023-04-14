@@ -224,7 +224,7 @@ namespace MixedAir {
         int EconomizerStatus = 0;             // Air Economizer status (1 = on, 0 = off or economizer not exists)
         int HeatRecoveryBypassStatus = 0;     // OA Sys Heat Recovery Bypass status (1 = on, 0 = off or economizer not exists)
         int HRHeatingCoilActive = 0;          // OA Sys Heat Recovery Heating Coil Was Active status (1 = on, 0 = off)
-        Real64 MixedAirTempAtMinOAFlow = 0.0; // calculated mixed air temp when using special HX bypass control
+        Real64 MixedAirTempAtMinOAFlow = 0.0; // calculated mixed air temp at min flow rate when using special HX bypass control
         int HighHumCtrlStatus = 0;            // High Humidity Control status (1 = on, 0 = off or high hum ctrl not used)
         Real64 OAFractionRpt = 0.0;           // Actual outdoor air fraction for reporting (based on mixed air flow rate),
         // 0 to 1 (normally)
@@ -316,7 +316,7 @@ namespace MixedAir {
         Real64 SysDesOA = 0.0; // System design OA
 
         Real64 CalcMechVentController(EnergyPlusData &state,
-                                      Real64 &SysSA // System supply air mass flow rate [kg/s]
+                                      Real64 SysSA // System supply air mass flow rate [kg/s]
         );
     };
 
