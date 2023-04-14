@@ -100,8 +100,6 @@ namespace MixedAir {
     enum class MixedAirControllerType
     {
         Invalid = -1,
-        None,
-        ControllerSimple,
         ControllerOutsideAir,
         ControllerStandAloneERV,
         Num,
@@ -124,8 +122,8 @@ namespace MixedAir {
         Num,
     };
 
-    // OA Controller Limiting Factor (used for integer output variable values for OAControllerProps::OALimitingFactor
-    // stored as int since it is used in SetupOutputVariable()
+    // OA Controller Limiting Factor
+    // Must keep these values to use for integer output variable OAControllerProps::OALimitingFactorReport
     enum class OALimitFactor
     {
         Invalid = -1,
@@ -157,9 +155,8 @@ namespace MixedAir {
     {
         // Members
         std::string Name;
-        std::string ControllerType;
-        MixedAirControllerType ControllerType_Num = MixedAirControllerType::None; // Parameter equivalent of controller type
-        LockoutType Lockout = LockoutType::NoLockoutPossible;                     // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
+        MixedAirControllerType ControllerType = MixedAirControllerType::Invalid; // Mixed air controller type
+        LockoutType Lockout = LockoutType::NoLockoutPossible;                    // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
         // 2=LockoutWithCompressorPossible;
         bool FixedMin = true;                  // Fixed Minimum or Proportional Minimum
         Real64 TempLim = 0.0;                  // Temperature Limit

@@ -140,6 +140,9 @@ using namespace FaultsManager;
 
 constexpr std::array<std::string_view, static_cast<int>(ControllerKind::Num)> ControllerKindNamesUC{"CONTROLLER:WATERCOIL", "CONTROLLER:OUTDOORAIR"};
 
+constexpr std::array<std::string_view, static_cast<int>(MixedAirControllerType::Num)> MixedAirControllerTypeNames{
+    "Controller:OutdoorAir", "ZoneHVAC:EnergyRecoveryVentilator:Controller"};
+
 constexpr std::array<std::string_view, static_cast<int>(CMO::Num)> CurrentModuleObjects{"None",
                                                                                         "AirLoopHVAC:OutdoorAirSystem",
                                                                                         "AirLoopHVAC:OutdoorAirSystem:EquipmentList",
@@ -2046,8 +2049,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("GetOAControllerInputs: "); // include trailing blank space
 
     state.dataMixedAir->OAController(OutAirNum).Name = AlphArray(1);
-    state.dataMixedAir->OAController(OutAirNum).ControllerType = CurrentModuleObject;
-    state.dataMixedAir->OAController(OutAirNum).ControllerType_Num = MixedAirControllerType::ControllerOutsideAir;
+    state.dataMixedAir->OAController(OutAirNum).ControllerType = MixedAirControllerType::ControllerOutsideAir;
     state.dataMixedAir->OAController(OutAirNum).MaxOA = NumArray(2);
     state.dataMixedAir->OAController(OutAirNum).MinOA = NumArray(1);
     state.dataMixedAir->OAController(OutAirNum).MixNode =
@@ -2265,10 +2267,11 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
                         }
                     } else {
                         if (OASysIndex == 0) {
-                            ShowSevereError(state,
-                                            format("Did not find an AirLoopHVAC:OutdoorAirSystem for {} = \"{}\"",
-                                                   state.dataMixedAir->OAController(OutAirNum).ControllerType,
-                                                   state.dataMixedAir->OAController(OutAirNum).Name));
+                            ShowSevereError(
+                                state,
+                                format("Did not find an AirLoopHVAC:OutdoorAirSystem for {} = \"{}\"",
+                                       MixedAirControllerTypeNames[static_cast<int>(state.dataMixedAir->OAController(OutAirNum).ControllerType)],
+                                       state.dataMixedAir->OAController(OutAirNum).Name));
                             ErrorsFound = true;
                         }
                     }
@@ -2277,7 +2280,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
             if (!AirNodeFound) {
                 ShowSevereError(state,
                                 format("Did not find Air Node (Zone with Humidistat), {} = \"{}\"",
-                                       state.dataMixedAir->OAController(OutAirNum).ControllerType,
+                                       MixedAirControllerTypeNames[static_cast<int>(state.dataMixedAir->OAController(OutAirNum).ControllerType)],
                                        state.dataMixedAir->OAController(OutAirNum).Name));
                 ShowContinueError(state, format("Specified {} = {}", cAlphaFields(17), AlphArray(17)));
                 ShowContinueError(state,
@@ -2287,7 +2290,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
             if (!AirLoopFound) {
                 ShowSevereError(state,
                                 format("Did not find correct Primary Air Loop for {} = \"{}\"",
-                                       state.dataMixedAir->OAController(OutAirNum).ControllerType,
+                                       MixedAirControllerTypeNames[static_cast<int>(state.dataMixedAir->OAController(OutAirNum).ControllerType)],
                                        state.dataMixedAir->OAController(OutAirNum).Name));
                 ShowContinueError(state, format("{} = {} is not served by this Primary Air Loop equipment.", cAlphaFields(17), AlphArray(17)));
                 ErrorsFound = true;
@@ -2295,7 +2298,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
         } else {
             ShowSevereError(state,
                             format("Did not find Air Node (Zone with Humidistat), {} = \"{}\"",
-                                   state.dataMixedAir->OAController(OutAirNum).ControllerType,
+                                   MixedAirControllerTypeNames[static_cast<int>(state.dataMixedAir->OAController(OutAirNum).ControllerType)],
                                    state.dataMixedAir->OAController(OutAirNum).Name));
             ShowContinueError(state, format("Specified {} = {}", cAlphaFields(17), AlphArray(17)));
             ShowContinueError(state,
@@ -2392,8 +2395,10 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
     }
 
     if (UtilityRoutines::SameString(AlphArray(16), "Yes") && state.dataMixedAir->OAController(OutAirNum).Econo == EconoOp::NoEconomizer) {
-        ShowWarningError(
-            state, format("{} \"{}\"", state.dataMixedAir->OAController(OutAirNum).ControllerType, state.dataMixedAir->OAController(OutAirNum).Name));
+        ShowWarningError(state,
+                         format("{} \"{}\"",
+                                MixedAirControllerTypeNames[static_cast<int>(state.dataMixedAir->OAController(OutAirNum).ControllerType)],
+                                state.dataMixedAir->OAController(OutAirNum).Name));
         ShowContinueError(state, format("...Economizer operation must be enabled when {} is set to YES.", cAlphaFields(16)));
         ShowContinueError(state, "...The high humidity control option will be disabled and the simulation continues.");
     }
@@ -2454,7 +2459,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
     }
     if (state.dataMixedAir->OAControllerMyOneTimeFlag(OAControllerNum)) {
         // Determine Inlet node index for OAController, not a user input for controller, but is obtained from OutsideAirSys and OAMixer
-        switch (thisOAController.ControllerType_Num) {
+        switch (thisOAController.ControllerType) {
         case MixedAirControllerType::ControllerOutsideAir: {
             int thisOASys = 0;
             for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
@@ -2505,7 +2510,9 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             thisOAController.InletNode = thisOAController.OANode;
         } break;
         default: {
-            ShowSevereError(state, format("InitOAController: Failed to find ControllerType: {}", thisOAController.ControllerType));
+            ShowSevereError(state,
+                            format("InitOAController: Failed to find ControllerType: {}",
+                                   MixedAirControllerTypeNames[static_cast<int>(thisOAController.ControllerType)]));
             ErrorsFound = true;
         } break;
         }
@@ -2882,7 +2889,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 auto &loopOAController(state.dataMixedAir->OAController(OAControllerLoop));
 
                 // Find the outside air system that has the OA controller
-                if (loopOAController.ControllerType_Num == MixedAirControllerType::ControllerStandAloneERV) continue; // ERV controller not on airloop
+                if (loopOAController.ControllerType == MixedAirControllerType::ControllerStandAloneERV) continue; // ERV controller not on airloop
                 bool OASysFound = false;
                 int thisOASys = 0;
                 for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
@@ -3084,7 +3091,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
     // Each time step
     if (FirstHVACIteration) {
         // Mixed air setpoint. Set by a setpoint manager.
-        if (thisOAController.ControllerType_Num == MixedAirControllerType::ControllerOutsideAir) {
+        if (thisOAController.ControllerType == MixedAirControllerType::ControllerOutsideAir) {
             if (state.dataLoopNodes->Node(thisOAController.MixNode).TempSetPoint > SensedNodeFlagValue) {
                 thisOAController.MixSetTemp = state.dataLoopNodes->Node(thisOAController.MixNode).TempSetPoint;
             } else {
@@ -3116,7 +3123,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
     // Each iteration
 
-    if (thisOAController.ControllerType_Num == MixedAirControllerType::ControllerOutsideAir) {
+    if (thisOAController.ControllerType == MixedAirControllerType::ControllerOutsideAir) {
         // zone exhaust mass flow is saved in AirLoopFlow%ZoneExhaust
         // the zone exhaust mass flow that is said to be balanced by simple air flows is saved in AirLoopFlow%ZoneExhaustBalanced
         if (AirLoopNum > 0) {
@@ -3477,7 +3484,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
     }
 
     // Do not allow OA to be below Exh for controller:outside air
-    if (this->ControllerType_Num == MixedAirControllerType::ControllerOutsideAir) {
+    if (this->ControllerType == MixedAirControllerType::ControllerOutsideAir) {
         if (this->ExhMassFlow > this->OAMassFlow) {
             this->OAMassFlow = this->ExhMassFlow;
             this->OALimitingFactor = OALimitFactor::Exhaust;
@@ -4394,7 +4401,7 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
     // it was calculated using the approximate method of sensible energy balance. Now we have to get the
     // accurate result using a full mass, enthalpy and moisture balance and iteration.
     if (OutAirSignal > OutAirMinFrac && OutAirSignal < 1.0 && this->MixMassFlow > VerySmallMassFlow &&
-        this->ControllerType_Num == MixedAirControllerType::ControllerOutsideAir && !AirLoopNightVent) {
+        this->ControllerType == MixedAirControllerType::ControllerOutsideAir && !AirLoopNightVent) {
 
         if (AirLoopNum > 0) {
 
@@ -4687,7 +4694,7 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
 
         if (state.dataSize->CurSysNum > 0) {
 
-            switch (this->ControllerType_Num) {
+            switch (this->ControllerType) {
             case MixedAirControllerType::ControllerOutsideAir: {
                 CheckSysSizing(state, CurrentModuleObject, this->Name);
                 switch (state.dataSize->CurDuctType) {
@@ -4712,7 +4719,7 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
 
         } else if (state.dataSize->CurZoneEqNum > 0) {
 
-            switch (this->ControllerType_Num) {
+            switch (this->ControllerType) {
             case MixedAirControllerType::ControllerOutsideAir: {
                 CheckZoneSizing(state, CurrentModuleObject, this->Name);
                 this->MaxOA = max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow,
@@ -4811,7 +4818,7 @@ void OAControllerProps::UpdateOAController(EnergyPlusData &state)
     int RelAirNodeNum = this->RelNode;
     int RetAirNodeNum = this->RetNode;
 
-    if (this->ControllerType_Num == MixedAirControllerType::ControllerOutsideAir) {
+    if (this->ControllerType == MixedAirControllerType::ControllerOutsideAir) {
         // The outside air controller sets the outside air flow rate and the relief air flow rate
         if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && (this->ManageDemand) &&
             (this->OAMassFlow > this->DemandLimitFlowRate)) {

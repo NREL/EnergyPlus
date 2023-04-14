@@ -1410,7 +1410,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ControllerTypeTest)
     state->dataMixedAir->OAController.allocate(OAControllerNum);
     state->dataLoopNodes->Node.allocate(4);
 
-    state->dataMixedAir->OAController(OAControllerNum).ControllerType_Num = MixedAir::MixedAirControllerType::ControllerOutsideAir;
+    state->dataMixedAir->OAController(OAControllerNum).ControllerType = MixedAir::MixedAirControllerType::ControllerOutsideAir;
     state->dataMixedAir->OAController(OAControllerNum).OANode = 1;
     state->dataMixedAir->OAController(OAControllerNum).InletNode = 2;
     state->dataMixedAir->OAController(OAControllerNum).RelNode = 3;
