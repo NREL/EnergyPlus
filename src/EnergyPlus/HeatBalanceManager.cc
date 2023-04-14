@@ -1881,8 +1881,9 @@ namespace HeatBalanceManager {
                 }
                 Real64 tube_spacing = fields.at("tube_spacing").get<Real64>();
                 Real64 calculation_position = 0.0;
-                if (fields.find("two_dimensional_temperature_calculation_position") != fields.end()) {
-                    calculation_position = fields.at("two_dimensional_temperature_calculation_position").get<Real64>();
+                auto const twoDimTempCalcPos = fields.find("two_dimensional_temperature_calculation_position");
+                if (twoDimTempCalcPos != fields.end()) {
+                    calculation_position = twoDimTempCalcPos.value().get<Real64>();
                 }
 
                 // Find the construction
