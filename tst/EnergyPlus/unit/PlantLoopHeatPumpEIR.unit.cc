@@ -2812,8 +2812,8 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
                                                       "  Dimensionless;",
                                                       "Curve:Quadratic,",
                                                       "  EIRCurveFuncPLR,",
-                                                      "  1.0,",
                                                       "  0.0,",
+                                                      "  1.0,",
                                                       "  0.0,",
                                                       "  0.0,",
                                                       "  1.0;"});
@@ -3246,8 +3246,8 @@ TEST_F(EnergyPlusFixture, Test_Curve_Negative_Energy)
                                                       "  Dimensionless;",
                                                       "Curve:Quadratic,",
                                                       "  EIRCurveFuncPLR,",
-                                                      "  1.0,",
                                                       "  0.0,",
+                                                      "  1.0,",
                                                       "  0.0,",
                                                       "  0.0,",
                                                       "  1.0;"

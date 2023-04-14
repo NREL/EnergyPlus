@@ -1146,11 +1146,11 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_inlet_node_name").get<std::string>());
             std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
 
-            auto compHPFound = fields.find("companion_heat_pump_name");
+            auto const compHPFound = fields.find("companion_heat_pump_name");
             if (compHPFound != fields.end()) { // optional field
                 thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(compHPFound.value().get<std::string>());
             }
-            auto &tmpFlowRate = fields.at("load_side_reference_flow_rate");
+            auto const &tmpFlowRate = fields.at("load_side_reference_flow_rate");
             if (tmpFlowRate == "Autosize") {
                 thisPLHP.loadSideDesignVolFlowRate = DataSizing::AutoSize;
                 thisPLHP.loadSideDesignVolFlowRateWasAutoSized = true;
@@ -1158,7 +1158,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.loadSideDesignVolFlowRate = tmpFlowRate.get<Real64>();
             }
 
-            auto &tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
+            auto const &tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
             if (tmpSourceFlowRate == "Autosize") {
                 thisPLHP.sourceSideDesignVolFlowRate = DataSizing::AutoSize;
                 thisPLHP.sourceSideDesignVolFlowRateWasAutoSized = true;
@@ -1166,7 +1166,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.sourceSideDesignVolFlowRate = tmpSourceFlowRate.get<Real64>();
             }
 
-            auto &tmpRefCapacity = fields.at("reference_capacity");
+            auto const &tmpRefCapacity = fields.at("reference_capacity");
             if (tmpRefCapacity == "Autosize") {
                 thisPLHP.referenceCapacity = DataSizing::AutoSize;
                 thisPLHP.referenceCapacityWasAutoSized = true;
@@ -1174,7 +1174,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.referenceCapacity = tmpRefCapacity.get<Real64>();
             }
 
-            auto refCOPFound = fields.find("reference_coefficient_of_performance");
+            auto const refCOPFound = fields.find("reference_coefficient_of_performance");
             if (refCOPFound != fields.end()) {
                 thisPLHP.referenceCOP = refCOPFound.value().get<Real64>();
             } else {
@@ -1192,7 +1192,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
             }
 
-            auto sizeFacFound = fields.find("sizing_factor");
+            auto const sizeFacFound = fields.find("sizing_factor");
             if (sizeFacFound != fields.end()) {
                 thisPLHP.sizingFactor = sizeFacFound.value().get<Real64>();
             } else {
@@ -1209,7 +1209,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
             }
 
-            std::string const &capFtName =
+            std::string const capFtName =
                 UtilityRoutines::MakeUPPERCase(fields.at("capacity_modifier_function_of_temperature_curve_name").get<std::string>());
             thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, capFtName);
             if (thisPLHP.capFuncTempCurveIndex == 0) {
@@ -1217,7 +1217,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 errorsFound = true;
             }
 
-            std::string const &eirFtName = UtilityRoutines::MakeUPPERCase(
+            std::string const eirFtName = UtilityRoutines::MakeUPPERCase(
                 fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name").get<std::string>());
             thisPLHP.powerRatioFuncTempCurveIndex = Curve::GetCurveIndex(state, eirFtName);
             if (thisPLHP.powerRatioFuncTempCurveIndex == 0) {
@@ -1225,7 +1225,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 errorsFound = true;
             }
 
-            std::string const &eirFplrName = UtilityRoutines::MakeUPPERCase(
+            std::string const eirFplrName = UtilityRoutines::MakeUPPERCase(
                 fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name").get<std::string>());
             thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, eirFplrName);
             if (thisPLHP.powerRatioFuncPLRCurveIndex == 0) {
@@ -1239,9 +1239,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.heatSizingRatio = heatCoolCapRatio.value().get<Real64>();
             } else if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
                 Real64 defaultVal = 1.0;
-                bool defaultFound = state.dataInputProcessing->inputProcessor->getDefaultValue(
-                    state, cCurrentModuleObject, "heating_to_cooling_capacity_sizing_ratio", defaultVal);
-                if (!defaultFound) {
+                if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                        state, cCurrentModuleObject, "heating_to_cooling_capacity_sizing_ratio", defaultVal)) {
                     // excluding from coverage
                     ShowWarningError(
                         state, // LCOV_EXCL_LINE
@@ -1289,9 +1288,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.minimumPLR = minPLR.value().get<Real64>();
             } else { // get default value
                 Real64 defaultVal = 0.0;
-                bool defaultFound =
-                    state.dataInputProcessing->inputProcessor->getDefaultValue(state, cCurrentModuleObject, "minimum_part_load_ratio", defaultVal);
-                if (!defaultFound) {
+                if (!state.dataInputProcessing->inputProcessor->getDefaultValue(state, cCurrentModuleObject, "minimum_part_load_ratio", defaultVal)) {
                     // excluding from coverage
                     ShowWarningError(state, // LCOV_EXCL_LINE
                                      format("EIR PLHP \"{}\": Heat Pump Minimum Part Load Ratio not entered and default value not found.",
@@ -1307,11 +1304,9 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.minSourceTempLimit = minSupplyTemp.value().get<Real64>();
             } else { // get default value
                 Real64 defaultVal = 0.0;
-                bool defaultFound = state.dataInputProcessing->inputProcessor->getDefaultValue(
-                    state, cCurrentModuleObject, "minimum_source_inlet_temperature", defaultVal);
-                if (!defaultFound) {
-                    // excluding from coverage
-                    ShowWarningError(state, // LCOV_EXCL_LINE
+                if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                        state, cCurrentModuleObject, "minimum_source_inlet_temperature", defaultVal)) {
+                    ShowWarningError(state, // LCOV_EXCL_LINE - excluding from coverage
                                      format("EIR PLHP \"{}\": Heat Pump Minimum Source Inlet Temperature not entered and default value not found.",
                                             thisPLHP.name)); // LCOV_EXCL_LINE
                     errorsFound = true;                      // LCOV_EXCL_LINE
@@ -1325,9 +1320,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.maxSourceTempLimit = maxSupplyTemp.value().get<Real64>();
             } else { // get default value
                 Real64 defaultVal = 0.0;
-                bool defaultFound = state.dataInputProcessing->inputProcessor->getDefaultValue(
-                    state, cCurrentModuleObject, "maximum_source_inlet_temperature", defaultVal);
-                if (!defaultFound) {
+                if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                        state, cCurrentModuleObject, "maximum_source_inlet_temperature", defaultVal)) {
                     // excluding from coverage
                     ShowWarningError(state, // LCOV_EXCL_LINE
                                      format("EIR PLHP \"{}\": Heat Pump Minimum Source Inlet Temperature not entered and default value not found.",
@@ -1375,9 +1369,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     thisPLHP.defrostTime = timePeriod.value().get<Real64>();
                 } else {
                     Real64 defaultVal = 0.0;
-                    bool defaultFound = state.dataInputProcessing->inputProcessor->getDefaultValue(
-                        state, cCurrentModuleObject, "heat_pump_defrost_time_period_fraction", defaultVal);
-                    if (!defaultFound) {
+                    if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
+                            state, cCurrentModuleObject, "heat_pump_defrost_time_period_fraction", defaultVal)) {
                         // excluding from coverage
                         ShowSevereError(state, // LCOV_EXCL_LINE
                                         format("EIR PLHP \"{}\": Heat Pump Defrost Time Period Fraction not entered and default value not found.",
@@ -1447,11 +1440,6 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 condenserNodeType = DataLoopNode::NodeFluidType::Air;
                 condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
                 condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
-            } else {
-                // Again, this should be protected by the input processor
-                ShowErrorMessage(
-                    state, format("Invalid heat pump condenser type (name={}; entered type: {}", thisPLHP.name, condenserType)); // LCOV_EXCL_LINE
-                errorsFound = true;                                                                                              // LCOV_EXCL_LINE
             }
             thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                  sourceSideInletNodeName,
