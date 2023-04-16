@@ -584,7 +584,6 @@ namespace HVACDXHeatPumpSystem {
         Real64 DesOutTemp;       // Desired outlet temperature of the DX cooling coil
         Real64 OutletTempDXCoil; // Actual outlet temperature of the DX cooling coil
 
-        int SolFla;        // Flag of solver
         bool SensibleLoad; // True if there is a sensible cooling load on this system
         int FanOpMode;     // Supply air fan operating mode
         // added variables to call variable speed DX coils
@@ -723,6 +722,7 @@ namespace HVACDXHeatPumpSystem {
                                         Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(coilIndex);
                                         return DesOutTemp - OutletAirTemp;
                                     };
+                                    int SolFla = 0;
                                     SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
@@ -941,6 +941,7 @@ namespace HVACDXHeatPumpSystem {
                                         auto f = [&state, VSCoilIndex, DesOutTemp, SpeedNum, FanOpMode](Real64 const x) {
                                             return VSCoilSpeedResidual(state, x, VSCoilIndex, DesOutTemp, SpeedNum, FanOpMode);
                                         };
+                                        int SolFla = 0;
                                         General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, f, 1.0e-10, 1.0);
 
                                         if (SolFla == -1) {
@@ -1017,6 +1018,7 @@ namespace HVACDXHeatPumpSystem {
                                         auto f = [&state, VSCoilIndex, DesOutTemp, FanOpMode](Real64 const x) {
                                             return VSCoilCyclingResidual(state, x, VSCoilIndex, DesOutTemp, FanOpMode);
                                         };
+                                        int SolFla = 0;
                                         General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 1.0e-10, 1.0);
                                         if (SolFla == -1) {
                                             if (!state.dataGlobal->WarmupFlag) {
