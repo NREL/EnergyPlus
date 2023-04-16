@@ -604,16 +604,16 @@ namespace HVACDXHeatPumpSystem {
         int I;                        // interation increment
         Real64 SpeedRatio;            // speed ratio between two neighboring speeds
 
-        auto &DXHeatPumpSystem(state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
+        auto &DXHeatPumpSystem = state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXSystemNum);
 
         // Set local variables
         // Retrieve the load on the controlled zone
-        OutletNode = DXHeatPumpSystem(DXSystemNum).DXHeatPumpCoilOutletNodeNum;
-        InletNode = DXHeatPumpSystem(DXSystemNum).DXHeatPumpCoilInletNodeNum;
-        ControlNode = DXHeatPumpSystem(DXSystemNum).DXSystemControlNodeNum;
-        DesOutTemp = DXHeatPumpSystem(DXSystemNum).DesiredOutletTemp;
-        CompName = DXHeatPumpSystem(DXSystemNum).HeatPumpCoilName;
-        FanOpMode = DXHeatPumpSystem(DXSystemNum).FanOpMode;
+        OutletNode = DXHeatPumpSystem.DXHeatPumpCoilOutletNodeNum;
+        InletNode = DXHeatPumpSystem.DXHeatPumpCoilInletNodeNum;
+        ControlNode = DXHeatPumpSystem.DXSystemControlNodeNum;
+        DesOutTemp = DXHeatPumpSystem.DesiredOutletTemp;
+        CompName = DXHeatPumpSystem.HeatPumpCoilName;
+        FanOpMode = DXHeatPumpSystem.FanOpMode;
 
         PartLoadFrac = 0.0;
 
@@ -634,17 +634,17 @@ namespace HVACDXHeatPumpSystem {
         SpeedRatio = 0.0;
 
         // If there is a fault of coil SAT Sensor
-        if (DXHeatPumpSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
+        if (DXHeatPumpSystem.FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
             (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
-            int FaultIndex = DXHeatPumpSystem(DXSystemNum).FaultyCoilSATIndex;
-            DXHeatPumpSystem(DXSystemNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+            int FaultIndex = DXHeatPumpSystem.FaultyCoilSATIndex;
+            DXHeatPumpSystem.FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the DesOutTemp
-            DesOutTemp -= DXHeatPumpSystem(DXSystemNum).FaultyCoilSATOffset;
+            DesOutTemp -= DXHeatPumpSystem.FaultyCoilSATOffset;
         }
 
         // If DXHeatingSystem is scheduled on and there is flow
-        if ((GetCurrentScheduleValue(state, DXHeatPumpSystem(DXSystemNum).SchedPtr) > 0.0) &&
+        if ((GetCurrentScheduleValue(state, DXHeatPumpSystem.SchedPtr) > 0.0) &&
             (state.dataLoopNodes->Node(InletNode).MassFlowRate > MinAirMassFlow)) {
 
             // Determine if there is a sensible load on this system
@@ -658,7 +658,7 @@ namespace HVACDXHeatPumpSystem {
                 {
                     Real64 TempOut1;
 
-                    switch (DXHeatPumpSystem(DXSystemNum).HeatPumpCoilType_Num) {
+                    switch (DXHeatPumpSystem.HeatPumpCoilType_Num) {
                     case CoilDX_HeatingEmpirical: { // Coil:Heating:DX:SingleSpeed
 
                         // Get no load result
@@ -667,7 +667,7 @@ namespace HVACDXHeatPumpSystem {
                                   CompName,
                                   CompressorOperation::On,
                                   FirstHVACIteration,
-                                  DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
+                                  DXHeatPumpSystem.HeatPumpCoilIndex,
                                   FanOpMode,
                                   PartLoadFrac);
                         NoOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
@@ -680,7 +680,7 @@ namespace HVACDXHeatPumpSystem {
                                   CompName,
                                   CompressorOperation::On,
                                   FirstHVACIteration,
-                                  DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
+                                  DXHeatPumpSystem.HeatPumpCoilIndex,
                                   FanOpMode,
                                   PartLoadFrac);
 
@@ -704,7 +704,7 @@ namespace HVACDXHeatPumpSystem {
                             //           OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above. If this
                             //           temp is greater than the desired outlet temp, then run the compressor at PartLoadFrac = 1, otherwise find the
                             //           operating PLR.
-                            OutletTempDXCoil = state.dataDXCoils->DXCoilOutletTemp(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex);
+                            OutletTempDXCoil = state.dataDXCoils->DXCoilOutletTemp(DXHeatPumpSystem.HeatPumpCoilIndex);
                             if (OutletTempDXCoil < DesOutTemp) {
                                 PartLoadFrac = 1.0;
                             } else {
@@ -715,11 +715,11 @@ namespace HVACDXHeatPumpSystem {
                                               CompName,
                                               CompressorOperation::On,
                                               FirstHVACIteration,
-                                              DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
+                                              DXHeatPumpSystem.HeatPumpCoilIndex,
                                               FanOpMode,
                                               PartLoadFrac);
                                 } else {
-                                    int coilIndex = DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex;
+                                    int coilIndex = DXHeatPumpSystem.HeatPumpCoilIndex;
                                     auto f = [&state, coilIndex, DesOutTemp](Real64 const PartLoadFrac) {
                                         DXCoils::CalcDXHeatingCoil(state, coilIndex, PartLoadFrac, ContFanCycCoil, 1.0);
                                         Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(coilIndex);
@@ -728,13 +728,13 @@ namespace HVACDXHeatPumpSystem {
                                     SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
-                                                ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter;
+                                            if (DXHeatPumpSystem.DXCoilSensPLRIter < 1) {
+                                                ++DXHeatPumpSystem.DXCoilSensPLRIter;
                                                 ShowWarningError(
                                                     state,
                                                     format("{} - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = {}",
-                                                           DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType,
-                                                           DXHeatPumpSystem(DXSystemNum).Name));
+                                                           DXHeatPumpSystem.DXHeatPumpSystemType,
+                                                           DXHeatPumpSystem.Name));
                                                 ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
                                                 ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
                                                 ShowContinueErrorTimeStamp(
@@ -742,12 +742,11 @@ namespace HVACDXHeatPumpSystem {
                                                     "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
                                             } else {
                                                 ShowRecurringWarningErrorAtEnd(state,
-                                                                               DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" +
-                                                                                   DXHeatPumpSystem(DXSystemNum).Name +
+                                                                               DXHeatPumpSystem.DXHeatPumpSystemType + " \"" + DXHeatPumpSystem.Name +
                                                                                    "\" - Iteration limit exceeded calculating sensible part-load "
                                                                                    "ratio error continues. Sensible "
                                                                                    "PLR statistics follow.",
-                                                                               DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                                               DXHeatPumpSystem.DXCoilSensPLRIterIndex,
                                                                                PartLoadFrac,
                                                                                PartLoadFrac);
                                             }
@@ -755,13 +754,13 @@ namespace HVACDXHeatPumpSystem {
                                     } else if (SolFla == -2) {
                                         PartLoadFrac = ReqOutput / FullOutput;
                                         if (!state.dataGlobal->WarmupFlag) {
-                                            if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
-                                                ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
+                                            if (DXHeatPumpSystem.DXCoilSensPLRFail < 1) {
+                                                ++DXHeatPumpSystem.DXCoilSensPLRFail;
                                                 ShowWarningError(state,
                                                                  format("{} - DX unit sensible part-load ratio calculation failed: part-load ratio "
                                                                         "limits exceeded, for unit = {}",
-                                                                        DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType,
-                                                                        DXHeatPumpSystem(DXSystemNum).Name));
+                                                                        DXHeatPumpSystem.DXHeatPumpSystemType,
+                                                                        DXHeatPumpSystem.Name));
                                                 ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
                                                 ShowContinueErrorTimeStamp(
                                                     state,
@@ -769,10 +768,10 @@ namespace HVACDXHeatPumpSystem {
                                             } else {
                                                 ShowRecurringWarningErrorAtEnd(
                                                     state,
-                                                    DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
+                                                    DXHeatPumpSystem.DXHeatPumpSystemType + " \"" + DXHeatPumpSystem.Name +
                                                         "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
                                                         "statistics follow.",
-                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                    DXHeatPumpSystem.DXCoilSensPLRFailIndex,
                                                     PartLoadFrac,
                                                     PartLoadFrac);
                                             }
@@ -803,7 +802,7 @@ namespace HVACDXHeatPumpSystem {
 
                         SimVariableSpeedCoils(state,
                                               CompName,
-                                              DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
+                                              DXHeatPumpSystem.HeatPumpCoilIndex,
                                               FanOpMode,
                                               MaxONOFFCyclesperHour,
                                               HPTimeConstant,
@@ -816,7 +815,7 @@ namespace HVACDXHeatPumpSystem {
                                               QLatReq,
                                               OnOffAirFlowRatio);
 
-                        VSCoilIndex = DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex;
+                        VSCoilIndex = DXHeatPumpSystem.HeatPumpCoilIndex;
                         NumOfSpeeds = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilIndex).NumOfSpeeds;
 
                         NoOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
@@ -948,13 +947,13 @@ namespace HVACDXHeatPumpSystem {
 
                                         if (SolFla == -1) {
                                             if (!state.dataGlobal->WarmupFlag) {
-                                                if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
-                                                    ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter;
+                                                if (DXHeatPumpSystem.DXCoilSensPLRIter < 1) {
+                                                    ++DXHeatPumpSystem.DXCoilSensPLRIter;
                                                     ShowWarningError(state,
                                                                      format("{} - Iteration limit exceeded calculating DX unit sensible part-load "
                                                                             "ratio for unit = {}",
-                                                                            DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType,
-                                                                            DXHeatPumpSystem(DXSystemNum).Name));
+                                                                            DXHeatPumpSystem.DXHeatPumpSystemType,
+                                                                            DXHeatPumpSystem.Name));
                                                     ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
                                                     ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
                                                     ShowContinueErrorTimeStamp(
@@ -963,11 +962,10 @@ namespace HVACDXHeatPumpSystem {
                                                 } else {
                                                     ShowRecurringWarningErrorAtEnd(
                                                         state,
-                                                        DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" +
-                                                            DXHeatPumpSystem(DXSystemNum).Name +
+                                                        DXHeatPumpSystem.DXHeatPumpSystemType + " \"" + DXHeatPumpSystem.Name +
                                                             "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
                                                             "Sensible PLR statistics follow.",
-                                                        DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                        DXHeatPumpSystem.DXCoilSensPLRIterIndex,
                                                         PartLoadFrac,
                                                         PartLoadFrac);
                                                 }
@@ -975,13 +973,13 @@ namespace HVACDXHeatPumpSystem {
                                         } else if (SolFla == -2) {
                                             PartLoadFrac = ReqOutput / FullOutput;
                                             if (!state.dataGlobal->WarmupFlag) {
-                                                if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
-                                                    ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
+                                                if (DXHeatPumpSystem.DXCoilSensPLRFail < 1) {
+                                                    ++DXHeatPumpSystem.DXCoilSensPLRFail;
                                                     ShowWarningError(state,
                                                                      format("{} - DX unit sensible part-load ratio calculation failed: part-load "
                                                                             "ratio limits exceeded, for unit = {}",
-                                                                            DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType,
-                                                                            DXHeatPumpSystem(DXSystemNum).Name));
+                                                                            DXHeatPumpSystem.DXHeatPumpSystemType,
+                                                                            DXHeatPumpSystem.Name));
                                                     ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
                                                     ShowContinueErrorTimeStamp(
                                                         state,
@@ -989,11 +987,10 @@ namespace HVACDXHeatPumpSystem {
                                                 } else {
                                                     ShowRecurringWarningErrorAtEnd(
                                                         state,
-                                                        DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" +
-                                                            DXHeatPumpSystem(DXSystemNum).Name +
+                                                        DXHeatPumpSystem.DXHeatPumpSystemType + " \"" + DXHeatPumpSystem.Name +
                                                             "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
                                                             "statistics follow.",
-                                                        DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                        DXHeatPumpSystem.DXCoilSensPLRFailIndex,
                                                         PartLoadFrac,
                                                         PartLoadFrac);
                                                 }
@@ -1025,13 +1022,13 @@ namespace HVACDXHeatPumpSystem {
                                         General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 1.0e-10, 1.0);
                                         if (SolFla == -1) {
                                             if (!state.dataGlobal->WarmupFlag) {
-                                                if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
-                                                    ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter;
+                                                if (DXHeatPumpSystem.DXCoilSensPLRIter < 1) {
+                                                    ++DXHeatPumpSystem.DXCoilSensPLRIter;
                                                     ShowWarningError(state,
                                                                      format("{} - Iteration limit exceeded calculating DX unit sensible part-load "
                                                                             "ratio for unit = {}",
-                                                                            DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType,
-                                                                            DXHeatPumpSystem(DXSystemNum).Name));
+                                                                            DXHeatPumpSystem.DXHeatPumpSystemType,
+                                                                            DXHeatPumpSystem.Name));
                                                     ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
                                                     ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
                                                     ShowContinueErrorTimeStamp(
@@ -1040,11 +1037,10 @@ namespace HVACDXHeatPumpSystem {
                                                 } else {
                                                     ShowRecurringWarningErrorAtEnd(
                                                         state,
-                                                        DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" +
-                                                            DXHeatPumpSystem(DXSystemNum).Name +
+                                                        DXHeatPumpSystem.DXHeatPumpSystemType + " \"" + DXHeatPumpSystem.Name +
                                                             "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
                                                             "Sensible PLR statistics follow.",
-                                                        DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                        DXHeatPumpSystem.DXCoilSensPLRIterIndex,
                                                         PartLoadFrac,
                                                         PartLoadFrac);
                                                 }
@@ -1052,13 +1048,13 @@ namespace HVACDXHeatPumpSystem {
                                         } else if (SolFla == -2) {
                                             PartLoadFrac = ReqOutput / FullOutput;
                                             if (!state.dataGlobal->WarmupFlag) {
-                                                if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
-                                                    ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
+                                                if (DXHeatPumpSystem.DXCoilSensPLRFail < 1) {
+                                                    ++DXHeatPumpSystem.DXCoilSensPLRFail;
                                                     ShowWarningError(state,
                                                                      format("{} - DX unit sensible part-load ratio calculation failed: part-load "
                                                                             "ratio limits exceeded, for unit = {}",
-                                                                            DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType,
-                                                                            DXHeatPumpSystem(DXSystemNum).Name));
+                                                                            DXHeatPumpSystem.DXHeatPumpSystemType,
+                                                                            DXHeatPumpSystem.Name));
                                                     ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
                                                     ShowContinueErrorTimeStamp(
                                                         state,
@@ -1066,11 +1062,10 @@ namespace HVACDXHeatPumpSystem {
                                                 } else {
                                                     ShowRecurringWarningErrorAtEnd(
                                                         state,
-                                                        DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" +
-                                                            DXHeatPumpSystem(DXSystemNum).Name +
+                                                        DXHeatPumpSystem.DXHeatPumpSystemType + " \"" + DXHeatPumpSystem.Name +
                                                             "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
                                                             "statistics follow.",
-                                                        DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                        DXHeatPumpSystem.DXCoilSensPLRFailIndex,
                                                         PartLoadFrac,
                                                         PartLoadFrac);
                                                 }
@@ -1089,8 +1084,7 @@ namespace HVACDXHeatPumpSystem {
                     } break;
                     default: {
                         ShowFatalError(state,
-                                       format("ControlDXHeatingSystem: Invalid DXHeatPumpSystem coil type = {}",
-                                              DXHeatPumpSystem(DXSystemNum).HeatPumpCoilType));
+                                       format("ControlDXHeatingSystem: Invalid DXHeatPumpSystem coil type = {}", DXHeatPumpSystem.HeatPumpCoilType));
                     } break;
                     }
                 }
@@ -1098,9 +1092,9 @@ namespace HVACDXHeatPumpSystem {
         }     // End of If DXheatingSystem is scheduled on and there is flow
 
         // Set the final results
-        DXHeatPumpSystem(DXSystemNum).PartLoadFrac = PartLoadFrac;
-        DXHeatPumpSystem(DXSystemNum).SpeedRatio = SpeedRatio;
-        DXHeatPumpSystem(DXSystemNum).SpeedNum = SpeedNum;
+        DXHeatPumpSystem.PartLoadFrac = PartLoadFrac;
+        DXHeatPumpSystem.SpeedRatio = SpeedRatio;
+        DXHeatPumpSystem.SpeedNum = SpeedNum;
     }
 
     //******************************************************************************
