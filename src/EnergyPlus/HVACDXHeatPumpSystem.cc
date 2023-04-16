@@ -470,7 +470,6 @@ namespace HVACDXHeatPumpSystem {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControlNode; // control node number
         int DXSysIndex;
-        int OutdoorAirUnitNum;    // "ONLY" for ZoneHVAC:OutdoorAirUnit
         Real64 OAUCoilOutletTemp; // "ONLY" for zoneHVAC:OutdoorAirUnit
 
         int NumDXHeatPumpSystems = state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems;
@@ -480,7 +479,6 @@ namespace HVACDXHeatPumpSystem {
         //    MyOneTimeFlag = .FALSE.
         //  END IF
         if (present(OAUnitNum)) { // This Dx system is component of ZoneHVAC:OutdoorAirUnit
-            OutdoorAirUnitNum = OAUnitNum;
             OAUCoilOutletTemp = OAUCoilOutTemp;
         }
 
