@@ -1185,18 +1185,14 @@ namespace HVACDXHeatPumpSystem {
         // PURPOSE OF THIS SUBROUTINE:
         // Get inlet node number
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NodeNum;
-        int DXHeatSysNum;
-
         if (state.dataHVACDXHeatPumpSys->GetInputFlag) { // First time subroutine has been entered
             GetDXHeatPumpSystemInput(state);
             state.dataHVACDXHeatPumpSys->GetInputFlag = false;
         }
 
-        NodeNum = 0;
+        int NodeNum = 0;
         if (state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems > 0) {
-            DXHeatSysNum = UtilityRoutines::FindItemInList(DXHeatCoilSysName, state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
+            int DXHeatSysNum = UtilityRoutines::FindItemInList(DXHeatCoilSysName, state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
             if (DXHeatSysNum > 0 && DXHeatSysNum <= state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems) {
                 NodeNum = state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum;
             }
@@ -1214,18 +1210,14 @@ namespace HVACDXHeatPumpSystem {
         // PURPOSE OF THIS SUBROUTINE:
         // Get Outlet node number
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NodeNum;
-        int DXHeatSysNum;
-
         if (state.dataHVACDXHeatPumpSys->GetInputFlag) { // First time subroutine has been entered
             GetDXHeatPumpSystemInput(state);
             state.dataHVACDXHeatPumpSys->GetInputFlag = false;
         }
 
-        NodeNum = 0;
+        int NodeNum = 0;
         if (state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems > 0) {
-            DXHeatSysNum = UtilityRoutines::FindItemInList(DXHeatCoilSysName, state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
+            int DXHeatSysNum = UtilityRoutines::FindItemInList(DXHeatCoilSysName, state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
             if (DXHeatSysNum > 0 && DXHeatSysNum <= state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems) {
                 NodeNum = state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum;
             }
