@@ -470,10 +470,9 @@ namespace HVACDXHeatPumpSystem {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControlNode; // control node number
         int DXSysIndex;
-        Real64 OAUCoilOutletTemp; // "ONLY" for zoneHVAC:OutdoorAirUnit
+        Real64 OAUCoilOutletTemp = 0.0; // "ONLY" for zoneHVAC:OutdoorAirUnit
 
         int NumDXHeatPumpSystems = state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems;
-        auto &DXHeatPumpSystem(state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
 
         //  IF (MyOneTimeFlag) THEN
         //    MyOneTimeFlag = .FALSE.
@@ -484,7 +483,8 @@ namespace HVACDXHeatPumpSystem {
 
         if (!state.dataGlobal->SysSizingCalc && state.dataHVACDXHeatPumpSys->MySetPointCheckFlag && DoSetPointTest) {
             for (DXSysIndex = 1; DXSysIndex <= NumDXHeatPumpSystems; ++DXSysIndex) {
-                ControlNode = DXHeatPumpSystem(DXSysIndex).DXSystemControlNodeNum;
+                auto &DXHeatPumpSystem = state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXSysIndex);
+                ControlNode = DXHeatPumpSystem.DXSystemControlNodeNum;
                 if (ControlNode > 0) {
                     if (AirLoopNum == -1) {                                                      // Outdoor Air Unit
                         state.dataLoopNodes->Node(ControlNode).TempSetPoint = OAUCoilOutletTemp; // Set the coil outlet temperature
@@ -494,8 +494,8 @@ namespace HVACDXHeatPumpSystem {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state,
                                                 format("{}: Missing temperature setpoint for DX unit= {}",
-                                                       DXHeatPumpSystem(DXSysIndex).DXHeatPumpSystemType,
-                                                       DXHeatPumpSystem(DXSysIndex).Name));
+                                                       DXHeatPumpSystem.DXHeatPumpSystemType,
+                                                       DXHeatPumpSystem.Name));
                                 ShowContinueError(state, "  use a Set Point Manager to establish a setpoint at the unit control node.");
                                 state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
@@ -504,8 +504,8 @@ namespace HVACDXHeatPumpSystem {
                                 if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state,
                                                     format("{}: Missing temperature setpoint for DX unit= {}",
-                                                           DXHeatPumpSystem(DXSysIndex).DXHeatPumpSystemType,
-                                                           DXHeatPumpSystem(DXSysIndex).Name));
+                                                           DXHeatPumpSystem.DXHeatPumpSystemType,
+                                                           DXHeatPumpSystem.Name));
                                     ShowContinueError(state, "  use a Set Point Manager to establish a setpoint at the unit control node.");
                                     ShowContinueError(state,
                                                       "  or use an EMS actuator to establish a temperature setpoint at the unit control node.");
@@ -521,12 +521,12 @@ namespace HVACDXHeatPumpSystem {
         // These initializations are done every iteration
         if (AirLoopNum == -1) { // This IF-Then routine is just for ZoneHVAC:OUTDOORAIRUNIT
 
-            DXHeatPumpSystem(DXSystemNum).DesiredOutletTemp = OAUCoilOutletTemp;
+            state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXSystemNum).DesiredOutletTemp = OAUCoilOutletTemp;
 
         } else if (AirLoopNum != -1) { // Not Outdoor Air Unit
-            ControlNode = DXHeatPumpSystem(DXSystemNum).DXSystemControlNodeNum;
+            ControlNode = state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXSystemNum).DXSystemControlNodeNum;
             state.dataHVACDXHeatPumpSys->EconomizerFlag = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive;
-            DXHeatPumpSystem(DXSystemNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
+            state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXSystemNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
         }
     }
 
