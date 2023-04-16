@@ -1179,62 +1179,37 @@ namespace HVACCooledBeam {
         // METHODOLOGY EMPLOYED:
         // Data is moved from the cooled beam unit data structure to the unit outlet nodes.
 
-        // Using/Aliasing
-        using PlantUtilities::SafeCopyPlantNode;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int AirInletNode;
-        int WaterInletNode;
-        int AirOutletNode;
-        int WaterOutletNode;
-        auto &CoolBeam = state.dataHVACCooledBeam->CoolBeam;
-
-        AirInletNode = CoolBeam(CBNum).AirInNode;
-        WaterInletNode = CoolBeam(CBNum).CWInNode;
-        AirOutletNode = CoolBeam(CBNum).AirOutNode;
-        WaterOutletNode = CoolBeam(CBNum).CWOutNode;
+        auto &coolBeam = state.dataHVACCooledBeam->CoolBeam(CBNum);
+        auto const &airInletNode = state.dataLoopNodes->Node(coolBeam.AirInNode);
+        auto &airOutletNode = state.dataLoopNodes->Node(coolBeam.AirOutNode);
 
         // Set the outlet air nodes of the unit; note that all quantities are unchanged
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
-        state.dataLoopNodes->Node(AirOutletNode).Temp = state.dataLoopNodes->Node(AirInletNode).Temp;
-        state.dataLoopNodes->Node(AirOutletNode).HumRat = state.dataLoopNodes->Node(AirInletNode).HumRat;
-        state.dataLoopNodes->Node(AirOutletNode).Enthalpy = state.dataLoopNodes->Node(AirInletNode).Enthalpy;
+        airOutletNode.MassFlowRate = airInletNode.MassFlowRate;
+        airOutletNode.Temp = airInletNode.Temp;
+        airOutletNode.HumRat = airInletNode.HumRat;
+        airOutletNode.Enthalpy = airInletNode.Enthalpy;
 
         // Set the outlet water nodes for the unit
-        //  Node(WaterOutletNode)%MassFlowRate = CoolBeam(CBNum)%CoolWaterMassFlow
-        SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
+        PlantUtilities::SafeCopyPlantNode(state, coolBeam.CWInNode, coolBeam.CWOutNode);
 
-        state.dataLoopNodes->Node(WaterOutletNode).Temp = CoolBeam(CBNum).TWOut;
-        state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = CoolBeam(CBNum).EnthWaterOut;
+        state.dataLoopNodes->Node(coolBeam.CWOutNode).Temp = coolBeam.TWOut;
+        state.dataLoopNodes->Node(coolBeam.CWOutNode).Enthalpy = coolBeam.EnthWaterOut;
 
         // Set the air outlet nodes for properties that just pass through & not used
-        state.dataLoopNodes->Node(AirOutletNode).Quality = state.dataLoopNodes->Node(AirInletNode).Quality;
-        state.dataLoopNodes->Node(AirOutletNode).Press = state.dataLoopNodes->Node(AirInletNode).Press;
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin;
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax;
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMaxAvail;
-
-        // Set the outlet nodes for properties that just pass through & not used
-        //  Node(WaterOutletNode)%Quality             = Node(WaterInletNode)%Quality
-        //  Node(WaterOutletNode)%Press               = Node(WaterInletNode)%Press
-        //  Node(WaterOutletNode)%HumRat              = Node(WaterInletNode)%HumRat
-        //  Node(WaterOutletNode)%MassFlowRateMin     = Node(WaterInletNode)%MassFlowRateMin
-        //  Node(WaterOutletNode)%MassFlowRateMax     = Node(WaterInletNode)%MassFlowRateMax
-        //  Node(WaterOutletNode)%MassFlowRateMinAvail= Node(WaterInletNode)%MassFlowRateMinAvail
-        //  Node(WaterOutletNode)%MassFlowRateMaxAvail= Node(WaterInletNode)%MassFlowRateMaxAvail
-
-        //  IF (CoolBeam(CBNum)%CoolWaterMassFlow.EQ.0.0) THEN
-        //    Node(WaterInletNode)%MassFlowRateMinAvail= 0.0
-        //    Node(WaterOutletNode)%MassFlowRateMinAvail= 0.0
-        //  END IF
+        airOutletNode.Quality = airInletNode.Quality;
+        airOutletNode.Press = airInletNode.Press;
+        airOutletNode.MassFlowRateMin = airInletNode.MassFlowRateMin;
+        airOutletNode.MassFlowRateMax = airInletNode.MassFlowRateMax;
+        airOutletNode.MassFlowRateMinAvail = airInletNode.MassFlowRateMinAvail;
+        airOutletNode.MassFlowRateMaxAvail = airInletNode.MassFlowRateMaxAvail;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
+            airOutletNode.CO2 = airInletNode.CO2;
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
+            airOutletNode.GenContam = airInletNode.GenContam;
         }
     }
 
@@ -1273,16 +1248,16 @@ namespace HVACCooledBeam {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 ReportingConstant;
-        auto &CoolBeam = state.dataHVACCooledBeam->CoolBeam;
+        auto &coolBeam = state.dataHVACCooledBeam->CoolBeam(CBNum);
 
         ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
         // report the WaterCoil energy from this component
-        CoolBeam(CBNum).BeamCoolingEnergy = CoolBeam(CBNum).BeamCoolingRate * ReportingConstant;
-        CoolBeam(CBNum).SupAirCoolingEnergy = CoolBeam(CBNum).SupAirCoolingRate * ReportingConstant;
-        CoolBeam(CBNum).SupAirHeatingEnergy = CoolBeam(CBNum).SupAirHeatingRate * ReportingConstant;
+        coolBeam.BeamCoolingEnergy = coolBeam.BeamCoolingRate * ReportingConstant;
+        coolBeam.SupAirCoolingEnergy = coolBeam.SupAirCoolingRate * ReportingConstant;
+        coolBeam.SupAirHeatingEnergy = coolBeam.SupAirHeatingRate * ReportingConstant;
 
         // set zone OA volume flow rate report variable
-        CoolBeam(CBNum).CalcOutdoorAirVolumeFlowRate(state);
+        coolBeam.CalcOutdoorAirVolumeFlowRate(state);
     }
 
     void CoolBeamData::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
