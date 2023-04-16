@@ -128,8 +128,6 @@ namespace HVACDXHeatPumpSystem {
         std::string CompName; // Name of CoilSystem:Heating:DX object
         int DXSystemNum;      // Index to CoilSystem:Heating:DX object
         Real64 AirMassFlow;   // DX System air mass flow rate
-        int InletNodeNum;     // DX System inlet node number
-        int OutletNodeNum;    // DX System outlet node number
 
         auto &DXHeatPumpSystem(state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
 
@@ -226,8 +224,8 @@ namespace HVACDXHeatPumpSystem {
         }
 
         if (present(QTotOut)) {
-            InletNodeNum = DXHeatPumpSystem(DXSystemNum).DXHeatPumpCoilInletNodeNum;
-            OutletNodeNum = DXHeatPumpSystem(DXSystemNum).DXHeatPumpCoilOutletNodeNum;
+            int InletNodeNum = DXHeatPumpSystem(DXSystemNum).DXHeatPumpCoilInletNodeNum;
+            int OutletNodeNum = DXHeatPumpSystem(DXSystemNum).DXHeatPumpCoilOutletNodeNum;
             AirMassFlow = state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate;
             QTotOut = AirMassFlow * (state.dataLoopNodes->Node(InletNodeNum).Enthalpy - state.dataLoopNodes->Node(OutletNodeNum).Enthalpy);
         }
@@ -468,8 +466,7 @@ namespace HVACDXHeatPumpSystem {
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ControlNode; // control node number
-        int DXSysIndex;
+        int ControlNode;                // control node number
         Real64 OAUCoilOutletTemp = 0.0; // "ONLY" for zoneHVAC:OutdoorAirUnit
 
         int NumDXHeatPumpSystems = state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems;
@@ -482,7 +479,7 @@ namespace HVACDXHeatPumpSystem {
         }
 
         if (!state.dataGlobal->SysSizingCalc && state.dataHVACDXHeatPumpSys->MySetPointCheckFlag && DoSetPointTest) {
-            for (DXSysIndex = 1; DXSysIndex <= NumDXHeatPumpSystems; ++DXSysIndex) {
+            for (int DXSysIndex = 1; DXSysIndex <= NumDXHeatPumpSystems; ++DXSysIndex) {
                 auto &DXHeatPumpSystem = state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXSysIndex);
                 ControlNode = DXHeatPumpSystem.DXSystemControlNodeNum;
                 if (ControlNode > 0) {
