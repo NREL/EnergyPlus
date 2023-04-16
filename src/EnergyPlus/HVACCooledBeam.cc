@@ -1091,23 +1091,23 @@ namespace HVACCooledBeam {
 
         // test CWFlow against plant
         mdot = CWFlow;
-        auto &CoolBeam = state.dataHVACCooledBeam->CoolBeam;
+        auto const &coolBeam = state.dataHVACCooledBeam->CoolBeam(CBNum);
 
-        SetComponentFlowRate(state, mdot, CoolBeam(CBNum).CWInNode, CoolBeam(CBNum).CWOutNode, CoolBeam(CBNum).CWPlantLoc);
+        SetComponentFlowRate(state, mdot, coolBeam.CWInNode, coolBeam.CWOutNode, coolBeam.CWPlantLoc);
 
-        CWFlowPerBeam = mdot / CoolBeam(CBNum).NumBeams;
-        TWIn = CoolBeam(CBNum).TWIn;
+        CWFlowPerBeam = mdot / coolBeam.NumBeams;
+        TWIn = coolBeam.TWIn;
 
         Cp = GetSpecificHeatGlycol(state,
-                                   state.dataPlnt->PlantLoop(CoolBeam(CBNum).CWPlantLoc.loopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(coolBeam.CWPlantLoc.loopNum).FluidName,
                                    TWIn,
-                                   state.dataPlnt->PlantLoop(CoolBeam(CBNum).CWPlantLoc.loopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(coolBeam.CWPlantLoc.loopNum).FluidIndex,
                                    RoutineName);
 
         rho = GetDensityGlycol(state,
-                               state.dataPlnt->PlantLoop(CoolBeam(CBNum).CWPlantLoc.loopNum).FluidName,
+                               state.dataPlnt->PlantLoop(coolBeam.CWPlantLoc.loopNum).FluidName,
                                TWIn,
-                               state.dataPlnt->PlantLoop(CoolBeam(CBNum).CWPlantLoc.loopNum).FluidIndex,
+                               state.dataPlnt->PlantLoop(coolBeam.CWPlantLoc.loopNum).FluidIndex,
                                RoutineName);
 
         TWOut = TWIn + 2.0;
@@ -1128,18 +1128,16 @@ namespace HVACCooledBeam {
 
             WaterCoolPower = CWFlowPerBeam * Cp * (TWOut - TWIn);
             DT = max(ZTemp - 0.5 * (TWIn + TWOut), 0.0);
-            IndFlow =
-                CoolBeam(CBNum).K1 * std::pow(DT, CoolBeam(CBNum).n) + CoolBeam(CBNum).Kin * CoolBeam(CBNum).BeamFlow / CoolBeam(CBNum).BeamLength;
-            CoilFlow = (IndFlow / CoolBeam(CBNum).a0) * state.dataEnvrn->StdRhoAir;
-            WaterVel = CWFlowPerBeam / (rho * Constant::Pi * pow_2(CoolBeam(CBNum).InDiam) / 4.0);
+            IndFlow = coolBeam.K1 * std::pow(DT, coolBeam.n) + coolBeam.Kin * coolBeam.BeamFlow / coolBeam.BeamLength;
+            CoilFlow = (IndFlow / coolBeam.a0) * state.dataEnvrn->StdRhoAir;
+            WaterVel = CWFlowPerBeam / (rho * Constant::Pi * pow_2(coolBeam.InDiam) / 4.0);
             if (WaterVel > MinWaterVel) {
-                K = CoolBeam(CBNum).a * std::pow(DT, CoolBeam(CBNum).n1) * std::pow(CoilFlow, CoolBeam(CBNum).n2) *
-                    std::pow(WaterVel, CoolBeam(CBNum).n3);
+                K = coolBeam.a * std::pow(DT, coolBeam.n1) * std::pow(CoilFlow, coolBeam.n2) * std::pow(WaterVel, coolBeam.n3);
             } else {
-                K = CoolBeam(CBNum).a * std::pow(DT, CoolBeam(CBNum).n1) * std::pow(CoilFlow, CoolBeam(CBNum).n2) *
-                    std::pow(MinWaterVel, CoolBeam(CBNum).n3) * (WaterVel / MinWaterVel);
+                K = coolBeam.a * std::pow(DT, coolBeam.n1) * std::pow(CoilFlow, coolBeam.n2) * std::pow(MinWaterVel, coolBeam.n3) *
+                    (WaterVel / MinWaterVel);
             }
-            AirCoolPower = K * CoolBeam(CBNum).CoilArea * DT * CoolBeam(CBNum).BeamLength;
+            AirCoolPower = K * coolBeam.CoilArea * DT * coolBeam.BeamLength;
             Diff = WaterCoolPower - AirCoolPower;
             Delta = TWOut * (std::abs(Diff) / Coeff);
             if (std::abs(Diff) > 0.1) {
@@ -1161,7 +1159,7 @@ namespace HVACCooledBeam {
                 break;
             }
         }
-        LoadMet = -WaterCoolPower * CoolBeam(CBNum).NumBeams;
+        LoadMet = -WaterCoolPower * coolBeam.NumBeams;
     }
 
     void UpdateCoolBeam(EnergyPlusData &state, int const CBNum)
