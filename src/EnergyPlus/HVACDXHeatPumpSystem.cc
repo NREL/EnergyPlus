@@ -488,7 +488,7 @@ namespace HVACDXHeatPumpSystem {
                 if (ControlNode > 0) {
                     if (AirLoopNum == -1) {                                                      // Outdoor Air Unit
                         state.dataLoopNodes->Node(ControlNode).TempSetPoint = OAUCoilOutletTemp; // Set the coil outlet temperature
-                    } else if (AirLoopNum != -1) {                                               // Not an outdoor air unit
+                    } else {                                                                     // Not an outdoor air unit
 
                         if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -523,7 +523,7 @@ namespace HVACDXHeatPumpSystem {
 
             state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXSystemNum).DesiredOutletTemp = OAUCoilOutletTemp;
 
-        } else if (AirLoopNum != -1) { // Not Outdoor Air Unit
+        } else { // Not Outdoor Air Unit
             ControlNode = state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXSystemNum).DXSystemControlNodeNum;
             state.dataHVACDXHeatPumpSys->EconomizerFlag = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive;
             state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXSystemNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
