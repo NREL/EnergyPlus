@@ -210,7 +210,6 @@ namespace HVACCooledBeam {
         static constexpr std::string_view RoutineName("GetCoolBeams "); // include trailing blank space
 
         int CBIndex;                     // loop index
-        int CBNum;                       // current fan coil number
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
@@ -267,7 +266,7 @@ namespace HVACCooledBeam {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            CBNum = CBIndex;
+            int CBNum = CBIndex;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             CoolBeam(CBNum).Name = Alphas(1);
@@ -529,17 +528,13 @@ namespace HVACCooledBeam {
         int OutWaterNode; // unit outlet chilled water node
         Real64 RhoAir;    // air density at outside pressure and standard temperature and humidity
         Real64 rho;       // local fluid density
-        int Loop;         // Loop checking control variable
-        std::string CurrentModuleObject;
-        bool errFlag;
 
-        CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam";
         auto &coolBeam = state.dataHVACCooledBeam->CoolBeam(CBNum);
         auto &ZoneEquipmentListChecked = state.dataHVACCooledBeam->ZoneEquipmentListChecked;
         int NumCB = state.dataHVACCooledBeam->NumCB;
 
         if (coolBeam.PlantLoopScanFlag && allocated(state.dataPlnt->PlantLoop)) {
-            errFlag = false;
+            bool errFlag = false;
             ScanPlantLoopsForObject(
                 state, coolBeam.Name, DataPlant::PlantEquipmentType::CooledBeamAirTerminal, coolBeam.CWPlantLoc, errFlag, _, _, _, _, _);
             if (errFlag) {
@@ -549,9 +544,10 @@ namespace HVACCooledBeam {
         }
 
         if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
+            std::string CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam";
             ZoneEquipmentListChecked = true;
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
-            for (Loop = 1; Loop <= NumCB; ++Loop) {
+            for (int Loop = 1; Loop <= NumCB; ++Loop) {
                 if (coolBeam.ADUNum == 0) continue;
                 if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", state.dataDefineEquipment->AirDistUnit(coolBeam.ADUNum).Name))
                     continue;
