@@ -2396,7 +2396,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         if (!state.dataPlnt->PlantFirstSizeCompleted) break;
 
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct *>(thisMCHP)->CalcMicroCHPNoNormalizeGeneratorModel(
-            state, runFlag, false, myElecLoadRequest, DataPrecisionGlobals::constant_zero, FirstHVACIteration);
+            state, runFlag, false, myElecLoadRequest, DataPrecisionGlobals::constant_zero);
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct *>(thisMCHP)->CalcUpdateHeatRecovery(state);
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct *>(thisMCHP)->UpdateMicroCHPGeneratorRecords(state);
 
