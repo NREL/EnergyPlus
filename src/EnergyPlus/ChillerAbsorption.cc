@@ -507,10 +507,10 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Rate",
@@ -526,10 +526,10 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
     SetupOutputVariable(state,
                         "Chiller Evaporator Inlet Temperature",
@@ -567,10 +567,10 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
     SetupOutputVariable(state,
                         "Chiller Condenser Inlet Temperature",
@@ -609,10 +609,10 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "PLANTLOOPHEATINGDEMAND",
                             "CHILLERS",
-                            _,
+                            {},
                             "Plant");
     } else {
         if (this->GenInputOutputNodesUsed) {
@@ -630,10 +630,10 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "CHILLERS",
-                                _,
+                                {},
                                 "Plant");
         } else {
             SetupOutputVariable(state,
@@ -650,10 +650,10 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 fluidNameSteam,
                                 "Cooling",
-                                _,
+                                {},
                                 "Plant");
         }
     }

@@ -467,10 +467,10 @@ namespace ElectricBaseboardRadiator {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 elecBaseboard.EquipName,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Baseboard Electricity Rate",
@@ -486,10 +486,10 @@ namespace ElectricBaseboardRadiator {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 elecBaseboard.EquipName,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,

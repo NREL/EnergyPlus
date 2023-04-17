@@ -439,10 +439,10 @@ namespace BaseboardRadiator {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipID,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -452,10 +452,10 @@ namespace BaseboardRadiator {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipID,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,

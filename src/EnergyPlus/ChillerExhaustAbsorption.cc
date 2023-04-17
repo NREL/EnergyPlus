@@ -546,10 +546,10 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -566,10 +566,10 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "BOILERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -586,10 +586,10 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -630,10 +630,10 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
-                        _,
+                        {},
                         "Electricity",
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -650,10 +650,10 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
-                        _,
+                        {},
                         "Electricity",
                         "Heating",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
