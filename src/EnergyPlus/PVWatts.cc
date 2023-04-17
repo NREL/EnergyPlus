@@ -186,10 +186,10 @@ namespace PVWatts {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "Photovoltaics",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Generator PV Cell Temperature",

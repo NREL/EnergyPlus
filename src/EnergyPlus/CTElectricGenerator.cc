@@ -373,10 +373,10 @@ namespace CTElectricGenerator {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -394,10 +394,10 @@ namespace CTElectricGenerator {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             this->FuelType,
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         //    general fuel use report (to match other generators)
@@ -449,10 +449,10 @@ namespace CTElectricGenerator {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -470,10 +470,10 @@ namespace CTElectricGenerator {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
