@@ -17349,10 +17349,10 @@ namespace UnitarySystems {
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                            _,
+                                            {},
                                             "Electricity",
                                             "Cooling",
-                                            _,
+                                            {},
                                             "System");
                     }
                     if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatCoilExists ||
@@ -17364,10 +17364,10 @@ namespace UnitarySystems {
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                            _,
+                                            {},
                                             "Electricity",
                                             "Heating",
-                                            _,
+                                            {},
                                             "System");
                     }
 

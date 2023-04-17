@@ -465,10 +465,10 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::NonState,
                                     zone.Name,
-                                    _,
+                                    {},
                                     "Electricity",
-                                    _,
-                                    _,
+                                    {},
+                                    {},
                                     "Building");
                 SetupOutputVariable(state,
                                     "Earth Tube Fan Electricity Rate",
