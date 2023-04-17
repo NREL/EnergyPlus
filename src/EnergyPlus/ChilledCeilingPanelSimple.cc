@@ -267,7 +267,6 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).FieldNames.allocate(NumNumbers);
         state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).FieldNames = "";
