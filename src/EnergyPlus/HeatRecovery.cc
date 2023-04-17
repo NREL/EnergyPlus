@@ -1093,10 +1093,10 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEAT RECOVERY FOR HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Cooling Rate",
@@ -1140,10 +1140,10 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEAT RECOVERY FOR COOLING",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -1160,10 +1160,10 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
-                                _,
+                                {},
                                 "ELECTRICITY",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "System");
         }
 

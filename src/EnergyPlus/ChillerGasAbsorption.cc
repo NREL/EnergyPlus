@@ -546,10 +546,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -566,10 +566,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "BOILERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -586,10 +586,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -622,10 +622,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         this->FuelType,
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -650,10 +650,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         this->FuelType,
                         "Heating",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -686,10 +686,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "Electricity",
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -706,10 +706,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "Electricity",
                         "Heating",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,

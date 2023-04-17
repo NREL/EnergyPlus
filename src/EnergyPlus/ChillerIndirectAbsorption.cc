@@ -589,10 +589,10 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -610,10 +610,10 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -655,10 +655,10 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -701,10 +701,10 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "EnergyTransfer",
                             "Cooling",
-                            _,
+                            {},
                             "Plant");
     } else {
         if (this->GenInputOutputNodesUsed) {
@@ -723,10 +723,10 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "CHILLERS",
-                                _,
+                                {},
                                 "Plant");
         } else {
             SetupOutputVariable(state,
@@ -744,10 +744,10 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 fluidNameSteam,
                                 "Cooling",
-                                _,
+                                {},
                                 "Plant");
         }
     }
