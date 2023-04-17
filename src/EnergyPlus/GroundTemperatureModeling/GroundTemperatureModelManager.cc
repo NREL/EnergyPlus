@@ -91,8 +91,6 @@ namespace GroundTemperatureManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell
         //       DATE WRITTEN   Summer 2015
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Called by objects requiring ground temperature models. Determines type and calls appropriate factory method.
