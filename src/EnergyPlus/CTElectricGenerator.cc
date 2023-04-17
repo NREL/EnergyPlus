@@ -177,7 +177,6 @@ namespace CTElectricGenerator {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             state.dataCTElectricGenerator->CTGenerator(genNum).Name = AlphArray(1);
 

@@ -3426,8 +3426,6 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
-
             auto &thisZoneEvapUnit = ZoneEvapUnit(UnitLoop);
             thisZoneEvapUnit.Name = Alphas(1);
             if (lAlphaBlanks(2)) {

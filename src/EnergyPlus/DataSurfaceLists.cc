@@ -143,7 +143,6 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject1, ErrorsFound);
 
             SurfList(Item).Name = Alphas(1);
             SurfList(Item).NumOfSurfaces = NumAlphas - 1;
@@ -251,7 +250,6 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject2, ErrorsFound);
 
             SlabList(Item).Name = Alphas(1);
             SlabList(Item).NumOfSurfaces = ((NumAlphas - 1) / 4);

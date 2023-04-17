@@ -85,7 +85,6 @@ namespace EnergyPlus::FluidCoolers {
 //       AUTHOR         Chandan Sharma
 //       DATE WRITTEN   August 2008
 //       MODIFIED       April 2010, Chandan Sharma, FSEC
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // Model the performance of fluid coolers
@@ -104,11 +103,12 @@ FluidCoolerspecs *FluidCoolerspecs::factory(EnergyPlusData &state, DataPlant::Pl
         state.dataFluidCoolers->GetFluidCoolerInputFlag = false;
     }
     // Now look for this particular fluid cooler in the list
-    for (auto &fc : state.dataFluidCoolers->SimpleFluidCooler) {
-        if (fc.FluidCoolerType == objectType && fc.Name == objectName) {
-            return &fc;
-        }
-    }
+    auto thisObj = std::find_if(
+        state.dataFluidCoolers->SimpleFluidCooler.begin(),
+        state.dataFluidCoolers->SimpleFluidCooler.end(),
+        [objectType, &objectName](const FluidCoolerspecs &myObj) { return myObj.FluidCoolerType == objectType && myObj.Name == objectName; });
+    if (thisObj != state.dataFluidCoolers->SimpleFluidCooler.end()) return thisObj;
+
     // If we didn't find it, fatal
     ShowFatalError(state, format("FluidCooler::factory: Error getting inputs for cooler named: {}", objectName));
     // Shut up the compiler
@@ -155,7 +155,6 @@ void GetFluidCoolerInput(EnergyPlusData &state)
     //       AUTHOR:          Chandan Sharma
     //       DATE WRITTEN:    August 2008
     //       MODIFIED         Chandan Sharma, FSEC, April 2010
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for fluid coolers and stores it in SimpleFluidCooler data structure.
@@ -192,13 +191,11 @@ void GetFluidCoolerInput(EnergyPlusData &state)
     state.dataFluidCoolers->SimpleFluidCooler.allocate(state.dataFluidCoolers->NumSimpleFluidCoolers);
     state.dataFluidCoolers->UniqueSimpleFluidCoolerNames.reserve(state.dataFluidCoolers->NumSimpleFluidCoolers);
 
-    int FluidCoolerNum = 0;
-
     // Load data structures with fluid cooler input data
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = cFluidCooler_SingleSpeed;
     for (int SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber) {
-        FluidCoolerNum = SingleSpeedFluidCoolerNumber;
+        int FluidCoolerNum = SingleSpeedFluidCoolerNumber;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  SingleSpeedFluidCoolerNumber,
@@ -299,7 +296,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
 
     cCurrentModuleObject = cFluidCooler_TwoSpeed;
     for (int TwoSpeedFluidCoolerNumber = 1; TwoSpeedFluidCoolerNumber <= NumTwoSpeedFluidCoolers; ++TwoSpeedFluidCoolerNumber) {
-        FluidCoolerNum = NumSingleSpeedFluidCoolers + TwoSpeedFluidCoolerNumber;
+        int FluidCoolerNum = NumSingleSpeedFluidCoolers + TwoSpeedFluidCoolerNumber;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
                                                                  TwoSpeedFluidCoolerNumber,
@@ -871,8 +868,6 @@ void FluidCoolerspecs::initialize(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Chandan Sharma
     //       DATE WRITTEN   August 2008
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for initializations of the fluid cooler components and for
@@ -924,7 +919,6 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     //       AUTHOR         Chandan Sharma
     //       DATE WRITTEN   August 2008
     //       MODIFIED       April 2010, Chandan Sharma, FSEC
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for sizing fluid cooler Components for which capacities and flow rates
@@ -944,14 +938,13 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     static constexpr std::string_view CalledFrom("SizeFluidCooler");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int SolFla;                     // Flag of solver
-    Real64 DesFluidCoolerLoad(0.0); // Design fluid cooler load [W]
-    Real64 UA0;                     // Lower bound for UA [W/C]
-    Real64 UA1;                     // Upper bound for UA [W/C]
-    Real64 UA;                      // Calculated UA value
-    Real64 OutWaterTempAtUA0;       // Water outlet temperature at UA0
-    Real64 OutWaterTempAtUA1;       // Water outlet temperature at UA1
-    std::string equipName;
+    int SolFla;                           // Flag of solver
+    Real64 DesFluidCoolerLoad(0.0);       // Design fluid cooler load [W]
+    Real64 UA0;                           // Lower bound for UA [W/C]
+    Real64 UA1;                           // Upper bound for UA [W/C]
+    Real64 UA;                            // Calculated UA value
+    Real64 OutWaterTempAtUA0;             // Water outlet temperature at UA0
+    Real64 OutWaterTempAtUA1;             // Water outlet temperature at UA1
     Real64 Cp;                            // local specific heat for fluid
     Real64 rho;                           // local density for fluid
     Real64 tmpHighSpeedFanPower;          // local temporary for high speed fan power
@@ -1620,10 +1613,9 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
 
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
         // create predefined report
-        equipName = this->Name;
         OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchMechType, equipName, DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)]);
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, this->FluidCoolerNominalCapacity);
+            state, state.dataOutRptPredefined->pdchMechType, this->Name, DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)]);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->FluidCoolerNominalCapacity);
     }
 
     if (this->FluidCoolerType == DataPlant::PlantEquipmentType::FluidCooler_TwoSpd && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
@@ -1655,7 +1647,6 @@ void FluidCoolerspecs::calcSingleSpeed(EnergyPlusData &state)
     //       AUTHOR         Chandan Sharma
     //       DATE WRITTEN   August 2008
     //       MODIFIED       Dec. 2008. BG. added RunFlag logic per original methodology
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // To simulate the operation of a single-speed fan fluid cooler.
@@ -1756,7 +1747,6 @@ void FluidCoolerspecs::calcTwoSpeed(EnergyPlusData &state)
     //       AUTHOR         Chandan Sharma
     //       DATE WRITTEN   August 2008
     //       MODIFIED       Dec. 2008. BG. added RunFlag logic per original methodology
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // To simulate the operation of a fluid cooler with a two-speed fan.
@@ -1884,7 +1874,6 @@ void CalcFluidCoolerOutlet(
     //       AUTHOR         Chandan Sharma
     //       DATE WRITTEN   August 2008
     //       MODIFIED       April 2010, Chandan Sharma, FSEC
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // See purpose for Single Speed or Two Speed Fluid Cooler model
@@ -1950,18 +1939,11 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Chandan Sharma
     //       DATE WRITTEN:    August 2008
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for passing results to the outlet water node.
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 LoopMinTemp;
-
-    auto &waterOutletNode = this->WaterOutletNodeNum;
+    int waterOutletNode = this->WaterOutletNodeNum;
     state.dataLoopNodes->Node(waterOutletNode).Temp = this->OutletWaterTemp;
 
     if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked ||
@@ -1990,7 +1972,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
     }
 
     // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
-    LoopMinTemp = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinTemp;
+    Real64 LoopMinTemp = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinTemp;
     if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
         ++this->OutletWaterTempErrorCount;
 
@@ -2039,8 +2021,6 @@ void FluidCoolerspecs::report(EnergyPlusData &state, bool const RunFlag)
     // SUBROUTINE INFORMATION:
     //       AUTHOR:          Chandan Sharma
     //       DATE WRITTEN:    August 2008
-    //       MODIFIED         na
-    //       RE-ENGINEERED    na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the report variables for the fluid cooler.

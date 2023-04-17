@@ -245,7 +245,6 @@ void GetCoolingPanelInput(EnergyPlusData &state)
     int SurfNum;           // Surface number Do loop counter
     int IOStat;
     bool ErrorsFound(false); // If errors detected in input
-    auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     int NumCoolingPanels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_CoolingPanel_Simple);
 
     // Count total number of baseboard units
@@ -267,7 +266,6 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).FieldNames.allocate(NumNumbers);
         state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).FieldNames = "";
