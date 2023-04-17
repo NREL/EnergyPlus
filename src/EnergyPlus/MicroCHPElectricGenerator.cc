@@ -456,10 +456,10 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ElectricityProduced",
                         "COGENERATION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -477,10 +477,10 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "COGENERATION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -580,10 +580,10 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "NaturalGas",
                         "COGENERATION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,

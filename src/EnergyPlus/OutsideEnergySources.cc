@@ -489,10 +489,10 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         typeName,
                         heatingOrCooling,
-                        _,
+                        {},
                         "Plant");
     SetupOutputVariable(state,
                         reportVarPrefix + hotOrChilled + "Water Rate",

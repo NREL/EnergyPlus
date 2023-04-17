@@ -566,7 +566,7 @@ namespace OutputProcessor {
 
     void GetReportVariableInput(EnergyPlusData &state);
 
-    ReportingFrequency determineFrequency(EnergyPlusData &state, std::string const &FreqString);
+    ReportingFrequency determineFrequency(EnergyPlusData &state, std::string_view const FreqString);
 
     std::string reportingFrequency(ReportingFrequency reportingInterval);
 
@@ -844,23 +844,23 @@ namespace OutputProcessor {
 // *****************************************************************************
 
 void SetupOutputVariable(EnergyPlusData &state,
-                         std::string_view const VariableName,                  // String Name of variable (with units)
-                         OutputProcessor::Unit VariableUnit,                   // Actual units corresponding to the actual variable
-                         Real64 &ActualVariable,                               // Actual Variable, used to set up pointer
-                         OutputProcessor::SOVTimeStepType TimeStepTypeKey,     // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         OutputProcessor::SOVStoreType VariableTypeKey,        // State, Average=1, NonState, Sum=2
-                         std::string_view const KeyedValue,                    // Associated Key for this variable
-                         ObjexxFCL::Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
-                         ObjexxFCL::Optional_string_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
-                         ObjexxFCL::Optional_string_const EndUseKey = _,       // Meter End Use Key (Lights, Heating, Cooling, etc)
-                         ObjexxFCL::Optional_string_const EndUseSubKey = _,    // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         ObjexxFCL::Optional_string_const GroupKey = _,        // Meter Super Group Key (Building, System, Plant)
-                         ObjexxFCL::Optional_string_const ZoneKey = _,         // Meter Zone Key (zone name)
-                         ObjexxFCL::Optional_int_const ZoneMult = _,           // Zone Multiplier, defaults to 1
-                         ObjexxFCL::Optional_int_const ZoneListMult = _,       // Zone List Multiplier, defaults to 1
-                         ObjexxFCL::Optional_int_const indexGroupKey = _,      // Group identifier for SQL output
-                         ObjexxFCL::Optional_string_const customUnitName = _,  // the custom name for the units from EMS definition of units
-                         ObjexxFCL::Optional_string_const SpaceType = _        // Space type (applicable for Building group only)
+                         std::string_view const VariableName,              // String Name of variable (with units)
+                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue,                // Associated Key for this variable
+                         std::string_view const ReportFreq = {},           // Internal use -- causes reporting at this freqency
+                         std::string_view const ResourceTypeKey = {},      // Meter Resource Type (Electricity, Gas, etc)
+                         std::string_view const EndUseKey = {},            // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         std::string_view const EndUseSubKey = {},         // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         std::string_view const GroupKey = {},             // Meter Super Group Key (Building, System, Plant)
+                         std::string_view const ZoneKey = {},              // Meter Zone Key (zone name)
+                         int const ZoneMult = 1,                           // Zone Multiplier, defaults to 1
+                         int const ZoneListMult = 1,                       // Zone List Multiplier, defaults to 1
+                         int const indexGroupKey = -999,                   // Group identifier for SQL output
+                         std::string_view const customUnitName = {},       // the custom name for the units from EMS definition of units
+                         std::string_view const SpaceType = {}             // Space type (applicable for Building group only)
 );
 
 void SetupOutputVariable(EnergyPlusData &state,
@@ -870,8 +870,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                // Associated Key for this variable
-                         ObjexxFCL::Optional_string_const ReportFreq = _,  // Internal use -- causes reporting at this freqency
-                         ObjexxFCL::Optional_int_const indexGroupKey = _   // Group identifier for SQL output
+                         std::string_view const ReportFreq = {},           // Internal use -- causes reporting at this freqency
+                         int const indexGroupKey = -999                    // Group identifier for SQL output
 );
 
 void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType TimeStepTypeKey); // What kind of data to update (Zone, HVAC)
@@ -973,7 +973,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
                              OutputProcessor::StoreType StateType,
                              OutputProcessor::VariableType VariableType,
                              OutputProcessor::Unit unitsForVar,
-                             ObjexxFCL::Optional_string_const customUnitName = _ // the custom name for the units from EMS definition of units
+                             std::string_view const customUnitName = {} // the custom name for the units from EMS definition of units
 );
 
 int initErrorFile(EnergyPlusData &state);

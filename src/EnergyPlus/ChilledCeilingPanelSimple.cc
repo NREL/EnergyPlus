@@ -267,7 +267,6 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).FieldNames.allocate(NumNumbers);
         state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).FieldNames = "";
@@ -723,10 +722,10 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGPANEL",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Panel Total System Cooling Energy",
@@ -735,10 +734,10 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGPANEL",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Panel Convective Cooling Energy",
