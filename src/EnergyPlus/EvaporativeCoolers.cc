@@ -946,10 +946,10 @@ void GetEvapInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisEvapCooler.Name,
-                            _,
+                            {},
                             "Electricity",
                             "Cooling",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Evaporative Cooler Electricity Rate",
@@ -967,10 +967,10 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
-                                _,
+                                {},
                                 "Water",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Evaporative Cooler Mains Water Volume",
@@ -979,10 +979,10 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
 
         } else if (thisEvapCooler.EvapWaterSupplyMode == WaterSupply::FromTank) {
@@ -993,10 +993,10 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
-                                _,
+                                {},
                                 "Water",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Evaporative Cooler Starved Water Volume",
@@ -1005,10 +1005,10 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
-                                _,
+                                {},
                                 "Water",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Evaporative Cooler Starved Mains Water Volume",
@@ -1017,10 +1017,10 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
         }
     }
@@ -3682,10 +3682,10 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisZoneEvapUnit.Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Sensible Cooling Rate",

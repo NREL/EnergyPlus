@@ -468,10 +468,10 @@ void FluidCoolerspecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "Electricity",
                         "HeatRejection",
-                        _,
+                        {},
                         "Plant");
 }
 

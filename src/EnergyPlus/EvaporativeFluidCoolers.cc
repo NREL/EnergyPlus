@@ -1026,10 +1026,10 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -1047,10 +1047,10 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -1060,10 +1060,10 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
 
         } else { // Evaporative fluid cooler water from mains and gets metered
@@ -1082,10 +1082,10 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -1095,10 +1095,10 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
         }
 
@@ -1149,10 +1149,10 @@ namespace EvaporativeFluidCoolers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "Electricity",
                             "HeatRejection",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,

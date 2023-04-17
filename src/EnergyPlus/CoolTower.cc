@@ -540,10 +540,10 @@ namespace CoolTower {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromMains) {
                 SetupOutputVariable(state,
@@ -560,10 +560,10 @@ namespace CoolTower {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
             } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
                 SetupOutputVariable(state,
@@ -587,10 +587,10 @@ namespace CoolTower {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
             }
         }
