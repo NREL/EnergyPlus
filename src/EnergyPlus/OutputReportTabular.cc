@@ -17084,7 +17084,7 @@ void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle)
     }
 }
 
-void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, ObjexxFCL::Optional_bool_const isBold)
+void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, bool const useBold)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer
@@ -17108,14 +17108,7 @@ void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, ObjexxF
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int iStyle;
-    bool useBold;
     auto &ort = state.dataOutRptTab;
-
-    if (present(isBold)) {
-        useBold = isBold;
-    } else {
-        useBold = false;
-    }
 
     for (iStyle = 1; iStyle <= ort->numStyles; ++iStyle) {
         TableStyle const style = ort->TableStyle(iStyle);
