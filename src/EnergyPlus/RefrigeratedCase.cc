@@ -3145,7 +3145,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigRack(RackNum).EvapSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(10)); // convert schedule name to pointer
                 //   check availability schedule for values >= 0
                 if (RefrigRack(RackNum).EvapSchedPtr > 0) {
-                    if (!ScheduleManager::CheckScheduleValueMinMax(state, RefrigRack(RackNum).EvapSchedPtr, ">=", 0.0)) {
+                    if (!ScheduleManager::CheckScheduleValueMinMax(state, RefrigRack(RackNum).EvapSchedPtr, true, 0.0)) {
                         ShowSevereError(state, format("{}{}=\"{}\" .", RoutineName, CurrentModuleObject, RefrigRack(RackNum).Name));
                         ShowContinueError(state, format("Error found in {} = {}", cAlphaFieldNames(10), Alphas(10)));
                         ShowContinueError(state, "schedule values must be (>=0.).");
@@ -3853,7 +3853,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     Condenser(CondNum).EvapSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(5)); // convert schedule name to pointer
                     //   check availability schedule for values >= 0
                     if (Condenser(CondNum).EvapSchedPtr > 0) {
-                        if (!ScheduleManager::CheckScheduleValueMinMax(state, Condenser(CondNum).EvapSchedPtr, ">=", 0.0)) {
+                        if (!ScheduleManager::CheckScheduleValueMinMax(state, Condenser(CondNum).EvapSchedPtr, true, 0.0)) {
                             ShowSevereError(state, format("{}{}=\"{}\" .", RoutineName, CurrentModuleObject, Condenser(CondNum).Name));
                             ShowContinueError(state, format("Error found in {} = {}", cAlphaFieldNames(5), Alphas(5)));
                             ShowContinueError(state, "schedule values must be (>=0.).");

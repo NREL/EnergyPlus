@@ -69,7 +69,7 @@ class CoilSelectionData
 
 public: // methods
     // Constructor
-    CoilSelectionData(std::string const &coilName);
+    explicit CoilSelectionData(std::string const &coilName);
 
 public:                                  // data
     std::string coilName_;               // user-defined coil name

@@ -419,8 +419,8 @@ void GetPumpInput(EnergyPlusData &state)
                             "{}{}=\"{}\", At least one scheduled VFD schedule input was invalid.", RoutineName, cCurrentModuleObject, thisPump.Name));
                     ShowContinueError(state, "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                     ErrorsFound = true;
-                } else if (!CheckScheduleValueMinMax(state, thisPump.VFD.ManualRPMSchedIndex, ">", 0.0) ||
-                           !CheckScheduleValueMinMax(state, thisPump.VFD.ManualRPMSchedIndex, ">", 0.0)) {
+                } else if (!CheckScheduleValueMinMax(state, thisPump.VFD.ManualRPMSchedIndex, false, 0.0) ||
+                           !CheckScheduleValueMinMax(state, thisPump.VFD.ManualRPMSchedIndex, false, 0.0)) {
                     ShowSevereError(
                         state,
                         format("{}{}=\"{}\", A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero.",
@@ -445,8 +445,8 @@ void GetPumpInput(EnergyPlusData &state)
                             "{}{}=\"{}\", At least one scheduled VFD schedule input was invalid.", RoutineName, cCurrentModuleObject, thisPump.Name));
                     ShowContinueError(state, "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                     ErrorsFound = true;
-                } else if (!CheckScheduleValueMinMax(state, thisPump.VFD.MinRPMSchedIndex, ">", 0.0) ||
-                           !CheckScheduleValueMinMax(state, thisPump.VFD.MaxRPMSchedIndex, ">", 0.0)) {
+                } else if (!CheckScheduleValueMinMax(state, thisPump.VFD.MinRPMSchedIndex, false, 0.0) ||
+                           !CheckScheduleValueMinMax(state, thisPump.VFD.MaxRPMSchedIndex, false, 0.0)) {
                     ShowSevereError(
                         state,
                         format("{}{}=\"{}\", A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero.",
