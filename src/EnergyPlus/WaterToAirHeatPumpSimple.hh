@@ -173,7 +173,7 @@ namespace WaterToAirHeatPumpSimple {
                                DataHVACGlobals::CompressorOperation CompressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
-                               ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
+                               Real64 const OnOffAirFlowRat = 1.0 // ratio of comp on to comp off air flow rate
     );
 
     // MODULE SUBROUTINES:

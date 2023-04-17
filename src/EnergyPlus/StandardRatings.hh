@@ -533,22 +533,21 @@ namespace StandardRatings {
         ObjexxFCL::Optional<HPdefrostControl const> DefrostControl = _ // defrost control; 1=timed, 2=on-demand
     );
 
-    void ReportDXCoilRating(
-        EnergyPlusData &state,
-        std::string const &CompType,     // Type of component
-        std::string_view CompName,       // Name of component
-        int const CompTypeNum,           // TypeNum of component
-        Real64 const CoolCapVal,         // Standard total (net) cooling capacity for AHRI Std. 210/240 {W}
-        Real64 const SEERValueIP,        // SEER value in IP units from user PLR curve {Btu/W-h}
-        Real64 const SEERValueDefaultIP, // SEER value in IP units from AHRI Std 210/240-2008 default PLF curve and C_D {Btu/W-h}
-        Real64 const EERValueSI,         // EER value in SI units {W/W}
-        Real64 const EERValueIP,         // EER value in IP units {Btu/W-h}
-        Real64 const IEERValueIP,        // IEER value in IP units {Btu/W-h}
-        Real64 const HighHeatingCapVal,  // High Temperature Heating Standard (Net) Rating Capacity
-        Real64 const LowHeatingCapVal,   // Low Temperature Heating Standard (Net) Rating Capacity
-        Real64 const HSPFValueIP,        // IEER value in IP units {Btu/W-h}
-        int const RegionNum,             // Region Number for which HSPF is calculated
-        ObjexxFCL::Optional_bool_const AHRI2023StandardRatings = false); // True if required AHRI/ANSI 210/240 Std. 2023 SEER2,HSPF2 Ratings.
+    void ReportDXCoilRating(EnergyPlusData &state,
+                            std::string const &CompType,     // Type of component
+                            std::string_view CompName,       // Name of component
+                            int const CompTypeNum,           // TypeNum of component
+                            Real64 const CoolCapVal,         // Standard total (net) cooling capacity for AHRI Std. 210/240 {W}
+                            Real64 const SEERValueIP,        // SEER value in IP units from user PLR curve {Btu/W-h}
+                            Real64 const SEERValueDefaultIP, // SEER value in IP units from AHRI Std 210/240-2008 default PLF curve and C_D {Btu/W-h}
+                            Real64 const EERValueSI,         // EER value in SI units {W/W}
+                            Real64 const EERValueIP,         // EER value in IP units {Btu/W-h}
+                            Real64 const IEERValueIP,        // IEER value in IP units {Btu/W-h}
+                            Real64 const HighHeatingCapVal,  // High Temperature Heating Standard (Net) Rating Capacity
+                            Real64 const LowHeatingCapVal,   // Low Temperature Heating Standard (Net) Rating Capacity
+                            Real64 const HSPFValueIP,        // IEER value in IP units {Btu/W-h}
+                            int const RegionNum,             // Region Number for which HSPF is calculated
+                            bool const AHRI2023StandardRatings = false); // True if required AHRI/ANSI 210/240 Std. 2023 SEER2,HSPF2 Ratings.
 
     void ReportDXCoolCoilDataCenterApplication(EnergyPlusData &state,
                                                std::string const &CompType,           // Type of component
