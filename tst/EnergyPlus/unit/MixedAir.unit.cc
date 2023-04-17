@@ -798,8 +798,8 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
 
     EXPECT_EQ(SysOAMethod::ProportionalControlDesOcc, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(*state, state->dataMixedAir->OAController(1).OANode));
-    EXPECT_NEAR(0.00314899, state->dataMixedAir->VentilationMechanical(1).ZoneOAPeopleRate(1), 0.00001);
-    EXPECT_NEAR(0.000407, state->dataMixedAir->VentilationMechanical(1).ZoneOAAreaRate(1), 0.00001);
+    EXPECT_NEAR(0.00314899, state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneOAPeopleRate, 0.00001);
+    EXPECT_NEAR(0.000407, state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneOAAreaRate, 0.00001);
 
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataMixedAir->OAController(1).MixMassFlow = 1.7 * state->dataEnvrn->StdRhoAir;
@@ -808,7 +808,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     state->dataMixedAir->VentilationMechanical(1).SchPtr = 1;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataMixedAir->VentilationMechanical(1).ZoneADEffSchPtr(1) = 2;
+    state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneADEffSchPtr = 2;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0;
     state->dataHeatBal->TotPeople = 1;
     state->dataHeatBal->People.allocate(1);
@@ -841,7 +841,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     EXPECT_NEAR(0.009527, state->dataMixedAir->OAController(1).MinOAFracLimit, 0.00001);
 
     state->dataSize->OARequirements(1).OAFlowMethod = OAFlowCalcMethod::PCDesOcc;
-    state->dataMixedAir->VentilationMechanical(1).ZoneOAFlowMethod(1) = state->dataSize->OARequirements(1).OAFlowMethod;
+    state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneOAFlowMethod = state->dataSize->OARequirements(1).OAFlowMethod;
     state->dataAirLoop->NumOASystems = 1;
 
     state->dataAirLoop->OutsideAirSys.allocate(1);
@@ -874,7 +874,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
 
     InitOAController(*state, 1, true, 1);
     EXPECT_EQ("ProportionalControlBasedOnDesignOccupancy",
-              DataSizing::OAFlowCalcMethodNames[static_cast<int>(state->dataMixedAir->VentilationMechanical(1).ZoneOAFlowMethod(1))]);
+              DataSizing::OAFlowCalcMethodNames[static_cast<int>(state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneOAFlowMethod)]);
 
     state->dataAirLoop->OutsideAirSys.deallocate();
     state->dataMixedAir->OAMixer.deallocate();
@@ -1003,10 +1003,10 @@ TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
     state->dataGlobal->DoZoneSizing = true;
     GetOAControllerInputs(*state);
 
-    EXPECT_EQ(0.00944, state->dataMixedAir->VentilationMechanical(1).ZoneOAPeopleRate(1));
-    EXPECT_EQ(0.00, state->dataMixedAir->VentilationMechanical(1).ZoneOAAreaRate(1));
-    EXPECT_EQ(0.00, state->dataMixedAir->VentilationMechanical(1).ZoneOAFlowRate(1));
-    EXPECT_EQ(0.00, state->dataMixedAir->VentilationMechanical(1).ZoneOAACHRate(1));
+    EXPECT_EQ(0.00944, state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneOAPeopleRate);
+    EXPECT_EQ(0.00, state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneOAAreaRate);
+    EXPECT_EQ(0.00, state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneOAFlowRate);
+    EXPECT_EQ(0.00, state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneOAACHRate);
 }
 
 TEST_F(EnergyPlusFixture, MixedAir_TestHXinOASystem)
@@ -5741,15 +5741,12 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     // Case 4 - System OA method = IndoorAirQualityProcedureCombined, SOAM_IAQPCOM, set zone OA schedules to alwaysoff
     state->dataScheduleMgr->Schedule.allocate(1);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0.0;
-    state->dataMixedAir->VentilationMechanical(1).ZoneOASchPtr(1) = 1;
-    state->dataMixedAir->VentilationMechanical(1).ZoneOASchPtr(2) = 1;
+    state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneOASchPtr = 1;
+    state->dataMixedAir->VentilationMechanical(1).VentMechZone(2).ZoneOASchPtr = 1;
 
     state->dataMixedAir->VentilationMechanical(1).SystemOAMethod = SysOAMethod::IAQPCOM;
     OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
     EXPECT_EQ(0.0, OAMassFlow);
-
-    state->dataContaminantBalance->ZoneSysContDemand.deallocate();
-    state->dataScheduleMgr->Schedule.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
@@ -6073,8 +6070,8 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 
     EXPECT_EQ(SysOAMethod::ProportionalControlDesOARate, state->dataMixedAir->VentilationMechanical(1).SystemOAMethod);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(*state, state->dataMixedAir->OAController(1).OANode));
-    EXPECT_NEAR(0.00314899, state->dataMixedAir->VentilationMechanical(1).ZoneOAPeopleRate(1), 0.00001);
-    EXPECT_NEAR(0.000407, state->dataMixedAir->VentilationMechanical(1).ZoneOAAreaRate(1), 0.00001);
+    EXPECT_NEAR(0.00314899, state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneOAPeopleRate, 0.00001);
+    EXPECT_NEAR(0.000407, state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneOAAreaRate, 0.00001);
 
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataMixedAir->OAController(1).MixMassFlow = 1.7 * state->dataEnvrn->StdRhoAir;
@@ -6083,7 +6080,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     state->dataMixedAir->VentilationMechanical(1).SchPtr = 1;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataMixedAir->VentilationMechanical(1).ZoneADEffSchPtr(1) = 2;
+    state->dataMixedAir->VentilationMechanical(1).VentMechZone(1).ZoneADEffSchPtr = 2;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0;
     state->dataHeatBal->TotPeople = 1;
     state->dataHeatBal->People.allocate(1);
