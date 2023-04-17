@@ -3426,7 +3426,6 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
-
             auto &thisZoneEvapUnit = ZoneEvapUnit(UnitLoop);
             thisZoneEvapUnit.Name = Alphas(1);
             if (lAlphaBlanks(2)) {
