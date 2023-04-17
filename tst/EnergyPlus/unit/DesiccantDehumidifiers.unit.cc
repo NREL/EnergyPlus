@@ -2888,6 +2888,19 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         }
     }
     EXPECT_EQ(RegCoilCapacity, state->dataHeatingCoils->HeatingCoil(CoilIndex).NominalCapacity);
+
+    // testing system peak cooling load timestamp
+    auto &finalSysSizing = state->dataSize->FinalSysSizing(1);
+    auto &sysSizPeakDDNum = state->dataSize->SysSizPeakDDNum(1);
+    EXPECT_EQ(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::SensibleCooling);
+    EXPECT_EQ(finalSysSizing.SizingOption, DataSizing::NonCoincident);
+    EXPECT_EQ(sysSizPeakDDNum.SensCoolPeakDD, 2);
+    int timeStepIndexAtPeakCoolLoad = sysSizPeakDDNum.TimeStepAtSensCoolPk(2);
+    EXPECT_EQ(sysSizPeakDDNum.TimeStepAtTotCoolPk(2), timeStepIndexAtPeakCoolLoad);
+    std::string coolPeakDDDate = sysSizPeakDDNum.cTotCoolPeakDDDate;
+    EXPECT_EQ(coolPeakDDDate, "7/21");
+    std::string dateHrMin = coolPeakDDDate + " " + SizingManager::TimeIndexToHrMinString(*state, timeStepIndexAtPeakCoolLoad);
+    EXPECT_EQ(dateHrMin, "7/21 10:30:00");
 }
 
 TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
