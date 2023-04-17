@@ -249,7 +249,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
             if (!ScheduleManager::CheckScheduleValueMinMax(
-                    state, state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum, ">=", 0.0)) {
+                    state, state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum, true, 0.0)) {
                 ShowWarningError(state,
                                  format("{}=\"{}\", is not valid",
                                         state.dataIPShortCut->cCurrentModuleObject,
