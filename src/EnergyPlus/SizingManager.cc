@@ -791,11 +791,13 @@ void ManageSizing(EnergyPlusData &state)
             std::string coolPeakDDDate;
             int coolPeakDD = 0;
             Real64 coolCap = 0.;
+            int timeStepIndexAtPeakCoolLoad = 0;
             if (FinalSysSizing(AirLoopNum).coolingPeakLoad == DataSizing::PeakLoad::SensibleCooling) {
                 coolPeakLoadKind = "Sensible";
                 coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate;
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).SensCoolCap;
+                timeStepIndexAtPeakCoolLoad = SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk(coolPeakDD);
             } else if (FinalSysSizing(AirLoopNum).coolingPeakLoad == DataSizing::PeakLoad::TotalCooling) {
                 if (FinalSysSizing(AirLoopNum).loadSizingType == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing) {
                     coolPeakLoadKind = "Total Based on Latent";
@@ -805,6 +807,7 @@ void ManageSizing(EnergyPlusData &state)
                 coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate;
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).TotCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).TotCoolCap;
+                timeStepIndexAtPeakCoolLoad = SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk(coolPeakDD);
             }
             if (coolPeakDD > 0) {
                 ReportSysSizing(state,
@@ -816,7 +819,7 @@ void ManageSizing(EnergyPlusData &state)
                                 FinalSysSizing(AirLoopNum).DesCoolVolFlow,
                                 FinalSysSizing(AirLoopNum).CoolDesDay,
                                 coolPeakDDDate,
-                                SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(coolPeakDD));
+                                timeStepIndexAtPeakCoolLoad);
             } else {
                 ReportSysSizing(state,
                                 curName,
