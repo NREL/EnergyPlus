@@ -1044,7 +1044,7 @@ void GetFanInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             Fan(FanNum).FanName,
-                            _,
+                            {},
                             "Electricity",
                             "Fans",
                             Fan(FanNum).EndUseSubcategoryName,

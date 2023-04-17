@@ -212,7 +212,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 24C/20C
 
-    Real64 coolingSetpoint2 = 24.0;
+    Real64 heatingSetpoint2 = 20.0;
     Real64 zoneAssumedTemperature2 = -9999;
     HeatBalanceKivaManager::KivaInstanceMap kv2(*state, fnd, 0, {}, 0, zoneAssumedTemperature2, 1.0, 0, &km);
 
@@ -223,14 +223,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult2 = kv2.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult2, coolingSetpoint2 + Constant::KelvinConv, 0.001);
+    EXPECT_NEAR(expectedResult2, heatingSetpoint2 + Constant::KelvinConv, 0.001);
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 100C/-100C
 
     state->dataZoneCtrls->TempControlledZone(1).SchIndx_DualSetPointWDeadBandCool = 4;
     state->dataZoneCtrls->TempControlledZone(1).SchIndx_DualSetPointWDeadBandHeat = 5;
 
-    Real64 coolingSetpoint3 = 100.0;
+    Real64 heatingSetpoint3 = -100.0;
     Real64 zoneAssumedTemperature3 = -9999;
     HeatBalanceKivaManager::KivaInstanceMap kv3(*state, fnd, 0, {}, 0, zoneAssumedTemperature3, 1.0, 0, &km);
 
@@ -241,7 +241,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult3 = kv3.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult3, coolingSetpoint3 + Constant::KelvinConv, 0.001);
+    EXPECT_NEAR(expectedResult3, heatingSetpoint3 + Constant::KelvinConv, 0.001);
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 100C/-100C
 

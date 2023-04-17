@@ -84,12 +84,12 @@
 
 namespace EnergyPlus {
 
-void createFacilityElectricPowerServiceObject(EnergyPlusData &state)
+void createFacilityElectricPowerServiceObject(const EnergyPlusData &state)
 {
     state.dataElectPwrSvcMgr->facilityElectricServiceObj = std::make_unique<ElectricPowerServiceManager>();
 }
 
-void initializeElectricPowerServiceZoneGains(EnergyPlusData &state) // namespace routine for handling call from InternalHeatGains
+void initializeElectricPowerServiceZoneGains(const EnergyPlusData &state) // namespace routine for handling call from InternalHeatGains
 {
     // internal zone gains need to be re initialized for begin new environment earlier than the main call into manage electric power service
     if (state.dataElectPwrSvcMgr->facilityElectricServiceObj->newEnvironmentInternalGainsFlag && state.dataGlobal->BeginEnvrnFlag) {
@@ -258,7 +258,6 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
         int numAlphas; // Number of elements in the alpha array
         int numNums;   // Number of elements in the numeric array
         int iOStat;    // IO Status when calling get input subroutine
-        int facilityPowerInTransformerIDFObjNum = 0;
         bool foundInFromGridTransformer = false;
 
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
@@ -279,7 +278,6 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerInFromGrid")) {
                 if (!foundInFromGridTransformer) {
                     foundInFromGridTransformer = true;
-                    facilityPowerInTransformerIDFObjNum = loopTransformer;
                     facilityPowerInTransformerName_ = state.dataIPShortCut->cAlphaArgs(1);
                     facilityPowerInTransformerPresent_ = true;
                 } else {
@@ -328,10 +326,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityPurchased",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -348,10 +346,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricitySurplusSold",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -368,10 +366,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityNet",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -526,9 +524,9 @@ void ElectricPowerServiceManager::reportPVandWindCapacity(EnergyPlusData &state)
     // LEED report
     pvTotalCapacity_ = 0.0;
     windTotalCapacity_ = 0.0;
-    for (auto &lc : elecLoadCenterObjs) {
+    for (auto const &lc : elecLoadCenterObjs) {
         if (lc->numGenerators > 0) {
-            for (auto &g : lc->elecGenCntrlObj) {
+            for (auto const &g : lc->elecGenCntrlObj) {
                 if (g->generatorType == GeneratorType::PV) {
                     pvTotalCapacity_ += g->maxPowerOut;
                 }
@@ -550,7 +548,7 @@ void ElectricPowerServiceManager::reportPVandWindCapacity(EnergyPlusData &state)
 void ElectricPowerServiceManager::sumUpNumberOfStorageDevices()
 {
     numElecStorageDevices = 0;
-    for (auto &e : elecLoadCenterObjs) {
+    for (auto const &e : elecLoadCenterObjs) {
         if (e->storageObj != nullptr) {
             ++numElecStorageDevices;
         }
@@ -699,10 +697,9 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
     int numAlphas; // Number of elements in the alpha array
     int numNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
-    bool errorsFound;
 
     state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Distribution";
-    errorsFound = false;
+    bool errorsFound = false;
     if (objectNum > 0) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
@@ -1042,7 +1039,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         // issue #5299 check for non-zero values in thermal electric ratio if gen op scheme is ThermalFollow*
         if (genOperationScheme_ == GeneratorOpScheme::ThermalFollow || genOperationScheme_ == GeneratorOpScheme::ThermalFollowLimitElectrical) {
             // check to make sure the user didn't input zeros for thermalToElectricControlRatio
-            for (auto &g : elecGenCntrlObj) {
+            for (auto const &g : elecGenCntrlObj) {
                 if (g->nominalThermElectRatio <= 0.0) {
                     ShowWarningError(state,
                                      format("Generator operation needs to be based on following thermal loads and needs values for Rated Thermal to "
@@ -1095,8 +1092,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
         int transformerItemNum =
             state.dataInputProcessing->inputProcessor->getObjectItemNum(state, state.dataIPShortCut->cCurrentModuleObject, transformerName_);
-        int iOStat;
         if (transformerItemNum > 0) {
+            int iOStat;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      transformerItemNum,
@@ -1653,7 +1650,7 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state,
     // sum up generator production
     genElectProdRate = 0.0;
     genElectricProd = 0.0;
-    for (auto &g : elecGenCntrlObj) {
+    for (auto const &g : elecGenCntrlObj) {
         genElectProdRate += g->electProdRate;
         g->electricityProd = g->electProdRate * (state.dataHVACGlobal->TimeStepSysSec);
         genElectricProd += g->electricityProd;
@@ -2041,7 +2038,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::ACBuss: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2057,7 +2054,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::ACBussStorage: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2075,7 +2072,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::DCBussInverter: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2093,7 +2090,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::DCBussInverterDCStorage: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2113,7 +2110,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     case ElectricBussType::DCBussInverterACStorage: {
         genElectProdRate = 0.0;
         genElectricProd = 0.0;
-        for (auto &gc : elecGenCntrlObj) {
+        for (auto const &gc : elecGenCntrlObj) {
             genElectProdRate += gc->electProdRate;
             genElectricProd += gc->electricityProd;
         }
@@ -2137,7 +2134,7 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
     } // end switch
     thermalProdRate = 0.0;
     thermalProd = 0.0;
-    for (auto &gc : elecGenCntrlObj) {
+    for (auto const &gc : elecGenCntrlObj) {
         thermalProdRate += gc->thermProdRate;
         thermalProd += gc->thermalProd;
     }
@@ -2146,9 +2143,8 @@ void ElectPowerLoadCenter::updateLoadCenterGeneratorRecords(EnergyPlusData &stat
 Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
 {
     if (myCoGenSetupFlag_) {
-        bool plantNotFound = false;
         for (auto &g : elecGenCntrlObj) {
-            plantNotFound = false;
+            bool plantNotFound = false;
             PlantUtilities::ScanPlantLoopsForObject(state, g->compPlantName, g->compPlantType, g->cogenLocation, plantNotFound, _, _, _, _, _);
             if (!plantNotFound) g->plantInfoFound = true;
         }
@@ -2477,9 +2473,6 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
     nomVoltEfficiencyARR_.resize(6, 0.0);
 
     static constexpr std::string_view routineName = "DCtoACInverter constructor ";
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     // if/when add object class name to input object this can be simplified. for now search all possible types
     bool foundInverter = false;
@@ -2516,6 +2509,9 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
     }
 
     if (foundInverter) {
+        int NumAlphas; // Number of elements in the alpha array
+        int NumNums;   // Number of elements in the numeric array
+        int IOStat;    // IO Status when calling get input subroutine
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
@@ -2684,10 +2680,10 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "POWERCONVERSION",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Inverter Thermal Loss Rate",
@@ -2717,7 +2713,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "Electricity",
                             "Cogeneration",
                             "DCtoACInverter Ancillary",
@@ -2987,15 +2983,15 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
 {
 
     static constexpr std::string_view routineName = "ACtoDCConverter constructor ";
-    int NumAlphas; // Number of elements in the alpha array
-    int NumNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     // if/when add object class name to input object this can be simplified. for now search all possible types
 
     int testConvertIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Storage:Converter", objectName);
 
     if (testConvertIndex > 0) {
+        int NumAlphas; // Number of elements in the alpha array
+        int NumNums;   // Number of elements in the numeric array
+        int IOStat;    // IO Status when calling get input subroutine
         state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Storage:Converter";
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -3144,10 +3140,10 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "POWERCONVERSION",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Converter Thermal Loss Rate",
@@ -3177,7 +3173,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "Electricity",
                             "Cogeneration",
                             "ACtoDCConverter Ancillary",
@@ -3318,13 +3314,9 @@ ElectricStorage::ElectricStorage( // main constructor
 {
 
     static constexpr std::string_view routineName = "ElectricStorage constructor ";
-    int numAlphas; // Number of elements in the alpha array
-    int numNums;   // Number of elements in the numeric array
-    int iOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     // if/when add object class name to input object this can be simplified. for now search all possible types
     bool foundStorage = false;
-    int testStorageIndex = 0;
     int storageIDFObjectNum = 0;
 
     const std::array<std::pair<std::string, StorageModelType>, 3> storageTypes{
@@ -3333,7 +3325,7 @@ ElectricStorage::ElectricStorage( // main constructor
          {"ElectricLoadCenter:Storage:LiIonNMCBattery", StorageModelType::LiIonNmcBattery}}};
 
     for (auto &item : storageTypes) {
-        testStorageIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, item.first, objectName);
+        int testStorageIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, item.first, objectName);
         if (testStorageIndex > 0) {
             foundStorage = true;
             storageIDFObjectNum = testStorageIndex;
@@ -3344,6 +3336,9 @@ ElectricStorage::ElectricStorage( // main constructor
     }
 
     if (foundStorage) {
+        int numAlphas; // Number of elements in the alpha array
+        int numNums;   // Number of elements in the numeric array
+        int iOStat;    // IO Status when calling get input subroutine
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                  storageIDFObjectNum,
@@ -3721,10 +3716,10 @@ ElectricStorage::ElectricStorage( // main constructor
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "ELECTRICSTORAGE",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Electric Storage Discharge Power",
@@ -3740,10 +3735,10 @@ ElectricStorage::ElectricStorage( // main constructor
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "ELECTRICSTORAGE",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Electric Storage Thermal Loss Rate",
@@ -4129,21 +4124,15 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
     Real64 Volt = 0.0;
 
     Real64 T0 = 0.0;
-    Real64 E0c = 0.0;
-    Real64 k = 0.0;
-    Real64 c = 0.0;
     Real64 qmaxf = 0.0;
     Real64 Ef = 0.0;
-    Real64 qmax = 0.0;
-    Real64 Pactual = 0.0;
     Real64 q0 = 0.0;
-    Real64 E0d = 0.0;
 
-    qmax = maxAhCapacity_;
-    E0c = chargedOCV_;
-    E0d = dischargedOCV_;
-    k = chargeConversionRate_;
-    c = availableFrac_;
+    Real64 qmax = maxAhCapacity_;
+    Real64 E0c = chargedOCV_;
+    Real64 E0d = dischargedOCV_;
+    Real64 k = chargeConversionRate_;
+    Real64 c = availableFrac_;
 
     if (charging) {
 
@@ -4204,7 +4193,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
 
         if (std::abs(I0) <= std::abs(Imax)) {
             I0 = Pw / Volt;
-            Pactual = I0 * Volt;
+            // Pactual = I0 * Volt;
         } else {
             I0 = Imax;
             qmaxf = 80.0; // Initial assumption to solve the equation using iterative method
@@ -4258,7 +4247,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
         Imax = min(Imax, maxDischargeI_);
         if (std::abs(I0) <= Imax) {
             I0 = Pw / Volt;
-            Pactual = I0 * Volt;
+            // Pactual = I0 * Volt;
         } else {
             I0 = Imax;
             qmaxf = 10.0;        // Initial assumption to solve the equation using iterative method
@@ -4294,7 +4283,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
         thisTimeStepBound_ = max(0.0, newBound);
     }
 
-    Pactual = I0 * Volt;
+    // Pactual = I0 * Volt;
     Real64 TotalSOC = thisTimeStepAvailable_ + thisTimeStepBound_;
 
     // output1
@@ -4663,15 +4652,15 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
       thermalLossEnergy_(0.0), elecUseMeteredUtilityLosses_(0.0), powerConversionMeteredLosses_(0.0), qdotConvZone_(0.0), qdotRadZone_(0.0)
 {
     static constexpr std::string_view routineName = "ElectricTransformer constructor ";
-    int numAlphas; // Number of elements in the alpha array
-    int numNums;   // Number of elements in the numeric array
-    int IOStat;    // IO Status when calling get input subroutine
     bool errorsFound = false;
     int transformerIDFObjectNum = 0;
     state.dataIPShortCut->cCurrentModuleObject = "ElectricLoadCenter:Transformer";
 
     transformerIDFObjectNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Transformer", objectName);
     if (transformerIDFObjectNum > 0) {
+        int numAlphas; // Number of elements in the alpha array
+        int numNums;   // Number of elements in the numeric array
+        int IOStat;    // IO Status when calling get input subroutine
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                  transformerIDFObjectNum,
@@ -4920,7 +4909,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
-                                _,
+                                {},
                                 "Electricity",
                                 "ExteriorEquipment",
                                 "Transformer",
@@ -4934,10 +4923,10 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "POWERCONVERSION",
-                                _,
+                                {},
                                 "System");
         }
         if (usageMode_ == TransformerUse::PowerBetweenLoadCenterAndBldg) {
@@ -4948,10 +4937,10 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "POWERCONVERSION",
-                                _,
+                                {},
                                 "System");
         }
 

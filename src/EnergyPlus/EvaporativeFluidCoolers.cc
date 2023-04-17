@@ -111,11 +111,11 @@ namespace EvaporativeFluidCoolers {
         }
 
         // Now look for this particular object
-        for (auto &thisEFC : state.dataEvapFluidCoolers->SimpleEvapFluidCooler) {
-            if ((thisEFC.Type == objectType) && (thisEFC.Name == objectName)) {
-                return &thisEFC;
-            }
-        }
+        auto thisObj = std::find_if(
+            state.dataEvapFluidCoolers->SimpleEvapFluidCooler.begin(),
+            state.dataEvapFluidCoolers->SimpleEvapFluidCooler.end(),
+            [&objectType, &objectName](const EvapFluidCoolerSpecs &myObj) { return myObj.Type == objectType && myObj.Name == objectName; });
+        if (thisObj != state.dataEvapFluidCoolers->SimpleEvapFluidCooler.end()) return thisObj;
         // If we didn't find it, fatal
         ShowFatalError(state, format("LocalEvapFluidCoolerFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
         // Shut up the compiler
@@ -1026,10 +1026,10 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -1047,10 +1047,10 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -1060,10 +1060,10 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
 
         } else { // Evaporative fluid cooler water from mains and gets metered
@@ -1082,10 +1082,10 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -1095,10 +1095,10 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
         }
 
@@ -1149,10 +1149,10 @@ namespace EvaporativeFluidCoolers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "Electricity",
                             "HeatRejection",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -2226,7 +2226,7 @@ namespace EvaporativeFluidCoolers {
                 // FanModeFrac = 1.0;
                 this->FanPower = FanPowerOn;
             }
-        } else if (inletWaterTemp <= TempSetPoint) {
+        } else {
             // Inlet water temperature lower than setpoint, assume 100% bypass, evaporative fluid cooler fan off
             if (this->capacityControl == CapacityControl::FluidBypass) {
                 if (inletWaterTemp > OWTLowerLimit) {
@@ -2657,15 +2657,11 @@ namespace EvaporativeFluidCoolers {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Chandan Sharma
         //       DATE WRITTEN:    May 2009
-        //       MODIFIED         na
-        //       RE-ENGINEERED    na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for passing results to the outlet water node.
 
         Real64 constexpr TempAllowance(0.02); // Minimum difference b/w fluid cooler water outlet temp and
-        std::string CharErrOut;
-        std::string CharLowOutletTemp;
 
         state.dataLoopNodes->Node(this->WaterOutletNode).Temp = this->OutletWaterTemp;
 

@@ -180,7 +180,7 @@ namespace Boilers {
                                  bool RunFlag   // boiler on when TRUE
         );
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static BoilerSpecs *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
     void GetBoilerInput(EnergyPlusData &state);

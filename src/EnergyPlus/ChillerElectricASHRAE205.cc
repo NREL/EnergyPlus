@@ -458,11 +458,10 @@ ASHRAE205ChillerSpecs *ASHRAE205ChillerSpecs::factory(EnergyPlusData &state, std
         getChillerASHRAE205Input(state);
         state.dataChillerElectricASHRAE205->getInputFlag = false;
     }
-    for (auto &obj : state.dataChillerElectricASHRAE205->Electric205Chiller) {
-        if (obj.Name == objectName) {
-            return &obj;
-        }
-    }
+    auto thisObj = std::find_if(state.dataChillerElectricASHRAE205->Electric205Chiller.begin(),
+                                state.dataChillerElectricASHRAE205->Electric205Chiller.end(),
+                                [&objectName](const ASHRAE205ChillerSpecs &myObj) { return myObj.Name == objectName; });
+    if (thisObj != state.dataChillerElectricASHRAE205->Electric205Chiller.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("ASHRAE205ChillerSpecs::factory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     return nullptr;                                                                                                         // LCOV_EXCL_LINE
@@ -1016,7 +1015,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Cooling",
                         this->EndUseSubcategory,
@@ -1037,10 +1036,10 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -1082,10 +1081,10 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,

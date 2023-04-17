@@ -110,7 +110,7 @@ namespace CondenserLoopTowers {
     std::string const cCoolingTower_VariableSpeed("CoolingTower:VariableSpeed");
     std::string const cCoolingTower_VariableSpeedMerkel("CoolingTower:VariableSpeed:Merkel");
 
-    PlantComponent *CoolingTower::factory(EnergyPlusData &state, std::string_view objectName)
+    CoolingTower *CoolingTower::factory(EnergyPlusData &state, std::string_view objectName)
     {
         // Process the input data for towers if it hasn't been done already
         if (state.dataCondenserLoopTowers->GetInput) {
@@ -118,11 +118,10 @@ namespace CondenserLoopTowers {
             state.dataCondenserLoopTowers->GetInput = false;
         }
         // Now look for this particular tower in the list
-        for (auto &tower : state.dataCondenserLoopTowers->towers) {
-            if (tower.Name == objectName) {
-                return &tower;
-            }
-        }
+        auto thisObj = std::find_if(state.dataCondenserLoopTowers->towers.begin(),
+                                    state.dataCondenserLoopTowers->towers.end(),
+                                    [&objectName](const CoolingTower &myObj) { return myObj.Name == objectName; });
+        if (thisObj != state.dataCondenserLoopTowers->towers.end()) return thisObj;
         // If we didn't find it, fatal
         ShowFatalError(state, format("CoolingTowerFactory: Error getting inputs for tower named: {}", objectName)); // LCOV_EXCL_LINE
         // Shut up the compiler
@@ -193,7 +192,6 @@ namespace CondenserLoopTowers {
         //                        B. Griffith, Aug. 2006 water consumption modeling and water system connections
         //                        T Hong, Aug. 2008: added fluid bypass for single speed tower
         //                        A Flament, July 2010, added multi-cell capability for the 3 types of cooling tower
-        //       RE-ENGINEERED    na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Obtains input data for cooling towers and stores it in towers data structure. Additional structure
@@ -1914,7 +1912,7 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HeatRejection",
                                 this->EndUseSubcategory,
@@ -1956,7 +1954,7 @@ namespace CondenserLoopTowers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "HeatRejection",
                                     "BasinHeater",
@@ -2008,7 +2006,7 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HeatRejection",
                                 this->EndUseSubcategory,
@@ -2049,7 +2047,7 @@ namespace CondenserLoopTowers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "HeatRejection",
                                     "BasinHeater",
@@ -2101,7 +2099,7 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HeatRejection",
                                 this->EndUseSubcategory,
@@ -2142,7 +2140,7 @@ namespace CondenserLoopTowers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "HeatRejection",
                                     "BasinHeater",
@@ -2194,7 +2192,7 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HeatRejection",
                                 this->EndUseSubcategory,
@@ -2229,7 +2227,7 @@ namespace CondenserLoopTowers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "HeatRejection",
                                     "BasinHeater",
@@ -2266,10 +2264,10 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(state,
                                 "Cooling Tower Starved Storage Tank Water Volume Flow Rate",
@@ -2292,10 +2290,10 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
         } else { // tower water from mains and gets metered
             SetupOutputVariable(state,
@@ -2312,10 +2310,10 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Mains Water Volume",
@@ -2324,10 +2322,10 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "HeatRejection",
-                                _,
+                                {},
                                 "Plant");
         }
 
@@ -3419,8 +3417,8 @@ namespace CondenserLoopTowers {
         }
 
         // input error checking
-        bool ErrorsFound = false;
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+            bool ErrorsFound = false;
             if (this->TowerType == DataPlant::PlantEquipmentType::CoolingTower_SingleSpd) {
                 if (this->DesignWaterFlowRate > 0.0) {
                     if (this->FreeConvAirFlowRate >= this->HighSpeedAirFlowRate) {

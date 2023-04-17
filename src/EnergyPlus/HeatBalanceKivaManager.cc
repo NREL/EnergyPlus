@@ -299,8 +299,8 @@ void KivaInstanceMap::setInitialBoundaryConditions(
                 int schNameIdCool = state.dataZoneCtrls->TempControlledZone(zoneControlNum).SchIndx_DualSetPointWDeadBandCool;
                 Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(state, schNameIdHeat, hour, timestep);
                 Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(state, schNameIdCool, hour, timestep);
-                constexpr Real64 heatBalanceTemp = 10.0; // (assumed) degC
-                constexpr Real64 coolBalanceTemp = 15.0; // (assumed) degC
+                constexpr Real64 heatBalanceTemp = 10.0 + Constant::KelvinConv; // (assumed)
+                constexpr Real64 coolBalanceTemp = 15.0 + Constant::KelvinConv; // (assumed)
 
                 if (bcs->outdoorTemp < heatBalanceTemp) {
                     Tin = heatSetpoint + Constant::KelvinConv;
@@ -333,8 +333,8 @@ void KivaInstanceMap::setInitialBoundaryConditions(
             int coolSpSchId = state.dataZoneCtrls->StageControlledZone(zoneControlNum).CSBchedIndex;
             Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(state, heatSpSchId, hour, timestep);
             Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(state, coolSpSchId, hour, timestep);
-            constexpr Real64 heatBalanceTemp = 10.0; // (assumed) degC
-            constexpr Real64 coolBalanceTemp = 15.0; // (assumed) degC
+            constexpr Real64 heatBalanceTemp = 10.0 + Constant::KelvinConv; // (assumed)
+            constexpr Real64 coolBalanceTemp = 15.0 + Constant::KelvinConv; // (assumed)
             if (bcs->outdoorTemp < heatBalanceTemp) {
                 Tin = heatSetpoint + Constant::KelvinConv;
             } else if (bcs->outdoorTemp > coolBalanceTemp) {
