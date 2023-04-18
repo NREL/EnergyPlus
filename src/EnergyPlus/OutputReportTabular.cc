@@ -6487,14 +6487,6 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                          thisPrimaryAirSys.Name,
                          thisSysPreDefRep.TimeAtOALimit[static_cast<int>(MixedAir::OALimitFactor::Limits)]);
         PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchOaTmFctNoLimit,
-                         thisPrimaryAirSys.Name,
-                         thisSysPreDefRep.TimeAtOALimit[static_cast<int>(MixedAir::OALimitFactor::None)]);
-        PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchOaTmFctLimit,
-                         thisPrimaryAirSys.Name,
-                         thisSysPreDefRep.TimeAtOALimit[static_cast<int>(MixedAir::OALimitFactor::Limits)]);
-        PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctEcono,
                          thisPrimaryAirSys.Name,
                          thisSysPreDefRep.TimeAtOALimit[static_cast<int>(MixedAir::OALimitFactor::Economizer)]);
@@ -6559,20 +6551,6 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                     return 0.0;
                 }
             };
-            PreDefTableEntry(
-                state, state.dataOutRptPredefined->pdchOaAvFctNoLimit, thisPrimaryAirSys.Name, avgFlowRate(iSys, MixedAir::OALimitFactor::None), 4);
-            PreDefTableEntry(
-                state, state.dataOutRptPredefined->pdchOaAvFctLimit, thisPrimaryAirSys.Name, avgFlowRate(iSys, MixedAir::OALimitFactor::Limits), 4);
-            PreDefTableEntry(state,
-                             state.dataOutRptPredefined->pdchOaAvFctEcono,
-                             thisPrimaryAirSys.Name,
-                             avgFlowRate(iSys, MixedAir::OALimitFactor::Economizer),
-                             4);
-            PreDefTableEntry(state,
-                             state.dataOutRptPredefined->pdchOaAvFctExhaust,
-                             thisPrimaryAirSys.Name,
-                             avgFlowRate(iSys, MixedAir::OALimitFactor::Exhaust),
-                             4);
             PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchOaAvFctNoLimit, thisPrimaryAirSys.Name, avgFlowRate(iSys, MixedAir::OALimitFactor::None), 4);
             PreDefTableEntry(
