@@ -6055,8 +6055,6 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI5_IEER2022ValueTest)
     TSCCapFTemp.push_back(thisCoil.CCapFTemp(1));
     TSCCapFTemp.push_back(thisCoil.CCapFTemp2);
 
-    const int HSCCapFlow = thisCoil.CCapFFlow(1);
-
     Array1D<Real64> TSFanPowerPerEvapAirFlowRate2023;
     TSFanPowerPerEvapAirFlowRate2023.push_back(thisCoil.FanPowerPerEvapAirFlowRate_2023(1));
     TSFanPowerPerEvapAirFlowRate2023.push_back(thisCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed(1));
@@ -6077,8 +6075,6 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI5_IEER2022ValueTest)
     TSRatedCOP.push_back(thisCoil.RatedCOP(1));
     TSRatedCOP.push_back(thisCoil.RatedCOP2);
 
-    const int HSEIRFFlow = thisCoil.EIRFFlow(1);
-
     // condenser type array values for first and second index ?? TODO
     // Create TEST with EVAP COOLED
     std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(*state,
@@ -6086,12 +6082,12 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI5_IEER2022ValueTest)
                                                                                     thisCoil.CondenserType,
                                                                                     TSCCapFTemp,
                                                                                     TSRatedTotCap,
-                                                                                    HSCCapFlow,
+                                                                                    thisCoil.CCapFFlow(1),
                                                                                     TSFanPowerPerEvapAirFlowRate2023,
                                                                                     TSRatedAirVolFlowRate,
                                                                                     TSEIRFTemp,
                                                                                     TSRatedCOP,
-                                                                                    HSEIRFFlow);
+                                                                                    thisCoil.EIRFFlow(1));
 
     NetCoolingCapRated = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);

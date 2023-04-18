@@ -1828,7 +1828,7 @@ namespace StandardRatings {
 
     std::map<std::string, Real64> SingleSpeedDXHeatingCoilStandardRatings(
         EnergyPlusData &state,
-        std::string const &DXCoilType,                             // Type of DX coil for which HSPF is calculated
+        [[maybe_unused]] std::string const &DXCoilType,                             // Type of DX coil for which HSPF is calculated
         Real64 const RatedTotalCapacity,                           // Reference capacity of DX coil [W]
         Real64 const RatedCOP,                                     // Reference coefficient of performance [W/W]
         int const CapFFlowCurveIndex,                              // Index for the capacity as a function of flow fraction modifier curve
