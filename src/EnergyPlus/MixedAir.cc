@@ -2725,7 +2725,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
             // Shrink final arrays to conserve environment space
             if (TempMechVentArrayCounter < vent_mech.NumofVentMechZones) {
-                // vent_mech.VentMechZone.resize(TempMechVentArrayCounter);
+                vent_mech.VentMechZone.resize(TempMechVentArrayCounter);
                 vent_mech.NumofVentMechZones = TempMechVentArrayCounter;
             }
 
