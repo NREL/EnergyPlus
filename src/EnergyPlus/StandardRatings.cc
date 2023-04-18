@@ -1828,7 +1828,7 @@ namespace StandardRatings {
 
     std::map<std::string, Real64> SingleSpeedDXHeatingCoilStandardRatings(
         EnergyPlusData &state,
-        [[maybe_unused]] std::string const &DXCoilType,                             // Type of DX coil for which HSPF is calculated
+        [[maybe_unused]] std::string const &DXCoilType,            // Type of DX coil for which HSPF is calculated
         Real64 const RatedTotalCapacity,                           // Reference capacity of DX coil [W]
         Real64 const RatedCOP,                                     // Reference coefficient of performance [W/W]
         int const CapFFlowCurveIndex,                              // Index for the capacity as a function of flow fraction modifier curve
@@ -3085,7 +3085,7 @@ namespace StandardRatings {
         Array1A_int const &EIRFFlowCurveIndex //  | Only for HIGH SPEED
     )
     {
-        int const nsp = 4; // ??
+        int constexpr nsp = 4; // ??
         Real64 IEER_2022(0.0);
         Real64 EER_2022(0.0);
         Real64 QAFull(0.0);

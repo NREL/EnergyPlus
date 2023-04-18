@@ -54,7 +54,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
-#include <EnergyPlus/Coils/CoilCoolingDX.cc>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -3572,19 +3572,17 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_IEER2022ValueTest)
         "    1.5;                     !- Maximum Value of x",
     });
 
-    /*
-Speed   Percent Load
-    1	22.55253033	  D_Low
-    2	27.78780704	  D_High  // Interpolation Required
-    3	32.94761764
-    4	43.07931341	  C_Low
-    5	52.99940811	  C_High  // Interpolation Required
-    6	62.73305712
-    7	72.29505771	  B_Low
-    8	81.6913288	  B_High  // Interpolation Required
-    9	90.92630956
-    10	100	          A (Exact Match)
-    */
+    // Speed   Percent Load
+    //    1	22.55253033	  D_Low
+    //    2	27.78780704	  D_High  // Interpolation Required
+    //    3	32.94761764
+    //    4	43.07931341	  C_Low
+    //    5	52.99940811	  C_High  // Interpolation Required
+    //    6	62.73305712
+    //    7	72.29505771	  B_Low
+    //    8	81.6913288	  B_High  // Interpolation Required
+    //    9	90.92630956
+    //    10	100	          A (Exact Match)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -3897,19 +3895,17 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_2_IEER2022ValueTest)
         "    1.5;                     !- Maximum Value of x",
     });
 
-    /*
-    Speed   % Load
-        1	10
-        2	20	      D_Low
-        3	30	      D_High // Interpolation Required
-        4	40
-        5	50	      C (Exact Match)
-        6	60
-        7	70	      B_Low
-        8	80	      B_High // Interpolation Required
-        9	90
-        10	100	      A (Exact Match)
-    */
+    //    Speed   % Load
+    //        1	10
+    //        2	20	      D_Low
+    //        3	30	      D_High // Interpolation Required
+    //        4	40
+    //        5	50	      C (Exact Match)
+    //        6	60
+    //        7	70	      B_Low
+    //        8	80	      B_High // Interpolation Required
+    //        9	90
+    //        10	100	      A (Exact Match)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -4219,20 +4215,17 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_3_IEER2022ValueTest)
         "    1.5;                     !- Maximum Value of x",
     });
 
-    /*
-    Speed   % Load
-       1	18.5
-       2	23.1	D_Low
-       3	30.8	D_High, C_Low | Interpolation Required
-       4	53.8	C_High | Interpolation Required
-       5	64.6	B_Low
-       6	76.9	B_High | Interpolation Required
-       7	83.1
-       8	89.2
-       9	92.3
-       10	100.0	A (Exact Match)
-
-    */
+    //    Speed   % Load
+    //       1	18.5
+    //       2	23.1	D_Low
+    //       3	30.8	D_High, C_Low | Interpolation Required
+    //       4	53.8	C_High | Interpolation Required
+    //       5	64.6	B_Low
+    //       6	76.9	B_High | Interpolation Required
+    //       7	83.1
+    //       8	89.2
+    //       9	92.3
+    //       10	100.0	A (Exact Match)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -4505,19 +4498,17 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_7Speed_IEER2022ValueTest)
         "    1.5;                     !- Maximum Value of x",
     });
 
-    /*
-Speed   Percent Load
-    1	22.55253033	  D_Low
-    2	27.78780704	  D_High  // Interpolation Required
-    3	32.94761764
-    4	43.07931341	  C_Low
-    5	52.99940811	  C_High  // Interpolation Required
-    6	62.73305712
-    7	72.29505771	  B_Low
-    8	81.6913288	  B_High  // Interpolation Required
-    9	90.92630956
-    10	100	          A (Exact Match)
-    */
+    // Speed   Percent Load
+    //    1	22.55253033	  D_Low
+    //    2	27.78780704	  D_High  // Interpolation Required
+    //    3	32.94761764
+    //    4	43.07931341	  C_Low
+    //    5	52.99940811	  C_High  // Interpolation Required
+    //    6	62.73305712
+    //    7	72.29505771	  B_Low
+    //    8	81.6913288	  B_High  // Interpolation Required
+    //    9	90.92630956
+    //    10	100	          A (Exact Match)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -6790,7 +6781,7 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
         "    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name",
         "    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name",
 
-        /*   "	! Curves from example file MultiSpeedHeatPump.idf, Sep 2013, same curves for all speeds.",*/
+        //   "	! Curves from example file MultiSpeedHeatPump.idf, Sep 2013, same curves for all speeds."
 
         "  Curve:Biquadratic,",
         "    Sys 2 Furnace DX Cool Cool Coil Cap-FT,  !- Name",
@@ -6846,7 +6837,7 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
         "    0.5,                     !- Minimum Value of x",
         "    1.5;                     !- Maximum Value of x",
 
-        /*    "	! PLF = l.- Cd(1.-PLR) where Cd = 0.15",*/
+        //    "	! PLF = l.- Cd(1.-PLR) where Cd = 0.15"
 
         "  Curve:Quadratic,",
         "    Sys 2 Furnace DX Cool Cool Coil PLF,  !- Name",
