@@ -102,8 +102,6 @@ namespace HVACDuct {
 
     void GetDuctInput(EnergyPlusData &state);
 
-    void InitDuct(EnergyPlusData &state, int DuctNum); // number of the current duct being simulated
-
     void CalcDuct(int DuctNum); // number of the current duct being simulated !unused1208
 
     void UpdateDuct(EnergyPlusData &state, int DuctNum); // number of the current duct being simulated

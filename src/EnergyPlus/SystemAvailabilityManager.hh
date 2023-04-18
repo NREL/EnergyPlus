@@ -442,10 +442,10 @@ namespace SystemAvailabilityManager {
     );
 
     void CalcNVentSysAvailMgr(EnergyPlusData &state,
-                              int const SysAvailNum,                          // number of the current scheduled system availability manager
-                              int const PriAirSysNum,                         // number of the primary air system affected by this Avail. Manager
-                              int &AvailStatus,                               // System status indicator
-                              ObjexxFCL::Optional_int_const ZoneEquipType = _ // Type of zone equipment component
+                              int const SysAvailNum,             // number of the current scheduled system availability manager
+                              int const PriAirSysNum,            // number of the primary air system affected by this Avail. Manager
+                              int &AvailStatus,                  // System status indicator
+                              bool const isZoneEquipType = false // Type of zone equipment component
     );
 
     void CalcDiffTSysAvailMgr(EnergyPlusData &state,
