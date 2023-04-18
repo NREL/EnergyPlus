@@ -4,7 +4,7 @@ Multi-stage Economizer
 **Jeremy Lerond, Pacific Northwest National Laboratory**
 
  - Original Date: Nov 28, 2022
- - Revision Date: Apr 14, 2023
+ - Revision Date: Apr 18, 2023
 
 ## Justification for New Feature ##
 
@@ -20,9 +20,9 @@ This is not how actual single-zone systems, and their controllers operate. Figur
 
 *Figure 1 - Honeywell JADE controller*
 
-![Belino ZIP Economizer](NFP-MultistageEconomizer_Figure2_Belimo_ZIPEconomizer.png)
+![Belimo ZIP Economizer](NFP-MultistageEconomizer_Figure2_Belimo_ZIPEconomizer.png)
 
-*Figure 2 - Belino ZIP Economizer controller*
+*Figure 2 - Belimo ZIP Economizer controller*
 
 Moreover, this control approach is a building energy code requirement. For instance, ASHRAE Standard 90.1-2019 states in Section 6.5.3.2.1 that "*units that include an air economizer to meet the requirements of Section 6.5.1 shall have a minimum of two speeds of fan control during economizer operation*".
 
@@ -36,7 +36,7 @@ This proposal is to add a new feature to EnergyPlus to simulate multi-stage econ
 
 ## Approach ##
 
-A new input will be added to the `Controller:OutdoorAir` object to turn on/off the proposed multi-stage economizer operation. The default behavior will be to use the current approach. With this new approach, the economizer operation dictates the system's air flow rate. EnergyPlus will determine which of the cooling speed air flow rate the economizer should use for its operation, what the mixed air temperature should be at this air flow to meet the zone load, and finally the outdoor air fraction necessary to meet the load.
+A new input will be added to the `Controller:OutdoorAir` object to turn on/off the proposed multi-stage economizer operation. The default behavior will be to use the current approach. With this new approach, the economizer operation dictates the system's air flow rate. EnergyPlus will determine which of the cooling speed air flow rate the economizer should use for its operation, what the mixed air temperature should be at this air flow to meet the zone load, and finally the outdoor air fraction necessary to meet the load. The approach will apply to constant and cycling fan operating modes.
 
 ## Testing/Validation/Data Sources ##
 
@@ -44,7 +44,7 @@ Appropriate unit tests will be added to test the new feature and make sure that 
 
 ## Input Output Reference Documentation ##
 
-Documentation for the new input will be added to the I/O reference guide. A description of how the two approaches will be provided.
+Documentation for the new input will be added to the I/O reference guide. A description of how the two approaches (current and proposed one) will be provided for both the `Controller:OutdoorAir` object and `AirLoopHVAC:UnitarySystem`.
 
 ## Input Description ##
 
@@ -58,13 +58,17 @@ Controller:OutdoorAir,
        \key EconomizerFirst
        \key InterlockedWithMechanicalCooling
        \default InterlockedWithMechanicalCooling
-       \note When modeled with an AirLoopHVAC:UnitarySystem with multiple cooling speeds
-       \note (specified in a UnitarySystemPerformance:Multispeed), EconomizerFirst runs
+       \note This input is only used when the Controller:OutdoorAir is used in conjunction
+       \note with an AirLoopHVAC:UnitarySystem with multiple cooling speeds.
+       \note When modeling an AirLoopHVAC:UnitarySystem with multiple cooling speeds
+       \note (as specified in a UnitarySystemPerformance:Multispeed), EconomizerFirst runs
        \note the economizer at all speeds, all the way to the highest cooling speed before
-       \note mechanical cooling is needed. InterlockedWithMechanicalCooling runs the
-       \note economizer at  the cooling speed chosen by the AirLoopHVAC:UnitarySystem.
-       \note Use EconomizerFirst to model typical economizer staging for in multi-speed
-       \note packaged single-zone equipment.
+       \note mechanical cooling is used to meet the load. InterlockedWithMechanicalCooling
+       \note runs the economizer at the cooling speed chosen by the AirLoopHVAC:UnitarySystem.
+       \note
+       \note Use EconomizerFirst to model typical economizer staging for multi-speed
+       \note packaged single-zone equipment with sensible load control (Control Type input of
+       \note the AirLoopHVAC:UnitarySystem should be set to Load).
 ```
 
 ## Outputs Description ##
@@ -79,7 +83,7 @@ No updates to the engineering reference are currently planned for this new featu
 
 No transition files will be needed since the default will be wired to the current approach.
 
-A new example file based on `UnitarySystem_MultiSpeedDX.idf` will be created to showcase the new feature.
+A new example file based on `UnitarySystem_MultiSpeedDX.idf` will be created to showcase the new feature. It will apply the new feature to all "multi-speed" coils: `Coil:Cooling:DX`, `Coil:Cooling:DX:MultiSpeed`, and `Coil:Cooling:DX:VariableSpeed`.
 
 ## Design Document ##
 Based on the information presented above, the following design plan only pertains to sensible load-based control for unitary systems. It is also assumed that the economizer stages/speeds align with the system's cooling speed's air flow ratios.
@@ -105,4 +109,4 @@ A preliminary version of this design has been implemented and tested on the `Uni
 - ASHRAE. 2019. ANSI/ASHRAE/IES 90.1-2019, Energy Standard for Buildings Except Low-Rise
 Residential Buildings. ASHRAE, Atlanta, GA
 - [Honeywell JADE controller](https://customer.honeywell.com/resources/techlit/TechLitDocuments/62-0000s/62-0331.pdf)
-- [Belino ZIP Economizer controller](http://www.kele.com/Catalog/22%20Thermostats_Controllers/PDFs/ZIP_Economizer_%20Complete%20Installation%20and%20Operation%20Manual.pdf)
+- [Belimo ZIP Economizer controller](http://www.kele.com/Catalog/22%20Thermostats_Controllers/PDFs/ZIP_Economizer_%20Complete%20Installation%20and%20Operation%20Manual.pdf)
