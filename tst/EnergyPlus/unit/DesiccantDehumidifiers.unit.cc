@@ -2890,13 +2890,14 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     EXPECT_EQ(RegCoilCapacity, state->dataHeatingCoils->HeatingCoil(CoilIndex).NominalCapacity);
 
     // testing system peak cooling load timestamp
+    int coolPeakDD = 2;
     auto &finalSysSizing = state->dataSize->FinalSysSizing(1);
     auto &sysSizPeakDDNum = state->dataSize->SysSizPeakDDNum(1);
-    EXPECT_EQ(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::SensibleCooling);
+    EXPECT_TRUE(compare_enums(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::SensibleCooling));
     EXPECT_EQ(finalSysSizing.SizingOption, DataSizing::NonCoincident);
-    EXPECT_EQ(sysSizPeakDDNum.SensCoolPeakDD, 2);
-    int timeStepIndexAtPeakCoolLoad = sysSizPeakDDNum.TimeStepAtSensCoolPk(2);
-    EXPECT_EQ(sysSizPeakDDNum.TimeStepAtTotCoolPk(2), timeStepIndexAtPeakCoolLoad);
+    EXPECT_EQ(sysSizPeakDDNum.SensCoolPeakDD, coolPeakDD);
+    int timeStepIndexAtPeakCoolLoad = sysSizPeakDDNum.TimeStepAtSensCoolPk(coolPeakDD);
+    EXPECT_EQ(sysSizPeakDDNum.TimeStepAtTotCoolPk(coolPeakDD), timeStepIndexAtPeakCoolLoad);
     std::string coolPeakDDDate = sysSizPeakDDNum.cTotCoolPeakDDDate;
     EXPECT_EQ(coolPeakDDDate, "7/21");
     std::string dateHrMin = coolPeakDDDate + " " + SizingManager::TimeIndexToHrMinString(*state, timeStepIndexAtPeakCoolLoad);
