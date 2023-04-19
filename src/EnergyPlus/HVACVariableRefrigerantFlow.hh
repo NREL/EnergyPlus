@@ -877,7 +877,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void InitVRF(EnergyPlusData &state, int VRFTUNum, int ZoneNum, bool FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq);
 
-    void SetCompFlowRate(EnergyPlusData &state, int VRFTUNum, int VRFCond, ObjexxFCL::Optional_bool_const UseCurrentMode = _);
+    void SetCompFlowRate(EnergyPlusData &state, int VRFTUNum, int VRFCond, bool const UseCurrentMode = false);
 
     void SizeVRF(EnergyPlusData &state, int const VRFTUNum);
 

@@ -915,10 +915,10 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ElectricityProduced",
                         "COGENERATION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -945,10 +945,10 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         sFuelType,
                         "COGENERATION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -994,10 +994,10 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATRECOVERY",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -1049,10 +1049,10 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "Electricity",
                             "Cogeneration",
-                            _,
+                            {},
                             "Plant");
     }
 

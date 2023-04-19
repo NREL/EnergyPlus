@@ -4729,10 +4729,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrfTU.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "COOLING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Total Cooling Rate",
@@ -4792,10 +4792,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrfTU.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Total Heating Rate",
@@ -4889,10 +4889,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisVrf.Name,
-                            _,
+                            {},
                             sFuelType,
                             "COOLING",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             format("VRF Heat Pump Heating {} Rate", sFuelType),
@@ -4908,10 +4908,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisVrf.Name,
-                            _,
+                            {},
                             sFuelType,
                             "HEATING",
-                            _,
+                            {},
                             "System");
 
         SetupOutputVariable(state,
@@ -5064,10 +5064,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
         } else { // defrost energy applied to fuel type
             SetupOutputVariable(state,
@@ -5084,10 +5084,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
-                                _,
+                                {},
                                 sFuelType,
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
         }
 
@@ -5142,10 +5142,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisVrf.Name,
-                            _,
+                            {},
                             "Electricity",
                             "COOLING",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "VRF Heat Pump Terminal Unit Cooling Load Rate",
@@ -5190,10 +5190,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
         }
 
@@ -5205,10 +5205,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
-                                _,
+                                {},
                                 "Water",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "VRF Heat Pump Evaporative Condenser Pump Electricity Rate",
@@ -5224,10 +5224,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "COOLING",
-                                _,
+                                {},
                                 "System");
 
             if (thisVrf.BasinHeaterPowerFTempDiff > 0.0) {
@@ -5245,10 +5245,10 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     thisVrf.Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "COOLING",
-                                    _,
+                                    {},
                                     "System");
             }
 
@@ -7442,7 +7442,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
     }
 }
 
-void SetCompFlowRate(EnergyPlusData &state, int const VRFTUNum, int const VRFCond, ObjexxFCL::Optional_bool_const UseCurrentMode)
+void SetCompFlowRate(EnergyPlusData &state, int const VRFTUNum, int const VRFCond, bool const UseCurrentMode)
 {
 
     // SUBROUTINE INFORMATION:
@@ -7460,17 +7460,11 @@ void SetCompFlowRate(EnergyPlusData &state, int const VRFTUNum, int const VRFCon
     // METHODOLOGY EMPLOYED:
     // Initializes flow rates for a specific terminal unit.
 
-    bool CurrentMode;      // - specifies whether current or previous operating mode is used
     int IndexToTUInTUList; // - index to TU in specific list for this VRF system
     int TUListIndex;       // index to TU list for this VRF system
 
     IndexToTUInTUList = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).IndexToTUInTUList;
     TUListIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).TUListIndex;
-    if (present(UseCurrentMode)) {
-        CurrentMode = UseCurrentMode;
-    } else {
-        CurrentMode = false;
-    }
 
     // uses current operating mode to set flow rate (after mode is set)
     if (state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList)) {
@@ -7487,7 +7481,7 @@ void SetCompFlowRate(EnergyPlusData &state, int const VRFTUNum, int const VRFCon
         state.dataHVACVarRefFlow->OACompOffMassFlow = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
         state.dataHVACVarRefFlow->CompOnFlowRatio = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatingSpeedRatio;
         state.dataHVACVarRefFlow->CompOffFlowRatio = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoHeatingSpeedRatio;
-    } else if (CurrentMode) { // uses current operating mode to set flow rate (after mode is set)
+    } else if (UseCurrentMode) { // uses current operating mode to set flow rate (after mode is set)
         if (state.dataHVACVarRefFlow->CoolingLoad(VRFCond)) {
             state.dataHVACVarRefFlow->CompOnMassFlow = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirMassFlow;
             state.dataHVACVarRefFlow->CompOffMassFlow = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoCoolAirMassFlow;
