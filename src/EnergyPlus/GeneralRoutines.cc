@@ -857,6 +857,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Array1D<Real64> HPlenARR;
     Array1D<Real64> HExtARR;
     Array1D<Real64> LocalWindArr;
+    Array1D<Real64> HSrdSurfARR;
 
     // local working variables
     Real64 Tamb;                  // outdoor drybulb
@@ -902,14 +903,24 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     LocalWindArr.dimension(NumSurfs, 0.0);
     HPlenARR.dimension(NumSurfs, 0.0);
     HExtARR.dimension(NumSurfs, 0.0);
+    HSrdSurfARR.dimension(NumSurfs, 0.0);
 
     for (int ThisSurf = 1; ThisSurf <= NumSurfs; ++ThisSurf) {
         int SurfPtr = SurfPtrARR(ThisSurf);
         // Initializations for this surface
         Real64 HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
-        ConvectionCoefficients::InitExteriorConvectionCoeff(
-            state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
+        ConvectionCoefficients::InitExteriorConvectionCoeff(state,
+                                                            SurfPtr,
+                                                            HMovInsul,
+                                                            Roughness,
+                                                            AbsExt,
+                                                            TmpTsBaf,
+                                                            HExtARR(ThisSurf),
+                                                            HSkyARR(ThisSurf),
+                                                            HGroundARR(ThisSurf),
+                                                            HAirARR(ThisSurf),
+                                                            HSrdSurfARR(ThisSurf));
         int ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
         Real64 AbsThermSurf =
             dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
@@ -965,6 +976,8 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     HPlenARR.deallocate();
     Real64 HExt = sum(HExtARR * Area) / A; // dummy for call to InitExteriorConvectionCoeff
     HExtARR.deallocate();
+    Real64 HrSrdSurfs = sum(HSrdSurfARR * Area) / A; // dummy for call to InitExteriorConvectionCoeff, unused for now
+    HSrdSurfARR.deallocate();
 
     if (state.dataEnvrn->IsRain) HExt = 1000.0;
 
