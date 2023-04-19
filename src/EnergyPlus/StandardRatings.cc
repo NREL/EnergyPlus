@@ -2327,7 +2327,7 @@ namespace StandardRatings {
             } else {
                 FanPowerPerEvapAirFlowRate_2023(spnum) = FanPowerPerEvapAirFlowRateFromInput_2023(spnum);
             }
-            CondenserType.push_back(_CondenserType);
+            CondenserType(spnum) = _CondenserType;
         }
 
         // Table 6 from AHRI Std. 340/360-2022 (IP)
@@ -3085,7 +3085,7 @@ namespace StandardRatings {
         Array1A_int const &EIRFFlowCurveIndex //  | Only for HIGH SPEED
     )
     {
-        int constexpr nsp = 4; // ??
+        int constexpr nsp = 2; // ??
         Real64 IEER_2022(0.0);
         Real64 EER_2022(0.0);
         Real64 QAFull(0.0);
