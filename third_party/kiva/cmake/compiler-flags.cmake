@@ -15,6 +15,7 @@ $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleCl
   -Wall
   -Wextra
   -Wpedantic
+  -Wno-enum-constexpr-conversion
   $<$<BOOL:${KIVA_WERROR}>:
     -Werror # Turn warnings into errors
   >

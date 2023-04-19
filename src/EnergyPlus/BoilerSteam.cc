@@ -185,7 +185,6 @@ namespace BoilerSteam {
                                                                      _,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBoilerName(state,
                                                 state.dataIPShortCut->cCurrentModuleObject,
@@ -431,10 +430,10 @@ namespace BoilerSteam {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "BOILERS",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
@@ -450,7 +449,7 @@ namespace BoilerSteam {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             this->BoilerFuelTypeForOutputVariable,
                             "Heating",
                             this->EndUseSubcategory,
