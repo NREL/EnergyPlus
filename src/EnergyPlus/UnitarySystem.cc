@@ -165,7 +165,7 @@ namespace UnitarySystems {
         if (this->m_HeatingPartLoadFrac * double(CompressorOn) > 0.0 || this->m_SuppHeatPartLoadFrac * double(CompressorOn) > 0.0) HeatActive = true;
 
         // set econo lockout flag
-        // If the sysem is not an equipment of Outdoor air unit
+        // If the system is not an equipment of Outdoor air unit
         if (AirLoopNum > 0 && !state.dataAirLoop->AirLoopControlInfo.empty() && this->m_AirLoopEquipment) {
 
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor =
@@ -1131,6 +1131,14 @@ namespace UnitarySystems {
                 }
             } else {
                 state.dataUnitarySystems->economizerFlag = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive;
+            }
+            // get OA controller info
+            this->OASysIndex = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum;
+            if (this->OASysIndex > 0) {
+                this->OAControllerIndex = state.dataAirLoop->OutsideAirSys(this->OASysIndex).OAControllerIndex;
+                if (this->OAControllerIndex > 0) {
+                    this->OAControllerEconomizerStaging = state.dataMixedAir->OAController(this->OAControllerIndex).EconomizerStagingOperation;
+                }
             }
         }
 
@@ -8454,7 +8462,6 @@ namespace UnitarySystems {
                                       SupHeaterLoad,
                                       CompressorONFlag);
         FullSensibleOutput = SensOutputOff;
-        NoLoadOutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
 
         if (!state.dataUnitarySystems->HeatingLoad && !state.dataUnitarySystems->CoolingLoad) {
             // no load
@@ -8496,6 +8503,12 @@ namespace UnitarySystems {
         default: {
             // should never get here
         } break;
+        }
+
+        this->m_EconoSpeedNum = 0;
+        if (this->OAControllerEconomizerStaging == DataHVACGlobals::EconomizerFirst && this->m_NumOfSpeedCooling > 0 && ZoneLoad < 0) {
+            UnitarySys &UnitarySystemMSEconomizer(state.dataUnitarySystems->unitarySys[this->m_UnitarySysNum]);
+            CoolingSpeedForEconomizerOperation(state, AirLoopNum, FirstHVACIteration, UnitarySystemMSEconomizer, ZoneLoad);
         }
 
         // if a variable speed unit, the SensOutputOff at SpeedNum=1 must be checked to see if it exceeds the ZoneLoad
@@ -9412,7 +9425,7 @@ namespace UnitarySystems {
                                     TempSysOutput = TempSensOutput;
                                 }
                                 TempMinPLR = TempMaxPLR;
-                                while ((TempSysOutput - TempLoad) < 0.0 && TempMinPLR > 0.05) {
+                                while ((TempSysOutput - TempLoad) < 0.0 && TempMinPLR > 0.025) {
                                     // pull upper limit of HeatingPLR down to last valid limit (i.e. heat output still exceeds SystemSensibleLoad)
                                     TempMaxPLR = TempMinPLR;
                                     // find minimum limit of HeatingPLR
@@ -10646,6 +10659,10 @@ namespace UnitarySystems {
                     state.dataUnitarySystems->CompOnMassFlow = this->MaxNoCoolHeatAirMassFlow;
                     state.dataUnitarySystems->CompOnFlowRatio = this->m_NoLoadAirFlowRateRatio;
                     state.dataUnitarySystems->OACompOnMassFlow = this->m_NoCoolHeatOutAirMassFlow;
+                } else if (this->m_EconoSpeedNum > 1) { // multi-stage economizer operation; set system flow rate to economizer flow rate
+                    state.dataUnitarySystems->CompOnMassFlow = this->m_CoolMassFlowRate[this->m_EconoSpeedNum];
+                    state.dataUnitarySystems->CompOnFlowRatio = this->m_MSCoolingSpeedRatio[this->m_EconoSpeedNum];
+                    state.dataUnitarySystems->OACompOnMassFlow = this->m_CoolOutAirMassFlow;
                 } else if (CoolSpeedNum == 1) {
                     state.dataUnitarySystems->CompOnMassFlow = this->m_CoolMassFlowRate[1];
                     state.dataUnitarySystems->CompOnFlowRatio = this->m_MSCoolingSpeedRatio[1];
@@ -10657,13 +10674,15 @@ namespace UnitarySystems {
                 }
                 // Set the compressor or coil OFF mass flow rate based on LOGICAL flag
                 // UseCompressorOnFlow is used when the user does not enter a value for no cooling or heating flow rate
-                //    IF(UnitarySystem(UnitarySysNum)%FanOpMode == DataHVACGlobals::ContFanCycCoil)THEN
-                //      IF (UnitarySystem(UnitarySysNum)%AirFlowControl .EQ. UseCompressorOnFlow) THEN
                 if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
                     if (CoolSpeedNum == 0) {
                         state.dataUnitarySystems->CompOffMassFlow = this->MaxNoCoolHeatAirMassFlow;
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_NoLoadAirFlowRateRatio;
                         state.dataUnitarySystems->OACompOffMassFlow = this->m_NoCoolHeatOutAirMassFlow;
+                    } else if (this->m_EconoSpeedNum > 1) { // multi-stage economizer operation; set system flow rate to economizer flow rate
+                        state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[this->m_EconoSpeedNum];
+                        state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[this->m_EconoSpeedNum];
+                        state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
                     } else if (CoolSpeedNum == 1) {
                         state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum];
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_CoolMassFlowRate[CoolSpeedNum];
@@ -10677,13 +10696,16 @@ namespace UnitarySystems {
                     if (CoolSpeedNum <= 1) {
                         state.dataUnitarySystems->CompOffMassFlow = 0.0; // #5518
                         state.dataUnitarySystems->CompOffFlowRatio = 0.0;
+                    } else if (this->m_EconoSpeedNum > 1) { // multi-stage economizer operation; set system flow rate to economizer flow rate
+                        state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[this->m_EconoSpeedNum];
+                        state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[this->m_EconoSpeedNum];
                     } else {
                         state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum - 1];
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum - 1];
                         state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
                     }
                 }
-            } else { // IF(MultiOrVarSpeedCoolCoil(UnitarySysNum)) THEN
+            } else {
                 state.dataUnitarySystems->CompOnMassFlow = this->MaxCoolAirMassFlow;
                 state.dataUnitarySystems->CompOnFlowRatio = this->m_CoolingFanSpeedRatio;
                 state.dataUnitarySystems->OACompOnMassFlow = this->m_CoolOutAirMassFlow;
@@ -11134,8 +11156,9 @@ namespace UnitarySystems {
         DataHVACGlobals::CompressorOperation CoolingCompOn = DataHVACGlobals::CompressorOperation::Off;
         if (CoolPLR > 0) {
             CoolingCompOn = CompressorOn;
-            // for multispeed coils, comp is on IF speed > 1
-        } else if (this->m_CoolingSpeedNum > 1) {
+        } else if (CoolPLR == 0 && this->m_EconoSpeedNum > 1) { // turn compressor off for economizer calculations
+            CoolingCompOn = DataHVACGlobals::CompressorOperation::Off;
+        } else if (this->m_CoolingSpeedNum > 1) { // for multispeed coils, comp is on IF speed > 1
             CoolingCompOn = DataHVACGlobals::CompressorOperation::On;
         }
 
@@ -18164,6 +18187,80 @@ namespace UnitarySystems {
             state.dataUnitarySystems->unitarySys.cbegin(), state.dataUnitarySystems->unitarySys.cend(), [waterCoilNodeNum](auto const &us) {
                 return us.m_WaterHRPlantLoopModel && us.m_HRcoolCoilFluidInletNode == waterCoilNodeNum;
             });
+    }
+
+    void CoolingSpeedForEconomizerOperation(EnergyPlusData &state,
+                                            int const AirLoopNum,
+                                            bool const FirstHVACIteration,
+                                            UnitarySystems::UnitarySys &UnitarySystemMSEconomizer,
+                                            Real64 const ZoneLoad)
+    {
+        auto OACtrl = state.dataMixedAir->OAController(UnitarySystemMSEconomizer.OAControllerIndex);
+        if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive == true && state.dataGlobal->WarmupFlag == false && ZoneLoad < 0) {
+            int clgSpdNum = UnitarySystemMSEconomizer.m_NumOfSpeedCooling;
+            // determine OA properties
+            using Psychrometrics::PsyCpAirFnW;
+            Real64 CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(OACtrl.InletNode).HumRat);
+            Real64 OATemp = state.dataLoopNodes->Node(OACtrl.InletNode).Temp;
+            Real64 ZoneTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(UnitarySystemMSEconomizer.ControlZoneNum).ZoneNode).Temp;
+            // iterate through system's cooling speed to see which air flow rate can be used to meet the load
+            // for now, assume 100% outdoor air
+            for (int clgSpd = 1; clgSpd <= clgSpdNum; ++clgSpd) {
+                Real64 econMassFlowRate = UnitarySystemMSEconomizer.m_CoolMassFlowRate[clgSpd];
+                Real64 econClgOutput = CpAir * econMassFlowRate * (ZoneTemp - OATemp);
+                // check if economizer alone can meet the load OR if we've reached the maximumm cooling speed (i.e., if the load cannot be met by low
+                // fan speeds we want the economizer to run at full speed)
+                if (econClgOutput > -ZoneLoad || clgSpd == UnitarySystemMSEconomizer.m_NumOfSpeedCooling) {
+                    UnitarySystemMSEconomizer.m_EconoSpeedNum = clgSpd;
+                    break;
+                }
+            }
+            // adjustments are only needed when economizer speed is greater than the lowest speed
+            if (UnitarySystemMSEconomizer.m_EconoSpeedNum > 1) {
+                // request fixed mixed flow rate
+                state.dataAirLoop->AirLoopControlInfo(AirLoopNum).LoopFlowRateSet = true;
+                // set new mixed air flow rate
+                state.dataAirLoop->AirLoopFlow(AirLoopNum).ReqSupplyFrac =
+                    UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum] /
+                    UnitarySystemMSEconomizer.m_CoolMassFlowRate[clgSpdNum];
+                // determine fan heat based on new mixed air flow rate
+                Real64 fanHeat = 0;
+                Real64 fanDT = 0;
+                Real64 volFlowRate = UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum];
+                switch (state.dataSize->DataFanEnumType) {
+                case DataAirSystems::StructArrayLegacyFanModels: {
+                    fanHeat = Fans::FanDesHeatGain(state,
+                                                   UnitarySystemMSEconomizer.m_FanIndex,
+                                                   UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum]);
+                    break;
+                }
+                case DataAirSystems::ObjectVectorOOFanSystemModel: {
+                    fanHeat = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, volFlowRate);
+                    break;
+                }
+                case DataAirSystems::Invalid: {
+                    fanHeat = 0;
+                    break;
+                }
+                }
+                fanDT = fanHeat / (volFlowRate * CpAir);
+                // recalculate and mixed air temperature setpoint; assumes that besides a fan, there's no passive component adding heat when the
+                // economizer is running
+                int mixedAirNode = OACtrl.MixNode;
+                Real64 newMixedAirSP =
+                    ZoneTemp + ZoneLoad / (CpAir * UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum]);
+                state.dataLoopNodes->Node(mixedAirNode).TempSetPoint = newMixedAirSP - fanDT;
+
+                // recalculate the outdoor air fraction to meet the new mixed air setpoint at the new mixed air flow rate
+                MixedAir::ManageOutsideAirSystem(state,
+                                                 state.dataAirLoop->OutsideAirSys(UnitarySystemMSEconomizer.OASysIndex).Name,
+                                                 FirstHVACIteration,
+                                                 AirLoopNum,
+                                                 UnitarySystemMSEconomizer.OASysIndex);
+            } else {
+                UnitarySystemMSEconomizer.m_EconoSpeedNum = 1.0;
+            }
+        }
     }
 
 } // namespace UnitarySystems

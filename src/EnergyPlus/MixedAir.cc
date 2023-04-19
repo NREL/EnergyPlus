@@ -2391,6 +2391,16 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
         }
     }
 
+    if (NumAlphas > 19) {
+        if (!lAlphaBlanks(20)) {
+            if (UtilityRoutines::SameString(AlphArray(20), "EconomizerFirst")) {
+                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingOperation = EconomizerFirst;
+            } else {
+                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingOperation = InterlockedWithMechanicalCooling;
+            }
+        }
+    }
+
     if (UtilityRoutines::SameString(AlphArray(16), "Yes") && state.dataMixedAir->OAController(OutAirNum).Econo == EconoOp::NoEconomizer) {
         ShowWarningError(
             state, format("{} \"{}\"", state.dataMixedAir->OAController(OutAirNum).ControllerType, state.dataMixedAir->OAController(OutAirNum).Name));

@@ -229,18 +229,19 @@ namespace MixedAir {
         bool EMSOverrideOARate = false;         // if true, EMS is calling to override OA rate
         Real64 EMSOARateValue = 0.0;            // Value EMS is directing to use. [kg/s]
         int HeatRecoveryBypassControlType =
-            DataHVACGlobals::BypassWhenWithinEconomizerLimits; // User input selects type of heat recovery optimization
-        bool ManageDemand = false;                             // Used by demand manager to manage ventilation
-        Real64 DemandLimitFlowRate = 0.0;                      // Current demand limit if demand manager is ON
-        Real64 MaxOAFracBySetPoint = 0.0;                      // The maximum OA fraction due to freezing cooling coil check
-        int MixedAirSPMNum = 0;                                // index of mixed air setpoint manager
-        bool CoolCoilFreezeCheck = false;                      // if true, cooling coil freezing is prevented by recalculating the amount of OA
-        bool EconoActive = false;                              // if true economizer is active
-        bool HighHumCtrlActive = false;                        // if true high humidity control is active
-        Array1D_int EconmizerFaultNum;                         // index to economizer fault
-        int NumFaultyEconomizer = 0;                           // total number of economizer faults
-        int CountMechVentFrac = 0;                             // Count when OA min fraction > mech vent fraction
-        int IndexMechVentFrac = 0;                             // Index when OA min fraction > mech vent fraction
+            DataHVACGlobals::BypassWhenWithinEconomizerLimits;                              // User input selects type of heat recovery optimization
+        int EconomizerStagingOperation = DataHVACGlobals::InterlockedWithMechanicalCooling; // User input select type of economizer staging operation
+        bool ManageDemand = false;                                                          // Used by demand manager to manage ventilation
+        Real64 DemandLimitFlowRate = 0.0;                                                   // Current demand limit if demand manager is ON
+        Real64 MaxOAFracBySetPoint = 0.0; // The maximum OA fraction due to freezing cooling coil check
+        int MixedAirSPMNum = 0;           // index of mixed air setpoint manager
+        bool CoolCoilFreezeCheck = false; // if true, cooling coil freezing is prevented by recalculating the amount of OA
+        bool EconoActive = false;         // if true economizer is active
+        bool HighHumCtrlActive = false;   // if true high humidity control is active
+        Array1D_int EconmizerFaultNum;    // index to economizer fault
+        int NumFaultyEconomizer = 0;      // total number of economizer faults
+        int CountMechVentFrac = 0;        // Count when OA min fraction > mech vent fraction
+        int IndexMechVentFrac = 0;        // Index when OA min fraction > mech vent fraction
         int OALimitingFactor = 0; // OA controller limiting factor: 0=none, 1=limits, 2=exhaust flow, 3=economizer, 4=DCV, 5=high hum, 6=night vent,
                                   // 7=demand limiting, 8=EMS
 

@@ -382,6 +382,7 @@ namespace UnitarySystems {
         Real64 m_CoolingCycRatio = 0.0;
         Real64 m_CoolingSpeedRatio = 0.0;
         int m_CoolingSpeedNum = 0;
+        int m_EconoSpeedNum = 0;
         Real64 m_HeatingCycRatio = 0.0;
         Real64 m_HeatingSpeedRatio = 0.0;
         int m_HeatingSpeedNum = 0;
@@ -530,7 +531,10 @@ namespace UnitarySystems {
         Real64 CoilSHR = 0.0;                   // Load sensible heat ratio with humidity control
         int temperatureOffsetControlStatus = 0; // water side economizer status flag, also report variable
         int OAMixerIndex = -1;                  // index to zone equipment OA mixer
-        bool OAMixerExists = false;             // true if OA mixer is connected to inlet of UnitarySystem
+        int OASysIndex = -1;                    // index to OA system
+        int OAControllerIndex = -1;             // index to OA controller
+        int OAControllerEconomizerStaging = DataHVACGlobals::InterlockedWithMechanicalCooling; // economizer staging operation type
+        bool OAMixerExists = false; // true if OA mixer is connected to inlet of UnitarySystem
 
         //    private:
         // private members not initialized in constructor
@@ -965,6 +969,11 @@ namespace UnitarySystems {
                                int &airLoopIndex);
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
     void isWaterCoilHeatRecoveryType(EnergyPlusData const &state, int const waterCoilNodeNum, bool &nodeNotFound);
+    void CoolingSpeedForEconomizerOperation(EnergyPlusData &state,
+                                            int const AirLoopNum,
+                                            bool const FirstHVACIteration,
+                                            UnitarySystems::UnitarySys &UnitarySystemMSEconomizer,
+                                            Real64 const ZoneLoad);
 
 } // namespace UnitarySystems
 struct UnitarySystemsData : BaseGlobalStruct

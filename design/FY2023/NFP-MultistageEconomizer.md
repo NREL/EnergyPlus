@@ -53,7 +53,7 @@ The following new input will be added to the `Controller:OutdoorAir` object:
 ```
 Controller:OutdoorAir,
 [...]
-  A20; \field Economizer Operation Staging
+  A20; \field Economizer Staging Operation
        \type choice
        \key EconomizerFirst
        \key InterlockedWithMechanicalCooling
