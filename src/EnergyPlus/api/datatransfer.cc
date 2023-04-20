@@ -64,6 +64,72 @@
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/api/runtime.h>
 
+
+APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize)
+{
+    struct LocalAPIDataEntry {
+        std::string what; std::string name; std::string type; std::string key;
+        LocalAPIDataEntry(std::string _what, std::string _name, std::string _key, std::string _type) :
+        what(std::move(_what)), name(std::move(_name)), type(std::move(_type)), key(std::move(_key)) {}
+    };
+    std::vector<LocalAPIDataEntry> localDataEntries;
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    for (auto const &availActuator : thisState->dataRuntimeLang->EMSActuatorAvailable) {
+        if (availActuator.ComponentTypeName.empty() && availActuator.UniqueIDName.empty() && availActuator.ControlTypeName.empty()) {
+            break;
+        }
+        localDataEntries.emplace_back("Actuator", availActuator.ComponentTypeName, availActuator.ControlTypeName, availActuator.UniqueIDName);
+    }
+    for (auto const &availVariable : thisState->dataRuntimeLang->EMSInternalVarsAvailable) {
+        if (availVariable.DataTypeName.empty() && availVariable.UniqueIDName.empty()) {
+            break;
+        }
+        localDataEntries.emplace_back("InternalVariable", availVariable.DataTypeName, "", availVariable.UniqueIDName);
+    }
+    for (auto const &gVarName : thisState->dataPluginManager->globalVariableNames) {
+        localDataEntries.emplace_back("PluginGlobalVariable", "", "", gVarName);
+    }
+    for (auto const &trend : thisState->dataPluginManager->trends) {
+        localDataEntries.emplace_back("PluginTrendVariable,", "", "", trend.name);
+    }
+    for (auto const &meter : thisState->dataOutputProcessor->EnergyMeters) {
+        if (meter.Name.empty()) {
+            break;
+        }
+        localDataEntries.emplace_back("OutputMeter", "", "", meter.Name);
+    }
+    for (auto const &variable : thisState->dataOutputProcessor->RVariableTypes) {
+        if (variable.VarNameOnly.empty() && variable.KeyNameOnlyUC.empty()) {
+            break;
+        }
+        localDataEntries.emplace_back("OutputVariable", variable.VarNameOnly, "", variable.KeyNameOnlyUC);
+    }
+    *resultingSize = localDataEntries.size();
+    auto * data = new APIDataEntry[*resultingSize];
+    for (unsigned int i = 0; i < *resultingSize; i++) {
+        data[i].what = new char[std::strlen(localDataEntries[i].what.c_str()) + 1];
+        std::strcpy(data[i].what, localDataEntries[i].what.c_str());
+        data[i].name = new char[std::strlen(localDataEntries[i].name.c_str()) + 1];
+        std::strcpy(data[i].name, localDataEntries[i].name.c_str());
+        data[i].key = new char[std::strlen(localDataEntries[i].key.c_str()) + 1];
+        std::strcpy(data[i].key, localDataEntries[i].key.c_str());
+        data[i].type = new char[std::strlen(localDataEntries[i].type.c_str()) + 1];
+        std::strcpy(data[i].type, localDataEntries[i].type.c_str());
+    }
+    return data;
+}
+
+void freeAPIData(struct APIDataEntry * data, unsigned int arraySize)
+{
+    for (unsigned int i = 0; i < arraySize; i++) {
+        free(data[i].what);
+        free(data[i].name);
+        free(data[i].key);
+        free(data[i].type);
+    }
+    free(data);
+}
+
 char *listAllAPIDataCSV(EnergyPlusState state)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);

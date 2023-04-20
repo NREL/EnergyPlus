@@ -61,7 +61,7 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
 {
     printf("STARTING A NEW TIME STEP\n");
     if (handlesRetrieved == 0) {
-        if (!apiDataFullyReady(state)) return;
+        if (apiDataFullyReady(state) == 1) return;
         outdoorDewPointActuator = getActuatorHandle(state, "Weather Data", "Outdoor Dew Point", "Environment");
         outdoorTempSensor = getVariableHandle(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
         outdoorDewPointSensor = getVariableHandle(state, "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
@@ -70,6 +70,10 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
             exit(1);
         }
         handlesRetrieved = 1;
+        unsigned int arraySize;
+        struct APIDataEntry * data = getAPIData(state, &arraySize);
+        int x = 1;
+        freeAPIData(data, arraySize);
     }
     setActuatorValue(state, outdoorDewPointActuator, -25.0);
     Real64 oa_temp = getVariableValue(state, outdoorTempSensor);

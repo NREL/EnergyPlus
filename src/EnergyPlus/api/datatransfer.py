@@ -53,9 +53,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from ctypes import cdll, c_int, c_char_p, c_void_p
+from ctypes import cdll, c_int, c_char_p, c_void_p, POINTER, Structure, byref
 from pyenergyplus.common import RealEP, EnergyPlusException, is_number
-from typing import Union
+from typing import List, Union
 
 
 class DataExchange:
@@ -71,7 +71,7 @@ class DataExchange:
 
     This data transfer class is used in one of two workflows:
 
-    - When a outside tool is already running EnergyPlus using the Runtime API, and data transfer is to be made during
+    - When an outside tool is already running EnergyPlus using the Runtime API, and data transfer is to be made during
       callback functions. In this case, the script should create a DataTransfer API class by calling the `data_transfer`
       method on the main API class, never trying to create this class directly.
     - When a Python script is used in the EnergyPlus Python Plugin System, and the user runs the EnergyPlus binary.  In
@@ -84,6 +84,33 @@ class DataExchange:
     outside calling code.
     """
 
+    class _APIDataEntry(Structure):
+        _fields_ = [("what", c_char_p),("name", c_char_p),("key", c_char_p),("type", c_char_p),]
+
+    class APIDataExchangePoint:
+        """
+        A class of string members that describe a single API exchange point.  The exchange described in this
+        class could represent output variables, output meters, actuators, and more.  The "type" member variable
+        can be used to filter a specific type.
+        """
+        def __init__(self, _what: str, _name: str, _key: str, _type: str):
+            #: This variable will hold the basic type of API data point, in string form.
+            #: This can be one of the following: "Actuator", "InternalVariable", "PluginGlobalVariable",
+            #: "PluginTrendVariable", "OutputMeter", or "OutputVariable".  Once the full list of data exchange points
+            #: are returned from a call to get_api_data, this can be used to quickly filter down to a specific type.
+            self.what = _what
+            #: This represents the name of the entry point, not the name of the specific instance of the entry point.
+            #: Some examples of this name could be "Chiller Heat Transfer Rate" -- which could be available for multiple
+            #: chillers.
+            self.name = _name
+            #: This represents the unique ID for this exchange point.  In the example of the chiller output variable,
+            #: this could be "Chiller 1". This is not used for meters
+            self.key = _key
+            #: This represents the "type" of exchange for this exchange point.  This is only used for actuators,
+            #: and represents the control actuation.  For a node setpoint actuation, this could be "temperature" or
+            #: "humidity", for example.
+            self.type = _type
+
     def __init__(self, api: cdll, running_as_python_plugin: bool = False):
         """
         Creates a new DataExchange API class instance
@@ -93,8 +120,12 @@ class DataExchange:
         """
         self.api = api
         self.running_as_python_plugin = running_as_python_plugin
+        self.api.getAPIData.argtypes = [c_void_p, POINTER(c_int)]
+        self.api.getAPIData.restype = POINTER(DataExchange._APIDataEntry)
         self.api.listAllAPIDataCSV.argtypes = [c_void_p]
-        self.api.listAllAPIDataCSV.restype = c_char_p
+        self.api.listAllAPIDataCSV.restype = POINTER(DataExchange._APIDataEntry)
+        self.api.freeAPIData.argtypes = [POINTER(DataExchange._APIDataEntry), c_int]
+        self.api.freeAPIData.restype = c_void_p
         self.api.apiDataFullyReady.argtypes = [c_void_p]
         self.api.apiDataFullyReady.restype = c_int
         self.api.apiErrorFlag.argtypes = [c_void_p]
@@ -247,6 +278,25 @@ class DataExchange:
         self.api.tomorrowWeatherLiquidPrecipitationAtTime.restype = RealEP
         self.api.currentSimTime.argtypes = [c_void_p]
         self.api.currentSimTime.restype = RealEP
+
+    def get_api_data(self, state: c_void_p) -> List[APIDataExchangePoint]:
+        """
+        Returns a nicely formed list of API data exchange points available in the current simulation.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :return: Returns a Python list of APIDataExchangePoint instances, which can be filtered to inspect exchanges.
+        """
+        count = c_int()
+        r = self.api.getAPIData(state, byref(count))
+        list_response = [
+            DataExchange.APIDataExchangePoint(
+                r[i].what.decode('utf-8'),
+                r[i].name.decode('utf-8'),
+                r[i].key.decode('utf-8'),
+                r[i].type.decode('utf-8')) for i in range(count.value)
+        ]
+        self.api.freeAPIData(r, count)  # free the underlying C memory now that we have a Python copy
+        return list_response
 
     def list_available_api_data_csv(self, state: c_void_p) -> bytes:
         """

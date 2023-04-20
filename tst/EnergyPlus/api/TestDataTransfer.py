@@ -70,6 +70,7 @@ def time_step_handler(state):
             # val = api.exchange.list_available_api_data_csv()
             # with open('/tmp/data.csv', 'w') as f:
             #     f.write(val.decode(encoding='utf-8'))
+            data = api.exchange.get_api_data(state)
             outdoor_temp_sensor = api.exchange.get_variable_handle(
                 state, u"SITE OUTDOOR AIR DRYBULB TEMPERATURE", u"ENVIRONMENT"
             )
