@@ -71,23 +71,24 @@ extern "C" {
 /// \brief A structure representing a data exchange entry for API calls
 /// \details Can represent an output variable (sensor), and actuator, or several other things.
 ///          The type of thing should be identified by the "what" member, which can be used as a filter for a specific type.
-struct APIDataEntry {
+struct APIDataEntry
+{
     ///  \brief This variable will hold the basic type of API data point, in string form.
     ///  \details This can be one of the following:
     ///           "Actuator", "InternalVariable", "PluginGlobalVariable", "PluginTrendVariable", "OutputMeter", or "OutputVariable"
     ///           Once the full list of data exchange points are returned from a call to getAPIData, this parameter can be
     ///           used to quickly filter down to a specific type.
-    char * what;
+    char *what;
     /// \brief This represents the name of the entry point, not the name of the specific instance of the entry point.
     /// \details Some examples of this name could be "Chiller Heat Transfer Rate" -- which could be available for multiple chillers.
-    char * name;
+    char *name;
     /// \brief This represents the unique ID for this exchange point.
     /// \details In the example of the chiller output variable, this could be "Chiller 1". This is not used for meters
-    char * key; // not used for meters
+    char *key; // not used for meters
     /// \brief This represents the "type" of exchange for this exchange point.
     /// \details This is only used for actuators, and represents the control actuation.
     ///          For a node setpoint actuation, this could be either temperature or humidity, for example.
-    char * type; // only used for actuators
+    char *type; // only used for actuators
 };
 
 /// \brief Gets available API data for the current simulation
@@ -102,7 +103,7 @@ ENERGYPLUSLIB_API struct APIDataEntry *getAPIData(EnergyPlusState state, unsigne
 /// \param[in] data An array (pointer) of API data exchange points as returned from the getAPIData function
 /// \param[in] arraySize The size of the API data exchange array, which is known after the call to getAPIData.
 /// \return Nothing, this simply frees the memory
-ENERGYPLUSLIB_API void freeAPIData(struct APIDataEntry * data, unsigned int arraySize);
+ENERGYPLUSLIB_API void freeAPIData(struct APIDataEntry *data, unsigned int arraySize);
 
 /// \brief Gets available API data for the current simulation
 /// \details This function returns a char * which points to API data in CSV form for the current simulation

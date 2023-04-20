@@ -64,13 +64,18 @@
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/api/runtime.h>
 
-
 APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize)
 {
-    struct LocalAPIDataEntry {
-        std::string what; std::string name; std::string type; std::string key;
-        LocalAPIDataEntry(std::string _what, std::string _name, std::string _key, std::string _type) :
-        what(std::move(_what)), name(std::move(_name)), type(std::move(_type)), key(std::move(_key)) {}
+    struct LocalAPIDataEntry
+    {
+        std::string what;
+        std::string name;
+        std::string type;
+        std::string key;
+        LocalAPIDataEntry(std::string _what, std::string _name, std::string _key, std::string _type)
+            : what(std::move(_what)), name(std::move(_name)), type(std::move(_type)), key(std::move(_key))
+        {
+        }
     };
     std::vector<LocalAPIDataEntry> localDataEntries;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
@@ -105,7 +110,7 @@ APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize)
         localDataEntries.emplace_back("OutputVariable", variable.VarNameOnly, "", variable.KeyNameOnlyUC);
     }
     *resultingSize = localDataEntries.size();
-    auto * data = new APIDataEntry[*resultingSize];
+    auto *data = new APIDataEntry[*resultingSize];
     for (unsigned int i = 0; i < *resultingSize; i++) {
         data[i].what = new char[std::strlen(localDataEntries[i].what.c_str()) + 1];
         std::strcpy(data[i].what, localDataEntries[i].what.c_str());
@@ -119,7 +124,7 @@ APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize)
     return data;
 }
 
-void freeAPIData(struct APIDataEntry * data, unsigned int arraySize)
+void freeAPIData(struct APIDataEntry *data, unsigned int arraySize)
 {
     for (unsigned int i = 0; i < arraySize; i++) {
         free(data[i].what);
