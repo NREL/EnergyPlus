@@ -5576,7 +5576,8 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPNoCap)
     EXPECT_TRUE(OAMassFlow > DesignOAMassFlow); // Expect that the system OA is greater than the design OA air flow
     EXPECT_TRUE(OAMassFlow < SysMassFlow);      // Expect that the system OA is less than the system air flow
 
-    // Starve one zone so that OAMassFlow = SysMassFlow
+    // Starve one zone by setting the zone supply flow rate to something < zone OA requirement
+    // This should cause the VRP control to go to 100% OA (OAMassFlow = SysMassFlow) in a futile attempt to supply the required OA
     SupplyMassFlow1 = DesignOAMassFlow1 * 0.5;
     SupplyMassFlow2 = DesignOAMassFlow2 / 0.2;
     state->dataLoopNodes->Node(primaryInletNode1).MassFlowRate = SupplyMassFlow1;
@@ -5588,7 +5589,7 @@ TEST_F(EnergyPlusFixture, MechVentController_VRPNoCap)
     OAMassFlow = state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow);
 
     EXPECT_TRUE(OAMassFlow > DesignOAMassFlow); // Expect that the system OA is greater than the design OA air flow
-    EXPECT_TRUE(OAMassFlow == SysMassFlow);     // Expect that the system OA is less than the system air flow
+    EXPECT_TRUE(OAMassFlow == SysMassFlow);     // Expect that the system OA is equal to the system air flow (100% OA)
 }
 
 TEST_F(EnergyPlusFixture, MechVentController_ACHflow)

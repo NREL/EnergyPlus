@@ -2603,8 +2603,9 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
     }
 
     if (state.dataGlobal->BeginEnvrnFlag && state.dataMixedAir->OAControllerMyEnvrnFlag(OAControllerNum)) {
-        thisOAController.MinOAMassFlowRate = thisOAController.MinOA * state.dataEnvrn->StdRhoAir;
-        thisOAController.MaxOAMassFlowRate = thisOAController.MaxOA * state.dataEnvrn->StdRhoAir;
+        Real64 RhoAirStdInit = state.dataEnvrn->StdRhoAir;
+        thisOAController.MinOAMassFlowRate = thisOAController.MinOA * RhoAirStdInit;
+        thisOAController.MaxOAMassFlowRate = thisOAController.MaxOA * RhoAirStdInit;
         state.dataMixedAir->OAControllerMyEnvrnFlag(OAControllerNum) = false;
         state.dataLoopNodes->Node(thisOAController.OANode).MassFlowRateMax = thisOAController.MaxOAMassFlowRate;
 
@@ -4073,7 +4074,7 @@ Real64 VentilationMechanicalProps::CalcMechVentController(EnergyPlusData &state,
                     Real64 ZonePA = 0.0; // Zone primary air flow rate
                     Ep = 1.0;
                     if (ZoneEquipConfigNum > 0) {
-                        auto &curZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum));
+                        auto &curZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum);
                         for (int InNodeIndex = 1; InNodeIndex <= curZoneEquipConfig.NumInletNodes; ++InNodeIndex) {
                             // Assume primary air is always stored at the AirDistUnitCool (cooling deck if dual duct)
                             int PriNode = curZoneEquipConfig.AirDistUnitCool(InNodeIndex).InNode; // primary node of zone terminal unit
