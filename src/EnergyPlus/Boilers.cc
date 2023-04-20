@@ -207,16 +207,8 @@ void GetBoilerInput(EnergyPlusData &state)
 
         // Validate fuel type input
         thisBoiler.FuelType = static_cast<Constant::eResource>(
-            getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
-        if (thisBoiler.FuelType == Constant::eResource::Invalid) {
-            ShowSevereError(
-                state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
-            // Set to Electric to avoid errors when setting up output variables
-            thisBoiler.FuelType = Constant::eResource::Electricity;
-            ErrorsFound = true;
-        }
-
+            getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
+        
         thisBoiler.NomCap = state.dataIPShortCut->rNumericArgs(1);
         if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
             ShowSevereError(

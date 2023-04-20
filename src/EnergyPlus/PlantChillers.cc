@@ -2431,14 +2431,7 @@ namespace PlantChillers {
 
             // Validate fuel type input
             thisChiller.FuelType = static_cast<Constant::eResource>(
-                getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(12))));
-            if (thisChiller.FuelType == Constant::eResource::Invalid) {
-                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12)));
-                ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(
-                    state, "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
-                ErrorsFound = true;
-            }
+                getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(12)));
 
             thisChiller.FuelHeatingValue = state.dataIPShortCut->rNumericArgs(25);
 
@@ -4492,7 +4485,7 @@ namespace PlantChillers {
 
             // Fuel Type Case Statement
             thisChiller.FuelType = static_cast<Constant::eResource>(
-                getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
+                getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
             if (thisChiller.FuelType == Constant::eResource::Invalid) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));

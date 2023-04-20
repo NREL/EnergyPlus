@@ -858,7 +858,7 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
             //       \key OtherFuel1
             //       \key OtherFuel2
             elcc->UsePriceEscalation(iInObj).resource =
-                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
+                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, AlphaArray(2)));
             if (NumAlphas > 3) {
                 ShowWarningError(state, format("In {} contains more alpha fields than expected.", CurrentModuleObject));
             }
@@ -1009,7 +1009,7 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
             //       \key OtherFuel1
             //       \key OtherFuel2
             elcc->UseAdjustment(iInObj).resource =
-                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
+                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, AlphaArray(2)));
             if (NumAlphas > 2) {
                 ShowWarningError(state, format("In {} contains more alpha fields than expected.", CurrentModuleObject));
             }

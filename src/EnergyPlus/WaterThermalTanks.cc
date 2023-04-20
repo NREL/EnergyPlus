@@ -2434,8 +2434,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.IgnitionDelay = state.dataIPShortCut->rNumericArgs(7); // Not yet implemented
 
         // Validate Heater Fuel Type
-        Tank.FuelType = static_cast<Constant::eResource>(
-            getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+        Tank.FuelType = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
         switch (Tank.FuelType) {
         case Constant::eResource::Invalid: {
             ShowSevereError(state,
@@ -2497,8 +2496,8 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OffCycParaLoad = state.dataIPShortCut->rNumericArgs(9);
 
         // Validate Off-Cycle Parasitic Fuel Type
-        Tank.OffCycParaFuelType = static_cast<Constant::eResource>(
-            getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
+        Tank.OffCycParaFuelType =
+            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
         switch (Tank.OffCycParaFuelType) {
         case Constant::eResource::Invalid:
             if (state.dataIPShortCut->cAlphaArgs(6).empty()) { // If blank, default to Fuel Type for heater
@@ -2523,8 +2522,8 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OnCycParaLoad = state.dataIPShortCut->rNumericArgs(11);
 
         // Validate On-Cycle Parasitic Fuel Type
-        Tank.OnCycParaFuelType = static_cast<Constant::eResource>(
-            getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(7))));
+        Tank.OnCycParaFuelType =
+            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
         switch (Tank.OnCycParaFuelType) {
         case Constant::eResource::Invalid:
             if (state.dataIPShortCut->cAlphaArgs(7).empty()) { // If blank, default to Fuel Type for heater
@@ -3007,8 +3006,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         // Validate Heater Fuel Type
         Tank.FuelType = static_cast<Constant::eResource>(
             getEnumerationValue(Constant::eResourceNamesUC,
-                                UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
-                                    7)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
+                                state.dataIPShortCut->cAlphaArgs(
+                                    7))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
         if (Tank.FuelType == Constant::eResource::Invalid) {
             ShowSevereError(state,
                             format("{} = {}:  Invalid Heater Fuel Type entered={}",
@@ -3035,8 +3034,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         // Validate Off-Cycle Parasitic Fuel Type
         Tank.OffCycParaFuelType = static_cast<Constant::eResource>(
             getEnumerationValue(Constant::eResourceNamesUC,
-                                UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
-                                    8)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
+                                state.dataIPShortCut->cAlphaArgs(
+                                    8))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
         if (Tank.OffCycParaFuelType == Constant::eResource::Invalid) {
             if (state.dataIPShortCut->cAlphaArgs(8).empty()) {
                 Tank.OffCycParaFuelType = Tank.FuelType;
@@ -3060,8 +3059,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         // Validate On-Cycle Parasitic Fuel Type
         Tank.OnCycParaFuelType = static_cast<Constant::eResource>(getEnumerationValue(
             Constant::eResourceNamesUC,
-            UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
-                9)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported/empty
+            state.dataIPShortCut->cAlphaArgs(
+                9))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported/empty
         if (Tank.OnCycParaFuelType == Constant::eResource::Invalid) {
             if (state.dataIPShortCut->cAlphaArgs(9).empty()) {
                 Tank.OnCycParaFuelType = Tank.FuelType;

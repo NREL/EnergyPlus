@@ -316,7 +316,7 @@ namespace CTElectricGenerator {
 
             // Validate fuel type input
             state.dataCTElectricGenerator->CTGenerator(genNum).FuelType =
-                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
+                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, AlphArray(11)));
             if (state.dataCTElectricGenerator->CTGenerator(genNum).FuelType == Constant::eResource::Invalid) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), AlphArray(11)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));

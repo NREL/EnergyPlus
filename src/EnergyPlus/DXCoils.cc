@@ -4010,14 +4010,7 @@ void GetDXCoils(EnergyPlusData &state)
 
         // A12; \field Fuel type, Validate fuel type input
         thisDXCoil.FuelTypeNum =
-            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(12))));
-        if (thisDXCoil.FuelTypeNum == Constant::eResource::Invalid) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-            ShowContinueError(state, format(",,,invalid choice for {}.  Entered choice = {}", cAlphaFields(12), Alphas(12)));
-            ShowContinueError(
-                state, "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
-            ErrorsFound = true;
-        }
+            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, Alphas(12)));
 
         thisDXCoil.NumOfSpeeds = Numbers(6); // Number of speeds
         if (thisDXCoil.NumOfSpeeds < 2) {
@@ -4522,14 +4515,7 @@ void GetDXCoils(EnergyPlusData &state)
 
         // A9; \field Fuel type, Validate fuel type input
         thisDXCoil.FuelTypeNum =
-            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(9))));
-        if (thisDXCoil.FuelTypeNum == Constant::eResource::Invalid) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-            ShowContinueError(state, format(",,,invalid choice for {}.  Entered choice = {}", cAlphaFields(9), Alphas(9)));
-            ShowContinueError(
-                state, "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1 or OtherFuel2");
-            ErrorsFound = true;
-        }
+            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, Alphas(9)));
 
         thisDXCoil.RegionNum = Numbers(8);   // Region Number for HSPF Calc
         thisDXCoil.NumOfSpeeds = Numbers(9); // Number of speeds
