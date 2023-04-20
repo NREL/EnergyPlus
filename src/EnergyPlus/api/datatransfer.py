@@ -98,18 +98,18 @@ class DataExchange:
             #: This can be one of the following: "Actuator", "InternalVariable", "PluginGlobalVariable",
             #: "PluginTrendVariable", "OutputMeter", or "OutputVariable".  Once the full list of data exchange points
             #: are returned from a call to get_api_data, this can be used to quickly filter down to a specific type.
-            self.what = _what
+            self.what: str = _what
             #: This represents the name of the entry point, not the name of the specific instance of the entry point.
             #: Some examples of this name could be "Chiller Heat Transfer Rate" -- which could be available for multiple
             #: chillers.
-            self.name = _name
+            self.name: str = _name
             #: This represents the unique ID for this exchange point.  In the example of the chiller output variable,
             #: this could be "Chiller 1". This is not used for meters
-            self.key = _key
+            self.key: str = _key
             #: This represents the "type" of exchange for this exchange point.  This is only used for actuators,
             #: and represents the control actuation.  For a node setpoint actuation, this could be "temperature" or
             #: "humidity", for example.
-            self.type = _type
+            self.type: str = _type
 
     def __init__(self, api: cdll, running_as_python_plugin: bool = False):
         """
@@ -123,7 +123,7 @@ class DataExchange:
         self.api.getAPIData.argtypes = [c_void_p, POINTER(c_int)]
         self.api.getAPIData.restype = POINTER(DataExchange._APIDataEntry)
         self.api.listAllAPIDataCSV.argtypes = [c_void_p]
-        self.api.listAllAPIDataCSV.restype = POINTER(DataExchange._APIDataEntry)
+        self.api.listAllAPIDataCSV.restype = c_char_p
         self.api.freeAPIData.argtypes = [POINTER(DataExchange._APIDataEntry), c_int]
         self.api.freeAPIData.restype = c_void_p
         self.api.apiDataFullyReady.argtypes = [c_void_p]

@@ -71,9 +71,8 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
         }
         handlesRetrieved = 1;
         unsigned int arraySize;
-        struct APIDataEntry * data = getAPIData(state, &arraySize);
-        int x = 1;
-        freeAPIData(data, arraySize);
+        struct APIDataEntry * data = getAPIData(state, &arraySize); // inspect this to see what's available to exchange
+        freeAPIData(data, arraySize); // don't forget to free it!
     }
     setActuatorValue(state, outdoorDewPointActuator, -25.0);
     Real64 oa_temp = getVariableValue(state, outdoorTempSensor);
