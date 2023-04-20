@@ -8415,7 +8415,6 @@ namespace UnitarySystems {
         Real64 CpAir;                     // specific heat of air [J/kg_C]
         Real64 FullLoadAirOutletTemp;     // saved full load outlet air temperature [C]
         Real64 FullLoadAirOutletHumRat;   // saved full load outlet air humidity ratio [kg/kg]
-        Real64 NoLoadOutletTemp;          // outlet temp of system with coils off [C]
 
         std::string CompName = this->Name;
         int OutletNode = this->AirOutNode;
@@ -8506,7 +8505,7 @@ namespace UnitarySystems {
         }
 
         this->m_EconoSpeedNum = 0;
-        if (this->OAControllerEconomizerStaging == DataHVACGlobals::EconomizerFirst && this->m_NumOfSpeedCooling > 0 && ZoneLoad < 0) {
+        if (this->OAControllerEconomizerStaging == DataHVACGlobals::EconomizerFirst) {
             UnitarySys &UnitarySystemMSEconomizer(state.dataUnitarySystems->unitarySys[this->m_UnitarySysNum]);
             CoolingSpeedForEconomizerOperation(state, AirLoopNum, FirstHVACIteration, UnitarySystemMSEconomizer, ZoneLoad);
         }
@@ -18196,7 +18195,8 @@ namespace UnitarySystems {
                                             Real64 const ZoneLoad)
     {
         auto OACtrl = state.dataMixedAir->OAController(UnitarySystemMSEconomizer.OAControllerIndex);
-        if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive == true && state.dataGlobal->WarmupFlag == false && ZoneLoad < 0) {
+        if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive == true && state.dataGlobal->WarmupFlag == false &&
+            state.dataUnitarySystems->CoolingLoad) {
             int clgSpdNum = UnitarySystemMSEconomizer.m_NumOfSpeedCooling;
             // determine OA properties
             using Psychrometrics::PsyCpAirFnW;
@@ -18227,21 +18227,12 @@ namespace UnitarySystems {
                 Real64 fanHeat = 0;
                 Real64 fanDT = 0;
                 Real64 volFlowRate = UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum];
-                switch (state.dataSize->DataFanEnumType) {
-                case DataAirSystems::StructArrayLegacyFanModels: {
+                if (UnitarySystemMSEconomizer.m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                    fanHeat = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, volFlowRate);
+                } else {
                     fanHeat = Fans::FanDesHeatGain(state,
                                                    UnitarySystemMSEconomizer.m_FanIndex,
                                                    UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum]);
-                    break;
-                }
-                case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                    fanHeat = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, volFlowRate);
-                    break;
-                }
-                case DataAirSystems::Invalid: {
-                    fanHeat = 0;
-                    break;
-                }
                 }
                 fanDT = fanHeat / (volFlowRate * CpAir);
                 // recalculate and mixed air temperature setpoint; assumes that besides a fan, there's no passive component adding heat when the
