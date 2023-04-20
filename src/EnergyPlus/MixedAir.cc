@@ -1409,14 +1409,9 @@ void GetOAControllerInputs(EnergyPlusData &state)
             for (int groupNum = 1; groupNum <= NumGroups; ++groupNum) {
                 int ZoneNum = UtilityRoutines::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataHeatBal->Zone);
                 if (ZoneNum > 0) {
-                    bool found = false;
-                    for (auto &thisVMZone : thisVentilationMechanical.VentMechZone) {
-                        if (thisVMZone.zoneNum == ZoneNum) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) {
+                    if (std::any_of(thisVentilationMechanical.VentMechZone.begin(),
+                                    thisVentilationMechanical.VentMechZone.end(),
+                                    [ZoneNum](auto const &vmZone) { return vmZone.zoneNum == ZoneNum; })) {
                         //          Disregard duplicate zone names, show warning and do not store data for this zone
                         ShowWarningError(state,
                                          format("Zone name = {} for {} object = {}",
@@ -1471,15 +1466,9 @@ void GetOAControllerInputs(EnergyPlusData &state)
                     if (ZoneListNum > 0) {
                         for (int ScanZoneListNum = 1; ScanZoneListNum <= state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones; ++ScanZoneListNum) {
                             // check to make sure zone name is unique (not listed more than once)...
-                            int ZoneNum = state.dataHeatBal->ZoneList(ZoneListNum).Zone(ScanZoneListNum);
-                            bool found = false;
-                            for (auto &thisVMZone : thisVentilationMechanical.VentMechZone) {
-                                if (thisVMZone.zoneNum == ZoneNum) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (found) {
+                            if (std::any_of(thisVentilationMechanical.VentMechZone.begin(),
+                                            thisVentilationMechanical.VentMechZone.end(),
+                                            [ZoneNum](auto const &vmZone) { return vmZone.zoneNum == ZoneNum; })) {
                                 //             Disregard duplicate zone names, show warning and do not store data for this zone
                                 ShowWarningError(state,
                                                  format("Zone name = {} in ZoneList = {} for {} object = {}",
