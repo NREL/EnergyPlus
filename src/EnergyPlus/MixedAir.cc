@@ -1466,13 +1466,14 @@ void GetOAControllerInputs(EnergyPlusData &state)
                     if (ZoneListNum > 0) {
                         for (int ScanZoneListNum = 1; ScanZoneListNum <= state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones; ++ScanZoneListNum) {
                             // check to make sure zone name is unique (not listed more than once)...
+                            int zoneNum2 = state.dataHeatBal->ZoneList(ZoneListNum).Zone(ScanZoneListNum);
                             if (std::any_of(thisVentilationMechanical.VentMechZone.begin(),
                                             thisVentilationMechanical.VentMechZone.end(),
-                                            [ZoneNum](auto const &vmZone) { return vmZone.zoneNum == ZoneNum; })) {
+                                            [zoneNum2](auto const &vmZone) { return vmZone.zoneNum == zoneNum2; })) {
                                 //             Disregard duplicate zone names, show warning and do not store data for this zone
                                 ShowWarningError(state,
                                                  format("Zone name = {} in ZoneList = {} for {} object = {}",
-                                                        state.dataHeatBal->Zone(ZoneNum).Name,
+                                                        state.dataHeatBal->Zone(zoneNum2).Name,
                                                         state.dataMixedAir->VentMechZoneOrListName(groupNum),
                                                         CurrentModuleObject,
                                                         thisVentilationMechanical.Name));
@@ -1483,8 +1484,8 @@ void GetOAControllerInputs(EnergyPlusData &state)
                                 //           HeatBalanceManager)
                                 ++MechVentZoneCount;
                                 auto &thisMechVentZone = thisVentilationMechanical.VentMechZone(MechVentZoneCount);
-                                thisMechVentZone.zoneNum = ZoneNum;
-                                thisMechVentZone.name = state.dataHeatBal->Zone(ZoneNum).Name;
+                                thisMechVentZone.zoneNum = zoneNum2;
+                                thisMechVentZone.name = state.dataHeatBal->Zone(zoneNum2).Name;
                                 // Populating new temp array to hold design spec OA object for each zone
                                 if (state.dataMixedAir->DesignSpecOAObjIndex(groupNum) > 0) {
                                     thisMechVentZone.ZoneDesignSpecOAObjName = state.dataMixedAir->DesignSpecOAObjName(groupNum);
@@ -1492,7 +1493,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                                 } else {
                                     if (state.dataGlobal->DoZoneSizing) {
                                         int ObjIndex = UtilityRoutines::FindItemInList(
-                                            state.dataHeatBal->Zone(ZoneNum).Name, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                            state.dataHeatBal->Zone(zoneNum2).Name, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                         if (ObjIndex > 0) {
                                             thisMechVentZone.ZoneDesignSpecOAObjName = state.dataSize->ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
                                             thisMechVentZone.ZoneDesignSpecOAObjIndex =
@@ -1508,7 +1509,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                                 } else {
                                     if (state.dataGlobal->DoZoneSizing) {
                                         int ObjIndex = UtilityRoutines::FindItemInList(
-                                            state.dataHeatBal->Zone(ZoneNum).Name, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                            state.dataHeatBal->Zone(zoneNum2).Name, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                         if (ObjIndex > 0) {
                                             thisMechVentZone.ZoneDesignSpecADObjName =
                                                 state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
