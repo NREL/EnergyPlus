@@ -11053,6 +11053,9 @@ namespace UnitarySystems {
         if (this->m_IsZoneEquipment) {
             turnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
             turnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+            // set global flag to act on the fan operation
+            state.dataHVACGlobal->TurnFansOn = turnFansOn;
+            state.dataHVACGlobal->TurnFansOff = turnFansOff;
         } else {
             turnFansOn = state.dataHVACGlobal->TurnFansOn;
             turnFansOff = state.dataHVACGlobal->TurnFansOff;
