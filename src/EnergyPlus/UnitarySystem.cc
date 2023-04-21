@@ -18226,18 +18226,34 @@ namespace UnitarySystems {
                 // determine fan heat based on new mixed air flow rate
                 Real64 fanHeat = 0;
                 Real64 fanDT = 0;
-                Real64 volFlowRate = UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum];
+                int mixedAirNode = OACtrl.MixNode;
+                int FanInletNode = 0;
+                int FanOutletNode = 0;
                 if (UnitarySystemMSEconomizer.m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    fanHeat = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, volFlowRate);
+                    FanInletNode = state.dataHVACFan->fanObjs[UnitarySystemMSEconomizer.m_FanIndex]->inletNodeNum;
+                    FanOutletNode = state.dataHVACFan->fanObjs[UnitarySystemMSEconomizer.m_FanIndex]->outletNodeNum;
+                    state.dataLoopNodes->Node(FanInletNode).MassFlowRate =
+                        UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum];
+                    state.dataLoopNodes->Node(FanOutletNode).MassFlowRate =
+                        UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum];
+                    state.dataHVACFan->fanObjs[UnitarySystemMSEconomizer.m_FanIndex]->simulate(
+                        state, state.dataAirLoop->AirLoopFlow(AirLoopNum).ReqSupplyFrac, _, _, _, _, _, _, _, _);
                 } else {
-                    fanHeat = Fans::FanDesHeatGain(state,
-                                                   UnitarySystemMSEconomizer.m_FanIndex,
-                                                   UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum]);
+                    FanInletNode = state.dataFans->Fan(UnitarySystemMSEconomizer.m_FanIndex).InletNodeNum;
+                    FanOutletNode = state.dataFans->Fan(UnitarySystemMSEconomizer.m_FanIndex).OutletNodeNum;
+                    state.dataLoopNodes->Node(FanInletNode).MassFlowRate =
+                        UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum];
+                    state.dataLoopNodes->Node(FanOutletNode).MassFlowRate =
+                        UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum];
+                    Fans::SimulateFanComponents(state,
+                                                blankString,
+                                                FirstHVACIteration,
+                                                UnitarySystemMSEconomizer.m_FanIndex,
+                                                state.dataAirLoop->AirLoopFlow(AirLoopNum).ReqSupplyFrac);
                 }
-                fanDT = fanHeat / (volFlowRate * CpAir);
+                fanDT = state.dataLoopNodes->Node(FanOutletNode).Temp - state.dataLoopNodes->Node(FanInletNode).Temp;
                 // recalculate and mixed air temperature setpoint; assumes that besides a fan, there's no passive component adding heat when the
                 // economizer is running
-                int mixedAirNode = OACtrl.MixNode;
                 Real64 newMixedAirSP =
                     ZoneTemp + ZoneLoad / (CpAir * UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum]);
                 state.dataLoopNodes->Node(mixedAirNode).TempSetPoint = newMixedAirSP - fanDT;
