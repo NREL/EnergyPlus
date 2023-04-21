@@ -1,0 +1,369 @@
+\section{UtilityCost:Tariff}\label{utilitycosttariff}
+
+Defines the name of the tariff, the type of tariff, and other details about the overall tariff. Each other object that is part of the tariff model references the tariff name including the \hyperref[utilitycostchargesimple]{UtilityCost:Charge:Simple}, \hyperref[utilitycostchargeblock]{UtilityCost:Charge:Block}, \hyperref[utilitycostratchet]{UtilityCost:Ratchet}, \hyperref[utilitycostqualify]{UtilityCost:Qualify}, \hyperref[utilitycostvariable]{UtilityCost:Variable} and \hyperref[utilitycostcomputation]{UtilityCost:Computation} objects.
+
+Multiple UtilityCost:Tariff objects can appear in the same IDF file. It is common that electric and gas utilities have more than one rate that may be used. Only one UtilityCost:Tariff for each \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object and Group Name is shown in the Economics Summary Report. The one that is shown in that report is chosen by first eliminating UtilityCost:Tariff objects that are not qualified due to their \hyperref[utilitycostqualify]{UtilityCost:Qualify} objects. If more than one UtilityCost:Tariff object remains, the one that has the lowest cost for a combination of a Meter and Group Name will be selected. If the Group Name field is not used, then the lowest cost UtilityCost:Tariff is chosen for each Meter.
+
+Part of the tariff description is used to transform the annual energy use of any fuel under any meter into a group of named variables containing the values for each of the periods that the bills are calculated (usually monthly). The schedules create a variable for energy use and for demand. If specified it also creates a variable for energy and a variable for demand for the ``on-peak'', ``off-peak'', and ``shoulder'' periods for use in time-of-use tariffs. It performs this allocation prior to other calculations for the tariff. The variables that are always created are:
+
+\begin{itemize}
+\item
+  totalEnergy
+\item
+  totalDemand
+\end{itemize}
+
+\subsection{Inputs}\label{inputs-072}
+
+\paragraph{Field: Name}\label{field-name-064}
+
+The name of the tariff. Tariffs are sometimes called rates. The name is used in identifying the output results and in associating all of the charges and other objects that make up a tariff.
+
+\paragraph{Field: Output Meter Name}\label{field-output-meter-name}
+
+The name of any meter defined but usually set to either Electricity:Facility or NaturalGas:Facility.
+
+\paragraph{Field: Conversion Factor Choice}\label{field-conversion-factor-choice}
+
+A choice that allows several different predefined conversion factors to be used; otherwise, user defined conversion factors are used as defined in the next two fields.
+
+\begin{itemize}
+\item
+  UserDefined
+\item
+  kWh
+\item
+  Therm
+\item
+  MMBtu
+\item
+  MJ
+\item
+  KBtu
+\item
+  MCF
+\item
+  CCF
+\item
+  m3
+\item
+  gal
+\item
+  kgal
+\end{itemize}
+
+Not all choices will be accepted by EnergyPlus depending on the resource of the Output Meter of the tariff object, and the same Conversion Factor Choice will take different values depending on the resource type. EnergyPlus will differentiate between \textbf{Water Meters} and \textbf{Energy Meters}.
+
+Energy Meters natively report energy in Joules (J) and demand in Joules/Sec (J/s) which is equivalent to Watts (W).
+If Conversion Factor Choice is omitted or not a valid conversion factor from the table below, the default is kWh and a warning is issued to the user.
+EnergyPlus will make a distinction between Electric, Gas, and 'Other' meters to determine the accepted options. If 'Therm' is used for an electric meter, the user is warned that this is an unusual choice for electricity. The following table shows the accepted options and the conversion factors for an Electric Meter.
+
+% table 37
+\begin{longtable}[c]{@{}lll@{}}
+\caption{Built in UtilityCost:Tariff Conversion Factors for Electric Meters \label{table:built-in-utilitycost-tariff-conversion-electric}} \tabularnewline
+\toprule
+Choice & Energy Conversion Factor & Demand Conversion Factor \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Built in UtilityCost:Tariff Conversion Factors for Electric Meters} \tabularnewline
+\toprule
+Choice & Energy Conversion Factor & Demand Conversion Factor \tabularnewline
+\midrule
+\endhead
+
+kWh & 0.0000002778 & 0.001 \tabularnewline
+MJ & 0.000001 & 0.0036 \tabularnewline
+MMBtu & 9.4781712E-10 & 0.000003412 \tabularnewline
+KBtu & 9.4781712E-07 & 0.003412 \tabularnewline
+Therm & 9.4781712E-09 & 0.00003412 \tabularnewline
+
+\bottomrule
+\end{longtable}
+
+ The following table shows the accepted options and the conversion factors for a Gas Meter. Note that for volumetric units, the simplification for the heat content of natural gas is that 100 CCF = 1 therm. It is recommended to use actual values for the heat content of natural gas in your region/year by using "UserDefined" and manually entering the conversion factors for energy and demand.
+
+% table 38
+\begin{longtable}[c]{@{}lll@{}}
+\caption{Built in UtilityCost:Tariff Conversion Factors for Gas Meters \label{table:built-in-utilitycost-tariff-conversion-gas}} \tabularnewline
+\toprule
+Choice & Energy Conversion Factor & Demand Conversion Factor \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Built in UtilityCost:Tariff Conversion Factors for Gas Meters} \tabularnewline
+\toprule
+Choice & Energy Conversion Factor & Demand Conversion Factor \tabularnewline
+\midrule
+\endhead
+
+kWh & 0.0000002778 & 0.001 \tabularnewline
+MJ & 0.000001 & 0.0036 \tabularnewline
+MMBtu & 9.4781712E-10 & 0.000003412 \tabularnewline
+KBtu & 9.4781712E-07 & 0.003412 \tabularnewline
+Therm & 9.4781712E-09 & 0.00003412 \tabularnewline
+MCF & 9.4781712E-10 & 0.000003412 \tabularnewline
+CCF & 9.4781712E-09 & 0.00003412 \tabularnewline
+m3 & 2.6839192e-10 & 9.6617081E-05 \tabularnewline
+
+\bottomrule
+\end{longtable}
+
+Water Meters natively report "energy" in cubic meters (m3).  If Conversion Factor Choice is omitted or not a valid conversion factor from the table below, the default is m3 and a warning is issued to the user. The following table shows the accepted options and the conversion factors for a water meter.
+
+% table 36
+\begin{longtable}[c]{@{}lll@{}}
+\caption{Built in UtilityCost:Tariff Conversion Factors for Water Meters \label{table:built-in-utilitycost-tariff-conversion-water}} \tabularnewline
+\toprule
+Choice & Energy Conversion Factor \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Built in UtilityCost:Tariff Conversion Factors for Water Meters} \tabularnewline
+\toprule
+Choice & Energy Conversion Factor \tabularnewline
+\midrule
+\endhead
+
+CCF & 0.353146667214885 \tabularnewline
+gal & 264.172052360252 \tabularnewline
+kgal & 0.264172052360252 \tabularnewline
+\bottomrule
+\end{longtable}
+
+The following table shows the accepted options and the conversion factors for all other Meters that aren't either Water, Electric, or gas.
+
+% table 39
+\begin{longtable}[c]{@{}lll@{}}
+\caption{Built in UtilityCost:Tariff Conversion Factors for Other Meters \label{table:built-in-utilitycost-tariff-conversion-other}} \tabularnewline
+\toprule
+Choice & Energy Conversion Factor & Demand Conversion Factor \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Built in UtilityCost:Tariff Conversion Factors for Other Meters} \tabularnewline
+\toprule
+Choice & Energy Conversion Factor & Demand Conversion Factor \tabularnewline
+\midrule
+\endhead
+
+kWh & 0.0000002778 & 0.001 \tabularnewline
+MJ & 0.000001 & 0.0036 \tabularnewline
+MMBtu & 9.4781712E-10 & 0.000003412 \tabularnewline
+KBtu & 9.4781712E-07 & 0.003412 \tabularnewline
+Therm & 9.4781712E-09 & 0.00003412 \tabularnewline
+
+\bottomrule
+\end{longtable}
+
+
+\paragraph{Field: Energy Conversion Factor}\label{field-energy-conversion-factor}
+
+Is a multiplier used to convert energy into the units specified by the utility in their tariff. If left blank, it defaults to 1 (no conversion). This field will be used only if Conversion Factor Choice is set to UserDefined. Within EnergyPlus energy always has units of J (joules), except for water meters that have units of m3. For conversion from J to kWh use the value of 0.0000002778. This is also used for all objects that reference the UtilityCost:Tariff.
+
+\paragraph{Field: Demand Conversion Factor}\label{field-demand-conversion-factor}
+
+Is a multiplier used to convert demand into the units specified by the utility in their tariff. If left blank, it defaults to 1 (no conversion). This field will be used only if Conversion Factor Choice is set to UserDefined. Within EnergyPlus demand always has units of J/s (joules/sec) which equivalent to W (watts). For conversion from W to kW use the value of 0.001. This is also used for all objects that reference the UtilityCost:Tariff.
+
+\paragraph{Field: Time of Use Period Schedule Name}\label{field-time-of-use-period-schedule-name}
+
+The name of the schedule that defines the time-of-use periods that occur each day. The period schedule is used to determine which variables are defined. The values for the different variables are:
+
+\begin{itemize}
+\item
+  1 is Peak
+\item
+  2 is Shoulder
+\item
+  3 is OffPeak
+\item
+  4 is MidPeak
+\end{itemize}
+
+The following variables are created automatically if these different periods are used in the schedule and include:
+
+\begin{itemize}
+\item
+  peakEnergy
+\item
+  peakDemand
+\item
+  shoulderEnergy
+\item
+  shoulderDemand
+\item
+  offPeakEnergy
+\item
+  offPeakDemand
+\item
+  midPeakEnergy
+\item
+  midPeakDemand
+\end{itemize}
+
+Some special variables are created that include only demand from one period that exceeds the demand from another period. For other months that do not exceed, the values are zero. These variables are seldom used but are available for the occasional rate that includes a clause looking at demands during one period that exceed another period.
+
+\begin{itemize}
+\item
+  PeakExceedsOffPeak
+\item
+  OffPeakExceedsPeak
+\item
+  PeakExceedsMidPeak
+\item
+  MidPeakExceedsPeak
+\item
+  PeakExceedsShoulder
+\item
+  ShoulderExceedsPeak
+\end{itemize}
+
+If no Period Schedule is specified then no peak, offPeak, midPeak or shoulder variables are defined.
+
+\paragraph{Field: Season Schedule Name}\label{field-season-schedule-name}
+
+The name of a schedule that defines the seasons. The seasons are
+
+\begin{itemize}
+\item
+  1 is Winter
+\item
+  2 is Spring
+\item
+  3 is Summer
+\item
+  4 is Autumn
+\end{itemize}
+
+The change in the season schedule must occur at the same time as the change in the Monthly Schedule. In other words, a season must end at the same time as a billing month. Variables are automatically created if a season schedule is used. These variables are set to 1 within the season and 0 for the months that are not in the season. The variables are:
+
+\begin{itemize}
+\item
+  isWinter
+\item
+  isNotWinter
+\item
+  isSpring
+\item
+  isNotSpring
+\item
+  isSummer
+\item
+  isNotSummer
+\item
+  isAutumn
+\item
+  isNotAutumn
+\end{itemize}
+
+\paragraph{Field: Month Schedule Name}\label{field-month-schedule-name}
+
+The name of the schedule that defines the billing periods of the year. Normally this entry is allowed to default and a schedule will be internally used that has the breaks between billing periods occurring at the same time as the breaks between months, i.e., at midnight prior to the first day of the month. If other billing periods are used such as two month cycles or a single bill for an entire season, such as some natural gas companies do in the summer, then the month schedule may be used to redefine it. Make sure that the month schedule and season schedule are consistent, otherwise an error will be issued.
+
+\begin{itemize}
+\item
+  1 is the first month, usually January
+\item
+  2 is the second month, usually February
+\item
+  3 is the third month, usually March
+\item
+  4 is the fourth month, usually April
+\item
+  5 is the fifth month, usually May
+\item
+  6 is the sixth month, usually June
+\item
+  7 is the seventh month, usually July
+\item
+  8 is the eighth month, usually August
+\item
+  9 is the ninth month, usually September
+\item
+  10 is the tenth month, usually October
+\item
+  11 is the eleventh month, usually November
+\item
+  12 is the twelfth month, usually December
+\end{itemize}
+
+Thus, the schedule that represents this would look like the following. If no schedule is specified the following Month Schedule is used which defines the months of the year as the normal calendar months.
+
+\begin{lstlisting}
+
+Schedule:Compact, defaultMonths, number,
+  Through: 1/31, For: AllDays, Until: 24:00, 1,
+  Through: 2/28, For: AllDays, Until: 24:00, 2,
+  Through: 3/31, For: AllDays, Until: 24:00, 3,
+  Through: 4/30, For: AllDays, Until: 24:00, 4,
+  Through: 5/31, For: AllDays, Until: 24:00, 5,
+  Through: 6/30, For: AllDays, Until: 24:00, 6,
+  Through: 7/31, For: AllDays, Until: 24:00, 7,
+  Through: 8/31, For: AllDays, Until: 24:00, 8,
+  Through: 9/30, For: AllDays, Until: 24:00, 9,
+  Through: 10/31, For: AllDays, Until: 24:00, 10,
+  Through: 11/30, For: AllDays, Until: 24:00, 11,
+  Through: 12/31, For: AllDays, Until: 24:00, 12;
+\end{lstlisting}
+
+\paragraph{Field: Demand Window Length}\label{field-demand-window-length-000}
+
+The determination of demand can vary by utility. Some utilities use the peak instantaneous demand measured but most use a fifteen minute average demand or a one hour average demand. Some gas utilities measure demand as the use during the peak day or peak week. The choices for demand window are:
+
+\begin{itemize}
+\item
+  QuarterHour
+\item
+  HalfHour
+\item
+  FullHour
+\item
+  Day
+\item
+  Week
+\end{itemize}
+
+If no value is entered, QuarterHour is assumed. The choice may be overridden based on the value of \hyperref[timestep]{Timestep} so that they are consistent:
+\begin{itemize}
+\item
+    If the \hyperref[timestep]{Timestep} is 6, i.e.~10 minute timesteps, then QuarterHour is not used and HalfHour is used instead.
+\item
+    If \hyperref[timestep]{Timestep} is 3, i.e.~20 minute timesteps, then QuarterHour and HalfHour are not used and FullHour is used instead.
+\end{itemize}
+
+Day and Week are primarily used by fuel utilities.
+
+\paragraph{Field: Monthly Charge or Variable Name}\label{field-monthly-charge-or-variable-name}
+
+The fixed monthly service charge that many utilities have. The entry may be numeric and gets added to the ServiceCharges variable or if a variable name is entered here, its values for each month are used.
+
+\paragraph{Field: Minimum Monthly Charge or Variable Name}\label{field-minimum-monthly-charge-or-variable-name}
+
+The minimum total charge for the tariff or if a variable name is entered here, its values for each month are used.~ The sum of the subtotal and taxes usually equals the total unless you have specified the minimum monthly charge. If the minimum monthly charge does not apply to the entire bill, a \hyperref[utilitycostcomputation]{UtilityCost:Computation} object can be specified using a Minimum function for the appropriate variables.
+
+\paragraph{Field: Real Time Pricing Charge Schedule Name}\label{field-real-time-pricing-charge-schedule-name}
+
+Used with real time pricing rates. The name of a schedule that contains the cost of energy for that particular time period of the year. Real time rates can be modeled using a charge schedule with the actual real time prices entered in the schedule. The charges should be consistent with the conversion factor specified in the tariff.
+
+\paragraph{Field: Customer Baseline Load Schedule Name}\label{field-customer-baseline-load-schedule-name}
+
+Used with real time pricing rates and often described as the CBL or customer baseline load. The name of a schedule that contains the baseline energy use for the customer. Many real time rates apply the charges as a credit or debit only to the difference between the baseline use and the actual use. The baseline use is established between the customer and the utility using a contract. If this field is used the baseline use schedule will be used for establishing the totalEnergy and totalDemand instead of the metered value and the real time rate charge is added or subtracted to the rate calculation using the real time charge schedule. If this field is not used, the real time charge schedule applies to all energy from the meter and totalEnergy and totalDemand is based on metered value as usual.
+
+\paragraph{Field: Group Name}\label{field-group-name}
+
+The group name of the tariff such as distribution, transmission, supplier, etc. If more than one tariff with the same group name is present and qualifies, only the lowest cost tariff is used. Usually the group name field is left blank which results in all tariffs using the same meter variable being compared and the lowest cost one being selected.
+
+\paragraph{Field: Buy Or Sell}\label{field-buy-or-sell}
+
+Sets whether the tariff is used for buying, selling or both to the utility. This should be allowed to default to BuyFromUtility unless a power generation system is included in the building that may generate more power than the building needs during the year. The choices are:
+
+\begin{itemize}
+\item
+  BuyFromUtility -- The values from the metered variable are used and are shown as being purchases from the utility.
+\item
+  SellToUtility -- The values from the metered variable are used for a ``sell back'' rate to the utility. The charges in the rate should be expressed as negative values.
+\item
+  NetMetering -- Negative values are used to reduce any positive values during the specific period on the tariff when negative values occur.
+\end{itemize}
+
+A warning will be issued if the selection of this field does not match the type of meter.

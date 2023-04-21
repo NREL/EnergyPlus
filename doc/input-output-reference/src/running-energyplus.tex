@@ -1,0 +1,29 @@
+\chapter{Running EnergyPlus}\label{running-energyplus}
+
+EnergyPlus is written in C++, using many C++11 features. It runs as a console application on Windows, Mac, and Linux (tested on latest Ubuntu LTS). Details on running EnergyPlus are available in a separate document (Running EnergyPlus in Auxiliary Programs). The following files are needed to run EnergyPlus:
+
+\begin{itemize}
+\tightlist
+\item
+  EnergyPlus.exe (the executable file)
+\item
+  Energy+.ini (described below)
+\item
+  Energy+.idd (the input data dictionary file)
+\item
+  in.idf (the input file)
+\item
+  in.epw -- optional (weather data file)
+\end{itemize}
+
+The input data dictionary and input data file have been discussed in the previous sections of this document.
+
+For weather simulations, EnergyPlus accepts EnergyPlus weather files. The actual file name is \textbf{in.epw}.
+
+The usual release for Windows platform also includes a dependence on a shared library, EnergyPlusAPI.dll (.so on Linux).
+
+\input{src/running-energyplus/energy-ini}
+
+\input{src/running-energyplus/errors}
+
+\input{src/running-energyplus/energyplus-execution-time}

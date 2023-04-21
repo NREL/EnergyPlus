@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>ObjexxFCL Users Guide: Global I/O</title>
+	<meta name="description" content="Objexx Fortran-C++ Library">
+	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
+	<meta name="copyright" content="Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.">
+	<link rel="icon" type="image/png" href="img/favicon.png">
+	<link rel="stylesheet" href="css/Objexx.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#CC3366" vlink="#990033" alink="#FF3366">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+	<tr>
+		<td></td>
+		<td height="70"><a href="ObjexxFCL.html"><img src="img/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
+		<td></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.2</div></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="5" height="16" valign="top" bgcolor="#EB7A87"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td height="24" colspan="5"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td height="300">&nbsp;</td>
+		<td valign="top">
+			<div id="sectionLinksTop">
+				<a href="ObjexxFCL.html">Home</a>
+			</div>
+			<div id="sectionLinks">
+				<a href="ObjexxFCL.Release.html">Release</a>
+				<a href="ObjexxFCL.Users.html">Users Guide</a>
+				<a href="ObjexxFCL.Developers.html">Developers</a>
+				<a href="ObjexxFCL.Support.html">Support</a>
+				<a href="http://objexx.com">Web</a>
+			</div>
+		</td>
+		<td></td>
+		<td width="500" valign="top">
+			<h1>Global I/O</h1>
+
+			<h2 class="h4">Overview</h2>
+			<p class="body">The ObjexxFCL global i/o system emulates Fortran's unit-based i/o. As in Fortran, i/o is tied to unit numbers that are global in the sense that i/o can be done to a unit from any function without passing a file handle object around.</p>
+			<p class="body">The global i/o system provides, open, read, write, inquire, backspace, rewind, and close functions. Read and write use Fortran compatible formats with C++ stream i/o item syntax.</p>
+			<p class="body">The global i/o system is layered on top of the <a href="ObjexxFCL.Formatted_IO.html">formatted i/o system</a>.</p>
+
+			<h2 class="h4">gio Namespace</h2>
+			<p class="body">The global i/o system lives in a gio namespace within the ObjexxFCL namespace. This is done to avoid ambiguity with C++ functions such as open and close.</p>
+			<p class="body">The gio functions are described below. See the gio.hh source for the full set of function overloads.</p>
+
+			<h3 class="h4">open</h3>
+			<p class="body">Overloads are provided for open that accept file names in various string types and both with and without a specified unit. Opening without a unit causes an available unit number to be selected and returned by the open call.</p>
+			<p class="body">Open modes (read, write, append, etc.) can be specified with C++ openmode or ObjexxFCL IOFlags arguments.</p>
+			<p class="body">Here are some examples of open calls:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>gio::open( 44, "MyFile.txt" ); // Open MyFile.txt on unit 44</pre>
+					</td>
+				</tr>
+			</table>
+			<br>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>int unit = gio::get_unit(); // Get an available unit number
+gio::open( unit, "InFile.txt", std::ios_base::in ); // Open InFile.txt for reading</pre>
+					</td>
+				</tr>
+			</table>
+			<br>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>IOFlags flags;
+int unit = gio::open( "MyData.dat", flags ); // Open MyData.dat and return the unit number
+// Can check flags.ios() for status or flags.err() for error</pre>
+					</td>
+				</tr>
+			</table>
+
+			<h3 class="h4">read</h3>
+			<p class="body">Reads are done using a Fortran-compatible format specification. An IOFlags argument can be optionally used to control certain read behavior, such as setting non-advancing reads, and to return status/error flags.</p>
+			<p class="body">If a string argument is used instead of a unit number the read is done from the string, as in a Fortran internal read.</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>gio::read( 52, "(2I3)" ) &gt;&gt; i &gt;&gt; j; // Reads 2 integers into i and j from unit 52
+</pre>
+					</td>
+				</tr>
+			</table>
+
+			<h3 class="h4">write</h3>
+			<p class="body">Writes are done using a Fortran-compatible format specification. An IOFlags argument can be optionally used to control certain write behavior, such as setting non-advancing writes, and to return status/error flags.</p>
+			<p class="body">If a string argument is used instead of a unit number the write is done to the string, as in a Fortran internal write.</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>gio::write( 53, "(2I3)" ) &lt;&lt; i &lt;&lt; j; // Writes i and j as 2 integers to unit 53
+</pre>
+					</td>
+				</tr>
+			</table>
+
+			<h3 class="h4">print</h3>
+			<p class="body">Although print output does not go to a specified global unit number a print function is provided in gio that uses the same format support as write.</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>gio::print( "(2I3)" ) &lt;&lt; i &lt;&lt; j; // Writes i and j as 2 integers to stdout
+</pre>
+					</td>
+				</tr>
+			</table>
+
+			<h3 class="h4">inquire</h3>
+			<p class="body">The inquire calls support the essential queries of Fortran's INQUIRE statement. As in Fortran, you can inquire by unit number or file name.</p>
+			<p class="body">An IOFlags argument is used to return information about the unit or named file: after running inquire the flags object can be queried for information such as whether the file exists or is open, the file size, and so forth.</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>IOFlags flags;
+gio::inquire( 22, flags );
+// flags.name() gives the file name
+// flags.open() tells you if the file is currently open
+// flags.write() tells you if the file is open for writing
+</pre>
+					</td>
+				</tr>
+			</table>
+
+			<h3 class="h4">backspace</h3>
+			<p class="body">The backspace call moves the i/o position in the file associated with the specified unit back by one record (line). An IOFlags argument can be added to get status/error information about the backspace call.</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>gio::backspace( 66 ); // Back up by one line on unit 66
+</pre>
+					</td>
+				</tr>
+			</table>
+
+			<h3 class="h4">rewind</h3>
+			<p class="body">The rewind call moves the i/o position in the file associated with the specified unit to the beginning of the file. An IOFlags argument can be added to get status/error information about the rewind call.</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>gio::rewind( 66 ); // Rewind back to the beginning on unit 66
+</pre>
+					</td>
+				</tr>
+			</table>
+
+			<h3 class="h4">close</h3>
+			<p class="body">A file opened on a global unit can be closed, with an optional IOFlags argument to set controls, such as delete, and to return status/error flags.</p>
+			<p class="body"></p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>gio::close( 77 );
+IOFlags flags;
+gio::close( 88, flags );
+</pre>
+					</td>
+				</tr>
+			</table>
+		<td></td>
+		<td width="100%" valign="top">
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td colspan="3" height="30" valign="bottom" class="footer_text">
+			<a href="ObjexxFCL.html"><span class="footer_link">Home</span></a> |
+			<a href="ObjexxFCL.Release.html"><span class="footer_link">Release Notes</span></a> |
+			<a href="ObjexxFCL.Users.html"><span class="footer_link">Users Guide</span></a> |
+			<a href="ObjexxFCL.Developers.html"><span class="footer_link">Developers Guide</span></a> |
+			<a href="ObjexxFCL.Support.html"><span class="footer_link">Support</span></a> |
+			<a href="ObjexxFCL.License.txt"><span class="footer_link">License</span></a> |
+			<a href="http://objexx.com"><span class="footer_link">Web</span></a>
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td height="21"></td>
+		<td></td>
+		<td></td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2017 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:9px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:500px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100%; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:1px"></td>
+	</tr>
+</tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,71 @@
+\section{EMS Actuator Interface}\label{ems-actuator-interface}
+
+New component models may need to register certain control variables with the Energy Management System. In many cases, a component model will be controlled by setpoints placed on a system node, such as the component outlet, and the setpoints placed on the nodes can already be actuated by the EMS. But a given new component may have internal controls that should be made to work with EMS. When this is the case, the developer needs to register the control point as an actuator that EMS users can reference. The content of registered actuators is reported to the EDD file when EMS is used in a model and the Output:EnergyManagementSystem object is configured to do so.
+
+The EMS actuator interface is similar to SetupOutputVariable. Here is the syntax:
+
+CALL SetupEMSActuator(\textless{}component type\textgreater{}, \textless{}component unique name\textgreater{},
+
+~~~~~~ \textless{}control type name\textgreater{}, \textless{}units\textgreater{}, \textless{}logical variable on flag\textgreater{},
+
+~~~~~~ \textless{} variable to be controlled\textgreater{}~ )
+
+\textbf{\textless{}component type\textgreater{}}is a string representing the type of component or entity being registered. This is usually the class name of the IDF object. Or it could be another identifying string, if not directly associated with an object. For example the call to setup actuator for nodes uses ``System Node Setpoint.'
+
+\textbf{\textless{}component unique name\textgreater{}}is the local user-specified object name that identifies a unique instance among a set of the same or similar components.
+
+\textbf{\textless{}control type name\textgreater{}} is the string identifying the type of actuator. A model may have more than one type of control and this argument clarifys which one is being registered. A thermostat object could, for instance, have several actuators for that object type: ``On/Off'', ``Heating Set Point Temperature'', and ``Cooling Set Point Temperature''.
+
+~\textbf{\textless{}units\textgreater{}} is the string for the units of the control variable, used for reporting.
+
+~\textbf{\textless{}logical variable ON flag\textgreater{}} is a local variable attached to the object data structure that says whether or not the actuator value should be used (see below). This becomes a pointer in the EMS data structure so that the EMS can set the value of this variable remotely. The variable type needs to be LOGICAL.
+
+~\textbf{\textless{}variable to be controlled\textgreater{}}~ is another variable attached to the object data structure that specifies the value or state of the actuator, used in conjunction with the flag above. Similar to above, this also becomes a pointer in the EMS data structure so that the EMS can set the value of this variable remotely. A Fortran INTERFACE is used to overload the call the SetupEMSActuator so that this can be either a real, integer, or logical value.
+
+However, it is not desirable to register EMS actuators in every simulation because if there is no use of the EMS then this just adds to memory and computation. Therefore, we wrap calls to SetupEMSActuator inside logical checks using a global variable called ``AnyEnergyManagementSystemInModel.''
+
+Here is an example to create an actuator that can set the power on EXTERIORLIGHTS:
+
+if (AnyEnergyManagementSystemInModel) Then
+
+~CALL SetupEMSActuator(`ExteriorLights', ExteriorLights(Item)\%Name, \&
+
+~~~ `Electric Power', `W',~ ExteriorLights(Item)\%PowerActuatorOn, \&
+
+~~~~ ExteriorLights(Item)\%PowerActuatorValue)
+
+ENDIF
+
+Variables analogous to ``PowerActuatorOn'' and ``PowerActuatorValue'' are added to data structure for the component model.
+
+Code must then be written at the object or component level to react to the variables that are being actuated by the EMS Manager. Often it only requires one or two lines of code per actuator. ExteriorLights is particularly simple:
+
+~ IF (ExteriorLights(Item)\%PowerActuatorOn) THEN
+
+~~~ ExteriorLights(Item)\%Power = \&
+
+~~~~~~~~~~ ExteriorLights(Item)\%PowerActuatorValue
+
+~ END IF
+
+Finally, once SetupEMSActuator is called, several things happen:
+
+~ 1. Two pointers are created in the EMS Manager
+
+~ 2. The actuator is made available for use Erl programs.
+
+~ 3. The actuator name and associated information are logged in the EDD output file
+
+All of the available actuators that can be accessed are shown in the EDD output file. Like the RDD, the list changes depending on what objects you have in your input file.
+
+In addition to setting up actuators, component model developers can also register design data for components and systems to be made available for possible use in Erl programs. These are generally static data that do not vary across an environment period but might vary from one run to the next. These are registered using calls to SetupEMSInternalVariable such as:
+
+~~~~~ \textbf{CALL} SetupEMSInternalVariable(`Zone Floor Area', Zone(ZoneNum)\%Name, `{[}m2{]}', \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Zone(ZoneNum)\%FloorArea )
+
+~~~~~ \textbf{CALL} SetupEMSInternalVariable(`Zone Air Volume', Zone(ZoneNum)\%Name, `{[}m3{]}', \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Zone(ZoneNum)\%Volume )
+
+The calls to SetupEMSInternalVariable should also be protected by logic that uses the AnyEnergyManagementSystemInModel logic flag. The internal data available can also be listed in the EDD output file.

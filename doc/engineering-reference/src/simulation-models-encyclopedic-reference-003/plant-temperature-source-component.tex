@@ -1,0 +1,7 @@
+\section{Plant Temperature Source Component }\label{plant-temperature-source-component}
+
+This component (Object: PlantComponent:TemperatureSource) is a simple object used to simulate systems with a known supply temperature.~ This could include a river, well, or other configuration where a known temperature is pumped back into the plant system.~ This fluid could be isolated from chilled water and other loops by using a heat exchanger connection between the loops.
+
+The temperature of the source of this object can be either constant or scheduled.~ If scheduled, it could also be actuated by EMS to allow a calculated temperature at run-time.
+
+The logic of this component is quite simple: if there is flow through the component, the outlet temperature is always the source temperature.~ The component requests flow from the design flow rate, which can be autosized.

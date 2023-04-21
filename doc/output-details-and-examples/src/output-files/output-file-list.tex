@@ -1,0 +1,74 @@
+\section{Output File List}\label{output-file-list}
+
+Following are the native file names that are output from EnergyPlus; native -- directly out of EnergyPlus. Usually you will not see these file names as batch files and interfaces will change them to be \textless{}file name\textgreater{}.\textless{}ext\textgreater{} or in some instances \textless{}file name\textgreater{}\textless{}qualifier\textgreater{}.\textless{}ext\textgreater{}. Usually the extension is the important piece and is described in the following table.
+
+% table 1
+\begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
+\caption{EnergyPlus Basic Output  Files \label{table:energyplus-basic-output-files}} \tabularnewline
+\toprule 
+Output File Name & Description & EP-Launch File Name \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{EnergyPlus Basic Output  Files} \tabularnewline
+\toprule 
+Output File Name & Description & EP-Launch File Name \tabularnewline
+\midrule
+\endhead
+
+eplusout.audit & Echo of input, includes both IDD echo and IDF echo – may have errors shown in context with IDD or IDF statements & < filename > .audit (without echoing IDD unless errors in IDD). \tabularnewline
+eplusout.bnd & This file contains details about the nodes and branches. Useful in determining if all your nodes are connected correctly. May be used to diagram the network/ nodes of the HVAC system. & < filename > .bnd \tabularnewline
+eplusout.dbg & From Debug Output object – may be useful to support to help track down problems & < filename > .dbg \tabularnewline
+eplusout.dxf & DXF (from Output:Surfaces:Drawing,DXF;) & < filename > .dxf \tabularnewline
+eplusout.edd & Descriptive output from the EMS portion & < filename > .edd \tabularnewline
+eplusout.eio & Contains several standard and optional “report” elements. CSV format – may be read directly into spreadsheet program for better formatting. & < filename > .eio \tabularnewline
+eplusout.end & A one line summary of success or failure (useful for Interface programs) & Not saved in the standard EPL-Run script file. \tabularnewline
+eplusout.epmidf & Output from EPMacro program – contains the idf created from the input imf file & < filename > .epmidf \tabularnewline
+eplusout.epmdet & Output from EPMacro program – the audit/details of the EPMacro processing & < filename > .epmdet \tabularnewline
+eplusout.err & Error file – contains very important information from running the program. & < filename > .err \tabularnewline
+eplusout.eso & Standard Output File (contains results from both Output:Variable and Output:Meter objects). & < filename > .eso \tabularnewline
+eplusout.mdd & Meter names that are applicable for reporting in the current simulation. & < filename > .mdd \tabularnewline
+eplusout.mtd & Meter details report – what variables are on what meters and vice versa. This shows the meters on which the Zone: Lights Electric Energy appear as well as the contents of the Electricity:Facility meter. & < filename > .mtd \tabularnewline
+eplusout.mtr & Similar to .eso but only has Output:Meter outputs. & < filename > .mtr \tabularnewline
+eplusout\_perflog.csv & A log file created when PerformancePrecisionTradeoffs object is used. & < filename > \_perflog.csv \tabularnewline
+eplusout.rdd & Variable names that are applicable for reporting in the current simulation. & < filename > .rdd \tabularnewline
+eplusout.shd & Surface shadowing combinations report & < filename > .shd \tabularnewline
+eplusout.sln & Similar to DXF output but less structured. Results of Output:Reports,Surface, Lines object. & < filename > .sln \tabularnewline
+eplusout.sql & Mirrors the data in the .eso and .mtr files but is in SQLite format (for viewing with SQLite tools). & < filename > .sql \tabularnewline
+eplusssz. < ext > & Results from the Sizing:System object. This file is “spreadsheet” ready. Different extensions (csv, tab, and txt) denote different “separators” in the file. & < filename > Ssz. < ext > \tabularnewline
+epluszsz. < ext > & Results from the Sizing:Zone object. This file is “spreadsheet” ready. Different extensions (csv, tab, and txt) denote different “separators” in the file. & < filename > Zsz. < ext > \tabularnewline
+eplusmap. < ext > & Daylighting intensity “map” output. Different extensions (csv, tab, and txt) denote different “separators” in the file. & < filename > Map. < ext > \tabularnewline
+eplusout.dfs & This file contains the hourly pre-calculated daylight factors for exterior windows of a daylight zone. & < filename > DFS.csv \tabularnewline
+eplusscreen.csv & Window screen transmittance (direct and reflected) “map” output. & < filename > Screen.csv \tabularnewline
+eplustbl. < ext > & Results of tabular and economics requests. Different extensions (csv, tab, and txt) denote different “separators” in the file. & < filename > Table. < ext > \tabularnewline
+eplusout.svg & Results from the HVAC-Diagram application. SVG is a Scalable Vector Graphics file for which several viewers can be found. & < filename > .svg \tabularnewline
+eplusout.sci & File of cost information & < filename > .sci \tabularnewline
+eplusout.delightin & File produced during DElight simulations – descriptive of EnergyPlus inputs into DElight inputs. & < filename > delight.in \tabularnewline
+eplusout.delightout & File produced during DElight simulations – basic results from DElight simulation. & < filename > delight.out \tabularnewline
+eplusout.wrl & VRML output from (Output:Reports, Surfaces, VRML) & < filename > .wrl \tabularnewline
+\bottomrule
+\end{longtable}
+
+In addition to the basic output files from EnergyPlus there are three standard ``hybrid'' output files. These are called ``hybrid'' because they are a result of post-processing after EnergyPlus has completed. Note that if there is an error during processing, these will not normally be ``complete''.
+
+% table 2
+\begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
+\caption{"Hybrid" EnergyPlus Output Files \label{table:hybrid-energyplus-output-files}} \tabularnewline
+\toprule 
+Output File Name & Description & EP-Launch File Name \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{"Hybrid" EnergyPlus Output Files} \tabularnewline
+\toprule 
+Output File Name & Description & EP-Launch File Name \tabularnewline
+\midrule
+\endhead
+
+eplusout. < ext >  ~ & “spreadsheet” ready file that contains either all the report variables requested (default: up to limit of 255) from the input file or specific ones specified by the user. Different extensions (csv, tab, and txt denote different “separators” in the file. & < filename > .csv or  < filename > .tab or  < filename > .txt \tabularnewline
+eplusmtr. < ext >  ~ & “spreadsheet” ready file that contains either all the report meter requests (default: up to 255) from the input file or specific ones specified by the user. Different extensions (csv, tab, and txt denote different “separators” in the file. & < filename > Meter.csv or  < filename > Meter.tab or  < filename > Meter.txt \tabularnewline
+readvars.rvaudit & Results of any “ReadVarsESO” execution in the current batch run. & < filename > .rvaudit \tabularnewline
+\bottomrule
+\end{longtable}
+
+Now, each file will be described in more detail with some examples of use.

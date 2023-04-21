@@ -1,0 +1,66 @@
+\section{eplusout.err}
+
+This file is \emph{very important} to every simulation run. All of the warnings, errors, etc that occur during the run will show up in this file. They may show up in other files as well. The first line of the error file is also significant:
+
+\begin{lstlisting}
+Program Version,EnergyPlus, <version>,IDD_Version <version>
+\end{lstlisting}
+
+This shows not only the current version of the program but the ``version'' of the Energy+.idd file that was used.
+
+\begin{longtable}[c]{@{}ll@{}}
+\caption{EnergyPlus Errors \label{table:energyplus-errors}} \tabularnewline
+\toprule 
+Error Level & Action \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{EnergyPlus Errors} \tabularnewline
+\toprule 
+Error Level & Action \tabularnewline
+\midrule
+\endhead
+
+Warning & Take note \tabularnewline
+Severe & Should Fix \tabularnewline
+Fatal & Program will abort \tabularnewline
+\bottomrule
+\end{longtable}
+
+The previous table illustrates the three levels of errors that occur in the eplusout.err file. Several other message lines may be shown as well. For example:
+
+\begin{lstlisting}
+** Warning ** World Coordinate System selected.  Any non-zero Building/Zone North Axes or non-zero Zone Origins are ignored.
+
+**   ~~~   ** These may be used in daylighting reference point coordinate calculations  but not in normal geometry inputs.
+\end{lstlisting}
+
+The line that includes the ``\~{}\~{}\~{}'' is a ``continue'' error line. It continues from the previous line to help describe the context of the error.
+
+Some common errors, their consequences, and what to do about them follows:
+
+\begin{lstlisting}
+** Severe  ** IP: Possible incorrect IDD File
+
+** Severe  ** IP: Possible Invalid Numerics
+
+**  Fatal  ** IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination.
+\end{lstlisting}
+
+The previous errors cause program termination. The most likely cause is that you have an “old” IDF and have not converted it to work with the current version of the program. In this case, you will likely has some other hints such as alphas in numeric fields or too many fields in an object. Energyplus also has built in range checking:
+
+\begin{lstlisting}
+** Severe  ** Out of range value Numeric Field#7 (Sky Clearness), value = 100.00000, range = {> = 0.0 and < = 1.2}, in SIZINGPERIOD:DESIGNDAY = CHICAGO ANN CLG .4% CONDNS WB = >MDB
+\end{lstlisting}
+
+If these occur during the initial processing of the IDF, you will see a termination clause:
+
+\begin{lstlisting}
+** Severe  ** IP: Out of "range" values found in input
+
+** Severe  ** IP: Out of "range" values and/or blank required fields found in input
+
+**  Fatal  ** IP: Errors occurred on processing IDF file. Preceding condition(s) cause termination.
+\end{lstlisting}
+
+The error message should supply you with enough information to find the line with the error. More details on error message formatting and some standard error messages are described in the Tips \& Tricks document.

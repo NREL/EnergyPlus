@@ -1,0 +1,153 @@
+\section{Psychrometric services}\label{psychrometric-services}
+
+EnergyPlus has a full complement of psychrometric functions. All the routines are Fortran functions returning a single precision real value.~ All arguments and results are in SI units.
+
+Note that each of the psychrometric routines has a ``calledfrom'' optional parameter -- this has been implemented in some of the calling routines and is useful when errors are detected during simulation for support personnel to figure out where the psych routine is called from.
+
+The Names for the different Psychrometric Routines are based on the following self-explanatory format; the different variables used in the Psych Routine taxonomy are as follows.
+
+\begin{itemize}
+\tightlist
+\item
+  H = Enthalpy
+\item
+  W = Humidity Ratio
+\item
+  Rh = Relative Humidity
+\item
+  V = Specific Volume
+\item
+  Rhov = Vapor Density of Air
+\item
+  Hfg = Latent energy (heat of vaporization for moist air)
+\item
+  Hg = Enthalpy of gaseous moisture
+\item
+  Pb = Barometric Pressure
+\item
+  Twb = Temperature Wet Bulb
+\item
+  Twd = Temperature Dry Bulb
+\item
+  Tdp = Temperature Dew Point
+\item
+  Tsat and Psat = Saturation Temperature and Saturation Pressure
+\item
+  Psy\#\# Fn \#\#~~~~ = Psy \{\#\# is a Function of~ \#\#\}
+\item
+  Note: Each of the two capital alphabets together have different meaning
+\end{itemize}
+
+~~~~~~ Eg:~~~~ \textbf{\{Psy \#\# Fn HW\} = \{Psy \#\# Function of~ \emph{Enthalpy and Humidity Ratio}\}}
+
+\subsection{PsyRhoAirFnPbTdbW (Pb,Tdb,W,calledfrom)}\label{psyrhoairfnpbtdbw-pbtdbwcalledfrom}
+
+Returns the density of air in kilograms per cubic meter as a function of barometric pressure {[}Pb{]} (in Pascals) and humidity ratio {[}W{]} (kilograms of water per kilogram of dry air).
+
+\subsection{PsyCpAirFnW (W,calledfrom)}\label{psycpairfnw-wcalledfrom}
+
+Returns the specific heat of air in Joules per kilogram degree Celsius as a function of humidity ratio {[}W{]} (kilograms of water per kilogram of dry air) and dry bulb temperature {[}Tdb{]} (Celsius).
+
+\subsection{PsyHfgAirFnWTdb (W,Tdb,calledfrom)}\label{psyhfgairfnwtdb-wtdbcalledfrom}
+
+Returns the Latent energy of air \href{Joules\%20per\%20kilogram}{Hfg} as a function of humidity ratio {[}W{]} (kilograms of water per kilogram of dry air) and dry bulb temperature {[}Tdb{]} (Celsius).~ It calculates hg and then hf and the difference is Hfg.
+
+\subsection{PsyHgAirFnWTdb (W,Tdb,calledfrom)}\label{psyhgairfnwtdb-wtdbcalledfrom}
+
+Returns the specific enthalpy of the moisture as a gas in the air in Joules per kilogram as a function of humidity ratio {[}W{]} (kilograms of water per kilogram of dry air) and dry bulb temperature {[}Tdb{]} (Celsius).
+
+\subsection{PsyTdpFnTdbTwbPb (Tdb,Twb,Pb,calledfrom)}\label{psytdpfntdbtwbpb-tdbtwbpbcalledfrom}
+
+Returns the dew point temperature in Celsius as a function of dry bulb temperature {[}Tdb{]} (Celsius), wet bulb temperature {[}Twb{]} (Celsius), and barometric pressure {[}Pb{]} (Pascals).
+
+\subsection{PsyTdpFnWPb (W,Pb,calledfrom)}\label{psytdpfnwpb-wpbcalledfrom}
+
+Returns the dew point temperature in Celsius as a function of humidity ratio {[}W{]} (kilograms of water per kilogram of dry air) and barometric pressure {[}Pb{]} (Pascals).
+
+\subsection{PsyHFnTdbW (Tdb,W,calledfrom)}\label{psyhfntdbw-tdbwcalledfrom}
+
+Returns the specific enthalpy of air in Joules per kilogram as a function of dry bulb temperature {[}Tdb{]} (Celsius) and humidity ratio {[}W{]} (kilograms of water per kilogram of dry air).
+
+\subsection{PsyHFnTdbRhPb (Tdb,Rh,Pb,calledfrom)}\label{psyhfntdbrhpb-tdbrhpbcalledfrom}
+
+Returns the specific enthalpy of air in Joules per kilogram as a function of dry bulb temperature {[}Tdb{]} (Celsius), relative humidity {[}Rh{]} (fraction), and barometric pressure {[}Pb{]} (Pascals).
+
+\subsection{PsyTdbFnHW~ (H,W,calledfrom)}\label{psytdbfnhw-hwcalledfrom}
+
+Returns the air temperature in Celsius as a function of air specific enthalpy {[}H{]} (Joules per kilogram) and humidity ratio {[}W{]} (kilograms of water per kilogram of dry air).
+
+\subsection{PsyRhovFnTdbRh (Tdb,Rh,calledfrom)}\label{psyrhovfntdbrh-tdbrhcalledfrom}
+
+Returns the Vapor Density in air \href{kilograms\%20of\%20water\%20per\%20cubic\%20meter\%20of\%20air}{RhoVapor} as a function of dry bulb temperature \href{Celcius}{Tdb}, Relative Humidity {[}Rh{]} (fraction).
+
+\subsection{PsyRhovFnTdbWP (Tdb,W,Pb,calledfrom)}\label{psyrhovfntdbwp-tdbwpbcalledfrom}
+
+Returns the Vapor Density in air \href{kilograms\%20of\%20water\%20per\%20cubic\%20meter\%20of\%20air}{RhoVapor} as a function of dry bulb temperature \href{Celcius}{Tdb}, humidity ratio {[}W{]} (kilograms of water per kilogram of dry air) and barometric pressure {[}Pb{]} (Pascals).
+
+\subsection{PsyRhFnTdbRhov (Tdb,Rhov,calledfrom)}\label{psyrhfntdbrhov-tdbrhovcalledfrom}
+
+Returns the Relative Humidity {[}Rh{]} (fraction) in air as a function of dry bulb temperature {[}Tdb{]} (Celcius) and Vapor Density in air \href{kilograms\%20of\%20water\%20per\%20cubic\%20meter\%20of\%20air}{RhoVapor}.
+
+\subsection{PsyRhFnTdbWPb (Tdb,W,Pb,calledfrom)}\label{psyrhfntdbwpb-tdbwpbcalledfrom}
+
+Returns the relative humifity (fraction) as a function of of dry bulb temperature {[}Tdb{]} (Celsius), humidity ratio {[}W{]} (kilograms of water per kilogram of dry air) and barometric pressure {[}Pb{]} (Pascals).
+
+\subsection{PsyTwbFnTdbWPb (Tdb,W,Pb,calledfrom)}\label{psytwbfntdbwpb-tdbwpbcalledfrom}
+
+Returns the air wet bulb temperatute in Celsius as a function of dry bulb temperature {[}Tdb{]} (Celsius), humidity ratio {[}W{]} (kilograms of water per kilogram of dry air) and barometric pressure {[}Pb{]} (Pascals).
+
+\subsection{PsyVFnTdbWPb (Tdb,W,Pb,calledfrom)}\label{psyvfntdbwpb-tdbwpbcalledfrom}
+
+Returns the specific volume in cubic meters per kilogram as a function of dry bulb temperature {[}Tdb{]} (Celsius), humidity ratio {[}W{]} (kilograms of water per kilogram of dry air) and barometric pressure {[}Pb{]} (Pascals).
+
+\subsection{PsyWFnTdpPb (Tdp,Pb,calledfrom)}\label{psywfntdppb-tdppbcalledfrom}
+
+Returns the humidity ratio in kilograms of water per kilogram of dry air as a function of the dew point temperature {[}Tdp{]} (Celsius) and barometric pressure {[}Pb{]} (Pascals).
+
+\subsection{PsyWFnTdbH (Tdb,H,calledfrom)}\label{psywfntdbh-tdbhcalledfrom}
+
+Returns the humidity ratio in kilograms of water per kilogram of dry air as a function of dry bulb temperature {[}Tdb{]} (Celsius) and air specific enthalpy {[}H{]} (Joules per kilogram).
+
+\subsection{PsyWFnTdbTwbPb (Tdb,Twb,Pb,calledfrom)}\label{psywfntdbtwbpb-tdbtwbpbcalledfrom}
+
+Returns the humidity ratio in kilograms of water per kilogram of dry air as a function of dry bulb temperature {[}Tdb{]} (Celsius), wet bulb temperature {[}Twb{]} (Celsius), and barometric pressure {[}Pb{]} (Pascals).
+
+\subsection{PsyWFnTdbRhPb (Tdb,Rh,Pb,calledfrom)}\label{psywfntdbrhpb-tdbrhpbcalledfrom}
+
+Returns the humidity ratio in kilograms of water per kilogram of dry air as a function of dry bulb temperature {[}Tdb{]} (Celsius), relative humidity {[}RH{]} (fraction), and barometric pressure {[}Pb{]} (Pascals).
+
+\subsection{PsyPsatFnTemp (T,calledfrom)}\label{psypsatfntemp-tcalledfrom}
+
+Returns the saturation pressure in Pascals as a function of the air saturation temperature {[}T{]} (Celsius).
+
+\subsection{PsyTsatFnHPb~ (H,Pb,calledfrom)}\label{psytsatfnhpb-hpbcalledfrom}
+
+Returns the air saturation temperature in Celsius as a function of air specific enthalpy {[}H{]} (Joules per kilogram) and barometric pressure {[}Pb{]} (Pascals).
+
+\subsection{PsyTsatFnPb (P,calledfrom)}\label{psytsatfnpb-pcalledfrom}
+
+Returns the air saturation temperature in Celsius as a function of saturation pressure {[}P{]} (Pascals).
+
+\subsection{CPCW (Temp,calledfrom)}\label{cpcw-tempcalledfrom}
+
+Returns Specific heat capacity~~ (Joule/kilogram/kelvin) for chilled water as function of temperature {[}T{]} (Celsius).
+
+\subsection{CPHW (Temp,calledfrom)}\label{cphw-tempcalledfrom}
+
+Returns Specific heat capacity (Joule/kilogram/kelvin) for hot water as function of temperature {[}T{]} (Celsius).
+
+\subsection{CVHW (Temp,calledfrom)}\label{cvhw-tempcalledfrom}
+
+Returns Specific heat capacity (Joule/kilogram/kelvin) for hot water at constant volume as function of temperature {[}T{]} (Celsius).
+
+\subsection{RhoH2O (Temp,calledfrom)}\label{rhoh2o-tempcalledfrom}
+
+Returns density of water (kg/m3) as function of Temperature {[}T{]} (Celsius).
+
+\subsection{PsyDeltaHSenFnTdb2W2Tdb1W1 (Tdb2,W2, Tdb1, W1,calledfrom)}\label{psydeltahsenfntdb2w2tdb1w1-tdb2w2tdb1w1calledfrom}
+
+Returns sensible enthalpy difference of moist air going from state 1 to state 2 in Joules per kilogram as a function of state 2 dry bulb temperature {[}Tdb2{]} (Celsius), state 2 humidity ratio {[}W2{]} (kilograms of water per kilogram of dry air), state 1 dry bulb temperature {[}Tdb1{]} (Celsius), and state 1 humidity ratio {[}W1{]} (kilograms of water per kilogram of dry air).
+
+\subsection{PsyHfgAvgFnTdb2Tdb1 (Tdb2,Tdb1,calledfrom)}\label{psyhfgavgfntdb2tdb1-tdb2w2tdb1calledfrom}
+
+Returns average latent of vaporization of water for use in moist air calculation in Joules per kilogram of water as a function of state 2 dry bulb temperature {[}Tdb2{]} (Celsius), and state 1 dry bulb temperature {[}Tdb1{]} (Celsius).

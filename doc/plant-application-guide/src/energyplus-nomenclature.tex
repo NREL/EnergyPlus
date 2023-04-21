@@ -1,0 +1,36 @@
+\chapter{EnergyPlus Nomenclature}\label{energyplus-nomenclature}
+
+The following is a list of terms that are used in this guide. A simple description of each of the terms is provided. More detailed descriptions can be obtained from the EnergyPlus Input Output Reference. Some keywords are provided to assist with the search for these terms in the Input Output Reference guide.
+
+\begin{itemize}
+\item
+  \textbf{Loops} -- Loops are high-level construction objects in EnergyPlus. Loops are paths through which the working fluid is circulated in order to satisfy a cooling or heating load. An HVAC system may consist of a zone, plant loop, and a condenser loop. Loops are constructed by using branches. (Keywords: \emph{PlantLoop})\emph{.} Note: Although EnergyPlus has separate object classes for \emph{CondenserLoops} and \emph{PlantLoops,} the difference between them is very trivial; therefore all the condenser loops in this guide will be modeled by a \emph{PlantLoop} object.
+\item
+  \textbf{Supply side half-loop} -- This is the half loop that contains components (such as Boilers and chillers) which treat the working fluid to supply a working fluid state to the demand components.
+\item
+  \textbf{Demand side half-loop} -- This is the half loop that contains components (such as cooling coils and heating coils which use the working fluid to satisfy a load.
+\item
+  \textbf{Branches} -- Branches are mid-level construction objects in EnergyPlus. Branches are the segments used to construct the loops. They are constructed by using nodes and a series of components. Every branch must have at least one component. Branches will be denoted by using blue colored lines in the EnergyPlus schematics. (Keyword: \emph{Branch})\emph{.}
+\item
+  \textbf{Branchlists} -- Branchlists list all the branches on one side of a loop. (Keyword: \emph{Branchlist})\emph{.}
+\item
+  \textbf{Bypass Branch} -- A bypass branch is used to bypass the core operating components, it ensures that when the operating components are not required, the working fluid can be circulated through the bypass pipe instead of component. Note: Only one bypass per half loop is required.
+\item
+  \textbf{Connectors} -- Connectors are mid-level loop construction objects that are used to connect the various branches in the loops. There are two kinds of connectors: splitter which split the flow into two or more branches, and mixers which mix the flow from two or more branches. A connector pair consists of a splitter and a mixer. A maximum of one connector pair is allowed on each half loop. Connectors will be denoted by using green colored lines in the EnergyPlus schematics used in this guide. (Keywords: \emph{Connector:Mixer, Connector:Splitter})\emph{.}
+\item
+  \textbf{Connectorlists} -- Connectorlists list all the connectors on one side of a loop. (Keyword: \emph{Connectorlist})\emph{.}
+\item
+  \textbf{Components} -- Components are the low-level construction objects in EnergyPlus. Physical objects that are present in the loop are generally called components. Components such as a chiller, cooling tower, and a circulation pump can be considered as the operating/active components. Pipes and ducts can be considered as passive or supporting components. (Keywords: \emph{Chiller:Electric, Pipe:Adiabatic, and many others})\emph{.}
+\item
+  \textbf{Nodes} -- Nodes define the starting and ending points of components and branches.
+\item
+  \textbf{Nodelists} -- Nodelists can be used to list a set of nodes in the loop. These nodelists can then be used for a variety of purposes. For example, a setpoint can be assigned to multiple nodes by referring to a particular nodelist. (Keyword: \emph{Nodelist})\emph{.}
+\item
+  \textbf{Set-point} -- Setpoints are control conditions imposed on node(s) that are monitored by the \emph{SetpointManager} to control the system. (Keyword: \emph{SetpointManager:Scheduled, and others}).
+\item
+  \textbf{Plant equipment operation scheme} -- This object details the mechanism required to control the operation of the plant loop, as well as the availability of the plant equipment under various conditions. (Keyword: \emph{PlantEquipmentOperation:CoolingLoad, and others}).
+\item
+  \textbf{Schedule} -- Schedules allow the user to influence the scheduling of many operational parameters in the loop. For example, a schedule can determine the time period of a simulation, or instruct the load profile object of a plant to import data from a certain external file, among other actions. (Keywords: \emph{Schedule:Compact, Schedule:file})\emph{.}
+\item
+  \textbf{Load Profile} -- A load profile object is used to simulate a demand profile. This object can be used when the load profile of a building is already known. (Keyword: \emph{LoadProfile:Plant}). Note: This object does not allow feedback from the plant conditions to the air system or the zones. However, this object is a great tool for plant-only development and debugging.
+\end{itemize}

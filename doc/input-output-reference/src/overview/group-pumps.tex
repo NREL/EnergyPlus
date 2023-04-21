@@ -1,0 +1,975 @@
+\section{Group Pumps}\label{group-pumps}
+
+EnergyPlus plant and condenser loops need pump components to drive liquid flow around the loop. There are various types of pump models available.
+
+\subsection{Pump:VariableSpeed}\label{pumpvariablespeed}
+
+Pumps are needed in both plant and condenser loops. The syntax for a variable speed pump is given below.
+
+\subsubsection{Inputs}\label{inputs-037}
+
+\paragraph{Field: Name}\label{field-name-036}
+
+This alpha field contains the identifying a unique name for the pump.
+
+\paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-005}
+
+This alpha field contains the identifying name for the pump inlet node.
+
+\paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-006}
+
+This alpha field contains the identifying name for the pump outlet node.
+
+\paragraph{Field: Design Maximum Flow Rate}\label{field-design-maximum-flow-rate}
+
+This numeric field contains the pump's design maximum volume flow rate in cubic meters per second. This field can be autosized.
+
+\paragraph{Field: Design Pump Head}\label{field-design-pump-head}
+
+This numeric field contains the pump's design head pressure in Pascals. The default is 179352 Pa, or 60 ftH20, and is for a fairly large building.
+
+\paragraph{Field: Design Power Consumption}\label{field-design-power-consumption}
+
+This numeric field contains the pump's design power consumption in Watts. If the user is performing a pressure simulation on the loop in which this pump is found, this value would only be used to estimate pump efficiency. During reported calculations, the pump would use the loop pressure drop and current flow conditions along with efficiency to calculate pump power dynamically. This field can be autosized. When set to autosize the type of scaling factor is chosen in the input field Design Power Sizing Method.
+
+\paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-000}
+
+This numeric field contains the pump motor's efficiency in decimal form (0 = 0\%, 1 = 100\%).
+
+\paragraph{Field: Fraction of Motor Inefficiencies to Fluid Stream}\label{field-fraction-of-motor-inefficiencies-to-fluid-stream}
+
+This numeric field contains the pump motor's fraction of power loss to the fluid.
+
+\paragraph{Field: Coefficient 1 of the Part Load Performance Curve}\label{field-coefficient-1-of-the-part-load-performance-curve}
+
+This numeric field contains the first coefficient in the part load ratio curve. The fraction of full load power is determined by the cubic equation:
+
+\begin{equation}
+FractionFullLoadPower = {C_1} + {C_2}PLR + {C_3}PL{R^2} + {C_4}PL{R^3}
+\end{equation}
+
+where C\(_{1}\),C\(_{2}\),C\(_{3}\),and C\(_{4}\) are Coefficients 1 4 (below) and PLR is the Part Load Ratio.
+
+\paragraph{Field: Coefficient 2 of the Part Load Performance Curve}\label{field-coefficient-2-of-the-part-load-performance-curve}
+
+This numeric field contains the second coefficient in the part load ratio curve.
+
+\paragraph{Field: Coefficient 3 of the Part Load Performance Curve}\label{field-coefficient-3-of-the-part-load-performance-curve}
+
+This numeric field contains the third coefficient in the part load ratio curve.
+
+\paragraph{Field: Coefficient 4 of the Part Load Performance Curve}\label{field-coefficient-4-of-the-part-load-performance-curve}
+
+This numeric field contains the fourth coefficient in the part load ratio curve.
+
+\paragraph{Field: Design Minimum Flow Rate}\label{field-design-minimum-flow-rate}
+
+This field contains the minimum volume flow rate while operating in variable flow capacity rate in cubic meters per second. This field is autosizable. When set to autosize the value in the input field Design Minimum Flow Rate Sizing Factor is used to scale the minimum flow rate as a fraction of the Design Maximum Flow Rate.  Note that this Design Minimum Flow Rate should be less than the Design Maximum Flow Rate for a variable speed pump.  If the user enters a Design Minimum Flow Rate that is more than 99\% of the Design Maximum Flow Rate, a warning message is produced and the Design Minimum Flow Rate is reset to 99\% of the Design Maximum Flow Rate.
+
+\paragraph{Field: Pump Control Type}\label{field-pump-control-type-000}
+
+This is a choice field of Continuous or Intermittent. A variable speed pump is defined with maximum and minimum flow rates that are the physical limits of the device. If there is no load on the loop and the pump is operating intermittently, then the pump can shutdown. For any other condition such as the loop having a load and the pump is operating intermittently or the pump is continuously operating (regardless of the loading condition), the pump will operate and select a flow somewhere between the minimum and maximum limits. In these cases where the pump is running, it will try to meet the flow request made by demand side components. Applicable availability managers (ref. \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList}) may override this control by forcing the pump to be on or off.
+
+\paragraph{Field: Pump Flow Rate Schedule Name}\label{field-pump-flow-rate-schedule-name-000}
+
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, \textbf{not the actual flow rate at that time}. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations. For additional control over pump flow, EMS actuators can be employed.
+
+\paragraph{Field: Pump Curve Name}\label{field-pump-curve-name}
+
+This references a pump curve to be used during pump flow-loop head resolution. This is only applicable for loop simulations which include pressure components on at least a single branch. More information regarding pressure system simulation is available in the engineering reference.
+
+\paragraph{Field: Impeller Diameter}\label{field-impeller-diameter}
+
+For pressure simulation cases, this is the impeller diameter used during calculations which is used in non-dimensionalizing the pump curve described in the previous field. The units of this value are meters.
+
+\paragraph{Field: VFD Control Type}\label{field-vfd-control-type}
+
+This string defines which type of VFD control type to perform. PressureSetPointControl is a realistic approach which requires inputs of pressure range schedules to control the pump rpm to maintain a certain pressure drop (head). ManualControl is an idealized control strategy in which the pump RPM is maintained at a scheduled value throughout the simulation, abiding by other flow restrictions in the loop.
+
+\paragraph{Field: Pump RPM Schedule Name}\label{field-pump-rpm-schedule-name}
+
+For VFD Control Type = ManualControl, this defines the pump RPM schedule to use during the simulation. For VFD Control Type = PressureSetPointControl, this field is not interpreted. The value of the schedule is RPM.
+
+\paragraph{Field: Minimum Pressure Schedule}\label{field-minimum-pressure-schedule}
+
+For VFD Control Type = PressureSetPointControl, this field defines the minimum pressure range setpoint value, or the lower bound of pressure drop (head) to use when determining the required pump speed. For VFD Control Type = ManualControl, this field is not interpreted. The value of the schedule is Pascals.
+
+\paragraph{Field: Maximum Pressure Schedule}\label{field-maximum-pressure-schedule}
+
+For VFD Control Type = PressureSetPointControl, this field defines the maximum pressure range setpoint value, or the upper bound of pressure drop (head) to use when determining the required pump speed. For VFD Control Type = ManualControl, this field is not interpreted. The value of the schedule is Pascals.
+
+\paragraph{Field: Minimum RPM Schedule}\label{field-minimum-rpm-schedule}
+
+For VFD Control Type = PressureSetPointControl, this field defines the minimum allowable RPM, or the lower bound of pump speed to use when determining the required pump speed. For VFD Control Type = ManualControl, this field is not interpreted. The value of the schedule is RPM.
+
+\paragraph{Field: Maximum RPM Schedule}\label{field-maximum-rpm-schedule}
+
+For VFD Control Type = PressureSetPointControl, this field defines the maximum allowable RPM, or the upper bound of pump speed to use when determining the required pump speed. For VFD Control Type = ManualControl, this field is not interpreted. The value of the schedule is RPM.
+
+\paragraph{Field: Zone Name}\label{field-zone-name-008}
+
+This field is optional. It can be used to input the name of the Zone in which the pump is located in the model. If the pump is outdoors, or skin losses are not to be modeled, then leave this field blank. If a valid Zone name is entered, then the portion of electrical power consumed by the pump that is not added to the working fluid is added to the surrounding Zone.
+
+\paragraph{Field: Skin Loss Radiative Fraction}\label{field-skin-loss-radiative-fraction-000}
+
+This field is optional. If a Zone is named in the previous field and pump losses are to be added to a surrounding thermal zone, then this input determines the split between thermal radiation and thermal convection for the heat losses from the pump. If it is left blank then all the losses will be convective.
+
+\paragraph{Field: Design Power Sizing Method}\label{field-design-power-sizing-method}
+
+This field is optional. There are two choices PowerPerFlow and PowerPerFlowPerPressure. If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Electric Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor. If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Shaft Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
+
+\paragraph{Field: Design Electric Power per Unit Flow Rate}\label{field-design-electric-power-per-unit-flow-rate}
+
+This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow. It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m\(^{3}\)/s) ( 22 W/gpm) will be used.
+
+\paragraph{Field: Design Shaft Power per Unit Flow Rate Per Unit Head}\label{field-design-shaft-power-per-unit-flow-rate-per-unit-head}
+
+This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure. It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m\(^{3}\)/s)-Pa) will be used.
+
+\paragraph{Field: Design Minimum Flow Rate Sizing Factor}\label{field-design-minimum-flow-rate-sizing-factor}
+
+This field is optional. If omitted the default value of 0.0 will be used. This input is used when the input field Design Minimum Flow Rate is set to autosize. The minimum flow rate will be set to the product of this sizing factor and the Design Maximum Flow Rate.
+
+\paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-1-000}
+
+Allows you to specify a user-defined end-use subcategory, e.g., ``Main Pumps'', etc. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the pump will be assigned to the ``General'' end-use subcategory.
+
+Examples of this object in the IDF follow.
+
+\begin{lstlisting}
+
+Pump:VariableSpeed,
+  HW Circ Pump,                          !- Name
+  HW Supply Inlet Node,                  !- Inlet Node Name
+  HW Pump Outlet Node,                   !- Outlet Node Name
+  autosize,                              !- Design Maximum Flow Rate {m3/s}
+  179352,                                !- Design Pump Head {Pa}
+  autosize,                              !- Design Power Consumption {W}
+  0.9,                                   !- Motor Efficiency
+  0.0,                                   !- Fraction of Motor Inefficiencies to Fluid Stream
+  0,                                     !- Coefficient 1 of the Part Load Performance Curve
+  1,                                     !- Coefficient 2 of the Part Load Performance Curve
+  0,                                     !- Coefficient 3 of the Part Load Performance Curve
+  0,                                     !- Coefficient 4 of the Part Load Performance Curve
+  0,                                     !- Minimum Flow Rate {m3/s}
+  Intermittent;                          !- Pump Control Type
+
+
+  Pump:VariableSpeed,
+  Circ Pump,                             !- Name
+  CW Supply Inlet Node,                  !- Inlet Node Name
+  CW Pump Outlet Node,                   !- Outlet Node Name
+  .0011,                                 !- Design Maximum Flow Rate {m3/s}
+  300000,                                !- Design Pump Head {Pa}
+  500,                                   !- Design Power Consumption {W}
+  .87,                                   !- Motor Efficiency
+  0.0,                                   !- Fraction of Motor Inefficiencies to Fluid Stream
+  0,                                     !- Coefficient 1 of the Part Load Performance Curve
+  1,                                     !- Coefficient 2 of the Part Load Performance Curve
+  0,                                     !- Coefficient 3 of the Part Load Performance Curve
+  0,                                     !- Coefficient 4 of the Part Load Performance Curve
+  0,                                     !- Minimum Flow Rate {m3/s}
+  Intermittent;                          !- Pump Control Type
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-026}
+
+\begin{itemize}
+\item
+  HVAC,Average,Pump Electricity Rate {[}W{]}
+\item
+  HVAC,Sum,Pump Electricity Energy {[}J{]}
+\item
+  HVAC,Average,Pump Shaft Power {[}W{]}
+\item
+  HVAC,Average,Pump Fluid Heat Gain Rate {[}W{]}
+\item
+  HVAC,Sum,Pump Fluid Heat Gain Energy {[}J{]}
+\item
+  HVAC,Average,Pump Outlet Temperature {[}C{]}
+\item
+  HVAC,Average,Pump Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Pump Zone Total Heating Rate {[}W{]}
+\item
+  HVAC,Sum,Pump Zone Total Heating Energy {[}J{]}
+\item
+  HVAC,Average,Pump Zone Convective Heating Rate {[}W{]}
+\item
+  HVAC,Average,Pump Zone Radiative Heating Rate {[}W{]}
+\end{itemize}
+
+\paragraph{Pump Electricity Rate {[}W{]}}\label{pump-electric-power-w}
+
+\paragraph{Pump Electricity Energy {[}J{]}}\label{pump-electric-energy-j}
+
+These outputs are the electric power input to the pump motor. Consumption is metered on Pumps:Electricity, Electricity:Plant, and Electricity:Facility.
+
+\paragraph{Pump Shaft Power {[}W{]}}\label{pump-shaft-power-w}
+
+This is the shaft power delivered from the motor to the pump.
+
+\paragraph{Pump Fluid Heat Gain Rate {[}W{]}}\label{pump-fluid-heat-gain-rate-w}
+
+\paragraph{Pump Fluid Heat Gain Energy {[}J{]}}\label{pump-fluid-heat-gain-energy-j}
+
+These outputs are the energy added to the fluid as heat. For the current algorithm, this is equal to Pump Shaft Power, because the loops are closed and all energy added to the fluid will ultimately become heat due to friction.
+
+\paragraph{Pump Outlet Temperature {[}C{]}}\label{pump-outlet-temperature-c}
+
+\paragraph{Pump Mass Flow Rate {[}kg/s{]}}\label{pump-mass-flow-rate-kgs}
+
+These outputs are the water outlet temperature and mass flow rate.
+
+\paragraph{Pump Zone Total Heating Rate {[}W{]}}\label{pump-zone-total-heating-rate-w}
+
+\paragraph{Pump Zone Total Heating Energy {[}J{]}}\label{pump-zone-total-heating-energy-j}
+
+These outputs are the thermal losses from the pump to the surrounding Zone. They are only available if a Zone was named in the pump's input. These indicate the amount of heat added to the zone from the pump's inefficiencies. They are the total heat loss including both convection and radiation.
+
+\paragraph{Pump Zone Convective Heating Rate {[}W{]}}\label{pump-zone-convective-heating-rate-w}
+
+This output is the thermal loss from the pump to the surrounding Zone in the form of convective gains directly to the zone air. It is only available if a Zone was named in the pump input.
+
+\paragraph{Pump Zone Radiative Heating Rate {[}W{]}}\label{pump-zone-radiative-heating-rate-w}
+
+This output is the thermal loss from the pump to the surrounding Zone in the form of thermal radiation gains directly to the inside face of the zone's surfaces. It is only available if a Zone was named in the pump input.
+
+\subsection{Pump:ConstantSpeed}\label{pumpconstantspeed}
+
+Pumps may be found in both plant and condenser loops. The syntax for a constant speed pump is given below.
+
+\subsubsection{Inputs}\label{inputs-1-034}
+
+\paragraph{Field: Name}\label{field-name-1-033}
+
+This alpha field contains the identifying name for the pump.
+
+\paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-1-002}
+
+This alpha field contains the identifying name for the pump inlet node.
+
+\paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-1-003}
+
+This alpha field contains the identifying name for the pump outlet node.
+
+\paragraph{Field: Design Flow Rate}\label{field-design-flow-rate-002}
+
+This numeric field contains the pump's design volume flow rate in cubic meters per second. This field is autosizable.
+
+\paragraph{Field: Design Pump Head}\label{field-design-pump-head-1}
+
+This numeric field contains the pump's design head pressure in Pascals. The default is 179352 Pa, or 60 ftH20, and is for a fairly large building.
+
+\paragraph{Field: Design Power Consumption}\label{field-design-power-consumption-1}
+
+This numeric field contains the pump's design power consumption in Watts. If the user is performing a pressure simulation on the loop in which this pump is found, this value would only be used to estimate pump efficiency. During reported calculations, the pump would use the loop pressure drop and current flow conditions along with efficiency to calculate pump power dynamically. This field can be autosized. When set to autosize the type of scaling factor is chosen in the input field Design Power Sizing Method.
+
+\paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-1-000}
+
+This numeric field contains the pump motor's efficiency in decimal form (0 = 0\%, 1 = 100\%).
+
+\paragraph{Field: Fraction of Motor Inefficiencies to Fluid Stream}\label{field-fraction-of-motor-inefficiencies-to-fluid-stream-1}
+
+This numeric field contains the pump motor's fraction of power loss to the fluid.
+
+\paragraph{Field: Pump Control Type}\label{field-pump-control-type-1-000}
+
+This is a choice field of Continuous or Intermittent. The operation of a constant speed pump is fairly straightforward. If the user designates a constant speed pump that is operating continuously, the pump will run regardless of whether or not there is a load. This may have the net effect of adding heat to the loop if no equipment is turned on. If the pump is constant speed and operates intermittently, the pump will run at its capacity if a load is sensed and will shut off if there is no load on the loop. Applicable availability managers (ref. \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList}) may override this control by forcing the pump to be on or off.
+
+\paragraph{Field: Pump Flow Rate Schedule Name}\label{field-pump-flow-rate-schedule-name-1}
+
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, \textbf{not the actual flow rate at that time}. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations. For additional control over pump flow, EMS actuators can be employed.
+
+\paragraph{Field:Pump Curve Name}\label{fieldpump-curve-name}
+
+This field is only used if the user is performing a pressure-based simulation in the plant loop of the LoopFlowCorrection type (see \hyperref[plantloop]{PlantLoop} section for how to enable this).
+
+This field references a separate pressure head curve that the user has input separately in the input file. The pressure curve represents a non-dimensional regression of pressure-flow rate data. The equation should be of the following form:
+
+\begin{equation}
+\psi  = {C_4} \times {\varphi ^4} + {C_3} \times {\varphi ^3} + {C_2} \times {\varphi ^2} + {C_1} \times \varphi  + {C_0}.
+\end{equation}
+
+In this equation, the two dimensionless parameters, X and X are defined in terms of physical pump and flow parameters as:
+
+\begin{equation}
+\psi  = \frac{{\Delta P}}{{\rho {N^2}{D^2}}}
+\end{equation}
+
+\begin{equation}
+\varphi  = \frac{{\dot m}}{{\rho N{D^3}}}
+\end{equation}
+
+Where Delta P is the pressure drop, mdot is the fluid mass flow rate, rho is a representative fluid density, N is the rotational speed of the pump, and D is the pump impeller diameter.
+
+Since the user may not need a full fourth order expansion of this, the user may use linear (first order), quadratic (second order), cubic (third order), or full quartic (fourth order). These are available in the objects \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}.
+
+Once this curve is input properly (along with the following two fields), the pump will respond to the plant loop pressure drop when resolving the flow rate. Note that this simulation method will likely result in a plant loop that does not exactly hit the setpoint as the current simulation method does. This is due to the loop flow rate now being pressure-based and not decision-based .
+
+\paragraph{Field:Impeller Diameter}\label{fieldimpeller-diameter}
+
+This field is only used if the user is performing a pressure-based simulation in the plant loop of the LoopFlowCorrection type (see \hyperref[plantloop]{PlantLoop} section for how to enable this).
+
+To re-dimensionalize the dimensionless pump curve, the impeller diameter must be known. This value is entered in meters.
+
+\paragraph{Field:Rotational Speed}\label{fieldrotational-speed}
+
+This field is only used if the user is performing a pressure-based simulation in the plant loop of the LoopFlowCorrection type (see \hyperref[plantloop]{PlantLoop} section for how to enable this).
+
+To re-dimensionalize the dimensionless pump curve, the rotational speed must be known. This value is entered in RPM (revolutions per minute).
+
+\paragraph{Field: Zone Name}\label{field-zone-name-1-006}
+
+This field is optional. It can be used to input the name of the Zone in which the pump is located in the model. If the pump is outdoors, or skin losses are not to be modeled, then leave this field blank. If a valid Zone name is entered, then the portion of electrical power consumed by the pump that is not added to the working fluid is added to the surrounding Zone.
+
+\paragraph{Field: Skin Loss Radiative Fraction}\label{field-skin-loss-radiative-fraction-1-000}
+
+This field is optional. If a Zone is named in the previous field and pump losses are to be added to a surrounding thermal zone, then this input determines the split between thermal radiation and thermal convection for the heat losses from the pump. If it is left blank then all the losses will be convective.
+
+\paragraph{Field: Design Power Sizing Method}\label{field-design-power-sizing-method-1}
+
+This field is optional. There are two choices PowerPerFlow and PowerPerFlowPerPressure. If omitted the default method of PowerPerFlowPerPressure will be used.
+
+If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Electrical Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor.
+
+If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Shaft Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency.
+
+\paragraph{Field: Design Electrical Power per Unit Flow Rate}\label{field-design-electrical-power-per-unit-flow-rate}
+
+This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow. It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m\(^{3}\)/s) (22 W/gpm) will be used.
+
+\paragraph{Field: Design Shaft Power per Unit Flow Rate Per Unit Head}\label{field-design-shaft-power-per-unit-flow-rate-per-unit-head-1}
+
+This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure. It allows controlling the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m\(^{3}\)/s)-Pa) will be used.
+
+\paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-2-000}
+
+Allows you to specify a user-defined end-use subcategory, e.g., ``Main Pumps'', etc. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the pump will be assigned to the ``General'' end-use subcategory.
+
+An example of this object follows.
+
+\begin{lstlisting}
+
+Pump:ConstantSpeed,
+  Circ Pump,                         !- Name
+  CW Supply Inlet Node,              !- Inlet Node Name
+  PumpChiller Node,                  !- Outlet Node Name
+  0.0011,                            !- Design Flow Rate
+  300000,                            !- Design Pump Head
+  700,                               !- Design Power Consumption
+  0.87,                              !- Motor Efficiency
+  0.0,                               !- Fraction of Motor Inefficiencies to Fluid Stream
+  Intermittent;                      !- Pump Control Type
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-1-020}
+
+\begin{itemize}
+\item
+  HVAC,Average,Pump Electricity Rate {[}W{]}
+\item
+  HVAC,Sum,Pump Electricity Energy {[}J{]}
+\item
+  HVAC,Average,Pump Shaft Power {[}W{]}
+\item
+  HVAC,Average,Pump Fluid Heat Gain Rate {[}W{]}
+\item
+  HVAC,Sum,Pump Fluid Heat Gain Energy {[}J{]}
+\item
+  HVAC,Average,Pump Outlet Temperature {[}C{]}
+\item
+  HVAC,Average,Pump Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Pump Zone Total Heating Rate {[}W{]}
+\item
+  HVAC,Sum,Pump Zone Total Heating Energy {[}J{]}
+\item
+  HVAC,Average,Pump Zone Convective Heating Rate {[}W{]}
+\item
+  HVAC,Average,Pump Zone Radiative Heating Rate {[}W{]}
+\end{itemize}
+
+\paragraph{Pump Electricity Rate {[}W{]}}\label{pump-electric-power-w-1}
+
+\paragraph{Pump Electricity Energy {[}J{]}}\label{pump-electric-energy-j-1}
+
+These outputs are the electric power input to the pump motor. Consumption is metered on Pumps:Electricity, Electricity:Plant, and Electricity:Facility.
+
+\paragraph{Pump Shaft Power {[}W{]}}\label{pump-shaft-power-w-1}
+
+This is the shaft power delivered from the motor to the pump.
+
+\paragraph{Pump Fluid Heat Gain Rate {[}W{]}}\label{pump-fluid-heat-gain-rate-w-1}
+
+\paragraph{Pump Fluid Heat Gain Energy {[}J{]}}\label{pump-fluid-heat-gain-energy-j-1}
+
+These outputs are the energy added to the fluid as heat. For the current algorithm, this is equal to Pump Shaft Power, because the loops are closed and all energy added to the fluid will ultimately become heat due to friction.
+
+\paragraph{Pump Outlet Temperature {[}C{]}}\label{pump-outlet-temperature-c-1}
+
+\paragraph{Pump Mass Flow Rate {[}kg/s{]}}\label{pump-mass-flow-rate-kgs-1}
+
+These outputs are the water outlet temperature and mass flow rate.
+
+\paragraph{Pump Zone Convective Heating Rate {[}W{]}}\label{pump-zone-convective-heating-rate-w-1}
+
+This output is the thermal loss from the pump to the surrounding Zone in the form of convective gains directly to the zone air. It is only available if a Zone was named in the pump input.
+
+\paragraph{Pump Zone Radiative Heating Rate {[}W{]}}\label{pump-zone-radiative-heating-rate-w-1}
+
+This output is the thermal loss from the pump to the surrounding Zone in the form of thermal radiation gains directly to the inside face of the zone's surfaces. It is only available if a Zone was named in the pump input.
+
+\paragraph{Pump Zone Total Heating Energy {[}J{]}}\label{pump-zone-total-heating-energy-j-1}
+
+\paragraph{Pump Zone Total Heating Rate {[}W{]}}\label{pump-zone-total-heating-rate-w-1}
+
+These outputs are the thermal losses from the pump to the surrounding Zone. They are only available if a Zone was named in the pump's input. These indicate the amount of heat added to the zone from the pump's inefficiencies. They are the total heat loss including both convection and radiation.
+
+\subsection{Pump:VariableSpeed:Condensate}\label{pumpvariablespeedcondensate}
+
+The Pump:VariableSpeed:Condensate object can only be used in steam system simulation for the condensate side of the loop. This is a variable speed pump, which pumps the condensate back to the steam boiler. The syntax for condensate pump is given below.
+
+\subsubsection{Inputs}\label{inputs-2-031}
+
+\paragraph{Field: Name}
+
+This alpha field contains the identifying unique name for the pump.
+
+\paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-2-001}
+
+This alpha field contains the identifying name for the pump inlet node.
+
+\paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-2-001}
+
+This alpha field contains the identifying name for the pump outlet node.
+
+\paragraph{Field: Design Steam Volume Flow Rate}\label{field-design-steam-volume-flow-rate}
+
+This numeric field contains the pump's design volume flow rate in cubic meters per second. This field is autosizable. This is the volume flow rate of steam in expanded stated. The volume of condensate is calculated by the software from the steam density and is much lower.
+
+\paragraph{Field: Design Pump Head}\label{field-design-pump-head-2}
+
+This numeric field contains the pump's design head in Pascals. The default is 179352 Pa, or 60 ftH20, and is for a fairly large building.
+
+\paragraph{Field: Design Power Consumption}\label{field-design-power-consumption-2}
+
+This numeric field contains the pump's rated power consumption in Watts. If the user is performing a pressure simulation on the loop in which this pump is found, this value would only be used to estimate pump efficiency. During reported calculations, the pump would use the loop pressure drop and current flow conditions along with efficiency to calculate pump power dynamically. This field can be autosized. When set to autosize the type of scaling factor is chosen in the input field Design Power Sizing Method.
+
+\paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-2-000}
+
+This numeric field contains the pump motor's efficiency in decimal form (0 = 0\%, 1 = 100\%).
+
+\paragraph{Field: Fraction of Motor Inefficiencies to Fluid Stream}\label{field-fraction-of-motor-inefficiencies-to-fluid-stream-2}
+
+This numeric field contains the pump motor's fraction of power loss to the fluid.
+
+\paragraph{Field: Coefficient 1 of the Part Load Performance Curve}\label{field-coefficient-1-of-the-part-load-performance-curve-1}
+
+This numeric field contains the first coefficient in the part load ratio curve. The fraction of full load power is determined by the cubic equation:
+
+\begin{equation}
+FractionFullLoadPower = {C_1} + {C_2}PLR + {C_3}PL{R^2} + {C_4}PL{R^3}
+\end{equation}
+
+where C\(_{1}\),C\(_{2}\),C\(_{3}\),and C\(_{4}\) are Coefficients 1 4 (below) and PLR is the Part Load Ratio.
+
+\paragraph{Field: Coefficient 2 of the Part Load Performance Curve}\label{field-coefficient-2-of-the-part-load-performance-curve-1}
+
+This numeric field contains the second coefficient in the part load ratio curve.
+
+\paragraph{Field: Coefficient 3 of the Part Load Performance Curve}\label{field-coefficient-3-of-the-part-load-performance-curve-1}
+
+This numeric field contains the third coefficient in the part load ratio curve.
+
+\paragraph{Field: Coefficient 4 of the Part Load Performance Curve}\label{field-coefficient-4-of-the-part-load-performance-curve-1}
+
+This numeric field contains the fourth coefficient in the part load ratio curve.
+
+\paragraph{Field: Pump Flow Rate Schedule Name}\label{field-pump-flow-rate-schedule-name-2}
+
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, \textbf{not the actual flow rate at that time}. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations. For additional control over pump flow, EMS actuators can be employed.
+
+\paragraph{Field: Zone Name}\label{field-zone-name-2-004}
+
+This field is optional. It can be used to input the name of the Zone in which the pump is located in the model. If the pump is outdoors, or skin losses are not to be modeled, then leave this field blank. If a valid Zone name is entered, then the portion of electrical power consumed by the pump that is not added to the working fluid is added to the surrounding Zone.
+
+\paragraph{Field: Skin Loss Radiative Fraction}\label{field-skin-loss-radiative-fraction-2}
+
+This field is optional. If a Zone is named in the previous field and pump losses are to be added to a surrounding thermal zone, then this input determines the split between thermal radiation and thermal convection for the heat losses from the pump. If it is left blank then all the losses will be convective.
+
+\paragraph{Field: Design Power Sizing Method}\label{field-design-power-sizing-method-2}
+
+This field is optional. There are two choices PowerPerFlow and PowerPerFlowPerPressure. If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Electric Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor. If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Shaft Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
+
+\paragraph{Field: Design Electric Power per Unit Flow Rate}\label{field-design-electric-power-per-unit-flow-rate-1}
+
+This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow. It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m\(^{3}\)/s) ( 22 W/gpm) will be used.
+
+\paragraph{Field: Design Shaft Power per Unit Flow Rate Per Unit Head}\label{field-design-shaft-power-per-unit-flow-rate-per-unit-head-2}
+
+This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure. It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m\(^{3}\)/s)-Pa) will be used.
+
+\paragraph{Field: End-Use Subcategory}
+
+Allows you to specify a user-defined end-use subcategory, e.g., ``Main Pumps'', etc. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the pump will be assigned to the ``General'' end-use subcategory.
+
+Examples of this object in the IDF follow.
+
+\begin{lstlisting}
+
+Pump:VariableSpeed:Condensate,
+  Steam Boiler Plant Steam Circ Pump,         !- Name
+  Steam Boiler Plant Steam Supply Inlet Node, !- Inlet Node Name
+  Steam Boiler Plant Steam Pump Outlet Node,  !- Outlet Node Name
+  0.36,                                  !- Design Steam Volume Flow Rate {m3/s}
+  179352,                                !- Design Pump Head {Pa}
+  400,                                   !- Design Power Consumption {W}
+  0.9,                                   !- Motor Efficiency
+  0.0,                                   !- Fraction of Motor Inefficiencies to Fluid Stream
+  0,                                     !- Coefficient 1 of the Part Load Performance Curve
+  1,                                     !- Coefficient 2 of the Part Load Performance Curve
+  0,                                     !- Coefficient 3 of the Part Load Performance Curve
+  0;                                     !- Coefficient 4 of the Part Load Performance Curve
+
+
+  Pump:VariableSpeed:Condensate,
+  Steam Boiler Plant Steam Circ Pump,         !- Name
+  Steam Boiler Plant Steam Supply Inlet Node, !- Inlet Node Name
+  Steam Boiler Plant Steam Pump Outlet Node,  !- Outlet Node Name
+  0.36,                                  !- Design Steam Volume Flow Rate {m3/s}
+  179352,                                !- Design Pump Head {Pa}
+  autosize,                              !- Design Power Consumption {W}
+  0.9,                                   !- Motor Efficiency
+  0.0,                                   !- Fraction of Motor Inefficiencies to Fluid Stream
+  0,                                     !- Coefficient 1 of the Part Load Performance Curve
+  1,                                     !- Coefficient 2 of the Part Load Performance Curve
+  0,                                     !- Coefficient 3 of the Part Load Performance Curve
+  0;                                     !- Coefficient 4 of the Part Load Performance Curve
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-2-016}
+
+\begin{itemize}
+\item
+  HVAC,Average,Pump Electricity Rate {[}W{]}
+\item
+  HVAC,Sum,Pump Electricity Energy {[}J{]}
+\item
+  HVAC,Average,Pump Shaft Power {[}W{]}
+\item
+  HVAC,Average,Pump Fluid Heat Gain Rate {[}W{]}
+\item
+  HVAC,Sum,Pump Fluid Heat Gain Energy {[}J{]}
+\item
+  HVAC,Average,Pump Outlet Temperature {[}C{]}
+\item
+  HVAC,Average,Pump Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average, Pump Zone Total Heating Rate {[}W{]}
+\item
+  HVAC, Sum, Pump Zone Total Heating Energy {[}J{]}
+\item
+  HVAC, Average, Pump Zone Convective Heating Rate {[}W{]}
+\item
+  HVAC, Average, Pump Zone Radiative Heating Rate {[}W{]}
+\end{itemize}
+
+\paragraph{Pump Electricity Rate {[}W{]}}\label{pump-electric-power-w-2}
+
+\paragraph{Pump Electricity Energy {[}J{]}}\label{pump-electric-energy-j-2}
+
+These outputs are the electric power input to the pump motor. Consumption is metered on Pumps:Electricity, Electricity:Plant, and Electricity:Facility.
+
+\paragraph{Pump Shaft Power {[}W{]}}\label{pump-shaft-power-w-2}
+
+This is the shaft power delivered from the motor to the pump.
+
+\paragraph{Pump Fluid Heat Gain Rate {[}W{]}}\label{pump-fluid-heat-gain-rate-w-2}
+
+\paragraph{Pump Fluid Heat Gain Energy {[}J{]}}\label{pump-fluid-heat-gain-energy-j-2}
+
+These outputs are the energy added to the fluid as heat. For the current algorithm, this is equal to Pump Shaft Power, because the loops are closed and all energy added to the fluid will ultimately become heat due to friction.
+
+\paragraph{Pump Outlet Temperature {[}C{]}}\label{pump-outlet-temperature-c-2}
+
+\paragraph{Pump Mass Flow Rate {[}kg/s{]}}\label{pump-mass-flow-rate-kgs-2}
+
+These outputs are the water outlet temperature and mass flow rate.
+
+\paragraph{Pump Zone Total Heating Rate {[}W{]}}\label{pump-zone-total-heating-rate-w-2}
+
+\paragraph{Pump Zone Total Heating Energy {[}J{]}}\label{pump-zone-total-heating-energy-j-2}
+
+These outputs are the thermal losses from the pump to the surrounding Zone. They are only available if a Zone was named in the pump's input. These indicate the amount of heat added to the zone from the pump's inefficiencies. They are the total heat loss including both convection and radiation.
+
+\paragraph{Pump Zone Convective Heating Rate {[}W{]}}\label{pump-zone-convective-heating-rate-w-2}
+
+This output is the thermal loss from the pump to the surrounding Zone in the form of convective gains directly to the zone air. It is only available if a Zone was named in the pump input.
+
+\paragraph{Pump Zone Radiative Heating Rate {[}W{]}}\label{pump-zone-radiative-heating-rate-w-2}
+
+This output is the thermal loss from the pump to the surrounding Zone in the form of thermal radiation gains directly to the inside face of the zone's surfaces. It is only available if a Zone was named in the pump input.
+
+\subsection{HeaderedPumps:ConstantSpeed}\label{headeredpumpsconstantspeed}
+
+Headered pumps are components with more than one identical pumps connected in parallel. The syntax for HeaderedPumps:ConstantSpeed is as follows.
+
+\subsubsection{Inputs}\label{inputs-3-027}
+
+\paragraph{Field: Name}\label{field-name-3-024}
+
+This alpha field contains the identifying name for the pump bank.
+
+\paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-3-000}
+
+This alpha field contains the identifying name for the pump bank inlet node.
+
+\paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-3-000}
+
+This alpha field contains the identifying name for the pump bank outlet node.
+
+\paragraph{Field: Total Design Flow Rate}\label{field-total-design-flow-rate}
+
+This numeric field contains the pump bank's rated volumetric flow rate in cubic meters per second. This is equal to the product of number of pumps and the flow rate of each individual pump. The field can be autosized.
+
+\paragraph{Field: Number of Pumps in Bank}\label{field-number-of-pumps-in-bank}
+
+The numeric field specifies the number of pumps present in the pump bank. All these pumps are connected in parallel internally.
+
+\paragraph{Field: Flow Sequencing Control Scheme}\label{field-flow-sequencing-control-scheme}
+
+The alpha field specifies the scheme for sequencing flow. Currently the only choice is Sequential, where a pump in the pump bank will be turned ON only after fully loading the previous pump.
+
+\paragraph{Field: Design Pump Head}\label{field-design-pump-head-3}
+
+This numeric field contains the pump's design head pressure in Pascals.
+
+\paragraph{Field: Design Power Consumption}\label{field-design-power-consumption-3}
+
+This numeric field contains the pump bank's total power consumption in Watts. This field is equal to the product of number of pumps and the rated power consumption of each individual pump. If the user is performing a pressure simulation on the loop in which this pump bank is found, this value would only be used to estimate pump efficiency. During reported calculations, the pump would use the loop pressure drop and current flow conditions along with efficiency to calculate pump power dynamically. This field can be autosized. When set to autosize the type of scaling factor is chosen in the input field Design Power Sizing Method.
+
+\paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-3-000}
+
+This numeric field contains the pump motor's efficiency in decimal form (0 = 0\%, 1 = 100\%).
+
+\paragraph{Field: Fraction of Motor Inefficiencies to Fluid Stream}\label{field-fraction-of-motor-inefficiencies-to-fluid-stream-3}
+
+This numeric field contains the pump motor's fraction of power loss to the fluid.
+
+\paragraph{Field: Pump Control Type}\label{field-pump-control-type-2-000}
+
+This is a choice field of Continuous or Intermittent. The operation of a constant speed pump bank is fairly straightforward. If the user designates a constant speed pump bank that is operating continuously, the pump bank will run regardless of whether or not there is a load. This may have the net effect of adding heat to the loop if no equipment is turned on. If the pump bank is constant speed and operates intermittently, the pump bank will run at its capacity if a load is sensed and will shut off if there is no load on the loop. Applicable availability managers (ref. \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList}) may override this control by forcing the pump to be on or off.
+
+\paragraph{Field: Pump Flow Rate Schedule Name}\label{field-pump-flow-rate-schedule-name-3}
+
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, \textbf{not the actual flow rate at that time}. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations. For additional control over pump flow, EMS actuators can be employed.
+
+\paragraph{Field: Zone Name}\label{field-zone-name-3-003}
+
+This field is optional. It can be used to input the name of the Zone in which the pump is located in the model. If the pump is outdoors, or skin losses are not to be modeled, then leave this field blank. If a valid Zone name is entered, then the portion of electrical power consumed by the pump that is not added to the working fluid is added to the surrounding Zone.
+
+\paragraph{Field: Skin Loss Radiative Fraction}\label{field-skin-loss-radiative-fraction-3}
+
+This field is optional. If a Zone is named in the previous field and pump losses are to be added to a surrounding thermal zone, then this input determines the split between thermal radiation and thermal convection for the heat losses from the pump. If it is left blank then all the losses will be convective.
+
+\paragraph{Field: Design Power Sizing Method}\label{field-design-power-sizing-method-3}
+
+This field is optional. There are two choices PowerPerFlow and PowerPerFlowPerPressure. If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Electric Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor. If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Shaft Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
+
+\paragraph{Field: Design Electric Power per Unit Flow Rate}\label{field-design-electric-power-per-unit-flow-rate-2}
+
+This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow. It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m\(^{3}\)/s) ( 22 W/gpm) will be used.
+
+\paragraph{Field: Design Shaft Power per Unit Flow Rate Per Unit Head}\label{field-design-shaft-power-per-unit-flow-rate-per-unit-head-3}
+
+This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure. It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m\(^{3}\)/s)-Pa) will be used.
+
+\paragraph{Field: End-Use Subcategory}
+
+Allows you to specify a user-defined end-use subcategory, e.g., ``Main Pumps'', etc. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the pump will be assigned to the ``General'' end-use subcategory.
+
+An example for constant speed pump bank follows.
+
+\begin{lstlisting}
+
+HeaderedPumps:ConstantSpeed,
+  Chilled Water Headered Pumps,           !- Name
+  CW Supply Inlet Node,                   !- Inlet Node Name
+  CW Pumps Outlet Node,                   !- Outlet Node Name
+  autosize,                               !- Total Design Flow Rate
+  2,                                      !- Number of Pumps in Bank
+  SEQUENTIAL,                             !- Flow Sequencing Control Scheme
+  179352,                                 !- Design Pump Head
+  autosize,                               !- Design Power Consumption
+  0.9,                                    !- Motor Efficiency
+  0.0,                                    !- Fraction of Motor Inefficiencies to Fluid Stream
+  INTERMITTENT,                           !- Pump Control Type
+  CoolingPumpAvailSched;                  !- Pump Flow Rate Schedule Name
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-3-014}
+
+\begin{itemize}
+\item
+  HVAC,Average,Pump Electricity Rate {[}W{]}
+\item
+  HVAC,Sum, Pump Electricity Energy {[}J{]}
+\item
+  HVAC,Average,Pump Shaft Power {[}W{]}
+\item
+  HVAC,Average, Pump Fluid Heat Gain Rate {[}W{]}
+\item
+  HVAC,Sum, Pump Fluid Heat Gain Energy {[}J{]}
+\item
+  HVAC,Average, Pump Outlet Temperature {[}C{]}
+\item
+  HVAC,Average,Pump Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Number of Pumps Operating {[]}
+\item
+  HVAC, Average, Pump Zone Total Heating Rate {[}W{]}
+\item
+  HVAC, Sum, Pump Zone Total Heating Energy {[}J{]}
+\item
+  HVAC, Average, Pump Zone Convective Heating Rate {[}W{]}
+\item
+  HVAC, Average, Pump Zone Radiative Heating Rate {[}W{]}
+\end{itemize}
+
+\paragraph{Pump Electricity Rate {[}W{]}}\label{pump-electric-power-w-3}
+
+\paragraph{Pump Electricity Energy {[}J{]}}\label{pump-electric-energy-j-3}
+
+These outputs are the electric power input to the pump motor. Consumption is metered on Pumps:Electricity, Electricity:Plant, and Electricity:Facility.
+
+\paragraph{Pump Shaft Power {[}W{]}}\label{pump-shaft-power-w-3}
+
+This is the shaft power delivered from the motor to the pump.
+
+\paragraph{Pump Fluid Heat Gain Rate {[}W{]}}\label{pump-fluid-heat-gain-rate-w-3}
+
+\paragraph{Pump Fluid Heat Gain Energy {[}J{]}}\label{pump-fluid-heat-gain-energy-j-3}
+
+These outputs are the energy added to the fluid as heat. For the current algorithm, this is equal to Pump Shaft Power, because the loops are closed and all energy added to the fluid will ultimately become heat due to friction.
+
+\paragraph{Pump Outlet Temperature {[}C{]}}\label{pump-outlet-temperature-c-3}
+
+\paragraph{Pump Mass Flow Rate {[}kg/s{]}}\label{pump-mass-flow-rate-kgs-3}
+
+These outputs are the water outlet temperature and mass flow rate.
+
+\paragraph{Pump Operating Pumps Count {[]}}\label{pump-operating-pumps-count}
+
+This output tells the number of pumps in the pump bank operating at any reporting frequency.
+
+\paragraph{Pump Zone Total Heating Rate {[}W{]}}\label{pump-zone-total-heating-rate-w-3}
+
+\paragraph{Pump Zone Total Heating Energy {[}J{]}}\label{pump-zone-total-heating-energy-j-3}
+
+These outputs are the thermal losses from the pump to the surrounding Zone. They are only available if a Zone was named in the pump's input. These indicate the amount of heat added to the zone from the pump's inefficiencies. They are the total heat loss including both convection and radiation.
+
+\paragraph{Pump Zone Convective Heating Rate {[}W{]}}\label{pump-zone-convective-heating-rate-w-3}
+
+This output is the thermal loss from the pump to the surrounding Zone in the form of convective gains directly to the zone air. It is only available if a Zone was named in the pump input.
+
+\paragraph{Pump Zone Radiative Heating Rate {[}W{]}}\label{pump-zone-radiative-heating-rate-w-3}
+
+This output is the thermal loss from the pump to the surrounding Zone in the form of thermal radiation gains directly to the inside face of the zone's surfaces. It is only available if a Zone was named in the pump input.
+
+\subsection{HeaderedPumps:VariableSpeed}\label{headeredpumpsvariablespeed}
+
+Headered pumps are components with more than one identical pumps connected in parallel. Currently this object may be found only in plant loops. The syntax for a HeaderedPumps:VariableSpeed pump is given below.
+
+\subsubsection{Inputs}\label{inputs-4-024}
+
+\paragraph{Field: Name}\label{field-name-4-021}
+
+This alpha field contains the identifying unique name for the pump bank.
+
+\paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-4}
+
+This alpha field contains the identifying name for the pump bank inlet node.
+
+\paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-4}
+
+This alpha field contains the identifying name for the pump bank outlet node.
+
+\paragraph{Field: Total Design Flow Rate}\label{field-total-design-flow-rate-1}
+
+This numeric field contains the pump bank's rated volume flow rate in cubic meters per second. This is equal to the product of number of pumps and the flow rate of each individual pump. The field can be autosized.
+
+\paragraph{Field: Number of Pumps in Bank}\label{field-number-of-pumps-in-bank-1}
+
+The numeric field specifies the number of pumps present in the pump bank. All these pumps are connected in parallel internally.
+
+\paragraph{Field: Flow Sequencing Control Scheme}\label{field-flow-sequencing-control-scheme-1}
+
+The alpha field specifies the scheme for sequencing flow. Currently the only choice is Sequential, where a pump in the pump bank will be turned ON only after fully loading the previous pump.
+
+\paragraph{Field: Design Pump Head}\label{field-design-pump-head-4}
+
+This numeric field contains the pump's design head in Pascals.
+
+\paragraph{Field: Design Power Consumption}\label{field-design-power-consumption-4}
+
+This numeric field contains the pump bank's total power consumption in Watts. This field is equal to the product of number of pumps and the design power consumption of each individual pump. If the user is performing a pressure simulation on the loop in which this pump bank is found, this value would only be used to estimate pump efficiency. During reported calculations, the pump would use the loop pressure drop and current flow conditions along with efficiency to calculate pump power dynamically. This field can be autosized. When set to autosize the type of scaling factor is chosen in the input field Design Power Sizing Method.
+
+\paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-4}
+
+This numeric field contains the motor's efficiency of the individual pump (which will be equivalent to pump bank efficiency) in decimal form (0 = 0\%, 1 = 100\%).
+
+\paragraph{Field: Fraction of Motor Inefficiencies to Fluid Stream}\label{field-fraction-of-motor-inefficiencies-to-fluid-stream-4}
+
+This numeric field contains the individual pump's fraction of power loss to the fluid.
+
+\paragraph{Field: Coefficient 1 of the Part Load Performance Curve}\label{field-coefficient-1-of-the-part-load-performance-curve-2}
+
+This numeric field contains the first coefficient (\emph{C\(_{1}\)}) in the part load ratio curve. The fraction of full load power is determined by the cubic equation:
+
+\begin{equation}
+FractionFullLoadPower = {C_1} + {C_2}PLR + {C_3}PL{R^2} + {C_4}PL{R^3}
+\end{equation}
+
+where C\(_{1}\),C\(_{2}\),C\(_{3}\),and C\(_{4}\) are Coefficients 1 4 (below) and PLR is the Part Load Ratio.
+
+\paragraph{Field: Coefficient 2 of the Part Load Performance Curve}\label{field-coefficient-2-of-the-part-load-performance-curve-2}
+
+This numeric field contains the second coefficient (\emph{C\(_{2}\)}) in the part load ratio curve.
+
+\paragraph{Field: Coefficient 3 of the Part Load Performance Curve}\label{field-coefficient-3-of-the-part-load-performance-curve-2}
+
+This numeric field contains the third coefficient (\emph{C\(_{3}\)}) in the part load ratio curve.
+
+\paragraph{Field: Coefficient 4 of the Part Load Performance Curve}\label{field-coefficient-4-of-the-part-load-performance-curve-2}
+
+This numeric field contains the fourth coefficient (\emph{C\(_{4}\)}) in the part load ratio curve.
+
+\paragraph{Field: Minimum Flow Rate Fraction}\label{field-minimum-flow-rate-fraction}
+
+The numeric field specifies the minimum flow allowed for the pump bank as a fraction of the nominal flow. If the requested flow is less than minimum flow pump bank runs at minimum flow.
+
+\paragraph{Field: Pump Control Type}\label{field-pump-control-type-3}
+
+This is a choice field of Continuous or Intermittent. A variable speed pump bank is defined with maximum and minimum flow rates that are the physical limits of the device. If there is no load on the loop and the pump bank is operating intermittently, then the bank can shutdown. For any other condition such as the loop having a load and the pump bank is operating intermittently or the pump bank is continuously operating (regardless of the loading condition), the bank will operate and select a flow somewhere between the minimum and maximum limits. In these cases where the pump bank is running, it will try to meet the flow request made by demand side components. Applicable availability managers (ref. \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList}) may override this control by forcing the pump to be on or off.
+
+\paragraph{Field: Pump Flow Rate Schedule Name}\label{field-pump-flow-rate-schedule-name-4}
+
+The schedule values modify the value for Rated Flow Rate of the pump on a time basis. This essentially sets the maximum value available for the pump at a given time, \textbf{not the actual flow rate at that time}. The default is that the pump is ON and runs according to its other operational requirements specified above. This schedule is for special, not typical pump operations. For additional control over pump flow, EMS actuators can be employed.
+
+\paragraph{Field: Zone Name}\label{field-zone-name-4-003}
+
+This field is optional. It can be used to input the name of the Zone in which the pump is located in the model. If the pump is outdoors, or skin losses are not to be modeled, then leave this field blank. If a valid Zone name is entered, then the portion of electrical power consumed by the pump that is not added to the working fluid is added to the surrounding Zone.
+
+\paragraph{Field: Skin Loss Radiative Fraction}\label{field-skin-loss-radiative-fraction-4}
+
+This field is optional. If a Zone is named in the previous field and pump losses are to be added to a surrounding thermal zone, then this input determines the split between thermal radiation and thermal convection for the heat losses from the pump. If it is left blank then all the losses will be convective.
+
+\paragraph{Field: Design Power Sizing Method}\label{field-design-power-sizing-method-4}
+
+This field is optional. There are two choices PowerPerFlow and PowerPerFlowPerPressure. If PowerPerFlow is used the pump's Design Power Consumption will be calculated using the sizing factor from the input field Design Electric Power per Unit Flow Rate -- with Design Power Consumption = Design Maximum Flow Rate * scaling factor. If PowerPerFlowPerPressure is used the pump's Design Power Consumption will use the sizing factor from the input field Design Shaft Power per Unit Flow Rate Per Unit Head -- with Design Power Consumption = Design Maximum Flow Rate * Design Pump Head * scaling factor / Motor Efficiency. If omitted the default method of PowerPerFlowPerPressure will be used.
+
+\paragraph{Field: Design Electric Power per Unit Flow Rate}\label{field-design-electric-power-per-unit-flow-rate-3}
+
+This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlow. It allows setting the efficiency the pumping system's power consumption using only the design flow rate. If omitted the default value of 348701.1 W/(m\(^{3}\)/s) ( 22 W/gpm) will be used.
+
+\paragraph{Field: Design Shaft Power per Unit Flow Rate Per Unit Head}\label{field-design-shaft-power-per-unit-flow-rate-per-unit-head-4}
+
+This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure. It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m\(^{3}\)/s)-Pa) will be used.
+
+\paragraph{Field: End-Use Subcategory}
+
+Allows you to specify a user-defined end-use subcategory, e.g., ``Main Pumps'', etc. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the pump will be assigned to the ``General'' end-use subcategory.
+
+An example of this object follows.
+
+\begin{lstlisting}
+
+HeaderedPumps:VariableSpeed,
+  Chilled Water Headered Pumps, !- Name
+  CW Supply Inlet Node,       !- Inlet Node Name
+  CW Pumps Outlet Node,       !- Outlet Node Name
+  autosize,                   !- Total Design Flow Rate {m3/s}
+  2,                          !- Number of Pumps in Bank
+  SEQUENTIAL,                 !- Flow Sequencing Control Scheme
+  179352,                     !- Design Pump Head {Pa}
+  autosize,                   !- Design Power Consumption {W}
+  0.9,                        !- Motor Efficiency
+  0.0,                        !- Fraction of Motor Inefficiencies to Fluid Stream
+  0,                          !- Coefficient 1 of the Part Load Performance Curve
+  1,                          !- Coefficient 2 of the Part Load Performance Curve
+  0,                          !- Coefficient 3 of the Part Load Performance Curve
+  0,                          !- Coefficient 4 of the Part Load Performance Curve
+  0.1,                        !- Minimum Flow Rate {m3/s}
+  INTERMITTENT,               !- Pump Control Type
+  CoolingPumpAvailSched;      !- Pump Flow Rate Schedule Name
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-4-011}
+
+\begin{itemize}
+\item
+  HVAC,Average,Pump Electricity Rate {[}W{]}
+\item
+  HVAC,Sum, Pump Electricity Energy {[}J{]}
+\item
+  HVAC,Average,Pump Shaft Power {[}W{]}
+\item
+  HVAC,Average, Pump Fluid Heat Gain Rate {[}W{]}
+\item
+  HVAC,Sum, Pump Fluid Heat Gain Energy {[}J{]}
+\item
+  HVAC,Average, Pump Outlet Temperature {[}C{]}
+\item
+  HVAC,Average,Pump Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Number of pumps operating {[]}
+\item
+  HVAC, Average, Pump Zone Total Heating Rate {[}W{]}
+\item
+  HVAC, Sum, Pump Zone Total Heating Energy {[}J{]}
+\item
+  HVAC, Average, Pump Zone Convective Heating Rate {[}W{]}
+\item
+  HVAC, Average, Pump Zone Radiative Heating Rate {[}W{]}
+\end{itemize}
+
+\paragraph{Pump Electricity Rate {[}W{]}}\label{pump-electric-power-w-4}
+
+\paragraph{Pump Electricity Energy {[}J{]}}\label{pump-electric-energy-j-4}
+
+These outputs are the electric power input to the pump motor. Consumption is metered on Pumps:Electricity, Electricity:Plant, and Electricity:Facility.
+
+\paragraph{Pump Shaft Power {[}W{]}}\label{pump-shaft-power-w-4}
+
+This is the shaft power delivered from the motor to the pump.
+
+\paragraph{Pump Fluid Heat Gain Rate {[}W{]}}\label{pump-fluid-heat-gain-rate-w-4}
+
+\paragraph{Pump Fluid Heat Gain Energy {[}J{]}}\label{pump-fluid-heat-gain-energy-j-4}
+
+These outputs are the energy added to the fluid as heat. For the current algorithm, this is equal to Pump Shaft Power, because the loops are closed and all energy added to the fluid will ultimately become heat due to friction.
+
+\paragraph{Pump Outlet Temperature {[}C{]}}\label{pump-outlet-temperature-c-4}
+
+\paragraph{Pump Mass Flow Rate {[}kg/s{]}}\label{pump-mass-flow-rate-kgs-4}
+
+These outputs are the water outlet temperature and mass flow rate.
+
+\paragraph{Pump Operating Pumps Count {[]}}\label{pump-operating-pumps-count-1}
+
+This output tells the number of pumps in the pump bank operating at any reporting frequency.
+
+\paragraph{Pump Zone Total Heating Rate {[}W{]}}\label{pump-zone-total-heating-rate-w-4}
+
+\paragraph{Pump Zone Total Heating Energy {[}J{]}}\label{pump-zone-total-heating-energy-j-4}
+
+These outputs are the thermal losses from the pump to the surrounding Zone. They are only available if a Zone was named in the pump's input. These indicate the amount of heat added to the zone from the pump's inefficiencies. They are the total heat loss including both convection and radiation.
+
+\paragraph{Pump Zone Convective Heating Rate {[}W{]}}\label{pump-zone-convective-heating-rate-w-4}
+
+This output is the thermal loss from the pump to the surrounding Zone in the form of convective gains directly to the zone air. It is only available if a Zone was named in the pump input.
+
+\paragraph{Pump Zone Radiative Heating Rate {[}W{]}}\label{pump-zone-radiative-heating-rate-w-4}
+
+This output is the thermal loss from the pump to the surrounding Zone in the form of thermal radiation gains directly to the inside face of the zone's surfaces. It is only available if a Zone was named in the pump input.

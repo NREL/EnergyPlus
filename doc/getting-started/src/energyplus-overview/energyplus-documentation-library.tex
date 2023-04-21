@@ -1,0 +1,53 @@
+\section{EnergyPlus Documentation Library}\label{energyplus-documentation-library}
+
+The documentation library for EnergyPlus has historically been provided in the form of pdf's packaged with the release. As of the 8.5.0 release, a major conversion was completed where the source of the docs was changed to \LaTeX. Source code for the documentation is provided on the EnergyPlus GitHub.com code repository \url{www.github.com/nrel/energyplus}.
+
+\subsection{User Information Documents}\label{user-information-documents}
+
+The following documents relate to using EnergyPlus, the engine. These documents cover a full range of questions and should be the first place a beginning or even experienced user would go to find out how the program works, what it expects as input, what it produces as output, etc. In general, the information in these documents is not highly technical, but it is detailed enough to use the basic capabilities of the program.
+
+\textbf{\emph{Getting Started with EnergyPlus -- the Basics Manual:}} You are currently reading the Overview section of this document. The overview contains a ``big picture'' description of the EnergyPlus program as well as background of its development and the goals to which it ascribes. The remainder of the Getting Started document provides beginning users with an introduction into how to run EnergyPlus, what files are needed for EnergyPlus to execute, and what files are produced when EnergyPlus runs successfully. It also provides some guidance as to how to determine what potential sources of errors are when EnergyPlus runs into problems and how serious those problems might be.
+
+\textbf{\emph{Input and Output Reference:}} This document is a thorough description of the various input and output files related to EnergyPlus, the format of these files, and how the files interact and interrelate.
+
+\textbf{\emph{Output Details, Examples and Data Sets:}} While the Input and Output Reference document touch on some of the outputs from EnergyPlus, this document has more details and specific examples. It also addresses the reference data sets that are included.
+
+\textbf{\emph{Auxiliary Programs}:}~This document contains information for the auxiliary programs that are part of the EnergyPlus package. For example, this document contains the user manual for the Weather Converter program, descriptions on using Ground Heat Transfer auxiliary programs with EnergyPlus, Compact HVAC descriptions, the Transition program/package and other assorted documents.
+
+\subsection{Engineering Reference Document}\label{engineering-reference-document}
+
+The Engineering Reference provides more in-depth knowledge into the theoretical basis behind the various calculations contained in the program. This reference includes more information on modeling equations, limitations, literature references, etc. The document contains the following information and is structured along the lines of the above illustration (Figure~\ref{fig:energyplus-internal-elements}. EnergyPlus -- Internal elements).
+
+\textbf{\emph{Heat Balance Overview and Reference:}}~ This section describes the heat balance calculations that form the basis of the EnergyPlus building model. It includes descriptions of shadowing calculations and other pieces of the model.
+
+\textbf{\emph{HVAC Overview and Reference:}}This section contains a description of the loop-based approach used by EnergyPlus to model the HVAC systems: air loops, water loops, etc. It includes a description of the higher-level managers that control the simulation flow as well as some information on the various components that can be linked together to comprise an HVAC system.
+
+\textbf{\emph{HVAC Branch Based Input Description:}}This section is a special extension of both the input document and the HVAC overview document. It contains more detail on the various HVAC input objects and how these different object link together to form an HVAC description. It contains vital information mainly for the interface developer but also provides users with an in-depth look at the inner workings of the loop approach adopted by EnergyPlus.
+
+\textbf{\emph{Encyclopedic Reference:}}If the information did not fit in the above categories, then the last part of the Engineering Reference is a detailed description of the various models.
+
+\subsection{Application Guides}\label{application-guides}
+
+The application guides are intended to address specific applications using EnergyPlus where the other documents may not provide cohesive examples of intended usage; that is, the techniques for doing certain things may be spread throughout other documents but warrant a more ``how to'' approach that will be present in these documents. The application guides are intended to become more prolific over time, specifically targeted to questions users have sent to the helpdesk support site.
+
+\textbf{\emph{Current Application Guides:}}
+
+\textbf{\emph{EMS Application Guide:}} This guide contains information useful to use the advanced feature of EnergyPlus: Energy Management System tweaks. The Erl language is described and examples for use are given.
+
+\textbf{\emph{External Interface Application Guide:}} This guide contains information specific to using the external interface feature of EnergyPlus to connect other simulation systems.
+
+\textbf{\emph{Plant Application Guide:}} This guide details the methods for simulating real chilled and hot water plant systems within EnergyPlus.
+
+\textbf{\emph{Using EnergyPlus for Compliance Guide:}} This guide contains information specific to using EnergyPlus in Compliance and Standard Rating systems.
+
+\textbf{\emph{External Interface(s) Application Guide:}} This guide contains information about external interfaces (through the Building Controls Virtual Test Bed link) to EnergyPlus.
+
+\textbf{\emph{Tips \& Tricks for Using EnergyPlus:}} This guide contains short tips and tricks for using various parts of EnergyPlus.
+
+\subsection{Developer Menu and Developer Information Documents}\label{developer-menu-and-developer-information-documents}
+
+The following documents will be most useful to potential developers of EnergyPlus, both Interface Developers and Module Developers. Interface Developers will be creating input and output wraps on EnergyPlus so that is it is usable to the architect, design engineers, and others. Module developers will be creating new modules within the EnergyPlus structure and framework.
+
+\textbf{\emph{Interface Developer's Guide:}} This document is critically important to persons interested in developing an interface that provides input to and read output from EnergyPlus. It is a comprehensive guide to the input data dictionary and the input data files that contain a user's building data. Each piece of input syntax is described in detail. In addition, the mechanism for obtaining output and the format in which output will be produced are discussed. This document also contains sections on weather files and units. Numerous samples and examples are given throughout the document with a full file length example provided in the appendix.
+
+\textbf{\emph{Module Developer's Guide:}} This document contains a wealth of information that is intended to provide as much assistance as possible to persons interested in adding modules to the EnergyPlus program. It reviews the module concept as outlined in the programming standard and how they have been implemented in EnergyPlus. It provides a description of how the various modules work together and how the program is structured from a module tree (inverted tree) perspective. One of the most important features of this document is a list of standard EnergyPlus service subroutines and modules that greatly simplify the developers' task of integrating their work into the program. Input and output issues are also addressed from the perspective of how modules actually obtain data from the input file and how each section of the code sends data to the output files.

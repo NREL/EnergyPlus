@@ -1,0 +1,494 @@
+\section{Group ExternalInterface}\label{group-externalinterface}
+
+The \hyperref[externalinterface]{ExternalInterface} allows coupling EnergyPlus to the Building Controls Virtual Test Bed (BCVTB). It supports the import of Functional Mock-up Units (FMUs) for co-simulation as well as the export of EnergyPlus as a FMU for co-simulation. BCVTB is a software environment that allows expert users to couple different simulation programs for distributed simulation or for a real-time simulation that is connected to a building control system. For example, the BCVTB allows simulation of the building envelope and HVAC system in EnergyPlus and the control logic in MATLAB/Simulink, while exchanging data between the two programs as they simulate. The BCVTB can be downloaded from \url{http://simulationresearch.lbl.gov/bcvtb}. A FMU is a component which implements the Functional Mock-up Interface (FMI) standard (\url{http://www.modelisar.com}).
+
+\subsection{ExternalInterface}\label{externalinterface}
+
+This object activates the external interface of EnergyPlus. If the object ExternalInterface is present, then the external interface objects listed below will receive their values from the BCVTB interface or from FMUs at each zone time step. If this object is not present, then the values of these objects will be fixed at the value declared in the initial value field of the corresponding object, and a warning will be written to the EnergyPlus error file.
+
+\subsubsection{Inputs}\label{inputs-018}
+
+\paragraph{Field: Name}\label{field-name-017}
+
+The name of the external interface. The only valid entries are \textbf{PtolemyServer}, \textbf{FunctionalMockupUnitImport}, and \textbf{FunctionalMockupUnitExport}.
+
+An example IDF object is:
+
+\begin{lstlisting}
+
+ExternalInterface,                     !- Object to activate the external interface
+  PtolemyServer;                           !- Name of external interface
+\end{lstlisting}
+
+\subsection{Building Controls Virtual Test Bed (BCVTB)}\label{building-controls-virtual-test-bed-bcvtb}
+
+The following objects are designed to couple EnergyPlus with the BCVTB.
+
+\subsection{ExternalInterface:Schedule}\label{externalinterfaceschedule}
+
+This input object is similar to \hyperref[schedulecompact]{Schedule:Compact}. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value.
+
+\subsubsection{Inputs}\label{inputs-1-016}
+
+\paragraph{Field: Name}\label{field-name-1-015}
+
+This field should contain a unique (within all DaySchedules) designation for this schedule. It is referenced by WeekSchedules to define the appropriate schedule values.
+
+\paragraph{Field: Schedule Type Limits Name}\label{field-schedule-type-limits-name}
+
+This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see above), then the restrictions from the referenced object will be used to validate the current field values.
+
+\paragraph{Field: Initial Value}\label{field-initial-value}
+
+This field contains the schedule value that is used during the warm-up period and during the system sizing.
+
+! Cooling schedule. This schedule is set directly by the external interface.
+
+! During warm-up and system-sizing, it is fixed at 24 degC.
+
+\begin{lstlisting}
+
+ExternalInterface:Schedule,
+  TSetCoo,                                 !- Name
+  Temperature,                         !- ScheduleType
+  24;                                           !- Initial value, used during warm-up
+\end{lstlisting}
+
+! Heating schedule. This schedule is set directly by the external interface.
+
+! During warm-up and system-sizing, it is fixed at 20 degC.
+
+\begin{lstlisting}
+
+ExternalInterface:Schedule,
+  TSetHea,                                 !- Name
+  Temperature,                         !- ScheduleType
+  20;                                           !- Initial value, used during warm-up
+\end{lstlisting}
+
+\subsection{ExternalInterface:Actuator}\label{externalinterfaceactuator}
+
+This object maps a value received from the external interface to an actuator of the Energy Management System. The object is similar to \hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator}. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value.
+
+\subsubsection{Inputs}\label{inputs-2-015}
+
+\paragraph{Field: Name}\label{field-name-2-014}
+
+This field contains a unique name for the actuator. No spaces are allowed in the object name. This name will be a global read-only variable in Erl programs and cannot duplicate any other global scope Erl variable.
+
+\paragraph{Field: Actuated Component Unique Name}\label{field-actuated-component-unique-name-000}
+
+This field defines a unique name for the specific entity that is to be controlled. The names for each individual component are listed in the EDD output file when Verbose mode is used see the input object \textbf{\hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem}} for more on the EDD file. These will often be user-defined names of input objects or system nodes, but some actuators are automatically setup by the program and will not be completely user-defined.
+
+\paragraph{Field: Actuated Component Type}\label{field-actuated-component-type-000}
+
+The field defines the type of the entity that is to be controlled by the actuator. The component types available vary with the specifics of individual models. The types of components that can be used as actuators in a specific model are listed in the EDD output file see the input object \textbf{\hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem}} for more on the EDD file. Components can be object types defined elsewhere in the IDD but there are other types of entities such as nodes and system-level actuators that do not directly correspond to IDF objects.
+
+\paragraph{Field: Actuated Component Control Type}\label{field-actuated-component-control-type-000}
+
+This field defines the type of control to be done on the specific entity being controlled. The control types available are listed in the EDD output. Specific components may have more than one type of control available, such as flow rate or temperature, and this field is used to distinguish between them.
+
+\paragraph{Field: Initial Value}\label{field-initial-value-1}
+
+This field contains the initial value. If a value is specified, then this value is used during the warm-up period and the system sizing. If no value is specified, then the actuated component will only be updated once the time stepping starts, i.e., after the warm-up and the system-sizing. This allows, for example, to schedule a setpoint with a \hyperref[schedulecompact]{Schedule:Compact} during warm-up and system-sizing, and then overwrite the value of this schedule during each zone time step based on a feedback control loop that is implemented in the BCVTB.
+
+\begin{lstlisting}
+
+ExternalInterface:Actuator,
+  Zn001_Wall001_Win001_Shading_Deploy_Status,   !- Name
+  Zn001:Wall001:Win001,       !- Actuated Component Unique Name
+  Window Shading Control,   !- Actuated Component Type
+  Control Status,                   !- Actuated Component Control Type
+  ;                                             ! initial value
+\end{lstlisting}
+
+\subsection{ExternalInterface:Variable}\label{externalinterfacevariable}
+
+This input object is similar to \hyperref[energymanagementsystemglobalvariable]{EnergyManagementSystem:GlobalVariable}. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value. This object can be used to move data into Erl subroutines.
+
+\subsubsection{Inputs}\label{inputs-3-013}
+
+\paragraph{Field: Name}\label{field-name-3-012}
+
+This field becomes the global Erl variable name that can be referenced in the EnergyPlus Runtime Language. No spaces are allowed in the object name. The name must be unique across all global scope variables including those declared as sensor and actuators and the built-in variables.
+
+\paragraph{Field: Initial Value}\label{field-initial-value-2}
+
+This field contains the initial value that is used during the warm-up period and during the system sizing.
+
+\begin{lstlisting}
+
+ExternalInterface:Variable,
+  yShade,                                   !- Name of Erl variable
+  1;                                             !- Initial value
+\end{lstlisting}
+
+\subsection{Functional Mock-up Unit (FMU) Import}\label{functional-mock-up-unit-fmu-import}
+
+The following objects are designed to couple EnergyPlus with FMUs for co-simulation.
+
+\subsection{ExternalInterface:FunctionalMockupUnitImport}\label{externalinterfacefunctionalmockupunitimport}
+
+This object defines the FMU that will be linked to EnergyPlus.
+
+\subsubsection{Inputs}\label{inputs-4-012}
+
+\paragraph{Field: FMU File Name}\label{field-fmu-file-name}
+
+This field contains the name of the FMU file including the extension. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+
+\paragraph{Field: FMU Timeout}\label{field-fmu-timeout}
+
+This field contains the communication timeout value in milli-seconds to allow interprocess communication to take place.
+
+\paragraph{Field: FMU LoggingOn}\label{field-fmu-loggingon}
+
+This field contains the loggingOn value to enable or disable debug in FMU. If loggingOn = 1, debug logging is enabled. If loggingOn = 0, debug logging is disabled.
+
+\begin{lstlisting}
+
+ExternalInterface:FunctionalMockupUnitImport,
+  MoistAir.fmu,                       !- FMU File Name
+  15,                                           !- FMU Timeout
+  0;                                             !- FMU LoggingOn
+\end{lstlisting}
+
+\subsection{ExternalInterface:FunctionalMockupUnitImport:From:Variable}\label{externalinterfacefunctionalmockupunitimportfromvariable}
+
+This input object maps the names of the output variables of EnergyPlus to the input variables of the FMU.
+
+\subsubsection{Inputs}\label{inputs-5-010}
+
+\paragraph{Field: EnergyPlus Key Value}\label{field-energyplus-key-value}
+
+This input object maps the names of the EnergyPlus output variables (\textbf{\hyperref[outputvariable]{Output:Variable}} or \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}}) to the input variables of the FMU.
+
+\paragraph{Field: EnergyPlus Variable Name}\label{field-energyplus-variable-name}
+
+This field contains the output variable name as defined in the InputOutput Reference. For an \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}}, the EnergyPlus Variable Name is the name of the \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}}'s object.
+
+\paragraph{Field: FMU File Name}\label{field-fmu-file-name-1}
+
+This field contains the name of the FMU file including the extension. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+
+\paragraph{Field: FMU Instance Name}\label{field-fmu-instance-name}
+
+This field contains the EnergyPlus instance name of the FMU. See External Interface Application guide for more details.
+
+\paragraph{Field: FMU Variable Name}\label{field-fmu-variable-name}
+
+This field contains the name of the variable in the FMU that will be mapped to the corresponding variable in EnergyPlus.
+
+\begin{lstlisting}
+
+ExternalInterface:FunctionalMockupUnitImport:From:Variable,
+  Environment,                         !- EnergyPlus Key Value
+  Site Outdoor Air Drybulb Temperature,       !- EnergyPlus Variable Name
+  MoistAir.fmu,                       !- FMU File Name
+  Model1,                                   !- FMU Instance Name
+  TDryBul;                                 !- FMU Variable Name
+
+
+  ExternalInterface:FunctionalMockupUnitImport:From:Variable,
+  ZONE ONE,                               !- EnergyPlus Key Value
+  Zone Mean Air Temperature, !- EnergyPlus Variable Name
+  MoistAir.fmu,                       !- FMU File Name
+  Model1,                                   !- FMU Instance Name
+  TRooMea;                                 !- FMU Variable Name
+
+
+  ExternalInterface:FunctionalMockupUnitImport:From:Variable,
+  Environment,                         !- EnergyPlus Key Value
+  Site Outdoor Air Relative Humidity,   !- EnergyPlus Variable Name
+  MoistAir.fmu,                       !- FMU File Name
+  Model1,                                   !- FMU Instance Name
+  outRelHum;                             !- FMU Variable Name
+
+
+  ExternalInterface:FunctionalMockupUnitImport:From:Variable,
+  ZONE ONE,                               !- EnergyPlus Key Value
+  Zone Air Relative Humidity,   !- EnergyPlus Variable Name
+  MoistAir.fmu,                       !-FMU File Name
+  Model1,                                   !- FMU Instance Name
+  rooRelHum;                             !- FMU Variable Name
+\end{lstlisting}
+
+\subsection{ExternalInterface:FunctionalMockupUnitImport:To:Schedule}\label{externalinterfacefunctionalmockupunitimporttoschedule}
+
+This input object is similar to \hyperref[schedulecompact]{Schedule:Compact}. However, during the time stepping, its value is set to the value received from the external interface. During the system sizing, its value is set to the value specified by the field initial value.
+
+\subsubsection{Inputs}\label{inputs-6-009}
+
+\paragraph{Field: EnergyPlus Variable Name}\label{field-energyplus-variable-name-1}
+
+This field contains a unique (within all Schedules) designation for this schedule in EnergyPlus.
+
+\paragraph{Field: Schedule Type Limits Name}\label{field-schedule-type-limits-name-1}
+
+This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see above), then the restrictions from the referenced object will be used to validate the current field values.
+
+\paragraph{Field: FMU File Name}\label{field-fmu-file-name-2}
+
+This field contains the name of the FMU file including the extension. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+
+\paragraph{Field: FMU Instance Name}\label{field-fmu-instance-name-1}
+
+This field contains the EnergyPlus instance name of the FMU. See External Interface Application guide for more details.
+
+\paragraph{Field: FMU Variable Name}\label{field-fmu-variable-name-1}
+
+This field contains the name of the variable in the FMU that will be mapped to the schedule in EnergyPlus.
+
+\paragraph{Field: Initial Value}\label{field-initial-value-3}
+
+This field contains the schedule value that is used during the system sizing.
+
+\begin{lstlisting}
+
+ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
+  FMU_OthEquSen_ZoneOne,     !- EnergyPlus Variable Name
+  Any Number,                           !- Schedule Type Limits Names
+  MoistAir.fmu,                       !- FMU File Name
+  Model1,                                   !- FMU Instance Name
+  QSensible,                             !- FMU Variable Name
+  0;                                             !- Initial Value
+
+
+  ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
+  FMU_OthEquLat_ZoneOne,     !- EnergyPlus Variable Name
+  Any Number,                           !- Schedule Type Limits Names
+  MoistAir.fmu,                       !- FMU File Name
+  Model1,                                   !- FMU Instance Name
+  QLatent,                                 !- FMU Variable Name
+  0;                                             !- Initial Value
+\end{lstlisting}
+
+\subsection{ExternalInterface:FunctionalMockupUnitImport:To:Actuator}\label{externalinterfacefunctionalmockupunitimporttoactuator}
+
+This object maps a value received from the external interface to an actuator of the Energy Management System. The object is similar to \hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator}. However, during the warm-up and time stepping, its value is set to the value received from the external interface. During the system sizing, its value is set to the value specified by the field initial value.
+
+\subsubsection{Inputs}\label{inputs-7-009}
+
+\paragraph{Field: EnergyPlus Variable Name}\label{field-energyplus-variable-name-2}
+
+This field contains a unique name for the actuator. No spaces are allowed in the object name. This name will be a global read-only variable in Erl programs and cannot duplicate any other global scope Erl variable.
+
+\paragraph{Field: Actuated Component Unique Name}\label{field-actuated-component-unique-name-1}
+
+This field defines a unique name for the specific entity that is to be controlled. The names for each individual component are listed in the EDD output file when Verbose mode is used see the input object \textbf{\hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem}} for more on the EDD file. These will often be user-defined names of input objects or system nodes, but some actuators are automatically setup by the program and will not be completely user-defined.
+
+\paragraph{Field: Actuated Component Type}\label{field-actuated-component-type-1}
+
+The field defines the type of the entity that is to be controlled by the actuator. The component types available vary with the specifics of individual models. The types of components that can be used as actuators in a specific model are listed in the EDD output file see the input object \textbf{\hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem}} for more on the EDD file. Components can be object types defined elsewhere in the IDD but there are other types of entities such as nodes and system-level actuators that do not directly correspond to IDF objects.
+
+\paragraph{Field: Actuated Component Control Type}\label{field-actuated-component-control-type-1}
+
+This field defines the type of control to be done on the specific entity being controlled. The control types available are listed in the EDD output. Specific components may have more than one type of control available, such as flow rate or temperature, and this field is used to distinguish between them.
+
+\paragraph{Field: FMU File Name}\label{field-fmu-file-name-3}
+
+This field contains the name of the FMU file including the extension. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+
+\paragraph{Field: FMU Instance Name}\label{field-fmu-instance-name-2}
+
+This field contains the EnergyPlus instance name of the FMU. See External Interface Application guide for more details.
+
+\paragraph{Field: FMU Variable Name}\label{field-fmu-variable-name-2}
+
+This field contains the name of the variable in the FMU that will be mapped to the actuator in EnergyPlus.
+
+\paragraph{Field: Initial Value}\label{field-initial-value-4}
+
+This field contains the value that is used during the system sizing.
+
+\begin{lstlisting}
+
+ExternalInterface:FunctionalMockupUnitImport:To:Actuator,
+  Zn001_Wall001_Win001_Shading_Deploy_Status,   !- EnergyPlus Variable Name
+  Zn001:Wall001:Win001,                                 !- Actuated Component Unique Name
+  Window Shading Control,                                   !- Actuated Component Type
+  Control Status,                                             !- Actuated Component Control Type
+  ShadingController.fmu,                                     !- FMU File Name
+  Model1,                                                                   !- FMU Instance Name
+  yShade,                                                                   !- FMU Variable Name
+  6;                                                                             !- Initial Value
+\end{lstlisting}
+
+\subsection{ExternalInterface:FunctionalMockupUnitImport:To:Variable}\label{externalinterfacefunctionalmockupunitimporttovariable}
+
+This input object is similar to \hyperref[energymanagementsystemglobalvariable]{EnergyManagementSystem:GlobalVariable}. However, during the warm-up and time stepping, its value is set to the value received from the external interface. During the system sizing its value is set to the value specified by the field initial value. This object can be used to move data into Erl subroutines.
+
+\subsubsection{Inputs}\label{inputs-8-007}
+
+\paragraph{Field: EnergyPlus Variable Name}\label{field-energyplus-variable-name-3}
+
+This field becomes the global Erl variable name that can be referenced in the EnergyPlus Runtime Language. No spaces are allowed in the object name. The name must be unique across all global scope variables including those declared as sensor and actuators and the built-in variables.
+
+\paragraph{Field: FMU File Name}\label{field-fmu-file-name-4}
+
+This field contains the name of the FMU file including the extension. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
+
+\paragraph{Field: FMU Instance Name}\label{field-fmu-instance-name-3}
+
+This field contains the EnergyPlus instance name of the FMU. See External Interface Application guide for more details.
+
+\paragraph{Field: FMU Variable Name}\label{field-fmu-variable-name-3}
+
+This field contains the name of the variable in the FMU that will be mapped to the corresponding variable in EnergyPlus.
+
+\paragraph{Field: Initial Value}\label{field-initial-value-5}
+
+This field contains the initial value that is used during the system sizing.
+
+\begin{lstlisting}
+
+ExternalInterface:FunctionalMockupUnitImport:To:Variable,
+  Shade_Signal,                       !- EnergyPlus Variable Name
+  ShadingController.fmu,     !- FMU File Name
+  Model1,                                   !- FMU Instance Name
+  yShade,                                   !- FMU Variable Name
+  1;                                             !- Initial Value
+\end{lstlisting}
+
+\subsection{Functional Mock-up Unit (FMU) Export}\label{functional-mock-up-unit-fmu-export}
+
+The following objects are designed to support the export of EnergyPlus as a FMU for co-simulation.
+
+\subsection{ExternalInterface:FunctionalMockupUnitExport:From:Variable}\label{externalinterfacefunctionalmockupunitexportfromvariable}
+
+This object exposes the EnergyPlus output variables (\textbf{\hyperref[outputvariable]{Output:Variable}} or \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}}) to the outside simulation program.
+
+\subsubsection{Inputs}\label{inputs-9-006}
+
+\paragraph{Field: EnergyPlus Key Value}\label{field-energyplus-key-value-1}
+
+This field contains a Key Value for an EnergyPlus output variable (ref \hyperref[outputvariable]{Output:Variable}/.rdd file). For an \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}}, the EnergyPlus Key Value needs to be set to \textbf{EMS} .
+
+\paragraph{Field: EnergyPlus Variable Name}\label{field-energyplus-variable-name-4}
+
+This field contains the Variable Name as defined in the InputOutput Reference. For an \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}}, the EnergyPlus Variable Name is the name of the \textbf{\hyperref[energymanagementsystemoutputvariable]{EnergyManagementSystem:OutputVariable}}'s object.
+
+\paragraph{Field: FMU Variable Name}\label{field-fmu-variable-name-4}
+
+This field contains the name of the variable in the model description file of the FMU that will be mapped to the corresponding variable in EnergyPlus.
+
+\begin{lstlisting}
+
+ExternalInterface:FunctionalMockupUnitExport:From:Variable,
+  Environment,                         !- EnergyPlus Key Value
+  Site Outdoor Air Drybulb Temperature,   !- EnergyPlus Variable Name
+  TDryBul;                                 !- FMU Variable Name
+
+  ExternalInterface: FunctionalMockupUnitExport:From:Variable,
+  ZONE ONE,                                   !- EnergyPlus Key Value
+  Zone Mean Air Temperature, !- EnergyPlus Variable Name
+  TRooMea;                                     !- FMU Variable Name
+
+  ExternalInterface: FunctionalMockupUnitExport:From:Variable,
+  Environment,                               !- EnergyPlus Key Value
+  Site Outdoor Air Relative Humidity,   !- EnergyPlus Variable Name
+  outRelHum;                                   !- FMU Variable Name
+
+  ExternalInterface:FunctionalMockupUnitExport:From:Variable,
+  ZONE ONE,                                       !- EnergyPlus Key Value
+  Zone Air Relative Humidity,   !- EnergyPlus Variable Name
+  rooRelHum;                                     !- FMU Variable Name
+\end{lstlisting}
+
+\subsection{ExternalInterface:FunctionalMockupUnitExport:To:Schedule}\label{externalinterfacefunctionalmockupunitexporttoschedule}
+
+This object is similar to \hyperref[schedulecompact]{Schedule:Compact}. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value.
+
+\subsubsection{Inputs}\label{inputs-10-005}
+
+\paragraph{Field: EnergyPlus Variable Name}\label{field-energyplus-variable-name-5}
+
+This field contains a unique (within all Schedules) designation for this schedule in EnergyPlus.
+
+\paragraph{Field: Schedule Type Limits Name}\label{field-schedule-type-limits-name-2}
+
+This field contains a reference to the Schedule Type Limits object. If found in a list of Schedule Type Limits (see above), then the restrictions from the referenced object will be used to validate the current field values.
+
+\paragraph{Field: FMU Variable Name}\label{field-fmu-variable-name-5}
+
+This field contains the name of the variable in the model description file of the FMU that will be mapped to the schedule in EnergyPlus.
+
+\paragraph{Field: Initial Value}\label{field-initial-value-6}
+
+This field contains the schedule value that is used during the warm-up period and during the system sizing.
+
+\begin{lstlisting}
+
+ExternalInterface:FunctionalMockupUnitExport:To:Schedule,
+  FMU_OthEquSen_ZoneOne,     !- EnergyPlus Variable Name
+  Any Number,                           !- Schedule Type Limits Names
+  QSensible,                             !- FMU Variable Name
+  0;                                             !- Initial Value
+\end{lstlisting}
+
+\subsection{ExternalInterface:FunctionalMockupUnitExport:To:Actuator}\label{externalinterfacefunctionalmockupunitexporttoactuator}
+
+This object maps a value received from the external interface to an actuator of the Energy Management System. The object is similar to \hyperref[energymanagementsystemactuator]{EnergyManagementSystem:Actuator}. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value.
+
+\subsubsection{Inputs}\label{inputs-11-004}
+
+\paragraph{Field: EnergyPlus Variable Name}\label{field-energyplus-variable-name-6}
+
+This field contains a unique name for the actuator. No spaces are allowed in the object name. This name will be a global read-only variable in Erl programs and cannot duplicate any other global scope Erl variable.
+
+\paragraph{Field: Actuated Component Unique Name}\label{field-actuated-component-unique-name-2}
+
+This field defines a unique name for the specific entity that is to be controlled. The names for each individual component are listed in the EDD output file when Verbose mode is used see the input object \textbf{\hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem}} for more on the EDD file. These will often be user-defined names of input objects or system nodes, but some actuators are automatically setup by the program and will not be completely user-defined.
+
+\paragraph{Field: Actuated Component Type}\label{field-actuated-component-type-2}
+
+The field defines the type of the entity that is to be controlled by the actuator. The component types available vary with the specifics of individual models. The types of components that can be used as actuators in a specific model are listed in the EDD output file see the input object \textbf{\hyperref[outputenergymanagementsystem]{Output:EnergyManagementSystem}} for more on the EDD file. Components can be object types defined elsewhere in the IDD but there are other types of entities such as nodes and system-level actuators that do not directly correspond to IDF objects.
+
+\paragraph{Field: Actuated Component Control Type}\label{field-actuated-component-control-type-2}
+
+This field defines the type of control to be done on the specific entity being controlled. The control types available are listed in the EDD output. Specific components may have more than one type of control available, such as flow rate or temperature, and this field is used to distinguish between them.
+
+\paragraph{Field: FMU Variable Name}\label{field-fmu-variable-name-6}
+
+This field contains the name of the variable in the model description file of the FMU that will be mapped to the actuator in EnergyPlus.
+
+\paragraph{Field: Initial Value}\label{field-initial-value-7}
+
+This field contains the initial value. If a value is specified, then this value is used during the warm-up period and the system sizing. If no value is specified, then the actuated component will only be updated once the time stepping starts, i.e., after the warm-up and the system-sizing.
+
+\begin{lstlisting}
+
+ExternalInterface:FunctionalMockupUnitExport:To:Actuator,
+  Zn001_Wall001_Win001_Shading_Deploy_Status,   !- EnergyPlus Variable Name
+  Zn001:Wall001:Win001,                                   !- Actuated Component Unique Name
+  Window Shading Control,                               !- Actuated Component Type
+  Control Status,                                               !- Actuated Component Control Type
+  yShade,                                                               !- FMU Variable Name
+  6;                                                                         !- Initial Value
+\end{lstlisting}
+
+\subsection{ExternalInterface:FunctionalMockupUnitExport:To:Variable}\label{externalinterfacefunctionalmockupunitexporttovariable}
+
+This input object is similar to \hyperref[energymanagementsystemglobalvariable]{EnergyManagementSystem:GlobalVariable}. However, during the time stepping, its value is set to the value received from the external interface. During the warm-up period and the system sizing, its value is set to the value specified by the field initial value. This object can be used to move data into Erl subroutines.
+
+\subsubsection{Inputs}\label{inputs-12-004}
+
+\paragraph{Field: EnergyPlus Variable Name}\label{field-energyplus-variable-name-7}
+
+This field becomes the global Erl variable name that can be referenced in the EnergyPlus Runtime Language. No spaces are allowed in the object name. The name must be unique across all global scope variables including those declared as sensor and actuators and the built-in variables.
+
+\paragraph{Field: FMU Variable Name}\label{field-fmu-variable-name-7}
+
+This field contains the name of the variable in the model description file of the FMU that will be mapped to the corresponding variable in EnergyPlus.
+
+\paragraph{Field: Initial Value}\label{field-initial-value-8}
+
+This field contains the initial value that is used during the warm-up period and during the system sizing.
+
+\begin{lstlisting}
+
+ExternalInterface:FunctionalMockupUnitExport:To:Variable,
+  Shade_Signal,                       !- EnergyPlus Variable Name
+  yShade,                                   !- FMU Variable Name
+  1;                                             !- Initial Value
+\end{lstlisting}

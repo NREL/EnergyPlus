@@ -1,0 +1,51 @@
+\section{eplusout.edd}\label{eplusout.edd}
+
+This file is invoked by including an Output:EnergyManagementSystem input object. The EDD file contains three different types of information related to the Energy Management System (EMS) including: (1) listing of available actuators, (2) listing of available internal variables, and (3) a record of the execution of user's programs for the EnergyPlus Runtime Language (Erl).
+
+The EMS feature in EnergyPlus uses ``Actuators'' to do control operations. The actuators available in a given model depend on the non-EMS-related content of the input file. Similar to how EnergyPlus reports the available output variables to the RDD file, a list of available actuators can be written to the EDD file. There are three settings in the Output:EnergyManagementSystem input object that control how actuators are listed. Selecting ``None'' directs the program to not list the available actuators. Selecting ``NotByUniqueKeyNames'' directs the program to provide a concise listing of the available actuators that does not include their enumeration by unique name. Selecting ``Verbose'' directs the program to provide a complete listing of the available actuators including the unique identifying names. An example listing of actuators using the~ ``NotByUniqueKeyNames''~ option follows.
+
+! \textless{}EnergyManagementSystem:Actuator Available\textgreater{}, *, Component Type, 'Control Type, Units
+
+EnergyManagementSystem:Actuator Available, *,Schedule:Compact,Schedule Value,{[} {]}
+
+EnergyManagementSystem:Actuator Available, *,People,Number of People,{[}each{]}
+
+EnergyManagementSystem:Actuator Available, *,Lights,Electricity Rate,{[}W{]}
+
+EnergyManagementSystem:Actuator Available, *,ElectricEquipment,Electricity Rate,{[}W{]}
+
+EnergyManagementSystem:Actuator Available, *,Window Shading Control,Control Status,{[}ShadeStatus{]}
+
+EnergyManagementSystem:Actuator Available, *,Zone Temperature Control,Heating Setpoint,{[}C{]}
+
+EnergyManagementSystem:Actuator Available, *,Zone Temperature Control,Cooling Setpoint,{[}C{]}
+
+EnergyManagementSystem:Actuator Available, *,Surface,Interior Surface Convection Heat Transfer Coefficient,{[}W/m2-K{]}
+
+EnergyManagementSystem:Actuator Available, *,Surface,Exterior Surface Convection Heat Transfer Coefficient,{[}W/m2-K{]}
+
+EnergyManagementSystem:Actuator Available, *,Ideal Loads Air System,Air Mass Flow Rate,{[}kg/s{]}
+
+The EMS feature in EnergyPlus uses ``Internal Variables'' to obtain input data for use in scaling the results of control calculations. The internal variables available in a give model depend on the non-EMS-related content of the input file. Similar to how EnergyPlus reports the available output variables to the RDD file, a list of available internal variables can be written to the EDD file. There are three settings in the Output:EnergyManagementSystem input object that control how internal variables are listed. Selecting ``None'' directs the program to not list the available internal variables. Selecting ``NotByUniqueKeyNames'' directs the program to provide a concise listing of the available internal variables that does not include their enumeration by unique name. Selecting ``Verbose'' directs the program to provide a complete listing of the available internal variables including the unique identifying names. An example listing of actuators using the~ ``NotByUniqueKeyNames''~ option follows.
+
+! \textless{}EnergyManagementSystem:InternalVariable Available\textgreater{}, *, Internal Data Type
+
+EnergyManagementSystem:InternalVariable Available, *,People Count Design Level,{[}each{]}
+
+EnergyManagementSystem:InternalVariable Available, *,Lighting Power Design Level,{[}W{]}
+
+EnergyManagementSystem:InternalVariable Available, *,Plug and Process Power Design Level,{[}W{]}
+
+EnergyManagementSystem:InternalVariable Available, *,Zone List Multiplier,{[} {]}
+
+EnergyManagementSystem:InternalVariable Available, *,Zone Floor Area,{[}m2{]}
+
+EnergyManagementSystem:InternalVariable Available, *,Zone Air Volume,{[}m3{]}
+
+EnergyManagementSystem:InternalVariable Available, *,Zone Multiplier,{[} {]}
+
+EnergyManagementSystem:InternalVariable Available, *,Zone List Multiplier,{[} {]}
+
+The EMS uses the EnergyPlus Runtime Language, or Erl, to do custom controlling. When Erl programs are being developed, the EDD becomes a primary source of information for debugging. When a line of Erl code is executed, the program can output records called ``line traces'' that are useful for debugging because they show the outcome of each line of code. There are three settings in the Output:EnergyManagementSystem input object that control how line traces are reported. Selecting ``None'' directs the program to not write out any line traces. Selecting ``ErrorsOnly'' directs the program to only write line traces when computation errors are encountered (such as divide by zero). Selecting ``Verbose'' directs the program to write out line traces for each and every line of Erl program code that is executed.
+
+It is very important to be careful with the EDD file. The Verbose option should be used with care because a full line-by-line trace of Erl program execution for an annual run can easily create an enormous computer file that is too large for most computer systems. ~It is possible for EnergyPlus to generate an EDD file that cannot be opened in traditional text editors.

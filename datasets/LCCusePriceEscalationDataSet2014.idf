@@ -1,0 +1,2549 @@
+! The source of the values for the following objects is:
+!
+!    NISTIR 85-3273-29
+!
+!    ENERGY PRICE INDICES AND DISCOUNT FACTORS
+!    FOR LIFE-CYCLE COST ANALYSIS
+!
+!    Annual Supplement to NIST Handbook 135 and NBS Special Publication 709
+!
+!    April 1, 2014 to March 31, 2015
+!
+!    Data for the Federal Methodology for Life-Cycle Cost Analysis, Title 10, CFR, Part 436, Subpart A;
+!    and for the Energy Conservation Mandatory Performance Standards for New Federal Residential Buildings,
+!    Title 10, CFR, Part 435
+!
+!    Amy S. Rushing
+!    Joshua D. Kneifel
+!    Priya Lavappa
+!
+! These are factors for the United States and regions of the United States.
+!
+! The factors are from a file available upon request from NIST called ENCOSTxx.TXT and are
+! converted into EnergyPlus objects using a spreadsheet called ConvertENCOSTtoEnergyPlusLifeCycleCost.xls
+! which is available upon request.
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Residential-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0077,                  !- Year 1 Escalation
+    1.0081,                  !- Year 2 Escalation
+    1.0063,                  !- Year 3 Escalation
+    1.0119,                  !- Year 4 Escalation
+    1.0223,                  !- Year 5 Escalation
+    1.0259,                  !- Year 6 Escalation
+    1.0244,                  !- Year 7 Escalation
+    1.0156,                  !- Year 8 Escalation
+    1.0083,                  !- Year 9 Escalation
+    1.0204,                  !- Year 10 Escalation
+    1.0302,                  !- Year 11 Escalation
+    1.0371,                  !- Year 12 Escalation
+    1.0476,                  !- Year 13 Escalation
+    1.0563,                  !- Year 14 Escalation
+    1.0665,                  !- Year 15 Escalation
+    1.0807,                  !- Year 16 Escalation
+    1.0935,                  !- Year 17 Escalation
+    1.0935,                  !- Year 18 Escalation
+    1.0891,                  !- Year 19 Escalation
+    1.0930,                  !- Year 20 Escalation
+    1.1022,                  !- Year 21 Escalation
+    1.1106,                  !- Year 22 Escalation
+    1.1204,                  !- Year 23 Escalation
+    1.1293,                  !- Year 24 Escalation
+    1.1441,                  !- Year 25 Escalation
+    1.1604,                  !- Year 26 Escalation
+    1.1700,                  !- Year 27 Escalation
+    1.1775,                  !- Year 28 Escalation
+    1.1850,                  !- Year 29 Escalation
+    1.1925;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Residential-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9607,                  !- Year 1 Escalation
+    0.9329,                  !- Year 2 Escalation
+    0.9187,                  !- Year 3 Escalation
+    0.9222,                  !- Year 4 Escalation
+    0.9383,                  !- Year 5 Escalation
+    0.9561,                  !- Year 6 Escalation
+    0.9746,                  !- Year 7 Escalation
+    0.9934,                  !- Year 8 Escalation
+    1.0112,                  !- Year 9 Escalation
+    1.0285,                  !- Year 10 Escalation
+    1.0447,                  !- Year 11 Escalation
+    1.0574,                  !- Year 12 Escalation
+    1.0732,                  !- Year 13 Escalation
+    1.0855,                  !- Year 14 Escalation
+    1.0983,                  !- Year 15 Escalation
+    1.1098,                  !- Year 16 Escalation
+    1.1222,                  !- Year 17 Escalation
+    1.1364,                  !- Year 18 Escalation
+    1.1526,                  !- Year 19 Escalation
+    1.1696,                  !- Year 20 Escalation
+    1.1834,                  !- Year 21 Escalation
+    1.1961,                  !- Year 22 Escalation
+    1.2089,                  !- Year 23 Escalation
+    1.2227,                  !- Year 24 Escalation
+    1.2405,                  !- Year 25 Escalation
+    1.2609,                  !- Year 26 Escalation
+    1.2794,                  !- Year 27 Escalation
+    1.2979,                  !- Year 28 Escalation
+    1.3164,                  !- Year 29 Escalation
+    1.3353;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Residential-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0288,                  !- Year 1 Escalation
+    1.0052,                  !- Year 2 Escalation
+    1.0061,                  !- Year 3 Escalation
+    1.0227,                  !- Year 4 Escalation
+    1.0358,                  !- Year 5 Escalation
+    1.0498,                  !- Year 6 Escalation
+    1.0760,                  !- Year 7 Escalation
+    1.0970,                  !- Year 8 Escalation
+    1.1180,                  !- Year 9 Escalation
+    1.1477,                  !- Year 10 Escalation
+    1.1844,                  !- Year 11 Escalation
+    1.2194,                  !- Year 12 Escalation
+    1.2483,                  !- Year 13 Escalation
+    1.2806,                  !- Year 14 Escalation
+    1.3164,                  !- Year 15 Escalation
+    1.3505,                  !- Year 16 Escalation
+    1.3575,                  !- Year 17 Escalation
+    1.3226,                  !- Year 18 Escalation
+    1.3199,                  !- Year 19 Escalation
+    1.3304,                  !- Year 20 Escalation
+    1.3479,                  !- Year 21 Escalation
+    1.3706,                  !- Year 22 Escalation
+    1.3907,                  !- Year 23 Escalation
+    1.4126,                  !- Year 24 Escalation
+    1.4580,                  !- Year 25 Escalation
+    1.5070,                  !- Year 26 Escalation
+    1.5323,                  !- Year 27 Escalation
+    1.5507,                  !- Year 28 Escalation
+    1.5691,                  !- Year 29 Escalation
+    1.5874;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Residential-LPG,  !- Name
+    Propane,                 !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9783,                  !- Year 1 Escalation
+    0.9735,                  !- Year 2 Escalation
+    0.9913,                  !- Year 3 Escalation
+    1.0100,                  !- Year 4 Escalation
+    1.0222,                  !- Year 5 Escalation
+    1.0304,                  !- Year 6 Escalation
+    1.0409,                  !- Year 7 Escalation
+    1.0509,                  !- Year 8 Escalation
+    1.0583,                  !- Year 9 Escalation
+    1.0666,                  !- Year 10 Escalation
+    1.0761,                  !- Year 11 Escalation
+    1.0848,                  !- Year 12 Escalation
+    1.0935,                  !- Year 13 Escalation
+    1.1009,                  !- Year 14 Escalation
+    1.1083,                  !- Year 15 Escalation
+    1.1157,                  !- Year 16 Escalation
+    1.1231,                  !- Year 17 Escalation
+    1.1309,                  !- Year 18 Escalation
+    1.1401,                  !- Year 19 Escalation
+    1.1483,                  !- Year 20 Escalation
+    1.1557,                  !- Year 21 Escalation
+    1.1627,                  !- Year 22 Escalation
+    1.1688,                  !- Year 23 Escalation
+    1.1744,                  !- Year 24 Escalation
+    1.1809,                  !- Year 25 Escalation
+    1.1888,                  !- Year 26 Escalation
+    1.1979,                  !- Year 27 Escalation
+    1.2075,                  !- Year 28 Escalation
+    1.2166,                  !- Year 29 Escalation
+    1.2262;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Commercial-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0098,                  !- Year 1 Escalation
+    1.0193,                  !- Year 2 Escalation
+    1.0180,                  !- Year 3 Escalation
+    1.0286,                  !- Year 4 Escalation
+    1.0468,                  !- Year 5 Escalation
+    1.0479,                  !- Year 6 Escalation
+    1.0444,                  !- Year 7 Escalation
+    1.0324,                  !- Year 8 Escalation
+    1.0259,                  !- Year 9 Escalation
+    1.0447,                  !- Year 10 Escalation
+    1.0580,                  !- Year 11 Escalation
+    1.0664,                  !- Year 12 Escalation
+    1.0803,                  !- Year 13 Escalation
+    1.0915,                  !- Year 14 Escalation
+    1.1032,                  !- Year 15 Escalation
+    1.1204,                  !- Year 16 Escalation
+    1.1343,                  !- Year 17 Escalation
+    1.1329,                  !- Year 18 Escalation
+    1.1250,                  !- Year 19 Escalation
+    1.1288,                  !- Year 20 Escalation
+    1.1403,                  !- Year 21 Escalation
+    1.1503,                  !- Year 22 Escalation
+    1.1620,                  !- Year 23 Escalation
+    1.1727,                  !- Year 24 Escalation
+    1.1909,                  !- Year 25 Escalation
+    1.2119,                  !- Year 26 Escalation
+    1.2244,                  !- Year 27 Escalation
+    1.2339,                  !- Year 28 Escalation
+    1.2437,                  !- Year 29 Escalation
+    1.2533;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Commercial-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9036,                  !- Year 1 Escalation
+    0.8620,                  !- Year 2 Escalation
+    0.8528,                  !- Year 3 Escalation
+    0.8584,                  !- Year 4 Escalation
+    0.8762,                  !- Year 5 Escalation
+    0.8949,                  !- Year 6 Escalation
+    0.9143,                  !- Year 7 Escalation
+    0.9345,                  !- Year 8 Escalation
+    0.9520,                  !- Year 9 Escalation
+    0.9679,                  !- Year 10 Escalation
+    0.9845,                  !- Year 11 Escalation
+    0.9984,                  !- Year 12 Escalation
+    1.0143,                  !- Year 13 Escalation
+    1.0262,                  !- Year 14 Escalation
+    1.0393,                  !- Year 15 Escalation
+    1.0516,                  !- Year 16 Escalation
+    1.0643,                  !- Year 17 Escalation
+    1.0789,                  !- Year 18 Escalation
+    1.0948,                  !- Year 19 Escalation
+    1.1111,                  !- Year 20 Escalation
+    1.1234,                  !- Year 21 Escalation
+    1.1353,                  !- Year 22 Escalation
+    1.1472,                  !- Year 23 Escalation
+    1.1599,                  !- Year 24 Escalation
+    1.1781,                  !- Year 25 Escalation
+    1.1987,                  !- Year 26 Escalation
+    1.2182,                  !- Year 27 Escalation
+    1.2372,                  !- Year 28 Escalation
+    1.2566,                  !- Year 29 Escalation
+    1.2761;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Commercial-Residual Oil,  !- Name
+    FuelOilNo2,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.7222,                  !- Year 1 Escalation
+    0.6339,                  !- Year 2 Escalation
+    0.6206,                  !- Year 3 Escalation
+    0.6215,                  !- Year 4 Escalation
+    0.6330,                  !- Year 5 Escalation
+    0.6490,                  !- Year 6 Escalation
+    0.6650,                  !- Year 7 Escalation
+    0.6874,                  !- Year 8 Escalation
+    0.7048,                  !- Year 9 Escalation
+    0.7176,                  !- Year 10 Escalation
+    0.7300,                  !- Year 11 Escalation
+    0.7487,                  !- Year 12 Escalation
+    0.7689,                  !- Year 13 Escalation
+    0.7785,                  !- Year 14 Escalation
+    0.7977,                  !- Year 15 Escalation
+    0.8124,                  !- Year 16 Escalation
+    0.8270,                  !- Year 17 Escalation
+    0.8416,                  !- Year 18 Escalation
+    0.8558,                  !- Year 19 Escalation
+    0.8705,                  !- Year 20 Escalation
+    0.8796,                  !- Year 21 Escalation
+    0.8902,                  !- Year 22 Escalation
+    0.9021,                  !- Year 23 Escalation
+    0.9140,                  !- Year 24 Escalation
+    0.9309,                  !- Year 25 Escalation
+    0.9510,                  !- Year 26 Escalation
+    0.9721,                  !- Year 27 Escalation
+    0.9941,                  !- Year 28 Escalation
+    1.0165,                  !- Year 29 Escalation
+    1.0389;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Commercial-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0334,                  !- Year 1 Escalation
+    1.0060,                  !- Year 2 Escalation
+    1.0083,                  !- Year 3 Escalation
+    1.0262,                  !- Year 4 Escalation
+    1.0381,                  !- Year 5 Escalation
+    1.0524,                  !- Year 6 Escalation
+    1.0834,                  !- Year 7 Escalation
+    1.1073,                  !- Year 8 Escalation
+    1.1311,                  !- Year 9 Escalation
+    1.1669,                  !- Year 10 Escalation
+    1.2122,                  !- Year 11 Escalation
+    1.2551,                  !- Year 12 Escalation
+    1.2884,                  !- Year 13 Escalation
+    1.3278,                  !- Year 14 Escalation
+    1.3719,                  !- Year 15 Escalation
+    1.4124,                  !- Year 16 Escalation
+    1.4160,                  !- Year 17 Escalation
+    1.3623,                  !- Year 18 Escalation
+    1.3528,                  !- Year 19 Escalation
+    1.3600,                  !- Year 20 Escalation
+    1.3743,                  !- Year 21 Escalation
+    1.3969,                  !- Year 22 Escalation
+    1.4160,                  !- Year 23 Escalation
+    1.4374,                  !- Year 24 Escalation
+    1.4887,                  !- Year 25 Escalation
+    1.5471,                  !- Year 26 Escalation
+    1.5793,                  !- Year 27 Escalation
+    1.6043,                  !- Year 28 Escalation
+    1.6293,                  !- Year 29 Escalation
+    1.6544;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Commercial-Coal,  !- Name
+    Coal,                    !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0199,                  !- Year 1 Escalation
+    1.0322,                  !- Year 2 Escalation
+    1.0291,                  !- Year 3 Escalation
+    1.0399,                  !- Year 4 Escalation
+    1.0491,                  !- Year 5 Escalation
+    1.0567,                  !- Year 6 Escalation
+    1.0598,                  !- Year 7 Escalation
+    1.0613,                  !- Year 8 Escalation
+    1.0629,                  !- Year 9 Escalation
+    1.0660,                  !- Year 10 Escalation
+    1.0706,                  !- Year 11 Escalation
+    1.0752,                  !- Year 12 Escalation
+    1.0782,                  !- Year 13 Escalation
+    1.0828,                  !- Year 14 Escalation
+    1.0859,                  !- Year 15 Escalation
+    1.0936,                  !- Year 16 Escalation
+    1.0982,                  !- Year 17 Escalation
+    1.1043,                  !- Year 18 Escalation
+    1.1074,                  !- Year 19 Escalation
+    1.1120,                  !- Year 20 Escalation
+    1.1150,                  !- Year 21 Escalation
+    1.1181,                  !- Year 22 Escalation
+    1.1242,                  !- Year 23 Escalation
+    1.1288,                  !- Year 24 Escalation
+    1.1350,                  !- Year 25 Escalation
+    1.1426,                  !- Year 26 Escalation
+    1.1472,                  !- Year 27 Escalation
+    1.1534,                  !- Year 28 Escalation
+    1.1595,                  !- Year 29 Escalation
+    1.1656;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Industrial-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9827,                  !- Year 1 Escalation
+    0.9651,                  !- Year 2 Escalation
+    0.9583,                  !- Year 3 Escalation
+    0.9668,                  !- Year 4 Escalation
+    0.9873,                  !- Year 5 Escalation
+    0.9894,                  !- Year 6 Escalation
+    0.9887,                  !- Year 7 Escalation
+    0.9855,                  !- Year 8 Escalation
+    0.9838,                  !- Year 9 Escalation
+    1.0011,                  !- Year 10 Escalation
+    1.0169,                  !- Year 11 Escalation
+    1.0304,                  !- Year 12 Escalation
+    1.0477,                  !- Year 13 Escalation
+    1.0635,                  !- Year 14 Escalation
+    1.0798,                  !- Year 15 Escalation
+    1.1002,                  !- Year 16 Escalation
+    1.1154,                  !- Year 17 Escalation
+    1.1130,                  !- Year 18 Escalation
+    1.1052,                  !- Year 19 Escalation
+    1.1112,                  !- Year 20 Escalation
+    1.1250,                  !- Year 21 Escalation
+    1.1377,                  !- Year 22 Escalation
+    1.1514,                  !- Year 23 Escalation
+    1.1638,                  !- Year 24 Escalation
+    1.1850,                  !- Year 25 Escalation
+    1.2093,                  !- Year 26 Escalation
+    1.2248,                  !- Year 27 Escalation
+    1.2376,                  !- Year 28 Escalation
+    1.2506,                  !- Year 29 Escalation
+    1.2637;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Industrial-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8824,                  !- Year 1 Escalation
+    0.8383,                  !- Year 2 Escalation
+    0.8337,                  !- Year 3 Escalation
+    0.8406,                  !- Year 4 Escalation
+    0.8584,                  !- Year 5 Escalation
+    0.8770,                  !- Year 6 Escalation
+    0.8956,                  !- Year 7 Escalation
+    0.9161,                  !- Year 8 Escalation
+    0.9327,                  !- Year 9 Escalation
+    0.9470,                  !- Year 10 Escalation
+    0.9629,                  !- Year 11 Escalation
+    0.9768,                  !- Year 12 Escalation
+    0.9923,                  !- Year 13 Escalation
+    1.0039,                  !- Year 14 Escalation
+    1.0159,                  !- Year 15 Escalation
+    1.0279,                  !- Year 16 Escalation
+    1.0410,                  !- Year 17 Escalation
+    1.0553,                  !- Year 18 Escalation
+    1.0696,                  !- Year 19 Escalation
+    1.0843,                  !- Year 20 Escalation
+    1.0952,                  !- Year 21 Escalation
+    1.1060,                  !- Year 22 Escalation
+    1.1168,                  !- Year 23 Escalation
+    1.1280,                  !- Year 24 Escalation
+    1.1455,                  !- Year 25 Escalation
+    1.1660,                  !- Year 26 Escalation
+    1.1849,                  !- Year 27 Escalation
+    1.2035,                  !- Year 28 Escalation
+    1.2224,                  !- Year 29 Escalation
+    1.2414;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Industrial-Residual Oil,  !- Name
+    FuelOilNo2,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8034,                  !- Year 1 Escalation
+    0.7327,                  !- Year 2 Escalation
+    0.7187,                  !- Year 3 Escalation
+    0.7201,                  !- Year 4 Escalation
+    0.7313,                  !- Year 5 Escalation
+    0.7476,                  !- Year 6 Escalation
+    0.7639,                  !- Year 7 Escalation
+    0.7862,                  !- Year 8 Escalation
+    0.8034,                  !- Year 9 Escalation
+    0.8160,                  !- Year 10 Escalation
+    0.8286,                  !- Year 11 Escalation
+    0.8477,                  !- Year 12 Escalation
+    0.8677,                  !- Year 13 Escalation
+    0.8775,                  !- Year 14 Escalation
+    0.8971,                  !- Year 15 Escalation
+    0.9120,                  !- Year 16 Escalation
+    0.9264,                  !- Year 17 Escalation
+    0.9413,                  !- Year 18 Escalation
+    0.9558,                  !- Year 19 Escalation
+    0.9702,                  !- Year 20 Escalation
+    0.9795,                  !- Year 21 Escalation
+    0.9898,                  !- Year 22 Escalation
+    1.0023,                  !- Year 23 Escalation
+    1.0144,                  !- Year 24 Escalation
+    1.0307,                  !- Year 25 Escalation
+    1.0512,                  !- Year 26 Escalation
+    1.0727,                  !- Year 27 Escalation
+    1.0950,                  !- Year 28 Escalation
+    1.1178,                  !- Year 29 Escalation
+    1.1407;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Industrial-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0621,                  !- Year 1 Escalation
+    1.0874,                  !- Year 2 Escalation
+    1.1068,                  !- Year 3 Escalation
+    1.1320,                  !- Year 4 Escalation
+    1.1476,                  !- Year 5 Escalation
+    1.1689,                  !- Year 6 Escalation
+    1.2117,                  !- Year 7 Escalation
+    1.2466,                  !- Year 8 Escalation
+    1.2835,                  !- Year 9 Escalation
+    1.3398,                  !- Year 10 Escalation
+    1.4117,                  !- Year 11 Escalation
+    1.4796,                  !- Year 12 Escalation
+    1.5340,                  !- Year 13 Escalation
+    1.5981,                  !- Year 14 Escalation
+    1.6699,                  !- Year 15 Escalation
+    1.7320,                  !- Year 16 Escalation
+    1.7417,                  !- Year 17 Escalation
+    1.6524,                  !- Year 18 Escalation
+    1.6350,                  !- Year 19 Escalation
+    1.6427,                  !- Year 20 Escalation
+    1.6641,                  !- Year 21 Escalation
+    1.6971,                  !- Year 22 Escalation
+    1.7262,                  !- Year 23 Escalation
+    1.7573,                  !- Year 24 Escalation
+    1.8369,                  !- Year 25 Escalation
+    1.9243,                  !- Year 26 Escalation
+    1.9748,                  !- Year 27 Escalation
+    2.0155,                  !- Year 28 Escalation
+    2.0563,                  !- Year 29 Escalation
+    2.0971;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    NorthEast  Industrial-Coal,  !- Name
+    Coal,                    !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0075,                  !- Year 1 Escalation
+    1.0200,                  !- Year 2 Escalation
+    1.0250,                  !- Year 3 Escalation
+    1.0400,                  !- Year 4 Escalation
+    1.0575,                  !- Year 5 Escalation
+    1.0700,                  !- Year 6 Escalation
+    1.0750,                  !- Year 7 Escalation
+    1.0800,                  !- Year 8 Escalation
+    1.0850,                  !- Year 9 Escalation
+    1.0925,                  !- Year 10 Escalation
+    1.0975,                  !- Year 11 Escalation
+    1.1075,                  !- Year 12 Escalation
+    1.1150,                  !- Year 13 Escalation
+    1.1275,                  !- Year 14 Escalation
+    1.1350,                  !- Year 15 Escalation
+    1.1450,                  !- Year 16 Escalation
+    1.1525,                  !- Year 17 Escalation
+    1.1625,                  !- Year 18 Escalation
+    1.1725,                  !- Year 19 Escalation
+    1.1800,                  !- Year 20 Escalation
+    1.1875,                  !- Year 21 Escalation
+    1.1975,                  !- Year 22 Escalation
+    1.2075,                  !- Year 23 Escalation
+    1.2175,                  !- Year 24 Escalation
+    1.2250,                  !- Year 25 Escalation
+    1.2375,                  !- Year 26 Escalation
+    1.2475,                  !- Year 27 Escalation
+    1.2575,                  !- Year 28 Escalation
+    1.2650,                  !- Year 29 Escalation
+    1.2750;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Residential-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0319,                  !- Year 1 Escalation
+    1.0552,                  !- Year 2 Escalation
+    1.0755,                  !- Year 3 Escalation
+    1.0899,                  !- Year 4 Escalation
+    1.1046,                  !- Year 5 Escalation
+    1.1138,                  !- Year 6 Escalation
+    1.1175,                  !- Year 7 Escalation
+    1.1147,                  !- Year 8 Escalation
+    1.1135,                  !- Year 9 Escalation
+    1.1227,                  !- Year 10 Escalation
+    1.1267,                  !- Year 11 Escalation
+    1.1291,                  !- Year 12 Escalation
+    1.1374,                  !- Year 13 Escalation
+    1.1402,                  !- Year 14 Escalation
+    1.1414,                  !- Year 15 Escalation
+    1.1460,                  !- Year 16 Escalation
+    1.1515,                  !- Year 17 Escalation
+    1.1546,                  !- Year 18 Escalation
+    1.1546,                  !- Year 19 Escalation
+    1.1558,                  !- Year 20 Escalation
+    1.1595,                  !- Year 21 Escalation
+    1.1635,                  !- Year 22 Escalation
+    1.1672,                  !- Year 23 Escalation
+    1.1687,                  !- Year 24 Escalation
+    1.1721,                  !- Year 25 Escalation
+    1.1779,                  !- Year 26 Escalation
+    1.1828,                  !- Year 27 Escalation
+    1.1874,                  !- Year 28 Escalation
+    1.1917,                  !- Year 29 Escalation
+    1.1963;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Residential-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9080,                  !- Year 1 Escalation
+    0.8635,                  !- Year 2 Escalation
+    0.8487,                  !- Year 3 Escalation
+    0.8523,                  !- Year 4 Escalation
+    0.8690,                  !- Year 5 Escalation
+    0.8873,                  !- Year 6 Escalation
+    0.9064,                  !- Year 7 Escalation
+    0.9260,                  !- Year 8 Escalation
+    0.9447,                  !- Year 9 Escalation
+    0.9626,                  !- Year 10 Escalation
+    0.9793,                  !- Year 11 Escalation
+    0.9936,                  !- Year 12 Escalation
+    1.0096,                  !- Year 13 Escalation
+    1.0219,                  !- Year 14 Escalation
+    1.0354,                  !- Year 15 Escalation
+    1.0474,                  !- Year 16 Escalation
+    1.0609,                  !- Year 17 Escalation
+    1.0764,                  !- Year 18 Escalation
+    1.0924,                  !- Year 19 Escalation
+    1.1099,                  !- Year 20 Escalation
+    1.1242,                  !- Year 21 Escalation
+    1.1373,                  !- Year 22 Escalation
+    1.1501,                  !- Year 23 Escalation
+    1.1644,                  !- Year 24 Escalation
+    1.1835,                  !- Year 25 Escalation
+    1.2046,                  !- Year 26 Escalation
+    1.2237,                  !- Year 27 Escalation
+    1.2428,                  !- Year 28 Escalation
+    1.2619,                  !- Year 29 Escalation
+    1.2814;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Residential-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9970,                  !- Year 1 Escalation
+    0.9718,                  !- Year 2 Escalation
+    0.9940,                  !- Year 3 Escalation
+    1.0403,                  !- Year 4 Escalation
+    1.0645,                  !- Year 5 Escalation
+    1.0575,                  !- Year 6 Escalation
+    1.0655,                  !- Year 7 Escalation
+    1.0716,                  !- Year 8 Escalation
+    1.0796,                  !- Year 9 Escalation
+    1.0978,                  !- Year 10 Escalation
+    1.1069,                  !- Year 11 Escalation
+    1.1089,                  !- Year 12 Escalation
+    1.1159,                  !- Year 13 Escalation
+    1.1250,                  !- Year 14 Escalation
+    1.1452,                  !- Year 15 Escalation
+    1.1734,                  !- Year 16 Escalation
+    1.1935,                  !- Year 17 Escalation
+    1.2137,                  !- Year 18 Escalation
+    1.2379,                  !- Year 19 Escalation
+    1.2591,                  !- Year 20 Escalation
+    1.2813,                  !- Year 21 Escalation
+    1.3125,                  !- Year 22 Escalation
+    1.3317,                  !- Year 23 Escalation
+    1.3448,                  !- Year 24 Escalation
+    1.3690,                  !- Year 25 Escalation
+    1.3982,                  !- Year 26 Escalation
+    1.4214,                  !- Year 27 Escalation
+    1.4425,                  !- Year 28 Escalation
+    1.4637,                  !- Year 29 Escalation
+    1.4859;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Residential-LPG,!- Name
+    Propane,                 !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9783,                  !- Year 1 Escalation
+    0.9735,                  !- Year 2 Escalation
+    0.9913,                  !- Year 3 Escalation
+    1.0100,                  !- Year 4 Escalation
+    1.0222,                  !- Year 5 Escalation
+    1.0304,                  !- Year 6 Escalation
+    1.0409,                  !- Year 7 Escalation
+    1.0509,                  !- Year 8 Escalation
+    1.0583,                  !- Year 9 Escalation
+    1.0666,                  !- Year 10 Escalation
+    1.0761,                  !- Year 11 Escalation
+    1.0848,                  !- Year 12 Escalation
+    1.0935,                  !- Year 13 Escalation
+    1.1009,                  !- Year 14 Escalation
+    1.1083,                  !- Year 15 Escalation
+    1.1157,                  !- Year 16 Escalation
+    1.1231,                  !- Year 17 Escalation
+    1.1309,                  !- Year 18 Escalation
+    1.1401,                  !- Year 19 Escalation
+    1.1483,                  !- Year 20 Escalation
+    1.1557,                  !- Year 21 Escalation
+    1.1627,                  !- Year 22 Escalation
+    1.1688,                  !- Year 23 Escalation
+    1.1744,                  !- Year 24 Escalation
+    1.1809,                  !- Year 25 Escalation
+    1.1888,                  !- Year 26 Escalation
+    1.1979,                  !- Year 27 Escalation
+    1.2075,                  !- Year 28 Escalation
+    1.2166,                  !- Year 29 Escalation
+    1.2262;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Commercial-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0269,                  !- Year 1 Escalation
+    1.0458,                  !- Year 2 Escalation
+    1.0624,                  !- Year 3 Escalation
+    1.0756,                  !- Year 4 Escalation
+    1.0927,                  !- Year 5 Escalation
+    1.0964,                  !- Year 6 Escalation
+    1.0930,                  !- Year 7 Escalation
+    1.0843,                  !- Year 8 Escalation
+    1.0794,                  !- Year 9 Escalation
+    1.0893,                  !- Year 10 Escalation
+    1.0911,                  !- Year 11 Escalation
+    1.0919,                  !- Year 12 Escalation
+    1.1006,                  !- Year 13 Escalation
+    1.1025,                  !- Year 14 Escalation
+    1.1033,                  !- Year 15 Escalation
+    1.1085,                  !- Year 16 Escalation
+    1.1146,                  !- Year 17 Escalation
+    1.1180,                  !- Year 18 Escalation
+    1.1180,                  !- Year 19 Escalation
+    1.1195,                  !- Year 20 Escalation
+    1.1241,                  !- Year 21 Escalation
+    1.1301,                  !- Year 22 Escalation
+    1.1346,                  !- Year 23 Escalation
+    1.1369,                  !- Year 24 Escalation
+    1.1418,                  !- Year 25 Escalation
+    1.1494,                  !- Year 26 Escalation
+    1.1547,                  !- Year 27 Escalation
+    1.1585,                  !- Year 28 Escalation
+    1.1623,                  !- Year 29 Escalation
+    1.1660;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Commercial-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8515,                  !- Year 1 Escalation
+    0.7957,                  !- Year 2 Escalation
+    0.7866,                  !- Year 3 Escalation
+    0.7921,                  !- Year 4 Escalation
+    0.8098,                  !- Year 5 Escalation
+    0.8283,                  !- Year 6 Escalation
+    0.8475,                  !- Year 7 Escalation
+    0.8676,                  !- Year 8 Escalation
+    0.8849,                  !- Year 9 Escalation
+    0.9006,                  !- Year 10 Escalation
+    0.9171,                  !- Year 11 Escalation
+    0.9312,                  !- Year 12 Escalation
+    0.9470,                  !- Year 13 Escalation
+    0.9587,                  !- Year 14 Escalation
+    0.9713,                  !- Year 15 Escalation
+    0.9835,                  !- Year 16 Escalation
+    0.9969,                  !- Year 17 Escalation
+    1.0114,                  !- Year 18 Escalation
+    1.0267,                  !- Year 19 Escalation
+    1.0428,                  !- Year 20 Escalation
+    1.0546,                  !- Year 21 Escalation
+    1.0664,                  !- Year 22 Escalation
+    1.0782,                  !- Year 23 Escalation
+    1.0912,                  !- Year 24 Escalation
+    1.1088,                  !- Year 25 Escalation
+    1.1297,                  !- Year 26 Escalation
+    1.1489,                  !- Year 27 Escalation
+    1.1678,                  !- Year 28 Escalation
+    1.1870,                  !- Year 29 Escalation
+    1.2063;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Commercial-Residual Oil,  !- Name
+    FuelOilNo2,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0698,                  !- Year 1 Escalation
+    1.0767,                  !- Year 2 Escalation
+    1.0600,                  !- Year 3 Escalation
+    1.0612,                  !- Year 4 Escalation
+    1.0733,                  !- Year 5 Escalation
+    1.0912,                  !- Year 6 Escalation
+    1.1131,                  !- Year 7 Escalation
+    1.1368,                  !- Year 8 Escalation
+    1.1581,                  !- Year 9 Escalation
+    1.1777,                  !- Year 10 Escalation
+    1.1956,                  !- Year 11 Escalation
+    1.2129,                  !- Year 12 Escalation
+    1.2372,                  !- Year 13 Escalation
+    1.2545,                  !- Year 14 Escalation
+    1.2747,                  !- Year 15 Escalation
+    1.2914,                  !- Year 16 Escalation
+    1.3076,                  !- Year 17 Escalation
+    1.3254,                  !- Year 18 Escalation
+    1.3445,                  !- Year 19 Escalation
+    1.3595,                  !- Year 20 Escalation
+    1.3751,                  !- Year 21 Escalation
+    1.3912,                  !- Year 22 Escalation
+    1.4068,                  !- Year 23 Escalation
+    1.4235,                  !- Year 24 Escalation
+    1.4455,                  !- Year 25 Escalation
+    1.4709,                  !- Year 26 Escalation
+    1.4980,                  !- Year 27 Escalation
+    1.5257,                  !- Year 28 Escalation
+    1.5540,                  !- Year 29 Escalation
+    1.5822;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Commercial-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9976,                  !- Year 1 Escalation
+    0.9785,                  !- Year 2 Escalation
+    1.0048,                  !- Year 3 Escalation
+    1.0572,                  !- Year 4 Escalation
+    1.0822,                  !- Year 5 Escalation
+    1.0715,                  !- Year 6 Escalation
+    1.0787,                  !- Year 7 Escalation
+    1.0834,                  !- Year 8 Escalation
+    1.0906,                  !- Year 9 Escalation
+    1.1085,                  !- Year 10 Escalation
+    1.1156,                  !- Year 11 Escalation
+    1.1168,                  !- Year 12 Escalation
+    1.1216,                  !- Year 13 Escalation
+    1.1287,                  !- Year 14 Escalation
+    1.1490,                  !- Year 15 Escalation
+    1.1776,                  !- Year 16 Escalation
+    1.1979,                  !- Year 17 Escalation
+    1.2193,                  !- Year 18 Escalation
+    1.2431,                  !- Year 19 Escalation
+    1.2646,                  !- Year 20 Escalation
+    1.2861,                  !- Year 21 Escalation
+    1.3194,                  !- Year 22 Escalation
+    1.3373,                  !- Year 23 Escalation
+    1.3480,                  !- Year 24 Escalation
+    1.3731,                  !- Year 25 Escalation
+    1.4041,                  !- Year 26 Escalation
+    1.4303,                  !- Year 27 Escalation
+    1.4553,                  !- Year 28 Escalation
+    1.4803,                  !- Year 29 Escalation
+    1.5054;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Commercial-Coal,!- Name
+    Coal,                    !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0168,                  !- Year 1 Escalation
+    1.0364,                  !- Year 2 Escalation
+    1.0504,                  !- Year 3 Escalation
+    1.0672,                  !- Year 4 Escalation
+    1.0812,                  !- Year 5 Escalation
+    1.0896,                  !- Year 6 Escalation
+    1.0952,                  !- Year 7 Escalation
+    1.1008,                  !- Year 8 Escalation
+    1.1036,                  !- Year 9 Escalation
+    1.1120,                  !- Year 10 Escalation
+    1.1176,                  !- Year 11 Escalation
+    1.1261,                  !- Year 12 Escalation
+    1.1345,                  !- Year 13 Escalation
+    1.1429,                  !- Year 14 Escalation
+    1.1513,                  !- Year 15 Escalation
+    1.1653,                  !- Year 16 Escalation
+    1.1709,                  !- Year 17 Escalation
+    1.1793,                  !- Year 18 Escalation
+    1.1877,                  !- Year 19 Escalation
+    1.1933,                  !- Year 20 Escalation
+    1.2017,                  !- Year 21 Escalation
+    1.2073,                  !- Year 22 Escalation
+    1.2157,                  !- Year 23 Escalation
+    1.2213,                  !- Year 24 Escalation
+    1.2325,                  !- Year 25 Escalation
+    1.2437,                  !- Year 26 Escalation
+    1.2549,                  !- Year 27 Escalation
+    1.2633,                  !- Year 28 Escalation
+    1.2745,                  !- Year 29 Escalation
+    1.2857;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Industrial-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0213,                  !- Year 1 Escalation
+    1.0369,                  !- Year 2 Escalation
+    1.0494,                  !- Year 3 Escalation
+    1.0661,                  !- Year 4 Escalation
+    1.0884,                  !- Year 5 Escalation
+    1.0968,                  !- Year 6 Escalation
+    1.0968,                  !- Year 7 Escalation
+    1.0916,                  !- Year 8 Escalation
+    1.0905,                  !- Year 9 Escalation
+    1.1035,                  !- Year 10 Escalation
+    1.1103,                  !- Year 11 Escalation
+    1.1160,                  !- Year 12 Escalation
+    1.1280,                  !- Year 13 Escalation
+    1.1342,                  !- Year 14 Escalation
+    1.1394,                  !- Year 15 Escalation
+    1.1498,                  !- Year 16 Escalation
+    1.1608,                  !- Year 17 Escalation
+    1.1675,                  !- Year 18 Escalation
+    1.1707,                  !- Year 19 Escalation
+    1.1769,                  !- Year 20 Escalation
+    1.1873,                  !- Year 21 Escalation
+    1.1988,                  !- Year 22 Escalation
+    1.2092,                  !- Year 23 Escalation
+    1.2154,                  !- Year 24 Escalation
+    1.2258,                  !- Year 25 Escalation
+    1.2399,                  !- Year 26 Escalation
+    1.2503,                  !- Year 27 Escalation
+    1.2591,                  !- Year 28 Escalation
+    1.2685,                  !- Year 29 Escalation
+    1.2773;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Industrial-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8584,                  !- Year 1 Escalation
+    0.8082,                  !- Year 2 Escalation
+    0.8032,                  !- Year 3 Escalation
+    0.8100,                  !- Year 4 Escalation
+    0.8278,                  !- Year 5 Escalation
+    0.8455,                  !- Year 6 Escalation
+    0.8640,                  !- Year 7 Escalation
+    0.8841,                  !- Year 8 Escalation
+    0.8999,                  !- Year 9 Escalation
+    0.9143,                  !- Year 10 Escalation
+    0.9298,                  !- Year 11 Escalation
+    0.9434,                  !- Year 12 Escalation
+    0.9581,                  !- Year 13 Escalation
+    0.9694,                  !- Year 14 Escalation
+    0.9811,                  !- Year 15 Escalation
+    0.9928,                  !- Year 16 Escalation
+    1.0060,                  !- Year 17 Escalation
+    1.0200,                  !- Year 18 Escalation
+    1.0344,                  !- Year 19 Escalation
+    1.0483,                  !- Year 20 Escalation
+    1.0585,                  !- Year 21 Escalation
+    1.0691,                  !- Year 22 Escalation
+    1.0801,                  !- Year 23 Escalation
+    1.0910,                  !- Year 24 Escalation
+    1.1080,                  !- Year 25 Escalation
+    1.1280,                  !- Year 26 Escalation
+    1.1465,                  !- Year 27 Escalation
+    1.1647,                  !- Year 28 Escalation
+    1.1832,                  !- Year 29 Escalation
+    1.2017;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Industrial-Residual Oil,  !- Name
+    FuelOilNo2,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0977,                  !- Year 1 Escalation
+    1.1144,                  !- Year 2 Escalation
+    1.0971,                  !- Year 3 Escalation
+    1.0983,                  !- Year 4 Escalation
+    1.1108,                  !- Year 5 Escalation
+    1.1292,                  !- Year 6 Escalation
+    1.1519,                  !- Year 7 Escalation
+    1.1763,                  !- Year 8 Escalation
+    1.1983,                  !- Year 9 Escalation
+    1.2186,                  !- Year 10 Escalation
+    1.2370,                  !- Year 11 Escalation
+    1.2549,                  !- Year 12 Escalation
+    1.2817,                  !- Year 13 Escalation
+    1.2984,                  !- Year 14 Escalation
+    1.3198,                  !- Year 15 Escalation
+    1.3377,                  !- Year 16 Escalation
+    1.3544,                  !- Year 17 Escalation
+    1.3734,                  !- Year 18 Escalation
+    1.3925,                  !- Year 19 Escalation
+    1.4068,                  !- Year 20 Escalation
+    1.4223,                  !- Year 21 Escalation
+    1.4390,                  !- Year 22 Escalation
+    1.4550,                  !- Year 23 Escalation
+    1.4723,                  !- Year 24 Escalation
+    1.4949,                  !- Year 25 Escalation
+    1.5217,                  !- Year 26 Escalation
+    1.5491,                  !- Year 27 Escalation
+    1.5777,                  !- Year 28 Escalation
+    1.6069,                  !- Year 29 Escalation
+    1.6361;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Industrial-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0093,                  !- Year 1 Escalation
+    1.0429,                  !- Year 2 Escalation
+    1.0951,                  !- Year 3 Escalation
+    1.1679,                  !- Year 4 Escalation
+    1.2015,                  !- Year 5 Escalation
+    1.1810,                  !- Year 6 Escalation
+    1.1903,                  !- Year 7 Escalation
+    1.1940,                  !- Year 8 Escalation
+    1.2015,                  !- Year 9 Escalation
+    1.2276,                  !- Year 10 Escalation
+    1.2369,                  !- Year 11 Escalation
+    1.2388,                  !- Year 12 Escalation
+    1.2444,                  !- Year 13 Escalation
+    1.2537,                  !- Year 14 Escalation
+    1.2817,                  !- Year 15 Escalation
+    1.3246,                  !- Year 16 Escalation
+    1.3526,                  !- Year 17 Escalation
+    1.3825,                  !- Year 18 Escalation
+    1.4179,                  !- Year 19 Escalation
+    1.4478,                  !- Year 20 Escalation
+    1.4795,                  !- Year 21 Escalation
+    1.5299,                  !- Year 22 Escalation
+    1.5522,                  !- Year 23 Escalation
+    1.5672,                  !- Year 24 Escalation
+    1.6007,                  !- Year 25 Escalation
+    1.6474,                  !- Year 26 Escalation
+    1.6884,                  !- Year 27 Escalation
+    1.7257,                  !- Year 28 Escalation
+    1.7649,                  !- Year 29 Escalation
+    1.8060;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Industrial-Coal,!- Name
+    Coal,                    !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0252,                  !- Year 1 Escalation
+    1.0504,                  !- Year 2 Escalation
+    1.0683,                  !- Year 3 Escalation
+    1.0899,                  !- Year 4 Escalation
+    1.1079,                  !- Year 5 Escalation
+    1.1187,                  !- Year 6 Escalation
+    1.1259,                  !- Year 7 Escalation
+    1.1367,                  !- Year 8 Escalation
+    1.1475,                  !- Year 9 Escalation
+    1.1583,                  !- Year 10 Escalation
+    1.1691,                  !- Year 11 Escalation
+    1.1799,                  !- Year 12 Escalation
+    1.1906,                  !- Year 13 Escalation
+    1.1978,                  !- Year 14 Escalation
+    1.2086,                  !- Year 15 Escalation
+    1.2194,                  !- Year 16 Escalation
+    1.2302,                  !- Year 17 Escalation
+    1.2374,                  !- Year 18 Escalation
+    1.2482,                  !- Year 19 Escalation
+    1.2554,                  !- Year 20 Escalation
+    1.2662,                  !- Year 21 Escalation
+    1.2734,                  !- Year 22 Escalation
+    1.2806,                  !- Year 23 Escalation
+    1.2878,                  !- Year 24 Escalation
+    1.2986,                  !- Year 25 Escalation
+    1.3129,                  !- Year 26 Escalation
+    1.3237,                  !- Year 27 Escalation
+    1.3381,                  !- Year 28 Escalation
+    1.3525,                  !- Year 29 Escalation
+    1.3669;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Residential-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0184,                  !- Year 1 Escalation
+    1.0300,                  !- Year 2 Escalation
+    1.0448,                  !- Year 3 Escalation
+    1.0639,                  !- Year 4 Escalation
+    1.0758,                  !- Year 5 Escalation
+    1.0768,                  !- Year 6 Escalation
+    1.0748,                  !- Year 7 Escalation
+    1.0677,                  !- Year 8 Escalation
+    1.0632,                  !- Year 9 Escalation
+    1.0710,                  !- Year 10 Escalation
+    1.0761,                  !- Year 11 Escalation
+    1.0794,                  !- Year 12 Escalation
+    1.0845,                  !- Year 13 Escalation
+    1.0881,                  !- Year 14 Escalation
+    1.0926,                  !- Year 15 Escalation
+    1.0990,                  !- Year 16 Escalation
+    1.1042,                  !- Year 17 Escalation
+    1.1074,                  !- Year 18 Escalation
+    1.1113,                  !- Year 19 Escalation
+    1.1184,                  !- Year 20 Escalation
+    1.1265,                  !- Year 21 Escalation
+    1.1348,                  !- Year 22 Escalation
+    1.1416,                  !- Year 23 Escalation
+    1.1439,                  !- Year 24 Escalation
+    1.1484,                  !- Year 25 Escalation
+    1.1558,                  !- Year 26 Escalation
+    1.1613,                  !- Year 27 Escalation
+    1.1665,                  !- Year 28 Escalation
+    1.1713,                  !- Year 29 Escalation
+    1.1765;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Residential-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9497,                  !- Year 1 Escalation
+    0.9181,                  !- Year 2 Escalation
+    0.9036,                  !- Year 3 Escalation
+    0.9071,                  !- Year 4 Escalation
+    0.9235,                  !- Year 5 Escalation
+    0.9415,                  !- Year 6 Escalation
+    0.9598,                  !- Year 7 Escalation
+    0.9789,                  !- Year 8 Escalation
+    0.9969,                  !- Year 9 Escalation
+    1.0144,                  !- Year 10 Escalation
+    1.0308,                  !- Year 11 Escalation
+    1.0437,                  !- Year 12 Escalation
+    1.0597,                  !- Year 13 Escalation
+    1.0718,                  !- Year 14 Escalation
+    1.0847,                  !- Year 15 Escalation
+    1.0964,                  !- Year 16 Escalation
+    1.1089,                  !- Year 17 Escalation
+    1.1229,                  !- Year 18 Escalation
+    1.1393,                  !- Year 19 Escalation
+    1.1565,                  !- Year 20 Escalation
+    1.1705,                  !- Year 21 Escalation
+    1.1834,                  !- Year 22 Escalation
+    1.1959,                  !- Year 23 Escalation
+    1.2099,                  !- Year 24 Escalation
+    1.2279,                  !- Year 25 Escalation
+    1.2485,                  !- Year 26 Escalation
+    1.2673,                  !- Year 27 Escalation
+    1.2860,                  !- Year 28 Escalation
+    1.3051,                  !- Year 29 Escalation
+    1.3242;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Residential-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9968,                  !- Year 1 Escalation
+    0.9799,                  !- Year 2 Escalation
+    1.0008,                  !- Year 3 Escalation
+    1.0427,                  !- Year 4 Escalation
+    1.0637,                  !- Year 5 Escalation
+    1.0580,                  !- Year 6 Escalation
+    1.0677,                  !- Year 7 Escalation
+    1.0766,                  !- Year 8 Escalation
+    1.0886,                  !- Year 9 Escalation
+    1.1080,                  !- Year 10 Escalation
+    1.1233,                  !- Year 11 Escalation
+    1.1322,                  !- Year 12 Escalation
+    1.1434,                  !- Year 13 Escalation
+    1.1571,                  !- Year 14 Escalation
+    1.1757,                  !- Year 15 Escalation
+    1.2015,                  !- Year 16 Escalation
+    1.2208,                  !- Year 17 Escalation
+    1.2417,                  !- Year 18 Escalation
+    1.2651,                  !- Year 19 Escalation
+    1.2853,                  !- Year 20 Escalation
+    1.3070,                  !- Year 21 Escalation
+    1.3328,                  !- Year 22 Escalation
+    1.3465,                  !- Year 23 Escalation
+    1.3570,                  !- Year 24 Escalation
+    1.3747,                  !- Year 25 Escalation
+    1.4013,                  !- Year 26 Escalation
+    1.4206,                  !- Year 27 Escalation
+    1.4376,                  !- Year 28 Escalation
+    1.4545,                  !- Year 29 Escalation
+    1.4714;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Residential-LPG,  !- Name
+    Propane,                 !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9783,                  !- Year 1 Escalation
+    0.9735,                  !- Year 2 Escalation
+    0.9913,                  !- Year 3 Escalation
+    1.0100,                  !- Year 4 Escalation
+    1.0222,                  !- Year 5 Escalation
+    1.0304,                  !- Year 6 Escalation
+    1.0409,                  !- Year 7 Escalation
+    1.0509,                  !- Year 8 Escalation
+    1.0583,                  !- Year 9 Escalation
+    1.0666,                  !- Year 10 Escalation
+    1.0761,                  !- Year 11 Escalation
+    1.0848,                  !- Year 12 Escalation
+    1.0935,                  !- Year 13 Escalation
+    1.1009,                  !- Year 14 Escalation
+    1.1083,                  !- Year 15 Escalation
+    1.1157,                  !- Year 16 Escalation
+    1.1231,                  !- Year 17 Escalation
+    1.1309,                  !- Year 18 Escalation
+    1.1401,                  !- Year 19 Escalation
+    1.1483,                  !- Year 20 Escalation
+    1.1557,                  !- Year 21 Escalation
+    1.1627,                  !- Year 22 Escalation
+    1.1688,                  !- Year 23 Escalation
+    1.1744,                  !- Year 24 Escalation
+    1.1809,                  !- Year 25 Escalation
+    1.1888,                  !- Year 26 Escalation
+    1.1979,                  !- Year 27 Escalation
+    1.2075,                  !- Year 28 Escalation
+    1.2166,                  !- Year 29 Escalation
+    1.2262;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Commercial-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0110,                  !- Year 1 Escalation
+    1.0187,                  !- Year 2 Escalation
+    1.0329,                  !- Year 3 Escalation
+    1.0527,                  !- Year 4 Escalation
+    1.0662,                  !- Year 5 Escalation
+    1.0625,                  !- Year 6 Escalation
+    1.0563,                  !- Year 7 Escalation
+    1.0443,                  !- Year 8 Escalation
+    1.0377,                  !- Year 9 Escalation
+    1.0465,                  !- Year 10 Escalation
+    1.0512,                  !- Year 11 Escalation
+    1.0541,                  !- Year 12 Escalation
+    1.0596,                  !- Year 13 Escalation
+    1.0633,                  !- Year 14 Escalation
+    1.0677,                  !- Year 15 Escalation
+    1.0746,                  !- Year 16 Escalation
+    1.0808,                  !- Year 17 Escalation
+    1.0838,                  !- Year 18 Escalation
+    1.0881,                  !- Year 19 Escalation
+    1.0955,                  !- Year 20 Escalation
+    1.1046,                  !- Year 21 Escalation
+    1.1141,                  !- Year 22 Escalation
+    1.1214,                  !- Year 23 Escalation
+    1.1247,                  !- Year 24 Escalation
+    1.1309,                  !- Year 25 Escalation
+    1.1397,                  !- Year 26 Escalation
+    1.1459,                  !- Year 27 Escalation
+    1.1507,                  !- Year 28 Escalation
+    1.1554,                  !- Year 29 Escalation
+    1.1602;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Commercial-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8637,                  !- Year 1 Escalation
+    0.8115,                  !- Year 2 Escalation
+    0.8024,                  !- Year 3 Escalation
+    0.8076,                  !- Year 4 Escalation
+    0.8258,                  !- Year 5 Escalation
+    0.8443,                  !- Year 6 Escalation
+    0.8637,                  !- Year 7 Escalation
+    0.8838,                  !- Year 8 Escalation
+    0.9012,                  !- Year 9 Escalation
+    0.9170,                  !- Year 10 Escalation
+    0.9336,                  !- Year 11 Escalation
+    0.9478,                  !- Year 12 Escalation
+    0.9637,                  !- Year 13 Escalation
+    0.9755,                  !- Year 14 Escalation
+    0.9885,                  !- Year 15 Escalation
+    1.0008,                  !- Year 16 Escalation
+    1.0138,                  !- Year 17 Escalation
+    1.0284,                  !- Year 18 Escalation
+    1.0439,                  !- Year 19 Escalation
+    1.0597,                  !- Year 20 Escalation
+    1.0719,                  !- Year 21 Escalation
+    1.0842,                  !- Year 22 Escalation
+    1.0960,                  !- Year 23 Escalation
+    1.1087,                  !- Year 24 Escalation
+    1.1264,                  !- Year 25 Escalation
+    1.1474,                  !- Year 26 Escalation
+    1.1667,                  !- Year 27 Escalation
+    1.1857,                  !- Year 28 Escalation
+    1.2051,                  !- Year 29 Escalation
+    1.2244;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Commercial-Residual Oil,  !- Name
+    FuelOilNo2,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.7975,                  !- Year 1 Escalation
+    0.7244,                  !- Year 2 Escalation
+    0.7096,                  !- Year 3 Escalation
+    0.7106,                  !- Year 4 Escalation
+    0.7229,                  !- Year 5 Escalation
+    0.7408,                  !- Year 6 Escalation
+    0.7582,                  !- Year 7 Escalation
+    0.7827,                  !- Year 8 Escalation
+    0.8016,                  !- Year 9 Escalation
+    0.8160,                  !- Year 10 Escalation
+    0.8298,                  !- Year 11 Escalation
+    0.8497,                  !- Year 12 Escalation
+    0.8722,                  !- Year 13 Escalation
+    0.8829,                  !- Year 14 Escalation
+    0.9039,                  !- Year 15 Escalation
+    0.9202,                  !- Year 16 Escalation
+    0.9361,                  !- Year 17 Escalation
+    0.9525,                  !- Year 18 Escalation
+    0.9678,                  !- Year 19 Escalation
+    0.9842,                  !- Year 20 Escalation
+    0.9949,                  !- Year 21 Escalation
+    1.0066,                  !- Year 22 Escalation
+    1.0199,                  !- Year 23 Escalation
+    1.0332,                  !- Year 24 Escalation
+    1.0516,                  !- Year 25 Escalation
+    1.0741,                  !- Year 26 Escalation
+    1.0976,                  !- Year 27 Escalation
+    1.1222,                  !- Year 28 Escalation
+    1.1472,                  !- Year 29 Escalation
+    1.1723;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Commercial-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9979,                  !- Year 1 Escalation
+    0.9845,                  !- Year 2 Escalation
+    1.0083,                  !- Year 3 Escalation
+    1.0568,                  !- Year 4 Escalation
+    1.0806,                  !- Year 5 Escalation
+    1.0702,                  !- Year 6 Escalation
+    1.0806,                  !- Year 7 Escalation
+    1.0888,                  !- Year 8 Escalation
+    1.1002,                  !- Year 9 Escalation
+    1.1219,                  !- Year 10 Escalation
+    1.1384,                  !- Year 11 Escalation
+    1.1457,                  !- Year 12 Escalation
+    1.1560,                  !- Year 13 Escalation
+    1.1684,                  !- Year 14 Escalation
+    1.1880,                  !- Year 15 Escalation
+    1.2138,                  !- Year 16 Escalation
+    1.2314,                  !- Year 17 Escalation
+    1.2521,                  !- Year 18 Escalation
+    1.2758,                  !- Year 19 Escalation
+    1.2955,                  !- Year 20 Escalation
+    1.3161,                  !- Year 21 Escalation
+    1.3409,                  !- Year 22 Escalation
+    1.3523,                  !- Year 23 Escalation
+    1.3574,                  !- Year 24 Escalation
+    1.3729,                  !- Year 25 Escalation
+    1.4008,                  !- Year 26 Escalation
+    1.4236,                  !- Year 27 Escalation
+    1.4452,                  !- Year 28 Escalation
+    1.4669,                  !- Year 29 Escalation
+    1.4886;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Commercial-Coal,  !- Name
+    Coal,                    !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0125,                  !- Year 1 Escalation
+    1.0229,                  !- Year 2 Escalation
+    1.0250,                  !- Year 3 Escalation
+    1.0375,                  !- Year 4 Escalation
+    1.0500,                  !- Year 5 Escalation
+    1.0604,                  !- Year 6 Escalation
+    1.0646,                  !- Year 7 Escalation
+    1.0667,                  !- Year 8 Escalation
+    1.0708,                  !- Year 9 Escalation
+    1.0771,                  !- Year 10 Escalation
+    1.0833,                  !- Year 11 Escalation
+    1.0896,                  !- Year 12 Escalation
+    1.0979,                  !- Year 13 Escalation
+    1.1083,                  !- Year 14 Escalation
+    1.1146,                  !- Year 15 Escalation
+    1.1250,                  !- Year 16 Escalation
+    1.1333,                  !- Year 17 Escalation
+    1.1417,                  !- Year 18 Escalation
+    1.1500,                  !- Year 19 Escalation
+    1.1542,                  !- Year 20 Escalation
+    1.1625,                  !- Year 21 Escalation
+    1.1729,                  !- Year 22 Escalation
+    1.1813,                  !- Year 23 Escalation
+    1.1896,                  !- Year 24 Escalation
+    1.1979,                  !- Year 25 Escalation
+    1.2083,                  !- Year 26 Escalation
+    1.2167,                  !- Year 27 Escalation
+    1.2250,                  !- Year 28 Escalation
+    1.2333,                  !- Year 29 Escalation
+    1.2417;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Industrial-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0082,                  !- Year 1 Escalation
+    1.0153,                  !- Year 2 Escalation
+    1.0285,                  !- Year 3 Escalation
+    1.0487,                  !- Year 4 Escalation
+    1.0624,                  !- Year 5 Escalation
+    1.0597,                  !- Year 6 Escalation
+    1.0569,                  !- Year 7 Escalation
+    1.0525,                  !- Year 8 Escalation
+    1.0509,                  !- Year 9 Escalation
+    1.0613,                  !- Year 10 Escalation
+    1.0706,                  !- Year 11 Escalation
+    1.0783,                  !- Year 12 Escalation
+    1.0881,                  !- Year 13 Escalation
+    1.0963,                  !- Year 14 Escalation
+    1.1051,                  !- Year 15 Escalation
+    1.1166,                  !- Year 16 Escalation
+    1.1270,                  !- Year 17 Escalation
+    1.1352,                  !- Year 18 Escalation
+    1.1445,                  !- Year 19 Escalation
+    1.1571,                  !- Year 20 Escalation
+    1.1708,                  !- Year 21 Escalation
+    1.1850,                  !- Year 22 Escalation
+    1.1970,                  !- Year 23 Escalation
+    1.2031,                  !- Year 24 Escalation
+    1.2129,                  !- Year 25 Escalation
+    1.2271,                  !- Year 26 Escalation
+    1.2381,                  !- Year 27 Escalation
+    1.2479,                  !- Year 28 Escalation
+    1.2573,                  !- Year 29 Escalation
+    1.2671;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Industrial-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8630,                  !- Year 1 Escalation
+    0.8137,                  !- Year 2 Escalation
+    0.8091,                  !- Year 3 Escalation
+    0.8157,                  !- Year 4 Escalation
+    0.8339,                  !- Year 5 Escalation
+    0.8525,                  !- Year 6 Escalation
+    0.8712,                  !- Year 7 Escalation
+    0.8917,                  !- Year 8 Escalation
+    0.9084,                  !- Year 9 Escalation
+    0.9228,                  !- Year 10 Escalation
+    0.9387,                  !- Year 11 Escalation
+    0.9527,                  !- Year 12 Escalation
+    0.9686,                  !- Year 13 Escalation
+    0.9802,                  !- Year 14 Escalation
+    0.9922,                  !- Year 15 Escalation
+    1.0043,                  !- Year 16 Escalation
+    1.0171,                  !- Year 17 Escalation
+    1.0314,                  !- Year 18 Escalation
+    1.0462,                  !- Year 19 Escalation
+    1.0609,                  !- Year 20 Escalation
+    1.0710,                  !- Year 21 Escalation
+    1.0819,                  !- Year 22 Escalation
+    1.0931,                  !- Year 23 Escalation
+    1.1044,                  !- Year 24 Escalation
+    1.1218,                  !- Year 25 Escalation
+    1.1424,                  !- Year 26 Escalation
+    1.1614,                  !- Year 27 Escalation
+    1.1801,                  !- Year 28 Escalation
+    1.1991,                  !- Year 29 Escalation
+    1.2181;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Industrial-Residual Oil,  !- Name
+    FuelOilNo2,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.7909,                  !- Year 1 Escalation
+    0.7154,                  !- Year 2 Escalation
+    0.7008,                  !- Year 3 Escalation
+    0.7018,                  !- Year 4 Escalation
+    0.7129,                  !- Year 5 Escalation
+    0.7291,                  !- Year 6 Escalation
+    0.7478,                  !- Year 7 Escalation
+    0.7696,                  !- Year 8 Escalation
+    0.7884,                  !- Year 9 Escalation
+    0.8051,                  !- Year 10 Escalation
+    0.8197,                  !- Year 11 Escalation
+    0.8365,                  !- Year 12 Escalation
+    0.8562,                  !- Year 13 Escalation
+    0.8709,                  !- Year 14 Escalation
+    0.8881,                  !- Year 15 Escalation
+    0.9018,                  !- Year 16 Escalation
+    0.9165,                  !- Year 17 Escalation
+    0.9327,                  !- Year 18 Escalation
+    0.9484,                  !- Year 19 Escalation
+    0.9656,                  !- Year 20 Escalation
+    0.9792,                  !- Year 21 Escalation
+    0.9924,                  !- Year 22 Escalation
+    1.0061,                  !- Year 23 Escalation
+    1.0203,                  !- Year 24 Escalation
+    1.0395,                  !- Year 25 Escalation
+    1.0618,                  !- Year 26 Escalation
+    1.0856,                  !- Year 27 Escalation
+    1.1094,                  !- Year 28 Escalation
+    1.1342,                  !- Year 29 Escalation
+    1.1590;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Industrial-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0517,                  !- Year 1 Escalation
+    1.1158,                  !- Year 2 Escalation
+    1.1872,                  !- Year 3 Escalation
+    1.2882,                  !- Year 4 Escalation
+    1.3300,                  !- Year 5 Escalation
+    1.2931,                  !- Year 6 Escalation
+    1.3103,                  !- Year 7 Escalation
+    1.3202,                  !- Year 8 Escalation
+    1.3374,                  !- Year 9 Escalation
+    1.3768,                  !- Year 10 Escalation
+    1.4039,                  !- Year 11 Escalation
+    1.4236,                  !- Year 12 Escalation
+    1.4458,                  !- Year 13 Escalation
+    1.4680,                  !- Year 14 Escalation
+    1.5099,                  !- Year 15 Escalation
+    1.5690,                  !- Year 16 Escalation
+    1.6059,                  !- Year 17 Escalation
+    1.6502,                  !- Year 18 Escalation
+    1.7020,                  !- Year 19 Escalation
+    1.7438,                  !- Year 20 Escalation
+    1.7882,                  !- Year 21 Escalation
+    1.8473,                  !- Year 22 Escalation
+    1.8645,                  !- Year 23 Escalation
+    1.8670,                  !- Year 24 Escalation
+    1.8990,                  !- Year 25 Escalation
+    1.9557,                  !- Year 26 Escalation
+    2.0099,                  !- Year 27 Escalation
+    2.0616,                  !- Year 28 Escalation
+    2.1133,                  !- Year 29 Escalation
+    2.1650;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    South  Industrial-Coal,  !- Name
+    Coal,                    !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0124,                  !- Year 1 Escalation
+    1.0249,                  !- Year 2 Escalation
+    1.0274,                  !- Year 3 Escalation
+    1.0373,                  !- Year 4 Escalation
+    1.0473,                  !- Year 5 Escalation
+    1.0522,                  !- Year 6 Escalation
+    1.0572,                  !- Year 7 Escalation
+    1.0622,                  !- Year 8 Escalation
+    1.0647,                  !- Year 9 Escalation
+    1.0721,                  !- Year 10 Escalation
+    1.0771,                  !- Year 11 Escalation
+    1.0846,                  !- Year 12 Escalation
+    1.0920,                  !- Year 13 Escalation
+    1.1020,                  !- Year 14 Escalation
+    1.1095,                  !- Year 15 Escalation
+    1.1219,                  !- Year 16 Escalation
+    1.1294,                  !- Year 17 Escalation
+    1.1368,                  !- Year 18 Escalation
+    1.1468,                  !- Year 19 Escalation
+    1.1517,                  !- Year 20 Escalation
+    1.1617,                  !- Year 21 Escalation
+    1.1716,                  !- Year 22 Escalation
+    1.1791,                  !- Year 23 Escalation
+    1.1891,                  !- Year 24 Escalation
+    1.1965,                  !- Year 25 Escalation
+    1.2090,                  !- Year 26 Escalation
+    1.2189,                  !- Year 27 Escalation
+    1.2264,                  !- Year 28 Escalation
+    1.2363,                  !- Year 29 Escalation
+    1.2463;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Residential-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9978,                  !- Year 1 Escalation
+    0.9930,                  !- Year 2 Escalation
+    0.9883,                  !- Year 3 Escalation
+    0.9833,                  !- Year 4 Escalation
+    0.9774,                  !- Year 5 Escalation
+    0.9713,                  !- Year 6 Escalation
+    0.9652,                  !- Year 7 Escalation
+    0.9621,                  !- Year 8 Escalation
+    0.9601,                  !- Year 9 Escalation
+    0.9596,                  !- Year 10 Escalation
+    0.9624,                  !- Year 11 Escalation
+    0.9643,                  !- Year 12 Escalation
+    0.9677,                  !- Year 13 Escalation
+    0.9719,                  !- Year 14 Escalation
+    0.9749,                  !- Year 15 Escalation
+    0.9808,                  !- Year 16 Escalation
+    0.9964,                  !- Year 17 Escalation
+    1.0086,                  !- Year 18 Escalation
+    1.0106,                  !- Year 19 Escalation
+    1.0145,                  !- Year 20 Escalation
+    1.0223,                  !- Year 21 Escalation
+    1.0323,                  !- Year 22 Escalation
+    1.0421,                  !- Year 23 Escalation
+    1.0474,                  !- Year 24 Escalation
+    1.0507,                  !- Year 25 Escalation
+    1.0538,                  !- Year 26 Escalation
+    1.0569,                  !- Year 27 Escalation
+    1.0599,                  !- Year 28 Escalation
+    1.0630,                  !- Year 29 Escalation
+    1.0661;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Residential-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9043,                  !- Year 1 Escalation
+    0.8603,                  !- Year 2 Escalation
+    0.8500,                  !- Year 3 Escalation
+    0.8538,                  !- Year 4 Escalation
+    0.8690,                  !- Year 5 Escalation
+    0.8865,                  !- Year 6 Escalation
+    0.9051,                  !- Year 7 Escalation
+    0.9241,                  !- Year 8 Escalation
+    0.9408,                  !- Year 9 Escalation
+    0.9575,                  !- Year 10 Escalation
+    0.9738,                  !- Year 11 Escalation
+    0.9871,                  !- Year 12 Escalation
+    1.0027,                  !- Year 13 Escalation
+    1.0163,                  !- Year 14 Escalation
+    1.0300,                  !- Year 15 Escalation
+    1.0429,                  !- Year 16 Escalation
+    1.0543,                  !- Year 17 Escalation
+    1.0680,                  !- Year 18 Escalation
+    1.0816,                  !- Year 19 Escalation
+    1.1306,                  !- Year 20 Escalation
+    1.1591,                  !- Year 21 Escalation
+    1.1773,                  !- Year 22 Escalation
+    1.1936,                  !- Year 23 Escalation
+    1.2077,                  !- Year 24 Escalation
+    1.2270,                  !- Year 25 Escalation
+    1.2491,                  !- Year 26 Escalation
+    1.2680,                  !- Year 27 Escalation
+    1.2863,                  !- Year 28 Escalation
+    1.3049,                  !- Year 29 Escalation
+    1.3235;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Residential-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9963,                  !- Year 1 Escalation
+    0.9588,                  !- Year 2 Escalation
+    0.9726,                  !- Year 3 Escalation
+    1.0156,                  !- Year 4 Escalation
+    1.0448,                  !- Year 5 Escalation
+    1.0512,                  !- Year 6 Escalation
+    1.0622,                  !- Year 7 Escalation
+    1.0714,                  !- Year 8 Escalation
+    1.0823,                  !- Year 9 Escalation
+    1.0979,                  !- Year 10 Escalation
+    1.1080,                  !- Year 11 Escalation
+    1.1061,                  !- Year 12 Escalation
+    1.1080,                  !- Year 13 Escalation
+    1.1153,                  !- Year 14 Escalation
+    1.1354,                  !- Year 15 Escalation
+    1.1619,                  !- Year 16 Escalation
+    1.1839,                  !- Year 17 Escalation
+    1.2031,                  !- Year 18 Escalation
+    1.2251,                  !- Year 19 Escalation
+    1.3019,                  !- Year 20 Escalation
+    1.3495,                  !- Year 21 Escalation
+    1.3989,                  !- Year 22 Escalation
+    1.4227,                  !- Year 23 Escalation
+    1.4245,                  !- Year 24 Escalation
+    1.4419,                  !- Year 25 Escalation
+    1.4648,                  !- Year 26 Escalation
+    1.4840,                  !- Year 27 Escalation
+    1.5032,                  !- Year 28 Escalation
+    1.5224,                  !- Year 29 Escalation
+    1.5425;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Residential-LPG,   !- Name
+    Propane,                 !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9789,                  !- Year 1 Escalation
+    0.9750,                  !- Year 2 Escalation
+    0.9931,                  !- Year 3 Escalation
+    1.0125,                  !- Year 4 Escalation
+    1.0254,                  !- Year 5 Escalation
+    1.0340,                  !- Year 6 Escalation
+    1.0448,                  !- Year 7 Escalation
+    1.0547,                  !- Year 8 Escalation
+    1.0624,                  !- Year 9 Escalation
+    1.0702,                  !- Year 10 Escalation
+    1.0801,                  !- Year 11 Escalation
+    1.0887,                  !- Year 12 Escalation
+    1.0973,                  !- Year 13 Escalation
+    1.1047,                  !- Year 14 Escalation
+    1.1120,                  !- Year 15 Escalation
+    1.1193,                  !- Year 16 Escalation
+    1.1266,                  !- Year 17 Escalation
+    1.1344,                  !- Year 18 Escalation
+    1.1434,                  !- Year 19 Escalation
+    1.1761,                  !- Year 20 Escalation
+    1.1947,                  !- Year 21 Escalation
+    1.2054,                  !- Year 22 Escalation
+    1.2132,                  !- Year 23 Escalation
+    1.2171,                  !- Year 24 Escalation
+    1.2244,                  !- Year 25 Escalation
+    1.2334,                  !- Year 26 Escalation
+    1.2446,                  !- Year 27 Escalation
+    1.2562,                  !- Year 28 Escalation
+    1.2679,                  !- Year 29 Escalation
+    1.2799;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Commercial-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9972,                  !- Year 1 Escalation
+    0.9904,                  !- Year 2 Escalation
+    0.9842,                  !- Year 3 Escalation
+    0.9780,                  !- Year 4 Escalation
+    0.9718,                  !- Year 5 Escalation
+    0.9625,                  !- Year 6 Escalation
+    0.9539,                  !- Year 7 Escalation
+    0.9486,                  !- Year 8 Escalation
+    0.9436,                  !- Year 9 Escalation
+    0.9399,                  !- Year 10 Escalation
+    0.9390,                  !- Year 11 Escalation
+    0.9387,                  !- Year 12 Escalation
+    0.9390,                  !- Year 13 Escalation
+    0.9393,                  !- Year 14 Escalation
+    0.9390,                  !- Year 15 Escalation
+    0.9421,                  !- Year 16 Escalation
+    0.9535,                  !- Year 17 Escalation
+    0.9619,                  !- Year 18 Escalation
+    0.9619,                  !- Year 19 Escalation
+    0.9659,                  !- Year 20 Escalation
+    0.9743,                  !- Year 21 Escalation
+    0.9858,                  !- Year 22 Escalation
+    0.9941,                  !- Year 23 Escalation
+    0.9963,                  !- Year 24 Escalation
+    0.9978,                  !- Year 25 Escalation
+    0.9997,                  !- Year 26 Escalation
+    1.0006,                  !- Year 27 Escalation
+    1.0015,                  !- Year 28 Escalation
+    1.0022,                  !- Year 29 Escalation
+    1.0031;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Commercial-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8331,                  !- Year 1 Escalation
+    0.7730,                  !- Year 2 Escalation
+    0.7665,                  !- Year 3 Escalation
+    0.7723,                  !- Year 4 Escalation
+    0.7897,                  !- Year 5 Escalation
+    0.8079,                  !- Year 6 Escalation
+    0.8269,                  !- Year 7 Escalation
+    0.8470,                  !- Year 8 Escalation
+    0.8637,                  !- Year 9 Escalation
+    0.8796,                  !- Year 10 Escalation
+    0.8958,                  !- Year 11 Escalation
+    0.9098,                  !- Year 12 Escalation
+    0.9256,                  !- Year 13 Escalation
+    0.9384,                  !- Year 14 Escalation
+    0.9512,                  !- Year 15 Escalation
+    0.9636,                  !- Year 16 Escalation
+    0.9764,                  !- Year 17 Escalation
+    0.9899,                  !- Year 18 Escalation
+    1.0039,                  !- Year 19 Escalation
+    1.0476,                  !- Year 20 Escalation
+    1.0728,                  !- Year 21 Escalation
+    1.0891,                  !- Year 22 Escalation
+    1.1034,                  !- Year 23 Escalation
+    1.1154,                  !- Year 24 Escalation
+    1.1340,                  !- Year 25 Escalation
+    1.1565,                  !- Year 26 Escalation
+    1.1758,                  !- Year 27 Escalation
+    1.1940,                  !- Year 28 Escalation
+    1.2130,                  !- Year 29 Escalation
+    1.2320;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Commercial-Residual Oil,  !- Name
+    FuelOilNo2,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8798,                  !- Year 1 Escalation
+    0.8243,                  !- Year 2 Escalation
+    0.8066,                  !- Year 3 Escalation
+    0.8078,                  !- Year 4 Escalation
+    0.8225,                  !- Year 5 Escalation
+    0.8438,                  !- Year 6 Escalation
+    0.8646,                  !- Year 7 Escalation
+    0.8908,                  !- Year 8 Escalation
+    0.9109,                  !- Year 9 Escalation
+    0.9311,                  !- Year 10 Escalation
+    0.9500,                  !- Year 11 Escalation
+    0.9683,                  !- Year 12 Escalation
+    0.9902,                  !- Year 13 Escalation
+    1.0110,                  !- Year 14 Escalation
+    1.0305,                  !- Year 15 Escalation
+    1.0451,                  !- Year 16 Escalation
+    1.0616,                  !- Year 17 Escalation
+    1.0805,                  !- Year 18 Escalation
+    1.1007,                  !- Year 19 Escalation
+    1.1226,                  !- Year 20 Escalation
+    1.1415,                  !- Year 21 Escalation
+    1.1599,                  !- Year 22 Escalation
+    1.1769,                  !- Year 23 Escalation
+    1.1928,                  !- Year 24 Escalation
+    1.2148,                  !- Year 25 Escalation
+    1.2416,                  !- Year 26 Escalation
+    1.2697,                  !- Year 27 Escalation
+    1.2990,                  !- Year 28 Escalation
+    1.3289,                  !- Year 29 Escalation
+    1.3588;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Commercial-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0053,                  !- Year 1 Escalation
+    0.9744,                  !- Year 2 Escalation
+    0.9936,                  !- Year 3 Escalation
+    1.0415,                  !- Year 4 Escalation
+    1.0756,                  !- Year 5 Escalation
+    1.0820,                  !- Year 6 Escalation
+    1.0937,                  !- Year 7 Escalation
+    1.1044,                  !- Year 8 Escalation
+    1.1171,                  !- Year 9 Escalation
+    1.1353,                  !- Year 10 Escalation
+    1.1448,                  !- Year 11 Escalation
+    1.1416,                  !- Year 12 Escalation
+    1.1416,                  !- Year 13 Escalation
+    1.1491,                  !- Year 14 Escalation
+    1.1715,                  !- Year 15 Escalation
+    1.2002,                  !- Year 16 Escalation
+    1.2226,                  !- Year 17 Escalation
+    1.2428,                  !- Year 18 Escalation
+    1.2673,                  !- Year 19 Escalation
+    1.3440,                  !- Year 20 Escalation
+    1.3919,                  !- Year 21 Escalation
+    1.4441,                  !- Year 22 Escalation
+    1.4696,                  !- Year 23 Escalation
+    1.4696,                  !- Year 24 Escalation
+    1.4878,                  !- Year 25 Escalation
+    1.5112,                  !- Year 26 Escalation
+    1.5346,                  !- Year 27 Escalation
+    1.5559,                  !- Year 28 Escalation
+    1.5783,                  !- Year 29 Escalation
+    1.6017;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Commercial-Coal,   !- Name
+    Coal,                    !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0102,                  !- Year 1 Escalation
+    1.0305,                  !- Year 2 Escalation
+    1.0381,                  !- Year 3 Escalation
+    1.0482,                  !- Year 4 Escalation
+    1.0584,                  !- Year 5 Escalation
+    1.0635,                  !- Year 6 Escalation
+    1.0711,                  !- Year 7 Escalation
+    1.0812,                  !- Year 8 Escalation
+    1.0939,                  !- Year 9 Escalation
+    1.1015,                  !- Year 10 Escalation
+    1.1117,                  !- Year 11 Escalation
+    1.1193,                  !- Year 12 Escalation
+    1.1294,                  !- Year 13 Escalation
+    1.1345,                  !- Year 14 Escalation
+    1.1396,                  !- Year 15 Escalation
+    1.1497,                  !- Year 16 Escalation
+    1.1574,                  !- Year 17 Escalation
+    1.1675,                  !- Year 18 Escalation
+    1.1751,                  !- Year 19 Escalation
+    1.1853,                  !- Year 20 Escalation
+    1.1904,                  !- Year 21 Escalation
+    1.2030,                  !- Year 22 Escalation
+    1.2107,                  !- Year 23 Escalation
+    1.2234,                  !- Year 24 Escalation
+    1.2310,                  !- Year 25 Escalation
+    1.2437,                  !- Year 26 Escalation
+    1.2538,                  !- Year 27 Escalation
+    1.2640,                  !- Year 28 Escalation
+    1.2741,                  !- Year 29 Escalation
+    1.2843;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Industrial-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9961,                  !- Year 1 Escalation
+    0.9859,                  !- Year 2 Escalation
+    0.9800,                  !- Year 3 Escalation
+    0.9805,                  !- Year 4 Escalation
+    0.9786,                  !- Year 5 Escalation
+    0.9713,                  !- Year 6 Escalation
+    0.9674,                  !- Year 7 Escalation
+    0.9674,                  !- Year 8 Escalation
+    0.9698,                  !- Year 9 Escalation
+    0.9737,                  !- Year 10 Escalation
+    0.9796,                  !- Year 11 Escalation
+    0.9859,                  !- Year 12 Escalation
+    0.9922,                  !- Year 13 Escalation
+    0.9961,                  !- Year 14 Escalation
+    0.9976,                  !- Year 15 Escalation
+    1.0039,                  !- Year 16 Escalation
+    1.0209,                  !- Year 17 Escalation
+    1.0326,                  !- Year 18 Escalation
+    1.0389,                  !- Year 19 Escalation
+    1.0492,                  !- Year 20 Escalation
+    1.0604,                  !- Year 21 Escalation
+    1.0759,                  !- Year 22 Escalation
+    1.0881,                  !- Year 23 Escalation
+    1.0940,                  !- Year 24 Escalation
+    1.0983,                  !- Year 25 Escalation
+    1.1032,                  !- Year 26 Escalation
+    1.1091,                  !- Year 27 Escalation
+    1.1149,                  !- Year 28 Escalation
+    1.1207,                  !- Year 29 Escalation
+    1.1266;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Industrial-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8569,                  !- Year 1 Escalation
+    0.8066,                  !- Year 2 Escalation
+    0.8023,                  !- Year 3 Escalation
+    0.8097,                  !- Year 4 Escalation
+    0.8279,                  !- Year 5 Escalation
+    0.8460,                  !- Year 6 Escalation
+    0.8646,                  !- Year 7 Escalation
+    0.8851,                  !- Year 8 Escalation
+    0.9017,                  !- Year 9 Escalation
+    0.9164,                  !- Year 10 Escalation
+    0.9327,                  !- Year 11 Escalation
+    0.9470,                  !- Year 12 Escalation
+    0.9629,                  !- Year 13 Escalation
+    0.9745,                  !- Year 14 Escalation
+    0.9868,                  !- Year 15 Escalation
+    0.9988,                  !- Year 16 Escalation
+    1.0112,                  !- Year 17 Escalation
+    1.0255,                  !- Year 18 Escalation
+    1.0391,                  !- Year 19 Escalation
+    1.0720,                  !- Year 20 Escalation
+    1.0909,                  !- Year 21 Escalation
+    1.1048,                  !- Year 22 Escalation
+    1.1172,                  !- Year 23 Escalation
+    1.1277,                  !- Year 24 Escalation
+    1.1455,                  !- Year 25 Escalation
+    1.1671,                  !- Year 26 Escalation
+    1.1861,                  !- Year 27 Escalation
+    1.2046,                  !- Year 28 Escalation
+    1.2236,                  !- Year 29 Escalation
+    1.2426;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Industrial-Residual Oil,  !- Name
+    FuelOilNo2,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8853,                  !- Year 1 Escalation
+    0.8311,                  !- Year 2 Escalation
+    0.8126,                  !- Year 3 Escalation
+    0.8138,                  !- Year 4 Escalation
+    0.8292,                  !- Year 5 Escalation
+    0.8508,                  !- Year 6 Escalation
+    0.8718,                  !- Year 7 Escalation
+    0.8977,                  !- Year 8 Escalation
+    0.9186,                  !- Year 9 Escalation
+    0.9383,                  !- Year 10 Escalation
+    0.9575,                  !- Year 11 Escalation
+    0.9766,                  !- Year 12 Escalation
+    0.9988,                  !- Year 13 Escalation
+    1.0197,                  !- Year 14 Escalation
+    1.0395,                  !- Year 15 Escalation
+    1.0543,                  !- Year 16 Escalation
+    1.0709,                  !- Year 17 Escalation
+    1.0900,                  !- Year 18 Escalation
+    1.1097,                  !- Year 19 Escalation
+    1.1326,                  !- Year 20 Escalation
+    1.1517,                  !- Year 21 Escalation
+    1.1702,                  !- Year 22 Escalation
+    1.1874,                  !- Year 23 Escalation
+    1.2035,                  !- Year 24 Escalation
+    1.2256,                  !- Year 25 Escalation
+    1.2528,                  !- Year 26 Escalation
+    1.2811,                  !- Year 27 Escalation
+    1.3107,                  !- Year 28 Escalation
+    1.3403,                  !- Year 29 Escalation
+    1.3705;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Industrial-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9828,                  !- Year 1 Escalation
+    0.9794,                  !- Year 2 Escalation
+    1.0155,                  !- Year 3 Escalation
+    1.0842,                  !- Year 4 Escalation
+    1.1306,                  !- Year 5 Escalation
+    1.1306,                  !- Year 6 Escalation
+    1.1409,                  !- Year 7 Escalation
+    1.1529,                  !- Year 8 Escalation
+    1.1667,                  !- Year 9 Escalation
+    1.1890,                  !- Year 10 Escalation
+    1.2010,                  !- Year 11 Escalation
+    1.1856,                  !- Year 12 Escalation
+    1.1787,                  !- Year 13 Escalation
+    1.1838,                  !- Year 14 Escalation
+    1.2079,                  !- Year 15 Escalation
+    1.2457,                  !- Year 16 Escalation
+    1.2749,                  !- Year 17 Escalation
+    1.3024,                  !- Year 18 Escalation
+    1.3351,                  !- Year 19 Escalation
+    1.3677,                  !- Year 20 Escalation
+    1.4003,                  !- Year 21 Escalation
+    1.4605,                  !- Year 22 Escalation
+    1.4845,                  !- Year 23 Escalation
+    1.4863,                  !- Year 24 Escalation
+    1.5069,                  !- Year 25 Escalation
+    1.5361,                  !- Year 26 Escalation
+    1.5687,                  !- Year 27 Escalation
+    1.6048,                  !- Year 28 Escalation
+    1.6409,                  !- Year 29 Escalation
+    1.6770;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    West  Industrial-Coal,   !- Name
+    Coal,                    !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0174,                  !- Year 1 Escalation
+    1.0451,                  !- Year 2 Escalation
+    1.0556,                  !- Year 3 Escalation
+    1.0694,                  !- Year 4 Escalation
+    1.0833,                  !- Year 5 Escalation
+    1.0972,                  !- Year 6 Escalation
+    1.1076,                  !- Year 7 Escalation
+    1.1215,                  !- Year 8 Escalation
+    1.1354,                  !- Year 9 Escalation
+    1.1493,                  !- Year 10 Escalation
+    1.1632,                  !- Year 11 Escalation
+    1.1771,                  !- Year 12 Escalation
+    1.1840,                  !- Year 13 Escalation
+    1.1910,                  !- Year 14 Escalation
+    1.1979,                  !- Year 15 Escalation
+    1.2083,                  !- Year 16 Escalation
+    1.2257,                  !- Year 17 Escalation
+    1.2361,                  !- Year 18 Escalation
+    1.2431,                  !- Year 19 Escalation
+    1.2500,                  !- Year 20 Escalation
+    1.2604,                  !- Year 21 Escalation
+    1.2674,                  !- Year 22 Escalation
+    1.2743,                  !- Year 23 Escalation
+    1.2847,                  !- Year 24 Escalation
+    1.2951,                  !- Year 25 Escalation
+    1.3090,                  !- Year 26 Escalation
+    1.3194,                  !- Year 27 Escalation
+    1.3333,                  !- Year 28 Escalation
+    1.3472,                  !- Year 29 Escalation
+    1.3611;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Residential-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0146,                  !- Year 1 Escalation
+    1.0230,                  !- Year 2 Escalation
+    1.0326,                  !- Year 3 Escalation
+    1.0437,                  !- Year 4 Escalation
+    1.0525,                  !- Year 5 Escalation
+    1.0539,                  !- Year 6 Escalation
+    1.0516,                  !- Year 7 Escalation
+    1.0452,                  !- Year 8 Escalation
+    1.0411,                  !- Year 9 Escalation
+    1.0478,                  !- Year 10 Escalation
+    1.0525,                  !- Year 11 Escalation
+    1.0557,                  !- Year 12 Escalation
+    1.0612,                  !- Year 13 Escalation
+    1.0653,                  !- Year 14 Escalation
+    1.0694,                  !- Year 15 Escalation
+    1.0761,                  !- Year 16 Escalation
+    1.0839,                  !- Year 17 Escalation
+    1.0877,                  !- Year 18 Escalation
+    1.0889,                  !- Year 19 Escalation
+    1.0936,                  !- Year 20 Escalation
+    1.1006,                  !- Year 21 Escalation
+    1.1078,                  !- Year 22 Escalation
+    1.1145,                  !- Year 23 Escalation
+    1.1177,                  !- Year 24 Escalation
+    1.1230,                  !- Year 25 Escalation
+    1.1300,                  !- Year 26 Escalation
+    1.1341,                  !- Year 27 Escalation
+    1.1384,                  !- Year 28 Escalation
+    1.1434,                  !- Year 29 Escalation
+    1.1484;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Residential-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9548,                  !- Year 1 Escalation
+    0.9251,                  !- Year 2 Escalation
+    0.9108,                  !- Year 3 Escalation
+    0.9143,                  !- Year 4 Escalation
+    0.9305,                  !- Year 5 Escalation
+    0.9482,                  !- Year 6 Escalation
+    0.9664,                  !- Year 7 Escalation
+    0.9853,                  !- Year 8 Escalation
+    1.0031,                  !- Year 9 Escalation
+    1.0205,                  !- Year 10 Escalation
+    1.0367,                  !- Year 11 Escalation
+    1.0498,                  !- Year 12 Escalation
+    1.0653,                  !- Year 13 Escalation
+    1.0776,                  !- Year 14 Escalation
+    1.0904,                  !- Year 15 Escalation
+    1.1020,                  !- Year 16 Escalation
+    1.1143,                  !- Year 17 Escalation
+    1.1286,                  !- Year 18 Escalation
+    1.1445,                  !- Year 19 Escalation
+    1.1630,                  !- Year 20 Escalation
+    1.1777,                  !- Year 21 Escalation
+    1.1904,                  !- Year 22 Escalation
+    1.2032,                  !- Year 23 Escalation
+    1.2171,                  !- Year 24 Escalation
+    1.2352,                  !- Year 25 Escalation
+    1.2557,                  !- Year 26 Escalation
+    1.2739,                  !- Year 27 Escalation
+    1.2924,                  !- Year 28 Escalation
+    1.3113,                  !- Year 29 Escalation
+    1.3302;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Residential-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0055,                  !- Year 1 Escalation
+    0.9791,                  !- Year 2 Escalation
+    0.9945,                  !- Year 3 Escalation
+    1.0328,                  !- Year 4 Escalation
+    1.0546,                  !- Year 5 Escalation
+    1.0555,                  !- Year 6 Escalation
+    1.0692,                  !- Year 7 Escalation
+    1.0801,                  !- Year 8 Escalation
+    1.0937,                  !- Year 9 Escalation
+    1.1146,                  !- Year 10 Escalation
+    1.1319,                  !- Year 11 Escalation
+    1.1419,                  !- Year 12 Escalation
+    1.1538,                  !- Year 13 Escalation
+    1.1692,                  !- Year 14 Escalation
+    1.1929,                  !- Year 15 Escalation
+    1.2211,                  !- Year 16 Escalation
+    1.2384,                  !- Year 17 Escalation
+    1.2457,                  !- Year 18 Escalation
+    1.2630,                  !- Year 19 Escalation
+    1.2957,                  !- Year 20 Escalation
+    1.3230,                  !- Year 21 Escalation
+    1.3549,                  !- Year 22 Escalation
+    1.3749,                  !- Year 23 Escalation
+    1.3876,                  !- Year 24 Escalation
+    1.4131,                  !- Year 25 Escalation
+    1.4459,                  !- Year 26 Escalation
+    1.4695,                  !- Year 27 Escalation
+    1.4895,                  !- Year 28 Escalation
+    1.5086,                  !- Year 29 Escalation
+    1.5278;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Residential-LPG,  !- Name
+    Propane,                 !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.9783,                  !- Year 1 Escalation
+    0.9735,                  !- Year 2 Escalation
+    0.9913,                  !- Year 3 Escalation
+    1.0104,                  !- Year 4 Escalation
+    1.0226,                  !- Year 5 Escalation
+    1.0308,                  !- Year 6 Escalation
+    1.0412,                  !- Year 7 Escalation
+    1.0512,                  !- Year 8 Escalation
+    1.0590,                  !- Year 9 Escalation
+    1.0668,                  !- Year 10 Escalation
+    1.0764,                  !- Year 11 Escalation
+    1.0855,                  !- Year 12 Escalation
+    1.0938,                  !- Year 13 Escalation
+    1.1011,                  !- Year 14 Escalation
+    1.1085,                  !- Year 15 Escalation
+    1.1159,                  !- Year 16 Escalation
+    1.1233,                  !- Year 17 Escalation
+    1.1311,                  !- Year 18 Escalation
+    1.1402,                  !- Year 19 Escalation
+    1.1532,                  !- Year 20 Escalation
+    1.1628,                  !- Year 21 Escalation
+    1.1706,                  !- Year 22 Escalation
+    1.1771,                  !- Year 23 Escalation
+    1.1823,                  !- Year 24 Escalation
+    1.1892,                  !- Year 25 Escalation
+    1.1975,                  !- Year 26 Escalation
+    1.2049,                  !- Year 27 Escalation
+    1.2135,                  !- Year 28 Escalation
+    1.2231,                  !- Year 29 Escalation
+    1.2331;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Commercial-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0108,                  !- Year 1 Escalation
+    1.0176,                  !- Year 2 Escalation
+    1.0247,                  !- Year 3 Escalation
+    1.0355,                  !- Year 4 Escalation
+    1.0460,                  !- Year 5 Escalation
+    1.0429,                  !- Year 6 Escalation
+    1.0368,                  !- Year 7 Escalation
+    1.0267,                  !- Year 8 Escalation
+    1.0206,                  !- Year 9 Escalation
+    1.0281,                  !- Year 10 Escalation
+    1.0325,                  !- Year 11 Escalation
+    1.0348,                  !- Year 12 Escalation
+    1.0406,                  !- Year 13 Escalation
+    1.0443,                  !- Year 14 Escalation
+    1.0477,                  !- Year 15 Escalation
+    1.0548,                  !- Year 16 Escalation
+    1.0632,                  !- Year 17 Escalation
+    1.0663,                  !- Year 18 Escalation
+    1.0663,                  !- Year 19 Escalation
+    1.0710,                  !- Year 20 Escalation
+    1.0791,                  !- Year 21 Escalation
+    1.0879,                  !- Year 22 Escalation
+    1.0957,                  !- Year 23 Escalation
+    1.0991,                  !- Year 24 Escalation
+    1.1051,                  !- Year 25 Escalation
+    1.1136,                  !- Year 26 Escalation
+    1.1210,                  !- Year 27 Escalation
+    1.1261,                  !- Year 28 Escalation
+    1.1305,                  !- Year 29 Escalation
+    1.1349;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Commercial-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8705,                  !- Year 1 Escalation
+    0.8201,                  !- Year 2 Escalation
+    0.8114,                  !- Year 3 Escalation
+    0.8169,                  !- Year 4 Escalation
+    0.8343,                  !- Year 5 Escalation
+    0.8528,                  !- Year 6 Escalation
+    0.8717,                  !- Year 7 Escalation
+    0.8917,                  !- Year 8 Escalation
+    0.9091,                  !- Year 9 Escalation
+    0.9248,                  !- Year 10 Escalation
+    0.9409,                  !- Year 11 Escalation
+    0.9547,                  !- Year 12 Escalation
+    0.9705,                  !- Year 13 Escalation
+    0.9827,                  !- Year 14 Escalation
+    0.9953,                  !- Year 15 Escalation
+    1.0075,                  !- Year 16 Escalation
+    1.0201,                  !- Year 17 Escalation
+    1.0346,                  !- Year 18 Escalation
+    1.0496,                  !- Year 19 Escalation
+    1.0720,                  !- Year 20 Escalation
+    1.0870,                  !- Year 21 Escalation
+    1.1000,                  !- Year 22 Escalation
+    1.1126,                  !- Year 23 Escalation
+    1.1252,                  !- Year 24 Escalation
+    1.1429,                  !- Year 25 Escalation
+    1.1646,                  !- Year 26 Escalation
+    1.1846,                  !- Year 27 Escalation
+    1.2039,                  !- Year 28 Escalation
+    1.2228,                  !- Year 29 Escalation
+    1.2421;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Commercial-Residual Oil,  !- Name
+    FuelOilNo2,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.7342,                  !- Year 1 Escalation
+    0.6480,                  !- Year 2 Escalation
+    0.6345,                  !- Year 3 Escalation
+    0.6354,                  !- Year 4 Escalation
+    0.6470,                  !- Year 5 Escalation
+    0.6633,                  !- Year 6 Escalation
+    0.6795,                  !- Year 7 Escalation
+    0.7022,                  !- Year 8 Escalation
+    0.7194,                  !- Year 9 Escalation
+    0.7324,                  !- Year 10 Escalation
+    0.7449,                  !- Year 11 Escalation
+    0.7639,                  !- Year 12 Escalation
+    0.7843,                  !- Year 13 Escalation
+    0.7941,                  !- Year 14 Escalation
+    0.8131,                  !- Year 15 Escalation
+    0.8279,                  !- Year 16 Escalation
+    0.8428,                  !- Year 17 Escalation
+    0.8576,                  !- Year 18 Escalation
+    0.8720,                  !- Year 19 Escalation
+    0.8868,                  !- Year 20 Escalation
+    0.8961,                  !- Year 21 Escalation
+    0.9068,                  !- Year 22 Escalation
+    0.9188,                  !- Year 23 Escalation
+    0.9309,                  !- Year 24 Escalation
+    0.9481,                  !- Year 25 Escalation
+    0.9685,                  !- Year 26 Escalation
+    0.9889,                  !- Year 27 Escalation
+    1.0107,                  !- Year 28 Escalation
+    1.0334,                  !- Year 29 Escalation
+    1.0561;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Commercial-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0079,                  !- Year 1 Escalation
+    0.9865,                  !- Year 2 Escalation
+    1.0056,                  !- Year 3 Escalation
+    1.0472,                  !- Year 4 Escalation
+    1.0697,                  !- Year 5 Escalation
+    1.0686,                  !- Year 6 Escalation
+    1.0832,                  !- Year 7 Escalation
+    1.0956,                  !- Year 8 Escalation
+    1.1091,                  !- Year 9 Escalation
+    1.1327,                  !- Year 10 Escalation
+    1.1530,                  !- Year 11 Escalation
+    1.1654,                  !- Year 12 Escalation
+    1.1777,                  !- Year 13 Escalation
+    1.1946,                  !- Year 14 Escalation
+    1.2205,                  !- Year 15 Escalation
+    1.2508,                  !- Year 16 Escalation
+    1.2666,                  !- Year 17 Escalation
+    1.2700,                  !- Year 18 Escalation
+    1.2857,                  !- Year 19 Escalation
+    1.3138,                  !- Year 20 Escalation
+    1.3386,                  !- Year 21 Escalation
+    1.3701,                  !- Year 22 Escalation
+    1.3881,                  !- Year 23 Escalation
+    1.3993,                  !- Year 24 Escalation
+    1.4263,                  !- Year 25 Escalation
+    1.4623,                  !- Year 26 Escalation
+    1.4893,                  !- Year 27 Escalation
+    1.5118,                  !- Year 28 Escalation
+    1.5354,                  !- Year 29 Escalation
+    1.5602;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Commercial-Coal,  !- Name
+    Coal,                    !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0147,                  !- Year 1 Escalation
+    1.0319,                  !- Year 2 Escalation
+    1.0392,                  !- Year 3 Escalation
+    1.0515,                  !- Year 4 Escalation
+    1.0662,                  !- Year 5 Escalation
+    1.0735,                  !- Year 6 Escalation
+    1.0784,                  !- Year 7 Escalation
+    1.0833,                  !- Year 8 Escalation
+    1.0882,                  !- Year 9 Escalation
+    1.0956,                  !- Year 10 Escalation
+    1.1029,                  !- Year 11 Escalation
+    1.1103,                  !- Year 12 Escalation
+    1.1176,                  !- Year 13 Escalation
+    1.1250,                  !- Year 14 Escalation
+    1.1324,                  !- Year 15 Escalation
+    1.1446,                  !- Year 16 Escalation
+    1.1495,                  !- Year 17 Escalation
+    1.1593,                  !- Year 18 Escalation
+    1.1667,                  !- Year 19 Escalation
+    1.1740,                  !- Year 20 Escalation
+    1.1789,                  !- Year 21 Escalation
+    1.1887,                  !- Year 22 Escalation
+    1.1961,                  !- Year 23 Escalation
+    1.2034,                  !- Year 24 Escalation
+    1.2108,                  !- Year 25 Escalation
+    1.2230,                  !- Year 26 Escalation
+    1.2279,                  !- Year 27 Escalation
+    1.2377,                  !- Year 28 Escalation
+    1.2475,                  !- Year 29 Escalation
+    1.2574;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Industrial-Electricity,  !- Name
+    Electricity,             !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0065,                  !- Year 1 Escalation
+    1.0095,                  !- Year 2 Escalation
+    1.0161,                  !- Year 3 Escalation
+    1.0296,                  !- Year 4 Escalation
+    1.0437,                  !- Year 5 Escalation
+    1.0437,                  !- Year 6 Escalation
+    1.0417,                  !- Year 7 Escalation
+    1.0377,                  !- Year 8 Escalation
+    1.0371,                  !- Year 9 Escalation
+    1.0482,                  !- Year 10 Escalation
+    1.0567,                  !- Year 11 Escalation
+    1.0643,                  !- Year 12 Escalation
+    1.0743,                  !- Year 13 Escalation
+    1.0823,                  !- Year 14 Escalation
+    1.0894,                  !- Year 15 Escalation
+    1.1009,                  !- Year 16 Escalation
+    1.1135,                  !- Year 17 Escalation
+    1.1200,                  !- Year 18 Escalation
+    1.1250,                  !- Year 19 Escalation
+    1.1345,                  !- Year 20 Escalation
+    1.1466,                  !- Year 21 Escalation
+    1.1606,                  !- Year 22 Escalation
+    1.1722,                  !- Year 23 Escalation
+    1.1792,                  !- Year 24 Escalation
+    1.1898,                  !- Year 25 Escalation
+    1.2038,                  !- Year 26 Escalation
+    1.2103,                  !- Year 27 Escalation
+    1.2179,                  !- Year 28 Escalation
+    1.2269,                  !- Year 29 Escalation
+    1.2364;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Industrial-Distillate Oil,  !- Name
+    FuelOilNo1,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8619,                  !- Year 1 Escalation
+    0.8122,                  !- Year 2 Escalation
+    0.8076,                  !- Year 3 Escalation
+    0.8145,                  !- Year 4 Escalation
+    0.8326,                  !- Year 5 Escalation
+    0.8507,                  !- Year 6 Escalation
+    0.8692,                  !- Year 7 Escalation
+    0.8896,                  !- Year 8 Escalation
+    0.9061,                  !- Year 9 Escalation
+    0.9207,                  !- Year 10 Escalation
+    0.9365,                  !- Year 11 Escalation
+    0.9504,                  !- Year 12 Escalation
+    0.9661,                  !- Year 13 Escalation
+    0.9777,                  !- Year 14 Escalation
+    0.9896,                  !- Year 15 Escalation
+    1.0015,                  !- Year 16 Escalation
+    1.0146,                  !- Year 17 Escalation
+    1.0289,                  !- Year 18 Escalation
+    1.0431,                  !- Year 19 Escalation
+    1.0616,                  !- Year 20 Escalation
+    1.0739,                  !- Year 21 Escalation
+    1.0854,                  !- Year 22 Escalation
+    1.0966,                  !- Year 23 Escalation
+    1.1077,                  !- Year 24 Escalation
+    1.1250,                  !- Year 25 Escalation
+    1.1458,                  !- Year 26 Escalation
+    1.1651,                  !- Year 27 Escalation
+    1.1831,                  !- Year 28 Escalation
+    1.2020,                  !- Year 29 Escalation
+    1.2209;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Industrial-Residual Oil,  !- Name
+    FuelOilNo2,                !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    0.8080,                  !- Year 1 Escalation
+    0.7366,                  !- Year 2 Escalation
+    0.7209,                  !- Year 3 Escalation
+    0.7214,                  !- Year 4 Escalation
+    0.7325,                  !- Year 5 Escalation
+    0.7492,                  !- Year 6 Escalation
+    0.7680,                  !- Year 7 Escalation
+    0.7898,                  !- Year 8 Escalation
+    0.8090,                  !- Year 9 Escalation
+    0.8247,                  !- Year 10 Escalation
+    0.8399,                  !- Year 11 Escalation
+    0.8571,                  !- Year 12 Escalation
+    0.8774,                  !- Year 13 Escalation
+    0.8916,                  !- Year 14 Escalation
+    0.9088,                  !- Year 15 Escalation
+    0.9235,                  !- Year 16 Escalation
+    0.9377,                  !- Year 17 Escalation
+    0.9539,                  !- Year 18 Escalation
+    0.9696,                  !- Year 19 Escalation
+    0.9863,                  !- Year 20 Escalation
+    0.9995,                  !- Year 21 Escalation
+    1.0127,                  !- Year 22 Escalation
+    1.0263,                  !- Year 23 Escalation
+    1.0400,                  !- Year 24 Escalation
+    1.0593,                  !- Year 25 Escalation
+    1.0821,                  !- Year 26 Escalation
+    1.1201,                  !- Year 27 Escalation
+    1.1494,                  !- Year 28 Escalation
+    1.1738,                  !- Year 29 Escalation
+    1.1986;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Industrial-Natural gas,  !- Name
+    NaturalGas,              !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0316,                  !- Year 1 Escalation
+    1.0737,                  !- Year 2 Escalation
+    1.1284,                  !- Year 3 Escalation
+    1.2084,                  !- Year 4 Escalation
+    1.2463,                  !- Year 5 Escalation
+    1.2274,                  !- Year 6 Escalation
+    1.2400,                  !- Year 7 Escalation
+    1.2505,                  !- Year 8 Escalation
+    1.2674,                  !- Year 9 Escalation
+    1.3011,                  !- Year 10 Escalation
+    1.3263,                  !- Year 11 Escalation
+    1.3368,                  !- Year 12 Escalation
+    1.3495,                  !- Year 13 Escalation
+    1.3684,                  !- Year 14 Escalation
+    1.4084,                  !- Year 15 Escalation
+    1.4589,                  !- Year 16 Escalation
+    1.4884,                  !- Year 17 Escalation
+    1.5137,                  !- Year 18 Escalation
+    1.5516,                  !- Year 19 Escalation
+    1.5853,                  !- Year 20 Escalation
+    1.6232,                  !- Year 21 Escalation
+    1.6779,                  !- Year 22 Escalation
+    1.7011,                  !- Year 23 Escalation
+    1.7095,                  !- Year 24 Escalation
+    1.7453,                  !- Year 25 Escalation
+    1.7958,                  !- Year 26 Escalation
+    1.8316,                  !- Year 27 Escalation
+    1.8737,                  !- Year 28 Escalation
+    1.9179,                  !- Year 29 Escalation
+    1.9642;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    U.S. Avg  Industrial-Coal,  !- Name
+    Coal,                    !- Resource
+    2015,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0182,                  !- Year 1 Escalation
+    1.0395,                  !- Year 2 Escalation
+    1.0486,                  !- Year 3 Escalation
+    1.0638,                  !- Year 4 Escalation
+    1.0790,                  !- Year 5 Escalation
+    1.0881,                  !- Year 6 Escalation
+    1.0942,                  !- Year 7 Escalation
+    1.1033,                  !- Year 8 Escalation
+    1.1125,                  !- Year 9 Escalation
+    1.1216,                  !- Year 10 Escalation
+    1.1307,                  !- Year 11 Escalation
+    1.1398,                  !- Year 12 Escalation
+    1.1459,                  !- Year 13 Escalation
+    1.1581,                  !- Year 14 Escalation
+    1.1672,                  !- Year 15 Escalation
+    1.1763,                  !- Year 16 Escalation
+    1.1884,                  !- Year 17 Escalation
+    1.1945,                  !- Year 18 Escalation
+    1.2067,                  !- Year 19 Escalation
+    1.2128,                  !- Year 20 Escalation
+    1.2219,                  !- Year 21 Escalation
+    1.2310,                  !- Year 22 Escalation
+    1.2401,                  !- Year 23 Escalation
+    1.2492,                  !- Year 24 Escalation
+    1.2584,                  !- Year 25 Escalation
+    1.2705,                  !- Year 26 Escalation
+    1.2857,                  !- Year 27 Escalation
+    1.2979,                  !- Year 28 Escalation
+    1.3100,                  !- Year 29 Escalation
+    1.3222;                  !- Year 30 Escalation
+

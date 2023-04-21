@@ -1,0 +1,320 @@
+!===================================================================================
+! ElectricGenerators.idf
+!
+! This dataset includes inputs for the Generator:MicroTurbine object and
+! associated performance curves. The performance curves were developed from
+! manufacturers data collected in Summer 2007.
+!
+!                       Reference Electric   Reference Electrical
+! Generator Name        Power Output (kW)    Efficiency (LHV basis)
+! Capstone C65                65                   0.29
+! Elliott TA100              100                   0.2874
+! Ingersoll Rand MT70         70                   0.28
+! Ingersoll Rand MT250       250                   0.29
+!
+! Capstone C65
+! References:
+!  Capstone Doc #480014 Rev A (Feb 2006)
+!  Capstone Doc #410048 Rev A (Dec 2005)
+!  Capstone Doc #460000-001 Rev H (Dec 2005)
+!  http://www.microturbine.com/
+!  Data accounts for external gas pressure booster pump (ancillary power)
+!
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  Generator:MicroTurbine,
+    Capstone C65,            !- Name
+    65000,                   !- Reference Electrical Power Output {W}
+    29900,                   !- Minimum Full Load Electrical Power Output {W}
+    65000,                   !- Maximum Full Load Electrical Power Output {W}
+    0.29,                    !- Reference Electrical Efficiency Using Lower Heating Value
+    15.0,                    !- Reference Combustion Air Inlet Temperature {C}
+    0.00638,                 !- Reference Combustion Air Inlet Humidity Ratio {kgWater/kgDryAir}
+    0.0,                     !- Reference Elevation {m}
+    Capstone C65 Power_vs_Temp_Elev,  !- Electrical Power Function of Temperature and Elevation Curve Name
+    Capstone C65 Efficiency_vs_Temp,  !- Electrical Efficiency Function of Temperature Curve Name
+    Capstone C65 Efficiency_vs_PLR,  !- Electrical Efficiency Function of Part Load Ratio Curve Name
+    NaturalGas,              !- Fuel Type
+    50000,                   !- Fuel Higher Heating Value {kJ/kg}
+    45450,                   !- Fuel Lower Heating Value {kJ/kg}
+    300,                     !- Standby Power {W}
+    4500;                    !- Ancillary Power {W}
+
+!
+! Curve set (3 Curves):
+!
+! Electrical Power Modifier Curve (function of temperature and elevation)
+! x = Dry-Bulb Temperature of Combustion Inlet Air (C) and y = Elevation (meters)
+!
+
+  Curve:Biquadratic,
+    Capstone C65 Power_vs_Temp_Elev,  !- Name
+    1.2027697,               !- Coefficient1 Constant
+    -9.671305E-03,           !- Coefficient2 x
+    -4.860793E-06,           !- Coefficient3 x**2
+    -1.542394E-04,           !- Coefficient4 y
+    9.111418E-09,            !- Coefficient5 y**2
+    8.797885E-07,            !- Coefficient6 x*y
+    -17.8,                   !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    3050.;                   !- Maximum Value of y
+
+!
+! Electrical Efficiency Modifier Curve (function of temperature)
+! x = Dry-Bulb Temperature of Combustion Inlet Air (C)
+!
+
+  Curve:Cubic,
+    Capstone C65 Efficiency_vs_Temp,  !- Name
+    1.0402217,               !- Coefficient1 Constant
+    -0.0017314,              !- Coefficient2 x
+    -6.497040E-05,           !- Coefficient3 x**2
+    5.133175E-07,            !- Coefficient4 x**3
+    -20.0,                   !- Minimum Value of x
+    50.0;                    !- Maximum Value of x
+
+!
+! Electrical Efficiency Modifier Curve (function of part-load ratio)
+! x = Part-Load Ratio (electrical load/full load electrical power output)
+!
+
+  Curve:Cubic,
+    Capstone C65 Efficiency_vs_PLR,  !- Name
+    0.215290,                !- Coefficient1 Constant
+    2.561463,                !- Coefficient2 x
+    -3.24613,                !- Coefficient3 x**2
+    1.497306,                !- Coefficient4 x**3
+    0.03,                    !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!
+! Elliott TA100
+! References:
+!  Direct correspondence with manufacturer personnel.
+!  http://www.elliottmicroturbines.com
+!  Data accounts for integrated gas pressure booster pump
+!
+
+  Generator:MicroTurbine,
+    Elliott TA100,           !- Name
+    100000,                  !- Reference Electrical Power Output {W}
+    40000,                   !- Minimum Full Load Electrical Power Output {W}
+    100000,                  !- Maximum Full Load Electrical Power Output {W}
+    0.2874,                  !- Reference Electrical Efficiency Using Lower Heating Value
+    15.0,                    !- Reference Combustion Air Inlet Temperature {C}
+    0.00638,                 !- Reference Combustion Air Inlet Humidity Ratio {kgWater/kgDryAir}
+    0.0,                     !- Reference Elevation {m}
+    Elliott TA100 Power_vs_Temp_Elev,  !- Electrical Power Function of Temperature and Elevation Curve Name
+    Elliott TA100 Efficiency_vs_Temp,  !- Electrical Efficiency Function of Temperature Curve Name
+    Elliott TA100 Efficiency_vs_PLR,  !- Electrical Efficiency Function of Part Load Ratio Curve Name
+    NaturalGas,              !- Fuel Type
+    50000,                   !- Fuel Higher Heating Value {kJ/kg}
+    45450,                   !- Fuel Lower Heating Value {kJ/kg}
+    300,                     !- Standby Power {W}
+    0;                       !- Ancillary Power {W}
+
+!
+! Curve set (3 Curves):
+!
+! Electrical Power Modifier Curve (function of temperature and elevation)
+! x = Dry-Bulb Temperature of Combustion Inlet Air (C) and y = Elevation (meters)
+!
+!  Elevation data not available from manufacturer.
+!  Assuming linear reduction of 3.4% per 1000 ft (305 m) elevation
+!  per Microturbine Technology Characterization for the US Environmental
+!  Protection Agency, Energy Nexus Group, March 2002
+
+  Curve:Biquadratic,
+    Elliott TA100 Power_vs_Temp_Elev,  !- Name
+    1.23063,                 !- Coefficient1 Constant
+    -0.01258,                !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    -1.11475E-04,            !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    -7.0,                    !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    3050.;                   !- Maximum Value of y
+
+!
+! Electrical Efficiency Modifier Curve (function of temperature)
+! x = Dry-Bulb Temperature of Combustion Inlet Air (C)
+!
+
+  Curve:Cubic,
+    Elliott TA100 Efficiency_vs_Temp,  !- Name
+    1.0021679,               !- Coefficient1 Constant
+    8.89497E-04,             !- Coefficient2 x
+    -7.06607E-05,            !- Coefficient3 x**2
+    -6.98114E-07,            !- Coefficient4 x**3
+    -7.0,                    !- Minimum Value of x
+    50.0;                    !- Maximum Value of x
+
+!
+! Electrical Efficiency Modifier Curve (function of part-load ratio)
+! x = Part-Load Ratio (electrical load/full load electrical power output)
+!
+
+  Curve:Cubic,
+    Elliott TA100 Efficiency_vs_PLR,  !- Name
+    -1.0547119E-15,          !- Coefficient1 Constant
+    1.91926871211,           !- Coefficient2 x
+    -1.14135760342,          !- Coefficient3 x**2
+    0.222088891305,          !- Coefficient4 x**3
+    0.0001,                  !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!
+! Ingersoll Rand MT70
+! References:
+!  Website materials (June 2007) and direct correspondence with manufacturer personnel.
+!  http://energy.ingersollrand.com
+!  Data accounts for integrated gas pressure booster pump
+!
+
+  Generator:MicroTurbine,
+    Ingersoll Rand MT70,     !- Name
+    70000,                   !- Reference Electrical Power Output {W}
+    32591,                   !- Minimum Full Load Electrical Power Output {W}
+    90000,                   !- Maximum Full Load Electrical Power Output {W}
+    0.28,                    !- Reference Electrical Efficiency Using Lower Heating Value
+    15.0,                    !- Reference Combustion Air Inlet Temperature {C}
+    0.00638,                 !- Reference Combustion Air Inlet Humidity Ratio {kgWater/kgDryAir}
+    0.0,                     !- Reference Elevation {m}
+    Ingersoll Rand MT70 Power_vs_Temp_Elev,  !- Electrical Power Function of Temperature and Elevation Curve Name
+    Ingersoll Rand MT70 Efficiency_vs_Temp,  !- Electrical Efficiency Function of Temperature Curve Name
+    Ingersoll Rand MT70 Efficiency_vs_PLR,  !- Electrical Efficiency Function of Part Load Ratio Curve Name
+    NaturalGas,              !- Fuel Type
+    50000,                   !- Fuel Higher Heating Value {kJ/kg}
+    45450,                   !- Fuel Lower Heating Value {kJ/kg}
+    500,                     !- Standby Power {W}
+    0;                       !- Ancillary Power {W}
+
+!
+! Curve set (3 Curves):
+!
+! Electrical Power Modifier Curve (function of temperature and elevation)
+! x = Dry-Bulb Temperature of Combustion Inlet Air (C) and y = Elevation (meters)
+!
+!  Linear reduction of 3.5% per 1000 ft (305 m) elevation
+
+  Curve:Biquadratic,
+    Ingersoll Rand MT70 Power_vs_Temp_Elev,  !- Name
+    1.1100093,               !- Coefficient1 Constant
+    -8.959532E-03,           !- Coefficient2 x
+    1.433197E-05,            !- Coefficient3 x**2
+    -1.14754E-04,            !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    -17.8,                   !- Minimum Value of x
+    46.1,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    3050.;                   !- Maximum Value of y
+
+!
+! Electrical Efficiency Modifier Curve (function of temperature)
+! x = Dry-Bulb Temperature of Combustion Inlet Air (C)
+!
+
+  Curve:Quadratic,
+    Ingersoll Rand MT70 Efficiency_vs_Temp,  !- Name
+    1.0260503,               !- Coefficient1 Constant
+    -1.68174E-03,            !- Coefficient2 x
+    -1.11640E-05,            !- Coefficient3 x**2
+    -17.8,                   !- Minimum Value of x
+    46.1;                    !- Maximum Value of x
+
+!
+! Electrical Efficiency Modifier Curve (function of part-load ratio)
+! x = Part-Load Ratio (electrical load/full load electrical power output)
+!
+
+  Curve:Cubic,
+    Ingersoll Rand MT70 Efficiency_vs_PLR,  !- Name
+    0.0,                     !- Coefficient1 Constant
+    2.96440584,              !- Coefficient2 x
+    -3.157155,               !- Coefficient3 x**2
+    1.19274913,              !- Coefficient4 x**3
+    0.5,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!
+! Ingersoll Rand MT250
+! References:
+!  Website materials (June 2007) and direct correspondence with manufacturer personnel.
+!  http://energy.ingersollrand.com
+!  Data accounts for integrated gas pressure booster pump
+!
+
+  Generator:MicroTurbine,
+    Ingersoll Rand MT250,    !- Name
+    250000,                  !- Reference Electrical Power Output {W}
+    110000,                  !- Minimum Full Load Electrical Power Output {W}
+    300000,                  !- Maximum Full Load Electrical Power Output {W}
+    0.29,                    !- Reference Electrical Efficiency Using Lower Heating Value
+    15.0,                    !- Reference Combustion Air Inlet Temperature {C}
+    0.00638,                 !- Reference Combustion Air Inlet Humidity Ratio {kgWater/kgDryAir}
+    0.0,                     !- Reference Elevation {m}
+    Ingersoll Rand MT250 Power_vs_Temp_Elev,  !- Electrical Power Function of Temperature and Elevation Curve Name
+    Ingersoll Rand MT250 Efficiency_vs_Temp,  !- Electrical Efficiency Function of Temperature Curve Name
+    Ingersoll Rand MT250 Efficiency_vs_PLR,  !- Electrical Efficiency Function of Part Load Ratio Curve Name
+    NaturalGas,              !- Fuel Type
+    50000,                   !- Fuel Higher Heating Value {kJ/kg}
+    45450,                   !- Fuel Lower Heating Value {kJ/kg}
+    1500,                    !- Standby Power {W}
+    0;                       !- Ancillary Power {W}
+
+!
+! Curve set (3 Curves):
+!
+! Electrical Power Modifier Curve (function of temperature and elevation)
+! x = Dry-Bulb Temperature of Combustion Inlet Air (C) and y = Elevation (meters)
+!
+!  Linear reduction of 3.5% per 1000 ft (305 m) elevation
+
+  Curve:Biquadratic,
+    Ingersoll Rand MT250 Power_vs_Temp_Elev,  !- Name
+    1.073797,                !- Coefficient1 Constant
+    -6.74610E-03,            !- Coefficient2 x
+    -4.12856E-05,            !- Coefficient3 x**2
+    -1.14754E-04,            !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    -17.8,                   !- Minimum Value of x
+    46.1,                    !- Maximum Value of x
+    0.0,                     !- Minimum Value of y
+    3050.;                   !- Maximum Value of y
+
+!
+! Electrical Efficiency Modifier Curve (function of temperature)
+! x = Dry-Bulb Temperature of Combustion Inlet Air (C)
+!
+
+  Curve:Cubic,
+    Ingersoll Rand MT250 Efficiency_vs_Temp,  !- Name
+    1.045428,                !- Coefficient1 Constant
+    -1.98019E-03,            !- Coefficient2 x
+    -7.65274E-05,            !- Coefficient3 x**2
+    7.31154E-07,             !- Coefficient4 x**3
+    -17.8,                   !- Minimum Value of x
+    46.1;                    !- Maximum Value of x
+
+!
+! Electrical Efficiency Modifier Curve (function of part-load ratio)
+! x = Part-Load Ratio (electrical load/full load electrical power output)
+!
+
+  Curve:Cubic,
+    Ingersoll Rand MT250 Efficiency_vs_PLR,  !- Name
+    0.0,                     !- Coefficient1 Constant
+    0.884774,                !- Coefficient2 x
+    1.023073,                !- Coefficient3 x**2
+    -0.907847,               !- Coefficient4 x**3
+    0.5,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+

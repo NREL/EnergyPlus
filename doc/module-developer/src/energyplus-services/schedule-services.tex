@@ -1,0 +1,277 @@
+\section{Schedule Services}\label{schedule-services}
+
+Schedules are widely used in specifying input for building simulation programs. For instance heat gains from lighting, equipment and occupancy are usually specified using schedules. Schedules are used to indicate when equipment is on or off. Schedules are also used to specify zone and system set points. EnergyPlus uses schedules in all these ways and provides services that make using schedules very easy for the developer.
+
+Schedules are specified in a three level hierarchy in EnergyPlus input.
+
+\textbf{Day Schedules} (IDD Objects: Schedule:Day:Hourly, Schedule:Day:Interval, Schedule:Day:List)
+
+\textbf{Week Schedules} (IDD Objects: Schedule:Week:Daily, Schedule:Week:Compact)
+
+\textbf{Annual Schedules} (IDD Objects: Schedule:Year, Schedule:Compact, Schedule:File)
+
+In addition, a \textbf{ScheduleTypeLimits} object can specify certain limits on the schedules.~ This is a mostly optional input but can be used effectively.~ (That is, if your examples include it, users will probably use it too.)
+
+An example from an input (IDF) file:
+
+~ \textbf{ScheduleTypeLimits},
+
+~~~ Fraction,~ !- ScheduleType Name
+
+~~~ 0.0 : 1.0,~ !- range
+
+~~~ CONTINUOUS;~ !- Numeric Type
+
+~ \textbf{ScheduleTypeLimits},
+
+~~~ On/Off,~ !- ScheduleType Name
+
+~~~ 0:1,~ !- range
+
+~~~ DISCRETE;~ !- Numeric Type
+
+! Schedule Constant
+
+~ \textbf{SCHEDULE:COMPACT},
+
+~ Constant,
+
+~ on/off,
+
+~ Through: 12/31,
+
+~ For: AllDays,
+
+~ Until: 24:00, 1.0;
+
+! Schedule Daytime Ventilation
+
+~ \textbf{SCHEDULE:COMPACT},
+
+~ Daytime Ventilation,
+
+~ Fraction,
+
+~ Through: 12/31,
+
+~ For: Weekdays SummerDesignDay,
+
+~ Until: 08:00, 0.0,
+
+~ Until: 18:00, 1.0,
+
+~ Until: 24:00, 0.0,
+
+~ For: Weekends WinterDesignDay,
+
+~ Until: 10:00, 0.0,
+
+~ Until: 16:00, 1.0,
+
+~ Until: 24:00, 0.0,
+
+~ For: Holidays AllOtherDays,
+
+~ Until: 24:00, 0.0;
+
+! Schedule Intermittent
+
+~ \textbf{SCHEDULE:COMPACT},
+
+~ Intermittent,
+
+~ Fraction,
+
+~ Through: 12/31,
+
+~ For: AllDays,
+
+~ Until: 08:00, 0.0,
+
+~ Until: 18:00, 1.0,
+
+~ Until: 24:00, 0.0;
+
+The day schedule elements assign numbers that span a full day (24 hours). The week schedule elements indicate which day schedules are applicable to each day of the week plus holiday and some special days. Schedule elements indicate which week schedules are applicable to various periods of the year. Both day schedules and schedules reference a schedule type. A schedule type is characterized by a range (e.g.~0 to 1) and whether it is continuous (can assume any value) or discrete (can assume integer values only). The following routines from the ScheduleManager module enable the developer to use schedules in a simulation.
+
+\subsection{GetScheduleIndex}\label{getscheduleindex}
+
+This function takes a schedule name as input and returns an internal pointer to the schedule. Schedule values will always be accessed via the pointer not the name during the simulation for reasons of efficiency. This function should be called once for each schedule during the input phase and the returned value stored in the appropriate data structure.
+
+Example:
+
+USE ScheduleManager, ONLY: GetScheduleIndex
+
+. . .
+
+Baseboard(BaseboardNum)\%SchedPtr = \textbf{GetScheduleIndex}(AlphArray(2))
+
+Here the schedule pointer for the schedule name contained in AlphArray(2) is stored in the baseboard data structure for later use.~ If a 0 is returned, this is not a valid schedule.~ Objects should also typically check for ``blank'' schedules.
+
+\subsection{GetDayScheduleIndex}\label{getdayscheduleindex}
+
+This function takes a ``day schedule'' name as input and returns an internal pointer to the schedule. Day schedule values will always be accessed via the pointer not the name during the simulation for reasons of efficiency. This function should be called once for each schedule during the input phase and the returned value stored in the appropriate data structure.
+
+Example:
+
+USE ScheduleManager, ONLY: GetDayScheduleIndex
+
+. . .~~~~~~~ DesDayInput(EnvrnNum)\%RelHumSchPtr = GetDayScheduleIndex(DDNames(4))
+
+Here the day schedule pointer for the day schedule name contained in DDNames(4) is stored in the design day data structure for later use.~ If a 0 is returned, this is not a valid day schedule.~ Objects should also typically check for ``blank'' schedules.
+
+\subsection{CheckScheduleValueMinMax}\label{checkschedulevalueminmax}
+
+Since you can't always rely on a user to input the ScheduleType, the ScheduleManager can be used to check the minimum and/or maximum values for a schedule.
+
+LOGICAL FUNCTION \textbf{CheckScheduleValueMinMax}(ScheduleIndex,~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ MinString,Minimum,MaxString,Maximum)
+
+The pair of specifications (MinString, Minimum) and (MaxString, Maximum) is optional -- only one set need be given.
+
+Examples from the code:
+
+USE ScheduleManager, ONLY: CheckScheduleValueMinMax
+
+. . .
+
+IF (.NOT. \textbf{CheckScheduleValueMinMax}(ScheduleIndex,`\textgreater{} =',0.,`\textless{} =',1.)) THEN
+
+~ CALL ShowSevereError(RoutineName//trim(currentModuleObject)//','//~ \&
+
+~~~ Trim(cAlphaFieldName(3))//'..')
+
+~ CALL ShowContinueError(`Error found in schedule ='//TRIM(Alphas(3)))
+
+~ CALL ShowContinueError(`setpoint values must be (\textgreater{} = 0., \textless{} = 1.)')
+
+~ ErrorsFound = .true.
+
+END IF
+
+\subsection{CheckScheduleValue}\label{checkschedulevalue}
+
+There are times when the ``CheckScheduleValueMinMax'' will not be sufficient to verify proper values.~ A good example is the ``control type'' schedules -- valid values might be 0 through 4, but just checking the min/max will not tell you if it contains a specific value (say, 3).~ This function allows you to check the entire schedule for a specific value -- this will be more useful for discrete schedules than for schedule types of a continuous nature but can be used for both.
+
+LOGICAL FUNCTION CheckScheduleValue(ScheduleIndex,Value)
+
+Example of use:
+
+~IF (\textbf{CheckScheduleValue}(CTIndex,REAL(SingleHeatingSetPoint))) THEN
+
+Here, the CTIndex is a schedule index for the Control Type schedules.~ SingleHeatingSetPoint is an integer value for that control type.~ ``CheckScheduleValue'' is used to determine if the schedule does, in fact, contain that value.
+
+\subsection{GetScheduleMinValue}\label{getscheduleminvalue}
+
+There are times when you don't necessarily want to issue an error message but might like to find out what the minimum value of a given schedule is.~ For example, if the schedule allowed for \textgreater{}1 multipliers on a given input.
+
+FUNCTION GetScheduleMinValue(ScheduleIndex) RESULT(MinimumValue)
+
+Example of use:
+
+USE ScheduleManager, ONLY: GetScheduleMinValue
+
+. . .
+
+Value = \textbf{GetScheduleMinValue}(ScheduleIndex)
+
+The only argument needed is the ScheduleIndex for the schedule.~ Note that all schedule values are stored as real numbers -- if you have a discrete/integer valued schedule, you may wish to do some special checking of the min value.
+
+\subsection{GetScheduleMaxValue}\label{getschedulemaxvalue}
+
+There are times when you don't necessarily want to issue an error message but might like to find out what the maximum value of a given schedule is.~ For example, if the schedule allowed for \textgreater{}1 multipliers on a given input.
+
+FUNCTION GetScheduleMaxValue(ScheduleIndex) RESULT(MaximumValue)
+
+Example of use:
+
+USE ScheduleManager, ONLY: GetScheduleMaxValue
+
+. . .
+
+Value = \textbf{GetScheduleMaxValue}(ScheduleIndex)
+
+The only argument needed is the ScheduleIndex for the schedule.~ Note that all schedule values are stored as real numbers -- if you have a discrete/integer valued schedule, you may wish to do some special checking of the min value.
+
+\subsection{GetCurrentScheduleValue}\label{getcurrentschedulevalue}
+
+This function returns the current schedule value for the current day and time, given the schedule pointer as input.
+
+REAL FUNCTION GetCurrentScheduleValue(ScheduleIndex)
+
+Example of use:
+
+USE ScheduleManager, ONLY: GetCurrentScheduleValue
+
+. . .
+
+CloUnit = \textbf{GetCurrentScheduleValue}(People(PeopleNum)\%ClothingPtr)
+
+Notice that the developer doesn't have to keep track of hour of the day, day of the month, or month. The program does all of that. The only input needed is the pointer to the schedule.
+
+\subsection{GetScheduleValuesForDay}\label{getschedulevaluesforday}
+
+This function returns the schedule values for a specific day, given the schedule index as input.
+
+SUBROUTINE GetScheduleValuesForDay(ScheduleIndex,DayValues,JDay)
+
+Example of use:
+
+~~~ ALLOCATE(SVals1(24,NumOfTimeStepInHour))
+
+~~~ SVals1 = 0.0
+
+~~~ \ldots{}
+
+~~~~~~~ DO JDay = 1,366
+
+~~~~~~~~~ CALL \textbf{GetScheduleValuesForDay}(CrossMixing(Loop)\%SchedPtr,~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~SVals1,JDay)
+
+~~~~~~~~~ IF (.not. ANY(SVals1\textgreater{}0.0)) CYCLE
+
+~~~~~~~ \ldots{}
+
+~~~~~~~ END DO
+
+\subsection{GetSingleDayScheduleValues}\label{getsingledayschedulevalues}
+
+This function returns the schedule values for a specific day schedule (used in Design Day input, for example).
+
+SUBROUTINE GetSingleDayScheduleValues(DayScheduleIndex,DayValues)
+
+Example of use:
+
+~~ ALLOCATE (DDRelHumValues(TotDesDays,24,NumOfTimeStepInHour))
+
+~~ DDRelHumValues = 0.0
+
+~~ \ldots{}
+
+~~~ CALL \textbf{GetSingleDayScheduleValues}(DesDayInput(EnvrnNum)\%RelHumSchPtr, \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DDRelHumValues(EnvrnNum,:,:))
+
+\subsection{LookUpScheduleValue}\label{lookupschedulevalue}
+
+This function can be used to look up a schedule value for the current time or optionally for any specific hour, timestep, day of year.
+
+REAL FUNCTION LookUpScheduleValue(ScheduleIndex, ThisHour, ThisTimeStep, ThisDayOfYear)
+
+\ldots{}
+
+~~~~~~~~~ ! FUNCTION ARGUMENT DEFINITIONS:
+
+~ INTEGER ScheduleIndex
+
+~ INTEGER, OPTIONAL :: ThisHour
+
+~ INTEGER, OPTIONAL :: ThisTimeStep
+
+~ INTEGER, OPTIONAL :: ThisDayOfYear
+
+Example of use:
+
+~~~~~ SchValue = \textbf{LookUpScheduleValue}(Surface(SNR)\%SchedShadowSurfIndex,IHOUR,TS)

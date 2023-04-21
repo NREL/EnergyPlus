@@ -1,0 +1,161 @@
+\section{Input Data Dictionary}\label{input-data-dictionary}
+
+An entry in the IDD consists of comma-separated text terminated by a semicolon. For instance:
+
+\textbf{Coil:Heating:Water,}
+
+~~~~~~ \textbackslash{}min-fields 14
+
+~ A1 , \textbackslash{}field Name
+
+~~~~~~ \textbackslash{}required-field
+
+~~~~~~ \textbackslash{}type alpha
+
+~~~~~~ \textbackslash{}reference HeatingCoilName
+
+~~~~~~ \textbackslash{}reference HeatingCoilsWater
+
+~ A2 , \textbackslash{}field Availability Schedule Name
+
+~~~~~~ \textbackslash{}type object-list
+
+~~~~~~ \textbackslash{}object-list ScheduleNames
+
+~ N1 , \textbackslash{}field U-Factor Times Area Value
+
+~~~~~~ \textbackslash{}units W/K
+
+~~~~~~ \textbackslash{}autosizable
+
+~~~~~~ \textbackslash{}default Autosize
+
+~ N2 , \textbackslash{}field Maximum Water Flow Rate
+
+~~~~~~ \textbackslash{}units m3/s
+
+~~~~~~ \textbackslash{}autosizable
+
+~~~~~~ \textbackslash{}ip-units gal/min
+
+~~~~~~ \textbackslash{}default Autosize
+
+~ A3 , \textbackslash{}field Water Inlet Node Name
+
+~~~~~~ \textbackslash{}required-field
+
+~ A4 , \textbackslash{}field Water Outlet Node Name
+
+~~~~~~ \textbackslash{}required-field
+
+~ A5 , \textbackslash{}field Air Inlet Node Name
+
+~~~~~~ \textbackslash{}required-field
+
+~ A6 , \textbackslash{}field Air Outlet Node Name
+
+~~~~~~ \textbackslash{}required-field
+
+~ A7 , \textbackslash{}field Performance Input Method
+
+~~~~~~ \textbackslash{}type Choice
+
+~~~~~~ \textbackslash{}key UFactorTimesAreaAndDesignWaterFlowRate
+
+~~~~~~ \textbackslash{}key NominalCapacity
+
+~~~~~~ \textbackslash{}default UFactorTimesAreaAndDesignWaterFlowRate
+
+~ N3 , \textbackslash{}field Nominal Capacity
+
+~~~~~~ \textbackslash{}type real
+
+~~~~~~ \textbackslash{}units W
+
+~~~~~~ \textbackslash{}autosizable
+
+~~~~~~ \textbackslash{}minimum 0
+
+~~~~~~ \textbackslash{}default Autosize
+
+~ N4 , \textbackslash{}field Design Inlet Water Temperature
+
+~~~~~~ \textbackslash{}units C
+
+~~~~~~ \textbackslash{}type real
+
+~~~~~~ \textbackslash{}default 82.2
+
+~ N5, \textbackslash{}field Design Inlet Air Temperature
+
+~~~~~ \textbackslash{}units C
+
+~~~~~ \textbackslash{}type real
+
+~~~~~ \textbackslash{}default 16.6
+
+~ N6, \textbackslash{}field Design Outlet Water Temperature
+
+~~~~~ \textbackslash{}units C
+
+~~~~~ \textbackslash{}type real
+
+~~~~~ \textbackslash{}default 71.1
+
+~ N7; \textbackslash{}field Design Outlet Air Temperature
+
+~~~~~ \textbackslash{}units C
+
+~~~~~ \textbackslash{}type real
+
+~~~~~ \textbackslash{}default 32.2
+
+This entry defines a simple water-heating coil and specifies all of the input data needed to model it. The following rules apply.
+
+\begin{itemize}
+\item
+  The first element Coil:Heating:Water is the class name (also called a keyword or key).~ This class name must be unique in the IDD.~ The maximum length for the class name is 100 characters.~ Embedded spaces are allowed and are significant.
+\item
+  In most cases, one should have fields following the object name.~ An object name by itself (terminated with a semicolon) is a ``section'' -- there may be uses for sections in input but the ``Getting'' of input is not hierarchical -- one typically gets all objects of one type and then all objects of the next type.
+\item
+  In most cases, the second field of an object should be an ``alpha'' and the field name should contain the word ``name''.~ (This will allow for certain validations later on.)
+\item
+  Commas separate fields.~ They always act as separators -- thus there is no way to include a comma in a class name or as part of a data field.
+\item
+  Similarly, semicolons are terminators -- a semicolon is always interpreted as the end of an EnergyPlus ``sentence''. So, avoid embedded semicolons in class names or data fields.
+\item
+  Blank lines are allowed.
+\item
+  Each line can be up to 500 characters in length.
+\item
+  The comment character is an exclamation or a backslash.~ Anything on a line after an ``!'' or a ``\textbackslash{}'' is ignored during EnergyPlus input.
+\end{itemize}
+
+The only significant syntax elements are the commas, the semicolon, the N's (denoting numeric data), and the A's (denoting alphanumeric data) and the exclamation and backslash.~ Everything else including blanks, end of lines, or even text that is not a comma, semicolon, N, or A is ignored.~ There are several style conventions in use however.
+
+\begin{itemize}
+\item
+  Sequence numbers are appended to the letters A or N denoting each data element.~ Thus, A2 is the second alphanumeric data item and N3 is the third numeric data item.
+\item
+  The class name contains a naming convention: type:subtype:subsubtype. For further naming conventions, please see the next section of this document.
+\item
+  Backslashes denote specially formatted comments. These comments provide information about the input, such as a description of the item, units, limits, mins \& maxes, etc., in a form that can be processed by an input editor or interface. A complete description of the backslash comment format is given at the start of the IDD file and in the Guide for Interface Developers.~ While these are ``comments'', they are quite important and allow the InputProcessor module to do some error checking for you.~~ They are also used by the IDFEditor that many users continue to use and by interface developers in understanding EnergyPlus.
+\item
+  \textbf{\textbackslash{}default} -- the number (N fields) or phrase (A fields) after this special field will be filled for any input file that has a blank in that field.
+\item
+  \textbf{\textbackslash{}minimum} or \textbf{\textbackslash{}minimum\textgreater{}} -- the number following this special field will be automatically checked during input
+\item
+  \textbf{\textbackslash{}maximum} or \textbf{\textbackslash{}maximum\textless{}} -- the number following this special field will be automatically checked during input
+\item
+  \textbf{\textbackslash{}extensible:\#} -- allows you to structure your GetInput routine so that the object arguments can be expanded (you include the number of fields in the ``extension'' and the Input Processor can automatically extend IDD definitions) -- you will still need to determine how many maximum arguments are in the object. The IDF Editor does not use this field and cannot auto-extend such objects if an IDF is encountered that has a greater number of fields than IDD allows.
+\item
+  \textbf{\textbackslash{}type integer} -- (or \textbf{real} or \textbf{alpha}) -- this field has gained increased importance after a user kept hitting an internal maximum detected by the program and kept increasing their input number until it overflowed the system's integer size. Until all types are shown on numeric fields it will be hard for the InputProcessor to provide proper error detection.
+\item
+  \textbf{There are many more \textbackslash{} fields} -- these are described at the top of the IDD.
+\end{itemize}
+
+Overall, the IDD file has very little structure.~ Generally, a new entry should be placed next to entries describing similar components.~ \emph{Coil:Heating:Water}, for instance, is grouped with entries describing other water coils.
+
+\textbf{Summary}
+
+One of the early tasks for a module developer is to create a new entry in the Input Data Dictionary.~ This entry defines the data needed to model the new component.

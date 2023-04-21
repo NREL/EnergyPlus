@@ -1,0 +1,101 @@
+\section{Input Data File}\label{input-data-file}
+
+The Input Data File (IDF) is the file containing the data for an actual simulation.~ This file is also a text (ASCII) file with a syntax ``filling in the blanks'' of the definitions in the IDD.~ A portion of an IDF with input data for the hot water coil defined in the IDD example looks like:
+
+~ Coil:Heating:Water,
+
+~~~ SPACE1-1 Zone Coil,~~~~~ !- Name
+
+~~~ ReheatCoilAvailSched,~~~ !- Availability Schedule Name
+
+~~~ autosize,~~~~~~~~~~~~~~~ !- U-Factor Times Area Value \{W/K\}
+
+~~~ autosize,~~~~~~~~~~~~~~~ !- Maximum Water Flow Rate \{m3/s\}
+
+~~~ SPACE1-1 Zone Coil Water In Node,~ !- Water Inlet Node Name
+
+~~~ SPACE1-1 Zone Coil Water Out Node,~ !- Water Outlet Node Name
+
+~~~ SPACE1-1 Zone Coil Air In Node,~ !- Air Inlet Node Name
+
+~~~ SPACE1-1 In Node,~~~~~~~ !- Air Outlet Node Name
+
+~~~ UFactorTimesAreaAndDesignWaterFlowRate,~ !- Performance Input Method
+
+~~~ autosize,~~~~~~~~~~~~~~~ !- Nominal Capacity \{W\}
+
+~~~ 82.2,~~~~~~~~~~~~~~~~~~~ !- Design Inlet Water Temperature \{C\}
+
+~~~ 16.6,~~~~~~~~~~~~~~~~~~~ !- Design Inlet Air Temperature \{C\}
+
+~~~ 71.1,~~~~~~~~~~~~~~~~~~~ !- Design Outlet Water Temperature \{C\}
+
+~~~ 32.2;~~~~~~~~~~~~~~~~~~~ !- Design Outlet Air Temperature \{C\}
+
+~ Coil:Heating:Water,
+
+~~~ SPACE2-1 Zone Coil,~~~~~ !- Name
+
+~~~ ReheatCoilAvailSched,~~~ !- Availability Schedule Name
+
+~~~ autosize,~~~~~~~~~~~~~~~ !- U-Factor Times Area Value \{W/K\}
+
+~~~ autosize,~~~~~~~~~~~~~~~ !- Maximum Water Flow Rate \{m3/s\}
+
+~~~ SPACE2-1 Zone Coil Water In Node,~ !- Water Inlet Node Name
+
+~~~ SPACE2-1 Zone Coil Water Out Node,~ !- Water Outlet Node Name
+
+~~~ SPACE2-1 Zone Coil Air In Node,~ !- Air Inlet Node Name
+
+~~~ SPACE2-1 In Node,~~~~~~~ !- Air Outlet Node Name
+
+~~~ UFactorTimesAreaAndDesignWaterFlowRate,~ !- Performance Input Method
+
+~~~ autosize,~~~~~~~~~~~~~~~ !- Nominal Capacity \{W\}
+
+~~~ 82.2,~~~~~~~~~~~~~~~~~~~ !- Design Inlet Water Temperature \{C\}
+
+~~~ 16.6,~~~~~~~~~~~~~~~~~~~ !- Design Inlet Air Temperature \{C\}
+
+~~~ 71.1,~ ~~~~~~~~~~~~~~~~~~!- Design Outlet Water Temperature \{C\}
+
+~~~ 32.2;~~~~~~~~~~~~~~~~~~~ !- Design Outlet Air Temperature \{C\}
+
+~ Coil:Heating:Water,
+
+~~~ SPACE3-1 Zone Coil,~~~~~ !- Name
+
+~~~ ReheatCoilAvailSched,~~~ !- Availability Schedule Name
+
+~~~ autosize, ~~~~~~~~~~~~~~~!- U-Factor Times Area Value \{W/K\}
+
+~~~ autosize,~~~~~~~~~~~~~~~ !- Maximum Water Flow Rate \{m3/s\}
+
+~~~ SPACE3-1 Zone Coil Water In Node,~ !- Water Inlet Node Name
+
+~~~ SPACE3-1 Zone Coil Water Out Node,~ !- Water Outlet Node Name
+
+~~~ SPACE3-1 Zone Coil Air In Node,~ !- Air Inlet Node Name
+
+~~~ SPACE3-1 In Node,~~~~~~~ !- Air Outlet Node Name
+
+~~~ UFactorTimesAreaAndDesignWaterFlowRate,~ !- Performance Input Method
+
+~~~ autosize,~~~~~~~~~~~~~~~ !- Nominal Capacity \{W\}
+
+~~~ 82.2,~~~~~~~~~~~~~~~~~~~ !- Design Inlet Water Temperature \{C\}
+
+~~~ 16.6,~~~~~~~~~~~~~~~~~~~ !- Design Inlet Air Temperature \{C\}
+
+~~~ 71.1,~~~~~~~~~~~~~~~~~~~ !- Design Outlet Water Temperature \{C\}
+
+~~~ 32.2;~~~~~~~~~~~~~~~~~~~ !- Design Outlet Air Temperature \{C\}
+
+Each coil entry begins with the class name (keyword) specifying the type of coil.~ Next is the coil name -- a user (or interface) created name that is unique within the given class.~ Generally in EnergyPlus, objects within a class are distinguished by unique names.~ The object name is usually the first data element following the class name.~ Any alphanumeric data item in the IDF can be up to 100 characters long.~ Any characters past 100 are truncated (lost). After the object name comes the real data.~ If we look at the IDD we see that the first data item after the object name is expected to be an alphanumeric -- a schedule name. In the IDF, we see the corresponding field is ``ReheatCoilAvailSched'', the object name of a schedule elsewhere in the IDF file. In EnergyPlus, all references to other data entries (objects) are via object names.~ The next two data items are numeric: the coil UA and the maximum water mass flow rate. The final four items are again alphanumeric -- the names of the coil inlet and outlet nodes. Nodes are used in EnergyPlus to connect HVAC components together into HVAC systems.
+
+The example illustrates the use of comments to create clear input.~ The IDF is intended to be human readable, largely for development and debugging purposes.~ Of course, most users will never see an IDF -- they will interact with EnergyPlus through a Graphical User Interface (GUI), which will write the IDF for them.~ However, a module developer is a special kind of user.~ The module developer will need to create a portion of an IDF by hand very early in the development process in order to begin testing the module under development.~ Thus, it is important to understand the IDF syntax and to use comments to create readable test IDF files.
+
+\textbf{Summary}
+
+One of the early tasks of a module developer is to create input (most likely by hand) for the new component and to insert it into an existing IDF file in order to test the new component model.~ The IDF syntax resembles the syntax for the IDD.~ The data follows the IDD class description.~ Comments should be used to make the IDF readable.

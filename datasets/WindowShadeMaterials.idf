@@ -1,0 +1,114 @@
+!===============================================================================
+! WindowShadeMaterials.idf
+!
+! EnergyPlus Reference Data Set for Window Shades
+! Terminology used in window shade names:
+! REFLECT        Solar or visible reflectance (assumed independent of angle of incidence)
+! TRANS          Solar or visible transmittance (assumed independent of angle of incidence)
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  WindowMaterial:Shade,
+    HIGH REFLECT - LOW TRANS SHADE,  !- Name
+    0.1,                     !- Solar Transmittance {dimensionless}
+    0.8,                     !- Solar Reflectance {dimensionless}
+    0.1,                     !- Visible Transmittance {dimensionless}
+    0.8,                     !- Visible Reflectance {dimensionless}
+    0.9,                     !- Infrared Hemispherical Emissivity {dimensionless}
+    0.0,                     !- Infrared Transmittance {dimensionless}
+    0.005,                   !- Thickness {m}
+    0.1,                     !- Conductivity {W/m-K}
+    0.05,                    !- Shade to Glass Distance {m}
+    0.5,                     !- Top Opening Multiplier
+    0.5,                     !- Bottom Opening Multiplier
+    0.5,                     !- Left-Side Opening Multiplier
+    0.5,                     !- Right-Side Opening Multiplier
+    0.0;                     !- Airflow Permeability {dimensionless}
+
+  WindowMaterial:Shade,
+    MEDIUM REFLECT - MEDIUM TRANS SHADE,  !- Name
+    0.4,                     !- Solar Transmittance {dimensionless}
+    0.5,                     !- Solar Reflectance {dimensionless}
+    0.4,                     !- Visible Transmittance {dimensionless}
+    0.5,                     !- Visible Reflectance {dimensionless}
+    0.9,                     !- Infrared Hemispherical Emissivity {dimensionless}
+    0.0,                     !- Infrared Transmittance {dimensionless}
+    0.005,                   !- Thickness {m}
+    0.1,                     !- Conductivity {W/m-K}
+    0.05,                    !- Shade to Glass Distance {m}
+    0.5,                     !- Top Opening Multiplier
+    0.5,                     !- Bottom Opening Multiplier
+    0.5,                     !- Left-Side Opening Multiplier
+    0.5,                     !- Right-Side Opening Multiplier
+    0.0;                     !- Airflow Permeability {dimensionless}
+
+  WindowMaterial:Shade,
+    MEDIUM REFLECT - LOW TRANS SHADE,  !- Name
+    0.1,                     !- Solar Transmittance {dimensionless}
+    0.5,                     !- Solar Reflectance {dimensionless}
+    0.1,                     !- Visible Transmittance {dimensionless}
+    0.5,                     !- Visible Reflectance {dimensionless}
+    0.9,                     !- Infrared Hemispherical Emissivity {dimensionless}
+    0.0,                     !- Infrared Transmittance {dimensionless}
+    0.005,                   !- Thickness {m}
+    0.1,                     !- Conductivity {W/m-K}
+    0.05,                    !- Shade to Glass Distance {m}
+    0.5,                     !- Top Opening Multiplier
+    0.5,                     !- Bottom Opening Multiplier
+    0.5,                     !- Left-Side Opening Multiplier
+    0.5,                     !- Right-Side Opening Multiplier
+    0.0;                     !- Airflow Permeability {dimensionless}
+
+  WindowMaterial:Shade,
+    LOW REFLECT - HIGH TRANS SHADE,  !- Name
+    0.7,                     !- Solar Transmittance {dimensionless}
+    0.2,                     !- Solar Reflectance {dimensionless}
+    0.7,                     !- Visible Transmittance {dimensionless}
+    0.2,                     !- Visible Reflectance {dimensionless}
+    0.9,                     !- Infrared Hemispherical Emissivity {dimensionless}
+    0.0,                     !- Infrared Transmittance {dimensionless}
+    0.005,                   !- Thickness {m}
+    0.1,                     !- Conductivity {W/m-K}
+    0.05,                    !- Shade to Glass Distance {m}
+    0.5,                     !- Top Opening Multiplier
+    0.5,                     !- Bottom Opening Multiplier
+    0.5,                     !- Left-Side Opening Multiplier
+    0.5,                     !- Right-Side Opening Multiplier
+    0.0;                     !- Airflow Permeability {dimensionless}
+
+  WindowMaterial:Shade,
+    LOW REFLECT - MEDIUM TRANS SHADE,  !- Name
+    0.4,                     !- Solar Transmittance {dimensionless}
+    0.2,                     !- Solar Reflectance {dimensionless}
+    0.4,                     !- Visible Transmittance {dimensionless}
+    0.2,                     !- Visible Reflectance {dimensionless}
+    0.9,                     !- Infrared Hemispherical Emissivity {dimensionless}
+    0.0,                     !- Infrared Transmittance {dimensionless}
+    0.005,                   !- Thickness {m}
+    0.1,                     !- Conductivity {W/m-K}
+    0.05,                    !- Shade to Glass Distance {m}
+    0.5,                     !- Top Opening Multiplier
+    0.5,                     !- Bottom Opening Multiplier
+    0.5,                     !- Left-Side Opening Multiplier
+    0.5,                     !- Right-Side Opening Multiplier
+    0.0;                     !- Airflow Permeability {dimensionless}
+
+  WindowMaterial:Shade,
+    LOW REFLECT - LOW TRANS SHADE,  !- Name
+    0.1,                     !- Solar Transmittance {dimensionless}
+    0.2,                     !- Solar Reflectance {dimensionless}
+    0.1,                     !- Visible Transmittance {dimensionless}
+    0.2,                     !- Visible Reflectance {dimensionless}
+    0.9,                     !- Infrared Hemispherical Emissivity {dimensionless}
+    0.0,                     !- Infrared Transmittance {dimensionless}
+    0.005,                   !- Thickness {m}
+    0.1,                     !- Conductivity {W/m-K}
+    0.05,                    !- Shade to Glass Distance {m}
+    0.5,                     !- Top Opening Multiplier
+    0.5,                     !- Bottom Opening Multiplier
+    0.5,                     !- Left-Side Opening Multiplier
+    0.5,                     !- Right-Side Opening Multiplier
+    0.0;                     !- Airflow Permeability {dimensionless}
+

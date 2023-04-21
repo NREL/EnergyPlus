@@ -1,0 +1,30 @@
+\section{Life-Cycle Costing}\label{life-cycle-costing}
+
+Life-cycle costing is used with building energy simulation in order to justify energy efficiency upgrades. Many alterative building technologies that result in energy savings cost more initially, or may cost more to maintain, than traditional solutions. In order to justify selecting these energy savings technologies, it is essential to combine both initial and future costs in the decision process. Using life-cycle costs provides a framework to combine initial costs and future costs into a single combined measure, called the ``present value.'' Present value is a metric that combines all costs and reduces (or discounts) those costs that occur in the future. Discounting future costs is based on the principal of the time value of money.
+
+The calculations are based on discounting the future values according to normal life-cycle costing techniques as described in NIST Handbook 135 ``Life-Cycle Costing Manual for the Federal Energy Management Program.''
+
+The following is a list of life-cycle costing related objects that provide a way to describe the parameters and costs associated with the life-cycle of a building or building system:
+
+\begin{itemize}
+\item
+  \hyperref[lifecyclecostparameters]{LifeCycleCost:Parameters}
+\item
+  \hyperref[lifecyclecostrecurringcosts]{LifeCycleCost:RecurringCosts}
+\item
+  \hyperref[lifecyclecostnonrecurringcost]{LifeCycleCost:NonrecurringCost}
+\item
+  \hyperref[lifecyclecostusepriceescalation]{LifeCycleCost:UsePriceEscalation}
+\item
+  \hyperref[lifecyclecostuseadjustment]{LifeCycleCost:UseAdjustment}
+\end{itemize}
+
+The utility costs (see \hyperref[utilitycosttariff]{UtilityCost:Tariff}) and first costs (see \hyperref[componentcostlineitem]{ComponentCost:LineItem}) are~ calculated by EnergyPlus are used along with other current and future costs input using the \hyperref[lifecyclecostrecurringcosts]{LifeCycleCost:RecurringCosts} and \hyperref[lifecyclecostnonrecurringcost]{LifeCycleCost:NonrecurringCost} objects and these are combined into the present value life-cycle cost metric. The \hyperref[lifecyclecostparameters]{LifeCycleCost:Parameters} object establishes the set of assumptions for the analysis along with \hyperref[lifecyclecostusepriceescalation]{LifeCycleCost:UsePriceEscalation} (often from a DataSet) and \hyperref[lifecyclecostuseadjustment]{LifeCycleCost:UseAdjustment}.
+
+It is important to understand that the comparison of different simulation results and their present values is not performed by EnergyPlus. Instead, EnergyPlus provides the present value calculations for a specific simulation combining the energy costs, first costs, and future costs and you need to make the comparison between the results of multiple simulations.
+
+The results of using the LifeCycleCost objects are included in the tabular report file when LifeCycleCostReport is specified in the \hyperref[outputtablesummaryreports]{Output:Table:SummaryReports} object. It is also generated with any of the AllSummary options. The report appearing in the tabular report file is titled ``Life Cycle Cost Report.'' This report shows the costs and the timing of costs, often called ``cash flows,'' along with the present value in several different tables. The tabular results would show the present value of all current and future costs.
+
+The datasets file ``LCCusePriceEscalationDataSetXXXX.idf'' includes the energy escalation factors from the NIST Handbook 135 annual supplement for the year indicated. These are necessary to use because the expected change in price for electricity and various fuels does not change at the same rate as inflation.
+
+Life-cycle costing should not be confused with life-cycle analysis. With life-cycle costing the result is an economic evaluation of current and future expenditures in order to make a decision on alternative investments. In life cycle analysis, the environmental impact such as equivalent CO2 production involved in the materials, delivery, manufacturing, and construction are combined with environmental impacts of the building in operation and the eventual removal of the building and is used to understand the overall environmental impact or embodied energy.

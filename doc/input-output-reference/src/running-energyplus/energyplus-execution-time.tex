@@ -1,0 +1,26 @@
+\section{EnergyPlus Execution Time}\label{energyplus-execution-time}
+
+Extensive timing studies and fine-tuning of EnergyPlus are an ongoing process. Remember that hourly simulations cannot be directly compared to EnergyPlus with its less than hourly timesteps.
+
+\subsection{Reducing Run Time Tips}\label{reducing-run-time-tips}
+
+Compared with creating energy models either by hand coding the IDF file or by using GUI tools or a combination of both, EnergyPlus run time is normally a small fraction of the total time needed to complete an energy modeling job. Therefore it is very important to build a clean and concise EnergyPlus model up front. Techniques of simplifying large and complex building and systems should be used during the creation of energy models, especially during the early design process when detailed zoning and other information is not available. Producing lots of hourly or sub-hourly reports from EnergyPlus runs can take significant amount of time. Modelers should only request time step reports when necessary. On the other hand, producing summary reports and typical monthly reports take relatively small amount of run time. These reports are valuable references for troubleshooting and model fine tuning.
+
+With powerful personal computers get more and more affordable, EnergyPlus modelers should choose to use current available PCs with 3 or more GHZ and 3 or more GB of RAM. For a large volume of EnergyPlus parametric runs, modelers can launch multiple runs in parallel. For modelers, most time is spent on troubleshooting and fine tuning energy models. During the early modeling process, it is recommended to keep the model as simple as possible and make quick runs to identify problems. Then modify the IDF file to fix problems and re-run the model. This is an iterative process until satisfactory solutions are found. The simulation process can be split into three phases: the diagnostic runs, the preliminary runs, and the final runs. The three phases would use different simulation settings. The diagnostic runs would use a set of simulation settings to speed up the runs with simulation accuracy being set as the second priority. The diagnostic runs will help catch most model problems by
+
+running simulations on summer and winter design days. The preliminary runs use a tighter set of simulation settings in order to catch problems missed in the diagnostic runs, and provide better results for quality assurance purpose. The final runs use the EnergyPlus recommended set of simulation settings in order to achieve better accuracy for simulation results ready for review and reporting.
+
+You might want to read the report on EnergyPlus run time at \url{http://repositories.cdlib.org/lbnl/LBNL-1311E/}.
+
+Additional run-time tips may be found in the EnergyPlus ``Tips and Tricks'' document.~ Some more tips:
+
+\begin{itemize}
+\item
+  In the \hyperref[simulationcontrol]{SimulationControl} object, Run Simulation for Sizing Periods until everything is working well, then switch to Run Simulation for Weather File Run Periods.
+\item
+  Turn off (comment them out in the text editor using !) daylighting controls while developing the HVAC simulation.~ Then turn back on for final runs.
+\item
+  HeatBalanceAlgorithm: ConductionTransferFunction is the fastest option.
+\item
+  In the \hyperref[people]{People} object, the thermal comfort reports can be time consuming, especially the KSU model which is more computationally intensive.
+\end{itemize}

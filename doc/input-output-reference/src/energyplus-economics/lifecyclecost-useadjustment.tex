@@ -1,0 +1,71 @@
+\section{LifeCycleCost:UseAdjustment}\label{lifecyclecostuseadjustment}
+
+Used by advanced users to adjust the energy or water use costs for future years. This should not be used for compensating for inflation but should only be used to increase the costs of energy or water based on assumed changes to the actual use of water or energy, such as due to changes in the future function of the building or the impact of future adjacent buildings on energy use. This object is not commonly used and should be used with caution. The adjustments begin at the start of the service period.
+
+\subsection{Inputs}\label{inputs-060}
+
+\paragraph{Field: Name}\label{field-name-058}
+
+The identifier used for the object.
+
+\paragraph{Field: Resource}\label{field-resource}
+
+Enter the resource such as:
+
+\begin{itemize}
+\item
+  Electricity
+\item
+  ElectricityPurchased
+\item
+  ElectricityProduced
+\item
+  ElectricitySurplusSold
+\item
+  ElectricityNet
+\item
+  NaturalGas
+\item
+  Propane
+\item
+  FuelOilNo1
+\item
+  FuelOilNo2
+\item
+  Coal
+\item
+  Steam
+\item
+  Gasoline
+\item
+  Diesel
+\item
+  OtherFuel1
+\item
+  OtherFuel2
+\item
+  Water
+\end{itemize}
+
+\paragraph{Field: Year 1 multiplier}\label{field-year-1-multiplier}
+
+The multiplier to be applied to the end use cost for the first year in the service period. The total utility costs for the selected end use is multiplied by this value. For no change enter 1.0.
+
+\paragraph{Field: Year N multiplier}\label{field-year-n-multiplier}
+
+The multiplier to be applied to the end use cost for each following year. The total utility costs for the selected end use is multiplied by this value. For no change enter 1.0.~ This object often includes 25 to 50 years of values. The maximum number of multipliers used in a simulation is 100.
+
+An example of this object in an IDF:
+
+\begin{lstlisting}
+LifeCycleCost:UseAdjustment,
+  ElecAdjustment,       !- Name
+  Electricity,          !- Resource
+  1.0000,               !- Year 1 Multiplier
+  1.0022,               !- Year 2 Multiplier
+  1.0023,               !- Year 3 Multiplier
+  1.0024,               !- Year 4 Multiplier
+  1.0025,               !- Year 5 Multiplier
+  1.0026,               !- Year 6 Multiplier
+  1.0027;               !- Year 7 Multiplier
+\end{lstlisting}

@@ -1,0 +1,28 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Site Outdoor Air Humidity Ratio
+Zone Air Temperature
+Zone Air Humidity Ratio
+Zone Air Relative Humidity
+Zone Air System Sensible Cooling Rate
+Zone Air System Sensible Heating Rate
+System Node Mass Flow Rate
+System Node Temperature
+System Node Humidity Ratio
+Zone Window Air Conditioner Total Cooling Rate
+Zone Window Air Conditioner Sensible Cooling Rate
+Zone Window Air Conditioner Electricity Rate
+Zone Window Air Conditioner Compressor Part Load Ratio
+Zone Window Air Conditioner Fan Part Load Ratio
+Heat Exchanger Sensible Heating Rate
+Heat Exchanger Sensible Cooling Rate
+Heat Exchanger Total Heating Rate
+Heat Exchanger Total Cooling Rate
+Heat Exchanger Sensible Effectiveness
+Heat Exchanger Latent Effectiveness
+Heat Exchanger Defrost Time Fraction
+Fan Rise in Air Temperature
+Heat Exchanger Supply Air Bypass Mass Flow Rate
+Heat Exchanger Exhaust Air Bypass Mass Flow Rate
+0

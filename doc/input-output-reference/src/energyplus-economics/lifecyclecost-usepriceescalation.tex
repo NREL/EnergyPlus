@@ -1,0 +1,144 @@
+\section{LifeCycleCost:UsePriceEscalation}\label{lifecyclecostusepriceescalation}
+
+The LifeCycleCost:UsePriceEscalation object will commonly be part of a dataset on life cycle costs. The values for this object may be found in the annual supplement to NIST Handbook 135 in Tables Ca-1 to Ca-5. A dataset file comes with EnergyPlus in the DataSet directory and includes the LCCusePriceEscalationDataSetXXXX.idf file which includes the value for the supplement to NIST 135 from the year indicated. The object provides inputs for the escalations of energy and water costs assuming that they change differently than inflation. According to the NIST 135 supplement the values are ``present projected fuel price indices for the four Census regions and for the United States. These indices, when multiplied by annual energy costs computed at base-date prices provide estimates of future-year costs in constant base-date dollars. Constant-dollar cost estimates are needed when discounting is performed with a real discount rate (i.e., a rate that does not include general price inflation).''
+
+The LCCusePriceEscalationDataSetXXXX.idf is periodically updated by the EnergyPlus development team using data available from NIST along with a spreadsheet to convert that data into an IDF dataset file. The NIST 135 annual supplement is available from NIST or through US DOE FEMP program.
+
+\url{http://www1.eere.energy.gov/femp/program/lifecycle.html}
+
+If requested, NIST personnel will provide a file called ENCOSTxx.TXT which contains the data used to create Table Ca-1 to Table Ca-5 in the supplement. To convert the data in the ENCOSTxx.TXT file to an IDF file, open the ENCOSTxx.TXT file in a text editor and copy the entire contents into the first tab called ``Step 1'' of the conversion spreadsheet. The conversion spreadsheet file named ConvertENCOSTtoEnergyPlusLifeCycleCost.xls is available upon request from the EnergyPlus development team. The ``Step 2'' tab separates the data into columns. The ``Step 3'' tab computes ratios that are the same as Table Ca-1 to Table C1-6 in the supplement. Checking these values against what appears in the printed supplement is recommended. The ``Step 4'' and ``Step 5'' tabs rearrange the data and the ``Step 6'' tab shows the data in a format that can be easily copied and pasted into a new idf dataset file. The final step requires using your text editor to replace the fuel names with those used by EnergyPlus. The replacement names are listed on the ``FuelNameConversion'' tab.
+
+\subsection{Inputs}\label{inputs-061}
+
+\paragraph{Field: Name}\label{field-name-059}
+
+The identifier used for the object. The name usually identifies the location (such as the state, region, country or census area) that the escalations apply to. In addition the name should identify the building class such as residential, commercial, or industrial and the use type such as electricity, natural gas, or water.
+
+\paragraph{Field: Resource}\label{field-resource-000}
+
+Enter the resource such as:
+
+\begin{itemize}
+\item
+  Electricity
+\item
+  ElectricityPurchased
+\item
+  ElectricityProduced
+\item
+  ElectricitySurplusSold
+\item
+  ElectricityNet
+\item
+  NaturalGas
+\item
+  Propane
+\item
+  FuelOilNo1
+\item
+  FuelOilNo2
+\item
+  Coal
+\item
+  Steam
+\item
+  Gasoline
+\item
+  Diesel
+\item
+  OtherFuel1
+\item
+  OtherFuel2
+\item
+  Water
+\end{itemize}
+
+\paragraph{Field: Escalation Start Year}\label{field-escalation-start-year}
+
+This field and the Escalation Start Month define the time that corresponds to ``Year 1 Escalation'' such as a year expressed in four digits like ``2013'', when the escalation rates are applied. This field and the Escalation Start Month define the time that escalation begins.
+
+\paragraph{Field: Escalation Start Month}\label{field-escalation-start-month}
+
+This field and the Escalation Start Year define the time that corresponds to ``Year 1 Escalation'' such as~ a year expressed in four digits such as ``2013'', when the escalation rates are applied. This field and the Escalation Start Year define the time that escalation begins.
+
+The choices are:
+
+\begin{itemize}
+\item
+  January
+\item
+  February
+\item
+  March
+\item
+  April
+\item
+  May
+\item
+  June
+\item
+  July
+\item
+  August
+\item
+  September
+\item
+  October
+\item
+  November
+\item
+  December
+\end{itemize}
+
+The default value is January. According to NIST Handbook 135:
+
+\paragraph{Field: Year 1 Escalation}\label{field-year-1-escalation}
+
+The escalation in price of the energy or water use for the first year expressed as a decimal.
+
+\paragraph{Field: Year n Escalation}\label{field-year-n-escalation}
+
+The escalation in price of the energy or water use for the n-th year expressed as a decimal. This object often includes 25 to 50 years of projected values. The maximum number of escalations used in a simulation is 100.
+
+If the number of years in LifeCycleCost:UsePriceEscalation is less than the number of years in the analysis period as defined by the Length of Study Period in Years field in the LifeCycleCost:Parameters object, the remaining years will assume no escalation or an escalation of 1. Normal inflation will be the only affect for these years.
+
+An example of this object in an IDF:
+
+\begin{lstlisting}
+
+LifeCycleCost:UsePriceEscalation,
+      NorthEast  Residential-Electricity,  !- Name
+      Electricity,                         !- Resource
+      2010,                                !- Escalation Start Year
+      January,                             !- Escalation Start Month
+      0.9374,                              !- Year 1 Escalation
+      0.9790,                              !- Year 2 Escalation
+      1.0138,                              !- Year 3 Escalation
+      1.0127,                              !- Year 4 Escalation
+      1.0096,                              !- Year 5 Escalation
+      1.0177,                              !- Year 6 Escalation
+      1.0279,                              !- Year 7 Escalation
+      1.0334,                              !- Year 8 Escalation
+      1.0327,                              !- Year 9 Escalation
+      1.0382,                              !- Year 10 Escalation
+      1.0454,                              !- Year 11 Escalation
+      1.0494,                              !- Year 12 Escalation
+      1.0564,                              !- Year 13 Escalation
+      1.0587,                              !- Year 14 Escalation
+      1.0549,                              !- Year 15 Escalation
+      1.0566,                              !- Year 16 Escalation
+      1.0630,                              !- Year 17 Escalation
+      1.0707,                              !- Year 18 Escalation
+      1.0857,                              !- Year 19 Escalation
+      1.0953,                              !- Year 20 Escalation
+      1.1063,                              !- Year 21 Escalation
+      1.1165,                              !- Year 22 Escalation
+      1.1227,                              !- Year 23 Escalation
+      1.1292,                              !- Year 24 Escalation
+      1.1349,                              !- Year 25 Escalation
+      1.1414,                              !- Year 26 Escalation
+      1.1480,                              !- Year 27 Escalation
+      1.1550,                              !- Year 28 Escalation
+      1.1617,                              !- Year 29 Escalation
+      1.1686;                              !- Year 30 Escalation
+\end{lstlisting}

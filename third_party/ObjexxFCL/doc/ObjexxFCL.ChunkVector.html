@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>ObjexxFCL Users Guide: ChunkVector</title>
+	<meta name="description" content="Objexx Fortran-C++ Library">
+	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
+	<meta name="copyright" content="Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.">
+	<link rel="icon" type="image/png" href="img/favicon.png">
+	<link rel="stylesheet" href="css/Objexx.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#CC3366" vlink="#990033" alink="#FF3366">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+	<tr>
+		<td></td>
+		<td height="70"><a href="ObjexxFCL.html"><img src="img/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
+		<td></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.2</div></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="5" height="16" valign="top" bgcolor="#EB7A87"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td height="24" colspan="5"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td height="300">&nbsp;</td>
+		<td valign="top">
+			<div id="sectionLinksTop">
+				<a href="ObjexxFCL.html">Home</a>
+			</div>
+			<div id="sectionLinks">
+				<a href="ObjexxFCL.Release.html">Release</a>
+				<a href="ObjexxFCL.Users.html">Users Guide</a>
+				<a href="ObjexxFCL.Developers.html">Developers</a>
+				<a href="ObjexxFCL.Support.html">Support</a>
+				<a href="http://objexx.com">Web</a>
+			</div>
+		</td>
+		<td></td>
+		<td width="500" valign="top">
+			<h1>ChunkVector</h1>
+			<p class="body">The ChunkVector class template provides a chunk-contiguous 1D vector intended for very large vectors in a possibly fragmented memory environment. The basic characteristics of ChunkVector include:</p>
+			<ul>
+				<li>The data is stored in a sequence of Chunk arrays. Since the data is non-contiguous <b>you cannot access elements by incremented pointers</b>.</li>
+				<li>The chunk size is a power of 2 for efficient look-up: the exponent is specified by the user.</li>
+				<li>Element access has the constant-time lookup speed of std::vector.</li>
+				<li>ChunkVector is similar to std::deque but much faster.</li>
+				<li>Index-based subscripting but not iterator access is provided.</li>
+				<li>0-based subscripting is provided by the [] operator, as in v[ i ].</li>
+				<li>1-based subscripting is provided by the () operator, as in v( i ).</li>
+				<li>Subscripting does bounds checking in debug builds.</li>
+				<li>Efficient dynamic size changing operations are provided.</li>
+				<li>Array size and indexing types are std::size_t so very large arrays are supported on 64-bit platforms where std::size_t is a 64-bit unsigned integer.</li>
+			</ul>
+			<p class="body">Shorthand (typedef) names are provided for the common value types in the ChunkVector.fwd.hh header so, for example, we use <span class="source">ChunkVector_int</span> instead of <span class="source">ChunkVector&lt; int &gt;</span> on this page.</p>
+			<h2 class="h3">Construction</h2>
+			<p class="body">ChunkVectors are created in a straightforward fashion:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+			<tr>
+				<td bgcolor="#F7F4F7"><pre>
+// ChunkVector with n elements
+ChunkVector_int v( n, p ); // Chunk size is 2^p // Built-in types are uninitialized
+ChunkVector_int w( n, p, 0 ); // Initialize elements to 0</pre></td>
+			</tr>
+		</table>
+			<p class="body">The first constructor shown does not initialize the elements of built-in types such as int and float, for efficiency when constructing very large arrays that will be initialized after construction.</p>
+			<p class="body">ChunkVectors can be constructed from std::vectors:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>
+std::vector s;
+...
+ChunkVector_int v( s, p ); // Chunk size is 2^p</pre></td>
+				</tr>
+			</table>
+			<p class="body">and from an iterator range:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>
+ChunkVector_int v( s.begin(), s.end(), p ); // Chunk size is 2^p</pre></td>
+				</tr>
+			</table>
+			<p class="body">ChunkVectors can also be default constructed and later sized:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>ChunkVector_int v;
+...
+v.resize( n, p ); // Now size and allocate it</pre></td>
+				</tr>
+			</table>
+			<p class="body">ChunkVectors can also be copy constructed from any ChunkVector with assignment-compatible values:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>ChunkVector_int v( n, p );
+...
+ChunkVector_double z( v );
+</pre></td>
+				</tr>
+			</table>
+			<h2 class="h3">Subscripting</h2>
+			<p class="body">ChunkVector elements can be accessed by 0-based or 1-based index:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>ChunkVector_int v( n, p );
+...
+int i = v[ 0 ]; // First element
+int j = v( 1 ); // First element</pre></td>
+				</tr>
+			</table>
+			<p class="body">Although the internal element access must compute a two-index lookup for each element the power-of-2 chunk sizing allows fast bit shift and mask operations to be used so there is very little performance difference from that of std::vector subscripting.</p>
+			<p class="body">Subscripting accesses to a ChunkVector's elements are bounds-checked via assertions in a debug build.</p>
+			<h2 class="h3">Front and Back Elements</h2>
+			<p class="body">The first and last elements of a ChunkVector elements can be read or write accessed with the STL-compatible <span class="source">front</span> and <span class="source">back</span> functions:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>ChunkVector_int v( n, p );
+...
+j = v.front(); // First element
+v.back() = k; // Last element</pre></td>
+				</tr>
+			</table>
+			<h2 class="h3">Assignment</h2>
+			<p class="body">ChunkVectors support assignment of any ChunkVector or std::vector with assignment-compatible values using the operators { =, +=, -= }:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>ChunkVector_int v( n, p );
+ChunkVector_double z( n, p );
+...<br>z = v;
+...
+z += v;</pre></td>
+				</tr>
+			</table>
+			<p class="body">and assignment of any assignment-compatible value with the operators { =, +=, -=, *=, /= }:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>ChunkVector_int v( n, p );
+
+...<br>v = 123; // All elements set to 123
+v += 4.2; // Now all elements are 127</pre></td>
+				</tr>
+			</table>
+			<p class="body">Additional assignment functions are available for assigning a std::vector and setting the Chunk size:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>ChunkVector_int v;
+std::vector s;
+...
+v.assign( s, p );</pre></td>
+				</tr>
+			</table>
+			<p class="body">or for assigning from an iterator range:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>v.assign( s.begin(), s.end() );</pre></td>
+				</tr>
+			</table>
+			<p>or assigning a specified number of uniform-value elements:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>v.assign( 1000, 123 ); // 1000 elements with value 123</pre></td>
+				</tr>
+			</table>
+			<h2 class="h3">Comparison</h2>
+			<p class="body">ChunkVectors can be compared with ChunkVector, std::vector, and uniform value objects using using the operators { ==, !=, &lt;, &lt;=, &gt;=, &gt; }.</p>
+			<h2 class="h3">Resizing</h2>
+			<p class="body">ChunkVectors can be efficiently grown and resized with a number of functions: <span class="source">push_back</span>, <span class="source">pop_back</span>, <span class="source">resize</span>, <span class="source">reshape</span>, <span class="source">append</span>, and <span class="source">shrink</span>. For efficiency when the resizing operation doesn't need to preserve the current values there are <span class="source">non_preserving_resize</span> and <span class="source">non_preserving_reshape</span> functions. The <span class="source">shrink</span> function will remove any excess capacity in the last Chunk (the <span class="source">swap</span> function can also be used in the common shrink-to-fit idiom but the shrink function does it more efficiently).</p>
+			<h2 class="h3">Special Functions</h2>
+			<p class="body">ChunkVectors can be reset to a default-constructed state that releases their memory with the <span class="source">clear</span> member function. ChunkVectors have <span class="source">length</span> and <span class="source">length_squared</span> member functions to compute their L<sub>2</sub> length and squared length and the <span class="source">normalize</span> function to normalize the array to unit length. The <span class="source">dot_product</span> function computes the dot (inner) product of two ChunkVectors. The <span class="source">distance</span> and <span class="source">distance_squared</span> functions compute the L<sub>2</sub> distance and squared distance between two ChunkVectors.</p>
+			<h2 class="h3">Debugging</h2>
+			<p class="body">For performance, ChunkVector doesn't check for bounds errors in release builds (when NDEBUG is defined). It is therefore important to test assertion-enabled debug builds of code using ChunkVectors.</p>
+			<h2 class="h3">Output</h2>
+			<p class="body">A stream input and output operators are provided.</p>
+		</td>
+		<td></td>
+		<td width="100%" valign="top">
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td colspan="3" height="30" valign="bottom" class="footer_text">
+			<a href="ObjexxFCL.html"><span class="footer_link">Home</span></a> |
+			<a href="ObjexxFCL.Release.html"><span class="footer_link">Release Notes</span></a> |
+			<a href="ObjexxFCL.Users.html"><span class="footer_link">Users Guide</span></a> |
+			<a href="ObjexxFCL.Developers.html"><span class="footer_link">Developers Guide</span></a> |
+			<a href="ObjexxFCL.Support.html"><span class="footer_link">Support</span></a> |
+			<a href="ObjexxFCL.License.txt"><span class="footer_link">License</span></a> |
+			<a href="http://objexx.com"><span class="footer_link">Web</span></a>
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td height="21"></td>
+		<td></td>
+		<td></td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2017 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:9px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:500px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100%; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:1px"></td>
+	</tr>
+</tbody>
+</table>
+</body>
+</html>

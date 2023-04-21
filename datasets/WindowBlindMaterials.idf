@@ -1,0 +1,102 @@
+!===============================================================================
+! WindowBlindMaterials.idf
+!
+! EnergyPlus Reference Data Set for Window Blinds
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  WindowMaterial:Blind,
+    BLIND WITH HIGH REFLECTIVITY SLATS,  !- Name
+    Horizontal,              !- Slat Orientation
+    0.025,                   !- Slat Width {m}
+    0.01875,                 !- Slat Separation {m}
+    0.001,                   !- Slat Thickness {m}
+    45.0,                    !- Slat Angle {deg}
+    0.9,                     !- Slat Conductivity {W/m-K}
+    0.0,                     !- Slat Beam Solar Transmittance
+    0.8,                     !- Front Side Slat Beam Solar Reflectance
+    0.8,                     !- Back Side Slat Beam Solar Reflectance
+    0.0,                     !- Slat Diffuse Solar Transmittance
+    0.8,                     !- Front Side Slat Diffuse Solar Reflectance
+    0.8,                     !- Back Side Slat Diffuse Solar Reflectance
+    0.0,                     !- Slat Beam Visible Transmittance
+    0.8,                     !- Front Side Slat Beam Visible Reflectance
+    0.8,                     !- Back Side Slat Beam Visible Reflectance
+    0.0,                     !- Slat Diffuse Visible Transmittance
+    0.8,                     !- Front Side Slat Diffuse Visible Reflectance
+    0.8,                     !- Back Side Slat Diffuse Visible Reflectance
+    0.0,                     !- Slat Infrared Hemispherical Transmittance
+    0.9,                     !- Front Side Slat Infrared Hemispherical Emissivity
+    0.9,                     !- Back Side Slat Infrared Hemispherical Emissivity
+    0.050,                   !- Blind to Glass Distance {m}
+    0.5,                     !- Blind Top Opening Multiplier
+    0.5,                     !- Blind Bottom Opening Multiplier
+    0.5,                     !- Blind Left Side Opening Multiplier
+    0.5,                     !- Blind Right Side Opening Multiplier
+    ,                        !- Minimum Slat Angle {deg}
+    ;                        !- Maximum Slat Angle {deg}
+
+  WindowMaterial:Blind,
+    BLIND WITH MEDIUM REFLECTIVITY SLATS,  !- Name
+    Horizontal,              !- Slat Orientation
+    0.025,                   !- Slat Width {m}
+    0.01875,                 !- Slat Separation {m}
+    0.001,                   !- Slat Thickness {m}
+    45.0,                    !- Slat Angle {deg}
+    0.9,                     !- Slat Conductivity {W/m-K}
+    0.0,                     !- Slat Beam Solar Transmittance
+    0.5,                     !- Front Side Slat Beam Solar Reflectance
+    0.5,                     !- Back Side Slat Beam Solar Reflectance
+    0.0,                     !- Slat Diffuse Solar Transmittance
+    0.5,                     !- Front Side Slat Diffuse Solar Reflectance
+    0.5,                     !- Back Side Slat Diffuse Solar Reflectance
+    0.0,                     !- Slat Beam Visible Transmittance
+    0.5,                     !- Front Side Slat Beam Visible Reflectance
+    0.5,                     !- Back Side Slat Beam Visible Reflectance
+    0.0,                     !- Slat Diffuse Visible Transmittance
+    0.5,                     !- Front Side Slat Diffuse Visible Reflectance
+    0.5,                     !- Back Side Slat Diffuse Visible Reflectance
+    0.0,                     !- Slat Infrared Hemispherical Transmittance
+    0.9,                     !- Front Side Slat Infrared Hemispherical Emissivity
+    0.9,                     !- Back Side Slat Infrared Hemispherical Emissivity
+    0.050,                   !- Blind to Glass Distance {m}
+    0.5,                     !- Blind Top Opening Multiplier
+    0.5,                     !- Blind Bottom Opening Multiplier
+    0.5,                     !- Blind Left Side Opening Multiplier
+    0.5,                     !- Blind Right Side Opening Multiplier
+    ,                        !- Minimum Slat Angle {deg}
+    ;                        !- Maximum Slat Angle {deg}
+
+  WindowMaterial:Blind,
+    BLIND WITH LOW REFLECTIVITY SLATS,  !- Name
+    Horizontal,              !- Slat Orientation
+    0.025,                   !- Slat Width {m}
+    0.01875,                 !- Slat Separation {m}
+    0.001,                   !- Slat Thickness {m}
+    45.0,                    !- Slat Angle {deg}
+    0.9,                     !- Slat Conductivity {W/m-K}
+    0.0,                     !- Slat Beam Solar Transmittance
+    0.2,                     !- Front Side Slat Beam Solar Reflectance
+    0.2,                     !- Back Side Slat Beam Solar Reflectance
+    0.0,                     !- Slat Diffuse Solar Transmittance
+    0.2,                     !- Front Side Slat Diffuse Solar Reflectance
+    0.2,                     !- Back Side Slat Diffuse Solar Reflectance
+    0.0,                     !- Slat Beam Visible Transmittance
+    0.2,                     !- Front Side Slat Beam Visible Reflectance
+    0.2,                     !- Back Side Slat Beam Visible Reflectance
+    0.0,                     !- Slat Diffuse Visible Transmittance
+    0.2,                     !- Front Side Slat Diffuse Visible Reflectance
+    0.2,                     !- Back Side Slat Diffuse Visible Reflectance
+    0.0,                     !- Slat Infrared Hemispherical Transmittance
+    0.9,                     !- Front Side Slat Infrared Hemispherical Emissivity
+    0.9,                     !- Back Side Slat Infrared Hemispherical Emissivity
+    0.050,                   !- Blind to Glass Distance {m}
+    0.5,                     !- Blind Top Opening Multiplier
+    0.5,                     !- Blind Bottom Opening Multiplier
+    0.5,                     !- Blind Left Side Opening Multiplier
+    0.5,                     !- Blind Right Side Opening Multiplier
+    ,                        !- Minimum Slat Angle {deg}
+    ;                        !- Maximum Slat Angle {deg}
+

@@ -1,0 +1,125 @@
+\chapter{Appendix B.~ Submissions and Check-ins}\label{appendix-b.-submissions-and-check-ins}
+
+There are two methods by which new modules are entered into the EnergyPlus (publicly available) program.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Checkin:} Part of the core development team may create or modify an existing module.~ As we use a configuration management system -- this is called a check in.
+\end{itemize}
+
+\emph{Note --- to save people grief and rework effort and to work toward consistency in approach, new features or changes to existing features must be proposed in a documented way for discussion during one of the bi-weekly conference calls.}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Submission:} When someone outside the core development team submits a module or modification of an existing module for inclusion, this is termed a submission.
+\end{itemize}
+
+\emph{Submissions are subjected to the same kind of scrutiny as team checkins and usually will require rework by the submitter.~ We welcome outside developers to send their ideas as early documents for comment with the understanding that revising does not guarantee automatic inclusion.~ See the proposed feature outline document in Appendix F and/or the ``doc'' file in the Documents for Developers Zip file.}
+
+Both kinds of inclusions need to follow the checklist procedure for new inclusions:
+
+ü~\textbf{Source Code Rules}
+
+Shall follow programming standard
+
+Shall follow F90/95 or later standards~ (use ``allocatable'' for allocatable structures within Derived Types)
+
+Shall follow the Template standards (documentation, naming conventions)
+
+Shall follow the guidelines shown in this document
+
+All items shall be directly initialized (exception: derived type elements may be staticly initialized)
+
+There shall be no ``unused'' variables.~ If you put in a variable that you ``might use later'' -- comment it out and comment it to be used later.
+
+No Tabs in source code!!!
+
+Lines shall be less than 133 characters in length.~ (Some compilers allow longer lines without warning).
+
+Suggest using F95 standards checking during compiles -- you may use the compiler option to generate warnings for non-standard code.
+
+\textbf{Permission to use the code shall be supplied -- written, even email, is required.~ LBNL is monitoring this aspect -- so a grant-back letter can also be obtained from them.}
+
+ü~\textbf{Energy+.IDD rules}
+
+Standard Units shall be used (SI only on Input)
+
+Show units with the \textbf{\textbackslash{}units} field.~ Supply \textbf{\textbackslash{}ip-units} only if your input would require it (see comments at top of the Energy+.idd).
+
+Use \textbf{\textbackslash{}minimum} and \textbf{\textbackslash{}maximum}
+
+The first field following the object name should contain ``\textbf{name}'' as part of the field name
+
+Use \textbf{\textbackslash{}default, \textbackslash{}min-fields} and \textbf{\textbackslash{}required-field} appropriately
+
+Object changes during minor releases (x.x.xxx) should not change fields in the middle -- only at the end
+
+Surface objects may not add further fields to the end (the end is reserved for vertices and extension to the current limits)
+
+Note that changes in the Energy+.idd will require a ``transition'' rule change in the Rules Spreadsheet file (Rules\ldots{}xls).~ Likewise, changes in report variable names must be documented in the ``report variables'' change file that is a companion to the Rules spreadsheet.
+
+ü~\textbf{Testing}
+
+Shall run the full test suite for all new features and unless you are absolutely, positively sure that your change will not impact other parts of the code.~ We have a python script that can compare between two run versions (using the .csv files output from EnergyPlus or ReadVarsESO).
+
+If you need a script, look under StarTeam\ldots{}Test Files\textgreater{}ScriptMaker.~ Other scripts are mentioned in the section on ``Running EnergyPlus for Developers'' (Module Developer's Guide).
+
+If you modify objects, you must change all test suite files that are impacted by your object modifications.
+
+ü~\textbf{New Features need a new example file}
+
+You must create a new input file for your changes---input files shall include appropriate internal documentation!~ (Test files have a document template as well seeAppendix E.~ Test File Documentation).~ Some features may be appropriately added to an existing file but documentation must be updated.
+
+You must fill out a line in the ``ExampleFiles.xls'' spreadsheet for your new input file.
+
+You must run a full annual run with your test file even if that is not the configuration that ends up in the internal test suite.~ Annual runs have been known to fail -- obviously, your input file should not.
+
+You must try to minimize the number of errors shown in the eplusout.err file for your files.
+
+Reverse DD Compliance Test: You must run a test that reverses a run of two environments (design days) and make sure that the results (when you also reverse the results files) are identical.~ (Identical means \emph{exactly} the same.)~ Several scripts and automated programs to accomplish this feat are available.
+
+ü~\textbf{Documentation (must be included at the same time as code!!!)}
+
+A document template is available for use -- only the styles in that document should be used.~ (Microsoft\textsuperscript{TM} Word is our standard word processing software).
+
+Equations -- limited in IORef, necessary in Engineering Doc -- limit the number of ``references'' though.~ You can use standard Equation formatting from Microsoft\textsuperscript{TM} Word or Mathtype\textsuperscript{TM} is an acceptable alternate.
+
+Figures -- Though AutoShapes may draw nice pictures, they are not often ``captionable'' without undue editing.~ Please make figures into Jpegs or GIFs.~ Use ``insert caption'' (below the figure) so that auto-numbering of figures is used (these will transfer automatically to EnergyPlus documents).
+
+Tables -- use ``insert caption'' (above the table) so that auto-numbering of figures is used (these will transfer automatically to EnergyPlus documents).
+
+Cross-References -- limit your ``insert cross references''.~ You should highlight these so that ``editing'' from your inclusion is more obvious -- use a different color to help them stand out.
+
+IORef -- See the InputOutputReference document for indications of what is included.
+
+Eng Ref -- New modules shall include an engineering document reference.~ See the Engineering Reference for indications of typical writeups.
+
+Output Details and Examples -- this can help illustrate your changes.~ Any new files \emph{must} be detailed in here.~ Likewise, changes to the .eio file must be described.
+
+ü~\textbf{FeatureChanges.csv}
+
+Every change to source code, example files, datsets, utilities (any change other than documentation) must include a line in the ``featurechanges.csv'' file.
+
+ü~\textbf{Checked in?}
+
+A courtesy message to the EnergyPlus team should be done for each check in, with details of files checked in, etc.~ Save one of the emails you have received if you don't know how many to send it to.
+
+ü~\textbf{Defect fixing?}
+
+If you fix a defect or ``fix'' a suggested change (CR), you should mark it ``fixed'' in StarTeam and the responsibility should automatically change back to the author of the CR.~ If you fix your own CR, assign it to someone else for verification.
+
+If you fix a defect or ``fix'' a suggested change, you should provide a ``synopsis for users'' (on the ``Custom'' tab in the CR edit dialog) so that when we release the version with your fix, we can provide something descriptive for the users.
+
+~ If a defect has a workaround, you should enter this in the ``Workaround'' field (on the ``Solution'' tab) to inform users until the fix is released in a public version.
+
+ü~\textbf{Rules\ldots{}xls}
+
+If a transition rule will be needed (or a deleted / obsolete / renamed object is needed) -- a line (or more) in this spreadsheet must be used.~ See example rules files from previous releases.~ If in doubt, put something in.
+
+ü~\textbf{ReportVariables\ldots{}csv}
+
+If you change the name of a report variable, the transition program for release can automatically transition older input files \textbf{IF} you put the old and new names into this file.
+
+If you delete a report variable, that detail should go in this file.~ Note that you must consult others on the core development team before deleting a reported variable.

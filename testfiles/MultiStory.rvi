@@ -1,0 +1,48 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Gnd Center Zone,Zone Outdoor Air Drybulb Temperature
+Mid Center Zone,Zone Outdoor Air Drybulb Temperature
+Top Center Zone,Zone Outdoor Air Drybulb Temperature
+Gnd Center OA Node,System Node Temperature
+Mid Center OA Node,System Node Temperature
+Top Center OA Node,System Node Temperature
+Site Outdoor Air Wetbulb Temperature
+Gnd Center Zone,Zone Outdoor Air Wetbulb Temperature
+Mid Center Zone,Zone Outdoor Air Wetbulb Temperature
+Top Center Zone,Zone Outdoor Air Wetbulb Temperature
+Site Wind Speed
+Gnd Center Zone,Zone Outdoor Air Wind Speed
+Mid Center Zone,Zone Outdoor Air Wind Speed
+Top Center Zone,Zone Outdoor Air Wind Speed
+Gnd West Zone,Zone Air System Sensible Heating Energy
+Gnd Center Zone,Zone Air System Sensible Heating Energy
+Gnd East Zone,Zone Air System Sensible Heating Energy
+Gnd Floor List,Zone List Sensible Heating Energy
+Gnd Floor,Zone Group Sensible Heating Energy
+Mid West Zone,Zone Air System Sensible Heating Energy
+Mid Center Zone,Zone Air System Sensible Heating Energy
+Mid East Zone,Zone Air System Sensible Heating Energy
+Mid Floor List,Zone List Sensible Heating Energy
+Mid Floor,Zone Group Sensible Heating Energy
+Top West Zone,Zone Air System Sensible Heating Energy
+Top Center Zone,Zone Air System Sensible Heating Energy
+Top East Zone,Zone Air System Sensible Heating Energy
+Top Floor List,Zone List Sensible Heating Energy
+Top Floor,Zone Group Sensible Heating Energy
+Gnd West Zone,Zone Air System Sensible Cooling Energy
+Gnd Center Zone,Zone Air System Sensible Cooling Energy
+Gnd East Zone,Zone Air System Sensible Cooling Energy
+Gnd Floor List,Zone List Sensible Cooling Energy
+Gnd Floor,Zone Group Sensible Cooling Energy
+Mid West Zone,Zone Air System Sensible Cooling Energy
+Mid Center Zone,Zone Air System Sensible Cooling Energy
+Mid East Zone,Zone Air System Sensible Cooling Energy
+Mid Floor List,Zone List Sensible Cooling Energy
+Mid Floor,Zone Group Sensible Cooling Energy
+Top West Zone,Zone Air System Sensible Cooling Energy
+Top Center Zone,Zone Air System Sensible Cooling Energy
+Top East Zone,Zone Air System Sensible Cooling Energy
+Top Floor List,Zone List Sensible Cooling Energy
+Top Floor,Zone Group Sensible Cooling Energy
+0

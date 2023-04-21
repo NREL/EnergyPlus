@@ -1,0 +1,83 @@
+eplusout.eso
+eplusout.csv
+Environment,Site Outdoor Air Drybulb Temperature
+RESISTIVE ZONE,Zone Total Internal Latent Gain Energy
+EAST ZONE,Zone Total Internal Latent Gain Energy
+NORTH ZONE,Zone Total Internal Latent Gain Energy
+RESISTIVE ZONE,Zone Air System Sensible Heating Energy
+RESISTIVE ZONE,Zone Air System Sensible Cooling Energy
+RESISTIVE ZONE,Zone Air System Sensible Heating Rate
+RESISTIVE ZONE,Zone Air System Sensible Cooling Rate
+RESISTIVE ZONE,Zone Air Temperature
+RESISTIVE ZONE,Zone Air Humidity Ratio
+RESISTIVE ZONE,Zone Air Relative Humidity
+EAST ZONE,Zone Air System Sensible Heating Energy
+EAST ZONE,Zone Air System Sensible Cooling Energy
+EAST ZONE,Zone Air System Sensible Heating Rate
+EAST ZONE,Zone Air System Sensible Cooling Rate
+EAST ZONE,Zone Air Temperature
+EAST ZONE,Zone Air Humidity Ratio
+EAST ZONE,Zone Air Relative Humidity
+NORTH ZONE,Zone Air System Sensible Heating Energy
+NORTH ZONE,Zone Air System Sensible Cooling Energy
+NORTH ZONE,Zone Air System Sensible Heating Rate
+NORTH ZONE,Zone Air System Sensible Cooling Rate
+NORTH ZONE,Zone Air Temperature
+NORTH ZONE,Zone Air Humidity Ratio
+NORTH ZONE,Zone Air Relative Humidity
+REHEAT COIL ZONE 1,Heating Coil Heating Rate
+REHEAT COIL ZONE 2,Heating Coil Heating Rate
+REHEAT COIL ZONE 3,Heating Coil Heating Rate
+DETAILED COOLING COIL,Cooling Coil Total Cooling Rate
+DESICCANT 1,Dehumidifier Removed Water Mass
+DESICCANT 1,Dehumidifier Removed Water Mass Flow Rate
+DESICCANT 1,Dehumidifier Part Load Ratio
+DESICCANT 1,Dehumidifier Electricity Rate
+DESICCANT 1,Dehumidifier Electricity Energy
+DESICCANT 1,Dehumidifier Regeneration Specific Energy
+DESICCANT 1,Dehumidifier Regeneration Rate
+DESICCANT 1,Dehumidifier Regeneration Energy
+DESICCANT 1,Dehumidifier Regeneration Air Speed
+DESICCANT 1,Dehumidifier Regeneration Air Mass Flow Rate
+DESICCANT 1,Dehumidifier Process Air Mass Flow Rate
+DESICCANT REGEN COIL,Heating Coil NaturalGas Rate
+SUPPLY FAN 1,Fan Electricity Rate
+SUPPLY FAN 1,Fan Rise in Air Temperature
+DESICCANT REGEN FAN,Fan Electricity Rate
+DESICCANT REGEN FAN,Fan Rise in Air Temperature
+OUTSIDE AIR INLET NODE,System Node Temperature
+OUTSIDE AIR INLET NODE,System Node Mass Flow Rate
+OUTSIDE AIR INLET NODE,System Node Humidity Ratio
+OUTSIDE AIR INLET NODE 2,System Node Temperature
+OUTSIDE AIR INLET NODE 2,System Node Mass Flow Rate
+OUTSIDE AIR INLET NODE 2,System Node Humidity Ratio
+AIR LOOP OUTLET NODE,System Node Temperature
+AIR LOOP OUTLET NODE,System Node Mass Flow Rate
+AIR LOOP OUTLET NODE,System Node Humidity Ratio
+MIXED AIR NODE,System Node Temperature
+MIXED AIR NODE,System Node Mass Flow Rate
+MIXED AIR NODE,System Node Humidity Ratio
+AIR LOOP INLET NODE,System Node Temperature
+AIR LOOP INLET NODE,System Node Mass Flow Rate
+AIR LOOP INLET NODE,System Node Humidity Ratio
+COOLING COIL AIR INLET NODE,System Node Temperature
+COOLING COIL AIR INLET NODE,System Node Humidity Ratio
+ZONE 1 NODE,System Node Mass Flow Rate
+ZONE 2 NODE,System Node Mass Flow Rate
+ZONE 3 NODE,System Node Mass Flow Rate
+RELIEF AIR OUTLET NODE,System Node Temperature
+RELIEF AIR OUTLET NODE,System Node Mass Flow Rate
+RELIEF AIR OUTLET NODE,System Node Humidity Ratio
+HEAT RECOVERY OUTLET NODE,System Node Temperature
+HEAT RECOVERY OUTLET NODE,System Node Mass Flow Rate
+HEAT RECOVERY OUTLET NODE,System Node Humidity Ratio
+DESICCANT PROCESS OUTLET NODE,System Node Temperature
+DESICCANT PROCESS OUTLET NODE,System Node Mass Flow Rate
+DESICCANT PROCESS OUTLET NODE,System Node Humidity Ratio
+REGEN COIL OUT NODE,System Node Temperature
+REGEN COIL OUT NODE,System Node Mass Flow Rate
+REGEN COIL OUT NODE,System Node Humidity Ratio
+HEAT RECOVERY SECONDARY OUTLET NODE,System Node Temperature
+HEAT RECOVERY SECONDARY OUTLET NODE,System Node Mass Flow Rate
+HEAT RECOVERY SECONDARY OUTLET NODE,System Node Humidity Ratio
+0

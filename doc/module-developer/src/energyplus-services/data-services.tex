@@ -1,0 +1,105 @@
+\section{Data Services}\label{data-services}
+
+For the most part, modules are independent and only need the data they have within or \textbf{USE} from other modules.~ Occasionally, this may take on more complicated needs such as accessing ``real-time'' values for meters and/or custom meters or current report variable names/values..~ Meter names are standard; you may have to use user input to get custom meter names.
+
+\subsection{Global variable: MetersHaveBeenInitialized}\label{global-variable-metershavebeeninitialized}
+
+Meters are a bit peculiar and aren't fully set until the first run through the first time step of the HVAC simulation.~ Therefore, there is a global variable ``MetersHaveBeenInitialized'' which is set to \textbf{true} after meters have been set up.~ If you have a call to your routine that must use meter values as part of the simulation, you must use this variable before your items can be set.
+
+Example:
+
+\ldots{}
+
+If (MetersHaveBeenInitialized) CALL ManageDemand
+
+Only the first time step will be missed in your routine and that time step will be part of ``warming up'' the simulation, so there is minimal impact due to this limitation.
+
+\subsection{GetMeterIndex}\label{getmeterindex}
+
+You use the GetMeterIndex to check if a meter is valid for a particular simulation or if the user has entered a custom meter of that name.~ You use the index returned in later calls to get the value of the meter.~ Returns 0 if there is no meter of that name.
+
+Example:
+
+INTEGER, EXTERNAL :: GetMeterIndex
+
+\ldots{}
+
+thismeter = GetMeterIndex(`Electricity:Facility')
+
+\subsection{GetVariableKeyCountAndType}\label{getvariablekeycountandtype}
+
+This subroutine returns the variable type (real, integer, meter, etc.) (varType) whether it is an averaged or summed variable (varAvgSum), whether it is a zone or HVAC time step (varStepType), and the number of keynames for a given report variable or report meter name (varName).~ The variable type (varType) and number of keys (numKeys) are used when calling subroutine GetVariableKeys to obtain a list of the keynames for a particular variable and a corresponding list of indexes.~ An INTERFACE statement exists in the module OPInterfaces.
+
+Declaration:
+
+SUBROUTINE GetVariableKeyCountandType(varName, numKeys, varType,~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ varAvgSum, varStepType, varUnits)
+
+Example:
+
+USE OPInterfaces, ONLY: GetVariableKeyCountAndType
+
+~~~ ! call the key count function but only need count during this pass
+
+~~~ CALL GetVariableKeyCountandType(AlphArray(fldIndex),~ \&
+
+~~~~~~~~~~~~~~~~ KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
+
+~~~ ALLOCATE(NamesOfKeys(KeyCount))
+
+~~~ ALLOCATE(IndexesForKeyVar(KeyCount))
+
+\subsection{GetVariableKeys}\label{getvariablekeys}
+
+This subroutine returns a list of keynames and indexes associated with a particular report variable or report meter name (varName). This routine assumes that the variable type (real, integer, meter, etc.) may be determined by calling GetVariableKeyCountandType.~ The variable type and index can then be used with function GetInternalVariableValue to to retrieve the current value of a particular variable/keyname combination. ~An INTERFACE statement exists in the module OPInterfaces.
+
+Declaration:
+
+SUBROUTINE GetVariableKeys(varName,varType,keyNames,keyVarIndexes)
+
+Example:
+
+USE OPInterfaces, ONLY: GetVariableKeys
+
+CALL GetVariableKeys(AlphArray(fldIndex), TypeVar, NamesOfKeys,~ \&
+
+~~~~~~~~~~~~~~~~~~~ IndexesForKeyVar)
+
+! See earlier GetVariableKeyCountandType as well.
+
+\subsection{GetCurrentMeterValue}\label{getcurrentmetervalue}
+
+You use the GetCurrentMeterValue to obtain the value of a meter at its last ``reported value'' (timestep).~ Note that all meters are reported on the zone time step.~ Returns 0.0 if the MeterNumber passed is \textless{} = 0.
+
+Example:
+
+INTEGER, EXTERNAL :: GetCurrentMeterValue
+
+\ldots{}
+
+thismetervalue = GetCurrentMeterValue(ElecFacilityMtrIndex)
+
+\subsection{GetInstantMeterValue}\label{getinstantmetervalue}
+
+You use the GetInstantMeterValue to get a component of a meter's value by index type. The values returned are ``raw'' (that is, not weighted by time step values).~ In these calls, 1 is a zone time step index, 2 is a system time step index.
+
+Example:
+
+INTEGER, EXTERNAL :: GetInstantMeterValue
+
+\ldots{}
+
+FuelType\%ElecFacility = \&~~~ GetInstantMeterValue(FuelType\%ElecFacilityIndex,1)*FracTimeStepZone + \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GetInstantMeterValue(FuelType\%ElecFacilityIndex,2)
+
+\subsection{GetInternalVariableValue}\label{getinternalvariablevalue}
+
+This function returns the current value of the Internal Variable assigned to the varType and keyVarIndex.~ Values may be accessed for real and integer report variables and meter variables.~ The variable type (varType) may be determined by calling subroutine and GetVariableKeyCountandType.~ The index (keyVarIndex) may be determined by calling subroutine GetVariableKeys. ~To use, there is an INTERFACE statement in DataGlobals.f90
+
+Example:
+
+USE DataGlobals, ONLY: GetInternalVariableValue
+
+~~~~~ curValue = GetInternalVariableValue(curTypeOfVar,curVarNum)

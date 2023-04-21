@@ -1,0 +1,17 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+PSI FOYER,Zone Mean Air Temperature
+DORM ROOMS AND COMMON AREAS,Zone Mean Air Temperature
+LEFT FORK,Zone Mean Air Temperature
+MIDDLE FORK,Zone Mean Air Temperature
+RIGHT FORK,Zone Mean Air Temperature
+PSI FOYER,Electricity:Building
+DORM ROOMS AND COMMON AREAS,Electricity:Building
+LEFT FORK,Electricity:Building
+MIDDLE FORK,Electricity:Building
+RIGHT FORK,Electricity:Building
+Daylighting Reference Point 1 Illuminance
+Daylighting Reference Point 1 Glare Index
+Daylighting Lighting Power Multiplier
+0

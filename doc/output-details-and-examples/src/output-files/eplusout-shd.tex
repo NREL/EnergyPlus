@@ -1,0 +1,53 @@
+\section{eplusout.shd}
+
+This file contains details of the shadow casting, back and receiving surfaces for the building. The \emph{Engineering Reference} explains the shadowing calculations in more detail; this report file merely shows the level of interactions that the calculations will use. The report shows the Solar Distribution algorithm (in the example Full Interior and Exterior) and then proceeds to illustrate which surfaces shade (possibly) which other surfaces.
+
+Note, a casting surface -- a shadow casting surface or general casting surface (so called in the file) -- is one that casts a shadow on other surfaces. A receiving surface - a shadow receiving surface -- is one that receives shadows from other surfaces (i.e. casting surfaces). A back surface -- an inside surface -- is one that may be partially sunlit/receive solar transmission for interior solar distribution.
+
+An example follows:
+
+\begin{lstlisting}
+Shadowing Combinations
+..Solar Distribution = FullInteriorAndExterior
+  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+ Surface = ZN001:WALL001 is used as Receiving Surface in calculations.
+ Number of general casting surfaces =            0
+ Number of back surfaces =            5
+ ...Surface = ZN001:WALL002
+ ...Surface = ZN001:WALL003
+ ...Surface = ZN001:WALL004
+ ...Surface = ZN001:FLR001
+ ...Surface = ZN001:ROOF001
+ Number of receiving sub surfaces =            1
+ ....Surface = ZN001:WALL001:WIN001
+  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+ Surface = ZN001:WALL001:WIN001 is not used as Receiving Surface in calculations.
+ Number of general casting surfaces =            0
+ Number of back surfaces =            0
+ Number of receiving sub surfaces =            0
+  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+ Surface = ZN001:WALL002 is used as Receiving Surface in calculations.
+ Number of general casting surfaces =            0
+ Number of back surfaces =            0
+ Number of receiving sub surfaces =            0
+  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+ Surface = ZN001:WALL003 is not used as Receiving Surface in calculations.
+ Number of general casting surfaces =            0
+ Number of back surfaces =            0
+ Number of receiving sub surfaces =            0
+  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+ Surface = ZN001:WALL004 is not used as Receiving Surface in calculations.
+ Number of general casting surfaces =            0
+ Number of back surfaces =            0
+ Number of receiving sub surfaces =            0
+  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+ Surface = ZN001:FLR001 is not used as Receiving Surface in calculations.
+ Number of general casting surfaces =            0
+ Number of back surfaces =            0
+ Number of receiving sub surfaces =            0
+  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+ Surface = ZN001:ROOF001 is used as Receiving Surface in calculations.
+ Number of general casting surfaces =            0
+ Number of back surfaces =            0
+ Number of receiving sub surfaces =            0
+\end{lstlisting}

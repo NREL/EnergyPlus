@@ -1,0 +1,117 @@
+\subsection{Electric Baseboard Heater with Radiation and Convection}\label{electric-baseboard-heater-with-radiation-and-convection}
+
+\subsubsection{Model Description}\label{model-description-009}
+
+The input object ZoneHVAC:Baseboard:RadiantConvective:Electric is used to specify electric baseboard heaters that include both convective and radiant heat additions to a zone from a baseboard heater that uses electricity rather than hot water as a heating source. The radiant heat transfer to people as well as surfaces within a zone is determined in the same fashion as both hot water and steam baseboard heaters with radiation and convection heat transfer. The electric baseboard heater receives energy via electric resistance heating. Radiant heat calculated by the user-defined fraction from the heating capacity of a baseboard unit impacts the surface heat balances and thermal comfort of occupants in a zone. EnergyPlus then assumes that the remaining convective gains from the unit are evenly spread throughout the space thus having an immediate impact on the zone air heat balance which is used to calculate the mean air temperature (MAT) within the space.
+
+\subsubsection{Convective Electric Baseboard Heater Inputs}\label{convective-electric-baseboard-heater-inputs-000}
+
+Like many other HVAC components, the electric baseboard model requires a unique identifying name and an availability schedule. The availability schedule defines when the unit can provide heating the zone. The input also requires a capacity and efficiency for the unit. While the efficiency is a required input that defaults to unity, the capacity can be chosen to be autosized by EnergyPlus.
+
+All inputs for the radiant heat calculation are the same as the water and steam baseboard heater with radiation and convection models in EnergyPlus. Users are required to input fractions that specify the fraction of the total radiant heat delivered directly to surfaces as well as people in a space. The sum of of these radiant distribution fractions must sum to unity, and each electric baseboard heater is allowed to distribute energy to up to 20 surfaces.
+
+\subsubsection{Simulation and Control}\label{simulation-and-control-002}
+
+The simulation and control of this model is fairly straightforward. When the unit is available and there is a heating load within a space, the electric baseboard unit will attempt to meet the entire remaining heating load if it has enough capacity to do so. If the zone heating load is greater than the baseboard heating capacity, then the baseboard unit will run at its capacity. The model then determines the radiant heat emitted by the baseboard unit using the following equation:
+
+\begin{equation}
+{q_{rad}} = q \cdot Fra{c_{rad}}
+\end{equation}
+
+where \emph{q\(_{rad}\)} is the total radiant heat transfer from the baseboard unit, \emph{q} is the lesser of the heating capacity of the unit and the zone heating load, and \emph{Frac\(_{rad}\)} is the user-defined radiant fraction for the baseboard unit. The radiant heat additions to people and surfaces are thus:
+
+\begin{equation}
+{q_{people}} = {q_{rad}} \cdot Fra{c_{people}}
+\end{equation}
+
+\begin{equation}
+{q_{surface,i}} = {{q_{rad}} \cdot Fra{c_{surface,i}}}
+\end{equation}
+
+where \emph{q\(_{people}\)} is the radiant heat transfer to people, \emph{q\(_{surface,i}\)} is the heat radiated to surface i, \emph{Frac\(_{people}\)} is the fraction of the heat radiated to people, and \emph{Frac\(_{surface,i}\)} is the fraction of the heat radiated to surface i.
+
+Based on these above equations, the model then distributes the radiant heat additions to the appropriate surfaces and people in the zone and the convective heat addition to air in the zone. The surface heat balances are then recalculated to account for the radiant heat added to the zone surfaces by the baseboard unit. It is assumed that the radiant heat incident on people in the zone is taken into account in the thermal comfort models and then is converted to convection to the zone so that the zone heat balance includes this amount of heat which would otherwise be lost (see the High Temperature Radiant Heater Model for more information about how radiant energy added by these types of systems affect thermal comfort). The load met, the actual convective system impact for the baseboard heater, \emph{q\(_{req}\)}, is calculated using the following equation:
+
+\begin{equation}
+{q_{req}} = ({q_{surf,c}} - {q_{surf,z}}) + {q_{conv}} + {q_{people}}
+\end{equation}
+
+where \emph{q\(_{surf,c}\)} is the convection from the surfaces to the air in the zone once the radiation from the baseboard unit is taken into account; \emph{q\(_{surf,z}\)} is the convection from the surfaces to the air in the zone when the radiation from the baseboard unit was zero; \emph{q\(_{conv}\)} is the convective heat transfer from the heater to the zone air; and \emph{q\(_{people}\)} is radiant heat to the people.
+
+The accounting of the radiant heat added to the zone (surfaces) by the electric baseboard heater is very similar to the method used in the high temperature radiant system model. After all the system time steps have been simulated for the zone time step, an ``average'' zone heat balance calculation is done (similar to the radiant systems).
+
+The energy consumption of the baseboard heater is calculated using the user-supplied efficiency and the actual convective system impact calculated as
+
+\begin{equation}
+{Q_{elec}} = \frac{q}{\eta }
+\end{equation}
+
+where \emph{Q\(_{elec}\)} is the energy consumption and \({\eta}\) is the efficiency of the unit.
+
+If the unit was scheduled off or there is no heating load for the zone, then there will be no heat transfer from the unit. The model assumes no heat storage in the baseboard unit itself and thus no residual heat transfer in future system time steps due to heat storage in the metal of the baseboard unit.
+
+\subsubsection{References}\label{references-020}
+
+While there are no specific references for this model as it is fairly intuitive, the user can always refer to the ASHRAE Handbook series for general information on different system types as needed.
+
+\subsection{Steam Baseboard Heater with Radiation and Convection}\label{steam-baseboard-heater-with-radiation-and-convection}
+
+\subsubsection{Model Description}\label{model-description-1-006}
+
+The input object ZoneHVAC:Baseboard:RadiantConvective:Steam is used to specify steam baseboard heaters that include both convective and radiant heat additions to a zone from a baseboard heater that uses steam rather than hot water or electricity as a heating source. The radiant heat transfer to people as well as surfaces within a zone is determined in the same fashion as both hot water and electric baseboard heaters with radiation and convection heat transfer. The steam baseboard heater produces heat mostly as a result of the condensation of steam inside the baseboard unit.  Some sensible heat is also extracted through subcooling of the condensed steam (water) below the phase change temperature. Since it is assumed that the steam temperature is much greater than the zone temperature, all of the heat generated by the phase change and subcooling are assumed to be transferred to the zone.  Radiant heat calculated by the user-defined fraction from the heating provided by the baseboard unit impacts the surface heat balances and thermal comfort of occupants in a zone. EnergyPlus then assumes that the remaining convective gains from the unit are evenly spread throughout the space thus having an immediate impact on the zone air heat balance which is used to calculate the mean air temperature (MAT) within the space.
+
+This model determines the heating provided by the unit from the sum of the latent heat transfer and sensible cooling of water in a similar fashion as the steam coil model in EnergyPlus does. Overall energy balances to the steam and air handle the heat exchange between the steam loop and the zone air. The mass flow rate of steam is determined based on the heating demand in the zone. The model requests the user input the desired degree of subcooling so that it determines the heating rate from the heater due to the cooling of the condensate.
+
+\subsubsection{Steam Baseboard Heater Inputs}\label{steam-baseboard-heater-inputs}
+
+The steam baseboard model requires a unique identifying name, an available schedule, and steam inlet and outlet nodes. These define the availability of the unit for providing heating to the zone and the node connections that relate to the primary system. It also requires the desired degree of subcooling to calculate the heating capacity and temperature of the condensate. A maximum design flow rate is required, and the user can request this parameter to be auto-sized by EnergyPlus. In addition, a convergence tolerance is requested of the user to control the system output. In almost all cases, the user should simply accept the default value for the convergence tolerance unless engaged in an expert study of controls logic in EnergyPlus.
+
+All of the inputs used to characterize the radiant heat transfer are the same as for the water and electric radiant-convective baseboard heater models in EnergyPlus. User inputs for the radiant fraction and for the fraction of radiant energy incident both on people and on surfaces are required to calculate radiant energy distribution from the heater to the people and surfaces. The sum of these radiant distribution fractions must sum to unity, and each steam baseboard heater is allowed to distribute energy to up to 20 surfaces.
+
+\subsubsection{Simulation and Control}\label{simulation-and-control-1-001}
+
+The algorithm for the steam baseboard model with radiation and convection is similar to the steam coil model in EnergyPlus while the simulation of radiant components is the same as the water radiant-convective baseboard model. This model initializes all conditions at the inlet node such as mass flow rate, temperature, enthalpy, and humidity ratio. The model then calculates the heating output of the steam baseboard (\emph{q}) using:
+
+\begin{equation}
+q = {\dot m_s}({h_{fg}} + {c_{pw}}\Delta t)
+\end{equation}
+
+where \({\dot m_s}\) is the mass flow rate of steam in kg/s, \({h_{fg}}\) is the heat of vaporization of steam in J/kg, \({c_{pw}}\) is the specific heat of water in J/kg.K, and \(\Delta t\) ~is the degree of subcooling in \(^{\circ}\)C.
+
+The outlet steam temperature is then calculated from:
+
+\begin{equation}
+{T_{s,out}} = {T_{s,in}} - \Delta t
+\end{equation}
+
+The model then determines the radiant heat emitted by the baseboard unit using the following equation:
+
+\begin{equation}
+{q_{rad}} = q \cdot Fra{c_{rad}}
+\end{equation}
+
+where \emph{q\(_{rad}\)} is the total radiant heat transfer from the baseboard unit, \emph{q} is the lesser of the heating capacity of the unit and the zone heating load, and \emph{Frac\(_{rad}\)} is the user-defined radiant fraction for the baseboard unit. The radiant heat additions to people and surfaces are thus:
+
+\begin{equation}
+{q_{people}} = {q_{rad}} \cdot Fra{c_{people}}
+\end{equation}
+
+\begin{equation}
+{q_{surface,i}} = {{q_{rad}} \cdot Fra{c_{surface,i}}}
+\end{equation}
+
+where \emph{q\(_{people}\)} is the radiant heat transfer to people, \emph{q\(_{surface,i}\)} is the heat radiated to surface i, \emph{Frac\(_{people}\)} is the fraction of the heat radiated to people, and \emph{Frac\(_{surface,i}\)} is the fraction of the heat radiated to surface i.
+
+Based on these above equations, the model then distributes the radiant heat additions to the appropriate surfaces and people in the zone and the convective heat addition to air in the zone. The surface heat balances are then recalculated to account for the radiant heat added to the zone surfaces by the baseboard unit. It is assumed that the radiant heat incident on people in the zone is taken into account in the thermal comfort models and then is converted to convection to the zone so that the zone heat balance includes this amount of heat which would otherwise be lost (see the High Temperature Radiant Heater Model for more information about how radiant energy added by these types of systems affect thermal comfort). The load met, the actual convective system impact for the baseboard heater, \emph{q\(_{req}\)}, is calculated using the following equation:
+
+\begin{equation}
+{q_{req}} = ({q_{surf,c}} - {q_{surf,z}}) + {q_{conv}} + {q_{people}}
+\end{equation}
+
+where \emph{q\(_{surf,c}\)} is the convection from the surfaces to the air in the zone once the radiation from the baseboard unit is taken into account; \emph{q\(_{surf,z}\)} is the convection from the surfaces to the air in the zone when the radiation from the baseboard unit was zero; \emph{q\(_{conv}\)} is the convective heat transfer from the heater to the zone air; and \emph{q\(_{people}\)} is radiant heat to the people.
+
+The accounting of the radiant heat added to the zone (surfaces) by the steam baseboard heater is very similar to the method used in the high temperature radiant system model. After all the system time steps have been simulated for the zone time step, an ``average'' zone heat balance calculation is done (similar to the radiant systems).  Note that if the unit was scheduled off or there is no steam flow rate through the baseboard unit, then, there will be no heat transfer from the unit. The model assumes no heat storage in the unit itself and thus no residual heat transfer in future system time steps due to heat storage in the steam or metal of the unit.
+
+\subsubsection{References}\label{references-1-007}
+
+While there are no specific references for this model as it is fairly intuitive, the user can always refer to the ASHRAE Handbook series for general information on different system types as needed. The user can also consult information on the EnergyPlus steam coil for further details.

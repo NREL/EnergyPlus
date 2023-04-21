@@ -1,0 +1,40 @@
+\chapter{Getting Started with EnergyPlus}\label{getting-started-with-energyplus}
+
+The remainder of this document is intended to give you a start on using the program with a few simple tools (EP-Launch to help run the simulation; IDFEditor to help create or look at input files) as well as some of the features (such as energy meters, simulation results) of using the program.
+
+For learning about a specific input file, or a specific input object, the install includes two documents in the ExampleFiles folder:
+
+\begin{itemize}
+\item
+  Example Files Summary (highlights of each example file)
+\item
+  Example Files Links to Objects (for any object, up to 3 files using that object are shown)
+\end{itemize}
+
+The standard Windows install procedure has put the following information on your computer, in the directories/folders shown.
+
+The main EnergyPlus folder contains: * Energy+.idd * EnergyPlus.exe and dependent shared libraries (dll files) * RunEPlus.bat and other batch files for running EnergyPlus * readme file(s), license, etc. * EP-Macro.exe and other support binaries * bugreprt.txt~
+
+The general layout of folders from the install looks like:
+
+\begin{lstlisting}
+. EnergyPlus main folder
++-- Documentation
+|   +-- A link to find the documentation online, and any additional docs packaged with the installation
++-- DataSets
+|   +-- Reference Data Sets (libraries)
++-- MacroDataSets
+|   +-- Macroized Reference Data Sets (libraries)
++-- PreProcess
+|   +-- FMUParser              Tool for external interface specific applications
+|   +-- IDFEditor              Program files for the IDFEditor
+|   +-- GrndTempCalc           Special program to calculate ground temperatures.
+|   +-- WeatherConverter       Tool for performing weather file creation and conversion
+|   +-- ParametricPreprocessor Parametric simulation tool
+|   +-- IDFVersionUpdater      Graphical tool for updating old EnergyPlus files to the latest version
++-- PostProcess
+|   +-- ReadVarsEso            The simple post processor exe.
+|   +-- EPCompare              A graphical tool for comparing two EnergyPlus output sets
++-- ExampleFiles               Sample input, output, results files shipped with the program.
++-- WeatherData                Sample weather files shipped with the program.
+\end{lstlisting}

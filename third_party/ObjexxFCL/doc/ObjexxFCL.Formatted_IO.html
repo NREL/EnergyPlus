@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>ObjexxFCL Users Guide: Formatted I/O</title>
+	<meta name="description" content="Objexx Fortran-C++ Library">
+	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
+	<meta name="copyright" content="Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.">
+	<link rel="icon" type="image/png" href="img/favicon.png">
+	<link rel="stylesheet" href="css/Objexx.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#CC3366" vlink="#990033" alink="#FF3366">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+	<tr>
+		<td></td>
+		<td height="70"><a href="ObjexxFCL.html"><img src="img/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
+		<td></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.2</div></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="5" height="16" valign="top" bgcolor="#EB7A87"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td height="24" colspan="5"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td height="300">&nbsp;</td>
+		<td valign="top">
+			<div id="sectionLinksTop">
+				<a href="ObjexxFCL.html">Home</a>
+			</div>
+			<div id="sectionLinks">
+				<a href="ObjexxFCL.Release.html">Release</a>
+				<a href="ObjexxFCL.Users.html">Users Guide</a>
+				<a href="ObjexxFCL.Developers.html">Developers</a>
+				<a href="ObjexxFCL.Support.html">Support</a>
+				<a href="http://objexx.com">Web</a>
+			</div>
+		</td>
+		<td></td>
+		<td width="500" valign="top">
+			<h1>Formated I/O</h1>
+
+			<h2 class="h4">Overview</h2>
+			<p class="body">Formatted i/o is supported in the ObjexxFCL by a powerful system that integrates Fortran format specifications into a C++ stream context. High-level components provide read, write, inquire, rewind, and backspace support. Fortran-style status/error handling is provided by an optional flags object in these calls. The result is a concise usage that is natural for both Fortran and C++ users.</p>
+			<p class="body">A lower-level formatted i/o system is also available for use when the full power of Fortran format control is not needed. Alternative systems such as Boost.Format can also be used alongside ObjexxFCL formatted i/o.</p>
+
+			<h2 class="h4">Read</h2>
+			<p class="body">Formatted read operations use a Read call with a stream or string (for "internal" reads) argument and a format argument. Here are some samples:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>Read( a_stream, "(F10.0,I5,F10.0)" ) &gt;&gt; x &gt;&gt; i &gt;&gt; M(j);
+Read( a_string, "(3F15.0)" ) &gt;&gt; a &gt;&gt; b &gt;&gt; c; // Internal read
+Read( a_stream, "(3F15.0)", flags ) &gt;&gt; a &gt;&gt; b &gt;&gt; c; // IOFlags argument
+Read( a_stream, "*" ) &gt;&gt; name &gt;&gt; age &gt;&gt; phone; // List-directed
+</pre>
+					</td>
+				</tr>
+			</table>
+			<p class="body">The i/o support is quite complete:</p>
+			<ul>
+				<li>Fortran Format support is nearly Fortran 2008 complete and all typical descriptors and usage is supported, including repeat counts, reversion logic, complex variables, and so forth.</li>
+				<li>File and string streams are supported, including std::cin and std::cout.</li>
+				<li>The IOFlags argument can control the read behavior (such as equivalents to the BLANK and ADVANCE Fortran READ arguments) and returns the i/o status and error/end state for local processing. If no IOFlags argument is used with handling set an i/o error will cause an error message and program exit, as in Fortran.</li>
+			</ul>
+			<p class="body">Using the i/o flags is straightforward and familiar to Fortran developers, as in this example:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>IOFlags flags;
+flags.na().ios_x(); // Turn on non-advancing mode and status handling
+Read( a_stream, "(3F15.0)", flags ) &gt;&gt; a &gt;&gt; b &gt;&gt; c;
+if ( flags.end() ) goto Label99; // Can also use flags.ios() value
+if ( flags.err() ) goto Label42;
+</pre>
+					</td>
+				</tr>
+			</table>
+
+			<h2 class="h4">Write</h2>
+			<p class="body">Similar to Read, formatted write operations use a Write call with a stream or string (for "internal" writes) argument and a format argument. Here are some samples:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>Write( a_stream, "(F10.0,I5,F10.0)" ) &lt;&lt; x &lt;&lt; i &lt;&lt; M(j);
+Write( a_string, "(3F15.0)" ) &lt;&lt; a &lt;&lt; b &lt;&lt; c; // Internal read
+Write( a_stream, "(3F15.0)", flags ) &lt;&lt; a &lt;&lt; b &lt;&lt; c; // IOFlags argument
+Write( a_stream, "*" ) &lt;&lt; name &lt;&lt; age &lt;&lt; phone; // List-directed
+</pre>
+					</td>
+				</tr>
+			</table>
+
+			<h2 class="h4">Print</h2>
+			<p class="body">Print is just a formatted write to the console. No stream argument is needed and, like Fortran's PRINT, no status/control is available so no IOFlags argument is used. Here are some samples:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>Print( "(3(I5,2X))" ) &lt;&lt; i &lt;&lt; j &lt;&lt; k;
+Print( "*" ) &lt;&lt; name &lt;&lt; age &lt;&lt; phone; // List-directed
+</pre>
+					</td>
+				</tr>
+			</table>
+
+			<h2 class="h4">Low-Level Formatted Input</h2>
+			<p class="body">The low-level formatted input capability allows formatted reads to be performed using C++ streams, as in:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>int i, j;<br>stream &gt;&gt; bite(3,i) &gt;&gt; skip(1) &gt;&gt; bite(2,j) &gt;&gt; skip;
+</pre>
+					</td>
+				</tr>
+			</table>
+			<p class="body">A numeric first argument to <span class="source">bite</span> is the number of characters to read the variable into. Variables of a known width, such as char, can be read with a one-argument <span class="source">bite</span> function, as in&nbsp; <span class="source">bite(name)</span>. Character strings are read into the variables as is: no BLANK=ZERO or <i>n</i>P Fortran-like read capability is available at this time.</p>
+			<p class="body">A numeric argument to <span class="source">skip</span> is the number of characters to skip over. A trailing skip reads the rest of the line and the line terminator.</p>
+
+			<h2 class="h4">Low-Level Formatted Output</h2>
+			<p class="body">The low-level formatted output capability provides the per-item Fortran formatting with C++ streams, as in:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7">
+						<pre>int i, j;<br>double x, y;
+std::string name;
+std::string address;
+...
+stream &lt;&lt; I(i,3) &lt;&lt; space(1) &lt;&lt; I(2,j) &lt;&lt; '\n';
+stream &lt;&lt; F(x,9,3) &lt;&lt; G(y,15,6) &lt;&lt; '\n';
+stream &lt;&lt; A(name,15) &lt;&lt; '\n';
+stream &lt;&lt; A(address,30) &lt;&lt; '\n';</pre>
+					</td>
+				</tr>
+			</table>
+			<p class="body">The floating point output functions have the form F(<i>v,w,d</i>), E(<i>v,w,d,e</i>), and G(<i>v,w,d,e</i>) where <i>v</i> stands for the variable, <i>w</i> is the field width, <i>d</i> is the number of fractional digits, and <i>e</i> is the number of exponent digits.</p>
+			<p class="body">Formatting similar to Fortran <b>list-directed writes</b> are provided by some additional functions. List-directed write formatting is not standardized. The LD functions provide list-directed write formatting with each field's width and precision based on its data type, provided by the <b>TraitsLD</b> templates. The <b>TraitsLD</b> matches Intel Fortran behavior: alternatives could be developed to match the behavior of other compilers.</p>
+
+			<h2 class="h4">Organization</h2>
+			<p class="body">The Read, Write, Print, Inquire, Rewind, and Backspace services are in separate files with those names. So, for example, to use Read the <b>Read.hh</b> header should be included.</p>
+			<p class="body">Format objects are handled internally by the i/o operations so application code rarely needs to work with it explicitly, but it can be found in the <b>Format.hh</b> and <b>Format.cc</b> files.</p>
+			<p class="body"></p>
+			<p class="body"></p>
+			<p class="body">The low-level formatted i/o support is contained within the nested <b>ObjexxFCL::fmt</b> namespace to provide control over scoping and name conflicts. The <b>fmt.hh</b> header should be included to use this support.</p>
+		</td>
+		<td></td>
+		<td width="100%" valign="top">
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td colspan="3" height="30" valign="bottom" class="footer_text">
+			<a href="ObjexxFCL.html"><span class="footer_link">Home</span></a> |
+			<a href="ObjexxFCL.Release.html"><span class="footer_link">Release Notes</span></a> |
+			<a href="ObjexxFCL.Users.html"><span class="footer_link">Users Guide</span></a> |
+			<a href="ObjexxFCL.Developers.html"><span class="footer_link">Developers Guide</span></a> |
+			<a href="ObjexxFCL.Support.html"><span class="footer_link">Support</span></a> |
+			<a href="ObjexxFCL.License.txt"><span class="footer_link">License</span></a> |
+			<a href="http://objexx.com"><span class="footer_link">Web</span></a>
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td height="21"></td>
+		<td></td>
+		<td></td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2017 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:9px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:500px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100%; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:1px"></td>
+	</tr>
+</tbody>
+</table>
+</body>
+</html>

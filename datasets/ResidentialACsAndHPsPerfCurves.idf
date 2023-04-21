@@ -1,0 +1,921 @@
+!
+!  ResidentialACsAndHPsPerfCurves.idf
+!  This dataset includes performance curves for single speed and two speed/stage air conditioners
+!  or furnaces for residential applications. The single speed performance curve are used in EnergyPlus
+!  single speed coils of air conditioners or furnace objects "Coil:Cooling:DX:singlespeed". And the
+!  two speed performance curves can be used in EnergyPlus multi-speed heat pump objects
+!  "Coil:Cooling:DX:MultiSpeed".
+!  This dataset also includes performance curves for single speed and two speed/stage heat pumps for
+!  residential applications. The single speed performance curve are used in EnergyPlus single
+!  speed coils of air-to-air heat pumps objects "Coil:Heating:DX:SingleSpeed" and
+!  "Coil:Cooling:DX:SingleSpeed".  The two speed performance curves can be used in EnergyPlus
+!  multi-speed DX coils of air-to-air heat pump objects: "Coil:Heating:DX:MultiSpeed" and
+!  "Coil:Cooling:DX:MultiSpeed".
+!
+!  These coefficients were taken directly from the report below. For further details users may need
+!  to refer this report.
+!  D. Cutler, J. Winkler, N. Kruis, and C. Christensen
+!  National Renewable Energy Laboratory
+!  M. Brandemuehl
+!  University of Colorado
+!
+!  Improved Modeling of Residential Air Conditioners and Heat Pumps for Energy Calculations
+!
+!  Technical Report
+!  NREL/TP-5500-56354
+!  January 2013
+!
+!
+!  Air Conditioner Performance Curves were taken from: Tables 9, 10, 16 and 17:
+!
+! *******************************************************************************************
+! *******************************************************************************************
+!               Beginning of Single Speed Air Conditioners Performance Curves
+! *******************************************************************************************
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+! The coil objects in this idf are entered generically with many required fields purposely removed.  These objects are left in the file as comments to show how to use the curves defined in this file, which remain uncommented to allow including the curves in a particular idf, by macro, for example.
+!  Coil:Cooling:DX:SingleSpeed,
+!   ACDXCoil Name,           !- Name
+!   ,                        !- Availability Schedule Name
+!   ,                        !- Rated Total Cooling Capacity {W}
+!   ,                        !- Rated Sensible Heat Ratio
+!   ,                        !- Rated COP {W/W}
+!   ,                        !- Rated Air Flow Rate {m3/s}
+!   ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+!   ,                        !- Air Inlet Node Name
+!   ,                        !- Air Outlet Node Name
+!   ACCoolingCAPFTemp,       !- Total Cooling Capacity Function of Temperature Curve Name
+!   ACCoolingCAPFFF,         !- Total Cooling Capacity Function of Flow Fraction Curve Name
+!   ACCoolingEIRFTemp,       !- Energy Input Ratio Function of Temperature Curve Name
+!   ACCoolingEIRFFF,         !- Energy Input Ratio Function of Flow Fraction Curve Name
+!   ACCoolingPLFFPLR;        !- Part Load Fraction Correlation Curve Name
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  Curve:Biquadratic,
+    ACCoolingCAPFTemp,       !- Name
+    1.5509,                  !- Coefficient1 Constant
+    -0.07505,                !- Coefficient2 x
+    0.0031,                  !- Coefficient3 x**2
+    0.0024,                  !- Coefficient4 y
+    -0.00005,                !- Coefficient5 y**2
+    -0.00043,                !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    ACCoolingEIRFTemp,       !- Name
+    -0.30428,                !- Coefficient1 Constant
+    0.11805,                 !- Coefficient2 x
+    -0.00342,                !- Coefficient3 x**2
+    -0.00626,                !- Coefficient4 y
+    0.0007,                  !- Coefficient5 y**2
+    -0.00047,                !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    ACCoolingCAPFFF,         !- Name
+    0.718605468,             !- Coefficient1 Constant
+    0.410099989,             !- Coefficient2 x
+    -0.128705457,            !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    ACCoolingEIRFFF,         !- Name
+    1.32299905,              !- Coefficient1 Constant
+    -0.477711207,            !- Coefficient2 x
+    0.154712157,             !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+! Part Load Fraction curve as a function of Part Load Ratio is default from
+! Table 6. BEopt AC Rated Value Inputs of NREL report NREL/TP-5500-56354
+
+  Curve:Quadratic,
+    ACCoolingPLFFPLR,        !- Name
+    0.90,                    !- Coefficient1 Constant
+    0.10,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+! *******************************************************************************************
+! *******************************************************************************************
+!               Beginning of Two Speed/Stage Air Conditioners Performance Curves
+! *******************************************************************************************
+!  The multi-speed heat pump has the option to use gas or electric heating coil. This means
+!  the multi-speed heat pump model can be used as multi-speed AC using gas or electric coil
+!  as the main heating coil.
+!  Coil:Cooling:DX:MultiSpeed,
+!    2Stage AC DXCoil Cooling,!- Name
+!    ,                        !- Availability Schedule Name
+!    ,                        !- Air Inlet Node Name
+!    ,                        !- Air Outlet Node Name
+!    ,                        !- Condenser Air Inlet Node Name
+!    AirCooled,               !- Condenser Type
+!    ,                        !- Supply Water Storage Tank Name
+!    ,                        !- Condensate Collection Water Storage Tank Name
+!    ,                        !- Apply Part Load Fraction to Speeds Greater than 1
+!    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+!    ,                        !- Crankcase Heater Capacity {W}
+!    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+!    ,                        !- Basin Heater Capacity {W/K}
+!    ,                        !- Basin Heater Setpoint Temperature {C}
+!    ,                        !- Basin Heater Operating Schedule Name
+!    Electricity,             !- Fuel Type
+!    ,                        !- Number of Speeds
+!    ,                        !- Speed 1 Rated Total Cooling Capacity {W}
+!    ,                        !- Speed 1 Rated Sensible Heat Ratio
+!    ,                        !- Speed 1 Rated COP {W/W}
+!    ,                        !- Speed 1 Rated Air Flow Rate {m3/s}
+!    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+!    ACHighStageCoolingCAPFTemp, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+!    ACHighStageCoolingCAPFFF,   !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
+!    ACHighStageCoolingEIRFTemp, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+!    ACHighStageCoolingEIRFFF,   !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name
+!    AC2StageCoolingPLFFPLR,     !- Speed 1 Part Load Fraction Correlation Curve Name
+!    ,                        !- Speed 1 Nominal Time for Condensate Removal to Begin {s}
+!    ,                        !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+!    ,                        !- Speed 1 Maximum Cycling Rate {cycles/hr}
+!    ,                        !- Speed 1 Latent Capacity Time Constant {s}
+!    ,                        !- Speed 1 Rated Waste Heat Fraction of Power Input {dimensionless}
+!    ,                        !- Speed 1 Waste Heat Function of Temperature Curve Name
+!    ,                        !- Speed 1 Evaporative Condenser Effectiveness {dimensionless}
+!    ,                        !- Speed 1 Evaporative Condenser Air Flow Rate {m3/s}
+!    ,                        !- Speed 1 Rated Evaporative Condenser Pump Power Consumption {W}
+!    ,                        !- Speed 2 Rated Total Cooling Capacity {W}
+!    ,                        !- Speed 2 Rated Sensible Heat Ratio
+!    ,                        !- Speed 2 Rated COP {W/W}
+!    ,                        !- Speed 2 Rated Air Flow Rate {m3/s}
+!    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+!    ACLowStageCoolingCAPFTemp, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+!    ACLowStageCoolingCAPFFF,   !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
+!    ACLowStageCoolingEIRFTemp, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+!    ACLowStageCoolingEIRFFF,   !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name
+!    AC2StageCoolingPLFFPLR,    !- Speed 2 Part Load Fraction Correlation Curve Name
+!    ,                        !- Speed 2 Nominal Time for Condensate Removal to Begin {s}
+!    ,                        !- Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}
+!    ,                        !- Speed 2 Maximum Cycling Rate {cycles/hr}
+!    ,                        !- Speed 2 Latent Capacity Time Constant {s}
+!    ,                        !- Speed 2 Rated Waste Heat Fraction of Power Input {dimensionless}
+!    ,                        !- Speed 2 Waste Heat Function of Temperature Curve Name
+!    ,                        !- Speed 2 Evaporative Condenser Effectiveness {dimensionless}
+!    ,                        !- Speed 2 Evaporative Condenser Air Flow Rate {m3/s}
+!    ;                        !- Speed 2 Rated Evaporative Condenser Pump Power Consumption {W}
+! ************ Low Speed Cooling **********
+
+  Curve:Biquadratic,
+    ACLowStageCoolingCAPFTemp,  !- Name
+    1.66458,                 !- Coefficient1 Constant
+    -0.08039,                !- Coefficient2 x
+    0.0033,                  !- Coefficient3 x**2
+    0.00124,                 !- Coefficient4 y
+    -0.00003,                !- Coefficient5 y**2
+    -0.00052,                !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    ACLowStageCoolingEIRFTemp,  !- Name
+    -0.42738,                !- Coefficient1 Constant
+    0.14191,                 !- Coefficient2 x
+    -0.00412,                !- Coefficient3 x**2
+    -0.01406,                !- Coefficient4 y
+    0.00083,                 !- Coefficient5 y**2
+    -0.00043,                !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    ACLowStageCoolingCAPFFF, !- Name
+    0.65673024,              !- Coefficient1 Constant
+    0.516470835,             !- Coefficient2 x
+    -0.172887149,            !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    ACLowStageCoolingEIRFFF, !- Name
+    1.562945114,             !- Coefficient1 Constant
+    -0.791859997,            !- Coefficient2 x
+    0.230030877,             !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+! ************ High Speed Cooling **********
+
+  Curve:Biquadratic,
+    ACHighStageCoolingCAPFTemp,  !- Name
+    1.36788,                 !- Coefficient1 Constant
+    -0.06257,                !- Coefficient2 x
+    0.0028,                  !- Coefficient3 x**2
+    0.00504,                 !- Coefficient4 y
+    -0.00007,                !- Coefficient5 y**2
+    -0.00045,                !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    ACHighStageCoolingEIRFTemp,  !- Name
+    0.04232,                 !- Coefficient1 Constant
+    0.07892,                 !- Coefficient2 x
+    -0.00238,                !- Coefficient3 x**2
+    -0.00304,                !- Coefficient4 y
+    0.00053,                 !- Coefficient5 y**2
+    -0.00032,                !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    ACHighStageCoolingCAPFFF,!- Name
+    0.690334551,             !- Coefficient1 Constant
+    0.464383753,             !- Coefficient2 x
+    -0.154507638,            !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    ACHighStageCoolingEIRFFF,!- Name
+    1.31565404,              !- Coefficient1 Constant
+    -0.482467162,            !- Coefficient2 x
+    0.166239001,             !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+! Part Load Fraction curve as a function of Part Load Ratio is default from
+! Table 6. BEopt AC Rated Value Inputs of NREL report NREL/TP-5500-56354
+
+  Curve:Quadratic,
+    AC2StageCoolingPLFFPLR,  !- Name
+    0.93,                    !- Coefficient1 Constant
+    0.07,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+! *******************************************************************************************
+!               End of Two Speed/Stage Air Conditioners Performance Curves
+! *******************************************************************************************
+! *******************************************************************************************
+!
+!
+!  This dataset includes performance curves for single speed and two speed/stage heat pumps for
+!  residential applications. The single speed performance curve are used in EnergyPlus single
+!  speed coils of air-to-air heat pumps objects "Coil:Heating:DX:singlespeed" and
+!  "Coil:Cooling:DX:singlespeed".  The two speed performance curves can be used in EnergyPlus
+!  multi-speed DX coils of air-to-air heat pump objects: "Coil:Heating:DX:MultiSpeed" and
+!  "Coil:Cooling:DX:MultiSpeed".  These coefficients were taken directly from the report below.
+!  For further details users may need to refer this report.
+!
+!  D. Cutler, J. Winkler, N. Kruis, and C. Christensen
+!  National Renewable Energy Laboratory
+!  M. Brandemuehl
+!  University of Colorado
+!
+!  Improved Modeling of Residential Air Conditioners and Heat Pumps for Energy Calculations
+!
+!  Technical Report
+!  NREL/TP-5500-56354
+!  January 2013
+!
+!  Heat Pump Performance Curves were taken from: Tables 14, 15, 18 and 19:
+!
+! *******************************************************************************************
+! *******************************************************************************************
+!               Beginning of Single Speed Heat Pump
+! *******************************************************************************************
+! Coil:Cooling:DX:SingleSpeed,
+!   HeatPump DX Cooling Coil,!- Name
+!   ,                        !- Availability Schedule Name
+!   ,                        !- Rated Total Cooling Capacity {W}
+!   ,                        !- Rated Sensible Heat Ratio
+!   ,                        !- Rated COP {W/W}
+!   ,                        !- Rated Air Flow Rate {m3/s}
+!   ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+!   ,                        !- Air Inlet Node Name
+!   ,                        !- Air Outlet Node Name
+!   HPCoolingCAPFTemp,       !- Total Cooling Capacity Function of Temperature Curve Name
+!   HPCoolingCAPFFF,         !- Total Cooling Capacity Function of Flow Fraction Curve Name
+!   HPCoolingEIRFTemp,       !- Energy Input Ratio Function of Temperature Curve Name
+!   HPCoolingEIRFFF,         !- Energy Input Ratio Function of Flow Fraction Curve Name
+!   HPCOOLPLFFPLR;           !- Part Load Fraction Correlation Curve Name
+! ************ Single Speed Cooling **********
+
+  Curve:Biquadratic,
+    HPCoolingCAPFTemp,       !- Name
+    1.55736,                 !- Coefficient1 Constant
+    -0.074448,               !- Coefficient2 x
+    0.003099,                !- Coefficient3 x**2
+    0.00146,                 !- Coefficient4 y
+    -0.000041,               !- Coefficient5 y**2
+    -0.000427,               !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    HPCoolingEIRFTemp,       !- Name
+    -0.350448,               !- Coefficient1 Constant
+    0.11681,                 !- Coefficient2 x
+    -0.0034,                 !- Coefficient3 x**2
+    -0.001226,               !- Coefficient4 y
+    0.000601,                !- Coefficient5 y**2
+    -0.000467,               !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    HPCoolingCAPFFF,         !- Name
+    0.718664047,             !- Coefficient1 Constant
+    0.41797409,              !- Coefficient2 x
+    -0.136638137,            !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    HPCoolingEIRFFF,         !- Name
+    1.143487507,             !- Coefficient1 Constant
+    -0.13943972,             !- Coefficient2 x
+    -0.004047787,            !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+! Part Load Fraction curve as a function of Part Load Ratio is default curve
+! from Table 6. BEopt AC Rated Value Inputs of NREL report NREL/TP-5500-56354
+
+  Curve:Quadratic,
+    HPCOOLPLFFPLR,           !- Name
+    0.90,                    !- Coefficient1 Constant
+    0.10,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+! ************ Single Speed Heating **********
+!  Coil:Heating:DX:SingleSpeed,
+!   HeatPump DX Heating Coil,!- Name
+!   ,                        !- Availability Schedule Name
+!   ,                        !- Rated Total Heating Capacity {W}
+!   2.75,                    !- Rated COP {W/W}
+!   ,                        !- Rated Air Flow Rate {m3/s}
+!   ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+!   ,                        !- Air Inlet Node Name
+!   ,                        !- Air Outlet Node Name
+!   HPHeatingCAPFTemp,       !- Total Heating Capacity Function of Temperature Curve Name
+!   HPHeatingCAPFFF,         !- Total Heating Capacity Function of Flow Fraction Curve Name
+!   HPHeatingEIRFTemp,       !- Energy Input Ratio Function of Temperature Curve Name
+!   HPHeatingCAPFFF,         !- Energy Input Ratio Function of Flow Fraction Curve Name
+!   HPHeatPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+!   ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name
+!   ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+!   ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
+!   ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
+!   ,                        !- Crankcase Heater Capacity {W}
+!   ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+!   ,                        !- Defrost Strategy
+!   ,                        !- Defrost Control
+!   ,                        !- Defrost Time Period Fraction
+!   ;                        !- Resistive Defrost Heater Capacity {W}
+
+  Curve:Biquadratic,
+    HPHeatingCAPFTemp,       !- Name
+    0.876825,                !- Coefficient1 Constant
+    -0.002955,               !- Coefficient2 x
+    -0.000058,               !- Coefficient3 x**2
+    0.025335,                !- Coefficient4 y
+    0.000196,                !- Coefficient5 y**2
+    -0.000043,               !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    HPHeatingEIRFTemp,       !- Name
+    0.704658,                !- Coefficient1 Constant
+    0.008767,                !- Coefficient2 x
+    0.000625,                !- Coefficient3 x**2
+    -0.009037,               !- Coefficient4 y
+    0.000738,                !- Coefficient5 y**2
+    -0.001025,               !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    HPHeatingCAPFFF,         !- Name
+    0.694045465,             !- Coefficient1 Constant
+    0.474207981,             !- Coefficient2 x
+    -0.168253446,            !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    HPHeatingEIRFFF,         !- Name
+    2.185418751,             !- Coefficient1 Constant
+    -1.942827919,            !- Coefficient2 x
+    0.757409168,             !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+! Part Load Fraction curve as a function of Part Load Ratio is default curve
+! from Table 6. BEopt AC Rated Value Inputs of NREL report NREL/TP-5500-56354
+
+  Curve:Quadratic,
+    HPHeatPLFFPLR,           !- Name
+    0.90,                    !- Coefficient1 Constant
+    0.10,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+! *******************************************************************************************
+!               End of Single Speed Heat Pump
+! *******************************************************************************************
+! *******************************************************************************************
+! *******************************************************************************************
+! *******************************************************************************************
+!               Beginning of Two Stage/Speed Heat Pump
+! *******************************************************************************************
+  ! Two Stage Heat Pump Cooling Coil Object
+!  Coil:Cooling:DX:MultiSpeed,
+!    2Stage HP DXCoil Cooling,!- Name
+!    ,                        !- Availability Schedule Name
+!    ,                        !- Air Inlet Node Name
+!    ,                        !- Air Outlet Node Name
+!    ,                        !- Condenser Air Inlet Node Name
+!    AirCooled,               !- Condenser Type
+!    ,                        !- Supply Water Storage Tank Name
+!    ,                        !- Condensate Collection Water Storage Tank Name
+!    ,                        !- Apply Part Load Fraction to Speeds Greater than 1
+!    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+!    ,                        !- Crankcase Heater Capacity {W}
+!    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+!    ,                        !- Basin Heater Capacity {W/K}
+!    ,                        !- Basin Heater Setpoint Temperature {C}
+!    ,                        !- Basin Heater Operating Schedule Name
+!    Electricity,             !- Fuel Type
+!    ,                        !- Number of Speeds
+!    ,                        !- Speed 1 Rated Total Cooling Capacity {W}
+!    ,                        !- Speed 1 Rated Sensible Heat Ratio
+!    ,                        !- Speed 1 Rated COP {W/W}
+!    ,                        !- Speed 1 Rated Air Flow Rate {m3/s}
+!    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+!    HPHighStageCoolingCAPFTemp, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+!    HPHighStageCoolingCAPFFF,   !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
+!    HPHighStageCoolingEIRFTemp, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+!    HPHighStageCoolingEIRFFF,   !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name
+!    HP2StageCoolingPLFFPLR,     !- Speed 1 Part Load Fraction Correlation Curve Name
+!    ,                        !- Speed 1 Nominal Time for Condensate Removal to Begin {s}
+!    ,                        !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+!    ,                        !- Speed 1 Maximum Cycling Rate {cycles/hr}
+!    ,                        !- Speed 1 Latent Capacity Time Constant {s}
+!    ,                        !- Speed 1 Rated Waste Heat Fraction of Power Input {dimensionless}
+!    ,                        !- Speed 1 Waste Heat Function of Temperature Curve Name
+!    ,                        !- Speed 1 Evaporative Condenser Effectiveness {dimensionless}
+!    ,                        !- Speed 1 Evaporative Condenser Air Flow Rate {m3/s}
+!    ,                        !- Speed 1 Rated Evaporative Condenser Pump Power Consumption {W}
+!    ,                        !- Speed 2 Rated Total Cooling Capacity {W}
+!    ,                        !- Speed 2 Rated Sensible Heat Ratio
+!    ,                        !- Speed 2 Rated COP {W/W}
+!    ,                        !- Speed 2 Rated Air Flow Rate {m3/s}
+!    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+!    HPLowStageCoolingCAPFTemp, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+!    HPLowStageCoolingCAPFFF,   !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
+!    HPLowStageCoolingEIRFTemp, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+!    HPLowStageCoolingEIRFFF,   !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name
+!    HP2StageCoolingPLFFPLR,    !- Speed 2 Part Load Fraction Correlation Curve Name
+!    ,                        !- Speed 2 Nominal Time for Condensate Removal to Begin {s}
+!    ,                        !- Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}
+!    ,                        !- Speed 2 Maximum Cycling Rate {cycles/hr}
+!    ,                        !- Speed 2 Latent Capacity Time Constant {s}
+!    ,                        !- Speed 2 Rated Waste Heat Fraction of Power Input {dimensionless}
+!    ,                        !- Speed 2 Waste Heat Function of Temperature Curve Name
+!    ,                        !- Speed 2 Evaporative Condenser Effectiveness {dimensionless}
+!    ,                        !- Speed 2 Evaporative Condenser Air Flow Rate {m3/s}
+!    ;                        !- Speed 2 Rated Evaporative Condenser Pump Power Consumption {W}
+! **************** Low Speed Cooling *********
+
+  Curve:Biquadratic,
+    HPLowStageCoolingCAPFTemp,  !- Name
+    1.658788,                !- Coefficient1 Constant
+    -0.083453,               !- Coefficient2 x
+    0.003424,                !- Coefficient3 x**2
+    0.002433,                !- Coefficient4 y
+    -0.000045,               !- Coefficient5 y**2
+    -0.000534,               !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    HPLowStageCoolingEIRFTemp,  !- Name
+    -0.582916,               !- Coefficient1 Constant
+    0.158101,                !- Coefficient2 x
+    -0.004398,               !- Coefficient3 x**2
+    -0.020335,               !- Coefficient4 y
+    0.00108,                 !- Coefficient5 y**2
+    -0.00064,                !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    HPLowStageCoolingCAPFFF, !- Name
+    0.655239515,             !- Coefficient1 Constant
+    0.511655216,             !- Coefficient2 x
+    -0.166894731,            !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    HPLowStageCoolingEIRFFF, !- Name
+    1.639108268,             !- Coefficient1 Constant
+    -0.998953996,            !- Coefficient2 x
+    0.359845728,             !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+! **************** High Speed Cooling *********
+
+  Curve:Biquadratic,
+    HPHighStageCoolingCAPFTemp,  !- Name
+    1.472738,                !- Coefficient1 Constant
+    -0.067222,               !- Coefficient2 x
+    0.00292,                 !- Coefficient3 x**2
+    0.000052,                !- Coefficient4 y
+    -0.00003,                !- Coefficient5 y**2
+    -0.000359,               !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    HPHighStageCoolingEIRFTemp,  !- Name
+    -0.488196,               !- Coefficient1 Constant
+    0.099162,                !- Coefficient2 x
+    -0.00237,                !- Coefficient3 x**2
+    0.019503,                !- Coefficient4 y
+    0.00043,                 !- Coefficient5 y**2
+    -0.001097,               !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    HPHighStageCoolingCAPFFF,!- Name
+    0.618281092,             !- Coefficient1 Constant
+    0.569060264,             !- Coefficient2 x
+    -0.187341356,            !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    HPHighStageCoolingEIRFFF,!- Name
+    1.570774717,             !- Coefficient1 Constant
+    -0.914152018,            !- Coefficient2 x
+    0.343377302,             !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+! Part Load Fraction curve as a function of Part Load Ratio is default curve
+! from Table 6. BEopt AC Rated Value Inputs of NREL report NREL/TP-5500-56354
+
+  Curve:Quadratic,
+    HP2StageCoolingPLFFPLR,  !- Name
+    0.93,                    !- Coefficient1 Constant
+    0.07,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+! Two Stage Heat Pump Heating Coil Object
+!  Coil:Heating:DX:MultiSpeed,
+!    2Stage HP DXCoil Heating,!- Name
+!    ,                        !- Availability Schedule Name
+!    ,                        !- Air Inlet Node Name
+!    ,                        !- Air Outlet Node Name
+!    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+!    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
+!    ,                        !- Crankcase Heater Capacity {W}
+!    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+!    ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name
+!    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
+!    ,                        !- Defrost Strategy
+!    ,                        !- Defrost Control
+!    ,                        !- Defrost Time Period Fraction
+!    ,                        !- Resistive Defrost Heater Capacity {W}
+!    ,                        !- Apply Part Load Fraction to Speeds Greater than 1
+!    Electricity,             !- Fuel Type
+!    ,                        !- Region number for Calculating HSPF
+!    ,                        !- Number of Speeds
+!    ,                        !- Speed 1 Rated Total Heating Capacity {W}
+!    ,                        !- Speed 1 Rated COP {W/W}
+!    ,                        !- Speed 1 Rated Air Flow Rate {m3/s}
+!    ,                        !- Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+!    HPHighStageHeatingCAPFTemp, !- Speed 1 Total Heating Capacity Function of Temperature Curve Name
+!    HPHighStageHeatingCAPFFF,   !- Speed 1 Total Heating Capacity Function of Flow Fraction Curve Name
+!    HPHighStageHeatingEIRFTemp, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+!    HPHighStageHeatingEIRFFF,   !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name
+!    HP2StageHeatingPLFFPLR,     !- Speed 1 Part Load Fraction Correlation Curve Name
+!    ,                        !- Speed 1 Rated Waste Heat Fraction of Power Input {dimensionless}
+!    ,                        !- Speed 1 Waste Heat Function of Temperature Curve Name
+!    ,                        !- Speed 2 Rated Total Heating Capacity {W}
+!    ,                        !- Speed 2 Rated COP {W/W}
+!    ,                        !- Speed 2 Rated Air Flow Rate {m3/s}
+!    ,                        !- Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+!    HPLowStageHeatingCAPFTemp, !- Speed 2 Total Heating Capacity Function of Temperature Curve Name
+!    HPLowStageHeatingCAPFFF,   !- Speed 2 Total Heating Capacity Function of Flow Fraction Curve Name
+!    HPLowStageHeatingEIRFTemp, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+!    HPLowStageHeatingEIRFFF,   !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name
+!    HP2StageHeatingPLFFPLR,    !- Speed 2 Part Load Fraction Correlation Curve Name
+!    ,                        !- Speed 2 Rated Waste Heat Fraction of Power Input {dimensionless}
+!    ;                        !- Speed 2 Waste Heat Function of Temperature Curve Name
+! *************** Low Speed Heating ************
+
+  Curve:Biquadratic,
+    HPLowStageHeatingCAPFTemp,  !- Name
+    0.84613,                 !- Coefficient1 Constant
+    -0.002279,               !- Coefficient2 x
+    -0.000047,               !- Coefficient3 x**2
+    0.026703,                !- Coefficient4 y
+    0.000201,                !- Coefficient5 y**2
+    -0.000079,               !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    HPLowStageHeatingEIRFTemp,  !- Name
+    0.551837,                !- Coefficient1 Constant
+    0.02038,                 !- Coefficient2 x
+    0.000546,                !- Coefficient3 x**2
+    -0.009638,               !- Coefficient4 y
+    0.000785,                !- Coefficient5 y**2
+    -0.00125,                !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    HPLowStageHeatingCAPFFF, !- Name
+    0.741466907,             !- Coefficient1 Constant
+    0.378645444,             !- Coefficient2 x
+    -0.119754733,            !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    HPLowStageHeatingEIRFFF, !- Name
+    2.153618211,             !- Coefficient1 Constant
+    -1.737190609,            !- Coefficient2 x
+    0.584269478,             !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+! *************** High Speed Heating ************
+
+  Curve:Biquadratic,
+    HPHighStageHeatingCAPFTemp,  !- Name
+    0.818223,                !- Coefficient1 Constant
+    0.001981,                !- Coefficient2 x
+    -0.000203,               !- Coefficient3 x**2
+    0.028703,                !- Coefficient4 y
+    0.000207,                !- Coefficient5 y**2
+    -0.000071,               !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    HPHighStageHeatingEIRFTemp,  !- Name
+    0.81584,                 !- Coefficient1 Constant
+    -0.00615,                !- Coefficient2 x
+    0.001021,                !- Coefficient3 x**2
+    -0.001301,               !- Coefficient4 y
+    0.001083,                !- Coefficient5 y**2
+    -0.001487,               !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50,                      !- Maximum Value of y
+    0,                       !- Minimum Curve Output
+    5,                       !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    HPHighStageHeatingCAPFFF,!- Name
+    0.76634609,              !- Coefficient1 Constant
+    0.32840943,              !- Coefficient2 x
+    -0.094701495,            !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Quadratic,
+    HPHighStageHeatingEIRFFF,!- Name
+    2.001041353,             !- Coefficient1 Constant
+    -1.58869128,             !- Coefficient2 x
+    0.587593517,             !- Coefficient3 x**2
+    0,                       !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    2,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+! Part Load Fraction curve as a function of Part Load Ratio is default curve
+! from Table 6. BEopt AC Rated Value Inputs of NREL report NREL/TP-5500-56354
+
+  Curve:Quadratic,
+    HP2StageHeatingPLFFPLR,  !- Name
+    0.93,                    !- Coefficient1 Constant
+    0.07,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+! *******************************************************************************************
+!               End of Two Stage/Speed Heat Pump
+! *******************************************************************************************
+! *******************************************************************************************

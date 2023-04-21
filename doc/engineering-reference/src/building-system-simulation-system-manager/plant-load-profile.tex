@@ -1,0 +1,43 @@
+\section{Plant Load Profile}\label{plant-load-profile}
+
+The LoadProfile:Plant object is used to simulate a scheduled demand profile. This can be useful when the building loads are already known. Demanded load and flow rate are schedules specified in the object definition. The load profile can specify heating and cooling loads. Cooling loads are entered as negative numbers. The actual load met is dependent on the performance of the supply loop components.
+
+The LoadProfile:Plant object must be connected on the demand side of the plant loop. If desired, multiple LoadProfile:Plant objects can be combined in series and/or parallel.
+
+\subsection{Calculation Model}\label{calculation-model}
+
+The LoadProfile:Plant object calculates the outlet water temperature based on the inlet water temperature from the plant loop and user inputs for the scheduled plant load and the requested flow rate.~ The calculation can be expressed with the equation:
+
+\begin{equation}
+{T_{out}} = {T_{in}} - \frac{{{Q_{load}}}}{{\dot m{c_p}}}
+\end{equation}
+
+where
+
+\({T_{out}}\) ~ = the outlet water temperature
+
+\({T_{in}}\) ~ = the inlet water temperature
+
+\({Q_{load}}\) ~ = the scheduled plant load
+
+\(\dot m\) ~ = the water mass flow rate
+
+\({c_p}\) ~ = the specific heat of water
+
+The user requested flow rate is not always available from the plant loop.~ The actual flow rate used in the calculation is the lesser of the user requested value and the plant available value.
+
+Note that the LoadProfile:Plant object can still request and receive flow even if the scheduled plant load is zero.~ In this case the outlet temperature will be the same as the inlet temperature.~ This allows users to drive the plant loop flow without necessarily affecting the loop temperature.
+
+For reporting purposes the energy consumption of the object is calculated using the equation:
+
+\begin{equation}
+E = {Q_{load}}\Delta t
+\end{equation}
+
+where
+
+\(E\) ~ = the energy consumption
+
+\({Q_{load}}\) ~ = the scheduled plant load
+
+\(\Delta t\) ~ = the time step interval

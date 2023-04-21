@@ -1,0 +1,20 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Zone Air Temperature
+Zone Air System Sensible Cooling Rate
+Zone Air System Sensible Heating Rate
+Heating Coil Heating Rate
+Cooling Coil Total Cooling Rate
+Cooling Coil Sensible Cooling Rate
+Mixed Air Node 1,System Node Temperature
+Main Cooling Coil 1 Outlet Node,System Node Temperature
+Main Heating Coil 1 Outlet Node,System Node Temperature
+VAV Sys 1 Outlet Node,System Node Temperature
+VAV Sys 1 Outlet Node,System Node Mass Flow Rate
+Zone Eq In Node,System Node Temperature
+Zone Eq In Node,System Node Mass Flow Rate
+Sup-PLENUM-1 Outlet Node,System Node Temperature
+Sup-PLENUM-1 Outlet Node,System Node Mass Flow Rate
+Zone Air Terminal VAV Damper Position
+0

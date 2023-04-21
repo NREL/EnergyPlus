@@ -1,0 +1,106 @@
+.TH EnergyPlus 1
+.SH NAME
+energyplus - whole building energy simulator
+.SH SYNOPSIS
+.B energyplus
+[\f[I]options\f[]] [\f[I]input-file\f[]]
+.SH DESCRIPTION
+.PP
+EnergyPlus is a whole building energy simulation program that engineers, architects, and
+researchers use to model energy and water use in buildings. Modeling the performance of a
+building with EnergyPlus enables building professionals to optimize the building design to
+use less energy and water. Each version of EnergyPlus is tested extensively before
+release.
+.PP
+EnergyPlus models heating, cooling, lighting, ventilation, other energy flows, and water
+use. EnergyPlus includes many innovative simulation capabilities: time-steps less than an
+hour, modular systems and plant integrated with heat balance-based zone simulation,
+multizone air flow, thermal comfort, water use, natural ventilation, and photovoltaic
+systems.
+.SS Using EnergyPlus
+.PP
+The \f[I]input-file\f[] is an input definition file (IDF) or input macro file (IMF).
+.PP
+If \f[I]options\f[] are specified, but no \f[I]input-file\f[] is provided, the program
+will look for 'in.idf' by default.
+.PP
+If no \f[I]options\f[] AND no \f[I]input-file\f[] are specified, EnergyPlus will default
+to its old behavior (looking for 'Energy+.idd', 'in.idf', and 'in.epw' in the current
+working directory and prefixing all outputs with 'eplus').
+.SH OPTIONS
+.TP
+.B \-a, \-\-annual
+Force annual simulation
+.RS
+.RE
+.TP
+.B \-d, \-\-output\-directory \f[I]ARG\f[]
+Output directory path (default: current directory)
+.RS
+.RE
+.TP
+.B \-D, \-\-design-day
+Force design-day-only simulation
+.RS
+.RE
+.TP
+.B \-h, \-\-help
+Display help information
+.RS
+.RE
+.TP
+.B \-i, \-\-idd \f[I]ARG\f[]
+Input data dictionary path (default: Energy+.idd in executable directory)
+.RS
+.RE
+.TP
+.B \-j, \-\-jobs \f[I]ARG\f[]
+Multi-thread with N threads; 1 thread with no arg.
+.RS
+.RE
+.TP
+.B \-m, \-\-epmacro
+Run EPMacro prior to simulation
+.RS
+.RE
+.TP
+.B \-p, \-\-output\-prefix \f[I]ARG\f[]
+Prefix for output file names (default: eplus)
+.RS
+.RE
+.TP
+.B \-r, \-\-readvars
+Run ReadVarsESO after simulation
+.RS
+.RE
+.TP
+.B \-s, \-\-output\-suffix \f[I]ARG\f[]
+Suffix style for output file names (default: L)
+   L: Legacy (e.g., eplustbl.csv)
+   C: Capital (e.g., eplusTable.csv)
+   D: Dash (e.g., eplus-table.csv)
+.RS
+.RE
+.TP
+.B \-v, \-\-version
+Display version information
+.RS
+.RE
+.TP
+.B \-w, \-\-weather \f[I]ARG\f[]
+Weather file path (default: in.epw in current directory)
+.RS
+.RE
+.TP
+.B \-x, \-\-expandobjects
+Run ExpandObjects prior to simulation
+.SH EXAMPLES
+.SS Using a custom IDD file:
+energyplus -i custom.idd -w weather.epw input.idf
+.SS Pre-processing using EPMacro and ExpandObjects:
+
+energyplus -w weather.epw -m -x input.imf
+
+.SS Forcing design-day only simulations:
+
+energyplus -D input.idf

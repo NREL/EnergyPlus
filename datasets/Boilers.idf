@@ -1,0 +1,134 @@
+!===============================================================================
+! Boilers.idf
+!
+! Performance curves for non-electric boilers
+!
+! Reference: Condensing Technology, Technical Series, Viessmann, 9446 803 - 1 GB Nov. 2004.
+!
+! The two curves below are meant to represent typical performance of non-electric boilers. These
+! curves do not represent the sharp decline in efficiency at very low load conditions.
+!
+! Consult the manufacturer for specific performance characteristics of the actual boiler
+! used in the simulation.
+! Gas-fired condensing boiler
+! Normalized boiler efficiency coefficiencts derived from two boilers;
+! One with 40C supply, 30C return and one with 75C supply, 60C return
+! Use curve below for a condensing boiler having a nominal thermal efficiency of 0.89.
+! For the curve below, specify EnteringBoiler for the Efficiency Curve Temperature Evaluation Variable
+!
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  Curve:Biquadratic,
+    CondensingBoilerEff,     !- Name
+    1.124970374,             !- Coefficient1 Constant
+    0.014963852,             !- Coefficient2 x
+    -0.02599835,             !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 y
+    -1.40464E-6,             !- Coefficient5 y**2
+    -0.00153624,             !- Coefficient6 x*y
+    0.1,                     !- Minimum Value of x
+    1.0,                     !- Maximum Value of x
+    30.0,                    !- Minimum Value of y
+    85.0;                    !- Maximum Value of y
+
+!
+! Low temperature gas-fired boilers (non-condensing)
+! Normalized boiler efficiency coefficients derived from multiple boilers with
+! different operating temperatures.
+! Use the curve below for a non-condensing boiler having a nominal thermal efficiency of 0.80.
+! For the curve below, specify LeavingBoiler for the Efficiency Curve Temperature Evaluation Variable
+!
+
+  Curve:Bicubic,
+    NonCondensingBoilerEff,  !- Name
+    1.111720116,             !- Coefficient1 Constant
+    0.078614078,             !- Coefficient2 x
+    -0.400425756,            !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 y
+    -0.000156783,            !- Coefficient5 y**2
+    0.009384599,             !- Coefficient6 x*y
+    0.234257955,             !- Coefficient7 x**3
+    1.32927E-06,             !- Coefficient8 y**3
+    -0.004446701,            !- Coefficient9 x**2*y
+    -1.22498E-05,            !- Coefficient10 x*y**2
+    0.1,                     !- Minimum Value of x
+    1.0,                     !- Maximum Value of x
+    20.0,                    !- Minimum Value of y
+    80.0;                    !- Maximum Value of y
+
+!
+!
+! The three curves below are meant to represent typical performance of constant
+! temperature non-electric non-condensing boilers. Use these curves when simulating
+! boilers where the boiler set point temperature does not change during the simulation
+! and the outlet water temperature is constant. These curves should be used with a
+! Theoretical Boiler Efficiency of 1 (i.e. normalized efficiency coefficients were derived
+! assuming the boiler thermal efficiency was 1). Lower the Theoretical Boiler Efficiency to
+! represent slightly lower efficiency boilers, the entire curve will shift downward in
+! proportion to the reduction in Theoretical Boiler Efficiency.
+!
+! Consult the manufacturer for specific performance characteristics of the actual boiler
+! used in the simulation.
+!
+! The figure below graphically illistrates the performance curves within the accuracy of
+! a text type performance graph. An older type boiler (A) has a fairly flat efficiency at
+! moderate to high part-load ratios. The efficiency for this boiler type falls off sharply
+! at lower part-load ratios. A boiler manufactured circa 1983 (B) has a higher efficiency
+! with only a moderate reduction in efficiency at lower part-load ratios. Efficiency decreases
+! slightly as the boiler part-load ratio approaches 1. The new type boilers have a nearly
+! constant efficiency curve with a slight upward bow in the middle of the part-load curve.
+!
+!            0.85|           C    C    C
+!                |   C        B   B    B        C
+!  Boiler        |      B                       B
+!  Efficiency    |  B          A   A    A       A
+!                |       A
+!                |
+!            0.65|  A
+!                ---------------------------------
+!                 0             0.5             1
+!                          Part-load Ratio
+!
+!   A = Circa1975HighTempBoiler
+!   B = Circa1983MidTempBoiler
+!   C = NewerLowTempBoiler
+!
+! Old style high temperature boiler produced around 1975. Boiler temperature at 75C.
+
+  Curve:Cubic,
+    Circa1975HighTempBoiler, !- Name
+    0.626428326,             !- Coefficient1 Constant
+    0.645643582,             !- Coefficient2 x
+    -0.77720685,             !- Coefficient3 x**2
+    0.313806701,             !- Coefficient4 x**3
+    0.1,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!
+! Newer style moderate temperature boiler produced around 1983. Lower temperature limit 40C.
+
+  Curve:Cubic,
+    Circa1983MidTempBoiler,  !- Name
+    0.751522818,             !- Coefficient1 Constant
+    0.384597789,             !- Coefficient2 x
+    -0.51156047,             !- Coefficient3 x**2
+    0.200944063,             !- Coefficient4 x**3
+    0.1,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!
+!
+! New style low temperature boiler. No low temperature limit.
+
+  Curve:Cubic,
+    NewerLowTempBoiler,      !- Name
+    0.83888652,              !- Coefficient1 Constant
+    0.132579019,             !- Coefficient2 x
+    -0.17028503,             !- Coefficient3 x**2
+    0.047468326,             !- Coefficient4 x**3
+    0.1,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+

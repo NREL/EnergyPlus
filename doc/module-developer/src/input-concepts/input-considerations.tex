@@ -1,0 +1,88 @@
+\section{Input Considerations}\label{input-considerations}
+
+The IDD/IDF concept allows the module developer much flexibility.~ Along with this flexibility comes a responsibility to the overall development of EnergyPlus. Developers must take care not to obstruct other developers with their additions or changes.~ Major changes in the IDD require collaboration among the developers (both module and interface).
+
+In many cases, the developer may be creating a new model -- a new HVAC component, for instance. Then the most straightforward approach is to create a new object class in the IDD with its own unique, self-contained input. This will seldom impact other developers.
+
+In some cases, the developer may be adding a calculation within an existing module or for an existing class of objects. This calculation may require new or different input fields. Then the developer has a number of choices. This section will present some ideas for adding to the IDD that will minimize impact to other developers.
+
+For example, consider the implementation of Other Side Coefficients (OSC) in the IDD.~ Other side coefficients are a simplification for the surface heat balance and were used mostly in BLAST 2.0 before we had interzone surfaces.~ We have carried this forward into EnergyPlus for those users that understand and can use it.~ We'll use it as an example of approaches to adding data items to the IDD.~ Moreover, we'll try to give some hints on which approaches might be used for future additions.
+
+So, you're adding something to EnergyPlus and it is part of an existing module or object class.~ What do you do with your required inputs to your model?~ There are at least four options:
+
+\begin{itemize}
+\item
+  Embed your values in a current object class definition.
+\item
+  Put something in the current definition that will trigger a ``GetInput'' for your values.
+\item
+  Put something in the current definition that will signal a ``special'' case and embed a name (of your item) in the definition (this adds 1 or 2 properties to the object).
+\item
+  Just get your input and have each of those inputs reference a named object.
+\end{itemize}
+
+For example, using the OSC option in surfaces, in the beta 2 version of EnergyPlus we had
+
+~ A8 , \textbackslash{}field Exterior environment
+
+~~~~~~ \textbackslash{}type alpha
+
+~~~~~~ \textbackslash{}note \textless{}for Interzone Surface:Adjacent surface name\textgreater{}
+
+~~~~~~ \textbackslash{}note For non-interzone surfaces enter:
+
+~~~~~~ \textbackslash{}note ExteriorEnvironment, Ground, or OtherSideCoeff
+
+~~~~~~ \textbackslash{}note OSC won't use CTFs
+
+~ N24, \textbackslash{}field User selected Constant Temperature
+
+~ N25, \textbackslash{}field Coefficient modifying the user selected constant
+
+~~~~~~~~~~~~~ temperature
+
+~ N26, \textbackslash{}field Coefficient modifying the external dry bulb temperature
+
+~ N27, \textbackslash{}field Coefficient modifying the ground temperature
+
+~ N28, \textbackslash{}field Combined convective/radiative film coefficient
+
+~~~~~~ \textbackslash{}note if = 0, use other coefficients
+
+~ N29, \textbackslash{}field Coefficient modifying the wind speed term (s/m)
+
+~ N30, \textbackslash{}field Coefficient modifying the zone air temperature part of
+
+~~~~~~~~~~~~~ the equation
+
+\textbf{1)~~}We have done option 1: embed the values in the input.~ (We have also embedded these values in each and every surface derived type (internal data structure) but that can be discussed elsewhere).
+
+When to use:~ It makes sense to embed these values when each and every object (SURFACE) needs these values (e.g.~we need to specify Vertices for Every Surface -- so these clearly should be embedded).
+
+After beta 2, the definition of Surfaces was changed. Obviously option 1 was not a good choice for the OSC data: the data would be rarely used. Our other options were:
+
+\textbf{2)~~}Obviously the ExteriorEnvironment field will remain (but its name was changed to Outside Face Environment).
+
+However, we do not want to embed the values for OtherSideCoef in the Surface items.~ So, if the ExteriorEnvironment continues to reference OtherSideCoef, we can easily trigger a ``GetInput'' for them.~ An additional object class would be necessary for this case.
+
+OtherSideCoef,~ A1, \textbackslash{}field name of OtherSideCoef,
+
+~ A2, \textbackslash{}field SurfaceName (reference to surface using OSC)
+
+~ \ldots{}.
+
+When to use:~ This option can be used for many cases.~ The same object definition will work for option 4 below.~ Obviously, if there is not a convenient trigger in SURFACE but you want to add a feature, this would let you do it without embedding it in the Surface Definition.~ If there is a trigger, such as exists with the ExteriorEnvironment, the A2 field might not be needed.~ This approach would become a bit cumbersome if you expected there to be a lot of these or if there were a one-to-many relationship (i.e.~a single set of OSCs could be used for many surfaces).~ Nevertheless, the approach provides a convenient ``data check''/cross reference that can be validated inside the code.
+
+\textbf{3)~~}We could also have the SURFACE definition reference an OSC name (in this instance).
+
+So, we'd add a field to the Surface that would be the name in the OtherSideCoef object above.~ Then, the OtherSideCoef objects wouldn't need a Surface Name. This is the most straightforward approach: including data in one object by referencing another and it was the approach chosen for the redefined Surface class.
+
+When to use:~ when there is a set of parameters that would be used extensively, then this would provide a name for those.~ If hand editing, then you only would need to change one set of these parameters rather than having to go through many.~ Of course, the OtherSideCoef object wouldn't also have to have the true numbers but could reference yet a third named object\ldots{}\ldots{} (starting to get messy).
+
+\textbf{4)~~}We could have the OtherSideCoef object as above and just ``get'' it as a matter of course.~ (e.g., in the case where we don't have a convenient trigger such as ExteriorEnvironment).
+
+When to use:~ Note that the same structure for 2 works here too.~ It's just not triggered (to get the input) by a value in the other object (SURFACE).
+
+\textbf{Summary}
+
+There are several approaches to adding items to the IDD.~ Developers need to consider impacts to other developers and users early in the implementation planning.

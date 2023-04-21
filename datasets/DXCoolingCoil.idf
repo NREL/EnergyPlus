@@ -1,0 +1,3292 @@
+!=================================================================================================================================================
+! DXCoolingCoil.idf
+!
+! This dataset includes performance curves for the object types Coil:Cooling:DX:SingleSpeed and Coil:Cooling:DX:TwoStageWithHumidityControlMode
+!
+! Reference capacity at standard rating conditions (ARI 95F (35C) OAT, 67F (19.44C) EWBT and air flow rate around 400 cfm/Ton).
+!
+! OAT  - Outdoor air dry-bulb temperature
+! EWBT - Entering air wet-bulb temeprature
+!
+! In the objects Coil:Cooling:DX:SingleSpeed and Coil:Cooling:DX:TwoStageWithHumidityControlMode below, input fields 'Availability Schedule Name',
+! 'Air Inlet Node Name' and 'Air Outlet Node Name' need to be defined by the user.  Also, the
+! 'Part Load Fraction' as a function of 'Part Load Ratio' curves (PLFFPLR) are derived by using the following correlation
+! described in InputOutput reference: PLF = 0.85 + 0.15(PLR)
+!
+! NOTE: If the rated air flow rates at ARI conditions were different from what are given at extended cooling performance data, then the flow rate
+! for which extended performance data is published is taken as the rated air flow rate.
+! Whenever the manufacturer's data was found to be inconsistent/insufficient to generate the curve fits, appropriate judgements were made to fill
+! the missing information. Also, these curve fits are good for use within the minimum and maximum limits of the independent variables
+! specified in the curves. The extrapolation of these curves can produce undesirable results. Users will have to use these curve-fits per their
+! own discretion.
+!
+!---------------------------------------------------------------------------------------------------------------------------------------
+!                                  Compressor  Nominal    Reference      Reference   Refrig        Expansion Valve Type
+! Name                               Type      Capacity   Capacity          COP       Type
+!                                              (tons)     kW (tons)
+!---------------------------------------------------------------------------------------------------------------------------------------
+! Lennox KCA060S4                   Scroll        5       18.1 (5.15)       4.07     R-410A       Balance port TXV removable head
+! Lennox KCA120S4                   Scroll        10      35.2 (10.02)      3.88     R-410A       Balance port TXV removable head
+! Lennox KCA240S4                   Scroll        20      69.94(19.9)       3.83     R-410A       Balance port TXV removable head
+! Lennox SCA060H4B                  Scroll        5       18.45(5.25)       4.48     R-410A       Thermostatic Expansion Valve
+! Lennox SCA120H4B                  Scroll        10      36.44(10.37)      4.35     R-410A       Thermostatic Expansion Valve
+! Lennox SCA240H4B                  Scroll        20      72.87(20.73)      4.26     R-410A       Thermostatic Expansion Valve
+! Lennox TCA060S2                   Scroll        5       18.45(5.25)       4.07     R-22         Balance port TXV removeable power head
+! Lennox TCA120S                    Scroll        10      37.14(10.57)      3.68     R-22         Balance port TXV removeable power head
+! Lennox TCA240S                    Scroll        20      71.17(20.25)      3.45     R-22         Balance port TXV removeable power head
+! Carrier Centurion 50PG06          Scroll        5       18.28(5.2)        4.15     R-410A       Thermostatic Expansion Valve
+! Carrier Centurion 50PG12          Scroll        10      36.79(10.47)      4.05     R-410A       Thermostatic Expansion Valve
+! Carrier Centurion 50PG24          Scroll        20      73.81(21)         3.95     R-410A       Thermostatic Expansion Valve
+! Carrier Comfort 50ES060           Scroll        5       17.5(4.98)        3.9      R-410A       Thermostatic Expansion Valve
+! Carrier Weathermaster 50HJ006     Scroll        5       18.69(5.32)       3.9      R-22         Thermostatic Expansion Valve
+! Carrier Weathermaster 50HJ012     Scroll        10      36.85(10.48)      3.71     R-22         Thermostatic Expansion Valve
+! Carrier Weathermaster 50HJ024     Scroll        20      73.52(21)         3.73     R-22         Thermostatic Expansion Valve
+! Goodman CPC060                    Scroll        5       17.43(4.96)       3.95     R-410A       Thermostatic Expansion Valve
+! York Affinity DNP060              Scroll        5       17.20(4.89)       3.88     R-22         Thermostatic Expansion Valve
+! York Affinity DNZ060              Scroll        5       17.4(4.95)        4.24     R-410A       Thermostatic Expansion Valve
+! York Lattitude SJ060              Scroll        5       17.43(4.96)       4.25     R-22         Thermostatic Expansion Valve
+! York Lattitude NM060              Scroll        5       17.10(4.65)       3.85     R-410A       Thermostatic Expansion Valve
+! York Predator ZF120               Recip         10      36.91(10.5)       4.06     R-410A       Thermostatic Expansion Valve
+! York Sunline ZR060                Scroll        5       18.69(5.32)       3.98     R-410A       Thermostatic Expansion Valve
+! York Sunline DR060                Scroll        5       17.4 (4.95)       4.05     R-22         Thermostatic Expansion Valve
+! York Sunline ZF240                Scroll        20      81.8 (23.275)     3.59     R-410A       Thermostatic Expansion Valve
+! York Sunline DJ240                Scroll        20      73.52(20.91)      4.096    R-22         Thermostatic Expansion Valve
+!----------------------------------------------------------------------------------------------------------------------------------------
+!
+!----------------------------------------------------------------------------------------------------------------------------------------
+! Manufacturer = Lennox, Model Line = KC model (Electric/Electric -- KCA060S4)
+! Reference point = 95F OAT, 67F EWBT, 2000 cfm
+! Reference Capacity = 18101.22 W (5.15 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Balance port TXV, removable head
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  Coil:Cooling:DX:SingleSpeed,
+    Lennox KCA060S4,         !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    18101.22,                !- Gross Rated Total Cooling Capacity {W}
+    0.72,                    !- Gross Rated Sensible Heat Ratio
+    4.07,                    !- Gross Rated Cooling COP {W/W}
+    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    Lennox KCA060S4 CapFT,   !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox KCA060S4 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox KCA060S4 EIRFT,   !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox KCA060S4 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox KCA060S4 PLFFPLR; !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox KCA060S4 CapFT,   !- Name
+    0.9600147,               !- Coefficient1 Constant
+    -0.0106038,              !- Coefficient2 x
+    0.0013516,               !- Coefficient3 x**2
+    0.0039357,               !- Coefficient4 y
+    -0.0000568,              !- Coefficient5 y**2
+    -0.0004915,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    29.44,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox KCA060S4 EIRFT,   !- Name
+    0.2484029,               !- Coefficient1 Constant
+    0.0610633,               !- Coefficient2 x
+    -0.0017081,              !- Coefficient3 x**2
+    -0.0102658,              !- Coefficient4 y
+    0.0007028,               !- Coefficient5 y**2
+    -0.0004237,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    29.44,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox KCA060S4 CapFFF,  !- Name
+    0.7491909,               !- Coefficient1 Constant
+    0.3721683,               !- Coefficient2 x
+    -0.1213592,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox KCA060S4 EIRFFF,  !- Name
+    1.2094575,               !- Coefficient1 Constant
+    -0.3165036,              !- Coefficient2 x
+    0.1070461,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Lennox KCA060S4 PLFFPLR, !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Lennox, Model Line = KC model (Electric/Electric -- KCA120S4) (2 Stage unit)
+! Reference point = 95F OAT, 67F EWBT, 4000 cfm
+! Reference Capacity at Stage 1    = 17193.23 W (4.89 tons)
+! Reference Capacity at Stage 1&2  = 35235.87 W (10.025 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Balance port TXV, removable head
+
+  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
+    Lennox KCA120S4,         !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    2,                       !- Number of Capacity Stages
+    0,                       !- Number of Enhanced Dehumidification Modes
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
+    Lennox KCA120S4 Stage 1, !- Normal Mode Stage 1 Coil Performance Name
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
+    Lennox KCA120S4 Stage 1&2;  !- Normal Mode Stage 1+2 Coil Performance Name
+
+! Stage 1 normal mode, 48.8% of total capacity, face-split coil, 51.2% of flow bypassed around active section of coil
+
+  CoilPerformance:DX:Cooling,
+    Lennox KCA120S4 Stage 1, !- Name
+    17193.23,                !- Gross Rated Total Cooling Capacity {W}
+    0.69,                    !- Gross Rated Sensible Heat Ratio
+    3.54,                    !- Gross Rated Cooling COP {W/W}
+    1.888,                   !- Rated Air Flow Rate {m3/s}
+    0.51,                    !- Fraction of Air Flow Bypassed Around Coil
+    Lennox KCA120S4 Stage 1 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox KCA120S4 Stage 1 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox KCA120S4 Stage 1 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox KCA120S4 Stage 1 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox KCA120S4 PLFFPLR; !- Part Load Fraction Correlation Curve Name
+
+! Stages 1 and 2 normal mode, 100% of total capacity
+
+  CoilPerformance:DX:Cooling,
+    Lennox KCA120S4 Stage 1&2,  !- Name
+    35235.87,                !- Gross Rated Total Cooling Capacity {W}
+    0.72,                    !- Gross Rated Sensible Heat Ratio
+    3.88,                    !- Gross Rated Cooling COP {W/W}
+    1.888,                   !- Rated Air Flow Rate {m3/s}
+    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
+    Lennox KCA120S4 Stage 1&2 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox KCA120S4 Stage 1&2 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox KCA120S4 Stage 1&2 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox KCA120S4 Stage 1&2 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox KCA120S4 PLFFPLR; !- Part Load Fraction Correlation Curve Name
+
+! Curve set (9 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox KCA120S4 Stage 1 CapFT,  !- Name
+    0.6383427,               !- Coefficient1 Constant
+    0.0368605,               !- Coefficient2 x
+    -0.0002156,              !- Coefficient3 x**2
+    -0.0032619,              !- Coefficient4 y
+    -0.0000414,              !- Coefficient5 y**2
+    -0.0001587,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox KCA120S4 Stage 1 EIRFT,  !- Name
+    0.6609961,               !- Coefficient1 Constant
+    -0.0173045,              !- Coefficient2 x
+    0.0003871,               !- Coefficient3 x**2
+    0.0121825,               !- Coefficient4 y
+    0.0003430,               !- Coefficient5 y**2
+    -0.0004676,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox KCA120S4 Stage 1 CapFFF,  !- Name
+    0.6422487,               !- Coefficient1 Constant
+    0.5494037,               !- Coefficient2 x
+    -0.1916525,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox KCA120S4 Stage 1 EIRFFF,  !- Name
+    1.3016695,               !- Coefficient1 Constant
+    -0.4659596,              !- Coefficient2 x
+    0.1642901,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox KCA120S4 Stage 1&2 CapFT,  !- Name
+    0.6803326,               !- Coefficient1 Constant
+    0.0268925,               !- Coefficient2 x
+    0.0001473,               !- Coefficient3 x**2
+    0.0003186,               !- Coefficient4 y
+    -0.0000584,              !- Coefficient5 y**2
+    -0.0002929,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox KCA120S4 Stage 1&2 EIRFT,  !- Name
+    0.7758738,               !- Coefficient1 Constant
+    -0.0051500,              !- Coefficient2 x
+    0.0002254,               !- Coefficient3 x**2
+    -0.0042810,              !- Coefficient4 y
+    0.0006657,               !- Coefficient5 y**2
+    -0.0006284,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox KCA120S4 Stage 1&2 CapFFF,  !- Name
+    0.6716542,               !- Coefficient1 Constant
+    0.4945968,               !- Coefficient2 x
+    -0.1662510,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox KCA120S4 Stage 1&2 EIRFFF,  !- Name
+    1.2812519,               !- Coefficient1 Constant
+    -0.4288495,              !- Coefficient2 x
+    0.1475977,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Lennox KCA120S4 PLFFPLR, !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Lennox, Model Line = KC model (Electric/Electric -- KCA240S4) (2 Stage Unit)
+! Reference point = 95F OAT, 67F EWBT, 8000 cfm
+! Reference Capacity at Satge 1   = 46951.87 W(13.36)
+! Reference Capacity at Stage 1&2 = 69944.52 W (19.9 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Balance port TXV, removable head
+
+  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
+    Lennox KCA240S4,         !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    2,                       !- Number of Capacity Stages
+    0,                       !- Number of Enhanced Dehumidification Modes
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
+    Lennox KCA240S4 Stage 1, !- Normal Mode Stage 1 Coil Performance Name
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
+    Lennox KCA240S4 Stage 1&2;  !- Normal Mode Stage 1+2 Coil Performance Name
+
+! Stage 1 normal mode, 67.1% of total capacity, face-split coil, 32.9% of flow bypassed around active section of coil
+
+  CoilPerformance:DX:Cooling,
+    Lennox KCA240S4 Stage 1, !- Name
+    46951.87,                !- Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Gross Rated Sensible Heat Ratio
+    3.74,                    !- Gross Rated Cooling COP {W/W}
+    3.776,                   !- Rated Air Flow Rate {m3/s}
+    0.33,                    !- Fraction of Air Flow Bypassed Around Coil
+    Lennox KCA240S4 Stage 1 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox KCA240S4 Stage 1 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox KCA240S4 Stage 1 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox KCA240S4 Stage 1 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox KCA240S4 PLFFPLR; !- Part Load Fraction Correlation Curve Name
+
+! Stages 1 and 2 normal mode, 100% of total capacity
+
+  CoilPerformance:DX:Cooling,
+    Lennox KCA240S4 Stage 1&2,  !- Name
+    69944.52,                !- Gross Rated Total Cooling Capacity {W}
+    0.78,                    !- Gross Rated Sensible Heat Ratio
+    3.83,                    !- Gross Rated Cooling COP {W/W}
+    3.776,                   !- Rated Air Flow Rate {m3/s}
+    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
+    Lennox KCA240S4 Stage 1&2 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox KCA240S4 Stage 1&2 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox KCA240S4 Stage 1&2 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox KCA240S4 Stage 1&2 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox KCA240S4 PLFFPLR; !- Part Load Fraction Correlation Curve Name
+
+! Curve set (9 Curves):
+!
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox KCA240S4 Stage 1 CapFT,  !- Name
+    0.6774110,               !- Coefficient1 Constant
+    0.0279341,               !- Coefficient2 x
+    0.0001421,               !- Coefficient3 x**2
+    -0.0020862,              !- Coefficient4 y
+    -0.0000337,              !- Coefficient5 y**2
+    -0.0002350,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox KCA240S4 Stage 1 EIRFT,  !- Name
+    0.7433676,               !- Coefficient1 Constant
+    -0.0189703,              !- Coefficient2 x
+    0.0003270,               !- Coefficient3 x**2
+    0.0118669,               !- Coefficient4 y
+    0.0003111,               !- Coefficient5 y**2
+    -0.0004329,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox KCA240S4 Stage 1 CapFFF,  !- Name
+    0.6631316,               !- Coefficient1 Constant
+    0.4928260,               !- Coefficient2 x
+    -0.1559576,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox KCA240S4 Stage 1 EIRFFF,  !- Name
+    1.3251503,               !- Coefficient1 Constant
+    -0.4910623,              !- Coefficient2 x
+    0.1659119,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+!
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox KCA240S4 Stage 1&2 CapFT,  !- Name
+    0.8015587,               !- Coefficient1 Constant
+    0.0136475,               !- Coefficient2 x
+    0.0005406,               !- Coefficient3 x**2
+    -0.0001875,              !- Coefficient4 y
+    -0.0000475,              !- Coefficient5 y**2
+    -0.0003036,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox KCA240S4 Stage 1&2 EIRFT,  !- Name
+    0.6483859,               !- Coefficient1 Constant
+    0.0034675,               !- Coefficient2 x
+    -0.0000671,              !- Coefficient3 x**2
+    0.0026918,               !- Coefficient4 y
+    0.0005166,               !- Coefficient5 y**2
+    -0.0006149,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox KCA240S4 Stage 1&2 CapFFF,  !- Name
+    0.6880235,               !- Coefficient1 Constant
+    0.4533082,               !- Coefficient2 x
+    -0.1413317,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox KCA240S4 Stage 1&2 EIRFFF,  !- Name
+    1.2930771,               !- Coefficient1 Constant
+    -0.4396936,              !- Coefficient2 x
+    0.1466166,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Lennox KCA240S4 PLFFPLR, !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Lennox, Model Line = SC model (Electric/Electric -- SCA060H4B)
+! Reference point = 95F OAT, 67F EWBT, 2000 cfm
+! Reference Capacity = 18452.7 W (5.25 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    Lennox SCA060H4B,        !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    18452.7,                 !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    4.48,                    !- Gross Rated Cooling COP {W/W}
+    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    Lennox SCA060H4B CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox SCA060H4B CapFFF, !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox SCA060H4B EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox SCA060H4B EIRFFF, !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox SCA060H4B PLFFPLR;!- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox SCA060H4B CapFT,  !- Name
+    1.0671319,               !- Coefficient1 Constant
+    -0.0218036,              !- Coefficient2 x
+    0.0016875,               !- Coefficient3 x**2
+    0.0054500,               !- Coefficient4 y
+    -0.0000643,              !- Coefficient5 y**2
+    -0.0005786,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox SCA060H4B EIRFT,  !- Name
+    0.4618717,               !- Coefficient1 Constant
+    0.0448432,               !- Coefficient2 x
+    -0.0012979,              !- Coefficient3 x**2
+    -0.0158459,              !- Coefficient4 y
+    0.0007680,               !- Coefficient5 y**2
+    -0.0003382,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox SCA060H4B CapFFF, !- Name
+    0.8174603,               !- Coefficient1 Constant
+    0.2420635,               !- Coefficient2 x
+    -0.0595238,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox SCA060H4B EIRFFF, !- Name
+    0.9342105,               !- Coefficient1 Constant
+    0.0986842,               !- Coefficient2 x
+    -0.0328947,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Lennox SCA060H4B PLFFPLR,!- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Lennox, Model Line = SC model (Electric/Electric -- SCA120H4B) (2 Stage Unit)
+! Reference point = 95F OAT, 67F EWBT, 4000 cfm
+! Reference Capacity at Stage 1   = 18218.38 W (5.183 tons)
+! Reference Capacity at Stage 1&2 = 36436.76 W (10.37 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
+    Lennox SCA120H4B,        !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    2,                       !- Number of Capacity Stages
+    0,                       !- Number of Enhanced Dehumidification Modes
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
+    Lennox SCA120H4B Stage 1,!- Normal Mode Stage 1 Coil Performance Name
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
+    Lennox SCA120H4B Stage 1&2;  !- Normal Mode Stage 1+2 Coil Performance Name
+
+! Stage 1 normal mode, 50% of total capacity, face-split coil, 50% of flow bypassed around active section of coil
+
+  CoilPerformance:DX:Cooling,
+    Lennox SCA120H4B Stage 1,!- Name
+    18218.38,                !- Gross Rated Total Cooling Capacity {W}
+    0.67,                    !- Gross Rated Sensible Heat Ratio
+    4.09,                    !- Gross Rated Cooling COP {W/W}
+    1.888,                   !- Rated Air Flow Rate {m3/s}
+    0.5,                     !- Fraction of Air Flow Bypassed Around Coil
+    Lennox SCA120H4B Stage 1 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox SCA120H4B Stage 1 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox SCA120H4B Stage 1 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox SCA120H4B Stage 1 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox SCA120H4B PLFFPLR;!- Part Load Fraction Correlation Curve Name
+
+! Stages 1 and 2 normal mode, 100% of total capacity
+
+  CoilPerformance:DX:Cooling,
+    Lennox SCA120H4B Stage 1&2,  !- Name
+    36436.76,                !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    4.35,                    !- Gross Rated Cooling COP {W/W}
+    1.888,                   !- Rated Air Flow Rate {m3/s}
+    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
+    Lennox SCA120H4B Stage 1&2 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox SCA120H4B Stage 1&2 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox SCA120H4B Stage 1&2 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox SCA120H4B Stage 1&2 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox SCA120H4B PLFFPLR;!- Part Load Fraction Correlation Curve Name
+
+! Curve set (9 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox SCA120H4B Stage 1 CapFT,  !- Name
+    0.8197084,               !- Coefficient1 Constant
+    0.0064733,               !- Coefficient2 x
+    0.0008546,               !- Coefficient3 x**2
+    0.0002134,               !- Coefficient4 y
+    -0.0000477,              !- Coefficient5 y**2
+    -0.0003191,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox SCA120H4B Stage 1 EIRFT,  !- Name
+    0.6505692,               !- Coefficient1 Constant
+    -0.0124024,              !- Coefficient2 x
+    0.0001183,               !- Coefficient3 x**2
+    0.0144585,               !- Coefficient4 y
+    0.0003194,               !- Coefficient5 y**2
+    -0.0005187,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox SCA120H4B Stage 1 CapFFF,  !- Name
+    0.7266881,               !- Coefficient1 Constant
+    0.3938907,               !- Coefficient2 x
+    -0.1205788,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox SCA120H4B Stage 1 EIRFFF,  !- Name
+    1.2512370,               !- Coefficient1 Constant
+    -0.3652365,              !- Coefficient2 x
+    0.1139994,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox SCA120H4B Stage 1&2 CapFT,  !- Name
+    0.9438524,               !- Coefficient1 Constant
+    -0.0094097,              !- Coefficient2 x
+    0.0013226,               !- Coefficient3 x**2
+    0.0038157,               !- Coefficient4 y
+    -0.0000608,              !- Coefficient5 y**2
+    -0.0004721,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox SCA120H4B Stage 1&2 EIRFT,  !- Name
+    0.5476528,               !- Coefficient1 Constant
+    0.0268762,               !- Coefficient2 x
+    -0.0007716,              !- Coefficient3 x**2
+    -0.0070535,              !- Coefficient4 y
+    0.0006878,               !- Coefficient5 y**2
+    -0.0005488,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox SCA120H4B Stage 1&2 CapFFF,  !- Name
+    0.7266881,               !- Coefficient1 Constant
+    0.4139871,               !- Coefficient2 x
+    -0.1406752,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox SCA120H4B Stage 1&2 EIRFFF,  !- Name
+    1.2731734,               !- Coefficient1 Constant
+    -0.4301446,              !- Coefficient2 x
+    0.1569712,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Lennox SCA120H4B PLFFPLR,!- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Lennox, Model Line = SC model (Electric/Electric -- SCA240H4B) (2 Stage Unit)
+! Reference point = 95F OAT, 67F EWBT, 8000 cfm
+! Reference Capacity at Stage 1   = 35411.61 W (10.075 tons)
+! Reference Capacity at Stage 1&2 = 72873.52 W (20.73 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
+    Lennox SCA240H4B,        !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    2,                       !- Number of Capacity Stages
+    0,                       !- Number of Enhanced Dehumidification Modes
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
+    Lennox SCA240H4B Stage 1,!- Normal Mode Stage 1 Coil Performance Name
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
+    Lennox SCA240H4B Stage 1&2;  !- Normal Mode Stage 1+2 Coil Performance Name
+
+! Stage 1 normal mode, 48.6% of total capacity, face-split coil, 51.4% of flow bypassed around active section of coil
+
+  CoilPerformance:DX:Cooling,
+    Lennox SCA240H4B Stage 1,!- Name
+    35411.61,                !- Gross Rated Total Cooling Capacity {W}
+    0.71,                    !- Gross Rated Sensible Heat Ratio
+    3.76,                    !- Gross Rated Cooling COP {W/W}
+    3.776,                   !- Rated Air Flow Rate {m3/s}
+    0.51,                    !- Fraction of Air Flow Bypassed Around Coil
+    Lennox SCA240H4B Stage 1 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox SCA240H4B Stage 1 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox SCA240H4B Stage 1 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox SCA240H4B Stage 1 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox SCA240H4B PLFFPLR;!- Part Load Fraction Correlation Curve Name
+
+! Stages 1 and 2 normal mode, 100% of total capacity
+
+  CoilPerformance:DX:Cooling,
+    Lennox SCA240H4B Stage 1&2,  !- Name
+    72873.52,                !- Gross Rated Total Cooling Capacity {W}
+    0.77,                    !- Gross Rated Sensible Heat Ratio
+    4.26,                    !- Gross Rated Cooling COP {W/W}
+    3.776,                   !- Rated Air Flow Rate {m3/s}
+    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
+    Lennox SCA240H4B Stage 1&2 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox SCA240H4B Stage 1&2 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox SCA240H4B Stage 1&2 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox SCA240H4B Stage 1&2 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox SCA240H4B PLFFPLR;!- Part Load Fraction Correlation Curve Name
+
+! Curve set (9 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox SCA240H4B Stage 1 CapFT,  !- Name
+    1.0046573,               !- Coefficient1 Constant
+    -0.0098458,              !- Coefficient2 x
+    0.0011934,               !- Coefficient3 x**2
+    -0.0002426,              !- Coefficient4 y
+    -0.0000424,              !- Coefficient5 y**2
+    -0.0002981,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox SCA240H4B Stage 1 EIRFT,  !- Name
+    0.5020269,               !- Coefficient1 Constant
+    0.0044036,               !- Coefficient2 x
+    -0.0003075,              !- Coefficient3 x**2
+    0.0120302,               !- Coefficient4 y
+    0.0003200,               !- Coefficient5 y**2
+    -0.0004203,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox SCA240H4B Stage 1 CapFFF,  !- Name
+    0.8014888,               !- Coefficient1 Constant
+    0.2708850,               !- Coefficient2 x
+    -0.0723739,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox SCA240H4B Stage 1 EIRFFF,  !- Name
+    1.1811735,               !- Coefficient1 Constant
+    -0.2541256,              !- Coefficient2 x
+    0.0729521,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox SCA240H4B Stage 1&2 CapFT,  !- Name
+    0.9947501,               !- Coefficient1 Constant
+    -0.0138816,              !- Coefficient2 x
+    0.0013836,               !- Coefficient3 x**2
+    0.0028728,               !- Coefficient4 y
+    -0.0000586,              !- Coefficient5 y**2
+    -0.0004070,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox SCA240H4B Stage 1&2 EIRFT,  !- Name
+    0.4914020,               !- Coefficient1 Constant
+    0.0298133,               !- Coefficient2 x
+    -0.0007899,              !- Coefficient3 x**2
+    -0.0052059,              !- Coefficient4 y
+    0.0006735,               !- Coefficient5 y**2
+    -0.0006127,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox SCA240H4B Stage 1&2 CapFFF,  !- Name
+    0.7729100,               !- Coefficient1 Constant
+    0.3275723,               !- Coefficient2 x
+    -0.1004823,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox SCA240H4B Stage 1&2 EIRFFF,  !- Name
+    1.1954441,               !- Coefficient1 Constant
+    -0.2809494,              !- Coefficient2 x
+    0.0855053,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Lennox SCA240H4B PLFFPLR,!- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Lennox, Model Line = TC model (Electric/Electric -- TCA060S2)
+! Reference point = 95F OAT, 67F EWBT, 2000 cfm
+! Reference Capacity = 18452.7 W (5.25 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-22
+! Expansion Valve Type = Balanced Port Thermostatic Expansion Valve, removeable power head
+
+  Coil:Cooling:DX:SingleSpeed,
+    Lennox TCA060S2,         !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    18452.7,                 !- Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Gross Rated Sensible Heat Ratio
+    4.07,                    !- Gross Rated Cooling COP {W/W}
+    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    Lennox TCA060S2 CapFT,   !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox TCA060S2 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox TCA060S2 EIRFT,   !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox TCA060S2 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox TCA060S2 PLFFPLR; !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox TCA060S2 CapFT,   !- Name
+    0.9274018,               !- Coefficient1 Constant
+    -0.0049893,              !- Coefficient2 x
+    0.0010446,               !- Coefficient3 x**2
+    0.0003500,               !- Coefficient4 y
+    -0.0000300,              !- Coefficient5 y**2
+    -0.0002957,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox TCA060S2 EIRFT,   !- Name
+    0.5480534,               !- Coefficient1 Constant
+    0.0256216,               !- Coefficient2 x
+    -0.0006559,              !- Coefficient3 x**2
+    -0.0031147,              !- Coefficient4 y
+    0.0006074,               !- Coefficient5 y**2
+    -0.0006367,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox TCA060S2 CapFFF,  !- Name
+    0.7539683,               !- Coefficient1 Constant
+    0.3650794,               !- Coefficient2 x
+    -0.1190476,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox TCA060S2 EIRFFF,  !- Name
+    1.0120192,               !- Coefficient1 Constant
+    -0.0420673,              !- Coefficient2 x
+    0.0300481,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Lennox TCA060S2 PLFFPLR, !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Lennox, Model Line = TC model (Electric/Electric -- TCA120S) (2 Stage Unit)
+! Reference point = 95F OAT, 67F EWBT, 4000 cfm
+! Reference Capacity at Satge 1   = 18276.96 W (5.2 tons)
+! Reference Capacity at Stage 1&2 = 37139.72 W(10.57 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-22
+! Expansion Valve Type = Balanced Port Thermostatic Expansion Valve, removeable power head
+
+  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
+    Lennox TCA120S,          !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    2,                       !- Number of Capacity Stages
+    0,                       !- Number of Enhanced Dehumidification Modes
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
+    Lennox TCA120S Stage 1,  !- Normal Mode Stage 1 Coil Performance Name
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
+    Lennox TCA120S Stage 1&2;!- Normal Mode Stage 1+2 Coil Performance Name
+
+! Stage 1 normal mode, 49.2% of total capacity, face-split coil, 50.8% of flow bypassed around active section of coil
+
+  CoilPerformance:DX:Cooling,
+    Lennox TCA120S Stage 1,  !- Name
+    18276.96,                !- Gross Rated Total Cooling Capacity {W}
+    0.71,                    !- Gross Rated Sensible Heat Ratio
+    3.54,                    !- Gross Rated Cooling COP {W/W}
+    1.888,                   !- Rated Air Flow Rate {m3/s}
+    0.51,                    !- Fraction of Air Flow Bypassed Around Coil
+    Lennox TCA120S Stage 1 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox TCA120S Stage 1 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox TCA120S Stage 1 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox TCA120S Stage 1 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox TCA120S PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Stages 1 and 2 normal mode, 100% of total capacity
+
+  CoilPerformance:DX:Cooling,
+    Lennox TCA120S Stage 1&2,!- Name
+    37139.72,                !- Gross Rated Total Cooling Capacity {W}
+    0.72,                    !- Gross Rated Sensible Heat Ratio
+    3.68,                    !- Gross Rated Cooling COP {W/W}
+    1.888,                   !- Rated Air Flow Rate {m3/s}
+    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
+    Lennox TCA120S Stage 1&2 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox TCA120S Stage 1&2 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox TCA120S Stage 1&2 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox TCA120S Stage 1&2 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox TCA120S PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (9 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox TCA120S Stage 1 CapFT,  !- Name
+    0.9945773,               !- Coefficient1 Constant
+    -0.0149279,              !- Coefficient2 x
+    0.0011358,               !- Coefficient3 x**2
+    0.0023510,               !- Coefficient4 y
+    -0.0001038,              !- Coefficient5 y**2
+    -0.0001298,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox TCA120S Stage 1 EIRFT,  !- Name
+    0.6121724,               !- Coefficient1 Constant
+    0.0075378,               !- Coefficient2 x
+    -0.0002892,              !- Coefficient3 x**2
+    0.0056946,               !- Coefficient4 y
+    0.0003564,               !- Coefficient5 y**2
+    -0.0004210,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox TCA120S Stage 1 CapFFF,  !- Name
+    0.7756410,               !- Coefficient1 Constant
+    0.3245192,               !- Coefficient2 x
+    -0.1001603,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox TCA120S Stage 1 EIRFFF,  !- Name
+    1.1786830,               !- Coefficient1 Constant
+    -0.2662820,              !- Coefficient2 x
+    0.0875989,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox TCA120S Stage 1&2 CapFT,  !- Name
+    1.0746975,               !- Coefficient1 Constant
+    -0.0187470,              !- Coefficient2 x
+    0.0013175,               !- Coefficient3 x**2
+    -0.0005737,              !- Coefficient4 y
+    -0.0000298,              !- Coefficient5 y**2
+    -0.0002236,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox TCA120S Stage 1&2 EIRFT,  !- Name
+    0.4749267,               !- Coefficient1 Constant
+    0.0251138,               !- Coefficient2 x
+    -0.0006690,              !- Coefficient3 x**2
+    0.0021468,               !- Coefficient4 y
+    0.0004483,               !- Coefficient5 y**2
+    -0.0004911,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox TCA120S Stage 1&2 CapFFF,  !- Name
+    0.7752366,               !- Coefficient1 Constant
+    0.3233438,               !- Coefficient2 x
+    -0.0985804,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox TCA120S Stage 1&2 EIRFFF,  !- Name
+    1.2030577,               !- Coefficient1 Constant
+    -0.3137318,              !- Coefficient2 x
+    0.1106741,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Lennox TCA120S PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Lennox, Model Line = TC model (Electric/Electric -- TCA240S) (2 Stage unit)
+! Reference point = 95F OAT, 67F EWBT, 8000 cfm
+! Reference Capacity at Stage 1   = 49207.2 W (14 tons)
+! Reference Capacity at Stage 1&2 = 71174.7 W (20.25 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-22
+! Expansion Valve Type = Balanced Port Thermostatic Expansion Valve, removeable power head
+
+  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
+    Lennox TCA240S,          !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    2,                       !- Number of Capacity Stages
+    0,                       !- Number of Enhanced Dehumidification Modes
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
+    Lennox TCA240S Stage 1,  !- Normal Mode Stage 1 Coil Performance Name
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
+    Lennox TCA240S Stage 1&2;!- Normal Mode Stage 1+2 Coil Performance Name
+
+! Stage 1 normal mode, 69% of total capacity, face-split coil, 31% of flow bypassed around active section of coil
+
+  CoilPerformance:DX:Cooling,
+    Lennox TCA240S Stage 1,  !- Name
+    49207.2,                 !- Gross Rated Total Cooling Capacity {W}
+    0.71,                    !- Gross Rated Sensible Heat Ratio
+    3.47,                    !- Gross Rated Cooling COP {W/W}
+    3.776,                   !- Rated Air Flow Rate {m3/s}
+    0.31,                    !- Fraction of Air Flow Bypassed Around Coil
+    Lennox TCA240S Stage 1 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox TCA240S Stage 1 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox TCA240S Stage 1 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox TCA240S Stage 1 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox TCA240S PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Stages 1 and 2 normal mode, 100% of total capacity
+
+  CoilPerformance:DX:Cooling,
+    Lennox TCA240S Stage 1&2,!- Name
+    71174.7,                 !- Gross Rated Total Cooling Capacity {W}
+    0.77,                    !- Gross Rated Sensible Heat Ratio
+    3.45,                    !- Gross Rated Cooling COP {W/W}
+    3.776,                   !- Rated Air Flow Rate {m3/s}
+    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
+    Lennox TCA240S Stage 1&2 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Lennox TCA240S Stage 1&2 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Lennox TCA240S Stage 1&2 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Lennox TCA240S Stage 1&2 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Lennox TCA240S PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (9 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox TCA240S Stage 1 CapFT,  !- Name
+    0.9914722,               !- Coefficient1 Constant
+    -0.0108810,              !- Coefficient2 x
+    0.0010999,               !- Coefficient3 x**2
+    -0.0007210,              !- Coefficient4 y
+    -0.0000305,              !- Coefficient5 y**2
+    -0.0001953,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox TCA240S Stage 1 EIRFT,  !- Name
+    0.5325300,               !- Coefficient1 Constant
+    0.0033859,               !- Coefficient2 x
+    -0.0001823,              !- Coefficient3 x**2
+    0.0107895,               !- Coefficient4 y
+    0.0003050,               !- Coefficient5 y**2
+    -0.0004131,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    35,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox TCA240S Stage 1 CapFFF,  !- Name
+    0.7797619,               !- Coefficient1 Constant
+    0.3244048,               !- Coefficient2 x
+    -0.1041667,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox TCA240S Stage 1 EIRFFF,  !- Name
+    1.1888341,               !- Coefficient1 Constant
+    -0.2942931,              !- Coefficient2 x
+    0.1054590,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox TCA240S Stage 1&2 CapFT,  !- Name
+    1.0116786,               !- Coefficient1 Constant
+    -0.0156968,              !- Coefficient2 x
+    0.0012604,               !- Coefficient3 x**2
+    0.0009509,               !- Coefficient4 y
+    -0.0000422,              !- Coefficient5 y**2
+    -0.0002417,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Lennox TCA240S Stage 1&2 EIRFT,  !- Name
+    0.6088217,               !- Coefficient1 Constant
+    0.0104053,               !- Coefficient2 x
+    -0.0002803,              !- Coefficient3 x**2
+    0.0009889,               !- Coefficient4 y
+    0.0004927,               !- Coefficient5 y**2
+    -0.0005063,              !- Coefficient6 x*y
+    17.22,                   !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    29.44,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox TCA240S Stage 1&2 CapFFF,  !- Name
+    0.7860082,               !- Coefficient1 Constant
+    0.3117284,               !- Coefficient2 x
+    -0.0977366,              !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Lennox TCA240S Stage 1&2 EIRFFF,  !- Name
+    1.1739773,               !- Coefficient1 Constant
+    -0.2636802,              !- Coefficient2 x
+    0.0897028,               !- Coefficient3 x**2
+    0.8,                     !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Lennox TCA240S PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Carrier, Model Line = Centurion (Electric/Electric -- 50PG06)
+! Reference point = 95F OAT, 67F EWBT, 2000 cfm
+! Reference Capacity = 18276.96 W (5.2 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    Carrier Centurion 50PG06,!- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    18276.96,                !- Gross Rated Total Cooling Capacity {W}
+    0.74,                    !- Gross Rated Sensible Heat Ratio
+    4.15,                    !- Gross Rated Cooling COP {W/W}
+    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    Carrier Centurion 50PG06 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier Centurion 50PG06 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier Centurion 50PG06 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier Centurion 50PG06 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Carrier Centurion 50PG06 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Centurion 50PG06 CapFT,  !- Name
+    0.9953455,               !- Coefficient1 Constant
+    -0.0118418,              !- Coefficient2 x
+    0.0012277,               !- Coefficient3 x**2
+    0.0030246,               !- Coefficient4 y
+    -0.0000702,              !- Coefficient5 y**2
+    -0.0003685,              !- Coefficient6 x*y
+    12.22,                   !- Minimum Value of x
+    26.67,                   !- Maximum Value of x
+    15.56,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Centurion 50PG06 EIRFT,  !- Name
+    0.3802131,               !- Coefficient1 Constant
+    0.0199468,               !- Coefficient2 x
+    -0.0006682,              !- Coefficient3 x**2
+    0.0058933,               !- Coefficient4 y
+    0.0004646,               !- Coefficient5 y**2
+    -0.0004072,              !- Coefficient6 x*y
+    12.22,                   !- Minimum Value of x
+    26.67,                   !- Maximum Value of x
+    15.56,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Centurion 50PG06 CapFFF,  !- Name
+    0.7705358,               !- Coefficient1 Constant
+    0.2848007,               !- Coefficient2 x
+    -0.0580891,              !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Centurion 50PG06 EIRFFF,  !- Name
+    1.3439758,               !- Coefficient1 Constant
+    -0.5111244,              !- Coefficient2 x
+    0.1732549,               !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Carrier Centurion 50PG06 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Carrier, Model Line = Centurion model (Electric/Electric -- 50PG12)
+! Reference point = 95F OAT, 67F EWBT, 4000 cfm
+! Reference Capacity = 36788.24 W (10.47 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    Carrier Centurion 50PG12,!- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    36788.24,                !- Gross Rated Total Cooling Capacity {W}
+    0.76,                    !- Gross Rated Sensible Heat Ratio
+    4.05,                    !- Gross Rated Cooling COP {W/W}
+    1.888,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    Carrier Centurion 50PG12 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier Centurion 50PG12 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier Centurion 50PG12 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier Centurion 50PG12 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Carrier Centurion 50PG12 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Centurion 50PG12 CapFT,  !- Name
+    1.0013476,               !- Coefficient1 Constant
+    -0.0187754,              !- Coefficient2 x
+    0.0015312,               !- Coefficient3 x**2
+    0.0054931,               !- Coefficient4 y
+    -0.0000901,              !- Coefficient5 y**2
+    -0.0004408,              !- Coefficient6 x*y
+    12.22,                   !- Minimum Value of x
+    26.67,                   !- Maximum Value of x
+    15.56,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Centurion 50PG12 EIRFT,  !- Name
+    0.3037085,               !- Coefficient1 Constant
+    0.0310288,               !- Coefficient2 x
+    -0.0009543,              !- Coefficient3 x**2
+    0.0053687,               !- Coefficient4 y
+    0.0004729,               !- Coefficient5 y**2
+    -0.0004469,              !- Coefficient6 x*y
+    12.22,                   !- Minimum Value of x
+    26.67,                   !- Maximum Value of x
+    15.56,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Centurion 50PG12 CapFFF,  !- Name
+    0.6460191,               !- Coefficient1 Constant
+    0.5455414,               !- Coefficient2 x
+    -0.1910828,              !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Centurion 50PG12 EIRFFF,  !- Name
+    1.3637624,               !- Coefficient1 Constant
+    -0.5775338,              !- Coefficient2 x
+    0.2130374,               !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Carrier Centurion 50PG12 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Carrier, Model Line = Centurion model (Electric/Electric -- 50PG24)
+! Reference point = 95F OAT, 67F EWBT, 8000 cfm
+! Reference Capacity = 73810.8 W (21 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    Carrier Centurion 50PG24,!- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    73810.8,                 !- Gross Rated Total Cooling Capacity {W}
+    0.71,                    !- Gross Rated Sensible Heat Ratio
+    3.95,                    !- Gross Rated Cooling COP {W/W}
+    3.776,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    Carrier Centurion 50PG24 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier Centurion 50PG24 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier Centurion 50PG24 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier Centurion 50PG24 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Carrier Centurion 50PG24 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Centurion 50PG24 CapFT,  !- Name
+    0.5781158,               !- Coefficient1 Constant
+    0.0405917,               !- Coefficient2 x
+    0.0000113,               !- Coefficient3 x**2
+    -0.0095022,              !- Coefficient4 y
+    0.0000001,               !- Coefficient5 y**2
+    -0.0000573,              !- Coefficient6 x*y
+    12.22,                   !- Minimum Value of x
+    26.67,                   !- Maximum Value of x
+    15.56,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Centurion 50PG24 EIRFT,  !- Name
+    0.5909553,               !- Coefficient1 Constant
+    -0.0496529,              !- Coefficient2 x
+    0.0016569,               !- Coefficient3 x**2
+    0.0397786,               !- Coefficient4 y
+    0.0003938,               !- Coefficient5 y**2
+    -0.0016575,              !- Coefficient6 x*y
+    12.22,                   !- Minimum Value of x
+    26.67,                   !- Maximum Value of x
+    15.56,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Centurion 50PG24 CapFFF,  !- Name
+    0.8328798,               !- Coefficient1 Constant
+    0.2403628,               !- Coefficient2 x
+    -0.0725624,              !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Centurion 50PG24 EIRFFF,  !- Name
+    1.0440554,               !- Coefficient1 Constant
+    -0.0701720,              !- Coefficient2 x
+    0.0258826,               !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Carrier Centurion 50PG24 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Carrier, Model Line = Comfort(Electric/Electric -- 50ES060)
+! Reference point = 95F OAT, 67F EWBT, 2000 cfm
+! Reference Capacity = 17500.95 W (4.98 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    Carrier Comfort 50ES060, !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    17500.95,                !- Gross Rated Total Cooling Capacity {W}
+    0.78,                    !- Gross Rated Sensible Heat Ratio
+    3.9,                     !- Gross Rated Cooling COP {W/W}
+    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    Carrier Comfort 50ES060 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier Comfort 50ES060 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier Comfort 50ES060 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier Comfort 50ES060 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Carrier Comfort 50ES060 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Comfort 50ES060 CapFT,  !- Name
+    1.6380187,               !- Coefficient1 Constant
+    -0.0747347,              !- Coefficient2 x
+    0.0029747,               !- Coefficient3 x**2
+    0.0015201,               !- Coefficient4 y
+    -0.0000519,              !- Coefficient5 y**2
+    -0.0004509,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Comfort 50ES060 EIRFT,  !- Name
+    -0.2209648,              !- Coefficient1 Constant
+    0.1033303,               !- Coefficient2 x
+    -0.0030061,              !- Coefficient3 x**2
+    -0.0070657,              !- Coefficient4 y
+    0.0006322,               !- Coefficient5 y**2
+    -0.0002496,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Comfort 50ES060 CapFFF,  !- Name
+    0.8185792,               !- Coefficient1 Constant
+    0.2831771,               !- Coefficient2 x
+    -0.1017563,              !- Coefficient3 x**2
+    0.875,                   !- Minimum Value of x
+    1.125;                   !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Comfort 50ES060 EIRFFF,  !- Name
+    1.0380778,               !- Coefficient1 Constant
+    -0.2013868,              !- Coefficient2 x
+    0.1633090,               !- Coefficient3 x**2
+    0.875,                   !- Minimum Value of x
+    1.125;                   !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Carrier Comfort 50ES060 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Carrier, Model Line = Weathermaster (Electric/Electric -- 50HJ006)
+! Reference point = 95F OAT, 67F EWBT, 2000 cfm
+! Reference Capacity = 18687 W (5.32 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-22
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    Carrier Weathermaster 50HJ006,  !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    18687,                   !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    3.9,                     !- Gross Rated Cooling COP {W/W}
+    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    Carrier Weathermaster 50HJ006 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier Weathermaster 50HJ006 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier Weathermaster 50HJ006 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier Weathermaster 50HJ006 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Carrier Weathermaster 50HJ006 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Weathermaster 50HJ006 CapFT,  !- Name
+    0.3116765,               !- Coefficient1 Constant
+    0.0622847,               !- Coefficient2 x
+    -0.0008633,              !- Coefficient3 x**2
+    -0.0066556,              !- Coefficient4 y
+    -0.0000462,              !- Coefficient5 y**2
+    0.0001349,               !- Coefficient6 x*y
+    16.67,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Weathermaster 50HJ006 EIRFT,  !- Name
+    1.0505234,               !- Coefficient1 Constant
+    -0.0653230,              !- Coefficient2 x
+    0.0021068,               !- Coefficient3 x**2
+    0.0235557,               !- Coefficient4 y
+    0.0004542,               !- Coefficient5 y**2
+    -0.0014092,              !- Coefficient6 x*y
+    16.67,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Weathermaster 50HJ006 CapFFF,  !- Name
+    0.6583072,               !- Coefficient1 Constant
+    0.5294956,               !- Coefficient2 x
+    -0.1869478,              !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Weathermaster 50HJ006 EIRFFF,  !- Name
+    1.3293472,               !- Coefficient1 Constant
+    -0.5218591,              !- Coefficient2 x
+    0.1918220,               !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Carrier Weathermaster 50HJ006 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Carrier, Model Line = Weathermaster model (Electric/Electric -- 50HJ012)
+! Reference point = 95F OAT, 67F EWBT, 4000 cfm
+! Reference Capacity = 36846.82 W (10.48 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-22
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    Carrier Weathermaster 50HJ012,  !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    36846.82,                !- Gross Rated Total Cooling Capacity {W}
+    0.73,                    !- Gross Rated Sensible Heat Ratio
+    3.71,                    !- Gross Rated Cooling COP {W/W}
+    1.888,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    Carrier Weathermaster 50HJ012 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier Weathermaster 50HJ012 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier Weathermaster 50HJ012 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier Weathermaster 50HJ012 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Carrier Weathermaster 50HJ012 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Weathermaster 50HJ012 CapFT,  !- Name
+    0.5878544,               !- Coefficient1 Constant
+    0.0247382,               !- Coefficient2 x
+    0.0001631,               !- Coefficient3 x**2
+    -0.0034960,              !- Coefficient4 y
+    -0.0000889,              !- Coefficient5 y**2
+    0.0001450,               !- Coefficient6 x*y
+    16.67,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Weathermaster 50HJ012 EIRFT,  !- Name
+    0.6445678,               !- Coefficient1 Constant
+    -0.0198276,              !- Coefficient2 x
+    0.0010284,               !- Coefficient3 x**2
+    0.0222812,               !- Coefficient4 y
+    0.0004996,               !- Coefficient5 y**2
+    -0.0015296,              !- Coefficient6 x*y
+    16.67,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Weathermaster 50HJ012 CapFFF,  !- Name
+    0.7232943,               !- Coefficient1 Constant
+    0.4292712,               !- Coefficient2 x
+    -0.1525863,              !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Weathermaster 50HJ012 EIRFFF,  !- Name
+    1.2158796,               !- Coefficient1 Constant
+    -0.3411366,              !- Coefficient2 x
+    0.1251095,               !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Carrier Weathermaster 50HJ012 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Carrier, Model Line = Weathermaster model (Electric/Electric -- 50HJ024)
+! Reference point = 95F OAT, 67F EWBT, 8000 cfm
+! Reference Capacity = 73517.9 W (21 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-22
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    Carrier Weathermaster 50HJ024,  !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    73517.9,                 !- Gross Rated Total Cooling Capacity {W}
+    0.76,                    !- Gross Rated Sensible Heat Ratio
+    3.73,                    !- Gross Rated Cooling COP {W/W}
+    3.776,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    Carrier Weathermaster 50HJ024 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier Weathermaster 50HJ024 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier Weathermaster 50HJ024 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier Weathermaster 50HJ024 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Carrier Weathermaster 50HJ024 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Weathermaster 50HJ024 CapFT,  !- Name
+    1.1345120,               !- Coefficient1 Constant
+    -0.0239764,              !- Coefficient2 x
+    0.0012836,               !- Coefficient3 x**2
+    0.0023642,               !- Coefficient4 y
+    -0.0000802,              !- Coefficient5 y**2
+    -0.0001980,              !- Coefficient6 x*y
+    12.22,                   !- Minimum Value of x
+    26.67,                   !- Maximum Value of x
+    15.56,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Carrier Weathermaster 50HJ024 EIRFT,  !- Name
+    0.3439210,               !- Coefficient1 Constant
+    0.0215041,               !- Coefficient2 x
+    -0.0006539,              !- Coefficient3 x**2
+    0.0073217,               !- Coefficient4 y
+    0.0003160,               !- Coefficient5 y**2
+    -0.0002297,              !- Coefficient6 x*y
+    12.22,                   !- Minimum Value of x
+    26.67,                   !- Maximum Value of x
+    15.56,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Weathermaster 50HJ024 CapFFF,  !- Name
+    0.7578828,               !- Coefficient1 Constant
+    0.3524189,               !- Coefficient2 x
+    -0.1092772,              !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Carrier Weathermaster 50HJ024 EIRFFF,  !- Name
+    1.2167653,               !- Coefficient1 Constant
+    -0.3411749,              !- Coefficient2 x
+    0.1233570,               !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Carrier Weathermaster 50HJ024 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = Goodman, Model Line = Air conditioners(CPC060)
+! Reference point = 95F OAT, 67F EWBT, 2000 cfm
+! Reference Capacity = 17427.55 W (4.96 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    Goodman CPC060,          !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    17427.55,                !- Gross Rated Total Cooling Capacity {W}
+    0.72,                    !- Gross Rated Sensible Heat Ratio
+    3.95,                    !- Gross Rated Cooling COP {W/W}
+    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    Goodman CPC060 CapFT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Goodman CPC060 CapFFF,   !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Goodman CPC060 EIRFT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Goodman CPC060 EIRFFF,   !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Goodman CPC060 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Goodman CPC060 CapFT,    !- Name
+    1.3045870,               !- Coefficient1 Constant
+    -0.0618386,              !- Coefficient2 x
+    0.0024674,               !- Coefficient3 x**2
+    0.0081572,               !- Coefficient4 y
+    -0.0001826,              !- Coefficient5 y**2
+    -0.0001610,              !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    Goodman CPC060 EIRFT,    !- Name
+    0.1618862,               !- Coefficient1 Constant
+    0.0531671,               !- Coefficient2 x
+    -0.0015621,              !- Coefficient3 x**2
+    0.0077612,               !- Coefficient4 y
+    0.0001864,               !- Coefficient5 y**2
+    -0.0001388,              !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    21.67,                   !- Maximum Value of x
+    18.33,                   !- Minimum Value of y
+    46.11,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Goodman CPC060 CapFFF,   !- Name
+    -0.9361345,              !- Coefficient1 Constant
+    3.4420168,               !- Coefficient2 x
+    -1.5058824,              !- Coefficient3 x**2
+    0.875,                   !- Minimum Value of x
+    1.125;                   !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    Goodman CPC060 EIRFFF,   !- Name
+    2.2905751,               !- Coefficient1 Constant
+    -2.2915498,              !- Coefficient2 x
+    1.0009747,               !- Coefficient3 x**2
+    0.875,                   !- Minimum Value of x
+    1.125;                   !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    Goodman CPC060 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = York, Model Line = Affinity (DNP060)
+! Reference point = 95F OAT, 67F EWBT, 1800 cfm
+! Reference Capacity = 17200 W (4.89 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-22
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    York Affinity DNP060,    !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    17200,                   !- Gross Rated Total Cooling Capacity {W}
+    0.71,                    !- Gross Rated Sensible Heat Ratio
+    3.88,                    !- Gross Rated Cooling COP {W/W}
+    0.8496,                  !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    York Affinity DNP060 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    York Affinity DNP060 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    York Affinity DNP060 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    York Affinity DNP060 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    York Affinity DNP060 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Affinity DNP060 CapFT,  !- Name
+    0.9829911,               !- Coefficient1 Constant
+    -0.0197231,              !- Coefficient2 x
+    0.0016341,               !- Coefficient3 x**2
+    0.0058106,               !- Coefficient4 y
+    -0.0000309,              !- Coefficient5 y**2
+    -0.0005776,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Affinity DNP060 EIRFT,  !- Name
+    0.2246908,               !- Coefficient1 Constant
+    0.0390385,               !- Coefficient2 x
+    -0.0010832,              !- Coefficient3 x**2
+    0.0080036,               !- Coefficient4 y
+    0.0003449,               !- Coefficient5 y**2
+    -0.0004327,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Affinity DNP060 CapFFF,  !- Name
+    0.9268752,               !- Coefficient1 Constant
+    0.0902018,               !- Coefficient2 x
+    -0.0175149,              !- Coefficient3 x**2
+    0.833,                   !- Minimum Value of x
+    1.167;                   !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Affinity DNP060 EIRFFF,  !- Name
+    2.0004106,               !- Coefficient1 Constant
+    -2.4070885,              !- Coefficient2 x
+    1.3922562,               !- Coefficient3 x**2
+    0.833,                   !- Minimum Value of x
+    1.167;                   !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    York Affinity DNP060 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = York, Model Line = Affinity (DNZ060)
+! Reference point = 95F OAT, 67F EWBT, 1750 cfm
+! Reference Capacity = 17395.3 W (4.95 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    York Affinity DNZ060,    !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    17395.3,                 !- Gross Rated Total Cooling Capacity {W}
+    0.68,                    !- Gross Rated Sensible Heat Ratio
+    4.24,                    !- Gross Rated Cooling COP {W/W}
+    0.826,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    York Affinity DNZ060 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    York Affinity DNZ060 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    York Affinity DNZ060 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    York Affinity DNZ060 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    York Affinity DNZ060 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Affinity DNZ060 CapFT,  !- Name
+    1.2343140,               !- Coefficient1 Constant
+    -0.0398816,              !- Coefficient2 x
+    0.0019354,               !- Coefficient3 x**2
+    0.0062114,               !- Coefficient4 y
+    -0.0001247,              !- Coefficient5 y**2
+    -0.0003619,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Affinity DNZ060 EIRFT,  !- Name
+    -0.1272387,              !- Coefficient1 Constant
+    0.0848124,               !- Coefficient2 x
+    -0.0021062,              !- Coefficient3 x**2
+    -0.0085792,              !- Coefficient4 y
+    0.0007783,               !- Coefficient5 y**2
+    -0.0005585,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Affinity DNZ060 CapFFF,  !- Name
+    1.2527302,               !- Coefficient1 Constant
+    -0.7182445,              !- Coefficient2 x
+    0.4623738,               !- Coefficient3 x**2
+    0.714,                   !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Affinity DNZ060 EIRFFF,  !- Name
+    0.6529892,               !- Coefficient1 Constant
+    0.8193151,               !- Coefficient2 x
+    -0.4617716,              !- Coefficient3 x**2
+    0.714,                   !- Minimum Value of x
+    1.2;                     !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    York Affinity DNZ060 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = York, Model Line = Lattitude (SJ060)
+! Reference point = 95F OAT, 67F EWBT, 2000 cfm
+! Reference Capacity = 17427.55 W (4.96 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-22
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    York Lattitude SJ060,    !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    17427.55,                !- Gross Rated Total Cooling Capacity {W}
+    0.70,                    !- Gross Rated Sensible Heat Ratio
+    4.25,                    !- Gross Rated Cooling COP {W/W}
+    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    York Lattitude SJ060 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    York Lattitude SJ060 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    York Lattitude SJ060 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    York Lattitude SJ060 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    York Lattitude SJ060 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Lattitude SJ060 CapFT,  !- Name
+    0.8277321,               !- Coefficient1 Constant
+    -0.0496772,              !- Coefficient2 x
+    0.0021600,               !- Coefficient3 x**2
+    0.0350767,               !- Coefficient4 y
+    -0.0004860,              !- Coefficient5 y**2
+    -0.0004331,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Lattitude SJ060 EIRFT,  !- Name
+    0.1643011,               !- Coefficient1 Constant
+    0.0818978,               !- Coefficient2 x
+    -0.0021640,              !- Coefficient3 x**2
+    -0.0183702,              !- Coefficient4 y
+    0.0007849,               !- Coefficient5 y**2
+    -0.0003855,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Lattitude SJ060 CapFFF,  !- Name
+    1.3022329,               !- Coefficient1 Constant
+    -0.7346939,              !- Coefficient2 x
+    0.4379352,               !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Lattitude SJ060 EIRFFF,  !- Name
+    0.7757255,               !- Coefficient1 Constant
+    0.5279901,               !- Coefficient2 x
+    -0.3030465,              !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    York Lattitude SJ060 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = York, Model Line = Lattitude (NM060)
+! Reference point = 95F OAT, 67F EWBT, 1700 cfm
+! Reference Capacity = 17100 W (4.65 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    York Lattitude NM060,    !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    17100,                   !- Gross Rated Total Cooling Capacity {W}
+    0.70,                    !- Gross Rated Sensible Heat Ratio
+    3.85,                    !- Gross Rated Cooling COP {W/W}
+    0.8024,                  !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    York Lattitude NM060 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    York Lattitude NM060 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    York Lattitude NM060 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    York Lattitude NM060 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    York Lattitude NM060 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Lattitude NM060 CapFT,  !- Name
+    1.1028912,               !- Coefficient1 Constant
+    -0.0119627,              !- Coefficient2 x
+    0.0014640,               !- Coefficient3 x**2
+    -0.0041312,              !- Coefficient4 y
+    -0.0000388,              !- Coefficient5 y**2
+    -0.0003520,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Lattitude NM060 EIRFT,  !- Name
+    0.0281200,               !- Coefficient1 Constant
+    0.0456536,               !- Coefficient2 x
+    -0.0006039,              !- Coefficient3 x**2
+    0.0145030,               !- Coefficient4 y
+    0.0006477,               !- Coefficient5 y**2
+    -0.0014811,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Lattitude NM060 CapFFF,  !- Name
+    0.7060647,               !- Coefficient1 Constant
+    0.3967112,               !- Coefficient2 x
+    -0.1059134,              !- Coefficient3 x**2
+    0.824,                   !- Minimum Value of x
+    1.47;                    !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Lattitude NM060 EIRFFF,  !- Name
+    0.4662994,               !- Coefficient1 Constant
+    0.2484568,               !- Coefficient2 x
+    -0.0381443,              !- Coefficient3 x**2
+    0.824,                   !- Minimum Value of x
+    1.47;                    !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    York Lattitude NM060 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = York, Model Line = Predator (ZF120)
+! Reference point = 95F OAT, 67F EWBT, 8000 cfm
+! Reference Capacity = 36905.4 W (10.5 tons)
+! Compressor Type = Reciprocating
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    York Predator ZF120,     !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    36905.4,                 !- Gross Rated Total Cooling Capacity {W}
+    0.734,                   !- Gross Rated Sensible Heat Ratio
+    4.06,                    !- Gross Rated Cooling COP {W/W}
+    1.888,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    York Predator ZF120 CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    York Predator ZF120 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    York Predator ZF120 EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    York Predator ZF120 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    York Predator ZF120 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Predator ZF120 CapFT,  !- Name
+    1.2083456,               !- Coefficient1 Constant
+    -0.0287633,              !- Coefficient2 x
+    0.0022322,               !- Coefficient3 x**2
+    0.0019731,               !- Coefficient4 y
+    -0.0000541,              !- Coefficient5 y**2
+    -0.0007392,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Predator ZF120 EIRFT,  !- Name
+    0.4822073,               !- Coefficient1 Constant
+    0.0401530,               !- Coefficient2 x
+    -0.0015820,              !- Coefficient3 x**2
+    -0.0116025,              !- Coefficient4 y
+    0.0006758,               !- Coefficient5 y**2
+    -0.0001198,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Predator ZF120 CapFFF,  !- Name
+    0.6735828,               !- Coefficient1 Constant
+    0.4697959,               !- Coefficient2 x
+    -0.1469388,              !- Coefficient3 x**2
+    0.625,                   !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Predator ZF120 EIRFFF,  !- Name
+    1.3074459,               !- Coefficient1 Constant
+    -0.4421330,              !- Coefficient2 x
+    0.1377204,               !- Coefficient3 x**2
+    0.625,                   !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    York Predator ZF120 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = York, Model Line = Sunline (ZR060)
+! Reference point = 95F OAT, 67F EWBT, 2000 cfm
+! Reference Capacity = 18687 W (5.32 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    York Sunline ZR060,      !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    18687,                   !- Gross Rated Total Cooling Capacity {W}
+    0.685,                   !- Gross Rated Sensible Heat Ratio
+    3.98,                    !- Gross Rated Cooling COP {W/W}
+    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    York Sunline ZR060 CapFT,!- Total Cooling Capacity Function of Temperature Curve Name
+    York Sunline ZR060 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    York Sunline ZR060 EIRFT,!- Energy Input Ratio Function of Temperature Curve Name
+    York Sunline ZR060 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    York Sunline ZR060 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Sunline ZR060 CapFT,!- Name
+    1.1491510,               !- Coefficient1 Constant
+    -0.0161007,              !- Coefficient2 x
+    0.0015936,               !- Coefficient3 x**2
+    -0.0027657,              !- Coefficient4 y
+    -0.0000236,              !- Coefficient5 y**2
+    -0.0004692,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Sunline ZR060 EIRFT,!- Name
+    0.1210878,               !- Coefficient1 Constant
+    0.0560928,               !- Coefficient2 x
+    -0.0012307,              !- Coefficient3 x**2
+    0.0092825,               !- Coefficient4 y
+    0.0005999,               !- Coefficient5 y**2
+    -0.0010492,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Sunline ZR060 CapFFF,  !- Name
+    0.3148231,               !- Coefficient1 Constant
+    1.0463502,               !- Coefficient2 x
+    -0.3708016,              !- Coefficient3 x**2
+    0.625,                   !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Sunline ZR060 EIRFFF,  !- Name
+    1.9711221,               !- Coefficient1 Constant
+    -1.6315991,              !- Coefficient2 x
+    0.6688369,               !- Coefficient3 x**2
+    0.625,                   !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    York Sunline ZR060 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = York, Model Line = Sunline (DR060)
+! Reference point = 95F OAT, 67F EWBT, 2000 cfm
+! Reference Capacity = 17398.26 W (4.95 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-22
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    York Sunline DR060,      !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    17398.26,                !- Gross Rated Total Cooling Capacity {W}
+    0.69,                    !- Gross Rated Sensible Heat Ratio
+    4.05,                    !- Gross Rated Cooling COP {W/W}
+    0.944,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    York Sunline DR060 CapFT,!- Total Cooling Capacity Function of Temperature Curve Name
+    York Sunline DR060 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    York Sunline DR060 EIRFT,!- Energy Input Ratio Function of Temperature Curve Name
+    York Sunline DR060 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    York Sunline DR060 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Sunline DR060 CapFT,!- Name
+    1.4767927,               !- Coefficient1 Constant
+    -0.0614116,              !- Coefficient2 x
+    0.0027182,               !- Coefficient3 x**2
+    -0.0010838,              !- Coefficient4 y
+    -0.0000353,              !- Coefficient5 y**2
+    -0.0003531,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Sunline DR060 EIRFT,!- Name
+    -0.2918107,              !- Coefficient1 Constant
+    0.0950527,               !- Coefficient2 x
+    -0.0026508,              !- Coefficient3 x**2
+    0.0070978,               !- Coefficient4 y
+    0.0005090,               !- Coefficient5 y**2
+    -0.0006143,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Sunline DR060 CapFFF,  !- Name
+    0.9156325,               !- Coefficient1 Constant
+    0.0076960,               !- Coefficient2 x
+    0.0769601,               !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Sunline DR060 EIRFFF,  !- Name
+    0.9336732,               !- Coefficient1 Constant
+    0.2228647,               !- Coefficient2 x
+    -0.1628839,              !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    York Sunline DR060 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = York, Model Line = Sunline (ZF240)
+! Reference point = 95F OAT, 67F EWBT, 8000 cfm
+! Reference Capacity = 81807 W (23.275 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-410A
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    York Sunline ZF240,      !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    81807,                   !- Gross Rated Total Cooling Capacity {W}
+    0.70,                    !- Gross Rated Sensible Heat Ratio
+    3.59,                    !- Gross Rated Cooling COP {W/W}
+    3.776,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    York Sunline ZF240 CapFT,!- Total Cooling Capacity Function of Temperature Curve Name
+    York Sunline ZF240 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    York Sunline ZF240 EIRFT,!- Energy Input Ratio Function of Temperature Curve Name
+    York Sunline ZF240 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    York Sunline ZF240 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Sunline ZF240 CapFT,!- Name
+    1.0477109,               !- Coefficient1 Constant
+    -0.0126686,              !- Coefficient2 x
+    0.0012838,               !- Coefficient3 x**2
+    0.0012381,               !- Coefficient4 y
+    -0.0000551,              !- Coefficient5 y**2
+    -0.0003875,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Sunline ZF240 EIRFT,!- Name
+    0.4544209,               !- Coefficient1 Constant
+    0.0213827,               !- Coefficient2 x
+    -0.0007051,              !- Coefficient3 x**2
+    0.0028662,               !- Coefficient4 y
+    0.0004214,               !- Coefficient5 y**2
+    -0.0003177,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    25,                      !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Sunline ZF240 CapFFF,  !- Name
+    0.6042146,               !- Coefficient1 Constant
+    0.6557209,               !- Coefficient2 x
+    -0.2667894,              !- Coefficient3 x**2
+    0.625,                   !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Sunline ZF240 EIRFFF,  !- Name
+    1.4410769,               !- Coefficient1 Constant
+    -0.7566253,              !- Coefficient2 x
+    0.3239453,               !- Coefficient3 x**2
+    0.625,                   !- Minimum Value of x
+    1.25;                    !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    York Sunline ZF240 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------
+! Manufacturer = York, Model Line = Sunline (DJ240)
+! Reference point = 95F OAT, 67F EWBT, 8000 cfm
+! Reference Capacity = 73518 W (20.91 tons)
+! Compressor Type = Scroll
+! Refrigerant = R-22
+! Expansion Valve Type = Thermostatic Expansion Valve
+
+  Coil:Cooling:DX:SingleSpeed,
+    York Sunline DJ240,      !- Name
+    CoolingCoilAvailSched,   !- Availability Schedule Name
+    73518,                   !- Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Gross Rated Sensible Heat Ratio
+    4.096,                   !- Gross Rated Cooling COP {W/W}
+    3.776,                   !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DXCoilAirInletNode,      !- Air Inlet Node Name
+    DXCoilAirOutletNode,     !- Air Outlet Node Name
+    York Sunline DJ240 CapFT,!- Total Cooling Capacity Function of Temperature Curve Name
+    York Sunline DJ240 CapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    York Sunline DJ240 EIRFT,!- Energy Input Ratio Function of Temperature Curve Name
+    York Sunline DJ240 EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    York Sunline DJ240 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+! Curve set (5 Curves):
+! Cooling Capacity Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Sunline DJ240 CapFT,!- Name
+    1.3804089,               !- Coefficient1 Constant
+    -0.0801861,              !- Coefficient2 x
+    0.0033588,               !- Coefficient3 x**2
+    0.0118882,               !- Coefficient4 y
+    -0.0001339,              !- Coefficient5 y**2
+    -0.0005357,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! EIR Function of Temperature Curve
+! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+  Curve:Biquadratic,
+    York Sunline DJ240 EIRFT,!- Name
+    -0.1635113,              !- Coefficient1 Constant
+    0.1222397,               !- Coefficient2 x
+    -0.0037107,              !- Coefficient3 x**2
+    -0.0070372,              !- Coefficient4 y
+    0.0005052,               !- Coefficient5 y**2
+    -0.0002069,              !- Coefficient6 x*y
+    13.89,                   !- Minimum Value of x
+    22.22,                   !- Maximum Value of x
+    23.89,                   !- Minimum Value of y
+    51.67,                   !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+! Cooling Capacity Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Sunline DJ240 CapFFF,  !- Name
+    0.7894654,               !- Coefficient1 Constant
+    0.1996615,               !- Coefficient2 x
+    0.0111454,               !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.175;                   !- Maximum Value of x
+
+! EIR Function of Flow Fraction Curve
+! x = Flow Fraction
+
+  Curve:Quadratic,
+    York Sunline DJ240 EIRFFF,  !- Name
+    1.5272381,               !- Coefficient1 Constant
+    -0.9652850,              !- Coefficient2 x
+    0.4418485,               !- Coefficient3 x**2
+    0.75,                    !- Minimum Value of x
+    1.175;                   !- Maximum Value of x
+
+! Part Load Fraction Function of Part Load Ratio Curve
+! (Generic curve used and not derived from manufacturer's data)
+! x = Part Load Ratio
+
+  Curve:Quadratic,
+    York Sunline DJ240 PLFFPLR,  !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+!-------------------------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------------------------------

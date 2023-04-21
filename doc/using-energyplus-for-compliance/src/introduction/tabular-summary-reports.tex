@@ -1,0 +1,911 @@
+\section{Tabular Summary Reports}\label{tabular-summary-reports}
+
+Several predefined reports are available from the Output Table:Predefined object including the following.
+
+\begin{itemize}
+\item
+  Annual Building Utility Performance Summary
+\item
+  Input Verification and Results Summary
+\item
+  Demand End Use Components Summary
+\item
+  Source Energy End Use Components Summary
+\item
+  Climatic Data Summary
+\item
+  Equipment Summary
+\item
+  Envelope Summary
+\item
+  Surface Shadowing Summary
+\item
+  Shading Summary
+\item
+  Lighting Summary
+\item
+  HVAC Sizing Summary
+\item
+  System Summary
+\item
+  Component Sizing Summary
+\item
+  Outside Air Summary
+\item
+  Object Count Summary
+\end{itemize}
+
+In addition, specifying ``All Summary'' will enable all the reports in this category (more than are shown here).
+
+\subsection{Annual Building Utility Performance Summary}\label{annual-building-utility-performance-summary}
+
+First and foremost, the Annual Building Utility Performance Summary gives a good overview of the energy use by category:
+
+Report: \textbf{AnnualBuildingUtilityPerformanceSummary}
+
+For: \textbf{Entire Facility}
+
+Timestamp: \textbf{2009-09-17 17:30:22}
+
+Values gathered over 8760.00 hours
+
+Site and Source Energy
+
+\begin{longtable}[c]{p{1.5in}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
+\toprule 
+~ & Total Energy [GJ] & Energy Per Total Building Area [MJ/m2] & Energy Per Conditioned Building Area [MJ/m2] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Total Energy [GJ] & Energy Per Total Building Area [MJ/m2] & Energy Per Conditioned Building Area [MJ/m2] \tabularnewline
+\midrule
+\endhead
+
+Total Site Energy & 180.73 & 194.92 & 194.92 \tabularnewline
+Net Site Energy & 180.73 & 194.92 & 194.92 \tabularnewline
+Total Source Energy & 1141.64 & 1231.28 & 1231.28 \tabularnewline
+Net Source Energy & 1141.64 & 1231.28 & 1231.28 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Source to Site Energy Conversion Factors
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Source= > Site Conversion Factor \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Source= > Site Conversion Factor \tabularnewline
+\midrule
+\endhead
+
+Electricity & 0.293 \tabularnewline
+Natural Gas & 0.010 \tabularnewline
+District Cooling & 0.098 \tabularnewline
+District Heating & 0.033 \tabularnewline
+Steam & 0.250 \tabularnewline
+Gasoline & 1.050 \tabularnewline
+Diesel & 1.050 \tabularnewline
+Coal & 1.050 \tabularnewline
+Fuel Oil \#1 & 1.050 \tabularnewline
+Fuel Oil \#2 & 1.050 \tabularnewline
+Propane & 1.050 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Building Area
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Area [m2] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Area [m2] \tabularnewline
+\midrule
+\endhead
+
+Total Building Area & 927.20 \tabularnewline
+Net Conditioned Building Area & 927.20 \tabularnewline
+Unconditioned Building Area & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+End Uses
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Electricity [GJ] & Natural Gas [GJ] & Other Fuel [GJ] & District Cooling [GJ] & District Heating [GJ] & Water [m3] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Electricity [GJ] & Natural Gas [GJ] & Other Fuel [GJ] & District Cooling [GJ] & District Heating [GJ] & Water [m3] \tabularnewline
+\midrule
+\endhead
+
+Heating & 0.00 & 28.16 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & 16.56 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & 81.24 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & 47.70 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & 6.59 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & 0.48 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+~ & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+Total End Uses & 152.57 & 28.16 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\emph{Note: Natural gas appears to be the principal heating source based on energy usage.}
+
+End Uses By Subcategory
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}p{0.75in}}
+\toprule 
+~ & Subcategory & Electricity [GJ] & Natural Gas [GJ] & Other Fuel [GJ] & District Cooling [GJ] & District Heating [GJ] & Water [m3] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Subcategory & Electricity [GJ] & Natural Gas [GJ] & Other Fuel [GJ] & District Cooling [GJ] & District Heating [GJ] & Water [m3] \tabularnewline
+\midrule
+\endhead
+
+Heating & Boiler & 0.00 & 28.16 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+~ & Boiler Parasitic & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & General & 16.56 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & GeneralLights & 81.24 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & General & 47.70 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & General & 6.59 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & General & 0.48 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & General & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Normalized Metrics
+
+Utility Use Per Conditioned Floor Area
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Electricity Intensity [MJ/m2] & Natural Gas Intensity [MJ/m2] & Other Fuel Intensity [MJ/m2] & District Cooling Intensity [MJ/m2] & District Heating Intensity [MJ/m2] & Water Intensity [m3/m2] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Electricity Intensity [MJ/m2] & Natural Gas Intensity [MJ/m2] & Other Fuel Intensity [MJ/m2] & District Cooling Intensity [MJ/m2] & District Heating Intensity [MJ/m2] & Water Intensity [m3/m2] \tabularnewline
+\midrule
+\endhead
+
+Lighting & 87.62 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+HVAC & 25.49 & 30.37 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Other & 51.44 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Total & 164.55 & 30.37 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Utility Use Per Total Floor Area
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Electricity Intensity [MJ/m2] & Natural Gas Intensity [MJ/m2] & Other Fuel Intensity [MJ/m2] & District Cooling Intensity [MJ/m2] & District Heating Intensity [MJ/m2] & Water Intensity [m3/m2] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Electricity Intensity [MJ/m2] & Natural Gas Intensity [MJ/m2] & Other Fuel Intensity [MJ/m2] & District Cooling Intensity [MJ/m2] & District Heating Intensity [MJ/m2] & Water Intensity [m3/m2] \tabularnewline
+\midrule
+\endhead
+
+Lighting & 87.62 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+HVAC & 25.49 & 30.37 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Other & 51.44 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Total & 164.55 & 30.37 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Electric Loads Satisfied
+
+\begin{longtable}[c]{>{\raggedright}p{2.9in}p{1.5in}p{1.59in}}
+\toprule 
+~ & Electricity [GJ] & Percent Electricity [\%] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Electricity [GJ] & Percent Electricity [\%] \tabularnewline
+\midrule
+\endhead
+
+Fuel-Fired Power Generation & 0.00 & 0.00 \tabularnewline
+High Temperature Geothermal* & 0.00 & 0.00 \tabularnewline
+Photovoltaic Power & 0.00 & 0.00 \tabularnewline
+Wind Power* & 0.00 & 0.00 \tabularnewline
+Net Decrease in On-Site Storage & 0.00 & 0.00 \tabularnewline
+Total On-Site Electric Sources & 0.00 & 0.00 \tabularnewline
+~ & ~ & ~ \tabularnewline
+Electricity Coming From Utility & 152.57 & 100.00 \tabularnewline
+Surplus Electricity Going To Utility & 0.00 & 0.00 \tabularnewline
+Net Electricity From Utility & 152.57 & 100.00 \tabularnewline
+~ & ~ & ~ \tabularnewline
+Total On-Site and Utility Electric Sources & 152.57 & 100.00 \tabularnewline
+Total Electricity End Uses & 152.57 & 100.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+On-Site Thermal Sources
+
+\begin{longtable}[c]{@{}lll@{}}
+\toprule 
+~ & Heat [GJ] & Percent Heat [\%] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Heat [GJ] & Percent Heat [\%] \tabularnewline
+\midrule
+\endhead
+
+Water-Side Heat Recovery & 0.00 & ~ \tabularnewline
+Air to Air Heat Recovery for Cooling & 0.00 & ~ \tabularnewline
+Air to Air Heat Recovery for Heating & 0.00 & ~ \tabularnewline
+High-Temperature Geothermal* & 0.00 & ~ \tabularnewline
+Solar Water Thermal & 0.00 & ~ \tabularnewline
+Solar Air Thermal & 0.00 & ~ \tabularnewline
+Total On-Site Thermal Sources & 0.00 & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Water Source Summary
+
+\begin{longtable}[c]{>{\raggedright}p{3.0in}p{1.5in}p{1.5in}}
+\toprule 
+~ & Water [m3] & Percent Water [\%] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Water [m3] & Percent Water [\%] \tabularnewline
+\midrule
+\endhead
+
+Rainwater Collection & 0.00 & - \tabularnewline
+Condensate Collection & 0.00 & - \tabularnewline
+Groundwater Well & 0.00 & - \tabularnewline
+Total On Site Water Sources & 0.00 & - \tabularnewline
+- & - & - \tabularnewline
+Initial Storage & 0.00 & - \tabularnewline
+Final Storage & 0.00 & - \tabularnewline
+Change in Storage & 0.00 & - \tabularnewline
+- & - & - \tabularnewline
+Water Supplied by Utility & 0.00 & - \tabularnewline
+- & - & - \tabularnewline
+Total On Site, Change in Storage, and Utility Water Sources & 0.00 & - \tabularnewline
+Total Water End Uses & 0.00 & - \tabularnewline
+\bottomrule
+\end{longtable}
+
+Comfort and Setpoint Not Met Summary
+
+\begin{longtable}[c]{p{4.5in}p{1.5in}}
+\toprule 
+~ & Facility [Hours] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Facility [Hours] \tabularnewline
+\midrule
+\endhead
+
+Time Set Point Not Met During Occupied Heating & 0.00 \tabularnewline
+Time Set Point Not Met During Occupied Cooling & 213.25 \tabularnewline
+Time Not Comfortable Based on Simple ASHRAE 55-2004 & 72.50 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Note 1: An asterisk (*) indicates that the feature is not yet implemented.
+
+\subsection{Input Verification Summary}\label{input-verification-summary}
+
+The input verification summary gives a good overview of the facility being simulated:
+
+Report: \textbf{InputVerificationandResultsSummary}
+
+For: \textbf{Entire Facility}
+
+\textbf{Timestamp: 2009-09-17 17:30:22}
+
+General
+
+\begin{longtable}[c]{>{\raggedright}p{2.25in}>{\raggedright}p{3.74in}}
+\toprule 
+~ & Value \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Value \tabularnewline
+\midrule
+\endhead
+
+Program Version and Build & EnergyPlus 4.0.0.017, 9/17/2009 5:30 PM \tabularnewline
+Weather & Climate Zone 6 CA USA WYEC2-C-00006 WMO\#=722970 \tabularnewline
+Latitude [deg] & 33.90 \tabularnewline
+Longitude [deg] & -118.5 \tabularnewline
+Elevation [m] & 30.00 \tabularnewline
+Time Zone & -8.0 \tabularnewline
+North Axis Angle [deg] & 30.00 \tabularnewline
+Rotation for Appendix G [deg] & 0.00 \tabularnewline
+Hours Simulated [hrs] & 8760.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+ENVELOPE
+
+Window-Wall Ratio
+
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+~ & Total & North (315 to 45 deg) & East (45 to 135 deg) & South (135 to 225 deg) & West (225 to 315 deg) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Total & North (315 to 45 deg) & East (45 to 135 deg) & South (135 to 225 deg) & West (225 to 315 deg) \tabularnewline
+\midrule
+\endhead
+
+Gross Wall Area [m2] & 274.20 & 91.50 & 45.60 & 91.50 & 45.60 \tabularnewline
+Window Opening Area [m2] & 60.90 & 20.85 & 9.12 & 21.81 & 9.12 \tabularnewline
+Window-Wall Ratio [\%] & 22.21 & 22.79 & 20.00 & 23.84 & 20.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+Skylight-Roof Ratio
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+~ & Total \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Total \tabularnewline
+\midrule
+\endhead
+
+Gross Roof Area [m2] & 463.60 \tabularnewline
+Skylight Area [m2] & 0.00 \tabularnewline
+Skylight-Roof Ratio [\%] & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}
+
+PERFORMANCE
+
+Zone Summary
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.7in}>{\raggedright}p{0.4in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.4in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}}
+\toprule 
+~ & Area [m2] & Conditioned (Y/N) & Volume [m3] & Multipliers & Gross Wall Area [m2] & Window Glass Area [m2] & Lighting [W/m2] & People [m2] per person & Plug and Process [W/m2] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Area [m2] & Conditioned (Y/N) & Volume [m3] & Multipliers & Gross Wall Area [m2] & Window Glass Area [m2] & Lighting [W/m2] & People [m2] per person & Plug and Process [W/m2] \tabularnewline
+\midrule
+\endhead
+
+PLENUM-1 & 463.60 & Yes & 283.20 & 1.00 & 54.84 & 0.00 & 0.0000 & ~ & 0.0000 \tabularnewline
+SPACE1-1 & 99.16 & Yes & 239.25 & 1.00 & 73.20 & 21.81 & 15.9742 & 9.01 & 10.6495 \tabularnewline
+SPACE2-1 & 42.73 & Yes & 103.31 & 1.00 & 36.48 & 9.12 & 16.0056 & 8.55 & 10.6704 \tabularnewline
+SPACE3-1 & 96.48 & Yes & 239.25 & 1.00 & 73.20 & 20.85 & 16.4179 & 8.77 & 10.9453 \tabularnewline
+SPACE4-1 & 42.73 & Yes & 103.31 & 1.00 & 36.48 & 9.12 & 16.0056 & 8.55 & 10.6704 \tabularnewline
+SPACE5-1 & 182.49 & Yes & 447.68 & 1.00 & 0.00 & 0.00 & 16.2420 & 9.12 & 10.8280 \tabularnewline
+Total & 927.20 & ~ & 1416.00 & ~ & 274.20 & 60.90 & 8.0889 & 17.83 & 5.3926 \tabularnewline
+Conditioned Total & 927.20 & ~ & 1416.00 & ~ & 274.20 & 60.90 & 8.0889 & 17.83 & 5.3926 \tabularnewline
+Unconditioned Total & 0.00 & ~ & 0.00 & ~ & 0.00 & 0.00 & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\subsection{Source Energy End Use Components Summary}\label{source-energy-end-use-components-summary}
+
+The source energy end use components summary gives a good overview of the source energy consumption broken down by end uses for the facility being simulated:
+
+Report: \textbf{SourceEnergyEndUseComponentsSummary}
+
+For: \textbf{Entire Facility}
+
+Timestamp: \textbf{2011-10-07 20:53:43}
+
+\textbf{Values gathered over 8760.00 hours}
+
+\textbf{Source Energy End Use Components Summary}
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+ & Source Electricity [GJ] & Source Natural Gas [GJ] & Source Other Fuel [GJ] & Source District Cooling [GJ] & Source District Heating [GJ] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Source Electricity [GJ] & Source Natural Gas [GJ] & Source Other Fuel [GJ] & Source District Cooling [GJ] & Source District Heating [GJ] \tabularnewline
+\midrule
+\endhead
+
+Heating & 0.00 & 140.03 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & 167.65 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & 569.39 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & 325.49 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & 55.72 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & 7.57 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+ &  &  &  &  &  \tabularnewline
+Total Source Energy End Use Components & 1125.82 & 140.03 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\textbf{Normalized Metrics}
+
+\textbf{Source Energy End Use Components Per Conditioned Floor Area}
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+ & Source Electricity [MJ/m2] & Source Natural Gas [MJ/m2] & Source Other Fuel [MJ/m2] & Source District Cooling [MJ/m2] & Source District Heating [MJ/m2] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Source Electricity [MJ/m2] & Source Natural Gas [MJ/m2] & Source Other Fuel [MJ/m2] & Source District Cooling [MJ/m2] & Source District Heating [MJ/m2] \tabularnewline
+\midrule
+\endhead
+
+Heating & 0.00 & 151.02 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & 180.82 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & 614.09 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & 351.05 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & 60.10 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & 8.16 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+ &  &  &  &  &  \tabularnewline
+Total Source Energy End Use Components & 1214.22 & 151.02 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\textbf{Source Energy End Use Components Per Total Floor Area}
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+ & Source Electricity [MJ/m2] & Source Natural Gas [MJ/m2] & Source Other Fuel [MJ/m2] & Source District Cooling [MJ/m2] & Source District Heating [MJ/m2] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+ & Source Electricity [MJ/m2] & Source Natural Gas [MJ/m2] & Source Other Fuel [MJ/m2] & Source District Cooling [MJ/m2] & Source District Heating [MJ/m2] \tabularnewline
+\midrule
+\endhead
+
+Heating & 0.00 & 151.02 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & 180.82 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & 614.09 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & 351.05 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & 60.10 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & 8.16 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Refrigeration & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+ &  &  &  &  &  \tabularnewline
+Total Source Energy End Use Components & 1214.22 & 151.02 & 0.00 & 0.00 & 0.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\subsection{Other Summary Reports}\label{other-summary-reports}
+
+The Climatic Data Summary, Envelope Summary and Equipment Summary reports might be quite important to some reporting or presentation.
+
+Report: \textbf{ClimaticDataSummary}
+
+For: \textbf{Entire Facility}
+
+\textbf{Timestamp: 2009-09-17 17:30:22}
+
+SizingPeriod:DesignDay
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.2in}>{\raggedright}p{0.7in}>{\raggedright}p{0.7in}>{\raggedright}p{0.7in}>{\raggedright}p{0.7in}>{\raggedright}p{0.7in}>{\raggedright}p{0.7in}}
+\toprule 
+~ & Maximum Dry Bulb [C] & Daily Temperature Range [C] & Humidity Value & Humidity Type & Wind Speed [m/s] & Wind Direction \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Maximum Dry Bulb [C] & Daily Temperature Range [C] & Humidity Value & Humidity Type & Wind Speed [m/s] & Wind Direction \tabularnewline
+\midrule
+\endhead
+
+LOS\-\_ANGELES\-\_CA\-\_USA HEATING 99\% CONDITIONS & 7.40 & 0.00 & 7.40 & 0 & 2.80 & 70.00 \tabularnewline
+LOS\-\_ANGELES\-\_CA\-\_USA COOLING 1\% CONDITIONS DB= > MWB & 27.00 & 6.10 & 17.60 & 0 & 4.40 & 250.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Weather Statistics File
+
+\begin{longtable}[c]{>{\raggedright}p{2.15in}>{\raggedright}p{3.84in}}
+\toprule 
+~ & Value \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Value \tabularnewline
+\midrule
+\endhead
+
+Reference & CZ06RV2 \tabularnewline
+Site:Location & Climate Zone 6 CA USA \tabularnewline
+Latitude & N 33° 54' \tabularnewline
+Longitude & W 118° 30' \tabularnewline
+Time Zone & GMT -8.0 Hours \tabularnewline
+Elevation & 30m above sea level \tabularnewline
+Standard Pressure at Elevation & 100965Pa \tabularnewline
+Data Source & WYEC2-C-00006 \tabularnewline
+WMO Station & 722970 \tabularnewline
+Design Conditions & Climate Design Data 2005 ASHRAE Handbook \tabularnewline
+Heating Design Temperature 99.6\% (C) & 4.9 \tabularnewline
+Heating Design Temperature 99\% (C) & 6.2 \tabularnewline
+Cooling Design Temperature 0.4\% (C) & 33.1 \tabularnewline
+Cooling Design Temperature 1\% (C) & 30.9 \tabularnewline
+Cooling Design Temperature 2\% (C) & 29.2 \tabularnewline
+Maximum Dry Bulb Temperature (C) & 31.7° \tabularnewline
+Maximum Dry Bulb Occurs on & Sep 24 \tabularnewline
+Minimum Dry Bulb Temperature (C) & 3.5° \tabularnewline
+Minimum Dry Bulb Occurs on & Jan 8 \tabularnewline
+Maximum Dew Point Temperature (C) & 20.9 \tabularnewline
+Maximum Dew Point Occurs on & Jun 20 \tabularnewline
+Minimum Dew Point Temperature (C) & -21.7 \tabularnewline
+Minimum Dew Point Occurs on & Dec 27 \tabularnewline
+Heating Degree-Days (base 10°C) & 2 \tabularnewline
+Cooling Degree-Days (base 18°C) & 216 \tabularnewline
+Köppen Classification & Csb \tabularnewline
+Köppen Description & Mediterranean climate (dry warm summer, mild winter, lat. 30-45°N) \tabularnewline
+Köppen Recommendation & ~ \tabularnewline
+ASHRAE Climate Zone & 3C \tabularnewline
+ASHRAE Description & Warm-Marine \tabularnewline
+\bottomrule
+\end{longtable}
+
+Report: \textbf{EnvelopeSummary}
+
+For: \textbf{Entire Facility}
+
+\textbf{Timestamp: 2009-09-17 17:30:22}
+
+Opaque Exterior
+
+{\scriptsize
+\begin{longtable}[c]{p{0.66in}p{0.66in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}p{0.6in}}
+\toprule 
+~ & Construction & Reflectance & U-Factor with Film [W/m2-K] & U-Factor no Film [W/m2-K] & Gross Area [m2] & Azimuth [deg] & Tilt [deg] & Cardinal Direction \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Construction & Reflectance & U-Factor with Film [W/m2-K] & U-Factor no Film [W/m2-K] & Gross Area [m2] & Azimuth [deg] & Tilt [deg] & Cardinal Direction \tabularnewline
+\midrule
+\endhead
+
+WALL-1PF & WALL-1 & 0.22 & 0.384 & 0.408 & 18.30 & 210.00 & 90.00 & S \tabularnewline
+WALL-1PR & WALL-1 & 0.22 & 0.384 & 0.408 & 9.12 & 120.00 & 90.00 & E \tabularnewline
+WALL-1PB & WALL-1 & 0.22 & 0.384 & 0.408 & 18.30 & 30.00 & 90.00 & N \tabularnewline
+WALL-1PL & WALL-1 & 0.22 & 0.384 & 0.408 & 9.12 & 300.00 & 90.00 & W \tabularnewline
+TOP-1 & ROOF-1 & 0.35 & 0.268 & 0.282 & 463.60 & 210.00 & 0.00 & ~ \tabularnewline
+FRONT-1 & WALL-1 & 0.22 & 0.384 & 0.408 & 73.20 & 210.00 & 90.00 & S \tabularnewline
+F1-1 & FLOOR-SLAB-1 & 0.35 & 3.119 & 12.894 & 99.16 & 30.00 & 180.00 & ~ \tabularnewline
+RIGHT-1 & WALL-1 & 0.22 & 0.384 & 0.408 & 36.48 & 120.00 & 90.00 & E \tabularnewline
+F2-1 & FLOOR-SLAB-1 & 0.35 & 3.119 & 12.894 & 42.73 & 300.00 & 180.00 & ~ \tabularnewline
+BACK-1 & WALL-1 & 0.22 & 0.384 & 0.408 & 73.20 & 30.00 & 90.00 & N \tabularnewline
+F3-1 & FLOOR-SLAB-1 & 0.35 & 3.119 & 12.894 & 96.48 & 74.22 & 180.00 & ~ \tabularnewline
+LEFT-1 & WALL-1 & 0.22 & 0.384 & 0.408 & 36.48 & 300.00 & 90.00 & W \tabularnewline
+F4-1 & FLOOR-SLAB-1 & 0.35 & 3.119 & 12.894 & 42.73 & 120.00 & 180.00 & ~ \tabularnewline
+F5-1 & FLOOR-SLAB-1 & 0.35 & 3.119 & 12.894 & 182.49 & 30.00 & 180.00 & ~ \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Fenestration
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.6in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}}
+\toprule 
+~ & Construction & Area of One Opening [m2] & Area of Openings [m2] & U-Factor [W/m2-K] & SHGC & Visible Transmittance & Shade Control & Parent Surface & Azimuth [deg] & Cardinal Direction \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Construction & Area of One Opening [m2] & Area of Openings [m2] & U-Factor [W/m2-K] & SHGC & Visible Transmittance & Shade Control & Parent Surface & Azimuth [deg] & Cardinal Direction \tabularnewline
+\midrule
+\endhead
+
+WF-1 & DBL CLR 3MM/13MM AIR & 16.56 & 16.56 & 2.720 & 0.764 & 0.812 & No & FRONT-1 & 210.00 & S \tabularnewline
+DF-1 & SGL GREY 3MM & 5.25 & 5.25 & 5.894 & 0.716 & 0.611 & No & FRONT-1 & 210.00 & S \tabularnewline
+WR-1 & DBL CLR 3MM/13MM AIR & 9.12 & 9.12 & 2.720 & 0.764 & 0.812 & No & RIGHT-1 & 120.00 & E \tabularnewline
+WB-1 & DBL CLR 3MM/13MM AIR & 16.44 & 16.44 & 2.720 & 0.764 & 0.812 & No & BACK-1 & 30.00 & N \tabularnewline
+DB-1 & SGL GREY 3MM & 4.41 & 4.41 & 5.894 & 0.716 & 0.611 & No & BACK-1 & 30.00 & N \tabularnewline
+WL-1 & DBL CLR 3MM/13MM AIR & 9.12 & 9.12 & 2.720 & 0.764 & 0.812 & No & LEFT-1 & 300.00 & W \tabularnewline
+Total or Average & ~ & ~ & 60.90 & 3.22 & 0.756 & 0.780 & ~ & ~ & ~ & ~ \tabularnewline
+North Total or Average & ~ & ~ & 20.85 & 3.39 & 0.754 & 0.769 & ~ & ~ & ~ & ~ \tabularnewline
+Non-North Total or Average & ~ & ~ & 40.05 & 3.14 & 0.757 & 0.785 & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}}
+
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
+
+Report: \textbf{ShadingSummary}
+
+For: \textbf{Entire Facility}
+
+\textbf{Timestamp: 2009-09-17 17:30:22}
+
+Sunlit Fraction
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.6in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}}
+\toprule 
+~ & March 21 9am & March 21 noon & March 21 3pm & June 21 9am & June 21 noon & June 21 3pm & December 21 9am & December 21 noon & December 21 3pm \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & March 21 9am & March 21 noon & March 21 3pm & June 21 9am & June 21 noon & June 21 3pm & December 21 9am & December 21 noon & December 21 3pm \tabularnewline
+\midrule
+\endhead
+
+WF-1 & 0.00 & 0.00 & 0.26 & 0.00 & 0.00 & 0.00 & 0.00 & 0.30 & 0.74 \tabularnewline
+DF-1 & 0.75 & 0.13 & 0.59 & 0.00 & 0.00 & 0.35 & 0.92 & 0.62 & 0.94 \tabularnewline
+WR-1 & 1.00 & 1.00 & 0.00 & 1.00 & 1.00 & 0.00 & 1.00 & 1.00 & 0.00 \tabularnewline
+WB-1 & 0.00 & 0.00 & 0.00 & 1.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+DB-1 & 0.00 & 0.00 & 0.00 & 1.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+WL-1 & 0.00 & 0.00 & 1.00 & 0.00 & 0.00 & 1.00 & 0.00 & 0.00 & 1.00 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Window Control
+
+\begin{longtable}[c]{@{}llllll@{}}
+\toprule 
+~ & Name & Type & Shaded Construction & Control & Glare Control \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Name & Type & Shaded Construction & Control & Glare Control \tabularnewline
+\midrule
+\endhead
+
+None & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Report: \textbf{LightingSummary}
+
+For: \textbf{Entire Facility}
+
+\textbf{Timestamp: 2009-09-17 17:30:22}
+
+Interior Lighting
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.6in}>{\raggedright}p{0.6in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}>{\raggedright}p{0.5in}}
+\toprule 
+~ & Zone & Lighting Power Density [W/m2] & Zone Area [m2] & Total Power [W] & End Use Subcategory & Schedule Name & Average Hours/Week [hr] & Return Air Fraction & Conditioned (Y/N) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Zone & Lighting Power Density [W/m2] & Zone Area [m2] & Total Power [W] & End Use Subcategory & Schedule Name & Average Hours/Week [hr] & Return Air Fraction & Conditioned (Y/N) \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 LIGHTS 1 & SPACE1-1 & 15.9742 & 99.16 & 1584.00 & GeneralLights & LIGHTS-1 & 0.00 & 0.2000 & Y \tabularnewline
+SPACE2-1 LIGHTS 1 & SPACE2-1 & 16.0056 & 42.73 & 684.00 & GeneralLights & LIGHTS-1 & 0.00 & 0.2000 & Y \tabularnewline
+SPACE3-1 LIGHTS 1 & SPACE3-1 & 16.4179 & 96.48 & 1584.00 & GeneralLights & LIGHTS-1 & 0.00 & 0.2000 & Y \tabularnewline
+SPACE4-1 LIGHTS 1 & SPACE4-1 & 16.0056 & 42.73 & 684.00 & GeneralLights & LIGHTS-1 & 0.00 & 0.2000 & Y \tabularnewline
+SPACE5-1 LIGHTS 1 & SPACE5-1 & 16.2420 & 182.49 & 2964.00 & GeneralLights & LIGHTS-1 & 0.00 & 0.2000 & Y \tabularnewline
+Interior Lighting Total & ~ & 16.1777 & 463.60 & 7500.00 & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Daylighting
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Zone & Daylighting Type & Control Type & Fraction Controlled & Lighting Installed in Zone [W] & Lighting Controlled [W] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Zone & Daylighting Type & Control Type & Fraction Controlled & Lighting Installed in Zone [W] & Lighting Controlled [W] \tabularnewline
+\midrule
+\endhead
+
+None & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Exterior Lighting
+
+\begin{longtable}[c]{>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}}
+\toprule 
+~ & Total Watts & Astronomical Clock/Schedule & Schedule Name & Average Annual Hours/Week \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Total Watts & Astronomical Clock/Schedule & Schedule Name & Average Annual Hours/Week \tabularnewline
+\midrule
+\endhead
+
+Exterior Lighting Total & 0.00 & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}
+
+Report: \textbf{EquipmentSummary}
+
+For: \textbf{Entire Facility}
+
+\textbf{Timestamp: 2009-09-17 17:30:22}
+
+Central Plant
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
+\toprule 
+~ & Type & Nominal Capacity [W] & Nominal Efficiency [W/W] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Type & Nominal Capacity [W] & Nominal Efficiency [W/W] \tabularnewline
+\midrule
+\endhead
+
+CENTRAL CHILLER & Chiller:Electric & 25311.64 & 3.20 \tabularnewline
+CENTRAL BOILER & Boiler:HotWater & 56191.29 & 0.80 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Cooling Coils
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Type & Nominal Total Capacity [W] & Nominal Sensible Capacity [W] & Nominal Latent Capacity [W] & Nominal Sensible Heat Ratio & Nominal Efficiency [W/W] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Type & Nominal Total Capacity [W] & Nominal Sensible Capacity [W] & Nominal Latent Capacity [W] & Nominal Sensible Heat Ratio & Nominal Efficiency [W/W] \tabularnewline
+\midrule
+\endhead
+
+MAIN COOLING COIL 1 & Coil:Cooling:Water & 28159.12 & 19476.53 & 8682.60 & 0.69 & - \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Heating Coils
+
+\begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
+\toprule 
+~ & Type & Nominal Total Capacity [W] & Nominal Efficiency [W/W] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Type & Nominal Total Capacity [W] & Nominal Efficiency [W/W] \tabularnewline
+\midrule
+\endhead
+
+SPACE1-1 ZONE COIL & Coil:Heating:Water & 10384.85 & - \tabularnewline
+SPACE2-1 ZONE COIL & Coil:Heating:Water & 8470.48 & - \tabularnewline
+SPACE3-1 ZONE COIL & Coil:Heating:Water & 10477.88 & - \tabularnewline
+SPACE4-1 ZONE COIL & Coil:Heating:Water & 11334.29 & - \tabularnewline
+SPACE5-1 ZONE COIL & Coil:Heating:Water & 11391.33 & - \tabularnewline
+MAIN HEATING COIL 1 & Coil:Heating:Water & 4061.83 & - \tabularnewline
+\bottomrule
+\end{longtable}
+
+Fans
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}>{\raggedright}p{0.75in}}
+\toprule 
+~ & Type & Total Efficiency [W/W] & Delta Pressure [pa] & Max Flow Rate [m3/s] & Rated Power [W] & Motor Heat In Air Fraction & End Use \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Type & Total Efficiency [W/W] & Delta Pressure [pa] & Max Flow Rate [m3/s] & Rated Power [W] & Motor Heat In Air Fraction & End Use \tabularnewline
+\midrule
+\endhead
+
+SUPPLY FAN 1 & Fan:VariableVolume & 0.70 & 600.00 & 1.28 & 1099.23 & 1.00 & General \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Pumps
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}}
+\toprule 
+~ & Type & Control & Head [pa] & Power [W] & Motor Efficiency [W/W] \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Type & Control & Head [pa] & Power [W] & Motor Efficiency [W/W] \tabularnewline
+\midrule
+\endhead
+
+HW CIRC PUMP & Pump:VariableSpeed & INTERMITTENT & 179352.00 & 312.23 & 0.90 \tabularnewline
+CW CIRC PUMP & Pump:VariableSpeed & INTERMITTENT & 179352.00 & 231.95 & 0.90 \tabularnewline
+\bottomrule
+\end{longtable}}
+
+Service Water Heating
+
+\begin{longtable}[c]{>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}>{\raggedright}p{0.85in}}
+\toprule 
+~ & Type & Storage Volume [m3] & Input [W] & Thermal Efficiency [W/W] & Recovery Efficiency [W/W] & Energy Factor \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Type & Storage Volume [m3] & Input [W] & Thermal Efficiency [W/W] & Recovery Efficiency [W/W] & Energy Factor \tabularnewline
+\midrule
+\endhead
+
+None & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+\bottomrule
+\end{longtable}

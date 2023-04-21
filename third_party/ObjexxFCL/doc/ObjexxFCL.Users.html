@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>ObjexxFCL Users Guide</title>
+	<meta name="description" content="Objexx Fortran-C++ Library">
+	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
+	<meta name="copyright" content="Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.">
+	<link rel="icon" type="image/png" href="img/favicon.png">
+	<link rel="stylesheet" href="css/Objexx.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#CC3366" vlink="#990033" alink="#FF3366">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+	<tr>
+		<td></td>
+		<td height="70"><a href="ObjexxFCL.html"><img src="img/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
+		<td></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.2</div></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="5" height="16" valign="top" bgcolor="#EB7A87"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td height="24" colspan="5"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td height="300">&nbsp;</td>
+		<td valign="top">
+			<div id="sectionLinksTop">
+				<a href="ObjexxFCL.html">Home</a>
+			</div>
+			<div id="sectionLinks">
+				<a href="ObjexxFCL.Release.html">Release</a>
+				<a href="ObjexxFCL.Users.html">Users Guide</a>
+				<a href="ObjexxFCL.Developers.html">Developers</a>
+				<a href="ObjexxFCL.Support.html">Support</a>
+				<a href="http://objexx.com">Web</a>
+			</div>
+		</td>
+		<td></td>
+		<td width="500" valign="top">
+			<h1>Users Guide</h1>
+			<p class="body">The ObjexxFCL provides a C++ framework to support the migration of Fortran-based projects to C++. This framework includes array and string classes as well as math, i/o, and other functions and associated classes. With the proper application of the ObjexxFCL, the converted project can preserve the look and approach the performance of the original Fortran within modern, ISO/ANSI standard C++.</p>
+			<p class="body">The Users Guide contains the linked sections listed below.</p>
+			<table border="0" cellspacing="0" cellpadding="10" class="body">
+				<tr>
+					<td width="107"><a href="ObjexxFCL.Platforms.html">Platforms</a></td>
+					<td width="352"><b>ObjexxFCL supported platforms</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.Organization.html">Organization</a></td>
+					<td><b>ObjexxFCL namespaces and files</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.IndexRange.html">Index Ranges</a></td>
+					<td><b>Fortran-compatible array index ranges</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.Array.html">Array</a></td>
+					<td><b>Fortran-compatible arrays</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.MArray.html">MArray</a></td>
+					<td><b>Fortran-compatible "member" arrays</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.Cstring.html">Cstring</a></td>
+					<td><b><b>Memory-managed</b> C-style string wrapper</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.CArray.html">CArray</a></td>
+					<td><b>Memory-managed C-style array wrapper</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.CArrayP.html">CArrayP</a></td>
+					<td><b>Memory-managed C-style array wrapper/proxy</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.Vector.html">Vector2, Vector3, &amp; Vector4</a></td>
+					<td><b>Fast fixed-size vectors</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.ChunkVector.html">ChunkVector</a></td>
+					<td><b>Chunk-contiguous vector</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.byte.html">byte</a></td>
+					<td><b>Single-byte signed and unsigned integers</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.Global_IO.html">Global I/O</a></td>
+					<td><b>Fortran-like global i/o system</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.Formatted_IO.html">Formatted I/O</a></td>
+					<td><b>Fortran-like i/o using C++ streams</b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.Optional.html">Optional &amp; Required</a></td>
+					<td><b><span class="body">Optional and required argument support</span></b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.Reference.html">Reference</a></td>
+					<td><b><span class="body">Reference (POINTER) support</span></b></td>
+				</tr>
+				<tr>
+					<td><a href="ObjexxFCL.Functions.html">Functions</a></td>
+					<td><b><span class="body">Fortran intrinsics and additional functions</span></b></td>
+				</tr>
+			</table>
+		</td>
+		<td></td>
+		<td width="100%" valign="top">
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td colspan="3" height="30" valign="bottom" class="footer_text">
+			<a href="ObjexxFCL.html"><span class="footer_link">Home</span></a> |
+			<a href="ObjexxFCL.Release.html"><span class="footer_link">Release Notes</span></a> |
+			<a href="ObjexxFCL.Users.html"><span class="footer_link">Users Guide</span></a> |
+			<a href="ObjexxFCL.Developers.html"><span class="footer_link">Developers Guide</span></a> |
+			<a href="ObjexxFCL.Support.html"><span class="footer_link">Support</span></a> |
+			<a href="ObjexxFCL.License.txt"><span class="footer_link">License</span></a> |
+			<a href="http://objexx.com"><span class="footer_link">Web</span></a>
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td height="21"></td>
+		<td></td>
+		<td></td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2017 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:9px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:500px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100%; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:1px"></td>
+	</tr>
+</tbody>
+</table>
+</body>
+</html>

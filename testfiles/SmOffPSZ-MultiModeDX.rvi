@@ -1,0 +1,38 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Zone Air Temperature
+Zone Air System Sensible Cooling Rate
+Zone Air System Sensible Heating Rate
+Zone Air Relative Humidity
+DX COOLING COIL SYSTEM 1,Coil System Part Load Ratio
+ACDXCOIL 1,Cooling Coil Total Cooling Rate
+ACDXCOIL 1,Cooling Coil Sensible Cooling Rate
+ACDXCOIL 1,Cooling Coil Electricity Rate
+ACDXCOIL 1,Cooling Coil Runtime Fraction
+MAIN HEATING COIL 1,Heating Coil Heating Rate
+DX COOLING COIL SYSTEM 2,Coil System Part Load Ratio
+ACDXCOIL 2,Cooling Coil Total Cooling Rate
+ACDXCOIL 2,Cooling Coil Sensible Cooling Rate
+ACDXCOIL 2,Cooling Coil Electricity Rate
+ACDXCOIL 2,Cooling Coil Runtime Fraction
+MAIN HEATING COIL 2,Heating Coil Heating Rate
+DX COOLING COIL SYSTEM 3,Coil System Part Load Ratio
+ACDXCOIL 3,Cooling Coil Total Cooling Rate
+ACDXCOIL 3,Cooling Coil Sensible Cooling Rate
+ACDXCOIL 3,Cooling Coil Electricity Rate
+ACDXCOIL 3,Cooling Coil Runtime Fraction
+MAIN HEATING COIL 3,Heating Coil Heating Rate
+DX COOLING COIL SYSTEM 4,Coil System Part Load Ratio
+ACDXCOIL 4,Cooling Coil Total Cooling Rate
+ACDXCOIL 4,Cooling Coil Sensible Cooling Rate
+ACDXCOIL 4,Cooling Coil Electricity Rate
+ACDXCOIL 4,Cooling Coil Runtime Fraction
+MAIN HEATING COIL 4,Heating Coil Heating Rate
+ACDXCOIL 1,Cooling Coil Stage 2 Runtime Fraction
+ACDXCOIL 1,Cooling Coil Dehumidification Mode
+ACDXCOIL 2,Cooling Coil Stage 2 Runtime Fraction
+ACDXCOIL 2,Cooling Coil Dehumidification Mode
+ACDXCOIL 3,Cooling Coil Stage 2 Runtime Fraction
+ACDXCOIL 3,Cooling Coil Dehumidification Mode
+0

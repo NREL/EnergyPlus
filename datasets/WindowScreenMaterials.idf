@@ -1,0 +1,90 @@
+!===============================================================================
+! WindowScreenMaterials.idf
+!
+! EnergyPlus Reference Data Set for Window Screens.
+! Names are based on color and material.
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  WindowMaterial:Screen,
+    CHARCOAL FIBERGLASS SCREEN 1,  !- Name
+    ModelAsDiffuse,          !- Reflected Beam Transmittance Accounting Method
+    0.08,                    !- Diffuse Solar Reflectance {dimensionless}
+    0.08,                    !- Diffuse Visible Reflectance {dimensionless}
+    0.9,                     !- Thermal Hemispherical Emissivity {dimensionless}
+    0.04,                    !- Conductivity {W/m-K}
+    0.00157,                 !- Screen Material Spacing {m}
+    0.000381,                !- Screen Material Diameter {m}
+    0.025,                   !- Screen to Glass Distance {m}
+    0.0,                     !- Top Opening Multiplier {dimensionless}
+    0.0,                     !- Bottom Opening Multiplier {dimensionless}
+    0.0,                     !- Left Side Opening Multiplier {dimensionless}
+    0.0,                     !- Right Side Opening Multiplier {dimensionless}
+    0;                       !- Angle of Resolution for Screen Transmittance Output Map {deg}
+
+  WindowMaterial:Screen,
+    CHARCOAL FIBERGLASS SCREEN 2,  !- Name
+    ModelAsDiffuse,          !- Reflected Beam Transmittance Accounting Method
+    0.08,                    !- Diffuse Solar Reflectance {dimensionless}
+    0.08,                    !- Diffuse Visible Reflectance {dimensionless}
+    0.9,                     !- Thermal Hemispherical Emissivity {dimensionless}
+    0.04,                    !- Conductivity {W/m-K}
+    0.00167,                 !- Screen Material Spacing {m}
+    0.000381,                !- Screen Material Diameter {m}
+    0.025,                   !- Screen to Glass Distance {m}
+    0.0,                     !- Top Opening Multiplier {dimensionless}
+    0.0,                     !- Bottom Opening Multiplier {dimensionless}
+    0.0,                     !- Left Side Opening Multiplier {dimensionless}
+    0.0,                     !- Right Side Opening Multiplier {dimensionless}
+    0;                       !- Angle of Resolution for Screen Transmittance Output Map {deg}
+
+  WindowMaterial:Screen,
+    CHARCOAL FIBERGLASS SCREEN 3,  !- Name
+    ModelAsDiffuse,          !- Reflected Beam Transmittance Accounting Method
+    0.08,                    !- Diffuse Solar Reflectance {dimensionless}
+    0.08,                    !- Diffuse Visible Reflectance {dimensionless}
+    0.9,                     !- Thermal Hemispherical Emissivity {dimensionless}
+    0.04,                    !- Conductivity {W/m-K}
+    0.00155,                 !- Screen Material Spacing {m}
+    0.000406,                !- Screen Material Diameter {m}
+    0.025,                   !- Screen to Glass Distance {m}
+    0.0,                     !- Top Opening Multiplier {dimensionless}
+    0.0,                     !- Bottom Opening Multiplier {dimensionless}
+    0.0,                     !- Left Side Opening Multiplier {dimensionless}
+    0.0,                     !- Right Side Opening Multiplier {dimensionless}
+    0;                       !- Angle of Resolution for Screen Transmittance Output Map {deg}
+
+  WindowMaterial:Screen,
+    BRIGHT ALUMINUM SCREEN 1,!- Name
+    ModelAsDiffuse,          !- Reflected Beam Transmittance Accounting Method
+    0.6,                     !- Diffuse Solar Reflectance {dimensionless}
+    0.6,                     !- Diffuse Visible Reflectance {dimensionless}
+    0.9,                     !- Thermal Hemispherical Emissivity {dimensionless}
+    221.0,                   !- Conductivity {W/m-K}
+    0.00154,                 !- Screen Material Spacing {m}
+    0.000254,                !- Screen Material Diameter {m}
+    0.025,                   !- Screen to Glass Distance {m}
+    0.0,                     !- Top Opening Multiplier {dimensionless}
+    0.0,                     !- Bottom Opening Multiplier {dimensionless}
+    0.0,                     !- Left Side Opening Multiplier {dimensionless}
+    0.0,                     !- Right Side Opening Multiplier {dimensionless}
+    0;                       !- Angle of Resolution for Screen Transmittance Output Map {deg}
+
+  WindowMaterial:Screen,
+    BRIGHT ALUMINUM SCREEN 2,!- Name
+    ModelAsDiffuse,          !- Reflected Beam Transmittance Accounting Method
+    0.6,                     !- Diffuse Solar Reflectance {dimensionless}
+    0.6,                     !- Diffuse Visible Reflectance {dimensionless}
+    0.9,                     !- Thermal Hemispherical Emissivity {dimensionless}
+    221.0,                   !- Conductivity {W/m-K}
+    0.00164,                 !- Screen Material Spacing {m}
+    0.000254,                !- Screen Material Diameter {m}
+    0.025,                   !- Screen to Glass Distance {m}
+    0.0,                     !- Top Opening Multiplier {dimensionless}
+    0.0,                     !- Bottom Opening Multiplier {dimensionless}
+    0.0,                     !- Left Side Opening Multiplier {dimensionless}
+    0.0,                     !- Right Side Opening Multiplier {dimensionless}
+    0;                       !- Angle of Resolution for Screen Transmittance Output Map {deg}
+

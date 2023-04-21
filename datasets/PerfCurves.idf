@@ -1,0 +1,326 @@
+!===============================================================================
+! PerfCurves.idf
+!
+! Performance curves for variable speed DX cooling
+! These curves are appropriate for small DX cooling units with variable speed compressors.
+! These curves would be referenced by the EnergyPlus object COIL:DX:MultiSpeed:CoolingEmpirical.
+! See the example input file 5ZoneAutoDXVAV for an example of their use.
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  Curve:Biquadratic,
+    VarSpeedCoolCapFT,       !- Name
+    0.476428E+00,            !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    12.77778,                !- Minimum Value of x
+    23.88889,                !- Maximum Value of x
+    23.88889,                !- Minimum Value of y
+    46.11111;                !- Maximum Value of y
+
+  Curve:Biquadratic,
+    VarSpeedCoolEIRFT,       !- Name
+    0.632475E+00,            !- Coefficient1 Constant
+    -0.121321E-01,           !- Coefficient2 x
+    0.507773E-03,            !- Coefficient3 x**2
+    0.155377E-01,            !- Coefficient4 y
+    0.272840E-03,            !- Coefficient5 y**2
+    -0.679201E-03,           !- Coefficient6 x*y
+    12.77778,                !- Minimum Value of x
+    23.88889,                !- Maximum Value of x
+    23.88889,                !- Minimum Value of y
+    46.11111;                !- Maximum Value of y
+
+  Curve:Biquadratic,
+    VarSpeedCoolCapLSFT,     !- Name
+    0.476428E+00,            !- Coefficient1 Constant
+    0.401147E-01,            !- Coefficient2 x
+    0.226411E-03,            !- Coefficient3 x**2
+    -0.827136E-03,           !- Coefficient4 y
+    -0.732240E-05,           !- Coefficient5 y**2
+    -0.446278E-03,           !- Coefficient6 x*y
+    12.77778,                !- Minimum Value of x
+    23.88889,                !- Maximum Value of x
+    23.88889,                !- Minimum Value of y
+    46.11111;                !- Maximum Value of y
+
+  Curve:Biquadratic,
+    VarSpeedCoolEIRLSFT,     !- Name
+    0.774645E+00,            !- Coefficient1 Constant
+    -0.343731E-01,           !- Coefficient2 x
+    0.783173E-03,            !- Coefficient3 x**2
+    0.146596E-01,            !- Coefficient4 y
+    0.488851E-03,            !- Coefficient5 y**2
+    -0.752036E-03,           !- Coefficient6 x*y
+    12.77778,                !- Minimum Value of x
+    23.88889,                !- Maximum Value of x
+    23.88889,                !- Minimum Value of y
+    46.11111;                !- Maximum Value of y
+
+  Curve:Cubic,
+    PackagedRatedCoolCapFFlow,  !- Name
+    0.47278589,              !- Coefficient1 Constant
+    1.2433415,               !- Coefficient2 x
+    -1.0387055,              !- Coefficient3 x**2
+    0.32257813,              !- Coefficient4 x**3
+    0.5,                     !- Minimum Value of x
+    1.5;                     !- Maximum Value of x
+
+  Curve:Cubic,
+    PackagedRatedCoolEIRFFlow,  !- Name
+    1.0079484,               !- Coefficient1 Constant
+    0.34544129,              !- Coefficient2 x
+    -.6922891,               !- Coefficient3 x**2
+    0.33889943,              !- Coefficient4 x**3
+    0.5,                     !- Minimum Value of x
+    1.5;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    VarSpeedCyclingPLFFPLR,  !- Name
+    0.75,                    !- Coefficient1 Constant
+    0.25,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+! Performance Curves for Variable Speed Cooling Tower Model Coefficients
+!*** YorkCalc Model Coefficients ***:
+! Model coefficients for user defined variable-speed cooling towers
+
+  CoolingTowerPerformance:YorkCalc,
+    YorkCalc Default Tower Model,  !- Name
+    -34.4,                   !- Minimum Inlet Air Wet-Bulb Temperature {C}
+    26.6667,                 !- Maximum Inlet Air Wet-Bulb Temperature {C}
+    1.1111,                  !- Minimum Range Temperature {deltaC}
+    22.2222,                 !- Maximum Range Temperature {deltaC}
+    1.1111,                  !- Minimum Approach Temperature {deltaC}
+    40.0,                    !- Maximum Approach Temperature {deltaC}
+    0.75,                    !- Minimum Water Flow Rate Ratio
+    1.25,                    !- Maximum Water Flow Rate Ratio
+    8.0,                     !- Maximum Liquid to Gas Ratio
+    -0.359741205,            !- Coefficient 1
+    -0.055053608,            !- Coefficient 2
+    0.0023850432,            !- Coefficient 3
+    0.173926877,             !- Coefficient 4
+    -0.0248473764,           !- Coefficient 5
+    0.00048430224,           !- Coefficient 6
+    -0.005589849456,         !- Coefficient 7
+    0.0005770079712,         !- Coefficient 8
+    -0.00001342427256,       !- Coefficient 9
+    2.84765801111111,        !- Coefficient 10
+    -0.121765149,            !- Coefficient 11
+    0.0014599242,            !- Coefficient 12
+    1.680428651,             !- Coefficient 13
+    -0.0166920786,           !- Coefficient 14
+    -0.0007190532,           !- Coefficient 15
+    -0.025485194448,         !- Coefficient 16
+    0.0000487491696,         !- Coefficient 17
+    0.00002719234152,        !- Coefficient 18
+    -0.0653766255555556,     !- Coefficient 19
+    -0.002278167,            !- Coefficient 20
+    0.0002500254,            !- Coefficient 21
+    -0.0910565458,           !- Coefficient 22
+    0.00318176316,           !- Coefficient 23
+    0.000038621772,          !- Coefficient 24
+    -0.0034285382352,        !- Coefficient 25
+    0.00000856589904,        !- Coefficient 26
+    -0.000001516821552;      !- Coefficient 27
+
+!*** CoolTools Model Coefficients ***:
+
+  CoolingTowerPerformance:CoolTools,
+    CoolTools CrossFlow Default Tower Model,  !- Name
+    -1.0,                    !- Minimum Inlet Air Wet-Bulb Temperature {C}
+    26.6667,                 !- Maximum Inlet Air Wet-Bulb Temperature {C}
+    1.1111,                  !- Minimum Range Temperature {deltaC}
+    11.1111,                 !- Maximum Range Temperature {deltaC}
+    1.1111,                  !- Minimum Approach Temperature {deltaC}
+    11.1111,                 !- Maximum Approach Temperature {deltaC}
+    0.75,                    !- Minimum Water Flow Rate Ratio
+    1.25,                    !- Maximum Water Flow Rate Ratio
+    0.52049709836241,        !- Coefficient 1
+    -10.617046395344,        !- Coefficient 2
+    10.7292974722538,        !- Coefficient 3
+    -2.74988377158227,       !- Coefficient 4
+    4.73629943913743,        !- Coefficient 5
+    -8.25759700874711,       !- Coefficient 6
+    1.57640938114136,        !- Coefficient 7
+    6.51119643791324,        !- Coefficient 8
+    1.50433525206692,        !- Coefficient 9
+    -3.2888529287801,        !- Coefficient 10
+    0.0257786145353773,      !- Coefficient 11
+    0.182464289315254,       !- Coefficient 12
+    -0.0818947291400898,     !- Coefficient 13
+    -0.215010003996285,      !- Coefficient 14
+    0.0186741309635284,      !- Coefficient 15
+    0.0536824177590012,      !- Coefficient 16
+    -0.00270968955115031,    !- Coefficient 17
+    0.00112277498589279,     !- Coefficient 18
+    -0.00127758497497718,    !- Coefficient 19
+    0.0000760420796601607,   !- Coefficient 20
+    1.43600088336017,        !- Coefficient 21
+    -0.5198695909109,        !- Coefficient 22
+    0.117339576910507,       !- Coefficient 23
+    1.50492810819924,        !- Coefficient 24
+    -0.135898905926974,      !- Coefficient 25
+    -0.152577581866506,      !- Coefficient 26
+    -0.0533843828114562,     !- Coefficient 27
+    0.00493294869565511,     !- Coefficient 28
+    -0.00796260394174197,    !- Coefficient 29
+    0.000222619828621544,    !- Coefficient 30
+    -0.0543952001568055,     !- Coefficient 31
+    0.00474266879161693,     !- Coefficient 32
+    -0.0185854671815598,     !- Coefficient 33
+    0.00115667701293848,     !- Coefficient 34
+    0.000807370664460284;    !- Coefficient 35
+
+! Performance Curves for Balanced Flow Desiccant Heat Exchangers
+!*** Performance Data Type 1 ***:
+! Model coefficients generated based on results from a finite difference desiccant dehumidifier
+! model for a rotary desiccant heat exchanger with a 50/50 face area split between
+! regeneration and process air streams. The wheel is 102 mm (4 inch) deep wheel with a rotational
+! speed of 12 revolutions per hour. The desiccant performance is based on a Brunauer Type 3
+! isotherm shape with a maximum uptake of 30% and a separate factor of 4.5.
+!
+! Reference:
+! Kosar, D. et al. 2007. National Center for Energy Management and
+! Building Technologies. Task 6: Integrating Advanced Humidity Control to
+! Reduce Energy Use. Final Report NCEMBT-070621.  Alexandria, VA: National
+! Center For Energy Management And Building Technologies.
+!
+! Model coefficients and applicable operating range are meant to represent a desiccant heat exchanger
+! transferring latent and sensible heat between the air entering and leaving a cooling coil to improve
+! the dehumidification performance of the system (ref. Coil:DX:CoolingHeatExchangerAssisted object).
+!
+
+  HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1,
+    HXDesPerf1,              !- Name
+    1.32,                    !- Nominal Air Flow Rate {m3/s}
+    2.54,                    !- Nominal Air Face Velocity {m/s}
+    50.0,                    !- Nominal Electricity Rate {W}
+    -7.18302E+00,            !- Temperature Equation Coefficient 1
+    -1.84967E+02,            !- Temperature Equation Coefficient 2
+    1.00051E+00,             !- Temperature Equation Coefficient 3
+    1.16033E+04,             !- Temperature Equation Coefficient 4
+    -5.07550E+01,            !- Temperature Equation Coefficient 5
+    -1.68467E-02,            !- Temperature Equation Coefficient 6
+    5.82213E+01,             !- Temperature Equation Coefficient 7
+    5.98863E-01,             !- Temperature Equation Coefficient 8
+    0.007143,                !- Minimum Regeneration Inlet Air Humidity Ratio for Temperature Equation {kgWater/kgDryAir}
+    0.024286,                !- Maximum Regeneration Inlet Air Humidity Ratio for Temperature Equation {kgWater/kgDryAir}
+    17.83333,                !- Minimum Regeneration Inlet Air Temperature for Temperature Equation {C}
+    48.88889,                !- Maximum Regeneration Inlet Air Temperature for Temperature Equation {C}
+    0.005000,                !- Minimum Process Inlet Air Humidity Ratio for Temperature Equation {kgWater/kgDryAir}
+    0.015714,                !- Maximum Process Inlet Air Humidity Ratio for Temperature Equation {kgWater/kgDryAir}
+    4.583333,                !- Minimum Process Inlet Air Temperature for Temperature Equation {C}
+    21.83333,                !- Maximum Process Inlet Air Temperature for Temperature Equation {C}
+    2.286,                   !- Minimum Regeneration Air Velocity for Temperature Equation {m/s}
+    4.826,                   !- Maximum Regeneration Air Velocity for Temperature Equation {m/s}
+    16.66667,                !- Minimum Regeneration Outlet Air Temperature for Temperature Equation {C}
+    46.11111,                !- Maximum Regeneration Outlet Air Temperature for Temperature Equation {C}
+    10.0,                    !- Minimum Regeneration Inlet Air Relative Humidity for Temperature Equation {percent}
+    100.0,                   !- Maximum Regeneration Inlet Air Relative Humidity for Temperature Equation {percent}
+    80.0,                    !- Minimum Process Inlet Air Relative Humidity for Temperature Equation {percent}
+    100.0,                   !- Maximum Process Inlet Air Relative Humidity for Temperature Equation {percent}
+    3.13878E-03,             !- Humidity Ratio Equation Coefficient 1
+    1.09689E+00,             !- Humidity Ratio Equation Coefficient 2
+    -2.63341E-05,            !- Humidity Ratio Equation Coefficient 3
+    -6.33885E+00,            !- Humidity Ratio Equation Coefficient 4
+    9.38196E-03,             !- Humidity Ratio Equation Coefficient 5
+    5.21186E-05,             !- Humidity Ratio Equation Coefficient 6
+    6.70354E-02,             !- Humidity Ratio Equation Coefficient 7
+    -1.60823E-04,            !- Humidity Ratio Equation Coefficient 8
+    0.007143,                !- Minimum Regeneration Inlet Air Humidity Ratio for Humidity Ratio Equation {kgWater/kgDryAir}
+    0.024286,                !- Maximum Regeneration Inlet Air Humidity Ratio for Humidity Ratio Equation {kgWater/kgDryAir}
+    17.83333,                !- Minimum Regeneration Inlet Air Temperature for Humidity Ratio Equation {C}
+    48.88889,                !- Maximum Regeneration Inlet Air Temperature for Humidity Ratio Equation {C}
+    0.005000,                !- Minimum Process Inlet Air Humidity Ratio for Humidity Ratio Equation {kgWater/kgDryAir}
+    0.015714,                !- Maximum Process Inlet Air Humidity Ratio for Humidity Ratio Equation {kgWater/kgDryAir}
+    4.583333,                !- Minimum Process Inlet Air Temperature for Humidity Ratio Equation {C}
+    21.83333,                !- Maximum Process Inlet Air Temperature for Humidity Ratio Equation {C}
+    2.286,                   !- Minimum Regeneration Air Velocity for Humidity Ratio Equation {m/s}
+    4.826,                   !- Maximum Regeneration Air Velocity for Humidity Ratio Equation {m/s}
+    0.007811,                !- Minimum Regeneration Outlet Air Humidity Ratio for Humidity Ratio Equation {kgWater/kgDryAir}
+    0.026707,                !- Maximum Regeneration Outlet Air Humidity Ratio for Humidity Ratio Equation {kgWater/kgDryAir}
+    10.0,                    !- Minimum Regeneration Inlet Air Relative Humidity for Humidity Ratio Equation {percent}
+    100.0,                   !- Maximum Regeneration Inlet Air Relative Humidity for Humidity Ratio Equation {percent}
+    80.0,                    !- Minimum Process Inlet Air Relative Humidity for Humidity Ratio Equation {percent}
+    100.0;                   !- Maximum Process Inlet Air Relative Humidity for Humidity Ratio Equation {percent}
+
+! Model coefficients generated based on results from a finite difference desiccant dehumidifier
+! model for a rotary desiccant heat exchanger with a 50/50 face area split between
+! regeneration and process air streams. The wheel is 102 mm (4 inch) deep wheel with a rotational
+! speed of 8 revolutions per hour. The desiccant performance is based on a Brunauer Type 3
+! isotherm shape with a maximum uptake of 30% and a separate factor of 4.5. The model is valid for
+! a regeneration air inlet temperature of 46.111111C (115F).
+!
+! Reference:
+! Kosar, D. et al. 2007. National Center for Energy Management and
+! Building Technologies Task 6: Integrating Advanced Humidity Control to
+! Reduce Energy Use. Final Report NCEMBT-070621.  Alexandria, VA: National
+! Center For Energy Management And Building Technologies.
+!
+! Model coefficients and applicable operating range are meant to represent a desiccant heat exchanger
+! located downstream of a cooling coil with desiccant regeneration by a separate airstream
+! at 46.111C (115F) (ref. Desiccant Dehumidifier object with companion cooling coil).
+!
+
+  HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1,
+    HXDesPerf2,              !- Name
+    1.32,                    !- Nominal Air Flow Rate {m3/s}
+    4.064,                   !- Nominal Air Face Velocity {m/s}
+    50.0,                    !- Nominal Electricity Rate {W}
+    -2.53636E+00,            !- Temperature Equation Coefficient 1
+    2.13247E+01,             !- Temperature Equation Coefficient 2
+    9.23308E-01,             !- Temperature Equation Coefficient 3
+    9.43276E+02,             !- Temperature Equation Coefficient 4
+    -5.92367E+01,            !- Temperature Equation Coefficient 5
+    -4.27465E-02,            !- Temperature Equation Coefficient 6
+    1.12204E+02,             !- Temperature Equation Coefficient 7
+    7.78252E-01,             !- Temperature Equation Coefficient 8
+    0.007143,                !- Minimum Regeneration Inlet Air Humidity Ratio for Temperature Equation {kgWater/kgDryAir}
+    0.024286,                !- Maximum Regeneration Inlet Air Humidity Ratio for Temperature Equation {kgWater/kgDryAir}
+    46.111110,               !- Minimum Regeneration Inlet Air Temperature for Temperature Equation {C}
+    46.111112,               !- Maximum Regeneration Inlet Air Temperature for Temperature Equation {C}
+    0.005000,                !- Minimum Process Inlet Air Humidity Ratio for Temperature Equation {kgWater/kgDryAir}
+    0.015714,                !- Maximum Process Inlet Air Humidity Ratio for Temperature Equation {kgWater/kgDryAir}
+    4.583333,                !- Minimum Process Inlet Air Temperature for Temperature Equation {C}
+    21.83333,                !- Maximum Process Inlet Air Temperature for Temperature Equation {C}
+    2.286,                   !- Minimum Regeneration Air Velocity for Temperature Equation {m/s}
+    4.826,                   !- Maximum Regeneration Air Velocity for Temperature Equation {m/s}
+    35.0,                    !- Minimum Regeneration Outlet Air Temperature for Temperature Equation {C}
+    50.0,                    !- Maximum Regeneration Outlet Air Temperature for Temperature Equation {C}
+    5.0,                     !- Minimum Regeneration Inlet Air Relative Humidity for Temperature Equation {percent}
+    45.0,                    !- Maximum Regeneration Inlet Air Relative Humidity for Temperature Equation {percent}
+    80.0,                    !- Minimum Process Inlet Air Relative Humidity for Temperature Equation {percent}
+    100.0,                   !- Maximum Process Inlet Air Relative Humidity for Temperature Equation {percent}
+    -2.25547E+01,            !- Humidity Ratio Equation Coefficient 1
+    9.76839E-01,             !- Humidity Ratio Equation Coefficient 2
+    4.89176E-01,             !- Humidity Ratio Equation Coefficient 3
+    -6.30019E-02,            !- Humidity Ratio Equation Coefficient 4
+    1.20773E-02,             !- Humidity Ratio Equation Coefficient 5
+    5.17134E-05,             !- Humidity Ratio Equation Coefficient 6
+    4.94917E-02,             !- Humidity Ratio Equation Coefficient 7
+    -2.59417E-04,            !- Humidity Ratio Equation Coefficient 8
+    0.007143,                !- Minimum Regeneration Inlet Air Humidity Ratio for Humidity Ratio Equation {kgWater/kgDryAir}
+    0.024286,                !- Maximum Regeneration Inlet Air Humidity Ratio for Humidity Ratio Equation {kgWater/kgDryAir}
+    46.111110,               !- Minimum Regeneration Inlet Air Temperature for Humidity Ratio Equation {C}
+    46.111112,               !- Maximum Regeneration Inlet Air Temperature for Humidity Ratio Equation {C}
+    0.005000,                !- Minimum Process Inlet Air Humidity Ratio for Humidity Ratio Equation {kgWater/kgDryAir}
+    0.015714,                !- Maximum Process Inlet Air Humidity Ratio for Humidity Ratio Equation {kgWater/kgDryAir}
+    4.583333,                !- Minimum Process Inlet Air Temperature for Humidity Ratio Equation {C}
+    21.83333,                !- Maximum Process Inlet Air Temperature for Humidity Ratio Equation {C}
+    2.286,                   !- Minimum Regeneration Air Velocity for Humidity Ratio Equation {m/s}
+    4.826,                   !- Maximum Regeneration Air Velocity for Humidity Ratio Equation {m/s}
+    0.007914,                !- Minimum Regeneration Outlet Air Humidity Ratio for Humidity Ratio Equation {kgWater/kgDryAir}
+    0.026279,                !- Maximum Regeneration Outlet Air Humidity Ratio for Humidity Ratio Equation {kgWater/kgDryAir}
+    5.0,                     !- Minimum Regeneration Inlet Air Relative Humidity for Humidity Ratio Equation {percent}
+    45.0,                    !- Maximum Regeneration Inlet Air Relative Humidity for Humidity Ratio Equation {percent}
+    80.0,                    !- Minimum Process Inlet Air Relative Humidity for Humidity Ratio Equation {percent}
+    100.0;                   !- Maximum Process Inlet Air Relative Humidity for Humidity Ratio Equation {percent}
+

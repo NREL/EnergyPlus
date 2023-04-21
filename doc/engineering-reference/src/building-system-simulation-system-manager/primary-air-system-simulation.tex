@@ -1,0 +1,215 @@
+\section{Primary Air System Simulation}\label{primary-air-system-simulation}
+
+When the EnergyPlus HVAC simulation manager needs to simulate the primary air system side of the air loop it calls \emph{ManageAirLoops}, the primary air system simulation manager subroutine.
+
+Note that ``air loop'' is used inconsistently in the program: sometimes it means the full loop consisting of both supply \& demand sides -- primary air system and zone equipment; sometimes it means just the supply side -- the primary air system.
+
+Like the other manager routines in EnergyPlus, \emph{ManageAirLoops} has a very simple structure:
+
+\begin{lstlisting}
+if ( GetAirLoopInputFlag ) { //First time subroutine has been entered
+	GetAirPathData(); // Get air loop descriptions from input file
+	GetAirLoopInputFlag = false;
+}
+
+// Initialize air loop related parameters
+InitAirLoops( FirstHVACIteration );
+
+// Call the AirLoop Simulation
+if ( SysSizingCalc ) {
+	SizeAirLoops();
+} else if ( !SysSizingCalc ) {
+	SimAirLoops( FirstHVACIteration, SimZoneEquipment );
+}
+
+// This flag could be used to resimulate only the air loops that needed additional iterations.
+// This flag would have to be moved inside SimAirLoops to gain this flexibility.
+SimAir = std::any_of( AirLoopControlInfo.begin(), AirLoopControlInfo.end(), []( DataAirLoop::AirLoopControlData const & e ){ return e.ResimAirLoopFlag; } );
+\end{lstlisting}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\def\labelenumii{\alph{enumii}.}
+\item
+  If the user input data has not been input, get the data and store it in the air loop data structures.
+\item
+  Perform air loop initialization calculations:
+
+    \begin{enumerate}
+    \item
+      at the beginning of the simulation (one time initializations);
+    \item
+      at the start of each environment (design day or simulation run period);
+    \item
+      before each air loop simulation.
+    \end{enumerate}
+\item
+  If automatic sizing of the loop flow rates is called for, do it.
+\item
+  Otherwise perform a simulation of the air loop.
+\end{enumerate}
+
+\subsection{Input data}\label{input-data}
+
+The input data specifying an air loop consists of:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\def\labelenumii{\alph{enumii}.}
+\tightlist
+\item
+  the loop configuration;
+    \begin{enumerate}
+    \item
+      Splitters, Mixers, and Branches;
+    \item
+      Components on the Branches
+    \end{enumerate}
+
+\item
+  loop control;
+
+    \begin{enumerate}
+    \item
+    Controllers;
+    \item
+    System Availability Managers;
+    \end{enumerate}
+\item
+  connection to zone equipment;
+\item
+  design flow rate.
+\end{enumerate}
+
+These objects and their data are described in the EnergyPlus \emph{Input Output Reference} document. The utility routines used to get and check the data are described in the EnergyPlus \emph{Guide for Module Developers}, section Input Services.
+
+\subsection{Initialization Calculations}\label{initialization-calculations}
+
+\subsubsection{One Time Calculations}\label{one-time-calculations}
+
+\paragraph{Zones Served by System}\label{zones-served-by-system}
+
+The main one time calculation involves figuring out what zones are served by each air loop. The EnergyPlus input does not explicitly describe which zones receive supply air from a given air loop. Instead that knowledge is embedded implicitly in the overall air loop -- zone equipment network description. For sizing calculations it is important to have a data structure that explicitly shows which zones each air loop serves. For instance, the air loop design supply air flow rate is obtained by summing the design heating or cooling air flow rates of the zones connected to the air loop.
+
+For each air loop, the following calculation is performed.
+
+(1)~~For each air loop outlet branch, the corresponding zone equipment inlet node is identified.
+
+(2)~~This node number is compared to the inlet node of all AirLoopHVAC:SupplyPaths. When a match is found, the AirLoopHVAC:ZoneSplitter for this supply path is identified.
+
+(3)~~The outlet nodes of the AirLoopHVAC:ZoneSplitter are compared to the cooling inlet nodes of all the zone ZoneHVAC:AirDistributionUnits. When a match is found this zone is identified as being served by cooling supply air from the air loop.
+
+(4)~~Similarly the outlet nodes of the AirLoopHVAC:ZoneSplitter are compared with the heating inlet nodes of all ZoneHVAC:AirDistributionUnits. A match indicates that this zone is served by heating supply air from the air loop.
+
+(5)~~The case where there is no AirLoopHVAC:ZoneSplitter for an AirLoopHVAC:SupplyPath must be handled. In this case the program looks for a match between the zone equipment inlet node and a ZoneHVAC:AirDistributionUnit heating or cooling inlet node. When a match is found that zone is identified as being served with heating or cooling supply air from the air loop.
+
+(6)~~The list of cooled and heated zones are saved in the air loop data structure AirToZoneNodeInfo.
+
+\paragraph{Branch Sizing}\label{branch-sizing}
+
+If this \emph{not} an air loop sizing calculation, but is the first pass through the HVAC code in a normal simulation, loop over all the branches in all air loops and trigger the branch design air flow auto-sizing calculation. The actual calculation is described in the Sizing section of this document.
+
+\subsubsection{Begin Environment Initializations}\label{begin-environment-initializations}
+
+For each air loop, loop over all the branches in the loop. Initialize each branch mass flow rate:
+
+\begin{equation}
+{\dot m_{br,\max }} = {\rho_{std}} \cdot {\dot V_{br,\max }}
+\end{equation}
+
+\begin{equation}
+{\dot m_{br,\min }} = {\rho_{std}} \cdot {\dot V_{br,\min }}
+\end{equation}
+
+where \({\rho_{std}}\) is the density of air at 20 degrees C, humidity ratio = 0, standard pressure.
+
+For each branch, loop over all the nodes on the branch and set the node data to the following values:
+
+\begin{equation}
+{T_{node}} = {20^{\rm{o}}}C
+\end{equation}
+
+\begin{equation}
+{W_{node}} = {W_{oa}}
+\end{equation}
+
+\begin{equation}
+{h_{node}} = {\mathop{\rm PsyHFnTdbW}\nolimits} {\rm{(}}20.0,{W_{oa}}{\rm{)}}
+\end{equation}
+
+\begin{equation}
+{\dot m_{node}} = {\dot m_{br,\max }}
+\end{equation}
+
+\begin{equation}
+{\dot m_{\max ,node}} = {\dot m_{br,\max }}
+\end{equation}
+
+\begin{equation}
+{\dot m_{\max avail,node}} = {\dot m_{br,\max }}
+\end{equation}
+
+\begin{equation}
+{\dot m_{\min ,node}} = 0.0
+\end{equation}
+
+\begin{equation}
+{\dot m_{setpt,node}} = 0.0
+\end{equation}
+
+\begin{equation}
+{\dot m_{\min avail,node}} = 0.0
+\end{equation}
+
+\begin{equation}
+{p_{node}} = {p_{std,baro}}
+\end{equation}
+
+\begin{equation}
+Q{u_{node}} = 0.0
+\end{equation}
+
+where \({W_{oa}}\) is the humidity ratio of the outside air; \({\rm{PsyHFnTdbW}}\) is the EnergyPlus psychrometric function for enthalpy \emph{h}, given temperature and humidity ratio; and \emph{Qu} is quality.
+
+\subsubsection{System Time Step Initializations}\label{system-time-step-initializations}
+
+For each branch in each air loop, loop over all the nodes on the branch and set \({\dot m_{setpt,node}} = 0.0\) ; if it is the start of an HVAC solution sequence set \({\dot m_{\max avail,node}} = {\dot m_{\max ,node}}\) . Then set the mass flow rate setpoints for the air loop nodes.
+
+1)~~~~On each air loop, loop over the outlet branches and find the loop outlet nodes. If it is the start of an HVAC solution sequence, set \({\dot m_{setpt,outletnode}} = {\dot m_{outletbr,\max }}\) . This will insure that during the first pass through the full loop that the mass flow rate will be at the maximum. Otherwise, set \({\dot m_{setpt,outletnode}} = {\dot m_{zone{\rm{ }}eq{\rm{ }}inletnode}}\) . This sets the air loop flow rate to the total zone requirement.
+
+2)~~~~Pass the mass flow rate setpoint upstream to the start of the outlet branches; through the splitter, if one exists; and upstream to the beginning node of the splitter inlet branch.
+
+3)~~~~Sum the total return air mass flow rate and save it in the AirLoopFlow data structure.
+
+4)~~~~For each air loop, loop over the inlet nodes and, at the start of each HVAC solution sequence, set the entering node mass flow rate equal to the primary air system design mass flow rate (subject to it not being larger than the entering node mass flow rate setpoint).
+
+\subsection{Central air system simulation}\label{central-air-system-simulation}
+
+The subroutine \emph{SimAirLoops} does the actual simulation the central air system equipment for all the air loops. The simulation of a full air loop (central equipment plus zone terminal units and equipment) requires the interaction of 2 managers: \emph{ManageAirLoops} and \emph{ManageZoneEquipment}. Thus a single call to \emph{SimAirLoops} results in a simulation of all the central air system equipment, but this is one part of a larger iterative simulation of the full air loops involving the zone equipment as well.
+
+\emph{SimAirLoops} accomplishes its task using a set of nested loops.
+
+\begin{itemize}
+\item
+  Loop over all of the central air systems (\emph{Air Primary Loops}).
+\item
+  For each air system, make 1 or 2 simulation passes
+\item
+  Loop over each controller in the \emph{Air Primary Loop}
+\item
+  For each controller, repeat the simulation of all the \emph{Air Primary Loop} components until the controller has converged
+\item
+  Loop over each branch in the \emph{Air Primary Loop}
+\item
+  On each branch, simulate in sequence each component
+\end{itemize}
+
+During and at the end of each loop some tests are performed.
+
+At the end of the first pass of loop 2, a decision is made on whether a second pass is needed. The first pass has been performed assuming that there is a mass flow balance in the central air system simulation. This is usually the case. A call to \emph{ResolveSysFlow} checks the mass balance and imposes a mass balance if there is not a balance. The lack of a system mass balance requires a resimulation of the central air system: i.e., a second pass in loop 2.
+
+In loop 3, a call to \emph{ManageControllers} simulates controller action and checks for controller convergence. If convergence is achieved loop 3 is exited.
+
+After all the controllers on a loop are converged, steps 5 \& 6 are repeated one more time to ensure all the components on the loop have final values.
+
+At the end of the primary air system simulation a call to \emph{UpdateHVACInterface} passes the primary air system outlet node data to the zone equipment inlet nodes. If the data across the supply side -- demand side gap doesn't match to within a preset tolerance, the flag \emph{SimZoneEquipment} is set to \emph{true} to ensure that the zone equipment side gets resimulated. Finally a flag indicating whether the economizer is active is set. This flag is used at a higher level to decide whether the primary air system needs to be resimulated if an HVAC component is calling for economizer lockout.

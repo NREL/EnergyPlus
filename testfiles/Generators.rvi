@@ -1,0 +1,23 @@
+eplusout.eso
+eplusout.csv
+Zone Air Temperature
+Facility Total Produced Electricity Rate
+Facility Total Produced Electricity Energy
+Facility Total Purchased Electricity Rate
+Facility Total Purchased Electricity Energy
+Facility Total Building Electricity Demand Rate
+Facility Total HVAC Electricity Demand Rate
+Facility Total Electricity Demand Rate
+Cat Diesel,Generator Produced AC Electricity Rate
+Cat Diesel,Generator Diesel Rate
+Cat Diesel,Generator Diesel Mass Flow Rate
+Cat Diesel,Generator Exhaust Air Temperature
+Solar Turbine,Generator Produced AC Electricity Rate
+Solar Turbine,Generator NaturalGas Rate
+Solar Turbine,Generator NaturalGas Mass Flow Rate
+Solar Turbine,Generator Exhaust Air Temperature
+Capstone C65,Generator Produced AC Electricity Rate
+Capstone C65,Generator NaturalGas HHV Basis Rate
+Capstone C65,Generator NaturalGas Mass Flow Rate
+Capstone C65,Generator LHV Basis Electric Efficiency
+0

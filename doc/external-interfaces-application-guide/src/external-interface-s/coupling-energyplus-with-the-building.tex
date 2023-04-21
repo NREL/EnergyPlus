@@ -1,0 +1,57 @@
+\section{Coupling EnergyPlus with the Building Controls Virtual Test Bed}\label{coupling-energyplus-with-the-building-controls-virtual-test-bed}
+
+\subsection{Algorithm for data exchange}\label{algorithm-for-data-exchange}
+
+The process in which at least two simulators solve initial-value differential equations that are coupled to each other is called co-simulation. Various algorithms are possible for the data exchange. In the BCVTB, data are exchanged between its client programs, including EnergyPlus, using a fixed synchronization time step. There is no iteration between the clients. In the co-simulation literature, this coupling scheme is referred to as \emph{quasi-dynamic coupling}, \emph{loose coupling} or \emph{ping-pong coupling} (Hensen 1999, Zhai and Chen 2005).
+
+The algorithm for exchanging data is as follows: Suppose we have a system with two clients, with client 1 being EnergyPlus and client 2 being, for example, the Simulink program from Mathworks. Suppose each client solves an initial-value ordinary differential equation that is coupled to the differential equation of the other client. Let \(N\in\mathbf{N}\) ~denote the number of time steps and let \(k\in\left\{1,...,N\right\}\) ~denote the time steps. We will use the subscripts \emph{1} and \emph{2} to denote the state variable and the function that computes the next state variable of the simulator \emph{1} and \emph{2}, respectively.
+
+The simulator \emph{1} computes, for \(k\in\left\{1,...,N-1\right\}\) the sequence
+
+\emph{x\(_{1}\)(k+1) = f\(_{1}\)(x\(_{1}\)(k), x\(_{2}\)(k))}
+
+and, similarly, the simulator \emph{2} computes the sequence
+
+\emph{x\(_{2}\)(k+1) = f\(_{2}\)(x\(_{2}\)(k), x\(_{1}\)(k))}
+
+with initial conditions \emph{x\(_{1}\)(0) = x\(_{1,0}\)} and \emph{x\(_{2}\)(0) = x\(_{2,0}\)}.
+
+To advance from time \emph{k} to \emph{k+1}, each simulator uses its own time integration algorithm. At the end of the time step, the simulator \emph{1} sends the new state \emph{x\(_{1}\)(k+1)} to the BCVTB and it receives the state \emph{x\(_{2}\)(k+1)} from the BCVTB. The same procedure is done with the simulator \emph{2}. The BCVTB synchronizes the data in such a way that it does not matter which of the two simulators is called first.
+
+In comparison to numerical methods of differential equations, this scheme is identical to an explicit Euler integration, which is an integration algorithm that computes for an ordinary differential equation with specified initial values,
+
+\emph{dx/dt = h(x),}
+
+\emph{x(0)~ = x\(_{0}\),}
+
+on the time interval \emph{t} \emph{∈ {[}0, 1{]}}, the following sequence:
+
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+
+\toprule 
+Step 0: & Initialize counter k=0 and number of steps \(N \in \mathbf{N}\). \tabularnewline
+\endhead
+
+~ & Set initial state x(k) = x and set time step Dt = 1/N. \tabularnewline
+Step 1: & Compute new state x(k+1) = x(k) + h(x(k)) Dt. \tabularnewline
+~ & Replace k by k+1. \tabularnewline
+Step 2: & If k=N stop, else go to Step 1. \tabularnewline
+\bottomrule
+\end{longtable}
+
+In the situation where the differential equation is solved using co-simulation, the above algorithm becomes
+
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+
+\toprule 
+Step 0: & Initialize counter k=0 and number of steps $N \in \mathbf{N}$ . \tabularnewline
+\endhead
+
+~ & Set initial state x  (k) = x   and x  (k) = x  . Set the time step Dt = 1/N. \tabularnewline
+Step 1: & Compute new states ~ x  (k+1) = x  (k) + f  (x  (k), x  (k)) Dt, and ~ x  (k+1) = x  (k) + f  (x  (k), x  (k)) Dt. \tabularnewline
+~ & Replace k by k+1. \tabularnewline
+Step 2: & If k=N stop, else go to Step 1. \tabularnewline
+\bottomrule
+\end{longtable}
+
+This algorithm is implemented in the BCVTB. Note that there is no iteration between the two simulators.

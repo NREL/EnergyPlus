@@ -1,0 +1,8 @@
+1.3.0.018,1.4.0.xxx,
+4,4, This number should be the number of following lines
+DHW:PlantLoopHeatingDemand,WaterSystems:PlantLoopHeatingDemand
+DHW:Gas,WaterSystems:Gas
+DHW:Electricity,WaterSystems:Electricity
+DHW:Water,WaterSystems:Water
+old variable name,new variable name -- put variable names in quotes and leave off units -- <DELETE> to delete
+

@@ -1,0 +1,513 @@
+\section{Group Demand Limiting Controls}\label{group-demand-limiting-controls}
+
+Demand limiting, or demand management, is a strategy for reducing a building's demand for utilities, e.g., electricity. Utility companies typically charge a monthly fee for ``demand charges'' that is based on the peak demand during a certain time period. Often the peak demand charge is set by one exceptional day that is much higher than the peak demand for an average day during the month. Therefore, to save utility costs, it is in the interest of building owners to find ways to manage the demand on peak days. While demand management is generally concerned with the demand for electricity, the future will likely see demand management of other utilities, such as natural gas or water.
+
+Demand limiting controls shut off or reduce the power to non-essential loads in order to reduce the overall building demand. Some typical controls:
+
+\begin{itemize}
+\item
+  shut off or dim electric lights, equipment, or HVAC systems
+\item
+  reset the thermostatic set points on HVAC systems
+\item
+  reduce the load of a set of similar components by rotating one or more components ``off'' for a short time interval
+\item
+  turn on generators to meet some or all of the building's demand.
+\end{itemize}
+
+The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies. Currently, only \hyperref[exteriorlights]{Exterior:Lights}, \hyperref[lights-000]{Lights}, \hyperref[electricequipment]{ElectricEquipment}, \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat}, and \hyperref[controlleroutdoorair]{Controller:OutdoorAir} objects can be demand limited. Additional components will be demand limited in future releases.
+
+\subsection{DemandManagerAssignmentList}\label{demandmanagerassignmentlist}
+
+The DemandManagerAssignmentList object is a high level control that makes demand limiting decisions based on a list of possible demand limiting strategies. Each demand limiting strategy is described in a separate DemandManager object. (This is structured like the relationship between the \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList} and the AvailabilityManager objects.)
+
+Each DemandManagerAssignmentList monitors and demand limits one meter. Only electricity meters are currently allowed. In many cases, the meter will be \emph{Electricity:Facility}. A schedule and safety factor are used to set the demand limit above which the DemandManagers become activated. The billing month schedule and demand window are also taken into account when calculating the demand limit.
+
+DemandManagers in the list are activated based on the \emph{Demand Manager Priority}. If the \textbf{Sequential} option is used, each manager in the list is activated in sequence from first to last until demand is reduced below the limit or until all managers are activated. If the \textbf{All} option is used, all managers are activated simultaneously to achieve the maximum demand reduction.
+
+A DemandManager is skipped if it cannot reduce the demand. Possible reasons that a manager cannot reduce demand include:
+
+\begin{itemize}
+\item
+  not enough load to limit
+\item
+  not available because of its \emph{Availability Schedule}
+\item
+  already activated; load limited during a previous timestep.
+\end{itemize}
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}\label{field-name-009}
+
+The name of the DemandManagerAssignmentList object.
+
+\paragraph{Field: Meter Name}\label{field-meter-name}
+
+This field references the meter that is to be monitored and demand limited. Only electricity meters are currently allowed.
+
+\paragraph{Field: Demand Limit Schedule Name}\label{field-demand-limit-schedule-name}
+
+The reference to the schedule object specifying the target demand limits {[}schedule values should be in Watts{]}.
+
+\paragraph{Field: Demand Limit Safety Fraction}\label{field-demand-limit-safety-fraction}
+
+This field is a multiplier that is applied to the target demand limit (above). When the metered demand exceeds (target demand limit * safety fraction), the DemandManagers begin to limit the demand. This helps to ensure that the target limit is not exceeded.
+
+\paragraph{Field: Billing Period Schedule Name}\label{field-billing-period-schedule-name}
+
+The reference to the schedule object that defines the monthly billing periods. The peak demand during the peak period of the billing period typically determines the demand charge. This should reference the same schedule that is used in the \emph{Month Schedule Name} field of the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object. If left blank, it defaults to the regular divisions between months.
+
+\paragraph{Field: Peak Period Schedule Name}\label{field-peak-period-schedule-name}
+
+The reference to the schedule object that defines the peak/off-peak time-of-use periods. The peak demand during the peak period of the billing period typically determines the demand charge. This should reference the same schedule that is used in the \emph{Time of Use Period Schedule Name} field of the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object. A value of 1 indicates the peak period; any other value is off-peak. If left blank, it defaults to always on the peak period. The DemandManagerAssignmentList only attempts to demand limit during peak periods.
+
+\paragraph{Field: Demand Window Length}\label{field-demand-window-length}
+
+This field is similar to the field of the same name in the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object. However, the user may not want to limit using the same demand window as the utility company. This field allows the user to input the number of minutes over which to calculate the current demand. The minutes are rounded to match the nearest multiple of time steps.
+
+\paragraph{Field: Demand Manager Priority}\label{field-demand-manager-priority}
+
+This field indicates what logic should be used to activate the individual DemandManagers in the list. \textbf{Sequential} treats the list of DemandManagers as a sequential priority list, i.e., the first DemandManager in the list is activated first, then the second, etc., until the demand falls below the limit. \textbf{All} activates all demand managers to achieve the maximum demand reduction.
+
+\paragraph{Field: Demand Manager \textless{}\#\textgreater{} Type}\label{field-demand-manager-type-1}
+
+The key word defining the type of DemandManager.
+
+\paragraph{Field: Demand Manager \textless{}\#\textgreater{} Name}\label{field-demand-manager-name-1}
+
+The name of a DemandManager object defined elsewhere in the input file.
+
+DemandManagers are listed by pairs of data items: \emph{Demand Manager Type} and \emph{Demand Manager Name}. This object is extensible, so additional pairs of these last two fields can be added to the end of this object.
+
+An example IDF showing how this object is used is provided below:
+
+\begin{lstlisting}
+
+DemandManagerAssignmentList,
+  Demand Manager,                   !- Name
+  Electricity:Facility,       !- Meter Name
+  Limit Schedule,                   !- Demand Limit Schedule Name
+  1.0,                                         !- Demand Limit Safety Fraction
+  ,                                               !- Billing Period Schedule Name
+  ,                                               !- Peak Period Schedule Name
+  15,                                           !- Demand Window Length {minutes}
+  Sequential,                           !- Demand Manager Priority
+  DemandManager:ExteriorLights,   !- DemandManager 1 Object Type
+  Ext Lights Manager,           !- DemandManager 1 Name
+  DemandManager:ElectricEquipment,   !- DemandManager 2 Object Type
+  Eq Mgr Stage 1,                   !- DemandManager 2 Name
+  DemandManager:ElectricEquipment,   !- DemandManager 3 Object Type
+  Eq Mgr Stage 2,                   !- DemandManager 3 Name
+  DemandManager:ElectricEquipment,   !- DemandManager 4 Object Type
+  Eq Mgr Stage 3,                   !- DemandManager 4 Name
+  DemandManager:Lights,       !- DemandManager 5 Object Type
+  Lights Manager,                   !- DemandManager 5 Name
+  DemandManager:Thermostats,   !- DemandManager 6 Object Type
+  Thermostats Manager;         !- DemandManager 6 Name
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-007}
+
+The following output variables are reported for the DemandManagerAssignmentList object:
+
+\begin{itemize}
+\item
+  Zone,Average,Demand Manager Meter Demand Power {[}W{]}
+\item
+  Zone,Average,Demand Manager Average Demand Power {[}W{]}
+\item
+  Zone,Average,Demand Manager Peak Demand Power {[}W{]}
+\item
+  Zone,Average,Demand Manager Scheduled Limit Power {[}W{]}
+\item
+  Zone,Average,Demand Manager Demand Limit Power {[}W{]}
+\item
+  Zone,Average,Demand Manager Avoided Demand {[}W{]}
+\item
+  Zone,Average,Demand Manager Over Limit Power {[}W{]}
+\item
+  Zone,Sum,Demand Manager Over Limit Time {[}hr{]}
+\item
+  Zone,Sum,Demand Manager Exterior Energy Iteration Count {[]}
+\item
+  Zone,Sum,Demand Manager Heat Balance Iteration Count {[]}
+\item
+  Zone,Sum,Demand Manager HVAC Iteration Count {[]}
+\end{itemize}
+
+\paragraph{Demand Manager Meter Demand Power {[}W{]}}\label{demand-manager-meter-demand-power-w}
+
+The current demand for the designated meter.
+
+\paragraph{Demand Manager Average Demand Power {[}W{]}}\label{demand-manager-average-demand-power-w}
+
+The current demand for the designated meter averaged over the \emph{Demand Window Length}.
+
+\paragraph{Demand Manager Peak Demand Power {[}W{]}}\label{demand-manager-peak-demand-power-w}
+
+The peak demand in the billing month so far.
+
+\paragraph{Demand Manager Scheduled Limit Power {[}W{]}}\label{demand-manager-scheduled-limit-power-w}
+
+The scheduled target demand limit from the \emph{Demand Limit Schedule}.
+
+\paragraph{Demand Manager Demand Limit Power {[}W{]}}\label{demand-manager-demand-limit-power-w}
+
+The actual demand limit after multiplication by the \emph{Demand Limit Safety Fraction}.
+
+\paragraph{Demand Manager Avoided Demand {[}W{]}}\label{demand-manager-avoided-demand-w}
+
+The demand that was avoided by the active DemandManagers.
+
+\paragraph{Demand Manager Over Limit Power {[}W{]}}\label{demand-manager-over-limit-power-w}
+
+The difference between the demand limit and the average demand.
+
+\paragraph{Demand Manager Over Limit Time {[}hr{]}}\label{demand-manager-over-limit-time-hr}
+
+The number of hours that the demand limit was exceeded.
+
+\paragraph{Demand Manager Exterior Energy Iteration Count {[]}}\label{demand-manager-exterior-energy-iteration-count}
+
+The number times that the exterior energy use was resimulated for demand limiting.
+
+\paragraph{Demand Manager Heat Balance Iteration Count {[]}}\label{demand-manager-heat-balance-iteration-count}
+
+The number times that the zone heat balance was resimulated for demand limiting.
+
+\paragraph{Demand Manager HVAC Iteration Count {[]}}\label{demand-manager-hvac-iteration-count}
+
+The number times that the HVAC system was resimulated for demand limiting.
+
+\subsection{DemandManager:ExteriorLights}\label{demandmanagerexteriorlights}
+
+The DemandManager:ExteriorLights object is used for demand limiting \hyperref[exteriorlights]{Exterior:Lights} objects.
+
+\subsubsection{Inputs}\label{inputs-1-009}
+
+\paragraph{Field: Name}\label{field-name-1-008}
+
+The name of the DemandManager:ExteriorLights object.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-003}
+
+The reference to the schedule object specifying the availability of this DemandManager. A schedule value of 0 indicates that the unit is off for that time period. A schedule value greater than 0 indicates that the unit can operate during the time period. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Limit Control}\label{field-limit-control}
+
+This field specifies the type of limiting control. The \textbf{Fixed} option reduces the power to the controlled loads by a fixed amount determined by the \emph{Maximum Limit Fraction} field. The \textbf{Off} option disables the DemandManager in the simulation.
+
+\paragraph{Field: Minimum Limit Duration}\label{field-minimum-limit-duration}
+
+The minimum amount of time {[}minutes{]} that the DemandManager will continue to demand limit after being activated. This prevents loads from turning on and off every time step.
+
+\paragraph{Field: Maximum Limit Fraction}\label{field-maximum-limit-fraction}
+
+This field specifies a fraction of the \emph{Design Level} power for the load that determines the lowest allowable power level. With \emph{Limit Control} set to \textbf{Fixed}, the power is reduced to \emph{Maximum Limit Fraction * Design Level} whenever the manager is activated. For example, if the \emph{Maximum Limit Fraction} is 0.8, then a 100 W design level load is reduced to 80 W when limiting. A \emph{Maximum Limit Fraction} of zero means that the load can be shut off entirely.
+
+\paragraph{Field: Limit Step Change}\label{field-limit-step-change}
+
+NOT YET IMPLEMENTED.
+
+\paragraph{Field: Selection Control}\label{field-selection-control}
+
+This field specifies which loads are selected to be limited. The \textbf{All} option simultaneously limits all of the loads listed in this DemandManager. The \textbf{RotateMany} option limits all loads except for one which rotates sequentially through the loads listed. The \textbf{RotateOne} limits only one load which rotates sequentially through the loads listed. The time interval between rotations is set by the \emph{Rotation Duration} field.
+
+\paragraph{Field: Rotation Duration}\label{field-rotation-duration}
+
+If the \textbf{RotateOne} or \textbf{RotateMany} option is used for \emph{Selection Control}, this field sets the time interval {[}minutes{]} between rotations.
+
+\paragraph{Field: Exterior Lights \textless{}\#\textgreater{} Name}\label{field-exterior-lights-1-10-name}
+
+The names of \hyperref[exteriorlights]{Exterior:Lights} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.  This field is extensible, so additional fields of this type can be added to the end of this object.
+
+An example IDF showing how this object is used is provided below:
+
+\begin{lstlisting}
+
+DemandManager:ExteriorLights,
+  Ext Lights Manager,           !- Name
+  ,                                               !- Availability Schedule Name
+  Fixed,                                     !- Limit Control
+  60,                                           !- Minimum Limit Duration {minutes}
+  0.0,                                         !- Maximum Limit Fraction
+  ,                                               !- Limit Step Change
+  All,                                         !- Selection Control
+  ,                                               !- Rotation Duration {minutes}
+  Exterior Lights;                 !- Exterior Lights 1 Name
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-1-005}
+
+There are no output variables reported for the DemandManager:ExteriorLights object.
+
+\subsection{DemandManager:Lights}\label{demandmanagerlights}
+
+The DemandManager:Lights object is used for demand limiting Lights objects.
+
+\subsubsection{Inputs}\label{inputs-2-009}
+
+\paragraph{Field: Name}\label{field-name-2-008}
+
+The name of the DemandManager:Lights object.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-1-001}
+
+The reference to the schedule object specifying the availability of this DemandManager. A schedule value of 0 indicates that the unit is off for that time period. A schedule value greater than 0 indicates that the unit can operate during the time period. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Limit Control}\label{field-limit-control-1}
+
+This field specifies the type of limiting control. The \textbf{Fixed} option reduces the power to the controlled loads by a fixed amount determined by the \emph{Maximum Limit Fraction} field. The \textbf{Off} option disables the DemandManager in the simulation.
+
+\paragraph{Field: Minimum Limit Duration}\label{field-minimum-limit-duration-1}
+
+The minimum amount of time {[}minutes{]} that the DemandManager will continue to demand limit after being activated. This prevents loads from turning on and off every time step.
+
+\paragraph{Field: Maximum Limit Fraction}\label{field-maximum-limit-fraction-1}
+
+This field specifies a fraction of the \emph{Design Level} power for the load that determines the lowest allowable power level. With \emph{Limit Control} set to \textbf{Fixed}, the power is reduced to \emph{Maximum Limit Fraction * Design Level} whenever the manager is activated. For example, if the \emph{Maximum Limit Fraction} is 0.8, then a 100 W design level load is reduced to 80 W when limiting. A \emph{Maximum Limit Fraction} of zero means that the load can be shut off entirely.
+
+\paragraph{Field: Limit Step Change}\label{field-limit-step-change-1}
+
+NOT YET IMPLEMENTED.
+
+\paragraph{Field: Selection Control}\label{field-selection-control-1}
+
+This field specifies which loads are selected to be limited. The \textbf{All} option simultaneously limits all of the loads listed in this DemandManager. The \textbf{RotateMany} option limits all loads except for one which rotates sequentially through the loads listed. The \textbf{RotateOne} limits only one load which rotates sequentially through the loads listed. The time interval between rotations is set by the \emph{Rotation Duration} field.
+
+\paragraph{Field: Rotation Duration}\label{field-rotation-duration-1}
+
+If the \textbf{RotateOne} or \textbf{RotateMany} option is used for \emph{Selection Control}, this field sets the time interval {[}minutes{]} between rotations.
+
+\paragraph{Field: Lights \textless{}\#\textgreater{} Name}\label{field-lights-1-10-name}
+
+The names of \hyperref[lights-000]{Lights} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.  This field is extensible, so additional fields of this type can be added to the end of this object.
+
+If a global lights statement is used (Ref: \hyperref[lights-000]{Lights}), then only that name need be entered and the demand limiting will be applied to all the zones for that lighting. If only one of a set of zones from a global lights statement is desired, then the name to be entered is: \textless{}Zone Name\textgreater{} \textless{}Name of \hyperref[lights-000]{Lights} Global Object\textgreater{}.
+
+An example IDF showing how this object is used is provided below:
+
+\begin{lstlisting}
+
+DemandManager:Lights,
+  Lights Manager,                   !- Name
+  ,                                               !- Availability Schedule Name
+  Fixed,                                     !- Limit Control
+  60,                                           !- Minimum Limit Duration {minutes}
+  0.5,                                         !- Maximum Limit Fraction
+  ,                                               !- Limit Step Change
+  All,                                         !- Selection Control
+  ,                                               !- Rotation Duration {minutes}
+  Space1-1 Lights 1,             !- Lights 1 Name
+  Space2-1 Lights 1,             !- Lights 2 Name
+  Space3-1 Lights 1,             !- Lights 3 Name
+  Space4-1 Lights 1,             !- Lights 4 Name
+  Space5-1 Lights 1;             !- Lights 5 Name
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-2-005}
+
+There are no output variables reported for the DemandManager:Lights object.
+
+\subsection{DemandManager:ElectricEquipment}\label{demandmanagerelectricequipment}
+
+The DemandManager:\hyperref[electricequipment]{ElectricEquipment} object is used for demand limiting \hyperref[electricequipment]{ElectricEquipment} objects.
+
+\subsubsection{Inputs}\label{inputs-3-008}
+
+\paragraph{Field: Name}\label{field-name-3-008}
+
+The name of the DemandManager:\hyperref[electricequipment]{ElectricEquipment} object.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-2-000}
+
+The reference to the schedule object specifying the availability of this DemandManager. A schedule value of 0 indicates that the unit is off for that time period. A schedule value greater than 0 indicates that the unit can operate during the time period. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Limit Control}\label{field-limit-control-2}
+
+This field specifies the type of limiting control. The \textbf{Fixed} option reduces the power to the controlled loads by a fixed amount determined by the \emph{Maximum Limit Fraction} field. The \textbf{Off} option disables the DemandManager in the simulation.
+
+\paragraph{Field: Minimum Limit Duration}\label{field-minimum-limit-duration-2}
+
+The minimum amount of time {[}minutes{]} that the DemandManager will continue to demand limit after being activated. This prevents loads from turning on and off every time step.
+
+\paragraph{Field: Maximum Limit Fraction}\label{field-maximum-limit-fraction-2}
+
+This field specifies a fraction of the \emph{Design Level} power for the load that determines the lowest allowable power level. With \emph{Limit Control} set to \textbf{Fixed}, the power is reduced to \emph{Maximum Limit Fraction * Design Level} whenever the manager is activated. For example, if the \emph{Maximum Limit Fraction} is 0.8, then a 100 W design level load is reduced to 80 W when limiting. A \emph{Maximum Limit Fraction} of zero means that the load can be shut off entirely.
+
+\paragraph{Field: Limit Step Change}\label{field-limit-step-change-2}
+
+NOT YET IMPLEMENTED.
+
+\paragraph{Field: Selection Control}\label{field-selection-control-2}
+
+This field specifies which loads are selected to be limited. The \textbf{All} option simultaneously limits all of the loads listed in this DemandManager. The \textbf{RotateMany} option limits all loads except for one which rotates sequentially through the loads listed. The \textbf{RotateOne} limits only one load which rotates sequentially through the loads listed. The time interval between rotations is set by the \emph{Rotation Duration} field.
+
+\paragraph{Field: Rotation Duration}\label{field-rotation-duration-2}
+
+If the \textbf{RotateOne} or \textbf{RotateMany} option is used for \emph{Selection Control}, this field sets the time interval {[}minutes{]} between rotations.
+
+\paragraph{Field: Electric Equipment \textless{}\#\textgreater{} Name}\label{field-electric-equipment-1-10-name}
+
+The names of \hyperref[electricequipment]{ElectricEquipment} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.  This field is extensible, so additional fields of this type can be added to the end of this object.
+
+If a global Electric Equipment statement is used (Ref: \hyperref[electricequipment]{ElectricEquipment}), then only that name need be entered and the demand limiting will be applied to all the zones for that equipment. If only one of a set of zones from a global electric equipment statement is desired, then the name to be entered is: \textless{}Zone Name\textgreater{} \textless{}Name of \hyperref[electricequipment]{ElectricEquipment} Global Object\textgreater{}.
+
+An example IDF showing how this object is used is provided below:
+
+\begin{lstlisting}
+
+DemandManager:ElectricEquipment,
+  Eq Mgr Stage 3,                   !- Name
+  ,                                               !- Availability Schedule Name
+  Fixed,                                     !- Limit Control
+  60,                                           !- Minimum Limit Duration {minutes}
+  0.0,                                         !- Maximum Limit Fraction
+  ,                                               !- Limit Step Change
+  All,                                         !- Selection Control
+  ,                                               !- Rotation Duration {minutes}
+  Space5-1 ElecEq 1;             !- Electric Equipment 1 Name
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-3-003}
+
+There are no output variables reported for the DemandManager:ElectricEquipment object.
+
+\subsection{DemandManager:Thermostats}\label{demandmanagerthermostats}
+
+The DemandManager:Thermostats object is used for demand limiting \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects.
+
+\subsubsection{Inputs}\label{inputs-4-007}
+
+\paragraph{Field: Name}\label{field-name-4-007}
+
+The name of the DemandManager:Thermostats object.
+
+\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-3-000}
+
+The reference to the schedule object specifying the availability of the DemandManager. A schedule value of 0 indicates that the unit is off for that time period. A schedule value greater than 0 indicates that the unit can operate during the time period. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Reset Control}\label{field-reset-control}
+
+This field specifies the type of limiting control. The \textbf{Fixed} option resets the thermostats to a fixed temperature determined by the \emph{Maximum Heating Setpoint Reset} and \emph{Maximum Cooling Setpoint Reset} fields. The \textbf{Off} option disables the DemandManager in the simulation.
+
+\paragraph{Field: Minimum Reset Duration}\label{field-minimum-reset-duration}
+
+The minimum amount of time {[}minutes{]} that the DemandManager will continue to demand limit after being activated. This prevents thermostats from resetting on and off every time step.
+
+\paragraph{Field: Maximum Heating Setpoint Reset}\label{field-maximum-heating-setpoint-reset}
+
+This field specifies the thermostat heating setpoint temperature {[}C{]} that represents the largest allowable temperature reset or setback. With \emph{Reset Control} set to \textbf{Fixed}, the setpoint temperature is reset to the \emph{Maximum Heating Setpoint Reset} whenever the manager is activated. For example, if the heating setpoint is normally 22 C and the \emph{Maximum Heating Setpoint Reset} is 20 C, then the setpoint is reset to 20 C when limiting.
+
+\paragraph{Field: Maximum Cooling Setpoint Reset}\label{field-maximum-cooling-setpoint-reset}
+
+This field specifies the thermostat cooling setpoint temperature {[}C{]} that represents the largest allowable temperature reset or setback. With \emph{Reset Control} set to \textbf{Fixed}, the setpoint temperature is reset to the \emph{Maximum Cooling Setpoint Reset} whenever the manager is activated. For example, if the cooling setpoint is normally 22 C and the \emph{Maximum Cooling Setpoint Reset} is 24 C, then the setpoint is reset to 24 C when limiting.
+
+\paragraph{Field: Reset Step Change}\label{field-reset-step-change}
+
+NOT YET IMPLEMENTED.
+
+\paragraph{Field: Selection Control}\label{field-selection-control-3}
+
+This field specifies which loads are selected to be limited. The \textbf{All} option simultaneously limits all of the loads listed in this DemandManager. The \textbf{RotateMany} option limits all loads except for one which rotates sequentially through the loads listed. The \textbf{RotateOne} limits only one load which rotates sequentially through the loads listed. The time interval between rotations is set by the \emph{Rotation Duration} field.
+
+\paragraph{Field: Rotation Duration}\label{field-rotation-duration-3}
+
+If the \textbf{RotateOne} or \textbf{RotateMany} option is used for \emph{Selection Control}, this field sets the time interval {[}minutes{]} between rotations.
+
+\paragraph{Field: Thermostat \textless{}\#\textgreater{} Name}\label{field-thermostat-1-10-name}
+
+The names of \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects defined elsewhere in the input file. These are the loads to be limited by this DemandManager.  This field is extensible, so additional fields of this type can be added to the end of this object.
+
+If a global thermostat statement is used (Ref: \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat}), then only that name need be entered and the demand limiting will be applied to all the zones for that thermostatic control. If only one of a set of zones from a global thermostat statement is desired, then the name to be entered is: \textless{}Zone Name\textgreater{} \textless{}Name of Thermostat Global Object\textgreater{}.
+
+An example IDF showing how this object is used is provided below:
+
+\begin{lstlisting}
+
+DemandManager:Thermostats,
+  Thermostats Manager,         !- Name
+  ,                                               !- Availability Schedule Name
+  Fixed,                                     !- Reset Control
+  60,                                           !- Minimum Reset Duration {minutes}
+  19,                                           !- Maximum Heating Setpoint Reset {C}
+  26,                                           !- Maximum Cooling Setpoint Reset {C}
+  ,                                               !- Reset Step Change
+  All,                                         !- Selection Control
+  ,                                               !- Rotation Duration {minutes}
+  SPACE1-1 Control,               !- Thermostat 1 Name
+  SPACE2-1 Control,               !- Thermostat 2 Name
+  SPACE3-1 Control,               !- Thermostat 3 Name
+  SPACE4-1 Control,               !- Thermostat 4 Name
+  SPACE5-1 Control;               !- Thermostat 5 Name
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-4-002}
+
+There are no output variables reported for the DemandManager:Thermostats object.
+
+\subsection{DemandManager:Ventilation}\label{demandmanagerventilation}
+
+The DemandManager:Ventilation object is used for limiting the ventilation rate calculated from the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} object.
+
+\subsubsection{Field: Name}\label{field-name-5-006}
+
+The name of the DemandManager:Ventilation object.
+
+\subsubsection{Field: Availability Schedule Name}\label{field-availability-schedule-name-4-000}
+
+The reference to the schedule object specifying the availability of this demand manager. A schedule value of zero indicates that this demand response (DR) is not applicable for that time period. A schedule greater than zero indicates that the demand response applies during the time period. If this field is blank, the schedule has values of one for all time period.
+
+\subsubsection{Field: Limit Control}\label{field-limit-control-3}
+
+This field specifies the type of limiting control. There are three options. The \textbf{FixedRate} option reduces the ventilation to a specified air flow rate. The \textbf{ReductionRatio} specifies the multiplier of the ventilation rate. The \textbf{Off} option disables the demand manager in the simulation.
+
+\subsubsection{Field: Minimum Limit Duration}\label{field-minimum-limit-duration-3}
+
+The minimum amount of time {[}minutes{]} that the demand manager will continue to demand limit after being activated. This prevent loads from turning on and off every time step.
+
+\subsubsection{Field: Fixed Rate}\label{field-fixed-rate}
+
+This field specifies the amount of fixed ventilation rate when the demand manager is active and \emph{FixedRate} limit control is applied. The unit is m3/s.
+
+\subsubsection{Field: Reduction Ratio}\label{field-reduction-ratio}
+
+This field specifies the multiplier of the ventilation rate when the demand manager is active and \emph{ReductionRatio} limit control is applied.
+
+\subsubsection{Field: Limit Step Change}\label{field-limit-step-change-3}
+
+NOT YET IMPLEMENTED.
+
+\subsubsection{Field: Selection Control}\label{field-selection-control-4}
+
+This field specifies which loads (ventilation rates) are selected to be limited. The \textbf{All} option simultaneously limits all of the loads listed in the demand manager. The \textbf{RotateMany} option limits all loads except for one which rotates sequentially through the loads listed. The \textbf{RotateOne} limits only one load which rotates sequentially through the loads listed. The time interval between rotations is set by the \emph{Rotation Duration} field.
+
+\subsubsection{Field: Rotation Duration}\label{field-rotation-duration-4}
+
+If the \textbf{RotateOne} of \textbf{RotateMany} option is used for \emph{Selection Control}, this field sets the time interval {[}minues{]} between rotations.
+
+\subsubsection{Field: Controller Outdoor Air \textless{}\#\textgreater{} Name}\label{field-controller-outdoor-air-x-name}
+
+The names of \hyperref[controlleroutdoorair]{Controller:OutdoorAir} objects defined elsewhere in the input file. These are the ventilation rates to be limited by this demand manager. Then objects are accommodated in the list by default.  This field is extensible, so additional fields of this type can be added to the end of this object.
+
+An example IDF showing how this object is used is provided below:
+
+\begin{lstlisting}
+
+DemandManager:Ventilation,
+  Ventilation Manager,         !- Name
+  ,                            !- Availability Schedule Name
+  ReductionRatio,              !- Reset Control
+  60,                          !- Minimum Limit Duration {minutes}
+  ,                            !- Fixed Rate {m3/s}
+  0.5,                         !- Reduction Ratio
+  ,                            !- Limit Step Change
+  All,                         !- Selection Control
+  ,                            !- Rotation Duration {minutes}
+  OA Controller 1;             !- Controller:OutdoorAir Name
+\end{lstlisting}
+
+\subsection{DemandManager:Ventilation Outputs}\label{demandmanagerventilation-outputs}
+
+There are no output variables reported for the \hyperref[demandmanagerventilation]{DemandManager:Ventilation} object.

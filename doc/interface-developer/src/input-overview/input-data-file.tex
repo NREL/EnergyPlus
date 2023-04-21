@@ -1,0 +1,14 @@
+\section{Input Data File}\label{input-data-file}
+
+This is the only file that EnergyPlus uses to create the building simulation.~ The input is order-independent; data can appear in any order and will be retrieved and sorted as necessary by the EnergyPlus simulation modules.~ In addition, EnergyPlus allocates everything dynamically, so there are no limitations as to number of zones, surfaces, etc.
+
+All numbers can be flexibly input and are processed into single precision variables (i.e.~1.0, 1.000, 1, .1E+1 are all processed equally).
+
+\subsection{Rules specific to Input Data file:}\label{rules-specific-to-input-data-file}
+
+\begin{itemize}
+\item
+  Each Alpha string in the input data file can be up to 100 characters in length.~ Anything beyond that is truncated.
+\item
+  A special combination of characters ``!-`` indicates a comment that contains the name and units of the field after each field value. These, like normal comments, are ignored by EnergyPlus. This type of comment containing the field names are created automatically with IDF Editor, IDF Version Updater (transition) and other user interfaces. Comments added by the user should not use ``!-`` because they are deleted and replaced with the field name when the file is saved using IDF Editor. For an example of this syntax, see the example file in Appendix A.
+\end{itemize}

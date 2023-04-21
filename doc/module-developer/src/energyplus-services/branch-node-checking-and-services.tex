@@ -1,0 +1,934 @@
+\section{Branch \& Node Checking and Services}\label{branch-node-checking-and-services}
+
+\subsection{BranchInputManager}\label{branchinputmanager}
+
+For the most part, new modules do not use the BranchInputManager directly.~ Branches are ``gotten'' at a high management level.~ The main routines that might be used from the BranchInputManager are: NumBranchesInBranchList, GetBranchList and GetBranchData.~ The BranchInputManager also houses the Splitter and Mixer data: GetLoopSplitter and GetLoopMixer.
+
+\subsection{NumBranchesInBranchList}\label{numbranchesinbranchlist}
+
+This routine is used to get the number of branches in a branch list name (so that an appropriate array can be allocated).
+
+INTEGER FUNCTION NumBranchesInBranchList(BranchListName)
+
+An example of use:
+
+= = = Example = = =
+
+USE BranchInputManager, ONLY: NumBranchesInBranchList,. . .
+
+. . .
+
+PrimeAirSys(ASysNum)\%NumBranches = ~ \&
+
+~~~~~~~~~~~~~ \textbf{NumBranchesInBranchList}(BranchListName)
+
+IF (PrimeAirSys(ASysNum)\%NumBranches.EQ.0) THEN
+
+~ CALL ShowSevereError(`There must be at least 1 branch in system' \&
+
+~~~~~~~~~~~~~~~~~~ ~~~~~~//TRIM(PrimeAirSys(ASysNum)\%Name))
+
+~ ErrorsFound = .true.
+
+END IF
+
+ALLOCATE(BranchNames(PrimeAirSys(ASysNum)\%NumBranches))
+
+BranchNames = `'
+
+\subsection{GetBranchList}\label{getbranchlist}
+
+This routine is used to get the names of the branches on a Loop.
+
+SUBROUTINE GetBranchList(LoopName, BranchListName, NumBranchNames, BranchNames, LoopType)
+
+= = = Example = = =
+
+USE BranchInputManager, ONLY: GetBranchList, . . .
+
+. . .
+
+(NumBranches from NumBranchesInBranchList)
+
+! get the branch lists
+
+CALL \textbf{GetBranchList}(PrimeAirSys(ASysNum)\%Name,BranchListName, ~\&
+
+~~~~~~~ PrimeAirSys(ASysNum)\%NumBranches,BranchNames,`Air')
+
+ALLOCATE(PrimeAirSys(ASysNum)\%Branch(NumBranches))
+
+. . . . . . . .
+
+The first argument is the loop name, the 2\(^{nd}\) argument is the name of the Branch List, the 3\(^{rd}\) argument is an output: the number of branch names, the 4\(^{th}\) argument is an output: the names of the branches in the list, the 5\(^{th}\) argument is the loop type.
+
+\subsection{GetBranchData}\label{getbranchdata}
+
+This routine is used to get pieces of data about a branch.
+
+SUBROUTINE GetBranchData(LoopName, BranchName, BranchMaxFlow, NumComps, CompType, CompName, CompCtrlType, CompInletNodeNames, CompInletNodeNums, CompOutletNodeNames, CompOutletNodeNums, ErrorsFound)
+
+= = = Example = = =
+
+! Cycle through all of the branches and set up the branch data
+
+DO BNum = 1,PrimeAirSys(ASysNum)\%NumBranches
+
+~ PrimeAirSys(ASysNum)\%Branch(BNum)\%Name = BranchNames(BNum)
+
+~ NumBComps = NumCompsInBranch(BranchNames(BNum))
+
+~ ALLOCATE(CompTypes(NumBComps))
+
+~ CompTypes = `'
+
+~ ALLOCATE(CompNames(NumBComps))
+
+~ CompNames = `'
+
+~ ALLOCATE(CompCtrls(NumBComps))
+
+~ CompCtrls = `'
+
+~ ALLOCATE(InletNodeNames(NumBComps))
+
+~ InletNodeNames = `'
+
+~ ALLOCATE(InletNodeNumbers(NumBComps))
+
+~ InletNodeNumbers = 0
+
+~ ALLOCATE(OutletNodeNames(NumBComps))
+
+~ OutletNodeNames = `'
+
+~ ALLOCATE(OutletNodeNumbers(NumBComps))
+
+~ OutletNodeNumbers = 0
+
+~ CALL GetBranchData(PrimeAirSys(ASysNum)\%Name,~ \&
+
+~~~~ BranchNames(BNum),~~~~~~~~~~~~ \&
+
+~~~~ PrimeAirSys(ASysNum)\%Branch(BNum)\%MaxVolFlowRate, \&
+
+~~~~ NumBComps,~~~~~~~~~~~~~~~~~~ \&
+
+~~~~ CompTypes,CompNames,CompCtrls, ~~~~~\&
+
+~~~~ InletNodeNames,InletNodeNumbers,~~~ \&
+
+~~~~ OutletNodeNames,OutletNodeNumbers,ErrorsFound)
+
+~ ALLOCATE \&
+
+~(PrimeAirSys(ASysNum)\%Branch(BNum)\%Comp(NumBComps))
+
+~ PrimeAirSys(ASysNum)\%Branch(BNum)\%TotalComponents = ~ \&
+
+~~~~~~~~~~~~~~~~~~ NumBComps
+
+~~PrimeAirSys(ASysNum)\%Branch(BNum)\%TotalNodes = ~~ \&
+
+~~~~~~~~~~~~~~~~~~ NumBComps+1
+
+~ ALLOCATE (PrimeAirSys(ASysNum)\%Branch(BNum)\%NodeNum(NumBComps+1))
+
+~ PrimeAirSys(ASysNum)\%Branch(BNum)\%NodeNum(1) = ~~ \&
+
+~~~~~~~~~~~~~~~~~~ InletNodeNumbers(1)
+
+~ PrimeAirSys(ASysNum)\%Branch(BNum)\%DuctType = Main
+
+~ DO CNum = 1,PrimeAirSys(ASysNum)\%Branch(BNum)\%TotalComponents
+
+~~~ PrimeAirSys(ASysNum)\%Branch(BNum)\%Comp(CNum)\%TypeOf = \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~ CompTypes(CNum)
+
+~~~ PrimeAirSys(ASysNum)\%Branch(BNum)\%Comp(CNum)\%Name~ = ~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ = CompNames(CNum)
+
+~~~ PrimeAirSys(ASysNum)\%Branch(BNum)\%Comp(CNum)\%Index = 0
+
+~~~ PrimeAirSys(ASysNum)\%Branch(BNum)\%Comp(CNum)\%FlowCtrl = \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~ CompCtrls(CNum)
+
+~~~ PrimeAirSys(ASysNum)\%Branch(BNum)\%Comp(CNum)\%NodeNameIn = \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~ InletNodeNames(CNum)
+
+~~~ PrimeAirSys(ASysNum)\%Branch(BNum)\%Comp(CNum)\%NodeNumIn = \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~ InletNodeNumbers(CNum)
+
+~~~ PrimeAirSys(ASysNum)\%Branch(BNum)\%Comp(CNum)\%NodeNameOut = \&
+
+~~~~~~~ ~~~~~~~~~~~~~~~~~OutletNodeNames(CNum)
+
+~~~ PrimeAirSys(ASysNum)\%Branch(BNum)\%Comp(CNum)\%NodeNumOut = \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~ OutletNodeNumbers(CNum)
+
+~~~ PrimeAirSys(ASysNum)\%Branch(BNum)\%NodeNum(CNum+1) = \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~ OutletNodeNumbers(CNum)
+
+\subsection{NodeInputManager}\label{nodeinputmanager}
+
+The NodeInputManager is responsible for getting all the node names and assigning each a number.~ Node names are learned in random order -- which can make validation difficult.~ Internally nodes are referenced as number and should be integers in any data structure or reference.~ Two key routines are used for obtaining node numbers:~ GetOnlySingleNode and GetNodeNums.
+
+\subsection{Node Information Arguments}\label{node-information-arguments}
+
+Both routines need some extra information about the node as the number is obtained.This information is used to support fluid property calculations, the HVAC Diagram utility, and various diagnostic checks.
+
+\subsubsection{NodeFluidType}\label{nodefluidtype}
+
+This argument defines the type of fluid at this node such as air or water.~ The node fluid type is used for fluid property calculations and is reported in the list of nodes in the bnd output file.~~ Parameter definitions for this argument can be found in DataLoopNode.~ As of version 1.3, the list of valid choices is:
+
+~ ! Valid Fluid Types for Nodes
+
+~ INTEGER, PARAMETER :: NodeType\_Unknown = 0~ ! `blank'
+
+~ INTEGER, PARAMETER :: NodeType\_Air~~~~ = 1~ ! `Air'
+
+~ INTEGER, PARAMETER :: NodeType\_Water~~ = 2~ ! `Water'
+
+~ INTEGER, PARAMETER :: NodeType\_Steam~~ = 3~ ! `Steam'
+
+~ INTEGER, PARAMETER :: NodeType\_Electric = 4~ ! `Electric'
+
+~ CHARACTER(len = *), PARAMETER, DIMENSION(0:4) :: ValidNodeFluidTypes = ~ \&
+
+~~~~~~~~~~~~~~~~~~~~ (/`blank~~',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `Air~~~~',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `Water~~',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `Steam~~',~ \&
+
+~~~~ ~~~~~~~~~~~~~~~~~~`Electric'/)
+
+~ INTEGER, PARAMETER :: NumValidNodeFluidTypes = 4
+
+Note that the argument passed in is an integer value -- you can ``USE DataLoopNode'' and use the above definitions (preferred over either defining your own or passing in a number).~ In many cases, a component may not know the fluid type.~ For example, most SET POINT MANAGERS are applicable to both air and water nodes.~ In this case, NodeType\_Unknown should be used.~ It is assumed that for any given node, at least one object referencing it will know the fluid type.~ Once a known fluid type is passed for a given node, it cannot be changed.~ All references to the same node must specify the same fluid type or unknown.~ When all input has been gotten, all node fluid types should be known, but this is not being validated currently.
+
+\subsubsection{NodeObjectType}\label{nodeobjecttype}
+
+This is the type of object which is referencing the node (e.g.~Chiller:Electric).~ This information is used to generate the list of Parent and Non-Parent Node Connections in the bnd output file.~ This list is used by the HVAC Diagram utility.
+
+\subsubsection{NodeObjectName}\label{nodeobjectname}
+
+This is the name of the object which is referencing the node (e.g.~My Chiller).~ This information is used to generate the list of Parent and Non-Parent Node Connections in the bnd output file.~ This list is used by the HVAC Diagram utility.
+
+\subsubsection{NodeConnectionType}\label{nodeconnectiontype}
+
+Parameter definitions for this argument can be found in DataLoopNode. .As of version 1.2.0, the current list of choices is:
+
+~ ! Valid Connection Types for Nodes
+
+~ CHARACTER(len = *), PARAMETER, DIMENSION(13) :: ValidConnectionTypes = ~ \&
+
+~~~~~~~~~~~~~~~~~~~~ (/`Inlet~~~~~',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `Outlet~~~~',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `Internal~~',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `ZoneNode~~',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `Sensor~~~~',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `Actuator~~',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `OutsideAir',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `ReliefAir~',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `ZoneInlet~',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `ZoneReturn',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `ZoneExhaust',~ \&
+
+~~~~~~~~~ ~~~~~~~~~~~~~`Setpoint~~',~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `Electric~~'/)
+
+~ INTEGER, PARAMETER :: NumValidConnectionTypes = 13
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_Inlet = 1
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_Outlet = 2
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_Internal = 3
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_ZoneNode = 4
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_Sensor = 5
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_Actuator = 6
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_OutsideAir = 7
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_ReliefAir = 8
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_ZoneInlet = 9
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_ZoneReturn = 10
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_ZoneExhaust = 11
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_Setpoint = 12
+
+~ INTEGER, PARAMETER :: NodeConnectionType\_Electric = 13
+
+This information is used to generate the list of Parent and Non-Parent Node Connections in the bnd output file.~ This list is used by the HVAC Diagram utility.
+
+After all input has been gotten, node connection types are also validated in CheckNodeConnections in NodeInputManager according to the following rules. The rules are intended to catch user input errors without placing unnecessary constraints on system configurations. The validation checks are not exhaustive, so it is possible to pass all of the checks yet have a misconnected simulation. The main goal here is to prevent dangling nodes which do not behave as the user expects and can often go undetected without scrutinizing detailed outputs.
+
+\begin{itemize}
+\item
+  For any node which is used as an actuator, the same node must also be used at least once as a node type which is not sensor or actuator or outsideair.
+\item
+  For any node which is used as a setpoint, the same node must also be used at least once as a node type which is not a setpoint or outsideair.
+\item
+  Every ZoneInlet must appear as an outlet from something, otherwise it will do nothing.
+\item
+  Every ZoneExhaust must appear as an inlet to something, otherwise it will do nothing.
+\item
+  Every inlet node should match either an Outlet, ZoneReturn, ZoneExhaust, ReliefAir, or OutsideAir node, with the following exceptions:
+\item
+  If an InletNode's object is AIR PRIMARY LOOP, CONDENSER LOOP, or PLANT LOOP, then skip the test.
+\item
+  If an InletNode's object is not one of the above types, it is valid if the same node name appears as an INLET to an AIR PRIMARY LOOP, CONDENSER LOOP, or PLANT LOOP.
+\end{itemize}
+
+If a node fails any of the above tests, a severe error message is generated. If a new module generates unexpected errors, check the node connection types used by a similar module. \emph{If a given node is used in more than one way by an object, it may be necessary to register the node more than once by successive calls to GetOnlySingleNode or GetNodeNums with different arguments in each call.}
+
+NodeConnectionType\_OutsideAir is intended to specify nodes which are connected to the outside air.~ For example, OUTSIDE AIR MIXER has an Outside\_Air\_Stream\_Node which is registered as NodeConnectionType\_Inlet, because it may have other components such as a preheat coil between it and the outside air. Whichever node ultimately connects to the outside air in this case will be registered as NodeConnectionType\_OutsideAir by an OUTSIDE AIR INLET NODE LIST object.
+
+Some types of equipment take in outside air directly without relying on OUTSIDE AIR INLET NODE LIST to set the conditions on that node.~ For example, UNIT VENTILATOR and chillers with air cooled condensers do not require the use of an OUTSIDE AIR INLET NODE LIST. In these cases, the component registers the outside air node directly as NodeConnectionType\_OutsideAir. Given that the use of outside air nodes is not consistent throughout the code, it may be necessary at some point to relax or alter the validation rules associated with outside air nodes to accommodate a new type of module. Please consult with the team before changing these rules.
+
+\subsubsection{NodeFluidStream}\label{nodefluidstream}
+
+This is an integer indicating which fluid stream this node belongs to (1, 2, 3). For components with a single fluid stream, such as a fan, set this to one for the inlet and outlet nodes.~ For components with multiple fluid streams, such as a water coil, matching inlets and outlets should use the same fluid stream number.~ For example, the air inlet and air outlet would be stream 1, and the water inlet and water outlet would be stream 2. This information is used to generate the list of Parent and Non-Parent Node Connections in the bnd output file.~ This list is used by the HVAC Diagram utility.
+
+\subsubsection{ObjectIsParent}\label{objectisparent}
+
+True If the object is a parent object, false if not. Parameters are defined in DataLoopNode. As of version 1.2.0, the current list of choices is:
+
+~ ! Valid IsParent Types for Node Connections
+
+~ LOGICAL, PARAMETER :: ObjectIsParent = .TRUE.
+
+~ LOGICAL, PARAMETER :: ObjectIsNotParent = .FALSE.
+
+What is a parent object?~ A parent object is one which encloses and references other objects.~ For example, FAN COIL UNIT:4 PIPE is a parent to a fan, a heating coil, a cooling coil, and an outside air mixer. In most cases, all nodes referenced by a parent object are duplicated in the non-parent objects which are the components which ultimately act on the fluid stream. From the perspective of the HVAC Diagram utility, every fluid loop must be a continuous connection of non-parent objects and zones. In this example, the nodes of the mixer, fan, coils, and zone form a complete loop. Some components, such as UNIT VENTILATOR are part parent and part non-parent. It is a parent to a fan, a heating coil, and a cooling coil, but it does not reference an explicit outside air mixer. The mixer is an implied component within the unit ventilator. In these cases, to facilitate drawing a loop in HVAC Diagram, it is necessary to create a non-parent component to carry the fluid. So, the unit ventilator uses the following approach as illustrated by the comments and source code. Note that Alphas(3), the air inlet node, is registered twice, once as an inlet to parent object UNIT VENTILATOR, and once as an inlet to the implicit non-parent object UNIT VENTILATOR-OA MIXER.
+
+Excerpt from GetUnitVentilatorInput in UnitVentilator
+
+~~~~~~~~~ ! Main air nodes (except outside air node):
+
+~~~~~~~~~ ! For node connections, this object is both a parent and a non-parent, because the
+
+~~~~~~~~~ ! OA mixing box is not called out as a separate component, its nodes must be connected
+
+~~~~~~~~~ ! as ObjectIsNotParent.~ But for the fan and coils, the nodes are connected as ObjectIsParent
+
+~~~~~~~~~ ! To support the diagramming tool, the unit ventilator inlet node must appear both as
+
+~~~~~~~~~ ! an inlet to the unit ventilator parent object and as an inlet to the implied
+
+~~~~~~~~~ ! non-parent OA mixing box within the unit ventilator.
+
+~~~~~~~~~ ! Because there is overlap between the nodes that are parent and non-parent, use a different
+
+~~~~~~~~~ ! object type for the non parent nodes
+
+~~~ UnitVent(UnitVentNum)\%AirInNode = \&
+
+~~~~~~~~~~~~~~ GetOnlySingleNode(Alphas(3),ErrorsFound,`UNIT VENTILATOR',Alphas(1), \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~ NodeType\_Air,NodeConnectionType\_Inlet,1,ObjectIsParent)
+
+~~~ UnitVent(UnitVentNum)\%AirInNode = \&
+
+~~~~~~~~~~~~~~ GetOnlySingleNode(Alphas(3),ErrorsFound,`UNIT VENTILATOR-OA MIXER',Alphas(1), \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~ NodeType\_Air,NodeConnectionType\_Inlet,1,ObjectIsNotParent)
+
+~~~ UnitVent(UnitVentNum)\%AirOutNode = \&
+
+~~~~~~~~~~~~~~ GetOnlySingleNode(Alphas(4),ErrorsFound,`UNIT VENTILATOR',Alphas(1), \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~ NodeType\_Air,NodeConnectionType\_Outlet,1,ObjectIsParent)
+
+~~~ UnitVent(UnitVentNum)\%FanOutletNode = \&
+
+~~~~~~~~~~~~~~ GetOnlySingleNode(Alphas(5),ErrorsFound,`UNIT VENTILATOR',Alphas(1), \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~ NodeType\_Air,NodeConnectionType\_Internal,1,ObjectIsParent)
+
+\subsection{GetOnlySingleNode}\label{getonlysinglenode}
+
+This is used when only one node is expected as the input point.~ If this name points to a NodeList, an appropriate error message will be issued and errFlag (the second argument) will be set .true.
+
+\textbf{GetOnlySingleNode}(NodeName,errFlag,NodeObjectType,NodeObjectName,NodeFluidType,NodeConnectionType,NodeFluidStream,ObjectIsParent)
+
+It is used:
+
+Example:
+
+USE NodeInputManager, ONLY: GetOnlySingleNode
+
+. . .
+
+! get inlet node number
+
+Baseboard(BaseboardNum)\%WaterInletNode~ = \&
+
+~~~~~~~~~~~~~~ \textbf{GetOnlySingleNode}(AlphArray(3),ErrorsFound,~ \&
+
+~~~~~~~~~~~~~~~~~~~ `Baseboard Heater:Water:Convective',AlphArray(1), \&
+
+~~~~~ ~~~~~~~~~~~~~~~NodeType\_Water,NodeConnectionType\_Inlet,~ \&
+
+~~~~~~~~~~~~~~~~~~~~ 1,ObjectIsNotParent)
+
+! get outlet node number
+
+Baseboard(BaseboardNum)\%WaterOutletNode~ = \&
+
+~~~~~~~~~~~~~~ \textbf{GetOnlySingleNode}(AlphArray(4),ErrorsFound,~ \&
+
+~~~~~~~~~~~~~~~~~~~~ `Baseboard Heater:Water:Convective',AlphArray(1), \&
+
+~~~~~~~~~~~~~~~~~~~~~ NodeType\_Water,NodeConnectionType\_Outlet,~ \& ~~~~~~~~~~~~~~~~~~~~~ 1,ObjectIsNotParent)
+
+The first argument is the node name, the 2\(^{nd}\) argument is the error flag variable, the 3\(^{rd}\) argument is the object type, the 4\(^{th}\) argument is the object name -- the remainder arguments are as listed above.
+
+\subsection{GetNodeNums}\label{getnodenums}
+
+This is used when more than one node is valid for an input. Like the GetOnlySingleNode invocation, GetNodeNums needs the extra information for a node:
+
+SUBROUTINE GetNodeNums(Name,NumNodes,NodeNumbers,ErrorsFound,~ \&
+
+~~~~~~~~~~~~~~ NodeFluidType,NodeObjectType,NodeObjectName,~ \&
+
+~~~~~~~~~~~~~~ NodeConnectionType,NodeFluidStream,ObjectIsParent)
+
+Example:
+
+USE NodeInputManager, ONLY: GetNodeNums
+
+. . .
+
+CHARACTER(len = MaxNameLength), DIMENSION(4) :: AlphArray
+
+INTEGER :: NumNodes
+
+INTEGER, DIMENSION(25) :: NodeNums
+
+. . . . . . . .
+
+! Get the supply nodes
+
+ErrInList = .false.
+
+CALL \textbf{GetNodeNums}(Names(8),NumNodes,NodeNums,ErrInList,NodeType\_Air,~ \&
+
+~~~~~~~~~~~~~~~ `AIR PRIMARY LOOP',PrimaryAirSystem(AirSysNum)\%Name,~ \&
+
+~~~~~~~~~~~~~~~ NodeConnectionType\_Inlet,1,ObjectIsParent)
+
+IF (ErrInList) THEN
+
+~CALL ShowContinueError(`Invalid Node Name or Node List in Air System =' \&
+
+~~~~~~~~~~~~~~~~~~~~~~~ //TRIM(PrimaryAirSystem(AirSysNum)\%Name))
+
+~ErrorsFound = .true.
+
+ENDIF
+
+! Allow at most 3 supply nodes (for a 3 deck system)
+
+IF (NumNodes \textgreater{} 3) THEN
+
+~ CALL ShowSevereError(`Air System:Only 1st 3 Nodes will be used from:' \&
+
+~~~~~~~~~~~~~ ~~~~~~~~~~//TRIM(Names(8)))
+
+~ CALL ShowContinueError(`Occurs in Air System ='//~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~ TRIM(PrimaryAirSystem(AirSysNum)\%Name))
+
+~ ErrorsFound = .true.
+
+ENDIF
+
+IF (NumNodes.EQ.0) THEN
+
+~ CALL ShowSevereError('Air System:there must be at least 1 `// \&
+
+~~~~~~~~~~~~~~~~~~~~~~ `supply node in system'//TRIM(Names(1)))
+
+~ CALL ShowContinueError(`Occurs in Air System ='//~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~ TRIM(PrimaryAirSystem(AirSysNum)\%Name))
+
+~ ErrorsFound = .true.
+
+END IF
+
+. . . . . . . .
+
+The first argument is a node name or the name of a Node List, the 2\(^{nd}\) argument is the number of nodes in the Node List (1 for a single node), the 3\(^{rd}\) argument is the output: a list of node numbers -- these are followed by the arguments shown above.
+
+\subsection{Unique Node Checking}\label{unique-node-checking}
+
+A set of routines will allow you to use the NodeInputManager to check for unique node names across a set of inputs.~ This is used currently in the CONTROLLED ZONE EQUIP CONFIGURATION object where each zone node mentioned must be unique.~ Three routines comprise the unique node check:~ InitUniqueNodeCheck, CheckUniqueNodes, EndUniqueNodeCheck
+
+\subsection{InitUniqueNodeCheck}\label{inituniquenodecheck}
+
+A call to this routine starts the collection and detection of unique/non-unique nodes by the NodeInputManager:
+
+USE NodeInputManager, ONLY: InitUniqueNodeCheck, CheckUniqueNodes, \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~ EndUniqueNodeCheck
+
+. . .
+
+CALL \textbf{InitUniqueNodeCheck}(`CONTROLLED ZONE EQUIP CONFIGURATION')
+
+The only argument is a simple string that will help with error messages that may come from the NodeInputManager.~ Unique node checking can only be done for one context (`CONTROLLED ZONE EQUIP CONFIGURATION') at a time.
+
+\subsection{CheckUniqueNodes}\label{checkuniquenodes}
+
+SUBROUTINE CheckUniqueNodes(NodeTypes,CheckType,ErrorsFound,~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~ CheckName,CheckNumber)
+
+This is the routine called during the getting of the nodes.~ The CheckType argument can be `Nodename' or `NodeNumber' and then pass in the appropriate argument to CheckName or CheckNumber.~ CheckName and CheckNumber are optional arguments -- only the necessary one need be supplied.
+
+Argument 1, NodeTypes, is the type of node being looked for -- this argument is used for error messages within the NodeInput processing.~ Argument 2, ErrorsFound, will be set to true of this node is not unique in the current context.
+
+Example:
+
+~~~ UniqueNodeError = .false.
+
+~~~ CALL \textbf{CheckUniqueNodes}(`Zone Air Node',`NodeName',UniqueNodeError,~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ CheckName = AlphArray(5))
+
+~~~ IF (UniqueNodeError) THEN
+
+~~~~~ CALL ShowContinueError(`Occurs for Zone ='//TRIM(AlphArray(1)))
+
+~~~~~ ErrorsFound = .true.
+
+~~~ ENDIF
+
+\subsection{EndUniqueNodeCheck}\label{enduniquenodecheck}
+
+This routine terminates the unique node check -- allows arrays to be deallocated, etc.
+
+CALL \textbf{EndUniqueNodeCheck}(`CONTROLLED ZONE EQUIP CONFIGURATION')
+
+The only argument is the Context String -- which must match the string given in the InitUniqueNodeCheck routine.
+
+\subsection{SetUpCompSets and TestCompSet}\label{setupcompsets-and-testcompset}
+
+SetUpCompSets and TestCompSet are used to develop a list of hierarchical relationships between HVAC objects.~ The CompSet routines are housed in the BranchInputManager.~ A list of component sets is built which contains the following information:
+
+Parent Object Type (Currently cannot be SPLITTER or MIXER)
+
+Parent Object Name
+
+Child Component Type (Currently cannot be SPLITTER or MIXER)
+
+Child Component Name
+
+Child Component InletNodeName
+
+Child Component OutletNodeName
+
+Node Description
+
+Parent and child refer to a hierarchical relationship of two HVAC objects.~ For example, a branch is the parent to a pump, and a fan coil is the parent to a fan.~ The component sets do not include peer-to-peer connections such as a splitter connected to a branch, or a zone supply air path connected to an air loop.
+
+The following rules apply to component sets:
+
+\begin{itemize}
+\item
+  Each parent/child component set is unique.~ The same pair of components should never appear in the component sets list more than once.
+\item
+  Each set of child component plus inlet and outlet nodes is unique.
+\item
+  Each child component must have a parent component.
+\item
+  A given component may appear in multiple component sets as a parent component.
+\item
+  A given component may appear in multiple component sets as a child component only if there is a different set of inlet/outlet nodes.~ \emph{(This was originally the intent, but some new components do not fit this rule well and it may need to be relaxed.)}
+\item
+  If a given node name appears more than once as an inlet node, the two components which use it must share a parent/child relationship.
+\item
+  If a given node name appears more than once as an outlet node, the two components which use it must share a parent/child relationship.
+\item
+  After the program has read all the input data, there should be no ``UNDEFINED'' values in the list of component sets.
+\end{itemize}
+
+When any of these rules are violated, a warning is issued indicating a possible node connection error.
+
+** Warning ** Potential Node Connection Error for object PIPE, name = CW\_BYPASS
+
+~~ **~~ \textsubscript{\textasciitilde{}}~~ **~~ Node Types are still UNDEFINED -- See Branch/Node Details file for further information
+
+~~ **~~ \textsubscript{\textasciitilde{}}~~ **~~ Inlet Node : CW\_BYPASS\_INLET
+
+~~ **~~ \textsubscript{\textasciitilde{}}~~ **~~ Outlet Node: CW\_BYPASS\_OUTLET
+
+The component sets are reported in the eplusout.bnd file:
+
+! \textless{}Component Set\textgreater{},\textless{}Component Set Count\textgreater{},\textless{}Parent Object Type\textgreater{},\textless{}Parent Object Name\textgreater{},\textless{}Component Type\textgreater{},\textless{}Component Name\textgreater{},\textless{}Inlet Node ID\textgreater{},\textless{}Outlet Node ID\textgreater{},\textless{}Description\textgreater{}
+
+~Component Set,1,BRANCH,COOLING SUPPLY INLET BRANCH,PUMP:VARIABLE SPEED,CHW CIRC PUMP,CHW SUPPLY INLET NODE,CHW PUMP OUTLET NODE,Water Nodes
+
+Component Set,21,FAN COIL UNIT:4 PIPE,ZONE1FANCOIL,FAN:SIMPLE:CONSTVOLUME,ZONE1FANCOILFAN,ZONE1FANCOILOAMIXEROUTLETNODE,ZONE1FANCOILFANOUTLETNODE,Air Nodes
+
+\subsubsection{SetUpCompSets}\label{setupcompsets}
+
+SetUpCompSets should be called any time a parent object such as a branch or a compound object (e.g.~furnace) references a child component which is connected to it.~ If an object has more than one child component, then SetUpCompSets is called once for each child.
+
+SetUpCompSets first looks for the child component in the existing list of component sets by looking for a matching component type and name.~ If it is found, then the parent name and type are filled in.~ If the child component is not found is the exisiting list, then a new component set is created.
+
+SUBROUTINE SetUpCompSets(ParentType,ParentName,CompType,CompName,InletNode,OutletNode,Description)
+
+The arguments are:
+
+ParentType ~~~ Parent Object Type
+
+ParentName ~ Parent Object Name
+
+CompType ~~~~ Child Component Type
+
+CompName ~~ Child Component Name
+
+InletNode ~~~~~~~ Child Component Inlet Node Name
+
+OutletNode ~~~~ Child Component Outlet Node Name
+
+Description~~~~~ Description of nodes (optional)
+
+For example, AirLoopHVAC:Unitary:Furnace:HeatOnly references a fan and a heating coil:
+
+\textbf{AirLoopHVAC:Unitary:Furnace:HeatOnly},
+
+~~~~~~~ \textbackslash{}memo identical to the AirLoopHVAC:UnitaryHeatOnly object
+
+~~~~~~~ \textbackslash{}min-fields 13
+
+~~ A1,~ \textbackslash{}field Name
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type alpha
+
+~~ A2,~ \textbackslash{}field Availability Schedule Name
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type object-list
+
+~~~~~~~ \textbackslash{}object-list ScheduleNames
+
+~~ A3,~ \textbackslash{}field Furnace Air Inlet Node Name
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type node
+
+~~ A4,~ \textbackslash{}field Furnace Air Outlet Node Name
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type node
+
+~~ A5,~ \textbackslash{}field Supply Air Fan Operating Mode Schedule Name
+
+~~~~~~~ \textbackslash{}type object-list
+
+~~~~~~~ \textbackslash{}object-list ScheduleNames
+
+~~~~~~~ \textbackslash{}note A fan operating mode schedule value of 0 indicates cycling fan mode (supply air
+
+~~~~~~~ \textbackslash{}note fan cycles on and off in tandem with the heating coil).
+
+~~~~~~~ \textbackslash{}note Any other schedule value indicates continuous fan mode (supply air fan operates
+
+~~~~~~~ \textbackslash{}note continuously regardless of heating coil operation).
+
+~~~~~~~ \textbackslash{}note Leaving this schedule name blank will default to cycling fan mode for the
+
+~~~~~~~ \textbackslash{}note entire simulation period.
+
+~~ N1,~ \textbackslash{}field Maximum Supply Air Temperature
+
+~~~~~~~ \textbackslash{}type real
+
+~~~~~~~ \textbackslash{}units C
+
+~~~~~~~ \textbackslash{}autosizable
+
+~~~~~~~ \textbackslash{}default 80.0
+
+~~ N2,~ \textbackslash{}field Supply Air Flow Rate
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type real
+
+~~~~~~~ \textbackslash{}note~ This value should be \textgreater{} 0 and \textless{} = than the fan air flow rate.
+
+~~~~~~~ \textbackslash{}units m3/s
+
+~~~~~~~ \textbackslash{}minimum\textgreater{} 0.0
+
+~~~~~~~ \textbackslash{}autosizable
+
+~~ A6,~ \textbackslash{}field Controlling Zone or Thermostat Location
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type object-list
+
+~~~~~~~ \textbackslash{}object-list ZoneNames
+
+~~ A7,~ \textbackslash{}field Supply Fan Object Type
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type choice
+
+~~~~~~~ \textbackslash{}key Fan:OnOff
+
+~~~~~~~ \textbackslash{}key Fan:ConstantVolume
+
+~~~~~~~ \textbackslash{}note Fan:ConstantVolume only works with continuous fan operating mode (i.e.~fan
+
+~~~~~~~ \textbackslash{}note operating mode schedule values are greater than 0).
+
+~~ A8,~ \textbackslash{}field Supply Fan Name
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type object-list
+
+~~~~~~~ \textbackslash{}object-list FansCVandOnOff
+
+~~ A9 , \textbackslash{}field Fan Placement
+
+~~~~~~~ \textbackslash{}type choice
+
+~~~~~~~ \textbackslash{}key BlowThrough
+
+~~~~~~~ \textbackslash{}key DrawThrough
+
+~~~~~~~ \textbackslash{}default BlowThrough
+
+~~ A10, \textbackslash{}field Heating Coil Object Type
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type choice
+
+~~~~~~~ \textbackslash{}key Coil:Heating:Fuel
+
+~~~~~~~ \textbackslash{}key Coil:Heating:Electric
+
+~~~~~~~ \textbackslash{}key Coil:Heating:Water
+
+~~~~~~~ \textbackslash{}key Coil:Heating:Steam
+
+~~~~~~~ \textbackslash{}note works with gas, electric, hot water and steam heating coils
+
+~~ A11; \textbackslash{}field Heating Coil Name
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type object-list
+
+~~~~~~~ \textbackslash{}object-list HeatingCoilName
+
+In this case, the furnace is the parent object to the fan and the heating coil.~ To set up the component set for the furnace and its fan, the furnace type and name, the fan type and name (A7 and A8), and the furnace/fan inlet and fan outlet nodes (A3 and A9) are passed to SetUpCompSets:
+
+Example:
+
+USE BranchInputManager, ONLY: SetUpCompSets
+
+. . .
+
+CALL SetUpCompSets( Furnace(FurnaceNum)\%FurnaceType,Furnace(FurnaceNum)\%Name, AlphArray(7),AlphArray(8),AlphArray(3),AlphArray(9))
+
+In some cases, the inlet or outlet node names may not be known by the parent object.~ In this case, ``UNDEFINED'' is passed to SetUpCompSets.
+
+Examples:
+
+USE BranchInputManager, ONLY: SetUpCompSets
+
+. . .
+
+CALL SetUpCompSets( Furnace(FurnaceNum)\%FurnaceType,Furnace(FurnaceNum)\%Name, AlphArray(8),AlphArray(9),`UNDEFINED',`UNDEFINED')
+
+CALL SetUpCompSets( Furnace(FurnaceNum)\%FurnaceType,Furnace(FurnaceNum)\%Name, AlphArray(12),AlphArray(13),`UNDEFINED',AlphArray(4))
+
+\subsubsection{TestCompSet}\label{testcompset}
+
+TestCompSet should be called by every HVAC object which has a parent object.~ A given object may be both a parent and a child.~ For example, \textbf{AirLoopHVAC:Unitary:Furnace:HeatOnly} is a child to a branch and a parent to a fan and coils.
+
+TestCompSet first looks for the calling component in the existing list of component sets by looking for a matching component type and name.~ If the found compset has inlet and outlet nodes defined, then these must also match.~ If~ a match is found, then any undefined node names are filled in and the description string for the nodes is added.~ If the component is not found, then a new component set is created with undefined parent object type and name.
+
+SUBROUTINE TestCompSet(CompType,CompName,InletNode,OutletNode,Description)
+
+The arguments are:
+
+\begin{itemize}
+\item
+  CompType ~~~~~~~~~~ Child Component Type
+\item
+  CompName ~~~~~~~~ Child Component Name
+\item
+  InletNode ~ ~~~~~~~~~~~ Child Component Inlet Node Name
+\item
+  OutletNode ~~~~~~~~~~ Child Component Outlet Node Name
+\item
+  Description~~~~~~~~~~~ Description of nodes
+\end{itemize}
+
+For example, \textbf{AirLoopHVAC:Unitary:Furnace:HeatOnly} is a child component with inlet and outlet nodes:
+
+\textbf{AirLoopHVAC:Unitary:Furnace:HeatOnly,}
+
+~~~~~~~ \textbackslash{}memo identical to the AirLoopHVAC:UnitaryHeatOnly object
+
+~~~~~~~ \textbackslash{}min-fields 14
+
+~~ A1,~ \textbackslash{}field Name
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type alpha
+
+~~ A2,~ \textbackslash{}field Availability Schedule Name
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type object-list
+
+~~~~~~~ \textbackslash{}object-list ScheduleNames
+
+~~ A3,~ \textbackslash{}field Furnace Air Inlet Node Name
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type alpha
+
+~~ A4,~ \textbackslash{}field Furnace Air Outlet Node Name
+
+~~~~~~~ \textbackslash{}required-field
+
+~~~~~~~ \textbackslash{}type alpha
+
+To register the component set for the furnace (as a child component), the furnace type and name, and the furnace inlet and outlet nodes (A3 and A4) along with a node descriptor are passed to TestCompSets:
+
+Example:
+
+USE BranchInputManager, ONLY: TestCompSet
+
+CALL TestCompSet (Furnace(FurnaceNum)\%FurnaceType,AlphArray(1), \&
+
+~~~~~~~~~~~~~~~~~ AlphArray(3),AlphArray(4),`Air Nodes')
+
+\subsection{CheckOutAirNodeNumber}\label{checkoutairnodenumber}
+
+Outside Air Nodes are special nodes connected to the outside environment.~ With the introduction of the Site Atmospheric Variation parameters, it becomes important to know whether the node name (e.g.~Condenser Inlet Node on Air Cooled Chillers) is a legitimate outside air node or not.~ CheckOutAirNodeNumber allows you to determine if an entered node is, in fact, a proper outside air node.
+
+Declaration:
+
+FUNCTION CheckOutAirNodeNumber(NodeNumber) RESULT(Okay)
+
+Example:
+
+USE OutAirNodeManager, ONLY: CheckOutAirNodeNumber
+
+! outdoor condenser node
+
+~ IF (lAlphaBlanks(10)) THEN
+
+~~~ DXCoil(DXCoilNum)\%CondenserInletNodeNum(1) = 0
+
+~ ELSE
+
+~~~ DXCoil(DXCoilNum)\%CondenserInletNodeNum(1) = \&
+
+~~~~ ~~GetOnlySingleNode(Alphas(10),ErrorsFound,TRIM(CurrentModuleObject),DXCoil(DXCoilNum)\%Name, \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~ NodeType\_Air,NodeConnectionType\_OutsideAirReference,1,ObjectIsNotParent)
+
+~~~ IF (.not. CheckOutAirNodeNumber(DXCoil(DXCoilNum)\%CondenserInletNodeNum(1))) THEN
+
+~~~~~ CALL ShowWarningError(RoutineName//trim(CurrentModuleObject)//`= ``'//trim(DXCoil(DXCoilNum)\%Name)//''', may be invalid')
+
+~~~~~ CALL ShowContinueError(TRIM(cAlphaFields(10))//' = ``'//TRIM(Alphas(10))// \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~~~'``, node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.')
+
+~~~~~ CALL ShowContinueError(`This node needs to be included in an air system or the coil model will not be valid' \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //`, and the simulation continues')
+
+~~~ END IF
+
+~ ENDIF
+
+Note that GetOnlySingleNode is used to get the proper node number, then the node number is used in the outside air node verification.
+
+\subsection{CheckAndAddAirNodeNumber}\label{checkandaddairnodenumber}
+
+Should you feel really nice about your users (or more likely be updating older code that may have allowed blanks in places that are properly outside air nodes), you can use the CheckAndAddAirNodeNumber routine to not only check to see if it is an outside air node but also add it at the same time.
+
+Declaration:
+
+SUBROUTINE CheckAndAddAirNodeNumber(NodeNumber,Okay)
+
+USE OutAirNodeManager, ONLY: CheckAndAddAirNodeNumber
+
+Example:
+
+ElectricChiller(ChillerNum)\%CondInletNodeNum~~~ = \&
+
+~GetOnlySingleNode(AlphArray(5),ErrorsFound,~ \&
+
+~~ `Chiller:Electric',AlphArray(1), NodeType\_Air, \&
+
+~~~ NodeConnectionType\_OutsideAirReference, 2, ObjectIsNotParent)
+
+CALL CheckAndAddAirNodeNumber(~ \&
+
+ElectricChiller(ChillerNum)\%CondInletNodeNum, \&
+
+Okay)
+
+IF (.not. Okay) THEN
+
+~ CALL ShowWarningError(`Chiller:Electric, Adding Outside Air Node ='//~ \&
+
+AlphArray(5)))
+
+ENDIF
+
+Note that here ``not Okay'' is not an error condition but rather the opportunity to notify the user that you are adding an air node.

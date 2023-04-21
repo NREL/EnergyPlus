@@ -1,0 +1,21 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Zone Air Temperature
+Zone Air Relative Humidity
+Zone Ideal Loads Zone Sensible Cooling Rate
+Zone Ideal Loads Supply Air Sensible Cooling Rate
+Zone Ideal Loads Supply Air Latent Cooling Rate
+Zone Ideal Loads Supply Air Total Cooling Rate
+Zone Ideal Loads Zone Sensible Heating Rate
+Zone Ideal Loads Supply Air Sensible Heating Rate
+Zone Ideal Loads Supply Air Latent Heating Rate
+Zone Ideal Loads Supply Air Total Heating Rate
+Zone Ideal Loads Economizer Active Time
+Zone Ideal Loads Heat Recovery Active Time
+Zone Ideal Loads Supply Air Temperature
+Zone Ideal Loads Supply Air Humidity Ratio
+Zone Ideal Loads Mixed Air Temperature
+Zone Ideal Loads Mixed Air Humidity Ratio
+System Node Standard Density Volume Flow Rate
+0

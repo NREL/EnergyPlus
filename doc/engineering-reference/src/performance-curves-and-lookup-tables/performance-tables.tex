@@ -1,0 +1,74 @@
+\section{Lookup Tables}\label{lookup-tables}
+
+\subsection{Table:Lookup}\label{table-lookup}
+
+Lookup tables provide a method to evaluate a group of data that may or
+may not conform to a fundamental equation. Lookup tables can interpolate
+the actual data using a linear interpolation or piecewise cubic spline
+using the Btwxt library (https://github.com/bigladder/btwxt).
+As with curve objects, the lookup table can be used anywhere a valid
+curve object name is allowed so long as they share the same number of
+independent variables. Care must be taken to ensure the table data
+format is consistent with the associate model that is using the
+performance curve (e.g., DX cooling coil capacity as a function of
+temperature where independent variable X1 = indoor wet-bulb temperature
+and independent variable X2 = outdoor dry-bulb temperature).
+
+A lookup table can be specified to use either linear or cubic interpolation
+independently for each dimension (input variable). For performance
+points outside the defined grid space, an extrapolation method--constant
+or linear--can be set independently for each dimension. Finally, each
+axis can have specified boundaries beyond which extrapolation is not
+permitted.
+
+\subsubsection{Linear Interpolation}\label{linear-interpolation}
+
+For linear interpolation in 1 dimension, given known values of \(f\) at
+\(x_0\) and \(x_1\), and a point \(x\) between \(x_0\) and \(x_1\), the
+value at \(x\) is estimated by:
+
+\[f\left(x\right) = \left(1-\mu\right) \cdot f\left(x_0\right) + \mu \cdot f\left(x_1\right)\]
+
+where \(\mu\) is the location of \(x\) expressed as a fraction of the
+distance between \(x_0\) and \(x_1\):
+
+\[\mu = \left(x-x_0\right) / \left(x_1 - x_0\right)\]
+
+\subsubsection{Cubic Spline
+Interpolation}\label{cubic-spline-interpolation}
+
+The general formula for a 1-dimensional piecewise cubic spline (for
+\(x\) between known values \(f\left(x_0\right)\) and
+\(f\left(x_1\right)\)) is:
+
+\[\begin{array}{rll}
+    f\left(x\right) &= \left(2\mu^3 - 3\mu^2 + 1\right) \cdot f\left(x_0\right)
+    &+ \left(-2\mu^3 + 3\mu^2\right) \cdot f\left(x_1\right) \\
+    &+ \left(\mu^3 - 2\mu^2 + \mu\right) \cdot f^\prime \left(x_0\right)
+    &+ \left(\mu^3 - \mu^2\right) \cdot f^\prime \left(x_1\right)
+\end{array}\]
+
+The Catmull-Rom cubic spline interpolation defines the derivatives
+\(f^\prime \left(x_0\right)\) and \(f^\prime\left(x_1\right)\) as the
+slope between the previous and following grid points on the axis:
+
+\[\begin{array}{rl}
+    f^\prime(x_0) &= ( f(x_1) - f(x_{-1}) ) / ( x_1 - x_{-1}) \\
+    f^\prime(x_1) &= ( f(x_2) - f(x_0) ) / ( x_2 - x_0)
+\end{array}\]
+
+When the hypercube is at the edge of the grid, Catmull-Rom simply
+extends the slope of the final segment for defining the slope terms:
+i.e., if there is no \(x_{-1}\), we substitute \(x_0\) into the
+\(f^\prime(x_0)\) formula.
+
+If a mix of interpolation methods are specified among the included
+dimensions, the interpolator will perform that mix as requested.
+If the lookup point is beyond the grid edge on any axis, the interpolator
+will perform the requested extrapolation method (linear or constant) on
+that dimension while proceeding with interpolation along any in-bounds
+dimension. If a ``do-not-extrapolate-beyond'' boundary is specified, the
+interpolator will perform a constant extrapolation from that boundary outward
+(in that dimension), and it will return the resulting numerical answer
+along with a warning that the request was outside the boundaries.
+

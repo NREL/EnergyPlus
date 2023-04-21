@@ -1,0 +1,32 @@
+\section{UtilityCost:Variable}\label{utilitycostvariable}
+
+The UtilityCost:Variable object allows for the direct entry of monthly values into a variable.
+
+\subsection{Inputs}\label{inputs-073}
+
+\paragraph{Field: Name}\label{field-name-065}
+
+The name of the variable.
+
+\paragraph{Field: Tariff Name}\label{field-tariff-name-004}
+
+The name of the tariff that is using the variable.
+
+\paragraph{Field: Variable Type}\label{field-variable-type-000}
+
+This field is used to indicate the kind of units that may be associated with the variable. It is used by IDF Editor to display the appropriate SI and IP units for the January through December values. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion\textbf{.}
+
+\begin{itemize}
+\item
+  Energy
+\item
+  Demand
+\item
+  Currency
+\item
+  Dimensionless
+\end{itemize}
+
+\paragraph{Field: January through December Values}\label{field-january-through-december-values}
+
+An entry (up to 24 are available) of the monthly values of the variable. Normally 12 months are used for most utility rates and so 12 values should be entered. If any values are not entered, the value of the previous entry is used. This allows a variable that is constant for an entire year to be entered using only the first value.

@@ -1,0 +1,109 @@
+! This file contains the conversion factors for the convertESOMTR
+! program.
+!
+! Three different lines are allowed:
+!    conv,<si-unit>,<ip-unit>,<multiplier>,<offset>
+!    wild,<match-string>,<si-unit>,<ip-unit>
+!    vari,<variable-name-no-units>,<si-unit>,<ip-unit>
+!
+! Factors based on NIST 811
+!
+! Energy
+!------------------------------
+!
+!   (1 Btu/1054.35 J) * (1 kBtu/1000 Btu)
+conv,J,kBtu,9.4845E-07,0
+!   60 s/min * 60 min/hr = 3600 s/hr
+!   J/s = W -> J = Ws
+!   1 kWh = 1000 W-hr
+!   (1 J / 1 W-s) * (1 hr/3600 s) * (1 kWh /1000 W-Hr)
+conv,J,kWh,2.77778E-07,0
+!   (1 Btu/1054.35 J) * (1 Therm / 100000 Btu)
+conv,J,therm,9.4845E-09,0
+!   (1 Btu/1054.35 J) * (1 MMBtu/1000000 Btu)
+conv,J,MMBtu,9.4845E-10,0
+!   (1 J / 1 W-s) * (1 hr/3600 s) * (1 ton  / 3516.853 W)
+conv,J,ton-hr,7.89847E-08,0
+!   (1 Btu/1054.35 J) * (1 kBtu/1000 Btu) * (0.4535924 kg / 1 lb)
+conv,J/kg,kBtu/lb,4.2986E-07,0.007686
+!   (1 Btu/1054.35 J) * (1 kBtu/1000 Btu) * (0.09290304 m2 / 1 ft2)
+conv,J/m2,kBtu/sqft,8.811404E-08,0
+!   (1 Btu/1054.35 J) * (1 kBtu/1000 Btu) * (1000 J / 1 kJ)
+conv,kJ,kBtu,9.4845E-04,0
+!
+! Power
+!------------------------------
+!    (1 Btuh/ 0.2928751 W) * (1 kBtuh/1000 Btuh)
+conv,W,kBtuh,3.41442E-03,0
+!    (1 kW / 1000 W)
+conv,W,kW,0.001,0
+!    (1 ton  / 3516.853 W)
+conv,W,ton,2.84345E-04,0
+!    (1 Btuh/ 0.2928751 W) * (1 kBtuh/1000 Btuh) * (0.4535924 kg / 1 lb)
+conv,W/kg,kBtuh/lb,1.54876E-03,0
+conv,W/kg H20,kBtuh/lb,1.54876E-03,0
+!    (1 Btuh/ 0.2928751 W) * (1 kBtuh/1000 Btuh) * (0.09290304 m2 / 1 ft2)
+conv,W/m2,kBtuh/sqft,3.172104E-04,0
+!    (1 Btuh/ 0.2928751 W) * (1 kBtuh/1000 Btuh) * (0.09290304 m2 / 1 ft2) * (1 F / 1.8 C)
+conv,W/m2-C,kBtuh/sqft-F,1.76228E-04,0
+conv,W/m2-K,kBtuh/sqft-F,1.76228E-04,0
+!
+! Mass
+!------------------------------
+!    (1 lb / 0.4535924 kg)
+conv,kg,lb,2.2046,0
+!    (1 lb / 0.4535924 kg) * (0.02831685 m3 / 1 cuft)
+conv,kg/m3,lb/cuft,0.062428,0
+!    (1 lb / 0.4535924 kg) * (60 s / 1 min)
+conv,kg/s,lb/min,132.2774,0
+conv,kgWater/s,lb/min,132.2774,0
+!    (1 lb / 0.4535924 kg) * (60 s / 1 min) * (0.09290304 m2/ 1 sqft)
+conv,kg/s/m2,lb/min/sqft,12.28897,0
+!
+!
+! Temperature
+!------------------------------
+conv,C,F,1.8,32
+conv,°C,F,1.8,32
+conv,K,R,1.8,0
+conv,deltaC,deltaF,1.8,0
+!    (1.8 F /1 K) * (0.3048 m / 1 ft)
+conv,K/m,F/ft,0.54864,0
+!
+!
+! Length
+!------------------------------
+!    (1 ft / 0.3048 m)
+conv,m,ft,3.28084,0
+!    (1 ft / 0.3048 m) * (60 s / 1 min)
+conv,m/s,ft/min,196.8504,0
+!    (1 sqft / 0.092903 m2)
+conv,m2,sqft,10.7639,0
+!    (1 cuft / 0.028317 m3)
+conv,m3,cuft,35.3145,0
+!    (1 cuft / 0.028317 m3) * (60 s / 1 min)
+conv,m3/s,cfm,2118.87,0
+!    (1 gal / 0.0037854 m3)  * (60 s / 1 min)
+conv,m3/s,gal/min,15850.37,0
+!
+!
+! Misc
+!------------------------------
+!    (1 gal / 3.785412 L)
+conv,L,gal,0.264172
+!    (1 psi / 6894.8 Pa)
+conv,Pa,psi,1.45037E-04
+!    (humidity ratio)
+conv,kgWater/kgDryAir,lbWater/lbDryAir,1
+!
+!
+! WILD CARD MATCHES
+!------------------------------
+wild,elec,J,kWh
+wild,gas,J,therm
+wild,cool,J,ton-hr
+wild,elec,W,kW
+
+
+!wild,mass,kg/s,test4
+!vari,NotReallyAVariable,C,test2

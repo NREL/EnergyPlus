@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<title>Objexx Logo</title>
+<metadata>
+<rdf:RDF>
+<cc:Work rdf:about="">
+<dc:format>image/svg+xml</dc:format>
+<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+<dc:title>Objexx Logo</dc:title>
+<dc:date>2015</dc:date>
+<dc:creator>
+<cc:Agent>
+<dc:title>Objexx Engineering, Inc.</dc:title>
+</cc:Agent>
+</dc:creator>
+<dc:rights>
+<cc:Agent>
+<dc:title>Copyright (c) 2015 Objexx Engineering, Inc. All Rights Reserved.</dc:title>
+</cc:Agent>
+</dc:rights>
+</cc:Work>
+</rdf:RDF>
+</metadata>
+<g>
+<path style="color-rendering:auto;text-decoration-color:#000000;color:#000000;isolation:auto;mix-blend-mode:normal;shape-rendering:auto;solid-color:#000000;block-progression:tb;text-decoration-line:none;text-decoration-style:solid;image-rendering:auto;white-space:normal;text-indent:0;text-transform:none" d="m100.67 199.75c-14.728 0.09-29.598-3.59-43.093-11.3-35.986-20.56-52.219-64.11-38.468-103.2 13.751-39.103 53.671-62.906 94.611-56.424l-4.0781 25.75c-28.674-4.54-56.305 11.938-65.935 39.318-9.63 27.376 1.602 57.516 26.807 71.916 25.205 14.403 56.884 8.7809 75.592-13.413 18.863-22.378 21.011-55.968 1.7399-75.844l18.718-18.15c29.812 30.747 26.033 79.291-0.52348 110.8-16.695 19.806-40.832 30.405-65.372 30.548z" fill-rule="evenodd" fill="#4b4b4b"/>
+<path fill="#4b4b4b" d="m119.65 49.988-30.572 30.572-9.221-9.221 30.573-30.572-30.573-30.572 9.331-9.3304 30.572 30.571l9.2196 9.2211z"/>
+<path fill="#d04253" d="m156.83 49.988-30.572 30.572-9.221-9.221 30.572-30.572-30.572-30.572 9.3308-9.3309 30.572 30.572 9.2196 9.2211z"/>
+</g>
+</svg>

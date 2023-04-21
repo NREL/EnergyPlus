@@ -1,0 +1,41 @@
+# unused kiva repo directories/files
+kiva/.github/
+kiva/bin
+kiva/docs
+kiva/examples
+kiva/scripts
+kiva/src/kiva
+kiva/src/libgroundplot
+kiva/templates
+kiva/test/bestest
+kiva/test/Rakefile
+kiva/vendor/boost-1.77.0/boost/date_time
+kiva/vendor/boost-1.77.0/boost/program_options
+kiva/vendor/boost-1.77.0/libs
+kiva/vendor/eigen
+kiva/vendor/fmt
+kiva/vendor/googletest
+kiva/vendor/mathgl-2.4.4
+kiva/vendor/yaml-cpp
+kiva/vendor/zlib-ng
+kiva/vendor/libpng
+kiva/weather
+kiva/.codecov.yml
+kiva/.gitignore
+kiva/ChangeLog.md
+kiva/README.md
+
+# submodules
+kiva/.gitmodules
+penumbra/.gitmodules
+btwxt/.gitmodules
+libtk205/.gitmodules
+
+# unused repo directories/files
+btwxt/vendor/googletest
+penumbra/vendor/googletest
+libtk205/.github
+libtk205/examples
+libtk205/test
+libtk205/vendor/btwxt
+libtk205/vendor/json

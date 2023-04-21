@@ -1,0 +1,101 @@
+!===============================================================================
+! WindowGasMaterials.idf
+!
+! EnergyPlus Reference Data Set for Window Gas.
+! For gas mixtures use WindowMaterial:GasMixture.
+! For custom gases--those other than Air,
+! Argon, Krypton or Xenon--use Type = Custom and
+! enter gas properties; see description of
+! WindowMaterial:Gas in Input/Output Reference Manual.
+! Air
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  WindowMaterial:Gas,
+    AIR 3MM,                 !- Name
+    Air,                     !- Gas Type
+    0.0032;                  !- Thickness {m}
+
+  WindowMaterial:Gas,
+    AIR 6MM,                 !- Name
+    Air,                     !- Gas Type
+    0.0063;                  !- Thickness {m}
+
+  WindowMaterial:Gas,
+    AIR 8MM,                 !- Name
+    Air,                     !- Gas Type
+    0.0079;                  !- Thickness {m}
+
+  WindowMaterial:Gas,
+    AIR 13MM,                !- Name
+    Air,                     !- Gas Type
+    0.0127;                  !- Thickness {m}
+
+! Argon
+
+  WindowMaterial:Gas,
+    ARGON 3MM,               !- Name
+    Argon,                   !- Gas Type
+    0.0032;                  !- Thickness {m}
+
+  WindowMaterial:Gas,
+    ARGON 6MM,               !- Name
+    Argon,                   !- Gas Type
+    0.0063;                  !- Thickness {m}
+
+  WindowMaterial:Gas,
+    ARGON 8MM,               !- Name
+    Argon,                   !- Gas Type
+    0.0079;                  !- Thickness {m}
+
+  WindowMaterial:Gas,
+    ARGON 13MM,              !- Name
+    Argon,                   !- Gas Type
+    0.0127;                  !- Thickness {m}
+
+! Krypton
+
+  WindowMaterial:Gas,
+    KRYPTON 3MM,             !- Name
+    Krypton,                 !- Gas Type
+    0.0032;                  !- Thickness {m}
+
+  WindowMaterial:Gas,
+    KRYPTON 6MM,             !- Name
+    Krypton,                 !- Gas Type
+    0.0063;                  !- Thickness {m}
+
+  WindowMaterial:Gas,
+    KRYPTON 8MM,             !- Name
+    Krypton,                 !- Gas Type
+    0.0079;                  !- Thickness {m}
+
+  WindowMaterial:Gas,
+    KRYPTON 13MM,            !- Name
+    Krypton,                 !- Gas Type
+    0.0127;                  !- Thickness {m}
+
+! Xenon
+
+  WindowMaterial:Gas,
+    XENON 3MM,               !- Name
+    Xenon,                   !- Gas Type
+    0.0032;                  !- Thickness {m}
+
+  WindowMaterial:Gas,
+    XENON 6MM,               !- Name
+    Xenon,                   !- Gas Type
+    0.0063;                  !- Thickness {m}
+
+  WindowMaterial:Gas,
+    XENON 8MM,               !- Name
+    Xenon,                   !- Gas Type
+    0.0079;                  !- Thickness {m}
+
+  WindowMaterial:Gas,
+    XENON 13MM,              !- Name
+    Xenon,                   !- Gas Type
+    0.0127;                  !- Thickness {m}
+

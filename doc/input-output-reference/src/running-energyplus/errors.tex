@@ -1,0 +1,186 @@
+\section{Errors}\label{errors}
+
+The \textbf{eplusout.err} file may contain three levels of errors (Information, Warning, Severe, Fatal) as well as the possibility of just message lines, see Table~\ref{table:energyplus-errors-and-required-actions}. EnergyPlus Errors and Required Actions. These errors may be duplicated in other files (such as the standard output file). These errors are described more completely in the Output Details and Examples document. An example .err file from the 1ZoneUncontrolled example input file:
+
+\begin{lstlisting}
+Program Version,EnergyPlus 7.0.0.024, 10/9/2011 4:04 PM,IDD\_Version 7.0.0.024
+   ** Warning ** IP: Note -- Some missing fields have been filled with defaults. See the audit output file for details.
+   ** Warning ** Weather file location will be used rather than entered Location object.
+   **   ~~~   ** ..Location object = DENVER STAPLETON INTL ARPT CO USA WMO = 724690
+   **   ~~~   ** ..Weather File Location = Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+   **   ~~~   ** ..due to location differences, Latitude difference = [3.00E-002] degrees, Longitude difference = [0.31] degrees.
+   **   ~~~   ** ..Time Zone difference = [0.0] hour(s), Elevation difference = [13.53] percent, [218.00] meters.
+   ************* Testing Individual Branch Integrity
+   ************* All Branches passed integrity testing
+   ************* Testing Individual Supply Air Path Integrity
+   ************* All Supply Air Paths passed integrity testing
+   ************* Testing Individual Return Air Path Integrity
+   ************* All Return Air Paths passed integrity testing
+   ************* No node connection errors were found.
+   ************* Beginning Simulation
+   ************* Simulation Error Summary *************
+   ************* EnergyPlus Warmup Error Summary. During Warmup: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Sizing Error Summary. During Sizing: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Completed Successfully-- 2 Warning; 0 Severe Errors; Elapsed Time = 00hr 00min  3.91sec
+\end{lstlisting}
+
+% table 48
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\caption{EnergyPlus Errors and Required Actions \label{table:energyplus-errors-and-required-actions}} \tabularnewline
+\toprule
+Error Level & Action \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{EnergyPlus Errors and Required Actions} \tabularnewline
+\toprule
+Error Level & Action \tabularnewline
+\midrule
+\endhead
+
+Information, shown as ********* & Informative, usually a follow-on to one of the others. No action required. \tabularnewline
+**~~ \~{}\textbackslash\~{}\~{}~~** & This is a continuation of a previous message.~ String all the words/sentences together to form the complete message. \tabularnewline
+Warning & Take note. Fix as applicable. \tabularnewline
+Severe & Should Fix \tabularnewline
+Fatal & Program will abort, Must Fix \tabularnewline
+\bottomrule
+\end{longtable}
+
+EnergyPlus produces several messages as it is executing, as a guide to its progress. These message illustrate the sequence of execution as well as provides checkpoints should the simulation fail.
+
+For example, the run of the 1ZoneUncontrolled example input file produces the log:
+
+\begin{lstlisting}
+Running d:\eppgm\intcheck\energyplus.exe
+ET Start: Sun 10/09/2011 - 16:04:34.71
+Input File  : d:\devtests\inputfiles\checkin\1ZoneUncontrolled.idf
+Output Files: d:\devtests\inputfiles\outputs\
+Weather File: USA\_CO\_Golden-NREL.724666\_TMY3.epw
+ExpandObjects Started.
+No expanded file generated.
+ExpandObjects Finished. Time:     0.016
+ EnergyPlus Starting
+ EnergyPlus 7.0.0.024, 10/9/2011 4:04 PM
+ Processing Data Dictionary
+ Processing Input File
+ Initializing Simulation
+ Reporting Surfaces
+ Initializing New Environment Parameters
+ Warming up {1}
+ Warming up {2}
+ Warming up {3}
+ Warming up {4}
+ Warming up {5}
+ Warming up {6}
+ Warming up {7}
+ Warming up {8}
+ Warming up {9}
+ Warming up {10}
+ Warming up {11}
+ Warming up {12}
+ Warming up {13}
+ Warming up {14}
+ Warming up {15}
+ Warming up {16}
+ Warming up {17}
+ Warming up {18}
+ Warming up {19}
+ Warming up {20}
+ Warming up {21}
+ Warming up {22}
+ Starting Simulation at 12/21 for DENVER STAPLETON INTL ARPT ANN HTG 99% CONDNS DB
+ Initializing New Environment Parameters
+ Warming up {1}
+ Warming up {2}
+ Warming up {3}
+ Warming up {4}
+ Warming up {5}
+ Warming up {6}
+ Warming up {7}
+ Warming up {8}
+ Warming up {9}
+ Warming up {10}
+ Warming up {11}
+ Warming up {12}
+ Warming up {13}
+ Warming up {14}
+ Warming up {15}
+ Warming up {16}
+ Warming up {17}
+ Starting Simulation at 07/21 for DENVER STAPLETON INTL ARPT ANN CLG 1% CONDNS DB = >MWB
+ Initializing New Environment Parameters
+ Warming up {1}
+ Warming up {2}
+ Warming up {3}
+ Warming up {4}
+ Warming up {5}
+ Warming up {6}
+ Warming up {7}
+ Warming up {8}
+ Warming up {9}
+ Warming up {10}
+ Warming up {11}
+ Warming up {12}
+ Warming up {13}
+ Warming up {14}
+ Warming up {15}
+ Warming up {16}
+ Warming up {17}
+ Warming up {18}
+ Warming up {19}
+ Warming up {20}
+ Starting Simulation at 01/01 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 01/21
+ Continuing Simulation at 01/21 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 02/10
+ Continuing Simulation at 02/10 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 03/02
+ Continuing Simulation at 03/02 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 03/22
+ Continuing Simulation at 03/22 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 04/11
+ Continuing Simulation at 04/11 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 05/01
+ Continuing Simulation at 05/01 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 05/21
+ Continuing Simulation at 05/21 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 06/10
+ Continuing Simulation at 06/10 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 06/30
+ Continuing Simulation at 06/30 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 07/20
+ Continuing Simulation at 07/20 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 08/09
+ Continuing Simulation at 08/09 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 08/29
+ Continuing Simulation at 08/29 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 09/18
+ Continuing Simulation at 09/18 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 10/08
+ Continuing Simulation at 10/08 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 10/28
+ Continuing Simulation at 10/28 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 11/17
+ Continuing Simulation at 11/17 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 12/07
+ Continuing Simulation at 12/07 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Updating Shadowing Calculations, Start Date = 12/27
+ Continuing Simulation at 12/27 for Denver Centennial  Golden   Nr CO USA TMY3 WMO\# = 724666
+ Writing tabular output file results using comma format.
+ Writing tabular output file results using tab format.
+ Writing tabular output file results using text format.
+ Writing tabular output file results using HTML format.
+ EnergyPlus Run Time = 00hr 00min  3.91sec
+ ReadVarsESO program starting.
+ ReadVars Run Time = 00hr 00min  0.39sec
+ ReadVarsESO program completed successfully.
+ ReadVarsESO program starting.
+ ReadVars Run Time = 00hr 00min  0.27sec
+ ReadVarsESO program completed successfully.
+  Started HVAC Diagram
+  Complete
+note: Pausing = N
+ET End: Sun 10/09/2011 - 16:04:39.34
+\end{lstlisting}
+
+In the example, the inclusion of the ``ReadVars'' program is also shown. It is run twice -- once for the \textbf{eplusout.eso} file and once for the \textbf{eplusout.mtr} file.

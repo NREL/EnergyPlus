@@ -1,0 +1,7 @@
+\section{Considerations for Legacy Codes}\label{considerations-for-legacy-codes}
+
+Those module developers who are adding to EnergyPlus's capabilities by adapting existing codes into the module structure should take special considerations.
+
+\textbf{First and foremost, who owns the legacy code that you are adapting?\emph{~ More on this is covered in Appendix C -- Submissions and Check-ins.~ One must be very careful when developing modules to be implemented in the publicly-available version of EnergyPlus.}}
+
+Legacy codes will typically come with their own input and output structures.~ In adapting a legacy code to use with EnergyPlus, the module developer will usually want to bypass these routines by embedding the code into EnergyPlus and using input entirely from the IDD/IDF structure.~ During original transition, you can consider doing a parallel effort of writing a simple input file for the legacy code while testing results with your developing EnergyPlus transition code.

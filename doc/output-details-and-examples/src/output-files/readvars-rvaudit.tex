@@ -1,0 +1,77 @@
+\section{readvars.rvaudit}\label{readvars.rvaudit}
+
+This file is available from standard EnergyPlus runs (batch file, EP-Launch, etc) where the included utility ``ReadVarsESO'' is used to create .csv or other delimited files. It shows what steps were taken during the read vars run(s) -- in standard EnergyPlus runs there are two: one for the .eso file and one for the .mtr file. Note that ReadVarsESO will not be run if native CSV output is generated with  OutputControl:Files. Contents might be:
+
+Mon 04/02/2007 19:34:17.09 ReadVars
+
+~ReadVarsESO
+
+~processing:eplusout.inp
+
+~input file:eplusout.eso
+
+~output file:eplusout.csv
+
+~found/finding:
+
+~~~~ 1 Outdoor Dry Bulb
+
+~~~~ 6 Zone/Sys Air Temperature
+
+~~~~ 6 Zone/Sys Sensible Cooling Rate
+
+~~~~ 6 Zone/Sys Sensible Heating Rate
+
+~~~~ 6 Total Water Heating Coil Rate
+
+~~~~ 1 Total Water Cooling Coil Rate
+
+~~~~ 1 Sensible Water Cooling Coil Rate
+
+~~~~ 2 Plant Loop Cooling Demand
+
+~~~~ 2 Plant Loop Heating Demand
+
+~~~~ 1 Boiler Gas Consumption Rate
+
+~~~~ 1 Boiler Heating Output Rate
+
+~~~~ 1 Chiller Electric Power
+
+~~~~ 1 Chiller Evap Heat Trans Rate
+
+~~~~ 1 Chiller Evap Water Inlet Temp
+
+~~~~ 1 Chiller Evap Water Outlet Temp
+
+~~~~ 1 Chiller Evap Water Mass Flow Rate
+
+~~~~ 1 Chiller Cond Heat Trans Rate
+
+~~~~ 0 Chiller Cond Water Inlet Temp
+
+~~~~ 0 Chiller Cond Water Outlet Temp
+
+~~~~ 0 Chiller Cond Water Mass Flow Rate
+
+~~~~ 2 Pump Mass Flow Rate
+
+~~~~ 2 Pump Outlet Temp
+
+~ReadVars Run Time = 00hr 00min~ 1.78sec
+
+~ReadVarsESO program completed successfully.
+
+~ReadVarsESO
+
+~processing:test.mvi
+
+~input file:eplusout.mtr
+
+~output file:eplusmtr.csv
+
+~getting all vars from:eplusout.mtr
+
+~ReadVars Run Time = 00hr 00min~ 0.00sec
+
+~ReadVarsESO program completed successfully.

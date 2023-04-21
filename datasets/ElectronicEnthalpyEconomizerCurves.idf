@@ -1,0 +1,169 @@
+!===============================================================================
+! ElectronicEnthalpyEconomizerCurves.idf
+!
+! EnergyPlus Reference Data Set for Electronic (Variable) Enthalpy Economizer limit
+!
+!  Modification History:  01/29/2008, R. Raustad, FSEC
+!
+! These curves approximate the electronic (variable) enthalpy curves used
+! to simulate electronic enthalpy economizer control. This control scheme
+! adjusts the upper outdoor air humidity ratio based on outdoor air
+! dry-bulb temperature. California Title 24 ACM 2005 lists the allowable
+! economizer control strategies with curve A as one of the options.
+!
+! Electronic Enthalpy curves A-D are presented here.
+! Curve A has the highest limit and curve D has the lowest limit.
+!
+! The curve objects below represent a single-point electronic enthalpy
+! control curve with the minimum value of x crossing the psychrometric
+! chart's saturation line and the maximum value of x crossing the
+! psychrometric chart's dry-bulb temperature axis. The curves are
+! evaluated at an outdoor dry-bulb temperature to provide a maximum
+! operating outdoor humidity ratio for economizer operation. If the
+! outdoor humidity ratio is greater than this maximum value, economizer
+! operation is terminated.
+!
+! These curves may be used with other economizer limits to create
+! multi-point economizer control (Temperature Limit, Temperature Low Limit,
+! Enthalpy Limit, and Dew Point Temperature Limit).
+!
+! Form of the Electronic Enthalpy Curve Equation:
+!  K = 45.672192 - 1.1559942 * Temperature (C) - 0.144599 * Relative Humidity (%)
+!
+! where: K  = Constant value to represent specific curve
+!        T  = Outdoor Dry-Bulb Temperature (C)
+!        RH = Outdoor Relative Humidity (%)
+!
+! NOTE:  modifying the RH multiplier (-0.144599) tends to "wag" the curvature
+!        at the upper relative humidities. Decreasing the multiplier "wags"
+!        the upper portion of the curve downward, increasing "wags" it
+!        upwards. Modifying the constant (K) moves the intersection of
+!        the curve with the Dry-Bulb Temperature axis. Increasing the constant
+!        moves the intersection to the left as shown in the figure, decreasing
+!        moves to the right. The minimum and/or maximum x boundaries in the
+!        curve objects below may have to be adjusted when modifying the equation.
+!
+!  Control  Curve      Approximate
+!   Curve  Constant   Control Point
+!             K        at 50% RH
+!                        (C)
+!    A       12          22.9
+!    B       14          21.1
+!    C       16          19.4
+!    D       18          17.7
+!
+!                       ________________
+!                      .      Enthaply  |
+!    Psychrometric   .         Curve    |
+!    Chart         .           /        |
+!               .      .      /         |
+!            .             . /          |  Outdoor
+!         .              A    .         |  Humidity
+!        |             B        .       |   Ratio
+!        |           C            .     |  (kg/kg)
+!        |         D                .   |
+!        |                           .  |
+!        |____________________________._|
+!         Outdoor Dry-Bulb Temperature (C)
+!                  |                  |
+!                  |                  |
+!               minimum            maximum
+!                value              value
+!                  of                of
+!                  x                 x
+!
+!  Figure - Psychrometric Chart Illustration of the Electronic
+!           (Variable) Enthalpy economizer limit curve objects.
+!           Curve output is Humidity Ratio as a function of T.
+!
+!
+! Example Curve A:
+! 12 = 45.672192 - 1.1559942 (T) - 0.144599 (RH)
+!
+! Step 1: Identify temperatures at incremental RH values
+!
+! T = (12 - 45.672192 + 0.144599 * RH) / -1.1559942
+!
+!    RH    Temp
+!   (%)    (C)
+!     0   29.128
+!    10   27.877
+!    20   26.627
+!    30   25.376
+!    40   24.125
+!    50   22.874
+!    60   21.623
+!    70   20.372
+!    80   19.121
+!    90   17.871
+!   100   16.620
+!
+! Step 2: Use psychrometric routines to identify humidity ratio at each point
+!
+!                  Humidity
+!    RH    Temp     Ratio
+!   (%)    (C)     (kg/kg)
+!     0   29.128   0.00000
+!    10   27.877   0.00232
+!    20   26.627   0.00433
+!    30   25.376   0.00605
+!    40   24.125   0.00750
+!    50   22.874   0.00872
+!    60   21.623   0.00971
+!    70   20.372   0.01051
+!    80   19.121   0.01112
+!    90   17.871   0.01158
+!   100   16.620   0.01189
+!
+! Step 3: Use multiple linear regression to solve one of the following equations:
+!
+!  Humidity Ratio = A0 + A1*Temp + A2*Temp^2               (Quadratic)
+!  Humidity Ratio = A0 + A1*Temp + A2*Temp^2 + A3*Temp^3     (Cubic)
+!
+! Step 4: Use the coefficients calculated in the multiple linear regression to create
+!         a cubic (or quadratic) curve object.
+!
+!
+! The method described here was used to create the following 4 "cubic" curve objects.
+!
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  Curve:Cubic,
+    ElectronicEnthalpyCurveA,!- Name
+    0.01342704,              !- Coefficient1 Constant
+    -0.00047892,             !- Coefficient2 x
+    0.000053352,             !- Coefficient3 x**2
+    -0.0000018103,           !- Coefficient4 x**3
+    16.6,                    !- Minimum Value of x
+    29.13;                   !- Maximum Value of x
+
+  Curve:Cubic,
+    ElectronicEnthalpyCurveB,!- Name
+    0.011529339,             !- Coefficient1 Constant
+    -0.00032266,             !- Coefficient2 x
+    0.000042788,             !- Coefficient3 x**2
+    -0.000001692,            !- Coefficient4 x**3
+    14.88,                   !- Minimum Value of x
+    27.4;                    !- Maximum Value of x
+
+  Curve:Cubic,
+    ElectronicEnthalpyCurveC,!- Name
+    0.010189477,             !- Coefficient1 Constant
+    -0.000235708,            !- Coefficient2 x
+    0.000034991,             !- Coefficient3 x**2
+    -0.000001608,            !- Coefficient4 x**3
+    13.16,                   !- Minimum Value of x
+    25.67;                   !- Maximum Value of x
+
+  Curve:Cubic,
+    ElectronicEnthalpyCurveD,!- Name
+    0.008798417,             !- Coefficient1 Constant
+    -0.000132302,            !- Coefficient2 x
+    0.000025932,             !- Coefficient3 x**2
+    -0.000001494,            !- Coefficient4 x**3
+    11.43,                   !- Minimum Value of x
+    23.94;                   !- Maximum Value of x
+

@@ -1,0 +1,23 @@
+4.0.0.024,5.0.0,
+20,20, These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
+Primary Side Common Pipe Flow Direction,<DELETE>,
+Secondary Side Common Pipe Flow Direction,<DELETE>,
+EarthTube-Sensible Heat Loss,Earth Tube Zone Sensible Cooling,
+EarthTube-Sensible Heat Gain ,Earth Tube Zone Sensible Heating,
+EarthTube-Volume,Earth Tube Air Volume Flow,
+EarthTube-Volume Flow Rate,Earth Tube Air Volume Flow Rate,
+EarthTube-Mass,Earth Tube Air Mass Flow,
+EarthTube-Mass Flow Rate,Earth Tube Air Mass Flow Rate,
+EarthTube-Fan Electric Consumption,Earth Tube Fan Electric Consumption,
+EarthTube-Inlet Air Temperature,Earth Tube Zone Inlet Air Temperature,
+HAMT-Surface Int Temperature,HAMT Surface Interior Temperature,
+HAMT-Surface Int RH,HAMT Surface Interior Relative Humidity,
+HAMT-Surface Int Vapor Pressure,HAMT Surface Interior Vapor Pressure,
+HAMT-Surface Ext Temperature,HAMT Surface Exterior Temperature,
+HAMT-Surface Ext RH,HAMT Surface Exterior Relative Humidity,
+HAMT-Profile Construction 1 Cell 1 Temperature,HAMT Profile Construction Cell x Temperature,
+HAMT-Profile Construction 1 Cell 1 Water,HAMT Profile Construction Cell x Water Content,
+HAMT-Profile Construction 1 Cell 1 RH,HAMT Profile Construction Cell x Relative Humidity,
+Refrigeration System Total Heat Rejection Rate,Refrigeration System Total Heat Rejected Rate
+Refrigeration System Total Heat Rejection Energy,Refrigeration System Total Heat Rejected Energy
+old variable name,new variable name -- add variable names (before this line) and leave off units -- <DELETE> to delete,

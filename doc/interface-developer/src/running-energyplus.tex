@@ -1,0 +1,117 @@
+\chapter{Running EnergyPlus}\label{running-energyplus}
+
+EnergyPlus is written in C++ and runs as a console application. More explicit details on running EnergyPlus are available in a separate document (Running EnergyPlus in Auxiliary Programs document). Optional command-line arguments are available (energyplus --help, or man energyplus on Linux systems). The following files are used to run EnergyPlus:
+
+\begin{itemize}
+\item
+  EnergyPlus.exe (the executable file)
+\item
+  Energy+.ini (described below)
+\item
+  Energy+.idd (the input data dictionary file)
+\item
+  In.idf (the input file)
+\item
+  In.epw -- optional (weather data file)
+\end{itemize}
+
+The input data dictionary and input data file have been discussed in the previous sections of this document.
+
+For weather simulations, EnergyPlus accepts EnergyPlus weather files. Previous versions accepted BLAST formatted weather files and now a BLASTWeatherConverter program is provided.~ The actual file name is \textbf{in.epw}.
+
+The Energy+.ini file is a ``standard'' Windows\textsuperscript{TM} ini file and can be manipulated using the Windows API calls though EnergyPlus uses standard Fortran to manipulate it.~ It is a very simple ini file and is fully described in the AuxiliaryPrograms.pdf document. Energy+.ini and in.idf file should be in the directory from which you are running EnergyPlus.exe.
+
+For the advanced user, there is also the ``EPMacro'' program, described in the Auxiliary Programs Document.~ You run it as a separate program before EnergyPlus (the batch file included in the install and shown in the GettingStarted document contains the commands).
+
+EnergyPlus creates the following files (plus more):
+
+% table 2
+\begin{longtable}[c]{@{}ll@{}}
+\caption{EnergyPlus Output Files \label{table:energyplus-output-files}} \tabularnewline
+\toprule 
+FileName & Description \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{EnergyPlus Output Files} \tabularnewline
+\toprule 
+FileName & Description \tabularnewline
+\midrule
+\endhead
+
+Audit.out & Echo of input \tabularnewline
+Eplusout.err & Error file \tabularnewline
+Eplusout.eso & Standard Output File \tabularnewline
+Eplusout.eio & One time output file \tabularnewline
+Eplusout.rdd & Report Variable Data Dictionary \tabularnewline
+Eplusout.dxf & DXF (from Report,Surfaces,DXF;) \tabularnewline
+Eplusout.end & A one line summary of success or failure \tabularnewline
+\bottomrule
+\end{longtable}
+
+The eplusout.err file may contain three levels of errors (Warning, Severe, Fatal) as well as the possibility of just message lines.~ These errors may be duplicated in other files (such as the standard output file).
+
+% table 3
+\begin{longtable}[c]{@{}ll@{}}
+\caption{EnergyPlus Errors \label{table:energyplus-errors}} \tabularnewline
+\toprule 
+Error Level & Action \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{EnergyPlus Errors} \tabularnewline
+\toprule 
+Error Level & Action \tabularnewline
+\midrule
+\endhead
+
+Warning & Take note \tabularnewline
+Severe & Should Fix \tabularnewline
+Fatal & Program will abort \tabularnewline
+\bottomrule
+\end{longtable}
+
+EnergyPlus produces several messages as it is executing, as a guide to its progress.~ For example, the run of the 1ZoneUncontrolled input file from Appendix A produces:
+
+\begin{lstlisting}
+
+EnergyPlus Starting
+   EnergyPlus 1.3.0.011, 4/5/2006 2:59 PM
+   Initializing New Environment Parameters
+   Warming up {1}
+   Initializing Response Factors
+   Initializing Window Optical Properties
+   Initializing Solar Calculations
+   Initializing HVAC
+   Warming up {2}
+   Warming up {3}
+   Warming up {4}
+   Starting Simulation at 12/21 for DENVER_STAPLETON ANN HTG 99% CONDNS DB
+   Initializing New Environment Parameters
+   Warming up {1}
+   Warming up {2}
+   Warming up {3}
+   Starting Simulation at 07/21 for DENVER_STAPLETON ANN CLG 1% CONDNS DB = >MWB
+   EnergyPlus Run Time = 00hr 00min  1.00sec
+\end{lstlisting}
+
+Extensive timing studies and fine-tuning of EnergyPlus is NOT complete.~ To give you an idea of comparable run times, we present the following (does not include HVAC) with an early version of EnergyPlus running on a 450MHZ machine.~ Remember, BLAST would be 1 calculation per hour, EnergyPlus (in this case) was 4 calculations per hour.~ Obviously, these are quite out of date.~ However, a recent change in a developer's test machine illustrates the importance of maximum memory.~ A 5 zone full year run on a 1.8GHZ, 1GB machine was running about 8 minutes -- with a new 2.1GHZ, 2GB machine the same file takes about 2 minutes.
+
+% table 4
+\begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
+\caption{Timings Comparison (EnergyPlus vs. BLAST) \label{table:timings-comparison-energyplus-vs.-blast}} \tabularnewline
+\toprule 
+File & BLAST Per Zone & EnergyPlus Per Zone \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Timings Comparison (EnergyPlus vs. BLAST)} \tabularnewline
+\toprule 
+File & BLAST Per Zone & EnergyPlus Per Zone \tabularnewline
+\midrule
+\endhead
+
+GeometryTest (5 Zones, 2 Design Day, Full Weather Year) & 13 sec & 33 sec \tabularnewline
+SolarShadingTest (9 Zones, Full Weather Year) & 7 sec & 25 sec \tabularnewline
+\bottomrule
+\end{longtable}

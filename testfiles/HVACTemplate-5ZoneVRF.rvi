@@ -1,0 +1,42 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Zone Air Temperature
+Zone Mean Radiant Temperature
+Zone Operative Temperature
+Zone Air Humidity Ratio
+Zone Air Relative Humidity
+Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time
+Fan Electricity Rate
+Zone Air System Sensible Cooling Rate
+Zone Air System Sensible Heating Rate
+Zone VRF Air Terminal Cooling Electricity Rate
+Zone VRF Air Terminal Total Cooling Rate
+Zone VRF Air Terminal Heating Electricity Rate
+Zone VRF Air Terminal Total Heating Rate
+Zone VRF Air Terminal Fan Availability Status
+VRF Heat Pump Total Cooling Rate
+VRF Heat Pump Total Heating Rate
+VRF Heat Pump Cooling Electricity Rate
+VRF Heat Pump Heating Electricity Rate
+VRF Heat Pump Cooling COP
+VRF Heat Pump Heating COP
+VRF Heat Pump Defrost Electricity Rate
+VRF Heat Pump Part Load Ratio
+VRF Heat Pump Runtime Fraction
+VRF Heat Pump Cycling Ratio
+VRF Heat Pump Operating Mode
+VRF Heat Pump Condenser Inlet Temperature
+VRF Heat Pump Crankcase Heater Electricity Rate
+VRF Heat Pump Terminal Unit Cooling Load Rate
+VRF Heat Pump Terminal Unit Heating Load Rate
+VRF Heat Pump Condenser Outlet Temperature
+VRF Heat Pump Condenser Heat Transfer Rate
+Plant Supply Side Outlet Temperature
+Boiler Heating Rate
+Boiler NaturalGas Rate
+Cooling Tower Heat Transfer Rate
+Cooling Tower Fan Electricity Rate
+Zone Heating Setpoint Not Met While Occupied Time
+Zone Cooling Setpoint Not Met While Occupied Time
+0

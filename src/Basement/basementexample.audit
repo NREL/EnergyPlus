@@ -1,0 +1,249 @@
+ This is a commercial bulding. There is no basement temp dead band.
+ 1-D solution has not converged, Delta T>0.05
+ 1-D solution has not converged, Delta T>0.05
+ 1-D solution has not converged, Delta T>0.05
+ 1-D solution has not converged, Delta T>0.05
+ 1-D solution has not converged, Delta T>0.05
+ 1-D solution has not converged, Delta T>0.05
+ 1-D solution has not converged, Delta T>0.05
+ 1-D solution has not converged, Delta T>0.05
+ 1-D solution has not converged, Delta T>0.05
+ 1-D solution has converged
+ Entering main simulation block
+ Year:           1 Day:          30 Converge Status: F
+ Year:           1 Day:          60 Converge Status: F
+ Year:           1 Day:          90 Converge Status: F
+ Year:           1 Day:         120 Converge Status: F
+ Year:           1 Day:         150 Converge Status: F
+ Year:           1 Day:         180 Converge Status: F
+ Year:           1 Day:         210 Converge Status: F
+ Year:           1 Day:         240 Converge Status: F
+ Year:           1 Day:         270 Converge Status: F
+ Year:           1 Day:         300 Converge Status: F
+ Year:           1 Day:         330 Converge Status: F
+ Year:           1 Day:         360 Converge Status: F
+ Year:           1 Day:         365 Converge Status: F
+ 3-D Solution Has Not Converged, Delta T>0.1
+ Max DeltaT=147.728
+ CVG =  F  QUIT =  F
+ Elapsed time: 107.25 seconds
+ Year:           2 Day:          30 Converge Status: F
+ Year:           2 Day:          60 Converge Status: F
+ Year:           2 Day:          90 Converge Status: F
+ Year:           2 Day:         120 Converge Status: F
+ Year:           2 Day:         150 Converge Status: F
+ Year:           2 Day:         180 Converge Status: F
+ Year:           2 Day:         210 Converge Status: F
+ Year:           2 Day:         240 Converge Status: F
+ Year:           2 Day:         270 Converge Status: F
+ Year:           2 Day:         300 Converge Status: F
+ Year:           2 Day:         330 Converge Status: F
+ Year:           2 Day:         360 Converge Status: F
+ Year:           2 Day:         365 Converge Status: F
+ 3-D Solution Has Not Converged, Delta T>0.1
+ Max DeltaT=1.311
+ CVG =  F  QUIT =  F
+ Elapsed time: 213.73 seconds
+ Year:           3 Day:          30 Converge Status: F
+ Year:           3 Day:          60 Converge Status: F
+ Year:           3 Day:          90 Converge Status: F
+ Year:           3 Day:         120 Converge Status: F
+ Year:           3 Day:         150 Converge Status: F
+ Year:           3 Day:         180 Converge Status: F
+ Year:           3 Day:         210 Converge Status: F
+ Year:           3 Day:         240 Converge Status: F
+ Year:           3 Day:         270 Converge Status: F
+ Year:           3 Day:         300 Converge Status: F
+ Year:           3 Day:         330 Converge Status: F
+ Year:           3 Day:         360 Converge Status: F
+ Year:           3 Day:         365 Converge Status: F
+ 3-D Solution Has Not Converged, Delta T>0.1
+ Max DeltaT=0.763
+ CVG =  F  QUIT =  F
+ Elapsed time: 320.48 seconds
+ Year:           4 Day:          30 Converge Status: F
+ Year:           4 Day:          60 Converge Status: F
+ Year:           4 Day:          90 Converge Status: F
+ Year:           4 Day:         120 Converge Status: F
+ Year:           4 Day:         150 Converge Status: F
+ Year:           4 Day:         180 Converge Status: F
+ Year:           4 Day:         210 Converge Status: F
+ Year:           4 Day:         240 Converge Status: F
+ Year:           4 Day:         270 Converge Status: F
+ Year:           4 Day:         300 Converge Status: F
+ Year:           4 Day:         330 Converge Status: F
+ Year:           4 Day:         360 Converge Status: F
+ Year:           4 Day:         365 Converge Status: F
+ 3-D Solution Has Not Converged, Delta T>0.1
+ Max DeltaT=0.475
+ CVG =  F  QUIT =  F
+ Elapsed time: 426.59 seconds
+ Year:           5 Day:          30 Converge Status: F
+ Year:           5 Day:          60 Converge Status: F
+ Year:           5 Day:          90 Converge Status: F
+ Year:           5 Day:         120 Converge Status: F
+ Year:           5 Day:         150 Converge Status: F
+ Year:           5 Day:         180 Converge Status: F
+ Year:           5 Day:         210 Converge Status: F
+ Year:           5 Day:         240 Converge Status: F
+ Year:           5 Day:         270 Converge Status: F
+ Year:           5 Day:         300 Converge Status: F
+ Year:           5 Day:         330 Converge Status: F
+ Year:           5 Day:         360 Converge Status: F
+ Year:           5 Day:         365 Converge Status: F
+ 3-D Solution Has Not Converged, Delta T>0.1
+ Max DeltaT=0.298
+ CVG =  F  QUIT =  F
+ Elapsed time: 533.31 seconds
+ Year:           6 Day:          30 Converge Status: F
+ Year:           6 Day:          60 Converge Status: F
+ Year:           6 Day:          90 Converge Status: F
+ Year:           6 Day:         120 Converge Status: F
+ Year:           6 Day:         150 Converge Status: F
+ Year:           6 Day:         180 Converge Status: F
+ Year:           6 Day:         210 Converge Status: F
+ Year:           6 Day:         240 Converge Status: F
+ Year:           6 Day:         270 Converge Status: F
+ Year:           6 Day:         300 Converge Status: F
+ Year:           6 Day:         330 Converge Status: F
+ Year:           6 Day:         360 Converge Status: F
+ Year:           6 Day:         365 Converge Status: F
+ 3-D Solution Has Not Converged, Delta T>0.1
+ Max DeltaT=0.187
+ CVG =  F  QUIT =  F
+ Elapsed time: 639.47 seconds
+ Year:           7 Day:          30 Converge Status: F
+ Year:           7 Day:          60 Converge Status: F
+ Year:           7 Day:          90 Converge Status: F
+ Year:           7 Day:         120 Converge Status: F
+ Year:           7 Day:         150 Converge Status: F
+ Year:           7 Day:         180 Converge Status: F
+ Year:           7 Day:         210 Converge Status: F
+ Year:           7 Day:         240 Converge Status: F
+ Year:           7 Day:         270 Converge Status: F
+ Year:           7 Day:         300 Converge Status: F
+ Year:           7 Day:         330 Converge Status: F
+ Year:           7 Day:         360 Converge Status: F
+ Year:           7 Day:         365 Converge Status: F
+ 3-D Solution Has Not Converged, Delta T>0.1
+ Max DeltaT=0.117
+ CVG =  F  QUIT =  F
+ Elapsed time: 745.53 seconds
+ Year:           8 Day:          30 Converge Status: F
+ Year:           8 Day:          60 Converge Status: F
+ Year:           8 Day:          90 Converge Status: F
+ Year:           8 Day:         120 Converge Status: F
+ Year:           8 Day:         150 Converge Status: F
+ Year:           8 Day:         180 Converge Status: F
+ Year:           8 Day:         210 Converge Status: F
+ Year:           8 Day:         240 Converge Status: F
+ Year:           8 Day:         270 Converge Status: F
+ Year:           8 Day:         300 Converge Status: F
+ Year:           8 Day:         330 Converge Status: F
+ Year:           8 Day:         360 Converge Status: F
+ Year:           8 Day:         365 Converge Status: F
+ 3-D Solution Has Not Converged, Delta T>0.1
+ Max DeltaT=7.325E-002
+ CVG =  T  QUIT =  F
+ Elapsed time: 851.70 seconds
+ Year:           9 Day:          30 Converge Status: T
+ Year:           9 Day:          60 Converge Status: T
+ Year:           9 Day:          90 Converge Status: T
+ Year:           9 Day:         120 Converge Status: T
+ Year:           9 Day:         150 Converge Status: T
+ Year:           9 Day:         180 Converge Status: T
+ Year:           9 Day:         210 Converge Status: T
+ Year:           9 Day:         240 Converge Status: T
+ Year:           9 Day:         270 Converge Status: T
+ Year:           9 Day:         300 Converge Status: T
+ Year:           9 Day:         330 Converge Status: T
+ Year:           9 Day:         360 Converge Status: T
+ Year:           9 Day:         365 Converge Status: T
+ 3-D Solution Has Converged
+ Elapsed time: 961.94 seconds
+ IYR=           9   Program Terminated
+  Processing Data Dictionary (BasementGHT.idd) File -- Complete
+  Maximum number of Alpha Args=           1
+  Maximum number of Numeric Args=          44
+  Number of Object Definitions=          14
+  Number of Section Definitions=           0
+  Processing Input Data File (BasementGHTIn.idf) -- Start
+      1 ! Minneapolis Test Cases
+      2 SimParameters,
+      3   0.1,     ! [F: Multiplier for the ADI solution: 0<F<1.0,
+      4            !         typically 0.1 (0.5 for high k
+      5   15;       ! [IYRS: Maximum number of iterations: typically 25-30
+      6 !
+      7 MatlProps,
+      8   6,       ! [NMAT: Number of materials in this domain, UP TO 6]
+      9   2242.6, 2242.6, 311.66, 1500.0, 2000.0, 448.5,!  [RHO(1-6): Matl density (Fndn wall, Floor Slab, Ceiling,
+     10                                                 !      Soil, Gravel, Wood), kg/m^3, ]
+     11   880.0, 880.0, 1513.0, 840.0, 720.0, 1630.0,!       [CP(1-6): Specific Heat: J/kg-K,
+     12   1.402, 1.402, 0.093, 0.5, 1.9, 0.119;  !       [TCON(1-6): Conductivity: W/m-K
+     13 !
+     14 Insulation,
+     15   5.0,  ! [REXT: R Value of any exterior insulation, K/(W/m^2)]
+     16   TRUE; ! [INSFULL: Flag: Is the wall fully insulated? TRUE/FALSE]
+     17 !
+     18 SurfaceProps,
+     19   .16, .40, ! [ALBEDO: Surface albedo array, .16 .40]
+     20   .94, .86, ! [EPSLN: Surface emissivity No Snow/ Snow .94 .86]
+     21   6.0, 0.25, ! [VEGHT: Surface roughness NS/S, cm, 6.0, 0.25]
+     22   TRUE;! [PET: Flag, Potential evapotranspiration on? T/F]
+     23 !               Typically, PET is True
+     24 !
+     25 BldgData,
+     26   .2, ! [DWALL: Wall thickness, m, .2]
+     27   .1, ! [DSLAB: Floor slab thickness, m, 0.1]
+     28   .3, ! [DGRAVXY: Width of gravel pit beside footing, m, 0.3]
+     29   .2, ! [DGRAVZN: Gravel depth above the floor slab, m, 0.2]
+     30   .1;! [DGRAVZP: Gravel depth below the floor slab, m, 0.1]
+     31 !
+     32 Interior,
+     33   TRUE, ! [COND: Flag: Is the basement conditioned? TRUE/FALSE]
+     34 !      [HIN: Indoor convective heat transfer coefficients, W/m^2
+     35 !       Convection Only: 1)Q Downward 2)Q Upward 3)Q Horizontal
+     36 !       Conv and Radiation: 4)Q Downward 5)Q Upward 6)Q Horizontal]
+     37   0.92, !Q Downward Convection Only
+     38   4.04, !Q Upward Convection Only
+     39   3.08, !Q HorizontalConvection Only
+     40   6.13, !Q Downward Conv and Radiation
+     41   9.26, !Q Upward Conv and Radiation
+     42   8.29;!Q Horizontal Conv and Radiation
+     43 !
+     44 EquivSlab,
+     45   15.0, ! [APRatio: The area to perimeter ratio for this slab: m]
+     46 !
+     47   TRUE;! [EquivSizing: Flag: Will the dimensions of an equivalent
+     48 !             slab be calculated (TRUE) or will the dimensions be
+     49 !              input directly? (FALSE)]
+     50 !             Only advanced special simulations should use FALSE.
+     51 !
+     52 EquivAutoGrid,   ! NOTE: EquivAutoGrid necessary when EquivSizing=TRUE
+     53 !                This is the normal case.
+     54 ! If the modelled building is not a rectangle or square, Equivalent
+     55 ! sizing MUST be used to get accurate results
+     56 !
+     57   15,  ! [CLEARANCE: Distance from outside of wall to edge, 15m]
+     58 !  0.0, ! [ConcAGHeight: Height of the fndn wall above grade, m (This should normally be zero for EnergyPlus)]
+     59   .1,  ! [SlabDepth: Thickness of the floor slab, m, 0.1]
+     60   2.4; ! [BaseDepth: Depth of the basement wall below grade, m]
+     61 !
+     62 ComBldg, !  Commercial building
+     63 20.,  !  Jan Ave basement temp
+     64 20.,  !  Feb Ave basement temp
+     65 20.,  !  Mar Ave basement temp
+     66 20.,  !  Apr Ave basement temp
+     67 20.,  !  May Ave basement temp
+     68 20.,  !  Jun Ave basement temp
+     69 20.,  !  Jul Ave basement temp
+     70 20.,  !  Aug Ave basement temp
+     71 20.,  !  Sep Ave basement temp
+     72 20.,  !  Oct Ave basement temp
+     73 20.,  !  Nov Ave basement temp
+     74 20.,  !  Dec Ave basement temp
+     75 0.0;  !  Daily variation Sine Wave amplitude
+     76 
+  Processing Input Data File (BasementGHTIn.idf) -- Complete
+  Number of IDF "Lines"=           9
+

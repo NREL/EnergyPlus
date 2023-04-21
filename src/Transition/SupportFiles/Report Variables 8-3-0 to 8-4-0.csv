@@ -1,0 +1,10 @@
+8.3.0,8.4.0,Transition notes
+7,7,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
+Zone Supply Air Mass Flow Rate,Zone Air Mass Balance Supply Mass Flow Rate,
+Zone Exhaust Air Mass Flow Rate,Zone Air Mass Balance Exhaust Mass Flow Rate,
+Zone Return Air Mass Flow Rate,Zone Air Mass Balance Return Mass Flow Rate,
+Zone Mixing Receiving Air Mass Flow Rate,Zone Air Mass Balance Mixing Receiving Mass Flow Rate,
+Zone Mixing Source Air Mass Flow Rate,Zone Air Mass Balance Mixing Source Mass Flow Rate,
+Zone Infiltration Air Mass Flow Balance Status,Zone Air Mass Balance Infiltration Status,
+Zone Mass Balance Infiltration Air Mass Flow Rate,Zone Air Mass Balance Infiltration Mass Flow Rate,
+old variable name,new variable name,-- add variable names (before this line) and leave off units -- <DELETE> to delete

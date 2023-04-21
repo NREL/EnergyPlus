@@ -1,0 +1,257 @@
+\section{Utility Routines/Functions}\label{utility-routinesfunctions}
+
+EnergyPlus supplies an extensive set of routines to help module developers get input, check values, get schedule values, get and check nodes.~ These are summarized in the following table and in more detail in the following sections.~ The table indicates the routine/function name, times of most likely use, and the module (if applicable) that you must USE in the code in order to make the routine available to you.~ Most of the items mentioned in this table are of particular use in ``GetInput'' processing.~ A few later tables will highlight similar functions/routines for simulation purposes.
+
+Table 2.~ Table of Utility Functions
+
+Routine/Function Name
+
+Use during
+
+Module
+
+GetNumObjectsFound
+
+``GetInput'' Processing
+
+InputProcessor
+
+GetObjectItem
+
+``GetInput'' Processing
+
+InputProcessor
+
+GetObjectDefMaxArgs
+
+``GetInput'' Processing
+
+InputProcessor
+
+GetObjectItemNum
+
+``GetInput'' Processing
+
+InputProcessor
+
+FindItemInList
+
+``GetInput'' Processing (best) though some are currently used in Simulation
+
+InputProcessor
+
+FindItem
+
+``GetInput'' Processing
+
+InputProcessor
+
+FindItemInSortedList
+
+``Special processing'' -- list must be sorted.
+
+InputProcessor
+
+SameString
+
+``GetInput'' Processing
+
+InputProcessor
+
+VerifyName
+
+``GetInput'' Processing
+
+InputProcessor
+
+RangeCheck
+
+``GetInput'' Processing
+
+InputProcessor
+
+MakeUPPERCase
+
+``GetInput'' Processing
+
+InputProcessor
+
+GetOnlySingleNode
+
+``GetInput'' Processing
+
+NodeInputManager
+
+GetNodeNums
+
+``GetInput'' Processing
+
+NodeInputManager
+
+InitUniqueNodeCheck, CheckUniqueNodes, EndUniqueNodeCheck
+
+``GetInput'' Processing
+
+NodeInputManager
+
+SetupCompSets
+
+``GetInput'' Processing
+
+NodeInputManager
+
+TestCompSets
+
+``GetInput'' Processing
+
+NodeInputManager
+
+GetNewUnitNumber
+
+(automatically retrieve an available unit number)
+
+EXTERNAL integer function
+
+FindUnitNumber
+
+Find a unit number when you know the name of the file
+
+EXTERNAL integer function
+
+FindNumberinList
+
+``GetInput'' Processing/Init processing
+
+EXTERNAL integer function
+
+ValidateComponent
+
+``GetInput'' Processing
+
+Subroutine CALL
+
+CheckComponent
+
+``GetInput'' Processing -- like ValidateComponent but doesn't generate error message if failure
+
+Subroutine CALL
+
+CreateSysTimeIntervalString
+
+Simulation -- Error Messages
+
+General
+
+TrimSigDigits
+
+Simulation -- Error Messages
+
+General
+
+RoundSigDigits
+
+Simulation -- Error Messages
+
+General
+
+GetScheduleIndex
+
+``GetInput'' Processing
+
+ScheduleManager
+
+GetDayScheduleIndex
+
+``GetInput'' Processing
+
+ScheduleManager
+
+GetCurrentScheduleValue
+
+Simulation
+
+ScheduleManager
+
+GetScheduleValuesForDay
+
+Simulation
+
+ScheduleManager
+
+GetSingleDayScheduleValues
+
+Simulation/''GetInput''
+
+ScheduleManager
+
+CheckScheduleValueMinMax
+
+``GetInput'' Processing
+
+ScheduleManager
+
+CheckScheduleValue
+
+``GetInput'' Processing
+
+ScheduleManager
+
+GetScheduleMinValue
+
+``GetInput'' Processing
+
+ScheduleManager
+
+GetScheduleMaxValue
+
+``GetInput'' Processing
+
+ScheduleManager
+
+LookUpScheduleValue
+
+Simulation
+
+ScheduleManager
+
+CheckOutAirNodeNumber
+
+``GetInput'' Processing
+
+OutAirNodeManager
+
+GetCurveIndex
+
+``GetInput'' Processing
+
+Curve
+
+GetCurveCheck
+
+``GetInput'' Processing
+
+Curve
+
+GetCurveType
+
+``GetInput'' Processing
+
+Curve
+
+CurveValue
+
+Simulation
+
+Curve
+
+SetupAndSort
+
+Sorting lists of character values
+
+SortAndStringUtilities
+
+SetupZoneInternalGain
+
+``GetInput'' Processing
+
+DataInterfaces

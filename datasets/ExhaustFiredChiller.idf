@@ -1,0 +1,57 @@
+!===============================================================================
+! ExhuastFiredChiller.idf
+!
+! This dataset includes object type for ChillerHeater:Absorption:DoubleEffect
+!
+! Based on personal communication with Exhaust fired Absorption chiller manufacturer
+! August 23,2011
+! Exhaust Fired Absorption Chiller
+! Reference capacity : 231 kW (66 tons)
+! Reference COP = 1.39
+!
+!
+! Exhaust chiller Capacity and Part-Load Ratio curve
+! Cooling Capacity function of temperature curve  - CoolCapfT
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  Curve:Biquadratic,
+    ExhAbsorb_CapFt,         !- Name
+    -0.115131E+01,           !- Coefficient1 Constant
+    -0.801316E-01,           !- Coefficient2 x
+    -0.945353E-02,           !- Coefficient3 x**2
+    0.209867E+00,            !- Coefficient4 y
+    -0.567055E-02,           !- Coefficient5 y**2
+    0.943605E-02,            !- Coefficient6 x*y
+    4.44444,                 !- Minimum Value of x
+    8.88889,                 !- Maximum Value of x
+    21.11111,                !- Minimum Value of y
+    35.00000;                !- Maximum Value of y
+
+! Thermal energy input to cooling output ratio function of temperature curve -  TeFIRfT
+
+  Curve:Biquadratic,
+    ExhAbsorb_EIRFt,         !- Name
+    0.131195E+01,            !- Coefficient1 Constant
+    -0.159283E-01,           !- Coefficient2 x
+    0.773725E-03,            !- Coefficient3 x**2
+    -0.196279E-01,           !- Coefficient4 y
+    0.378351E-03,            !- Coefficient5 y**2
+    0.558356E-04,            !- Coefficient6 x*y
+    4.44444,                 !- Minimum Value of x
+    8.88889,                 !- Maximum Value of x
+    21.11111,                !- Minimum Value of y
+    35.00000;                !- Maximum Value of y
+
+! Thermal energy input to cooling output ratio function of part load ratio curve -  TeFIRfPLR
+
+  Curve:Quadratic,
+    ExhAbsorb_PLR,           !- Name
+    0.026280035,             !- Coefficient1 Constant
+    0.678066088,             !- Coefficient2 x
+    0.273905867,             !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+

@@ -1,0 +1,667 @@
+\chapter{Appendix D.~ Module, Subroutine, Function Templates}\label{appendix-d.-module-subroutine-function-templates}
+
+The following module template can and should be used to create new modules.~ Following the module template are subroutine and function templates.~ You should be able to copy the template for your own use (or you can get a plain text version).
+
+\textbf{MODULE \textless{}module\_name\textgreater{}}
+
+~~~~~~~~~ ! Module containing the routines dealing with the \textless{}module\_name\textgreater{}
+
+~~~~~~~~~ ! MODULE INFORMATION:
+
+~~~~~~~~~ !~~~~~~ AUTHOR~~~~~~~~ \textless{}author\textgreater{}
+
+~~~~~~~~~ !~~~~~~ DATE WRITTEN~~ \textless{}date\_written\textgreater{}
+
+~~~~~~~~~ !~~~~~~ MODIFIED~~~~~~ na
+
+~~~~~~~~~ !~~~~~~ RE-ENGINEERED~ na
+
+~~~~~~~~~ ! PURPOSE OF THIS MODULE:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! METHODOLOGY EMPLOYED:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! REFERENCES:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! OTHER NOTES:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! USE STATEMENTS:
+
+~~~~~~~~~ ! \textless{}use statements for data only modules\textgreater{}
+
+USE DataGlobals, ONLY: ShowWarningError, ShowSevereError, ShowFatalError, \&
+
+~~~~~~~~~~~~~~~~~~~~~~ MaxNameLength, \ldots{}
+
+~~~~~~~~~ ! \textless{}use statements for access to subroutines in other modules\textgreater{}
+
+IMPLICIT NONE ! Enforce explicit typing of all variables
+
+PRIVATE ! Everything private unless explicitly made public
+
+~~~~~~~~~ ! MODULE PARAMETER DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! DERIVED TYPE DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! MODULE VARIABLE DECLARATIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE SPECIFICATIONS FOR MODULE:
+
+~~~~ ! Driver/Manager Routines
+
+PUBLIC~ Sim\textless{}module\_name\textgreater{}
+
+~~~~ ! Get Input routines for module
+
+PRIVATE Get\textless{}module\_name\textgreater{}
+
+~~~~ ! Initialization routines for module
+
+PRIVATE Init\textless{}module\_name\textgreater{}
+
+PRIVATE Size\textless{}module\_name\textgreater{}
+
+~~~~ ! Algorithms/Calculation routines for the module
+
+PRIVATE Calc\textless{}module\_name\textgreater{}
+
+~~~~ ! Update routines to check convergence and update nodes
+
+PRIVATE Update\textless{}module\_name\textgreater{}
+
+~~~~ ! Reporting routines for module
+
+PRIVATE Report\textless{}module\_name\textgreater{}
+
+~~~~ ! Utility routines for module
+
+! these would be public such as:
+
+! PUBLIC~ Get\textless{}module\textgreater{}InletNode
+
+! PUBLIC~ Get\textless{}module\textgreater{}OutletNode
+
+\textbf{CONTAINS}
+
+\textbf{SUBROUTINE Sim\textless{}module\_name\textgreater{}}
+
+~~~~~~~~~ ! SUBROUTINE INFORMATION:
+
+~~~~~~~~~ !~~~~~~ AUTHOR~~~~~~~~ \textless{}author\textgreater{}
+
+~~~~~~~~~ !~~~~~~ DATE WRITTEN~~ \textless{}date\_written\textgreater{}
+
+~~~~~~~~~ !~~~~~~ MODIFIED~~~~~~ na
+
+~~~~~~~~~ !~~~~~~ RE-ENGINEERED~ na
+
+~~~~~~~~~ ! PURPOSE OF THIS SUBROUTINE:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! METHODOLOGY EMPLOYED:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! REFERENCES:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! USE STATEMENTS:
+
+~~~~~~~~~ ! na
+
+~ IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
+
+~~~~~~~~~ ! SUBROUTINE ARGUMENT DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE PARAMETER DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! INTERFACE BLOCK SPECIFICATIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! DERIVED TYPE DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+~ LOGICAL,SAVE~~~~~ :: GetInputFlag = .true.~ ! First time, input is ``gotten''
+
+~ IF (GetInputFlag) THEN
+
+~~~ CALL Get\textless{}module\_name\textgreater{}Input
+
+~~~ GetInputFlag = .false.
+
+~ ENDIF
+
+~ \textless{}\ldots{} insert any necessary code here\textgreater{}
+
+~ CALL Init\textless{}module\_name\textgreater{}(Args)
+
+~ CALL Calc\textless{}module\_name\textgreater{}(Args)
+
+~ CALL Update\textless{}module\_name\textgreater{}(Args)
+
+~ CALL Report\textless{}module\_name\textgreater{}(Args)
+
+~ RETURN
+
+\textbf{END SUBROUTINE Sim\textless{}module\_name\textgreater{}}
+
+\textbf{SUBROUTINE Get\textless{}module\_name\textgreater{}Input}
+
+~~~~~~~~~ ! SUBROUTINE INFORMATION:
+
+~~~~~~~~~ !~~~~~~ AUTHOR~~~~~~~~ \textless{}author\textgreater{}
+
+~~~~~~~~~ !~~~~~~ DATE WRITTEN~~ \textless{}date\_written\textgreater{}
+
+~~~~~~~~~ !~~~~~~ MODIFIED~~~~~~ na
+
+~~~~~~~~~ !~~~~~~ RE-ENGINEERED~ na
+
+~~~~~~~~~ ! PURPOSE OF THIS SUBROUTINE:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! METHODOLOGY EMPLOYED:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! REFERENCES:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! USE STATEMENTS:
+
+~ USE InputProcessor, ONLY: GetNumObjectsFound, GetObjectItem ! might also use FindItemInList
+
+~ USE DataIPShortCuts
+
+~ IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
+
+~~~~~~~~~ ! SUBROUTINE ARGUMENT DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE PARAMETER DEFINITIONS:
+
+~ CHARACTER(len = *), PARAMETER :: RoutineName = `PutRoutineNameHere'
+
+~ CHARACTER(len = *), PARAMETER :: CurrentModuleObject = `GetModuleObject'
+
+~~~~~~~~~ ! INTERFACE BLOCK SPECIFICATIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! DERIVED TYPE DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+~ INTEGER~~~~~~~~~~~~~~~~~~~~~~~ :: Item~~~ ! Item to be ``gotten''
+
+~ !~ Instead of below, use Variables in IPShortCuts
+
+!~ CHARACTER(len = MaxNameLength), \&
+
+!~~~~~~~~~~~~~~~~~~~ DIMENSION(x) :: Alphas~ ! Alpha items for object
+
+!~ REAL, DIMENSION(y)~~~~~~~~~~~~ :: Numbers ! Numeric items for object
+
+~ INTEGER~~~~~~~~~~~~~~~~~~~~~~~ :: NumAlphas~ ! Number of Alphas for each GetObjectItem call
+
+~ INTEGER~~~~~~~~~~~~~~~~~~~~~~~ :: NumNumbers ! Number of Numbers for each GetObjectItem call
+
+~ INTEGER~~~~~~~~~~~~~~~~~~~~~~~ :: IOStatus~~ ! Used in GetObjectItem
+
+~ LOGICAL~~~~~~~~~~~~~~~~~~~~~~~ :: ErrorsFound = .false.~ ! Set to true if errors in input, fatal at end of routine
+
+~ \textless{}NumItems\textgreater{} = GetNumObjectsFound(CurrentModuleObject)
+
+~ DO Item = 1,\textless{}NumItems\textgreater{}
+
+~~~ CALL GetObjectItem(CurrentModuleObject,Item,cAlphaArgs,NumAlphas, \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~ rNumericArgs,NumNumbers,IOStatus,~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~ AlphaBlank = lAlphaFieldBlanks,NumBlank = lNumericFieldBlanks,~ \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~ AlphaFieldnames = cAlphaFieldNames,NumericFieldNames = cNumericFieldNames)
+
+~~~ \textless{}process, noting errors\textgreater{}
+
+~~~ ! Errors should be formatted as (alpha 1 should hold the name of the object)
+
+~~~ CALL ShowSevereError(RoutineName//`:'//CurrentModuleObject//' = ``'//trim(cAlphaArgs(1)))//~ \&
+
+~~~~~ `\,``, invalid '//trim(cAlphaFieldNames(x))//' =''\,'//trim(cAlphaArgs(x))//`" \textless{}condition\textgreater{}.')
+
+~~~ ! likewise for numeric fields
+
+~ ENDDO
+
+~ \textless{}SetupOutputVariables here\ldots{}\textgreater{}
+
+~ IF (ErrorsFound) THEN
+
+~~~ CALL ShowFatalError(RoutineName//`:'//CurrentModuleObject//`: Errors found in input.')
+
+~ ENDIF
+
+~ RETURN
+
+\textbf{END SUBROUTINE Get\textless{}module\_name\textgreater{}Input}
+
+\textbf{SUBROUTINE Init\textless{}module\_name\textgreater{}}
+
+~~~~~~~~~ ! SUBROUTINE INFORMATION:
+
+~~~~~~~~~ !~~~~~~ AUTHOR~~~~~~~~ \textless{}author\textgreater{}
+
+~~~~~~~~~ !~~~~~~ DATE WRITTEN~~ \textless{}date\_written\textgreater{}
+
+~~~~~~~~~ !~~~~~~ MODIFIED~~~~~~ na
+
+~~~~~~~~~ !~~~~~~ RE-ENGINEERED~ na
+
+~~~~~~~~~ ! PURPOSE OF THIS SUBROUTINE:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! METHODOLOGY EMPLOYED:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! REFERENCES:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! USE STATEMENTS:
+
+~~~~~~~~~ ! na
+
+~ IMPLICIT NONE~~~ ! Enforce explicit typing of all variables in this routine
+
+~~~~~~~~~ ! SUBROUTINE ARGUMENT DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE PARAMETER DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! INTERFACE BLOCK SPECIFICATIONS
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! DERIVED TYPE DEFINITIONS
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+~~~~~~~~~ ! na
+
+~ RETURN
+
+\textbf{END SUBROUTINE Init\textless{}module\_name\textgreater{}}
+
+\textbf{SUBROUTINE Size\textless{}module\_name\textgreater{}}
+
+~~~~~~~~~ ! SUBROUTINE INFORMATION:
+
+~~~~~~~~~ !~~~~~~ AUTHOR~~~~~~~~ \textless{}author\textgreater{}
+
+~~~~~~~~~ !~~~~~~ DATE WRITTEN~~ \textless{}date\_written\textgreater{}
+
+~~~~~~~~~ !~~~~~~ MODIFIED~~~~~~ na
+
+~~~~~~~~~ !~~~~~~ RE-ENGINEERED~ na
+
+~~~~~~~~~ ! PURPOSE OF THIS SUBROUTINE:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! METHODOLOGY EMPLOYED:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! REFERENCES:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! USE STATEMENTS:
+
+~~~~~~~~~ ! na
+
+~ IMPLICIT NONE~~~ ! Enforce explicit typing of all variables in this routine
+
+~~~~~~~~~ ! SUBROUTINE ARGUMENT DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE PARAMETER DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! INTERFACE BLOCK SPECIFICATIONS
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! DERIVED TYPE DEFINITIONS
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+~~~~~~~~~ ! na
+
+~ RETURN
+
+\textbf{END SUBROUTINE Size\textless{}module\_name\textgreater{}}
+
+\textbf{SUBROUTINE Calc\textless{}module\_name\textgreater{}}
+
+~~~~~~~~~ ! SUBROUTINE INFORMATION:
+
+~~~~~~~~~ !~~~~~~ AUTHOR~~~~~~~~ \textless{}author\textgreater{}
+
+~~~~~~~~~ !~~~~~~ DATE WRITTEN~~ \textless{}date\_written\textgreater{}
+
+~~~~~~~~~ !~~~~~~ MODIFIED~~~~~~ na
+
+~~~~~~~~~ !~~~~~~ RE-ENGINEERED~ na
+
+~~~~~~~~~ ! PURPOSE OF THIS SUBROUTINE:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! METHODOLOGY EMPLOYED:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! REFERENCES:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! USE STATEMENTS:
+
+~~~~~~~~~ ! na
+
+~ IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
+
+~~~~~~~~~ ! SUBROUTINE ARGUMENT DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE PARAMETER DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! INTERFACE BLOCK SPECIFICATIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! DERIVED TYPE DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+~~~~~~~~~ ! na
+
+~ RETURN
+
+\textbf{END SUBROUTINE Calc\textless{}module\_name\textgreater{}}
+
+\textbf{SUBROUTINE Update\textless{}module\_name\textgreater{}}
+
+~~~~~~~~~ ! SUBROUTINE INFORMATION:
+
+~~~~~~~~~ !~~~~~~ AUTHOR~~~~~~~~ \textless{}author\textgreater{}
+
+~~~~~~~~~ !~~~~~~ DATE WRITTEN~~ \textless{}date\_written\textgreater{}
+
+~~~~~~~~~ !~~~~~~ MODIFIED~~~~~~ na
+
+~~~~~~~~~ !~~~~~~ RE-ENGINEERED~ na
+
+~~~~~~~~~ ! PURPOSE OF THIS SUBROUTINE:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! METHODOLOGY EMPLOYED:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! REFERENCES:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! USE STATEMENTS:
+
+~~~~~~~~~ ! na
+
+~ IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
+
+~~~~~~~~~ ! SUBROUTINE ARGUMENT DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE PARAMETER DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! INTERFACE BLOCK SPECIFICATIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! DERIVED TYPE DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+~~~~~~~~~ ! na
+
+~ RETURN
+
+\textbf{END SUBROUTINE Update\textless{}module\_name\textgreater{}}
+
+\textbf{SUBROUTINE Report\textless{}module\_name\textgreater{}}
+
+~~~~~~~~~ ! SUBROUTINE INFORMATION:
+
+~~~~~~~~~ !~~~~~~ AUTHOR~~~~~~~~ \textless{}author\textgreater{}
+
+~~~~~~~~~ !~~~~~~ DATE WRITTEN~~ \textless{}date\_written\textgreater{}
+
+~~~~~~~~~ !~~~~~~ MODIFIED~~~~~~ na
+
+~~~~~~~~~ !~~~~~~ RE-ENGINEERED~ na
+
+~~~~~~~~~ ! PURPOSE OF THIS SUBROUTINE:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! METHODOLOGY EMPLOYED:
+
+~~~~~~~~~ ! \textless{}description\textgreater{}
+
+~~~~~~~~~ ! REFERENCES:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! USE STATEMENTS:
+
+~~~~~~~~~ ! na
+
+~ IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
+
+~~~~~~~~~ ! SUBROUTINE ARGUMENT DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE PARAMETER DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! INTERFACE BLOCK SPECIFICATIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! DERIVED TYPE DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+~~~~~~~~~ ! na
+
+~! \textless{}this routine is typically needed only for those cases where you must transform the internal data to a reportable form\textgreater{}
+
+~ RETURN
+
+\textbf{END SUBROUTINE Report\textless{}module\_name\textgreater{}}
+
+\textbf{! = = = = = = = = = = = = = = = = = = = = = ~ Utility/Other routines for module.}
+
+! Insert as appropriate
+
+! Insert Standard Copyright Notice here.
+
+\textbf{END MODULE \textless{}module\_name\textgreater{}}
+
+The Subroutine Template:
+
+SUBROUTINE \textless{}name\textgreater{}
+
+~~~~~~~~~ ! SUBROUTINE INFORMATION:
+
+~~~~~~~~~ !~~~~~~ AUTHOR~~~~~~~~ \textless{}author\textgreater{}
+
+~~~~~~~~~ !~~~~~~ DATE WRITTEN~~ \textless{}date\_written\textgreater{}
+
+~~~~~~~~~ !~~~~~~ MODIFIED~~~~~~ na
+
+~~~~~~~~~ !~~~~~~ RE-ENGINEERED~ na
+
+~~~~~~~~~ ! PURPOSE OF THIS SUBROUTINE:
+
+~~~~~~~~~ ! This subroutine needs a description.
+
+~~~~~~~~~ ! METHODOLOGY EMPLOYED:
+
+~~~~~~~~~ ! Needs description, as appropriate.
+
+~~~~~~~~~ ! REFERENCES:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! USE STATEMENTS:
+
+~~~~~~~~~ ! na
+
+~ IMPLICIT NONE~~~ ! Enforce explicit typing of all variables in this routine
+
+~~~~~~~~~ ! SUBROUTINE ARGUMENT DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE PARAMETER DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! INTERFACE BLOCK SPECIFICATIONS
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! DERIVED TYPE DEFINITIONS
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+~~~~~~~~~ ! na
+
+~ RETURN
+
+END SUBROUTINE \textless{}name\textgreater{}
+
+And the Function Template:
+
+\textless{}type\textgreater{} FUNCTION \textless{}name\textgreater{}
+
+~~~~~~~~~ ! FUNCTION INFORMATION:
+
+~~~~~~~~~ !~~~~~~ AUTHOR~~~~~~~~ \textless{}author\textgreater{}
+
+~~~~~~~~~ !~~~~~~ DATE WRITTEN~~ \textless{}date\_written\textgreater{}
+
+~~~~~~~~~ !~~~~~~ MODIFIED~~~~~~ na
+
+~~~~~~~~~ !~~~~~~ RE-ENGINEERED~ na
+
+~~~~~~~~~ ! PURPOSE OF THIS FUNCTION:
+
+~~~~~~~~~ ! This function needs a description.
+
+~~~~~~~~~ ! METHODOLOGY EMPLOYED:
+
+~~~~~~~~~ ! Needs description, as appropriate.
+
+~~~~~~~~~ ! REFERENCES:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! USE STATEMENTS:
+
+~~~~~~~~~ ! na
+
+~ IMPLICIT NONE~~~ ! Enforce explicit typing of all variables in this routine
+
+~~~~~~~~~ ! FUNCTION ARGUMENT DEFINITIONS:
+
+~ ~~~~~~~~! na
+
+~~~~~~~~~ ! FUNCTION PARAMETER DEFINITIONS:
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! INTERFACE BLOCK SPECIFICATIONS
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! DERIVED TYPE DEFINITIONS
+
+~~~~~~~~~ ! na
+
+~~~~~~~~~ ! FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+~~~~~~~~~ ! na
+
+~ RETURN
+
+END FUNCTION \textless{}name\textgreater{}

@@ -1,0 +1,62 @@
+\section{Standard EnergyPlus Units}\label{standard-energyplus-units}
+
+EnergyPlus expects information in a single unit system (SI).~ This requires interface developers to convert user inputs from those preferred by architects and engineers into the standard metric units of EnergyPlus.~ EnergyPlus will not perform any units conversions and will not have any unit conversion routines.
+
+ASCII with no spaces is used for abbreviations.~ Note that exponents appear without any indication of exponentiation: i.e., kg/m3 not kg/m\^{}3 or kg/m**3.~ Also note the use of dashes.~ We have W/m2-K not W/m2*K or W/(m2*K).
+
+At the end we note the ``problem'' variables -- the inputs that have non-standard units. Inputs using these units will have to be changed and the code checked to see how the quantities are used internally.
+
+% table 1
+\begin{longtable}[c]{p{1.59in}p{2.9in}p{1.5in}}
+\caption{Standard EnergyPlus Units \label{table:standard-energyplus-units}} \tabularnewline
+\toprule 
+Quantity & unit & abbreviation \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Standard EnergyPlus Units} \tabularnewline
+\toprule 
+Quantity & unit & abbreviation \tabularnewline
+\midrule
+\endhead
+
+angular degrees & degree & deg \tabularnewline
+Length & meter & m \tabularnewline
+Area & square meter & m2 \tabularnewline
+Volume & cubic meter & m3 \tabularnewline
+Time & seconds & s \tabularnewline
+Frequency & Hertz & Hz \tabularnewline
+Temperature & Celsius & C \tabularnewline
+absolute temperature & Kelvin & K \tabularnewline
+temperature difference & Kelvin & delK \tabularnewline
+speed & meters per second & m/s \tabularnewline
+energy (or work) & Joules & J \tabularnewline
+power & Watts & W \tabularnewline
+mass & kilograms & kg \tabularnewline
+force & Newton & N \tabularnewline
+mass flow & kilograms per second & kg/s \tabularnewline
+volume flow & cubic meters per second & m3/s \tabularnewline
+pressure & Pascals & Pa \tabularnewline
+pressure difference & Pascals & delPa \tabularnewline
+specific enthalpy & Joules per kilogram & J/kg \tabularnewline
+density & kilograms per cubic meter & kg/m3 \tabularnewline
+heat flux & watts per square meter & W/m2 \tabularnewline
+specific heat & ------------------------------------------------------------------------ & J/kg-K \tabularnewline
+conductivity & ------------------------------------------------------------------------ & W/m-K \tabularnewline
+diffusivity & ------------------------------------------------------------------------ & m2/s \tabularnewline
+heat transfer coefficient & ------------------------------------------------------------------------ & W/m2-K \tabularnewline
+R-value & ------------------------------------------------------------------------ & m2-K/W \tabularnewline
+heating or cooling capacity & Watts & W \tabularnewline
+electric potential & volts & V \tabularnewline
+electric current & Amperes & A \tabularnewline
+illuminace & lux & lx \tabularnewline
+luminous flux & lumen & lm \tabularnewline
+luminous intensity & candelas & cd \tabularnewline
+luminance & candelas per square meter & cd/m2 \tabularnewline
+vapor diffusivity & m2/s & ~ \tabularnewline
+viscosity & ------------------------------------------------------------------------ & kg/m-s \tabularnewline
+porosity & ------------------------------------------------------------------------ & m3/m3 \tabularnewline
+thermal gradient coeff for moisture capacity & ------------------------------------------------------------------------ & kg/kg-K \tabularnewline
+isothermal moisture capacity & ------------------------------------------------------------------------ & m3/kg \tabularnewline
+\bottomrule
+\end{longtable}

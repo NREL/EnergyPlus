@@ -1,0 +1,77 @@
+3-D BASEMENT MODEL INPUT SUMMARY:
+
+     RUN IDENTIFIER:     Run     TIME-STEP:    1.     F:  0.10
+     WEATHER FILE ID:  Chicago Ohare Intl Ap IL USA TMY3
+     LONGITUDE (DEG):   -87.9     LATITUDE (DEG):   42.0
+     STANDARD TIME MERIDIAN (DEG):   -6.0     ELEVATION (M):   201.0
+     OPERATING TEMPERATURE (C):   0.00
+
+CHARATERISTICS OF FOUNDATION INSULATION:
+
+     R-VALUE OF EXTERIOR FOUNDATION WALL INSULATION:   5.00
+     R-VALUE OF INTERIOR FOUNDATION WALL INSULATION:   0.00
+     R-VALUE OF EXTERIOR SIDING:   0.00
+     R-VALUE OF SILL BOX INSULATION:   0.00
+     R-VALUE OF BASEMENT CEILING INSULATION:   0.00
+
+     EXTERIOR INSULATION IS FULL LENGTH
+
+SOIL AND SURFACE PROPERTIES:
+
+     ALBEDO:
+     NO SNOW:   0.16     SNOW:   0.40
+
+     LONG-WAVE EMISSIVITY:
+     NO SNOW:   0.16     SNOW:   0.40
+
+     VEGETATION HEIGHT (CM):
+     NO SNOW:   0.16     SNOW:   0.40
+
+     DENSITY (KG/M**3):  1500.00     SPECIFIC HEAT (J/KG/K):  840.00
+     THERMAL CONDUCTIVITY (W/M/K):    0.50
+
+     GROUND SNOW COVER MODEL ON
+
+FOUNDATION WALL MATERIAL PROPERTIES AND BASEMENT DIMENSIONS:
+
+     DENSITY (KG/M**3):  2242.60     SPECIFIC HEAT (J/KG/K):  880.00
+     THERMAL CONDUCTIVITY (W/M/K):    1.40
+     CEILING AREA (M**2):    3637.54
+     FLOOR AREA (M**2):    3600.00     PERIMETER (M):     241.60
+     RIM JOIST AREA (M**2):      56.69
+     SILL PLATE AREA (M**2):      37.54
+     WALL AREA (M**2):     585.12
+     MIN X (M):     0.0     MAX X (M):    30.2
+     MIN Y (M):     0.0     MAX Y (M):    30.2
+     HEIGHT OF BASEMENT BELOW-GRADE (M):     2.4
+
+CONSTANT BASEMENT TEMPERATURE (C):      0.00
+
+BOUNDARY CONDITIONS:
+
+     INSIDE HEAT TRANSFER COEFFICIENTS, CONVECTION AND RADIATION (W/M**2/K):
+     Q DOWNWARD:    6.13     Q UPWARD:    9.26     Q HORIZONTAL:    8.29
+
+     BASEMENT RADIATION MODEL OFF
+     POTENTIAL EVAPOTRANSPIRATION SURFACE BOUNDARY
+     FIXED TEMPERATURE LOWER BOUNDARY
+
+CELL X-COORDINATES (M):
+      0.00      1.00      3.00      5.00      7.00      9.00     11.00     13.00     15.00     17.00
+     19.00     21.00     23.00     25.00     27.00     27.50     28.00     28.50     29.00     29.40
+     29.60     29.80     30.00     30.08     30.16     30.20     30.35     30.50     30.75     31.00
+     31.25     31.50     32.00     32.50     33.50     35.50     37.50     39.50     41.50     43.50
+     45.50
+
+CELL Y-COORDINATES (M):
+      0.00      1.00      3.00      5.00      7.00      9.00     11.00     13.00     15.00     17.00
+     19.00     21.00     23.00     25.00     27.00     27.50     28.00     28.50     29.00     29.40
+     29.60     29.80     30.00     30.08     30.16     30.20     30.35     30.50     30.75     31.00
+     31.25     31.50     32.00     32.50     33.50     35.50     37.50     39.50     41.50     43.50
+     45.50
+
+CELL Z-COORDINATES (M):
+     -0.32     -0.27     -0.04     -0.02      0.00      0.20      0.40      0.60      0.80      1.00
+      1.20      1.40      1.60      1.80      2.00      2.20      2.40      2.50      2.70      2.95
+      3.20      3.45      3.70      4.20      4.70      6.70      8.70     10.70     12.70     14.70
+     16.70     18.70

@@ -1,0 +1,119 @@
+\chapter{Example Input Files}\label{example-input-files}
+
+The EnergyPlus install includes a sample of example input files. For the most part, the developers create these files to illustrate and test a specific feature in EnergyPlus. Then, we pass them along to you for illustrative purposes. The install contains two spreadsheet files related to the example files:
+
+\begin{itemize}
+\item
+  \textbf{ExampleFiles.xls} - lists all the files available -- whether through the install or through an external site.
+\item
+  \textbf{ExampleFiles-ObjectLink.xls} - illustrates the first 3 occurances in the example files of an object.
+\end{itemize}
+
+Following convention, each example file should have at the top a set of comments that tell what the purpose of the file is and the key features.
+
+For example, the file titled ``5ZoneAirCooled.idf'' has:
+
+\begin{lstlisting}
+
+! 5ZoneAirCooled.idf
+  ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
+  !
+  ! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
+  !                          outside air stream controlled to preheat and precool setpoints.
+  !
+  ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
+  !                          Run Control executes the run periods using the weather file
+  !
+  ! Location:                Chicago, IL
+  !
+  ! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB = -17.3°C
+  !                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB =   31.5°C MCWB =   23.0°C
+  !
+  ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
+  !
+  ! Run Control:             Zone and System sizing with weather file run control (no design days run)
+  !
+  ! Building: Single floor rectangular building 100 ft x 50 ft. 5 zones - 4 exterior, 1 interior, zone height 8 feet.
+  !           Exterior zone depth is 12 feet. There is a 2 foot high return plenum: the overall building height is
+  !           10 feet. There are windows on all 4 facades; the south and north facades have glass doors.
+  !           The south facing glass is shaded by overhangs. The walls are woodshingle over plywood, R11 insulation,
+  !           and gypboard. The roof is a gravel built up roof with R-3 mineral board insulation and plywood sheathing.
+  !           The windows are of various single and double pane construction with 3mm and 6mm glass and either 6mm or
+  !           13mm argon or air gap. The window to wall ratio is approxomately 0.29.
+  !           The south wall and door have overhangs.
+  !
+  !           The building is oriented 30 degrees east of north.
+  !
+
+
+  ! Floor Area:        463.6 m2 (5000 ft2)
+  ! Number of Stories: 1
+  !
+  ! Zone Description Details:
+  !
+  !      (0,15.2,0)                      (30.5,15.2,0)
+  !           _____   ________                ____
+  !         |\     ***        ****************   /|
+  !         | \                                 / |
+  !         |  \                 (26.8,11.6,0) /  |
+  !         *   \_____________________________/   *
+  !         *    |(3.7,11.6,0)               |    *
+  !         *    |                           |    *
+  !         *    |                           |    *
+  !         *    |               (26.8,3.7,0)|    *
+  !         *    |___________________________|    *
+  !         *   / (3.7,3.7,0)                 \   *
+  !         |  /                               \  |
+  !         | /                                 \ |
+  !         |/___******************___***________\|
+  !          |       Overhang        |   |
+  !          |_______________________|   |   window/door = *
+  !                                  |___|
+  !
+  !      (0,0,0)                            (30.5,0,0)
+  !
+  ! Internal gains description:     lighting is 1.5 watts/ft2, office equip is 1.0 watts/ft2. There is 1 occupant
+  !                                 per 100 ft2 of floor area. The infiltration is 0.25 air changes per hour.
+  !
+  ! Interzone Surfaces:             6 interzone surfaces (see diagram)
+  ! Internal Mass:                  None
+  ! People:                         50
+  ! Lights:                         7500 W
+  ! Windows:                        4 ea.: 1) Double pane clear, 3mm glass, 13mm air gap
+  !                                        2) Double pane clear, 3mm glass, 13mm argon gap
+  !                                        3) Double pane clear, 6mm glass, 6mm air gap
+  !                                        4) Double pane lowE,  6mm lowE glass outside, 6mm air gap, 6mm clear glass
+  !
+  ! Doors:                          2 ea.:    Single pane grey,  3mm glass
+  !
+  ! Detached Shading:               None
+  ! Daylight:                       None
+  ! Natural Ventilation:            None
+  ! Compact Schedules:              Yes
+  !
+  ! HVAC:                           Standard VAV system with outside air, hot water reheat coils,
+  !                                 central chilled water cooling coil. Central Plant is single hot water
+  !                                 boiler, electric compression chiller with air cooled condenser.
+  !                                 All equipment is autosized. HW and ChW coils are used in the outside air
+  !                                 stream to precondition the outside air.
+  !
+  ! Zonal Equipment:                AirTerminal:SingleDuct:VAV:Reheat
+  ! Central Air Handling Equipment: Yes
+  ! System Equipment Autosize:      Yes
+  ! Purchased Cooling:              None
+  ! Purchased Heating:              None
+  ! Coils:                          Coil:Cooling:Water, Coil:Heating:Water
+  ! Pumps:                          Pump:VariableSpeed
+  ! Boilers:                        Boiler:HotWater
+  ! Chillers:                       Chiller:Electric
+  !
+  ! Results:
+  ! Standard Reports:               None
+  ! Timestep or Hourly Variables:   Hourly
+  ! Time bins Report:               None
+  ! HTML Report:                    None
+  ! Environmental Emissions:        None
+  ! Utility Tariffs:                None
+\end{lstlisting}
+
+In addition to the idf files, usually an .rvi and perhaps a .mvi of the same file set is included. As discussed previously, the .rvi is used with the ReadVarsESO post-processing program and the .eso file to create a .csv file which can be read easily into Excel\textsuperscript{TM}. Like the .rvi, the .mvi file can be used with the .mtr file to create a similar version for ``metered'' outputs.

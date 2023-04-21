@@ -1,0 +1,45 @@
+\section{Results Processing}\label{results-processing}
+
+Results from EnergyPlus (using EP-Launch) appear in several possible formats.~ The most basic are the csv files for the time oriented output and the meter output.~ These will appear as \textless{}filename\textgreater{}.csv and \textless{}filename\textgreater{}Meter.csv.~ These can be quite detailed files (ref: Output:Variable, Output:Meter commands).~ Other formats (such as Tabular outputs) can yield more summarized results.~ These files and contents are described in more detail in the ``\href{OutputDetailsAndExamples.pdf}{Output Details and Examples}'' document.
+
+As an example, here is what the normal ``csv'' file might look like in Excel\textsuperscript{TM}:
+
+\begin{figure}[hbtp] % fig 23
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image023.png}
+\caption{Results in Spreadsheet format \protect \label{fig:results-in-spreadsheet-format}}
+\end{figure}
+
+Likewise, a tabular output (usually in HTML format -- which can be read by any web browser) might look like:
+
+\textbf{End Uses}
+
+\begin{longtable}[c]{p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}p{0.85in}}
+\toprule 
+~ & Electricity (GJ) & Natural Gas (GJ) & Other Fuel (GJ) & Purchaseh Cooling (GJ) & Purchaseh Heating (GJ) & Water (m3) \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+~ & Electricity (GJ) & Natural Gas (GJ) & Other Fuel (GJ) & Purchaseh Cooling (GJ) & Purchaseh Heating (GJ) & Water (m3) \tabularnewline
+\midrule
+\endhead
+
+Heating & 0.00 & 95.17 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Cooling & 56.78 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Lighting & 124.39 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Lighting & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Interior Equipment & 28.27 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Exterior Equipment & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Fans & 73.52 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Pumps & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Rejection & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Humidification & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Heat Recovery & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Water Systems & 0.08 & 85.39 & 0.00 & 0.00 & 0.00 & 363.07 \tabularnewline
+Refrigeration & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+Generators & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \tabularnewline
+~ & ~ & ~ & ~ & ~ & ~ & ~ \tabularnewline
+Total End Uses & 283.03 & 180.56 & 0.00 & 0.00 & 0.00 & 363.07 \tabularnewline
+\bottomrule
+\end{longtable}

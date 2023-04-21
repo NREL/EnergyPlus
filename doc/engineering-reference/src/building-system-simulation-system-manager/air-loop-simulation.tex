@@ -1,0 +1,89 @@
+\section{Air Loop Simulation}\label{air-loop-simulation}
+
+A complete simulation of each primary air system -- zone equipment air loop is done in the following manner.
+
+\begin{itemize}
+\item
+  If this is the first simulation this system time-step, just call \emph{ManageAirLoops} (simulates the primary air systems) and \emph{ManageZoneEquipment} (simulates the zone equipment sets) once and quit. This initial pass is simulated with full design air flow rates and allows the zone equipment to set the flow rates for each zone that will meet the zone loads.
+\item
+  Otherwise loop over primary air systems and zone equipment sets until the temperatures, flow rates, enthalpies, humidity ratios etc. agree to within tolerance at each primary air system -- zone equipment gap. 
+\end{itemize}
+
+\begin{lstlisting}
+while ( ( SimAirLoops || SimZoneEquipment ) && ( IterAir <= MaxAir ) ) {
+	++IterAir; // Increment the iteration counter
+	// Call AirflowNetwork simulation to calculate air flows and pressures
+	ResimulateAirZone = false;
+	if ( SimulateAirflowNetwork > AirflowNetworkControlSimple ) {
+		ManageAirflowNetworkBalance( FirstHVACIteration, IterAir, ResimulateAirZone );
+	}
+	if ( SimAirLoops ) {
+		ManageAirLoops( FirstHVACIteration, SimAirLoops, SimZoneEquipment );
+		SimElecCircuits = true; //If this was simulated there are possible electric changes that need to be simulated
+	}
+
+	// make sure flow resolution gets done
+	if ( FlowResolutionNeeded ) {
+		SimZoneEquipment = true;
+	}
+	if ( SimZoneEquipment ) {
+		if ( ( IterAir == 1 ) && ( ! FlowMaxAvailAlreadyReset ) ) { // don't do reset if already done in FirstHVACIteration
+			// ResetTerminalUnitFlowLimits(); // don't do reset at all - interferes with convergence and terminal unit flow controls
+			FlowResolutionNeeded = true;
+		} else {
+			ResolveAirLoopFlowLimits();
+			FlowResolutionNeeded = false;
+		}
+		ManageZoneEquipment( FirstHVACIteration, SimZoneEquipment, SimAirLoops );
+		SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
+
+	}
+	FlowMaxAvailAlreadyReset = false;
+
+	//      IterAir = IterAir + 1   ! Increment the iteration counter
+	if ( SimulateAirflowNetwork > AirflowNetworkControlSimple ) {
+		if ( ResimulateAirZone ) { // Need to make sure that SimAirLoop and SimZoneEquipment are simulated
+			SimAirLoops = true; // at min three times using ONOFF fan with the AirflowNetwork model
+			SimZoneEquipment = true;
+		}
+	}
+
+}
+
+RepIterAir += IterAir;
+if ( IterAir > MaxAir ) {
+	AirLoopConvergFail = 1;
+} else {
+	AirLoopConvergFail = 0;
+}
+// Check to see if any components have been locked out. If so, SimAirLoops will be reset to TRUE.
+ResolveLockoutFlags( SimAirLoops );
+\end{lstlisting}
+
+The logical flags \emph{SimAirLoops} and \emph{SimZoneEquipment} are used to signal whether the primary air systems or the zone equipment sets need to be resimulated. These flags are set by the subroutine \emph{UpdateHVACInterface} which is called~ from within \emph{ManageAirLoops} and \emph{ManageZoneEquipment} at the end of each half-loop simulation. \emph{UpdateHVACInterface} (when called from \emph{ManageAirLoops}) passes the values at the outlet nodes of a primary air system on to the inlet nodes of the corresponding zone equipment half-loop and similarly (when called from \emph{ManageZoneEquipment}) passes the values of the outlet nodes of a zone equipment half-loop on to the inlet nodes of its corresponding~ primary air system. Each time \emph{UpdateHVACInterface} is called it also checks whether the values at the half-loop outlet nodes are in agreement with the values at the downstream half-loop inlet nodes. If they are not it sets the simulate flag of the downstream half-loop to \emph{true}. The values checked by \emph{UpdateHVACInterface} and their tolerances are as follows. If the air loop has no return path, then \emph{UpdateHVACInterface} compares and passes only the mass flow rate from the zone equipment inlet node to the primary air system inlet node.
+
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule 
+Quantities & Tolerances \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule 
+Quantities & Tolerances \tabularnewline
+\midrule
+\endhead
+
+specific enthalpy [J/kg\} & 10.0 \tabularnewline
+mass flow rate [kg/s] & 0.01 \tabularnewline
+humidity ratio [kg H  O / kg dry air] & 0.0001 \tabularnewline
+quality & 0.01 \tabularnewline
+air pressure [Pa] & 10.0 \tabularnewline
+temperature [C] & 0.01 \tabularnewline
+energy [J] & 10.0 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\emph{ResolveAirLoopFlowLimits} is invoked to deal with zone equipment -- primary air system flow mismatches. For instance the zone air terminal units (ATUs) may be asking for more air than the central fan can supply. In this case \emph{ResolveAirLoopFlowLimits} takes the air flow that the fan can supply and apportions it among the ATUs in proportion to their design maximum air flow rates (\emph{ResolveAirLoopFlowLimits} sets the \({\dot m_{\max avail,node}}\) ~at the entering node of each ATU in the system).
+
+At the end of the air loop simulation \emph{ResolveLockoutFlags} is called. This subroutine checks if any air system component has requested that the economizer be locked out. If such a request has been made and if the economizer is active, \emph{ResolveLockoutFlags} sets \emph{SimAirLoops} to \emph{true} and the \emph{EconoLockout} flag to \emph{true} to ensure that the air loop will be resimulated with the economizer forced off.

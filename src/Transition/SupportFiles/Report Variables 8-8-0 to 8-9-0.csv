@@ -1,0 +1,7 @@
+8.8.0,8.9.0,Transition notes
+4,4,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
+Heating Coil Total Heating Rate,Heating Coil Heating Rate,
+Heating Coil Total Heating Energy,Heating Coil Heating Energy,
+Heating Coil Air Heating Rate,Heating Coil Heating Rate,
+Heating Coil Air Heating Energy,Heating Coil Heating Energy,
+old variable name,new variable name,-- add variable names (before this line) and leave off units -- <DELETE> to delete

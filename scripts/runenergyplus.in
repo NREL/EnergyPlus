@@ -1,0 +1,894 @@
+#!/bin/bash
+#====================================================================
+# Runs EnergyPlus
+# This script is intended to duplicate the RunEPlus / EPL-Run PC
+# batch files with some Linux/Unix flavoring.
+#
+# On Mac OS X systems this script will look for the optional environment
+# variable ENERGYPLUS_DIR in order to locate the EnergyPlus installation.
+#
+# Weather files are searched in the paths (in this order)
+#   $ENERGYPLUS_WEATHER
+#   $ENERGYPLUS_DIR/weatherdata
+# If ENERGYPLUS_WEATHER is not set, then only the second path is
+# searched for weather files.
+#
+# April 08, 2004, Linda@Lawrie.com
+#
+# Modified June 02, 2007: gbstark@buildingsynergies.com
+# Modified December 05, 2007: gbstark@buildingsynergies.com
+#
+#     Changed to allow the input file and weather file to be entered with
+#     or without thier respective file extensions (e.g.,, *.idf, *.epw)
+#
+#     hanged to allow embedded spaces in path names
+#
+# Modified March 29, 2009, kyle.benne@nrel.gov
+#     Added support to find ENERGYPLUS_DIR if unset by user
+
+# Modified September 29, 2011, kyle.benne@nrel.gov
+#     Fixed support for ENERGYPLUS_WEATHER environment variable.
+
+# August 2015: Edwin: Marked as deprecated in favor of the command line interface
+#====================================================================
+
+echo "***** NOTE: This script is marked as deprecated as of August 2015."
+echo "*****       The functionality of this script is now in the command line interface."
+echo "*****       For information on the command line interface:"
+echo "*****        - See the documentation (https://energyplus.net/documentation)"
+echo "*****        - Call the application for usage: EnergyPlus --help"
+echo "*****        - Refer to the man page: man EnergyPlus"
+echo "*****       In a future version of EnergyPlus, this script will no longer be packaged."
+
+# function to set ENERGYPLUS_DIR relative to this script
+function SetEnergyPlusDir() {
+  unamestr=`uname`
+  if [ "$unamestr" == 'Darwin' ]; then
+    ENERGYPLUS_DIR="/usr"
+  else
+    U_DIR=`pwd`
+    if [ -n "`readlink "$0"`" ]; then
+      S_DIR=$(cd "$(dirname "$(readlink "$0")")"; pwd)
+      cd "$U_DIR"
+    else
+      S_DIR=$(cd "$(dirname "$0")"; pwd)
+      cd "$U_DIR"
+    fi
+    ENERGYPLUS_DIR=`dirname "$S_DIR"`
+  fi
+}
+
+# Check for user set ENERGYPLUS_DIR
+auto_eplus_dir=true
+if [ -n "$ENERGYPLUS_DIR" ]; then
+  auto_eplus_dir=false
+fi
+
+# Set the ENERGYPLUS_DIR
+if $auto_eplus_dir; then
+  SetEnergyPlusDir
+fi
+
+#echo
+#echo "1: " $1
+#echo "Large suffix: " ${1%%/*} " Small suffix: " ${1%/*}
+#echo "Large prefix: " ${1##*/} " Small prefix: " ${1#*/}
+#echo
+
+# Sets the input directory
+if [ "${1%/*}" != "${1##*/}" ] && [ "$1" ]; then
+  # Check to see if the directory starts with "/"
+  if [ "${1%%/*}" ]; then
+    INP_P=`pwd`/"${1%/*}"
+  else
+    INP_P="${1%/*}"
+  fi
+else
+  INP_P=`pwd`
+fi
+
+# ==========================================================
+# Set Output path and create an "output" subdirectory if necessary
+OUT_P="${INP_P}/Output"
+if [ ! -e "${OUT_P}" ]; then
+  mkdir "${OUT_P}"
+fi
+
+# Allows references that are relative to the IDF files location to be found
+cd "${INP_P}"
+
+# Allow the IDF or IMF file to include its file extension (e.g., *.idf, *.imf)
+case $1 in
+  *.idf | *.imf)
+    LONG_F="${1##*/}"
+    ARG1="${LONG_F%.*}"
+    ;;
+  *)
+    ARG1="${1##*/}"
+    ;;
+esac
+
+# Allow the weather file to include its file extension (i.e., *.epw)
+case $2 in
+  *.epw) ARG2="${2%.*}";;
+  *) ARG2="$2";;
+esac
+
+HEADER="=============== EnergyPlus ================="
+# Name of executable
+PRG_N=energyplus
+# Name of ExpandObjects executable
+PRG_X=ExpandObjects
+# Name of EPMacro executable
+PRG_M=EPMacro
+# Name of ReadVarsESO executable
+PRG_R=ReadVarsESO
+# Name of hvac-diagram executable
+PRG_H=HVAC-Diagram
+# Name of Basement executable
+PRG_B=Basement
+# Name of Slab executable
+PRG_S=Slab
+
+# Default weatherfile path
+unamestr=`uname`
+if [ "$unamestr" == 'Darwin' ]; then
+  if $auto_eplus_dir; then
+    WEA_P="@CPACK_PACKAGE_DEFAULT_LOCATION@@CPACK_PACKAGING_INSTALL_PREFIX@/WeatherData"
+  else
+    WEA_P="$ENERGYPLUS_DIR/WeatherData"
+  fi
+else
+  if $auto_eplus_dir; then
+    WEA_P="$ENERGYPLUS_DIR@CPACK_PACKAGING_INSTALL_PREFIX@/WeatherData"
+  else
+    WEA_P="$ENERGYPLUS_DIR/WeatherData"
+  fi
+fi
+
+# Additional files to be deleted after the run
+ADD_FILES="Energy+.ini"
+
+LINK_NAMES="in.idf in.epw in.imf Energy+.idd BasementGHT.idd eplusout.inp eplusmtr.inp"
+
+# ==========================================================
+function Usage() {
+  echo
+  echo "Usage:  runenergyplus InputFileName [WeatherFileName]"
+  echo "   or:  runenergyplus --help (or -h)"
+  echo "   or:  runenergyplus --weather (or -w)"
+  echo
+  echo "Runs EnergyPlus with an idf or imf input file and creates a"
+  echo "full set of output files (e.g., creates *.csv files, etc.)"
+  echo
+  echo "NOTE: All output will be placed in the output subdirectory (i.e., ./output)"
+  echo
+  echo " --help, or -h     displays this help"
+  echo " --weather, or -w  displays the installed weather files"
+  echo
+}
+# ==========================================================
+function ShowWeatherFiles() {
+  for pa in "${ENERGYPLUS_WEATHER}" "${WEA_P}"; do
+    echo ""
+    cd "$pa" 2> /dev/null;
+    if [ $? != 0 ]; then
+      echo "Weather directory '$pa' not found."
+    else
+      echo "Weather files in '$pa':";
+      ls *.epw 2> /dev/null;
+      if [ $? != 0 ]; then
+        echo "None."
+      fi
+    fi
+  done
+  echo
+}
+# ==========================================================
+function ExitWithError() {
+  echo "===== EnergyPlus terminated with error ====="
+  exit 1
+}
+# ==========================================================
+if [ "${ARG1}" = ""  ]; then
+    Usage ; exit 0;
+fi
+
+if [ "${ARG1}" = "--help" ]; then
+    Usage ; exit 0;
+fi
+
+if [ "${ARG1}" = "-h" ]; then
+    Usage ; exit 0;
+fi
+# ==========================================================
+if [ "$ENERGYPLUS_DIR" = "" ]; then
+  echo "$HEADER";
+  echo "To use EnergyPlus, you need to set the";
+  echo "environment variable ENERGYPLUS_DIR to";
+  echo "the root directory of EnergyPlus";
+  ExitWithError;
+fi
+
+# ==========================================================
+# Show weather files only
+if [ "${ARG1}" = "--weather" ]; then
+  ShowWeatherFiles ; exit 0;
+fi
+
+if [ "${ARG1}" = "-w" ]; then
+  ShowWeatherFiles ; exit 0;
+fi
+
+# ==========================================================
+# Delete all output files
+#  1. Clean up working directory
+rm -f  eplusout.end
+rm -f  eplusout.eso
+rm -f  eplusout.rdd
+rm -f  eplusout.edd
+rm -f  eplusout.mdd
+rm -f  eplusout.dbg
+rm -f  eplusout.eio
+rm -f  eplusout.err
+rm -f  eplusout.dxf
+rm -f  eplusout.csv
+rm -f  eplusout.tab
+rm -f  eplusout.txt
+rm -f  eplusmtr.csv
+rm -f  eplusmtr.tab
+rm -f  eplusmtr.txt
+rm -f  eplusout.sln
+rm -f  epluszsz.csv
+rm -f  epluszsz.tab
+rm -f  epluszsz.txt
+rm -f  eplusssz.csv
+rm -f  eplusssz.tab
+rm -f  eplusssz.txt
+rm -f  eplusout.mtr
+rm -f  eplusout.mtd
+rm -f  eplusout.cif
+rm -f  eplusout.bnd
+rm -f  eplusout.dbg
+rm -f  eplusout.sci
+rm -f  eplusout.cfp
+rm -f  eplusmap.csv
+rm -f  eplusmap.txt
+rm -f  eplusmap.tab
+rm -f  eplustbl.csv
+rm -f  eplustbl.txt
+rm -f  eplustbl.tab
+rm -f  eplustbl.htm
+rm -f  eplusout.log
+rm -f  eplusout.svg
+rm -f  eplusout.shd
+rm -f  eplusout.wrl
+rm -f  eplusshading.csv
+
+rm -f  eplusout.json
+rm -f  eplusout_detailed_zone.json
+rm -f  eplusout_detailed_HVAC.json
+rm -f  eplusout_timestep.json
+rm -f  eplusout_hourly.json
+rm -f  eplusout_daily.json
+rm -f  eplusout_yearly.json
+rm -f  eplusout_monthly.json
+rm -f  eplusout_runperiod.json
+rm -f  eplusout.cbor
+rm -f  eplusout_detailed_zone.cbor
+rm -f  eplusout_detailed_HVAC.cbor
+rm -f  eplusout_timestep.cbor
+rm -f  eplusout_hourly.cbor
+rm -f  eplusout_daily.cbor
+rm -f  eplusout_yearly.cbor
+rm -f  eplusout_monthly.cbor
+rm -f  eplusout_runperiod.cbor
+rm -f  eplusout.msgpack
+rm -f  eplusout_detailed_zone.msgpack
+rm -f  eplusout_detailed_HVAC.msgpack
+rm -f  eplusout_timestep.msgpack
+rm -f  eplusout_hourly.msgpack
+rm -f  eplusout_daily.msgpack
+rm -f  eplusout_yearly.msgpack
+rm -f  eplusout_monthly.msgpack
+rm -f  eplusout_runperiod.msgpack
+
+rm -f  eplusoutscreen.csv
+rm -f  eplusout.delightin
+rm -f  eplusout.delightout
+rm -f  eplusout.delighteldmp
+rm -f  eplusout.delightdfdmp
+rm -f  eplusout.sparklog
+rm -f  in.imf
+rm -f  in.idf
+rm -f  out.idf
+rm -f  eplusout.inp
+rm -f  in.epw
+rm -f  eplusout.audit
+rm -f  eplusmtr.inp
+rm -f  expanded.idf
+rm -f  expandedidf.err
+rm -f  readvars.audit
+rm -f  eplusout.sql
+rm -f  sqlite.err
+
+#  Delete output files in output path
+rm -f "${OUT_P}/${ARG1}.eso"
+rm -f "${OUT_P}/${ARG1}.rdd"
+rm -f "${OUT_P}/${ARG1}.edd"
+rm -f "${OUT_P}/${ARG1}.mdd"
+rm -f "${OUT_P}/${ARG1}.eio"
+rm -f "${OUT_P}/${ARG1}.err"
+rm -f "${OUT_P}/${ARG1}.dxf"
+rm -f "${OUT_P}/${ARG1}.csv"
+rm -f "${OUT_P}/${ARG1}.tab"
+rm -f "${OUT_P}/${ARG1}.txt"
+rm -f "${OUT_P}/${ARG1}Meter.csv"
+rm -f "${OUT_P}/${ARG1}Meter.tab"
+rm -f "${OUT_P}/${ARG1}Meter.txt"
+rm -f "${OUT_P}/${ARG1}.det"
+rm -f "${OUT_P}/${ARG1}.sln"
+rm -f "${OUT_P}/${ARG1}.Zsz"
+rm -f "${OUT_P}/${ARG1}Zsz.csv"
+rm -f "${OUT_P}/${ARG1}Zsz.tab"
+rm -f "${OUT_P}/${ARG1}Zsz.txt"
+rm -f "${OUT_P}/${ARG1}.ssz"
+rm -f "${OUT_P}/${ARG1}Ssz.csv"
+rm -f "${OUT_P}/${ARG1}Ssz.tab"
+rm -f "${OUT_P}/${ARG1}Ssz.txt"
+rm -f "${OUT_P}/${ARG1}.mtr"
+rm -f "${OUT_P}/${ARG1}.mtd"
+rm -f "${OUT_P}/${ARG1}.cif"
+rm -f "${OUT_P}/${ARG1}.bnd"
+rm -f "${OUT_P}/${ARG1}.dbg"
+rm -f "${OUT_P}/${ARG1}.sci"
+rm -f "${OUT_P}/${ARG1}.cfp"
+rm -f "${OUT_P}/${ARG1}Map.csv"
+rm -f "${OUT_P}/${ARG1}Map.tab"
+rm -f "${OUT_P}/${ARG1}Map.txt"
+rm -f "${OUT_P}/${ARG1}.audit"
+rm -f "${OUT_P}/${ARG1}Table.csv"
+rm -f "${OUT_P}/${ARG1}Table.tab"
+rm -f "${OUT_P}/${ARG1}Table.txt"
+rm -f "${OUT_P}/${ARG1}Table.html"
+rm -f "${OUT_P}/${ARG1}DElight.in"
+rm -f "${OUT_P}/${ARG1}DElight.out"
+rm -f "${OUT_P}/${ARG1}DElight.dfdmp"
+rm -f "${OUT_P}/${ARG1}DElight.eldmp"
+rm -f "${OUT_P}/${ARG1}.svg"
+rm -f "${OUT_P}/${ARG1}.shd"
+rm -f "${OUT_P}/${ARG1}.wrl"
+rm -f "${OUT_P}/${ARG1}Shading.csv"
+
+rm -f "${OUT_P}/${ARG1}.json"
+rm -f "${OUT_P}/${ARG1}_detailed_zone.json"
+rm -f "${OUT_P}/${ARG1}_detailed_HVAC.json"
+rm -f "${OUT_P}/${ARG1}_timestep.json"
+rm -f "${OUT_P}/${ARG1}_hourly.json"
+rm -f "${OUT_P}/${ARG1}_daily.json"
+rm -f "${OUT_P}/${ARG1}_yearly.json"
+rm -f "${OUT_P}/${ARG1}_monthly.json"
+rm -f "${OUT_P}/${ARG1}_runperiod.json"
+rm -f "${OUT_P}/${ARG1}.cbor"
+rm -f "${OUT_P}/${ARG1}_detailed_zone.cbor"
+rm -f "${OUT_P}/${ARG1}_detailed_HVAC.cbor"
+rm -f "${OUT_P}/${ARG1}_timestep.cbor"
+rm -f "${OUT_P}/${ARG1}_hourly.cbor"
+rm -f "${OUT_P}/${ARG1}_daily.cbor"
+rm -f "${OUT_P}/${ARG1}_yearly.cbor"
+rm -f "${OUT_P}/${ARG1}_monthly.cbor"
+rm -f "${OUT_P}/${ARG1}_runperiod.cbor"
+rm -f "${OUT_P}/${ARG1}.msgpack"
+rm -f "${OUT_P}/${ARG1}_detailed_zone.msgpack"
+rm -f "${OUT_P}/${ARG1}_detailed_HVAC.msgpack"
+rm -f "${OUT_P}/${ARG1}_timestep.msgpack"
+rm -f "${OUT_P}/${ARG1}_hourly.msgpack"
+rm -f "${OUT_P}/${ARG1}_daily.msgpack"
+rm -f "${OUT_P}/${ARG1}_yearly.msgpack"
+rm -f "${OUT_P}/${ARG1}_monthly.msgpack"
+rm -f "${OUT_P}/${ARG1}_runperiod.msgpack"
+
+rm -f "${OUT_P}/${ARG1}Screen.csv"
+rm -f "${OUT_P}/${ARG1}SPARK.log"
+rm -f "${OUT_P}/${ARG1}.expidf"
+rm -f "${OUT_P}/${ARG1}.rvaudit"
+
+rm -f "${OUT_P}/${ARG1}.epmdet"
+rm -f "${OUT_P}/${ARG1}.epmidf"
+rm -f "${OUT_P}/${ARG1}.expidf"
+
+rm -f "${OUT_P}/${ARG1}.sql"
+rm -f "${OUT_P}/${ARG1}SQLite.err"
+
+OSFMU=`uname`
+# delete FMU generated output files -- FMI
+if [ "$OSFMU" != "Darwin" ]; then
+  rm -f "${OUT_P}/${ARG1}.mat"
+fi
+
+# ==========================================================
+# Prepare simulation input files/links
+# Check for imf/idf and epw file
+if [ -f "${INP_P}/${ARG1}.imf" ]; then
+  #  process with EPMacro, then link
+  ln -s "${INP_P}/${ARG1}.imf" in.imf
+  rm -f out.idf
+  rm -f audit.out
+  rm -f "${OUT_P}/${ARG1}.epmdet"
+  rm -f "${OUT_P}/${ARG1}.epmidf"
+  if $auto_eplus_dir; then
+    "$ENERGYPLUS_DIR/bin/$PRG_M"
+  else
+    "$ENERGYPLUS_DIR/$PRG_M"
+  fi
+  if [ -f audit.out ]; then
+    mv audit.out "${OUT_P}/${ARG1}.epmdet"
+  fi
+  if [ -f out.idf ]; then
+    mv out.idf "${OUT_P}/${ARG1}.epmidf"
+    ln -s "${OUT_P}/${ARG1}.epmidf" in.idf
+    echo
+    echo "$HEADER"
+    echo "   Input file  : ${ARG1}.imf"
+  else
+    echo "epmacro did not produce out.idf with ${INP_P}/${ARG1}.imf"
+    Usage
+    ExitWithError
+  fi
+elif [ -f "${INP_P}/${ARG1}.idf" ]; then
+  #  link to the idf
+  ln -s "${INP_P}/${ARG1}.idf" in.idf
+  echo
+  echo "$HEADER"
+  echo "   Input file  : ${ARG1}.idf"
+else
+  echo
+  echo "$HEADER"
+  echo "First argument must the input file name,"
+  echo "received ${INP_P}/${ARG1}.idf"
+  echo ""
+  Usage
+  ExitWithError
+fi
+
+# ==========================================================
+
+# Set weather file
+if [ "" != "$ARG2" ]; then
+  echo "   Weather file: $ARG2.epw"
+# Search weather file
+  FOUND=0;
+  for pa in "$WEA_P" "$ENERGYPLUS_WEATHER"; do
+  if [ -f "$pa/$ARG2.epw" ]; then
+    WEA_F="$pa/$ARG2.epw"
+    FOUND=1
+    break
+  fi
+  done
+  if [ $FOUND == "0" ]; then
+    echo ""
+    echo "Argument '$ARG2' is not a weather file."
+    echo ""
+    echo "Possible weather files:"
+    echo "======================="
+    ShowWeatherFiles
+    echo ""
+    ExitWithError
+  fi
+else
+  WEA_P=""
+fi
+
+# ==========================================================
+# Make weather file link
+
+if [ "" != "$WEA_F" ]; then
+  if [ -f "$WEA_F" ]; then
+    ln -s "$WEA_F" in.epw
+  fi
+fi
+
+# ==========================================================
+# Run expand objects, basement and slab if necessary
+
+if [ -f in.idf ]; then
+  if $auto_eplus_dir; then
+    "$ENERGYPLUS_DIR/bin/$PRG_X"
+  else
+    "$ENERGYPLUS_DIR/$PRG_X"
+  fi
+  if [ -f expanded.idf ]; then
+    mv expanded.idf "${OUT_P}/${ARG1}.expidf"
+    rm in.idf
+    ln -s "${OUT_P}/${ARG1}.expidf" in.idf
+    if [ -f BasementGHTIn.idf ]; then
+      if $auto_eplus_dir; then
+        ln -s "$ENERGYPLUS_DIR/bin/BasementGHT.idd"
+        "$ENERGYPLUS_DIR/bin/$PRG_B"
+      else
+        ln -s "$ENERGYPLUS_DIR/PreProcess/GrndTempCalc/BasementGHT.idd"
+        "$ENERGYPLUS_DIR/PreProcess/GrndTempCalc/$PRG_B"
+      fi
+      cat EPObjects.TXT >> in.idf
+      mv RunINPUT.TXT "${OUT_P}/${ARG1}.RunINPUT.TXT"
+      mv RunDEBUGOUT.TXT "${OUT_P}/${ARG1}.RunDEBUGOUT.TXT"
+      mv EPObjects.TXT "${OUT_P}/${ARG1}.EPObjects.TXT"
+      mv BasementGHTIn.idf "${OUT_P}/${ARG1}.BasementGHTIn.idf"
+      mv MonthlyResults.csv "${OUT_P}/${ARG1}.MonthlyResults.csv"
+      rm BasementGHT.idd
+    fi
+    if [ -f GHTIn.idf ]; then
+      if $auto_eplus_dir; then
+        ln -s "$ENERGYPLUS_DIR/bin/SlabGHT.idd"
+        "$ENERGYPLUS_DIR/bin/$PRG_S"
+      else
+        ln -s "$ENERGYPLUS_DIR/PreProcess/GrndTempCalc/SlabGHT.idd"
+        "$ENERGYPLUS_DIR/PreProcess/GrndTempCalc/$PRG_S"
+      fi
+      cat SLABSurfaceTemps.TXT >> in.idf
+      mv SLABINP.TXT "${OUT_P}/${ARG1}.SLABINP.TXT"
+      mv GHTIn.idf "${OUT_P}/${ARG1}.GHTIn.idf"
+      mv SLABSurfaceTemps.TXT "${OUT_P}/${ARG1}.SLABSurfaceTemps.TXT"
+      mv "SLABSplit Surface Temps.TXT" "${OUT_P}/${ARG1}.SLABSplit Surface Temps.TXT"
+      rm SlabGHT.idd
+    fi
+    echo
+    echo "$HEADER"
+    echo "   Input file  : ${ARG1}.expidf"
+  else
+    echo
+    echo "$HEADER"
+    echo "   Input file  : ${ARG1}.idf"
+  fi
+fi
+
+if $auto_eplus_dir; then
+  ln -s "$ENERGYPLUS_DIR/bin/Energy+.idd"
+else
+  ln -s "$ENERGYPLUS_DIR/Energy+.idd"
+fi
+
+# ==========================================================
+# Start energyplus
+if $auto_eplus_dir; then
+  "$ENERGYPLUS_DIR/bin/$PRG_N"
+else
+  "$ENERGYPLUS_DIR/$PRG_N"
+fi
+
+#====================================================================
+# Check for error
+#
+# Note: EnergyPlus does not give an exit code.
+#       Therefore, we check the .end file for
+#       possible errors.
+#
+if [ -f eplusout.end ]; then
+  if [ -n "`grep 'Fatal Error' eplusout.end`" ]; then
+    RETVAL=1
+  else
+    RETVAL=0
+  fi
+else
+  echo ""
+  echo "File 'eplusout.end' does not exist."
+  RETVAL=1
+fi
+
+# ==========================================================
+# Do PostProcessing Steps
+#  6&8. Copy Post Processing Program command file(s) to working directory
+
+if [ -f "${INP_P}/${ARG1}.rvi" ]; then
+  #  link to the rvi
+  ln -s "${INP_P}/${ARG1}.rvi" eplusout.inp
+else
+  echo eplusout.eso >eplusout.inp
+  echo eplusout.csv >>eplusout.inp
+fi
+
+if [ -f "${INP_P}/${ARG1}.mvi" ]; then
+  #  link to the mvi
+  ln -s "${INP_P}/${ARG1}.mvi" eplusmtr.inp
+else
+  echo eplusout.mtr >eplusmtr.inp
+  echo eplusmtr.csv >>eplusmtr.inp
+fi
+
+#  7&9. Run Post Processing Program(s)
+#if %maxcol%==250     SET rvset=
+#if %maxcol%==nolimit SET rvset=unlimited
+
+if $auto_eplus_dir; then
+  "$ENERGYPLUS_DIR/bin/$PRG_R" eplusout.inp unlimited
+  "$ENERGYPLUS_DIR/bin/$PRG_R" eplusmtr.inp unlimited
+else
+  "$ENERGYPLUS_DIR/PostProcess/$PRG_R" eplusout.inp unlimited
+  "$ENERGYPLUS_DIR/PostProcess/$PRG_R" eplusmtr.inp unlimited
+fi
+
+if [ -f eplusout.bnd ]; then
+  if $auto_eplus_dir; then
+    "$ENERGYPLUS_DIR/bin/$PRG_H"
+  else
+    "$ENERGYPLUS_DIR/PostProcess/$PRG_H"
+  fi
+fi
+
+# ==========================================================
+# Move output files (except inp, since it is only a symlink)
+if [ -f eplusout.eso ]; then
+  mv eplusout.eso "${OUT_P}/${ARG1}.eso"
+fi
+if [ -f eplusout.rdd ]; then
+  mv eplusout.rdd "${OUT_P}/${ARG1}.rdd"
+fi
+if [ -f eplusout.edd ]; then
+  mv eplusout.edd "${OUT_P}/${ARG1}.edd"
+fi
+if [ -f eplusout.mdd ]; then
+  mv eplusout.mdd "${OUT_P}/${ARG1}.mdd"
+fi
+if [ -f eplusout.eio ]; then
+  mv eplusout.eio "${OUT_P}/${ARG1}.eio"
+fi
+if [ -f eplusout.err ]; then
+  mv eplusout.err "${OUT_P}/${ARG1}.err"
+fi
+if [ -f eplusout.dxf ]; then
+  mv eplusout.dxf "${OUT_P}/${ARG1}.dxf"
+fi
+if [ -f eplusout.csv ]; then
+  mv eplusout.csv "${OUT_P}/${ARG1}.csv"
+fi
+if [ -f eplusout.tab ]; then
+  mv eplusout.tab "${OUT_P}/${ARG1}.tab"
+fi
+if [ -f eplusout.txt ]; then
+  mv eplusout.txt "${OUT_P}/${ARG1}.txt"
+fi
+if [ -f eplusout.sln ]; then
+  mv eplusout.sln "${OUT_P}/${ARG1}.sln"
+fi
+if [ -f eplusout.mtr ]; then
+  mv eplusout.mtr "${OUT_P}/${ARG1}.mtr"
+fi
+if [ -f eplusout.mtd ]; then
+  mv eplusout.mtd "${OUT_P}/${ARG1}.mtd"
+fi
+if [ -f eplusout.cif ]; then
+  mv eplusout.cif "${OUT_P}/${ARG1}.cif"
+fi
+if [ -f eplusout.bnd ]; then
+  mv eplusout.bnd "${OUT_P}/${ARG1}.bnd"
+fi
+if [ -f eplusout.dbg ]; then
+  mv eplusout.dbg "${OUT_P}/${ARG1}.dbg"
+fi
+if [ -f eplusout.sci ]; then
+  mv eplusout.sci "${OUT_P}/${ARG1}.sci"
+fi
+if [ -f eplusout.cfp ]; then
+  mv eplusout.cfp "${OUT_P}/${ARG1}.cfp"
+fi
+if [ -f eplusout.audit ]; then
+  mv eplusout.audit "${OUT_P}/${ARG1}.audit"
+fi
+if [ -f eplusout.delightin ]; then
+  mv eplusout.delightin "${OUT_P}/${ARG1}DElight.in"
+fi
+if [ -f eplusout.delightout ]; then
+  mv eplusout.delightout "${OUT_P}/${ARG1}DElight.out"
+fi
+if [ -f eplusout.delightdfdmp ]; then
+  mv eplusout.delightdfdmp "${OUT_P}/${ARG1}DElight.dfdmp"
+fi
+if [ -f eplusout.delighteldmp ]; then
+  mv eplusout.delighteldmp "${OUT_P}/${ARG1}DElight.eldmp"
+fi
+if [ -f eplusout.svg ]; then
+  mv eplusout.svg "${OUT_P}/${ARG1}.svg"
+fi
+if [ -f eplusout.shd ]; then
+  mv eplusout.shd "${OUT_P}/${ARG1}.shd"
+fi
+if [ -f eplusout.wrl ]; then
+  mv eplusout.wrl "${OUT_P}/${ARG1}.wrl"
+fi
+if [ -f eplusscreen.csv ]; then
+  mv eplusscreen.csv "${OUT_P}/${ARG1}Screen.csv"
+fi
+
+if [ -f eplusout.json ]; then
+  mv eplusout.json "${OUT_P}/${ARG1}.json"
+fi
+if [ -f eplusout_detailed_zone.json ]; then
+  mv eplusout_detailed_zone.json "${OUT_P}/${ARG1}_detailed_zone.json"
+fi
+if [ -f eplusout_detailed_HVAC.json ]; then
+  mv eplusout_detailed_HVAC.json "${OUT_P}/${ARG1}_detailed_HVAC.json"
+fi
+if [ -f eplusout_timestep.json ]; then
+  mv eplusout_timestep.json "${OUT_P}/${ARG1}_timestep.json"
+fi
+if [ -f eplusout_hourly.json ]; then
+  mv eplusout_hourly.json "${OUT_P}/${ARG1}_hourly.json"
+fi
+if [ -f eplusout_daily.json ]; then
+  mv eplusout_daily.json "${OUT_P}/${ARG1}_daily.json"
+fi
+if [ -f eplusout_yearly.json ]; then
+  mv eplusout_yearly.json "${OUT_P}/${ARG1}_yearly.json"
+fi
+if [ -f eplusout_monthly.json ]; then
+  mv eplusout_monthly.json "${OUT_P}/${ARG1}_monthly.json"
+fi
+if [ -f eplusout_runperiod.json ]; then
+  mv eplusout_runperiod.json "${OUT_P}/${ARG1}_runperiod.json"
+fi
+if [ -f eplusout.cbor ]; then
+  mv eplusout.cbor "${OUT_P}/${ARG1}.cbor"
+fi
+if [ -f eplusout_detailed_zone.cbor ]; then
+  mv eplusout_detailed_zone.cbor "${OUT_P}/${ARG1}_detailed_zone.cbor"
+fi
+if [ -f eplusout_detailed_HVAC.cbor ]; then
+  mv eplusout_detailed_HVAC.cbor "${OUT_P}/${ARG1}_detailed_HVAC.cbor"
+fi
+if [ -f eplusout_timestep.cbor ]; then
+  mv eplusout_timestep.cbor "${OUT_P}/${ARG1}_timestep.cbor"
+fi
+if [ -f eplusout_hourly.cbor ]; then
+  mv eplusout_hourly.cbor "${OUT_P}/${ARG1}_hourly.cbor"
+fi
+if [ -f eplusout_daily.cbor ]; then
+  mv eplusout_daily.cbor "${OUT_P}/${ARG1}_daily.cbor"
+fi
+if [ -f eplusout_yearly.cbor ]; then
+  mv eplusout_yearly.cbor "${OUT_P}/${ARG1}_yearly.cbor"
+fi
+if [ -f eplusout_monthly.cbor ]; then
+  mv eplusout_monthly.cbor "${OUT_P}/${ARG1}_monthly.cbor"
+fi
+if [ -f eplusout_runperiod.cbor ]; then
+  mv eplusout_runperiod.cbor "${OUT_P}/${ARG1}_runperiod.cbor"
+fi
+if [ -f eplusout.msgpack ]; then
+  mv eplusout.msgpack "${OUT_P}/${ARG1}.msgpack"
+fi
+if [ -f eplusout_detailed_zone.msgpack ]; then
+  mv eplusout_detailed_zone.msgpack "${OUT_P}/${ARG1}_detailed_zone.msgpack"
+fi
+if [ -f eplusout_detailed_HVAC.msgpack ]; then
+  mv eplusout_detailed_HVAC.msgpack "${OUT_P}/${ARG1}_detailed_HVAC.msgpack"
+fi
+if [ -f eplusout_timestep.msgpack ]; then
+  mv eplusout_timestep.msgpack "${OUT_P}/${ARG1}_timestep.msgpack"
+fi
+if [ -f eplusout_hourly.msgpack ]; then
+  mv eplusout_hourly.msgpack "${OUT_P}/${ARG1}_hourly.msgpack"
+fi
+if [ -f eplusout_daily.msgpack ]; then
+  mv eplusout_daily.msgpack "${OUT_P}/${ARG1}_daily.msgpack"
+fi
+if [ -f eplusout_yearly.msgpack ]; then
+  mv eplusout_yearly.msgpack "${OUT_P}/${ARG1}_yearly.msgpack"
+fi
+if [ -f eplusout_monthly.msgpack ]; then
+  mv eplusout_monthly.msgpack "${OUT_P}/${ARG1}_monthly.msgpack"
+fi
+if [ -f eplusout_runperiod.msgpack ]; then
+  mv eplusout_runperiod.msgpack "${OUT_P}/${ARG1}_runperiod.msgpack"
+fi
+
+if [ -f eplusmtr.csv ]; then
+  mv eplusmtr.csv "${OUT_P}/${ARG1}Meter.csv"
+fi
+if [ -f eplusmtr.tab ]; then
+  mv eplusmtr.tab "${OUT_P}/${ARG1}Meter.tab"
+fi
+if [ -f eplusmtr.txt ]; then
+  mv eplusmtr.txt "${OUT_P}/${ARG1}Meter.txt"
+fi
+if [ -f epluszsz.csv ]; then
+  mv epluszsz.csv "${OUT_P}/${ARG1}Zsz.csv"
+fi
+if [ -f epluszsz.tab ]; then
+  mv epluszsz.tab "${OUT_P}/${ARG1}Zsz.tab"
+fi
+if [ -f epluszsz.txt ]; then
+  mv epluszsz.txt :"${OUT_P}/${ARG1}Zsz.txt"
+fi
+if [ -f eplusssz.csv ]; then
+  mv eplusssz.csv "${OUT_P}/${ARG1}Ssz.csv"
+fi
+if [ -f eplusssz.tab ]; then
+  mv eplusssz.tab "${OUT_P}/${ARG1}Ssz.tab"
+fi
+if [ -f eplusssz.txt ]; then
+  mv eplusssz.txt "${OUT_P}/${ARG1}Ssz.txt"
+fi
+if [ -f eplusmap.csv ]; then
+  mv eplusmap.csv "${OUT_P}/${ARG1}Map.csv"
+fi
+if [ -f eplusmap.tab ]; then
+  mv eplusmap.tab "${OUT_P}/${ARG1}Map.tab"
+fi
+if [ -f eplusmap.txt ]; then
+  mv eplusmap.txt "${OUT_P}/${ARG1}Map.txt"
+fi
+if [ -f eplustbl.csv ]; then
+  mv eplustbl.csv "${OUT_P}/${ARG1}Table.csv"
+fi
+if [ -f eplustbl.tab ]; then
+  mv eplustbl.tab "${OUT_P}/${ARG1}Table.tab"
+fi
+if [ -f eplustbl.txt ]; then
+  mv eplustbl.txt "${OUT_P}/${ARG1}Table.txt"
+fi
+if [ -f eplustbl.htm ]; then
+  mv eplustbl.htm "${OUT_P}/${ARG1}Table.html"
+fi
+if [ -f eplusout.sparklog ]; then
+  mv eplusout.sparklog "${OUT_P}/${ARG1}SPARK.log"
+fi
+if [ -f readvars.audit ]; then
+  mv readvars.audit "${OUT_P}/${ARG1}.rvaudit"
+fi
+if [ -f eplusout.sql ]; then
+  mv eplusout.sql "${OUT_P}/${ARG1}.sql"
+fi
+if [ -f sqlite.err ]; then
+  mv sqlite.err "${OUT_P}/${ARG1}SQLite.err"
+fi
+if [ -f audit.out ]; then
+  mv audit.out "${OUT_P}/${ARG1}.audit.out"
+fi
+if [ -f eplusshading.csv ]; then
+  mv eplusshading.csv "${OUT_P}/${ARG1}Shading.csv"
+fi
+
+# move FMU generated output files to output folder -- FMI
+#if [ "$OSFMU" != "Darwin" ]; then
+#  if [ -f *.mat ]; then
+#    mv *.mat "${OUT_P}/${ARG1}.mat"
+#  fi
+#fi
+
+# Delete additional files
+for filename in $LINK_NAMES Energy+.ini eplusout.end;
+do
+  if [ -f $filename ]; then
+    rm $filename
+  fi
+done
+
+# Delete FMUs files and folder -- FMI
+if [ "$OSFMU" != "Darwin" ]; then
+#  if [ -f *.mat ]; then
+#    rm *.mat
+#  fi
+
+#  if [ -f *.fmu ]; then
+#    rm *.fmu
+#  fi
+
+  if [ -d tmp-fmus ]; then
+    rm -rf tmp-fmus
+  fi
+fi
+
+# Write output location exit message
+echo
+echo "EnergyPlus output files are located in: \""${OUT_P}"\""
+echo
+
+#====================================================================
+# Process error
+if [ $RETVAL != 0 ]; then
+  echo ""
+  echo "===== EnergyPlus terminated with error ====="
+  echo
+fi
+
+exit $RETVAL

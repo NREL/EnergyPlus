@@ -1,0 +1,67 @@
+\section{What's different about EnergyPlus Input and Output?}\label{whats-different-about-energyplus-input-and-output}
+
+The usual procedure for non-interactive programs is to process all the input necessary to ``do the job'', perform the actions required by the input, and somewhere along the way produce reports on the actions. Usually, there will be error messages on incorrect input statements and/or incorrect conditions detected during processing. Usually, the input is echoed in its entirety so that the context of errors is shown clearly.
+
+Results are typically output into reports as well as a compilation of various inputs reformatted into different groupings than were originally entered (defaults filled in, etc.)
+
+EnergyPlus does all the above. However, some nuances are different from the usual actions.
+
+\subsection{EnergyPlus Input Processing}\label{energyplus-input-processing}
+
+1)~~~~EnergyPlus is compiled with a specific the data dictionary (Energy+.idd) and the input data file (in.idf) is read prior to doing anything else. Only after this is done does processing start. HOWEVER, the input processor only knows as much as the data dictionary has told it. It knows which fields should be alpha and which should be numeric. All of this information (including the IDD) is echoed to the audit file (audit.out) in case errors occur. Most of the errors show up (out of context) in the standard error file (eplusout.err) -- there might be enough information to decipher where the error is or you may have to look at the more inclusive audit file. Invalid numeric fields are detected during this processing and default numeric fields are filled. For more information on the IDD, its structure and implications, please see the IDD Conventions discussion below.
+
+2)~~~~The biggest difference between EnergyPlus and more traditional input processing is that EnergyPlus is modular in its actual filling in the details for the simulation. Because of the modular structure of EnergyPlus, each module is responsible for ``getting'' its own input. It receives this input from the input processor in the form of alpha and numeric fields. Each module typically gets all its input the first time it is called. The implication for the user is that error messages may show up in somewhat peculiar places. A further implication is that no order is needed in the input data file!~ Data that is not needed by a particular simulation is not processed.
+
+3)~~~~The data dictionary provides the capability to do ``automatic'' range checking on numeric fields as well as fill in numeric defaults. Both filling in defaults and ``automatic'' range checking are done when the data is read. Other checks may need a combination of fields and won't be done until the data is ``processed'' (after the simulation starts).
+
+4)~~~~A couple of other differences that might not be true in other programs:~ Blanks are significant in alpha fields \textbf{SO} DesignDay is not the same as Design Day (1 space between Design and Day) nor Design~ Day (2 spaces between Design and Day). Alpha objects, however, \emph{are} case insensitive SO DesignDay is the same as `designday' or `\hyperref[sizingperioddesignday]{SizingPeriod:DesignDay}'.
+
+\subsection{General Input Rules}\label{general-input-rules}
+
+Rules shown here are for the input data files. Rules about the Input Data Dictionary are shown in the Interface Developer's Guide (there is much similarity and overlap) but most users can view the IDD (Input Data Dictionary) as an additional quick reference for EnergyPlus.
+
+The input data file is the primary file that EnergyPlus uses to create the building simulation. The only additional files are referenced by certain objects (such as the \hyperref[schedulefile]{Schedule:File} object). The input is order-independent; data can appear in any order and will be retrieved and sorted as necessary by the EnergyPlus simulation modules.~ In addition, EnergyPlus allocates everything dynamically, so there are no limitations as to number of zones, surfaces, etc.
+
+\begin{itemize}
+\item
+  The initial line of an input object MUST have a comma or semicolon.
+\item
+  Fields do not extend over line boundaries.~ Usually, if a comma or (as appropriate) semi-colon is not the last field value on a line, one will be inserted.~ Of course, several fields may appear on a single line as long as they are comma separated. (And the last could be followed by a semi-colon).
+\item
+  Commas delimit fields -- therefore, no fields can have embedded commas.~ No error will occur but you won't get what you want. You cannot surround a field with `` to accommodate commas in the fields.
+\item
+  Blank lines are allowed.
+\item
+  The comment character is a exclamation ``!''.~ Anything on a line after the exclamation is ignored.
+\item
+  Input records (aka input line length) can be up to 500 characters in length.~ If you go over that, no error will occur but you won't get what you want.
+\item
+  Each Alpha string in the input data file (aka alpha field length) can be up to 100 characters in length. Anything beyond that is truncated. This would apply to all names (such as zone name, node name, schedule name) in fields.
+\item
+  Each Alpha string (including Section and Class/Object keywords) is mapped to UPPER case during processing, unless the ``\emph{retaincase}'' flag marks the field in the IDD.~ Get routines from the EnergyPlus code that use the Section and Object keywords automatically map to UPPER case for finding the item.~ The primary drawback with this is that error messages coming out of the input processor will be in UPPER case and may not appear exactly as input.
+\item
+  Special characters, such as tabs, should NOT be included in the file.~ However, tabs can be accommodated and are turned into spaces.
+\item
+  All numbers can be flexibly input and are processed into single precision variables (i.e.~1.0, 1.000, 1, .1E+1 are all processed equally).
+\end{itemize}
+
+\subsection{EnergyPlus Output Processing}\label{energyplus-output-processing}
+
+\begin{enumerate}
+  \item
+    Unlike the usual formatted output text formatted reports, EnergyPlus usual output is either at the summary or at the detailed (variable) level. Summary reports exist for many inputs as well as sizing results. The more detailed variable level reporting is produced as ``stream of consciousness'' (as the simulation happens) and must be post-processed for more sensible viewing. Note that the terms ``variable'' and ``output variable'' (accessed by the \hyperref[outputvariable]{Output:Variable} and/or \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects) are used interchangeably in this document.
+  \item
+    Most EnergyPlus reporting can be readily viewed in current spreadsheet programs -- or other software that can process ``delimited variable'' reports. In these kind of reports, each ``column'' is separated from the next by a ``delimiter''. Typical delimiters are ``comma'' and ``tab''. Gradually, EnergyPlus reporting is moving from all comma separated reports to allow the user to select the delimiter via ``style'' objects.
+  \item
+    Styled reports allow for more selectable output reporting but also increase the number of output files as we have chosen to create the report names with extensions that typify the actual reporting. Depending on the reporting, these can be:
+    \begin{itemize}
+      \item
+        Tab -- reports with a .tab extension have tabs as the delimiter. These report files (directly from EnergyPlus) will be named something like ``eplus\textless{}xxx\textgreater{}.tab'' where the \textless{}xxx\textgreater{} is a short name of the kind of report (e.g.~Zsz for Zone Sizing, Map for Daylighting Map)
+      \item
+        Csv -- reports with a .csv extension have commas as the delimiter. These are also specially formatted for use in spreadsheets (such as the compilation of results from the eplusout.eso file into the eplusout.csv file using the default post-processor program).
+      \item
+        Txt -- reports with a .txt extension have spaces as the ``delimiter'' but only certain of these are really formatted the way you might expect: where multiple spaces make printing with a non-proportional font would produce readable output.
+      \item
+        Html -- reports with a .html extension are ``web-browser'' ready.
+    \end{itemize}
+\end{enumerate}

@@ -1,0 +1,253 @@
+\section{Data Flow in an HVAC Component Module}\label{data-flow-in-an-hvac-component-module}
+
+The data in an EnergyPlus HVAC component module resides in three places.
+
+1.~~~The component inlet nodes -- this is where the data input to the model resides.
+
+2.~~~The component internal data structure(s) -- one or more arrays of data structures which contain all the data needed for the component simulation. This includes data from the input file, data from the inlet nodes, and any schedule values. In addition, these data structure(s) store the results of the calculation.
+
+3.~~~The component outlet nodes -- data is moved from the internal data structure(s) to the outlet nodes at the completion of each component simulation.
+
+The data flows from the inlet nodes into the component internal data structure(s) and then into the outlet nodes. Let us see how this works in our example module Fans.
+
+At the start of the module, the component internal data structure is defined.
+
+TYPE FanEquipConditions
+
+~ CHARACTER(len = MaxNameLength) :: FanName~ ! Name of the fan
+
+~ CHARACTER(len = MaxNameLength) :: FanType~ ! Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
+
+~ CHARACTER(len = MaxNameLength) :: Schedule ! Fan Operation Schedule
+
+~ CHARACTER(len = MaxNameLength) :: Control~ ! ie. Const Vol, Variable Vol
+
+~ Integer~~~~~ :: SchedPtr ! Pointer to the correct schedule
+
+~ REAL(r64)~~~ :: InletAirMassFlowRate~ !MassFlow through the Fan being Simulated {[}kg/Sec{]}
+
+~ REAL(r64)~~~ :: OutletAirMassFlowRate
+
+~ REAL(r64)~~~ :: MaxAirFlowRate~ !Max Specified Volume Flow Rate of Fan {[}m\^{}3/sec{]}
+
+~ REAL(r64)~~~ :: MinAirFlowRate~ !Min Specified Volume Flow Rate of Fan {[}m\^{}3/sec{]}
+
+~ REAL(r64)~~~ :: MaxAirMassFlowRate ! Max flow rate of fan in kg/sec
+
+~ REAL(r64)~~~ :: MinAirMassFlowRate ! Min flow rate of fan in kg/sec
+
+~ REAL(r64)~~~ :: InletAirTemp
+
+~ REAL(r64)~~~ :: OutletAirTemp
+
+~ REAL(r64)~~~ :: InletAirHumRat
+
+~ REAL(r64)~~~ :: OutletAirHumRat
+
+~ REAL(r64)~~~ :: InletAirEnthalpy
+
+~ REAL(r64)~~~ :: OutletAirEnthalpy
+
+~ REAL(r64)~~~ :: FanPower~~~~~~~~~~~~ !Power of the Fan being Simulated {[}kW{]}
+
+~ REAL(r64)~~~ :: FanEnergy~~~~~~~~~~~ !Fan energy in {[}kJ{]}
+
+~ REAL(r64)~~~ :: DeltaTemp~~~~~~~~~~~ !Temp Rise across the Fan {[}C{]}
+
+~ REAL(r64)~~~ :: DeltaPress~~~~~~~~~~ !Delta Pressure Across the Fan {[}N/M\^{}2{]}
+
+~ REAL(r64)~~~ :: FanEff~~~~~~~~~~~~~~ !Fan total efficiency; motor and mechanical
+
+~ REAL(r64)~~~ :: MotEff~~~~~~~~~~~~~~ !Fan motor efficiency
+
+~ REAL(r64)~~~ :: MotInAirFrac~~~~~~~~ !Fraction of motor heat entering air stream
+
+~ REAL(r64), Dimension(5):: FanCoeff~~~~~~~ !Fan Part Load Coefficients to match fan type
+
+~ ! Mass Flow Rate Control Variables
+
+~ REAL(r64)~~~ :: MassFlowRateMaxAvail
+
+~ REAL(r64)~~~ :: MassFlowRateMinAvail
+
+~ INTEGER~~~~~ :: InletNodeNum
+
+~ INTEGER~~~~~ :: OutletNodeNum ~END TYPE FanEquipConditions
+
+!MODULE VARIABLE DECLARATIONS:
+
+~ INTEGER :: NumFans~~~~ ! The Number of Fans found in the Input
+
+~ TYPE (FanEquipConditions), ALLOCATABLE, DIMENSION(:) :: Fan
+
+In this case, there is only one structure that stores all of the fan data. We could have chosen to divide this rather large structure up into separate structures -- one for input file data, one for inlet data, and one for outlet data, for instance. Note that in Fortran 90 structures are called defined type.~ The TYPE -- END TYPE construct defines a new data structure. Then an allocatable array \emph{Fan} of the defined type is created. This one-dimensional array will contain an entry for each fan in the problem.
+
+The internal data array is allocated (sized) in the ``GetInput'' routine GetFanInput.
+
+NumSimpFan~~ = GetNumObjectsFound(`FAN:SIMPLE:CONSTVOLUME')
+
+~~~ NumVarVolFan = GetNumObjectsFound(`FAN:SIMPLE:VARIABLEVOLUME')
+
+~~~ NumOnOff = GetNumObjectsFound(`FAN:SIMPLE:ONOFF')
+
+~~~ NumZoneExhFan = GetNumObjectsFound(`ZONE EXHAUST FAN')
+
+~~~ NumFans = NumSimpFan + NumVarVolFan + NumZoneExhFan+NumOnOff
+
+~~~ IF (NumFans.GT.0) ALLOCATE(Fan(NumFans))
+
+The remainder of the ``GetInput'' routine moves input file data into the Fan array. The ``Init'' routine transfers data from the inlet nodes into the same array in preparation for performing the calculation.
+
+~ ! Load the node data in this section for the component simulation
+
+~ !
+
+~ !First need to make sure that the massflowrate is between the max and min avail.
+
+~ IF (Fan(FanNum)\%FanType\_Num / = FanType\_ZoneExhaust ) THEN
+
+~~~ Fan(FanNum)\%InletAirMassFlowRate = Min(Node(InletNode)\%MassFlowRate, \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fan(FanNum)\%MassFlowRateMaxAvail)
+
+~~~ Fan(FanNum)\%InletAirMassFlowRate = Max(Fan(FanNum)\%InletAirMassFlowRate, \&
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fan(FanNum)\%MassFlowRateMinAvail)
+
+~ ELSE~ ! zone exhaust fans - always run at the max
+
+~~~ Fan(FanNum)\%MassFlowRateMaxAvail = Fan(FanNum)\%MaxAirMassFlowRate
+
+~~~ Fan(FanNum)\%MassFlowRateMinAvail = 0.0
+
+~~~ Fan(FanNum)\%InletAirMassFlowRate = Fan(FanNum)\%MassFlowRateMaxAvail
+
+~~~ IF (Fan(FanNum)\%EMSMaxMassFlowOverrideOn) Fan(FanNum)\%InletAirMassFlowRate = \&
+
+~~~~~~ MIN(Fan(FanNum)\%EMSAirMassFlowValue,Fan(FanNum)\%MassFlowRateMaxAvail)
+
+~ END IF
+
+~ !Then set the other conditions
+
+~ Fan(FanNum)\%InletAirTemp~~~~~~~~ = Node(InletNode)\%Temp
+
+~ Fan(FanNum)\%InletAirHumRat~~~~~~ = Node(InletNode)\%HumRat
+
+~ Fan(FanNum)\%InletAirEnthalpy~~~~ = Node(InletNode)\%Enthalpy
+
+The ``Calc'' routines do the actual component simulation. All the data they need has been stored in the internal data array ready to be used. The results of the calculation are, in this case, stored in the same array. The ``Calc'' routine always does pure calculation/simulation -- it never retrieves or stores data.
+
+DeltaPress = Fan(FanNum)\%DeltaPress
+
+~~ FanEff~~~~ = Fan(FanNum)\%FanEff
+
+~~ ! For a Constant Volume Simple Fan the Max Flow Rate is the Flow Rate for the fan
+
+~~ Tin~~~~~~~ = Fan(FanNum)\%InletAirTemp
+
+~~ Win~~~~~~~ = Fan(FanNum)\%InletAirHumRat
+
+~~ RhoAir~~~~ = Fan(FanNum)\%RhoAirStdInit
+
+~~ MassFlow~~ = MIN(Fan(FanNum)\%InletAirMassFlowRate,Fan(FanNum)\%MaxAirMassFlowRate)
+
+~~ MassFlow~~ = MAX(MassFlow,Fan(FanNum)\%MinAirMassFlowRate)
+
+~~ !
+
+~~ !Determine the Fan Schedule for the Time step
+
+~ If( ( GetCurrentScheduleValue(Fan(FanNum)\%SchedPtr)\textgreater{}0.0 .and. Massflow\textgreater{}0.0 .or. TurnFansOn .and. Massflow\textgreater{}0.0) \&
+
+~~~~~~~ .and. .NOT.TurnFansOff ) Then
+
+~~ !Fan is operating
+
+~~ Fan(FanNum)\%FanPower = MassFlow*DeltaPress/(FanEff*RhoAir) ! total fan power
+
+~~ FanShaftPower = Fan(FanNum)\%MotEff * Fan(FanNum)\%FanPower~ ! power delivered to shaft
+
+~~ PowerLossToAir = FanShaftPower + (Fan(FanNum)\%FanPower - FanShaftPower) * \&
+
+~~~~ Fan(FanNum)\%MotInAirFrac
+
+~~ Fan(FanNum)\%OutletAirEnthalpy = Fan(FanNum)\%InletAirEnthalpy + PowerLossToAir/MassFlow
+
+~~ ! This fan does not change the moisture or Mass Flow across the component
+
+~~ Fan(FanNum)\%OutletAirHumRat~~~~~~ = Fan(FanNum)\%InletAirHumRat
+
+~~ Fan(FanNum)\%OutletAirMassFlowRate = MassFlow
+
+~~ Fan(FanNum)\%OutletAirTemp = PsyTdbFnHW (Fan(FanNum)\%OutletAirEnthalpy,Fan(FanNum)\%OutletAirHumRat)
+
+~Else
+
+~~ !Fan is off and not operating no power consumed and mass flow rate.
+
+~~ Fan(FanNum)\%FanPower = 0.0
+
+~~ FanShaftPower = 0.0
+
+~~ PowerLossToAir = 0.0
+
+~~ Fan(FanNum)\%OutletAirMassFlowRate = 0.0
+
+~~ Fan(FanNum)\%OutletAirHumRat~~~~~~ = Fan(FanNum)\%InletAirHumRat
+
+~~ Fan(FanNum)\%OutletAirEnthalpy~~~~ = Fan(FanNum)\%InletAirEnthalpy
+
+~~ Fan(FanNum)\%OutletAirTemp = Fan(FanNum)\%InletAirTemp
+
+~~ ! Set the Control Flow variables to 0.0 flow when OFF.
+
+~~ Fan(FanNum)\%MassFlowRateMaxAvail = 0.0
+
+~~ Fan(FanNum)\%MassFlowRateMinAvail = 0.0
+
+~~End If
+
+Finally, the ``Update'' routine (UpdateFan) moves the results from the internal data array into the outlet node(s).
+
+~~ OutletNode = Fan(FanNum)\%OutletNodeNum
+
+~~ InletNode = Fan(FanNum)\%InletNodeNum
+
+~~ ! Set the outlet air nodes of the fan
+
+~~ Node(OutletNode)\%MassFlowRate~ = Fan(FanNum)\%OutletAirMassFlowRate
+
+~~ Node(OutletNode)\%Temp~~~~~~~~~ = Fan(FanNum)\%OutletAirTemp
+
+~~ Node(OutletNode)\%HumRat~~~~~~~ = Fan(FanNum)\%OutletAirHumRat
+
+~~ Node(OutletNode)\%Enthalpy~~~~~ = Fan(FanNum)\%OutletAirEnthalpy
+
+~~ ! Set the outlet nodes for properties that just pass through \& not used
+
+~~ Node(OutletNode)\%Quality~~~~~~~~ = Node(InletNode)\%Quality
+
+~~ Node(OutletNode)\%Press~~~~~~~~~~ = Node(InletNode)\%Press
+
+~~ ! Set the Node Flow Control Variables from the Fan Control Variables
+
+~~ Node(OutletNode)\%MassFlowRateMaxAvail = Fan(FanNum)\%MassFlowRateMaxAvail
+
+~~ Node(OutletNode)\%MassFlowRateMinAvail = Fan(FanNum)\%MassFlowRateMinAvail
+
+Certain data items must always be transferred from inlet nodes to outlet nodes even if the data item is unaltered by the component model. The data items that must be transferred are:
+
+1.~~~Temp
+
+2.~~~HumRat
+
+3.~~~Enthalpy
+
+4.~~~Press
+
+5.~~~MassFlowRate
+
+6.~~~MassFlowRateMaxAvail
+
+7.~~~MassFlowRateMinAvail

@@ -1,0 +1,168 @@
+#!/bin/bash
+#====================================================================
+# Runs ReadVarsEso
+#
+# This script needs the environment variable ENERGYPLUS_DIR to be
+# set to the root directory of EnergyPlus.
+#
+#
+# July 26, 2002, MWetter@lbl.gov
+# modified March 29, 2009, kyle.benne@nrel.gov
+# Added support to find ENERGYPLUS_DIR if unset by user
+#====================================================================
+
+# function to set ENERGYPLUS_DIR relative to this script
+function SetEnergyPlusDir() {
+  unamestr=`uname`
+  if [ "$unamestr" == 'Darwin' ]; then
+    ENERGYPLUS_DIR="/usr"
+  else
+    U_DIR=`pwd`
+    if [ -n "`readlink "$0"`" ]; then
+      S_DIR=$(cd "$(dirname "$(readlink "$0")")"; pwd)
+      cd "$U_DIR"
+    else
+      S_DIR=$(cd "$(dirname "$0")"; pwd)
+      cd "$U_DIR"
+    fi
+    ENERGYPLUS_DIR=`dirname "$S_DIR"`
+  fi
+}
+
+# Check for user set ENERGYPLUS_DIR
+auto_eplus_dir=true
+if [ -n "$ENERGYPLUS_DIR" ]; then
+  auto_eplus_dir=false
+fi
+
+# Set the ENERGYPLUS_DIR 
+if $auto_eplus_dir; then
+  SetEnergyPlusDir
+fi
+
+HEADER="=============== ReadVarsESO ================="
+# Name of executable
+PRG_N=ReadVarsESO
+# Output files extension
+OUT_EXT="csv"
+
+# ==========================================================
+function Usage() {
+  echo "Usage:  ReadVarsESO FileName"
+  echo "   or:  ReadVarsESO --clean (or -c)"
+  echo "   or:  ReadVarsESO --help (or -h)"
+  echo ""
+  echo "Runs ReadVarsESO for EnergyPlus post processing."
+  echo ""
+  echo "FileName is the name of the .rvi, .mvi, or .eso file,"
+  echo "including file extension."
+  echo ""
+  echo " --clean, or -c    deletes all output files (*.csv) in"
+  echo "                   the current directory"
+  echo " --help, or -h     displays this help"
+}
+# ==========================================================
+function CleanOutputFiles() {
+  # delete files
+  for extension in $OUT_EXT out;
+  do 
+    rm -f *.$extension
+  done
+  echo "Deleted output files";
+}
+# ==========================================================
+function ExitWithError() {
+  echo "===== ReadVarsESO terminated with error ====="
+  exit 1
+}
+# ==========================================================
+if [ -z "$1"  ]; then
+  Usage ; exit 0;
+fi
+
+if [ "$1" = "--help" ]; then
+  Usage ; exit 0;
+fi
+
+if [ "$1" = "-h" ]; then
+  Usage ; exit 0;
+fi
+# ==========================================================
+if [ "$ENERGYPLUS_DIR" = "" ]; then
+  echo "$HEADER";
+  echo "To use ReadVarsESO, you need to set the";
+  echo "environment variable ENERGYPLUS_DIR to";
+  echo "the root directory of EnergyPlus.";
+  ExitWithError;
+fi
+# ==========================================================
+# Clean output files only
+if [ "$1" = --clean ]; then
+  CleanOutputFiles ; exit 0;
+fi
+if [ "$1" = -c ]; then
+  CleanOutputFiles ; exit 0;
+fi
+# ==========================================================
+# check whether file exists
+if [ ! -f $1 ]; then
+  echo "$HEADER"
+  echo "First argument is not a file."
+  echo ""
+  Usage
+  ExitWithError
+fi
+# check reading permission
+if [ ! -r $1 ]; then
+  echo "$HEADER"
+  echo "Do not have reading permission for '$1'."
+  echo ""
+  Usage
+  ExitWithError
+fi
+# ==========================================================
+# Find out whether to process eso file or rvi/mvi file
+EXT=${1##*.}
+# check whether passed argument really has an extension
+if [ $1 == $EXT ]; then
+  echo "Argument must have a file extension."
+  Usage ; ExitWithError ;
+fi
+BASE=`basename $1 .$EXT`
+
+case $EXT in
+  eso)
+    if [ $BASE == eplusout ]; then
+      echo $HEADER
+      rm -f eplusout.csv
+      if $auto_eplus_dir; then
+        $ENERGYPLUS_DIR/bin/$PRG_N;
+      else
+        $ENERGYPLUS_DIR/PostProcess/$PRG_N;
+      fi
+    else
+      echo $HEADER
+      rm -f eplusout.eso $BASE.csv eplusout.csv;
+      ln -s $1 eplusout.eso;
+      if $auto_eplus_dir; then
+        $ENERGYPLUS_DIR/bin/$PRG_N;
+      else
+        $ENERGYPLUS_DIR/PostProcess/$PRG_N;
+      fi
+      rm -f eplusout.eso;
+      mv -f eplusout.csv $BASE.csv;
+    fi
+    exit 0;
+    ;;
+  rvi | mvi)
+    echo $HEADER
+    if $auto_eplus_dir; then
+      $ENERGYPLUS_DIR/bin/$PRG_N $1
+    else
+      $ENERGYPLUS_DIR/PostProcess/$PRG_N  $1
+    fi
+    exit 0;
+    ;;*)
+    Usage; ExitWithError;
+esac
+

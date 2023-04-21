@@ -1,0 +1,21 @@
+\section{Undisturbed Ground Temperature Model: Finite Difference}\label{undisturbed-ground-temperature-model-finite-difference}
+
+\subsubsection{Approach}\label{approach-003}
+
+This model uses a 1D implicit finite difference heat transfer model to determine the steady-periodic annual ground temperature. The model, which uses a daily timestep, is run through an annual simulation using the user provided weather file to determine daily averages for global horizontal radiation, air temperature, relative humidity, and wind speed. Once the steady-periodic ground temperature has been determined, the temperatures are cached for use later in the simulation. The basis for the model was taken from Xing, 2014, however, the numerical methods were adapted from those described in Lee, 2013; the latter uses an implicit numerically stable finite difference method, whereas the former utilized an explicit, conditionally stable method.
+
+Surface heat balance boundary conditions are similar what is described in Herb et al., 2008. Evapotranspiration is considered as described by Allen et al., 1998. Soil freezing given the assumed stagnant soil moisture content is also considered.
+
+\subsubsection{Limitations}\label{limitations}
+
+The model does not consider the effects of vegitative canopy layers, snow cover, ground water flow, ground moisture transport, or surface runoff.
+
+\subsubsection{References}\label{references-048}
+
+Allen, R.G., L.S. Pereira, D. Raes, M. Smith. 1998. \emph{Crop Evapotranspiration - Guidelines for Computing Crop Water Requirements.} Food and Agriculture Organization of the United Nations.
+
+Herb, W.R., B. Janke, O. Mohseni, \& H.G. Stefan. 2008. `Ground Surface Temperature Simulation for Different Land Covers.' Journal of Hydrology, 356: pp 327-343.
+
+Lee, E.S. 2013. An Improved Hydronic Loop System Solution Algorithm with a Zone-Coupled Horizontal Ground Heat Exchanger Model for Whole Building Energy Simulation. Ph.D.~Diss. Oklahoma State University, Stillwater, OK.
+
+Xing, L. 2014. Estimations of Undisturbed Ground Temperatures using Numerical and Analytical Modeling. Ph.D.~Diss. Oklahoma State University, Stillwater, OK.

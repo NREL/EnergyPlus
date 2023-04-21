@@ -1,0 +1,127 @@
+\section{EnergyPlus File Extensions}\label{energyplus-file-extensions}
+
+This section will present a list of common EnergyPlus file extensions and what they mean. This will help you after the EP-Launch program finishes.
+
+\subsection{Input Files}\label{input-files}
+
+The following files are input to the EnergyPlus program.
+
+\subsubsection{IDD}\label{idd}
+
+The \emph{input data dictionary} (IDD) is an ASCII (text) file containing a list of all possible EnergyPlus objects and a specification of the data each object requires. This file is analogous to the DOE-2 keyword file. The \emph{Guide for Interface Developers} contains a full description of the input data dictionary.
+
+\subsubsection{idf}\label{idf}
+
+The \emph{input data file} (IDF) is an ASCII file containing the data describing the building and HVAC system to be simulated. Many example files are installed as part of the EnergyPlus installation. Additionally, a spreadsheet file ``ExampleFiles.xls'' ~contains columnar descriptions of each file's features.
+
+\subsubsection{imf}\label{imf}
+
+The \emph{input macro file} (IMF) is an ascii file containing the data describing the building and HVAC system to be simulated and will have some contents of ``macro'' commands. The Auxiliary programs document describes use of the macro commands and the program that processes them -- EP-Macro. ~~Many example files are installed as part of the EnergyPlus installation.
+
+\subsubsection{ini}\label{ini}
+
+This is the EnergyPlus initialization file. It is an optional ascii input file that allows the user to specify the path for the directory containing Energy+.idd. This file, using the actual directories of the install, will be created during the install. Unless you change where the EnergyPlus.exe file resides, you will not need to change this file.
+
+\subsubsection{epw}\label{epw}
+
+The \emph{EnergyPlus weather} file is an ascii file containing the hourly or sub-hourly weather data needed by the simulation program. The data format is described in detail in the Auxiliary Programs Document. It is also described succinctly in the Input Output Reference document.
+
+\subsection{Primary Output Files}\label{primary-output-files}
+
+The following output files are the most important for beginning users.~ Then, there is the section on ``other output'' files.~ And, more information about output files (complete list) is shown in the \href{OutputDetailsAndExamples.pdf}{Output Details and Examples} Document.
+
+\subsubsection{err}\label{err}
+
+A text file containing the error messages issued by EnergyPlus. \textbf{This is the first output that should be examined after a simulation.}Error messages may be issued by EnergyPlus during its input phase or during the simulation. There are three levels of error severity: \emph{fatal}, \emph{severe}, and \emph{warning} as well as simple \emph{``information''} lines. A fatal error causes the program to terminate immediately. The following table illustrates the necessary actions.
+
+% table 1
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\caption{Error Message Levels – Required Actions \label{table:error-message-levels-required-actions}} \tabularnewline
+\toprule 
+Error Level & Action \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Error Message Levels – Required Actions} \tabularnewline
+\toprule 
+Error Level & Action \tabularnewline
+\midrule
+\endhead
+
+Information, shown as ********* & Informative, usually a follow-on to one of the others. No action required. \tabularnewline
+**~~ \~{}\textbackslash\~{}\~{}~~** & This is a continuation of a previous message.~ String all the words/sentences together to form the complete message. \tabularnewline
+Warning & Take note. Fix as applicable. \tabularnewline
+Severe & Should Fix \tabularnewline
+Fatal & Program will abort, Must Fix \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsubsection{csv}\label{csv}
+
+When run normally, EP-Launch and EnergyPlus automatically creates post-processed standard output (eso) and meter output (mtr) files into columnar csv (comma separated variable) files.~ These files are ready to be read by spreadsheet programs (such as Excel\textsuperscript{TM}).
+
+\subsubsection{htm/html}\label{htmhtml}
+
+Several of the report options produce html files that can be read in standard Web browsers.~ These are very powerful, information packed files.~ Though wary of information overload, the easiest way to see ``everything'' is to enter the following in your input file:
+
+\begin{lstlisting}
+
+OutputControl:Table,
+     HTML;                    !- ColumnSeparator
+
+  Output:Table:SummaryReports,
+     All Summary;
+\end{lstlisting}
+
+Note that you can also get this file in other formats (the OutputControl:Table option).
+
+\subsection{Other Output Files}\label{other-output-files}
+
+\subsubsection{audit}\label{audit}
+
+This is an text file which echoes the IDD and IDF files, flagging syntax errors in either file. Note that both \emph{err} and \emph{audit} will show most of the error messages caused by input syntax errors; however only \emph{err} will show errors issued during the actual simulation. The \emph{audit} can be used when you need to see the context of the error message to fully ascertain the cause. The \emph{audit} file also contains potentially extra information that may be useful from the input scan.
+
+\subsubsection{eso}\label{eso}
+
+The \emph{EnergyPlus Standard Output} (ESO) is a text file containing the time varying simulation output. The format of the file is discussed in the \emph{Guide for Interface Developers} and the \emph{InputOutputReference}. The contents of the file are controlled by \emph{Output:Variable} commands in the IDF file. Although the ESO is a text file, it is not easily interpretable by a human. Usually postprocessing will be done on this file in order to put it in a format that can be read by a spreadsheet; however a quick visual inspection of the file does show whether the expected variables are output at the desired time step.
+
+\subsubsection{mtr}\label{mtr}
+
+The \emph{EnergyPlus Meter Output} (MTR) is a text file containing the time varying simulation output. The format of the file is similar to the ESO file. As described in a later section of this document (see Energy Meters), meters are a powerful reporting tool in EnergyPlus. Values are grouped onto logical meters and can be viewed the same way that the ESO variables are used. The contents of the file are controlled by \emph{Output:Meter} commands in the IDF file. Although the MTR is a text file, it is not easily interpretable by a human. Usually postprocessing will be done on this file in order to put it in a format that can be read by a spreadsheet; however a quick visual inspection of the file does show whether the expected variables are output at the desired time step.
+
+\subsubsection{mtd}\label{mtd}
+
+This file contains all the details (i.e., which report variables are on a meter and, conversely, what meters contain) about meters.
+
+\subsubsection{eio}\label{eio}
+
+The \emph{EnergyPlus Invariant Output} (EIO) is a text file containing output that does not vary with time. For instance, location information (latitude, longitude, time zone, altitude) appears on this file.
+
+\subsubsection{rdd}\label{rdd}
+
+\subsubsection{mdd}\label{mdd}
+
+The \emph{Report (variable) Data Dictionary} (RDD) is a text file listing those variables available for reporting (on the ESO) for this particular simulation. Which variables are available for output depends on the actual simulation problem described in the IDF. The \emph{Report (meter) Data Dictionary} (MDD) is a text file listing those variables available for reporting (on the MTR) for this particular simulation. Which meters are available for output depends on the actual simulation problem described in the IDF. A simulation with no chiller does not permit the output of any chiller report variables. The user may need to examine the RDD or MDD to find out which report variables are available in a particular simulation. The RDD and MDD are written only if the following is included in the IDF file.
+
+\begin{lstlisting}
+
+Output:Reports, VariableDictionary;
+\end{lstlisting}
+
+A variant produces the same files in a IDF ``ready'' format.
+
+\begin{lstlisting}
+
+Output:Reports, VariableDictionary, IDF;
+\end{lstlisting}
+
+\subsubsection{dxf}\label{dxf}
+
+This is a file in AutoCad\textsuperscript{TM} DXF format showing all the surfaces defined in the IDF file. It provides a means of viewing the building geometry. The DXF file from EnergyPlus highlights different building elements (shading, walls, subsurfaces) in differing colors. A number of programs can read and display DXF files. Output of this file is triggered by
+
+\begin{lstlisting}
+
+Output:Reports, Surfaces, DXF;
+\end{lstlisting}
+
+in the IDF.

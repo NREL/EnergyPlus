@@ -1,0 +1,123 @@
+\section{eplusout.mtd}
+
+This file contains the “meter details” for the run. This shows what report variables are on which meters and vice versa – which meters contain what report variables.
+
+The meter details file consists of two parts:
+
+\begin{itemize}
+  \item For report variables that are on meters, it shows all the meters that the report variable is on.  In the following example, ``Meters for '' <report variable \#>, <report variable name> is shown and then the meters that accumulate the value of that variable as a “meter”.
+\end{itemize}
+
+\begin{lstlisting}
+ Meters for 1240,SPACE1-1:Lights-Electric Energy [J]
+  OnMeter = Electricity:Facility [J]
+  OnMeter = Electricity:Building [J]
+  OnMeter = Electricity:Zone:SPACE1-1 [J]
+  OnMeter = InteriorLights:Electricity [J]
+  OnMeter = InteriorLights:Electricity:Zone:SPACE1-1 [J]
+ Meters for 1460,SPACE1-1:Zone Air System Sensible Heating Energy [J]
+  OnMeter = EnergyTransfer:Facility [J]
+  OnMeter = EnergyTransfer:Building [J]
+  OnMeter = EnergyTransfer:Zone:SPACE1-1 [J]
+  OnMeter = Heating:EnergyTransfer [J]
+ Meters for 1557,SPACE1-1 ZONE COIL:Heating Coil Heating Energy [J]
+  OnMeter = EnergyTransfer:Facility [J]
+  OnMeter = EnergyTransfer:HVAC [J]
+  OnMeter = HeatingCoils:EnergyTransfer [J]
+\end{lstlisting}
+
+\begin{itemize}
+  \item For each meter, the report variables that make up that meter are shown. In the following example, ``For Meter = '' <name of meter>, ``contents are:'' and then each variable that occurs on that ``meter'' are shown.
+\end{itemize}
+
+\begin{lstlisting}
+For Meter = Electricity:Facility [J], contents are:
+  SPACE1-1 LIGHTS 1:Lights Electric Energy
+  SPACE2-1 LIGHTS 1:Lights Electric Energy
+  SPACE3-1 LIGHTS 1:Lights Electric Energy
+  SPACE4-1 LIGHTS 1:Lights Electric Energy
+  SPACE5-1 LIGHTS 1:Lights Electric Energy
+  SPACE1-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE2-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE3-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE4-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE5-1 ELECEQ 1:Electric Equipment Electric Energy
+  SUPPLY FAN 1:Fan Electric Energy
+  CENTRAL CHILLER:Chiller Electric Energy
+  HW CIRC PUMP:Pump Electric Energy
+  CW CIRC PUMP:Pump Electric Energy
+
+ For Meter = Electricity:Building [J], contents are:
+  SPACE1-1 LIGHTS 1:Lights Electric Energy
+  SPACE2-1 LIGHTS 1:Lights Electric Energy
+  SPACE3-1 LIGHTS 1:Lights Electric Energy
+  SPACE4-1 LIGHTS 1:Lights Electric Energy
+  SPACE5-1 LIGHTS 1:Lights Electric Energy
+  SPACE1-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE2-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE3-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE4-1 ELECEQ 1:Electric Equipment Electric Energy
+  SPACE5-1 ELECEQ 1:Electric Equipment Electric Energy
+ For Meter = Electricity:Zone:SPACE1-1 [J], contents are:
+  SPACE1-1 LIGHTS:Lights Electric Energy
+  SPACE1-1 ELECEQ:Electric Equipment Electric Energy
+ For Meter = InteriorLights:Electricity [J], contents are:
+  SPACE1-1 LIGHTS:Lights Electric Energy
+  SPACE2-1 LIGHTS:Lights Electric Energy
+  SPACE3-1 LIGHTS:Lights Electric Energy
+  SPACE4-1 LIGHTS:Lights Electric Energy
+  SPACE5-1 LIGHTS:Lights Electric Energy
+
+For Meter = Gas:Facility [J], contents are:
+  CENTRAL BOILER:Boiler Gas Energy
+
+ For Meter = Gas:Plant [J], contents are:
+  CENTRAL BOILER:Boiler Gas Energy
+
+ For Meter = Heating:Gas [J], contents are:
+  CENTRAL BOILER:Boiler Gas Energy
+
+ For Meter = Electricity:Plant [J], contents are:
+  CENTRAL CHILLER:Chiller Electric Energy
+  HW CIRC PUMP:Pump Electric Energy
+  CW CIRC PUMP:Pump Electric Energy
+
+ For Meter = Cooling:Electricity [J], contents are:
+  CENTRAL CHILLER:Chiller Electric Energy
+
+ For Meter = Cooling:EnergyTransfer [J], contents are:
+  PLENUM-1:Zone Air System Sensible Cooling Energy
+  SPACE1-1:Zone Air System Sensible Cooling Energy
+  SPACE2-1:Zone Air System Sensible Cooling Energy
+  SPACE3-1:Zone Air System Sensible Cooling Energy
+  SPACE4-1:Zone Air System Sensible Cooling Energy
+  SPACE5-1:Zone Air System Sensible Cooling Energy
+\end{lstlisting}
+
+As further illustration, an abbreviated example shows:
+
+\begin{lstlisting}
+Meters for 6,EAST ZONE LIGHTS 1:Lights Electric Energy [J]
+  OnMeter = Electricity:Facility [J]
+  OnMeter = Electricity:Building [J]
+  OnMeter = Electricity:Zone:EAST ZONE [J]
+  OnMeter = InteriorLights:Electricity [J]
+  OnMeter = InteriorLights:Electricity:Zone:EAST ZONE [J]
+  OnMeter = GeneralLights:InteriorLights:Electricity [J]
+
+For Meter = Electricity:Facility [J], ResourceType = Electricity, contents are:
+  EAST ZONE LIGHTS 1:Lights Electric Energy
+  NORTH ZONE LIGHTS 1:Lights Electric Energy
+  WEST ZONE ELECEQ 1:Electric Equipment Electric Energy
+  EAST ZONE ELECEQ 1:Electric Equipment Electric Energy
+  NORTH ZONE ELECEQ 1:Electric Equipment Electric Energy
+  SUPPLY FAN 1:Fan Electric Energy
+  LITTLE CHILLER:Chiller Electric Energy
+  BIG CHILLER:Chiller Electric Energy
+  BIG TOWER:Cooling Tower Fan Electric Energy
+  CIRC PUMP:Pump Electric Energy
+  COND CIRC PUMP:Pump Electric Energy
+  HW CIRC PUMP:Pump Electric Energy
+\end{lstlisting}
+
+This shows the meters on which the Zone: Lights Electric Energy appear as well as the contents of the Electricity:Facility meter.

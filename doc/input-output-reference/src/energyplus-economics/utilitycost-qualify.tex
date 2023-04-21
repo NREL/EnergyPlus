@@ -1,0 +1,63 @@
+\section{UtilityCost:Qualify}\label{utilitycostqualify}
+
+Many utilities provide a large number of tariffs and separate their customers by the amount of energy use they have or by the amount of demand. The qualify object allows only certain tariffs that are modeled to be used. If the results of the simulation fall outside of the range of qualifications, that tariff is still calculated but the ``Qualified'' entry will say ``No'' and the UtilityCost:Qualify that caused its exclusion is shown. When multiple tariffs from the same utility are modeled and only one of them should be used, make sure that the qualifiers are consistent especially within the same GroupName (see \hyperref[utilitycosttariff]{UtilityCost:Tariff}). Multiple UtilityCost:Qualify objects can appear for a specific rate and they can be based on any variable.
+
+The energy used and demands for each month vary. Since it is possible that they vary across the minimum and maximum values defined by this object, a choice in how to treat the thresholds is necessary. Say that a utility has two tariffs, a small tariff that has a maximum demand requirement of 50kW and a large tariff that has a minimum demand requirement of 50kW. If the use for a building goes above the 50kW threshold during some summer months and the rest of the time is below 50kW, then how does the utility choose which rate would qualify. The utility probably has very specific requirements about which months or consecutive months can be above or below a threshold to qualify for the rate.
+
+\subsection{Inputs}\label{inputs-070}
+
+\paragraph{Field: Name}\label{field-name-063}
+
+The name used for the UtilityCost:Qualify and displayed if the tariff does not qualify. It is also treated as a variable and contains:
+
+\begin{itemize}
+\item
+  1 for each month that does qualify,
+\item
+  0 for months that do not qualify, and
+\item
+  -1 for months that are not part of the season selected.
+\end{itemize}
+
+\paragraph{Field: Tariff Name}\label{field-tariff-name-002}
+
+The name of the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object that is associated with this UtilityCost:Qualify object.
+
+\paragraph{Field: Variable Name}\label{field-variable-name-001}
+
+The name of the variable used. For energy and demand, the automatically created variables, totalEnergy and totalDemand should be used, respectively.
+
+\paragraph{Field: Qualify Type}\label{field-qualify-type}
+
+Enter either ``Minimum'' or ``Maximum''.
+
+\paragraph{Field: Threshold Value or Variable Name}\label{field-threshold-value-or-variable-name}
+
+The minimum or maximum value for the qualify. If the variable has values that are less than this value when the qualify type is minimum then the tariff may be disqualified. If the variable has values that are greater than this value when the qualify type is maximum then the tariff may be disqualified. For demand, it is still the minimum of the demands set each month even though the demands are, by definition, the peak value for the month. Depending on the threshold test entry (see below) this minimum applies to all months, some of the months, or just a single month.
+
+\paragraph{Field: Season}\label{field-season-001}
+
+If the UtilityCost:Qualify only applies to a season, enter the season name from the following list:
+
+\begin{itemize}
+\item
+  Annual
+\item
+  Winter
+\item
+  Spring
+\item
+  Summer
+\item
+  Fall
+\end{itemize}
+
+If this field is left blank, it defaults to Annual.
+
+\paragraph{Field: Threshold Test}\label{field-threshold-test}
+
+Enter either ``Count'' or ``Consecutive''. Uses the number in Number of Months in one of two different ways depending on the Threshold Test. If the Threshold Test is set to ``Count'' then the qualification is based on the count of the total number of months per year. If the Threshold Test is set to ``Consecutive'' then the qualification is based on a consecutive number of months. If left blank this field defaults to count and it should be allowed to default for most cases.
+
+\paragraph{Field: Number of Months}\label{field-number-of-months}
+
+A number from 1 to 12. If no value entered, 12 is assumed when the qualify type is minimum and 1 when the qualify type is maximum. This is the number of months that the threshold test applies to determine if the rate qualifies or not. If the season is less than 12 months (if it is not annual) then the value is automatically reduced to the number of months of the season.

@@ -1,0 +1,75 @@
+\section{Weather Data Hourly Interpolation}\label{weather-data-hourly-interpolation}
+
+Much of the existing weather data is produced in hourly format (refer to the discussion of data formats and weather conversion processing in the Auxiliary Programs Document). In order to match the hourly data in a continuous manner for EnergyPlus (where the timesteps might be less than hourly), simple interpolation between ``last hour's'' values and ``this hour's'' values is performed; we will refer to this as ``Last Hour Interpolation''.
+
+Note that in versions prior to V1.0.3, the interpolation was done between ``this hour'' and ``next hour''. If required, we will refer to this as ``Next Hour Interpolation''.
+
+Remember that hour 1 for EnergyPlus is the time interval 00:00:01AM to 1:00:00AM. Hour 2 is 1:00:01AM to 2:00:00AM (hh:mm:ss). With the interpolation scheme (Last Hour Interpolation) and reporting weather data values at timestep resolution, the ``hour'' values reported should match with the hourly weather data values. (Note that reporting ``hourly'' resolution will not do this unless your ``Number of Timesteps per Hour'' is 1).
+
+Note that this interpolation applies to outdoor data only -- schedule values are not interpolated in this manner.
+
+The weighting scheme / interpolation is simply:
+
+\begin{equation}
+Valu{e_{TimeStep}} = LastHourValue\cdot Weigh{t_{LastHour}} + ThisHourValue\cdot Weigh{t_{ThisHour}}
+\end{equation}
+
+where
+
+\begin{equation}
+Weigh{t_{ThisHour}} = \frac{{CurrentTimeStep}}{{Number\,of\,TimeSteps\,in\,Hour}}
+\end{equation}
+
+\begin{equation}
+Weigh{t_{LastHour}} = 1.0 - Weigh{t_{ThisHour}}
+\end{equation}
+
+To explain further, the weighting for four (4) timesteps in hour is:
+
+% table 45
+\begin{longtable}[c]{@{}llll@{}}
+\caption{Illustration of Data Interpolation for 15 minute timesteps \label{table:illustration-of-data-interpolation-for-15}} \tabularnewline
+\toprule
+TimeStep & Time (mm:ss) & Weight & Weight \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Illustration of Data Interpolation for 15 minute timesteps} \tabularnewline
+\toprule
+TimeStep & Time (mm:ss) & Weight & Weight \tabularnewline
+\midrule
+\endhead
+
+1 & 00:01 to 15:00 & .75 & .25 \tabularnewline
+2 & 15:01 to 30:00 & .5 & .5 \tabularnewline
+3 & 30:01 to 45:00 & .25 & .75 \tabularnewline
+4 & 45:01 to 60:00 & 0 & 1.0 \tabularnewline
+\bottomrule
+\end{longtable}
+
+And similarly for six (6) timesteps in hour:
+
+% table 46
+\begin{longtable}[c]{@{}llll@{}}
+\caption{Illustration of Data Interpolation for 10 minute timesteps \label{table:illustration-of-data-interpolation-for-10}} \tabularnewline
+\toprule
+TimeStep & Time (mm:ss) & Weight & Weight \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Illustration of Data Interpolation for 10 minute timesteps} \tabularnewline
+\toprule
+TimeStep & Time (mm:ss) & Weight & Weight \tabularnewline
+\midrule
+\endhead
+
+1 & 00:01 to 10:00 & 0.833333333333333 & 0.166666666666667 \tabularnewline
+2 & 10:01 to 20:00 & 0.666666666666667 & 0.333333333333333 \tabularnewline
+3 & 20:01 to 30:00 & .5 & .5 \tabularnewline
+4 & 30:01 to 40:00 & 0.333333333333333 & 0.666666666666667 \tabularnewline
+5 & 40:01 to 50:00 & 0.166666666666667 & 0.833333333333333 \tabularnewline
+6 & 50:01 to 60:00 & 0 & 1.0 \tabularnewline
+\bottomrule
+\end{longtable}
+
+This interpolation gives a smooth, continuous look to the outdoor data. For day boundaries (i.e.~from hour 24 to hour 1), the values from the previous day's last hour (23:00:01 to 24:00:00). For the a design day, this is the values for hour 24. For the first day of a weather simulation, it is likewise values for hour 24 of that day. For subsequent weather days, it will be the last hour of the previous day.

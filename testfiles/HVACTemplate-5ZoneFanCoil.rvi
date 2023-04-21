@@ -1,0 +1,26 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Zone Air Temperature
+Zone Mean Radiant Temperature
+Zone Operative Temperature
+Zone Air Humidity Ratio
+Zone Air Relative Humidity
+Zone Thermal Comfort ASHRAE 55 Simple Model Summer or Winter Clothes Not Comfortable Time
+Zone Air System Sensible Cooling Rate
+Zone Air System Sensible Heating Rate
+Heating Coil Heating Rate
+Cooling Coil Total Cooling Rate
+Cooling Coil Sensible Cooling Rate
+Plant Supply Side Outlet Temperature
+Chiller Evaporator Cooling Rate
+Chiller Condenser Heat Transfer Rate
+Chiller Electricity Rate
+Chiller COP
+Boiler Heating Rate
+Boiler NaturalGas Rate
+Cooling Tower Heat Transfer Rate
+Cooling Tower Fan Electricity Rate
+Zone Heating Setpoint Not Met While Occupied Time
+Zone Cooling Setpoint Not Met While Occupied Time
+0

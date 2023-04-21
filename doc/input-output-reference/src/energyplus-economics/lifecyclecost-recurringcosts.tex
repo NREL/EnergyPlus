@@ -1,0 +1,87 @@
+\section{LifeCycleCost:RecurringCosts}\label{lifecyclecostrecurringcosts}
+
+Recurring costs are costs that repeat over time on a regular schedule during the study period. If costs associated with equipment do repeat but not on a regular schedule, use \hyperref[lifecyclecostnonrecurringcost]{LifeCycleCost:NonrecurringCost} objects instead. Costs related to energy usage are not included here. The \hyperref[utilitycosttariff]{UtilityCost:Tariff} and other UtilityCost objects can be used to compute energy costs that are automatically included in the life-cycle cost calculations
+
+\subsection{Inputs}\label{inputs-059}
+
+\paragraph{Field: Name}\label{field-name-057}
+
+The identifier used for the object. The name is used in identifying the cash flow equivalent in the output results in the Life-Cycle Cost Report.
+
+\paragraph{Field: Category}\label{field-category-000}
+
+Enter the category of the recurring costs. Choose the closest category. The options include:
+
+\begin{itemize}
+\item
+  Maintenance
+\item
+  Repair
+\item
+  Operation
+\item
+  Replacement
+\item
+  MinorOverhaul
+\item
+  MajorOverhaul
+\item
+  OtherOperational
+\end{itemize}
+
+The default value is Maintenance.
+
+For recommendations on estimating other operational costs, see NIST 135 Section 4.6.3.
+
+\paragraph{Field: Cost}\label{field-cost-000}
+
+Enter the cost in dollars (or the appropriate monetary unit) for the recurring costs. Enter the cost for each time it occurs. For example, if the annual maintenance cost is \$500, enter 500 here.
+
+\paragraph{Field: Start of Costs}\label{field-start-of-costs-000}
+
+Enter when the costs start. The First Year of Cost is based on the number of years past the Start of Costs. For most maintenance costs, the Start of Costs should be Service Period. The options are:
+
+\begin{itemize}
+\item
+  ServicePeriod
+\item
+  BasePeriod
+\end{itemize}
+
+The default value is ServicePeriod.
+
+\paragraph{Field: Years From Start}\label{field-years-from-start-000}
+
+This field and the Months From Start field together represent the time from either the start of the Service Period, on the service month and year, or start of the Base Period, on the base month and year (depending on the Start of Costs field) that the costs start to occur. Normally, for most maintenance costs that begin in the first year that the equipment is in service the Start of Costs is the Service Period and the Years from Start will be 0. Only integers should be entered representing whole years. The default value is 0.
+
+\paragraph{Field: Months From Start}\label{field-months-from-start-000}
+
+This field and the Years From Start field together represent the time from either the start of the Service Period, on the service month and year, or start of the Base Period, on the base month and year (depending on the Start of Costs field) that the costs start to occur. Normally, for most maintenance costs the Start of Costs is the Service Period and the Months from Start will be 0. Only integers should be entered representing whole months. The Years From Start (times 12) and Months From Start are added together. The default value is 0.
+
+\paragraph{Field: Repeat Period Years}\label{field-repeat-period-years}
+
+This field and the Repeat Period Months field indicate how much time elapses between reoccurrences of the cost. For costs that occur every year, such as annual maintenance costs, the Repeat Period Years should be 1 and Repeat Period Months should be 0. Only integers should be entered representing whole years. The default value is 1.
+
+\paragraph{Field: Repeat Period Months}\label{field-repeat-period-months}
+
+This field and the Repeat Period Years field indicate how much time elapses between reoccurrences of the cost. For costs that occur every year the Repeat Period Years should be 1 and Repeat Period Months should be 0. For, costs that occur every eighteen months, the Repeat Period Years should be 1 and the Repeat Period Months should be 6. Only integers should be entered representing whole years. The Repeat Period Years (times 12) and Repeat Period Months are added together. The default value is 0.
+
+\paragraph{Field: Annual Escalation Rate}\label{field-annual-escalation-rate}
+
+Enter the annual escalation rate as a decimal. For a 1\% rate, enter the value 0.01. This input is used when the Inflation Approach is CurrentDollar. When Inflation Approach is set to ConstantDollar this input is ignored. The default value is 0.
+
+An example of this object in an IDF:
+
+\begin{lstlisting}
+
+LifeCycleCost:RecurringCosts,
+      AnnualMaint,             !- Name
+      Maintenance,             !- Category
+      2000,                    !- Cost
+      ServicePeriod,           !- Start of Costs
+      0,                       !- Years from Start
+      0,                       !- Months from Start
+      1,                       !- Repeat Period Years
+      0,                       !- Repeat Period Months
+      0;                       !- Annual escalation rate
+\end{lstlisting}

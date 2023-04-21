@@ -1,0 +1,12 @@
+8.4.0,8.5.0,Transition notes
+7,7,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
+Wall Interface Heat Flux,GroundDomain Basement Wall Interface Heat Flux
+Wall Interface Temperature,GroundDomain Basement Wall Interface Temperature
+Floor Interface Heat Flux,GroundDomain Basement Floor Interface Heat Flux
+Floor Interface Temperature,GroundDomain Basement Floor Interface Temperature
+Zone Coupled Surface Heat Flux,GroundDomain Slab Zone Coupled Surface Heat Flux
+Zone Coupled Surface Temperature,GroundDomain Slab Zone Coupled Surface Temperature
+Availability Manager Optimum Start Hours Before Occupancy,Availability Manager Optimum Start Time Before Occupancy,
+Electric Storage Charge State, Electric Storage Simple Charge State
+Electric Storage Charge State, Electric Storage Battery Charge Sate
+old variable name,new variable name,-- add variable names (before this line) and leave off units -- <DELETE> to delete

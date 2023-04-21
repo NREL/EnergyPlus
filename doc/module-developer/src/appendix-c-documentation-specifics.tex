@@ -1,0 +1,52 @@
+\chapter{Appendix C.~ Documentation Specifics}\label{appendix-c.-documentation-specifics}
+
+Documents that module developers will typically be updating or changing are the: Input Output Reference, Engineering Documentation, and Output Details and Examples.~ You may, of course, note revisions to other documents.
+
+All of the EnergyPlus documentation follows a Word\textsuperscript{TM} template -- report.dot.
+
+This template takes care of many of the nuances of formatting so that the documents all retain the same ``look and feel''.~ The template itself will contain examples for the IORef and Engineering Documentation.
+
+General guidelines:
+
+\begin{itemize}
+\item
+  Don't get fancy with formatting.~ No extra ``enters'' are needed to space the paragraphs.
+\item
+  Submit your pictures as pictures (jpeg, tif, gif).~ This will allow you to ``insert captions'' below them and have them automatically numbered.~ (This also allows them to be re-numbered once inside the EnergyPlus documents).~ Don't use Text boxes.
+\item
+  Likewise, use an ``insert caption'' on tables.
+\item
+  Table captions go above the table.~ Figure captions go below.
+\item
+  If you want to reference a table or figure in your text, use ``insert cross reference'' and select table or figure as appropriate.~ Usually, just use the ``label and number'' option.
+\item
+  Body Text is the expected style for most text.~ DO NOT put object names in a different font (such as Courier) or as a different size though you may bold them for emphasis.
+\item
+  Headings are used judiciously to help separate text.
+\item
+  Object names (IOReference) are Heading 3.
+\item
+  Each field must be described and shown as Heading 4 followed by the description.~ Form should be ``Field: \textless{}field Name\textgreater{}''. (Exception: if your object has a repeating set of fields -- you may describe the initial field set in detail such as is done for the branch specifications fields in the Branch object).
+\item
+  Each object's IDD must be shown and use the format ``IDD Definition''.
+\item
+  An excerpt IDF using the object must be shown.
+\item
+  Output variables for the object must be shown (heading 4) with a heading 3 \textless{}object name\textgreater{} Output variables preceding.
+\item
+  Equations may be inserted using the Microsoft\textsuperscript{TM} Equation Editor.~ Internally we use software called ``MathType'' -- that also may be used for Equations.~ It is not desirable to number every equation.~ If you want to reference the equations, of course, you will need to number them -- it is best to number them in plain text and then we can edit them into the rest of the documents.
+\item
+  Each Engineering Reference section should contain a ``References'' section and should be formatted in author style (not numbered).
+\end{itemize}
+
+Example References:
+
+ASHRAE. 1993. 1993 ASHRAE Handbook -- Fundamentals. Atlanta: American Society of Heating, Refrigerating, and Air-Conditioning Engineers, Inc.
+
+Chapman, A. J. 1984. Heat Transfer, 4\(^{th}\) Edition, New York: Macmillan Publishing Company.
+
+Lienhard, J. H. 1981. A Heat Transfer Textbook, Englewood Cliffs, N.J.: Prentice-Hall, Inc.
+
+McClellan, T. M., and C. O. Pedersen. 1997. Investigation of Outside Heat Balance Models for Use in a Heat Balance Cooling Load Calculation. ASHRAE Transactions, Vol. 103, Part 2, pp.~469-484.
+
+Walton, G. N. 1983. Thermal Analysis Research Program Reference Manual. NBSSIR 83-2655. National Bureau of Standards.

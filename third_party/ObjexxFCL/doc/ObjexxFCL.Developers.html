@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>ObjexxFCL Developers Guide</title>
+	<meta name="description" content="Objexx Fortran-C++ Library">
+	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
+	<meta name="copyright" content="Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.">
+	<link rel="icon" type="image/png" href="img/favicon.png">
+	<link rel="stylesheet" href="css/Objexx.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#CC3366" vlink="#990033" alink="#FF3366">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+	<tr>
+		<td></td>
+		<td height="70"><a href="ObjexxFCL.html"><img src="img/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
+		<td></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.2</div></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="5" height="16" valign="top" bgcolor="#EB7A87"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td height="24" colspan="5"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td height="300">&nbsp;</td>
+		<td valign="top">
+			<div id="sectionLinksTop">
+				<a href="ObjexxFCL.html">Home</a>
+			</div>
+			<div id="sectionLinks">
+				<a href="ObjexxFCL.Release.html">Release</a>
+				<a href="ObjexxFCL.Users.html">Users Guide</a>
+				<a href="ObjexxFCL.Developers.html">Developers</a>
+				<a href="ObjexxFCL.Support.html">Support</a>
+				<a href="http://objexx.com">Web</a>
+			</div>
+		</td>
+		<td></td>
+		<td width="500" valign="top">
+			<h1>Developers Guide
+			</h1>
+			<p>This guide contains some supplementary information of interest to project developers who wish to understand the design and inner workings of the ObjexxFCL.</p>
+			<p class="body">The ObjexxFCL provides a fairly complete emulation layer for features up through those of Fortran 2008 and a number of capabilities beyond those of Fortran. In particular the Array class template hierarchy is notably more complex and subtle. For this reason care should be exercised when modifying and extending the ObjexxFCL code.</p>
+			<p class="body">The <a href="ObjexxFCL.Users.html">Users</a> guide is a prerequisite for this guide.</p>
+			<hr />
+			<h3>ObjexxFCL Organization</h3>
+			<p class="body">The ObjexxFCL is organized into the following source modules:</p>
+			<table border="1" cellspacing="0" cellpadding="6" bordercolor="#CABEDC" width="100%">
+				<tr class="table_text">
+					<td><b>Module</b></td>
+					<td><b>Description</b></td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>ObjexxFCL</b></font></td>
+					<td>ObjexxFCL declarations</td>
+				</tr>
+				<tr class="table_text">
+					<td>ObjexxFCL.Project</td>
+					<td>ObjexxFCL Project-specific declarations</td>
+				</tr>
+				<tr class="table_text">
+					<td>Array</td>
+					<td>Array abstract base class template</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Array.all</b></font></td>
+					<td>All-dimension Array master wrapper</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Array<em>N</em></b></font></td>
+					<td><em>N</em>D Array abstract base class template</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Array<em>N</em>D</b></font></td>
+					<td><em>N</em>D Real Array class template</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Array<em>N</em>A</b></font></td>
+					<td><em>N</em>D Argument (contiguous proxy) Array class template</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Array<em>N</em>.all</b></font></td>
+					<td><em>N</em>D Array master wrapper</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Array<em>N</em>S</b></font></td>
+					<td><em>N</em>D Slice Array class template</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>MArray<em>N</em></b></font></td>
+					<td><em>N</em>D Member array class template</td>
+				</tr>
+				<tr class="table_text">
+					<td>ArrayInitializer</td>
+					<td>Array initializer class template</td>
+				</tr>
+				<tr class="table_text">
+					<td>ArrayTail</td>
+					<td>Array contiguous tail proxy class template</td>
+				</tr>
+				<tr class="table_text">
+					<td>IndexRange</td>
+					<td>Index range class</td>
+				</tr>
+				<tr class="table_text">
+					<td>InitializerSentinel</td>
+					<td>Array initializer sentinel class</td>
+				</tr>
+				<tr class="table_text">
+					<td>ProxySentinel</td>
+					<td>Proxy array sentinel class</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Vector2</b></font></td>
+					<td>Fast 2-element vector</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Vector3</b></font></td>
+					<td>Fast 3-element vector</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Vector4</b></font></td>
+					<td>Fast 4-element vector</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>CArray</b></font></td>
+					<td>C-style array wrapper</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>CArrayA</b></font></td>
+					<td>C-style array wrapper with alignment support</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>CArrayP</b></font></td>
+					<td>C-style array wrapper/proxy</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>ChunkVector</b></font></td>
+					<td>Chunk-contiguous 1D vector</td>
+				</tr>
+				<tr class="table_text">
+					<td>Chunk</td>
+					<td>ChunkVector 1D Chunk vector class template</td>
+				</tr>
+				<tr class="table_text">
+					<td>ChunkExponent</td>
+					<td>ChunkVector exponent wrapper class</td>
+				</tr>
+				<tr class="table_text">
+					<td>Omit</td>
+					<td>Omitted argument sentinel class</td>
+				</tr>
+				<tr class="table_text">
+					<td>Sticky</td>
+					<td>Sticky (persistent) initializer wrapper class</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Cstring</b></font></td>
+					<td>C-style string (char*) memory managed wrapper class</td>
+				</tr>
+				<tr class="table_text">
+					<td><b><font color="#16694A">string.constants</font></b></td>
+					<td>Useful std::string constants</td>
+				</tr>
+				<tr class="table_text">
+					<td><b><font color="#16694A">string.functions</font></b></td>
+					<td>Useful std::string functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><b><font color="#16694A">char.constants</font></b></td>
+					<td>Useful char constants</td>
+				</tr>
+				<tr class="table_text">
+					<td><b><font color="#16694A">char.functions</font></b></td>
+					<td>Useful char functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Fmath</b></font></td>
+					<td>Math intrinsics/other functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>numeric</b></font></td>
+					<td>Numeric intrinsics: kind-related, digits, huge, ...</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>bit</b></font></td>
+					<td>Bit functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>byte</b></font></td>
+					<td>Single-byte integer</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>ubyte</b></font></td>
+					<td>Single-byte unsigned integer</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>gio</b></font></td>
+					<td>Global i/o system</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Stream</b></font></td>
+					<td>Stream wrapper and container</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Read</b></font></td>
+					<td>Formatted read support</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Write</b></font></td>
+					<td>Formatted write support</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Print</b></font></td>
+					<td>Formatted output to console support</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Inquire</b></font></td>
+					<td>File/stream query support</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Backspace</b></font></td>
+					<td>Back up by one record</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Rewind</b></font></td>
+					<td>Move to beginning of stream/file</td>
+				</tr>
+				<tr class="table_text">
+					<td>IOFlags</td>
+					<td>I/o control and status flag collection class</td>
+				</tr>
+				<tr class="table_text">
+					<td>Format</td>
+					<td>Format class hierarchy for formatted input/output</td>
+				</tr>
+				<tr class="table_text">
+					<td>FormattedIO</td>
+					<td>Non-global formatted i/o meta header</td>
+				</tr>
+				<tr class="table_text">
+					<td>fmt</td>
+					<td>Low-level formatted stream input/output support</td>
+				</tr>
+				<tr class="table_text">
+					<td>fmt.manipulators</td>
+					<td>Stream manipulators used by fmt</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>time</b></font></td>
+					<td>Time and date functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>random</b></font></td>
+					<td>Random number functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>command</b></font></td>
+					<td>Command line functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>environment</b></font></td>
+					<td>Environment variable functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Optional</b></font></td>
+					<td>Optional argument wrapper class template</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Required</b></font></td>
+					<td>Required argument wrapper class template</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Reference</b></font></td>
+					<td>Reference (POINTER) wrapper class template</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>array.iterator</b></font></td>
+					<td>C array begin and end iterator functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>floops</b></font></td>
+					<td>Fortran DO loop logic support</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>rvalue_cast</b></font></td>
+					<td>rvalue cast to reference function template</td>
+				</tr>
+				<tr class="table_text">
+					<td>Traits*</td>
+					<td>Format descriptor type traits class templates</td>
+				</tr>
+				<tr class="table_text">
+					<td>TypeTraits</td>
+					<td>Type traits class template and specializations</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Vector2</b></font></td>
+					<td>Fast 2-element vector</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Vector3</b></font></td>
+					<td>Fast 3-element vector</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Vector4</b></font></td>
+					<td>Fast 4-element vector</td>
+				</tr>
+			</table>
+			<p class="body">Source modules may have header and implementation files or just header files. Only the header files for the modules in <font color="#16694A"><b>green</b></font> would normally be included directly in project code, but the other headers can be used if desired. Classes intended for use in project code are forward declared in headers of the form <em>Class</em>.fwd.hh along with typedef names that are provided for coding convenience.</p>
+			<hr />
+			<h3>ObjexxFCL Applications</h3>
+			<p class="body">The ObjexxFCL is compatible with common 32 and 64-bit platforms. Very large (64-bit size type) Array and ChunkVector arrays are supported on 64-bit platforms but indexing into each dimension of an Array is still done by int types so each dimension's index range is limited to the range of a (32-bit) int.</p>
+			<p class="body">The ObjexxFCL is currently intended for use with single-threaded applications and is not thread safe.</p>
+			<p class="body">The ObjexxFCL can be built into a shared library or dynamic link library (DLL) but such use should be carefully validated on each platform/compiler combination to assure proper functioning. Using a shared library built with one compiler with executables built with another version of that compiler or a different compiler may not work due to the use of different C++ ABIs.<br>
+			</p>
+			<hr />
+			<h3>ObjexxFCL Design</h3>
+			<p class="body">Everything in the ObjexxFCL lives in the <b>ObjexxFCL namespace</b>. Normally projects would bring everything into visibility with a &quot;using namespace ObjexxFCL;&quot; directive as in the ObjexxFCL.Project.hh header provided. Even with such a directive the ObjexxFCL:: prefix can be used for explicit disambiguation.</p>
+			<p class="body">The design of the ObjexxFCL is focused on providing near-seamless Fortran migration support and near-Fortran performance. It is not intended to provide a complete linear algebra library or high-level matrix operations. Programming errors in the use of the ObjexxFCL are caught by assertion failures to avoid slowing down release builds, but this requires testing to be done with debug builds that enable assertion checks. C++ exceptions are not used to avoid the performance cost and the burden placed on project code to handle the exceptions.<br>
+			</p>
+			<hr />
+			<h3>IndexRange</h3>
+			<p class="body">The IndexRange classes encapsulate the arbitrary index range that Fortran arrays can use for each dimension (unlike the zero-based array indexing of native C/C++ arrays).</p>
+			<p class="body"><b>Zero-sized</b> index ranges are indicated by index ranges of the form [<i>lower</i>,<i>lower</i>-1]. (Zero-sized Arrays are supported.)</p>
+			<p class="body">&quot;<b>Unbounded</b>&quot; index ranges, having unknown upper bounds, have an index range of the form [<i>lower</i>,<i>lower</i>-2] with size given by a constant named <span class="source">npos</span> that is defined as the unsigned type size_t cast of -1. Unbounded argument Arrays are created when a bare array element is passed (the &quot;faster&quot; method) to an argument array pass-by-value function argument.</p>
+			<hr />
+			<h3>Array Hierarchy</h3>
+			<h4>Design</h4>
+			<p class="body">The Array hierarchy is designed to achieve a number of goals:</p>
+			<ul class="body">
+				<li>Fortran-compatibility:
+				<ul class="body">
+					<li>Arbitrary index ranges for each dimension</li>
+					<li>Array passing &quot;tricks&quot;</li>
+					<li>Fortran 90+ array slicing and member array support</li>
+					<li>Note: This ObjexxFCL variant uses row-major array layout, unlike Fortran's column-major layout</li>
+				</ul>
+				<li>Fast, near-Fortran run-time performance</li>
+			</ul>
+			<p class="body">The data is stored in a dynamically allocated array that is owned by the corresponding real array and pointed to, but not owned, by any argument arrays that might refer to the real array. The row-major ordering is obtained by the formulas giving the index into the linear array from the set of array dimensional indexes.</p>
+			<p class="body">On the assumption that <b>subscripting</b> calls are the most common and performance-critical, the Array design uses some cached values to speed up the subscript operations. The size of all but the last dimension's index ranges are cached and an offset pointer into the data array is cached. The const subscript operator returns its value by reference, which may have a small performance cost for built-in numeric types on some platforms but is necessary to support the passing of array elements to array arguments. Linear (one-dimensional) indexing is provided for very fast access to a sequence of array elements whose linear index is easily calculated.</p>
+			<p class="body">The <b>argument Arrays</b> are proxy objects that provide a view to the contiguous data of another array but act as if it is their own data. Argument Arrays don't automatically reattach to arrays that are resized. Argument Arrays are quickly constructed for use in function argument lists.</p>
+			<p class="body">Real and argument Arrays can be passed by reference when the function array type will always match that of the caller; a reference to the common Array base class can be passed any Arrays of the same rank and can perform all of the common array operations.</p>
+			<p class="body">The argument arrays &quot;work&quot; by grabbing a pointer to the passed array, array section, or element and, when possible, extracting the size of the actual data section. They can then reinterpret the pointed to data as an array of their declared rank. Since function argument declarations cannot contain constructor arguments, when the passed array is not of the same rank and dimensions as the argument array, or when array sections or elements will be passed, it is necessary to set the argument array dimensions with a call to the <span class="source">dim</span> member function, as in <span class="source">A.dim(3,4)</span>, before the array is used in the function.</p>
+			<p class="body">When array elements are passed to argument arrays the argument array can only extract the address of that element for its data pointer and it has indeterminate size. The <span class="source">dim</span> call can set a size but this cannot be checked against the actual underlying data array. The loss of size information will propagate through subsequent passing of that argument array, eliminating the possibility of bounds checking for those arrays. For this reason the argument, <span class="source">a</span>, member function is provided to pass &quot;safer&quot;, as in <span class="source">A.a(2,3)</span>: an ArrayTail proxy object is constructed and passed that contains the data pointer and size information. There is a performance cost for the construction of ArrayTails that remains in release builds so there is a definite tradeoff.</p>
+			<p class="body">Array <b>assignment</b> operators have value semantics but, unlike Fortran, will resize a real array if necessary. Real arrays can also be resized by the dimension member function. Resizing real Arrays invalidates any argument or slice arrays attached to them.</p>
+			<p class="body">In order to achieve maximal run-time performance no <b>array bounds checks</b> are performed for any Array classes in release builds (when NDEBUG is defined). Bounds are checked by asserts in debug builds. All new code using Arrays should be tested with debug builds.</p>
+			<p class="body">The Array implementation is heavily tuned for performance and thus has some unusual features:</p>
+			<ul class="body">
+				<li>Protected data and some manually inlined functions are used to improve the performance of non-inlining debug builds.</li>
+				<li>Overrides of non-virtual functions are used to allow more efficient calls to be made from the concrete Array classes.</li>
+			</ul>
+			<h4>Extensions</h4>
+			<p class="body">The Array hierarchy could be extended in many ways for specific applications:</p>
+			<ul class="body">
+				<li>Always bounds-checked subscript functions (like <span class="source">std::vector::at</span>).</li>
+				<li>Additional whole-array operations. Avoiding temporary arrays (such as with expression templates) where possible is important for performance.</li>
+				<li>An optional data-preserving resize during automatic redimensioning policy.</li>
+				<li>Linear algebra operations: Gaussian and iterative solvers, inversion, etc.</li>
+			</ul>
+			<p class="body">Objexx has developed some of these and can develop custom extensions for clients.</p>
+			<p class="body">In many cases it may make more sense to interface with existing matrix and numerical libraries. Arrays provide access to their row-major data arrays so they can work directly with libraries that accept arrays with this ordering. Copy in/out semantics will be required to interface with other array representations such as nested std::vectors, TNT, and Blitz++: this should be done as non-member functions declared and defined in separate files to avoid unnecessary dependencies.</p>
+			<h4>Slices</h4>
+			<p class="body">The ArrayS hierarchy is a new system that provides the ObjexxFCL array slice (section) support. Array slices are generally non-contiguous and thus cannot use the fast contiguous implementation of the Arrays and can't efficiently provide linear indexing. For these reasons ArrayS is currently a separate hierarchy from Array. This requires a lot of duplicated code for both types and can create overload complexities in application code, so an effort to integrate slice arrays into the Array hierarchy is planned.</p>
+			<p class="body">Slice arrays have the same characteristics as Fortran slices: some operations are slower and memory cache performance can be degraded. Unlike Fortran, ObjexxFCL does not allow passing slices to contiguous arrays.</p>
+			<p class="body">In Fortran if you pass an array slice to a contiguous array argument, like an assumed size array, the compiler will allow it but perform slow copy in, copy out semantics. ObjexxFCL supports such usage if the slice is actually contiguous. Otherwise the best solution is probably providing the necessary slice array argument overloads.</p>
+			<p class="body">ObjexxFCL slices use an efficient representation for good performance. This requires "drilling" into the underlying array data rather than resolving lookup calls through, possibly many, layer of slices.</p>
+			<hr />
+			<h3>ChunkVector</h3>
+			<p class="body">ChunkVector is designed to support very large 1D arrays. It uses a std::vector of Chunk objects of user-controllable size to avoid trying to allocate massive contiguous blocks of memory in a possibly fragmented memory environment. By using power-of-two Chunk sizes the 2-level indexing can be done with bit shift operations and provides speed competitive with that of std::vector. As of v.2.4.0 ChunkVector was rewritten to hold Chunk objects, which handle their own memory management, so that some problems with using nested std::vectors for the Chunks could be avoided, including:</p>
+			<ul>
+				<li>No control over the possible excess capacity in each Chunk (without expensive shrink operations)</li>
+				<li>No way to avoid initialization of elements of built-in value types</li>
+				<li>No bounds checking in debug builds</li>
+				<li>No non-preserving resize operations</li>
+			</ul>
+			<p><span class="source">ChunkVector::resize</span> was written to take advantage of the ability to swap the old Chunks into the new outer std::vector instead of expensively copying each Chunk as <span class="source">std::vector::resize</span> would do.</p>
+			<hr />
+		</td>
+		<td></td>
+		<td width="100%" valign="top">
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td colspan="3" height="30" valign="bottom" class="footer_text">
+			<a href="ObjexxFCL.html"><span class="footer_link">Home</span></a> |
+			<a href="ObjexxFCL.Release.html"><span class="footer_link">Release Notes</span></a> |
+			<a href="ObjexxFCL.Users.html"><span class="footer_link">Users Guide</span></a> |
+			<a href="ObjexxFCL.Developers.html"><span class="footer_link">Developers Guide</span></a> |
+			<a href="ObjexxFCL.Support.html"><span class="footer_link">Support</span></a> |
+			<a href="ObjexxFCL.License.txt"><span class="footer_link">License</span></a> |
+			<a href="http://objexx.com"><span class="footer_link">Web</span></a>
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td height="21"></td>
+		<td></td>
+		<td></td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2017 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:9px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:500px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100%; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:1px"></td>
+	</tr>
+</tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,183 @@
+\section{Environment Variables to Assist Running}\label{environment-variables-to-assist-running}
+
+Some environment variables can be used with single or several idf file(s) to keep IDF files pristine while allowing developers or others trying to determine a problem or run a group of files. Many of these have counterparts in Output:Diagnostics objects (some may not be documented). Likewise there may be some ``sections'' that will produce certain outputs not generally documented.
+
+\subsubsection{DDOnly: Design Days Only}\label{ddonly-design-days-only}
+
+Setting to ``yes'' will cause EnergyPlus to set Run Control option (regardless of whether there is a Run Control object in the input file) for Do the Design Day Simulation to ``yes'' and Do the Weather File Simulation to ``no''.~ (Uses logical variable \textbf{DDOnly} in module DataSystemVariables). There is no Output:Diagnostics equivalent.
+
+\begin{lstlisting}
+Set DDOnly = yes
+\end{lstlisting}
+
+\subsubsection{FullAnnualRun: Full Annual simulation}\label{fullannualrun-full-annual-simulation}
+
+Setting to ``yes'' will cause EnergyPlus to set Run Control option (regardless of whether there is a Run Control object in the input file) for Do the Weather File Simulation to ``yes''. Scripts should use a weather file when this environment variable is set.~ (Uses logical variable \textbf{FullAnnualRun} in module DataSystemVariables). There is no Output:Diagnostics equivalent.
+
+\begin{lstlisting}
+Set FullAnnualRun = yes
+\end{lstlisting}
+
+And appropriate changes to script files
+
+\subsubsection{NoWeatherFile: Do not use weatherfile even if indicated}\label{noweatherfile-do-not-use-weatherfile-even-if-indicated}
+
+Setting to ``yes'' doesn't cause EnergyPlus to do anything but can be used in the scripts to not copy a weather file even when indicated. There is no Output:Diagnostics equivalent.
+
+\begin{lstlisting}
+Set NoWeatherFile = yes
+\end{lstlisting}
+
+And appropriate changes to script files
+
+\subsubsection{ReverseDD: Reverse Design Days during run}\label{reversedd-reverse-design-days-during-run}
+
+Setting to ``yes'' causes the first two design days requested in the input file to be reversed during EnergyPlus execution.~ (Uses logical variable \textbf{ReverseDD} in module DataSystemVariables).~ For proper comparisons to original order, a program such as \textbf{ReverseDDInCSV} or \textbf{ReverseDDInESO} must be run or hand edited. There is no Output:Diagnostics equivalent.
+
+\begin{lstlisting}
+Set ReverseDD = yes
+\end{lstlisting}
+
+And appropriate changes to script files
+
+\subsubsection{MinReportFrequency: Set minimum reporting frequency for outputs}\label{minreportfrequency-set-minimum-reporting-frequency-for-outputs}
+
+Some developers persist in reporting at the timestep or detailed level even if their runs are full annual runs. This is really burdensome on developers that try to run the full test suite for checking changes. The MinReportFrequency environment variable allows EnergyPlus to report at a higher/less frequent level that still allows for changes to be checked (though differences may require more frequent reporting to track down). EnergyPlus reads this environment variable and sets reporting frequency appropriately. There is no Output:Diagnostics equivalent.
+
+\begin{lstlisting}
+Set MinReportFrequency = daily
+\end{lstlisting}
+
+The standard frequencies accepted by EnergyPlus must be used: detail, timestep, hourly, daily, monthly, runperiod, environment, annual. In addition, if this environment variable is used, the following will show in the .eio file:
+
+! \textless{}Minimum Reporting Frequency (overriding input value)\textgreater{}, Value, Input Value
+
+~Minimum Reporting Frequency,~ !Daily {[}Value,Min,Hour,Minute,Max,Hour,Minute{]},DAILY
+
+\subsubsection{ReportDuringWarmup: Cause reporting during warmup}\label{reportduringwarmup-cause-reporting-during-warmup}
+
+Setting to ``yes'' causes reporting (Output:Variable, Output:Meter) to be reporting during the warmup days at the start of each environment. (Uses logical variable \textbf{ReportDuringWarmup} in module DataSystemVariables).~ The Output:Diagnostics, ReportDuringWarmup; is equivalent.
+
+\begin{lstlisting}
+Set ReportDuringWarmup = yes
+\end{lstlisting}
+
+\subsubsection{REPORTDURINGHVACSIZINGSIMULATION: Cause SQLite reporting during HVAC Sizing Simulations}\label{reportduringhvacsizingsimulation-cause-sqlite-reporting-during-hvac-sizing-simulations}
+
+Setting to ``yes'' causes output to be sent to SQLite database file during HVAC Sizing Simulations. (Uses Boolean variable ReportDuringHVACSizingSimulation in DataSystemVariables). The Output:Diagnostics, ReportDuringHVAVSizingSimulation; is equivalent.
+
+\begin{lstlisting}
+Set REPORTDURINGHVACSIZINGSIMULATIN = YES
+\end{lstlisting}
+
+\subsubsection{DisplayAllWarnings: turn on all extra warnings}\label{displayallwarnings-turn-on-all-extra-warnings}
+
+Setting to ``yes'' causes turning on the warnings: DisplayAllWarnings, DisplayExtraWarnings, DisplayUnusedSchedules, DisplayUnusedObjects. DisplayUnusedObjects also displays unused fluids (that is, fluids that are not directly retrieved by the simulation). The Output:Diagnostics, DisplayAllWarnings; is equivalent.
+
+\begin{lstlisting}
+Set DisplayAllWarnings = yes
+\end{lstlisting}
+
+\subsubsection{DisplayExtraWarnings: turn on~ extra warnings}\label{displayextrawarnings-turn-on-extra-warnings}
+
+Setting to ``yes'' causes turning on DispalyExtraWarnings. The Output:Diagnostics, DisplayExtraWarnings; is equivalent.
+
+\begin{lstlisting}
+Set DisplayExtraWarnings = yes
+\end{lstlisting}
+
+\subsubsection{DisplayUnusedObjects: turn on display of unused objects and fluids}\label{displayunusedobjects-turn-on-display-of-unused-objects-and-fluids}
+
+Setting to ``yes'' causes the orphan objects and fluids that are in the input file but not used to be displayed at the end of the simulation. The Output:Diagnostics, DisplayUnusedObjects; is equivalent.
+
+\begin{lstlisting}
+Set DisplayUnusedObjects = yes
+\end{lstlisting}
+
+\subsubsection{DisplayUnusedSchedules: turn on display of unused schedules}\label{displayunusedschedules-turn-on-display-of-unused-schedules}
+
+Setting to ``yes'' causes the schedules that are in the input file but not used to be displayed at the end of the simulation. The Output:Diagnostics, DisplayUnusedSchedules; is equivalent.
+
+\begin{lstlisting}
+Set DisplayUnusedSchedules = yes
+\end{lstlisting}
+
+\subsubsection{DisplayZoneAirHeatBalanceOffBalance: turn on this development output}\label{displayzoneairheatbalanceoffbalance-turn-on-this-development-output}
+
+Setting to ``yes'' causes the program to calculate and display the Zone Air Heat Balance ``out of balance'' warnings. The Output:Diagnostics, DisplayZoneAirHeatBalanceOffBalance; is equivalent.
+
+\begin{lstlisting}
+Set DisplayZoneAirHeatBalanceOffBalance = yes
+\end{lstlisting}
+
+\subsubsection{IgnoreSolarRadiation: turn off using Solar in simulation}\label{ignoresolarradiation-turn-off-using-solar-in-simulation}
+
+Setting to ``yes'' causes the program to ignore all solar values during simulation.~ One might use this when a new set of weather files are produced but you are unsure of their impacts. It also speeds the program as no shading calculations are done. The Output:Diagnostics, IgnoreSolarRadiation; is equivalent.
+
+\begin{lstlisting}
+Set IgnoreSolarRadiation = yes
+\end{lstlisting}
+
+\subsubsection{DisplayAdvancedReportVariables: turn on access to advance report variables}\label{displayadvancedreportvariables-turn-on-access-to-advance-report-variables}
+
+Setting to ``yes'' causes the program to be able to access the ``advanced report variable'' set in the program.The Output:Diagnostics, DisplayAdvancedReportVariables; is equivalent.
+
+\begin{lstlisting}
+Set DisplayAdvancedReportVariables = yes
+\end{lstlisting}
+
+\subsubsection{SortIDD: turn on (or off) the sorting of IDD objects}\label{sortidd-turn-on-or-off-the-sorting-of-idd-objects}
+
+Setting to ``yes'' (internal default) causes the program to use sorted lists (a speed up mechanism) in searching for existant objects during IDF processing. There is really no reason to turn it off. There is no Output:Diagnostics equivalent.
+
+\begin{lstlisting}
+Set SortIDD = yes
+\end{lstlisting}
+
+\subsubsection{DeveloperFlag: turn on (or off) some different outputs for the developer}\label{developerflag-turn-on-or-off-some-different-outputs-for-the-developer}
+
+Setting to ``yes'' (internal default is ``no'') causes the program to display some different information that could be useful to developers. In particular, this will cause the Warmup Convergence output to show the last day for each zone, each timestep. There is no Output:Diagnostics equivalent.
+
+\begin{lstlisting}
+Set DeveloperFlag = yes
+\end{lstlisting}
+
+\subsubsection{IgnoreBeamRadiation: turn on (or off) the beam radiation}\label{ignorebeamradiation-turn-on-or-off-the-beam-radiation}
+
+Setting to ``yes'' causes the program to ignore beam radiation in solar calculations. Of limited use, but may be useful for some simulation developments or isolating problems. There is no Output:Diagnostics equivalent.
+
+\begin{lstlisting}
+Set IgnoreBeamRadiation = yes
+\end{lstlisting}
+
+\subsubsection{IgnoreDiffuseRadiation: turn on (or off) the diffuse radiation}\label{ignorediffuseradiation-turn-on-or-off-the-diffuse-radiation}
+
+Setting to ``yes'' causes the program to ignore diffuse radiation in solar calculations. Of limited use, but may be useful for some simulation developments or isolating problems. There is no Output:Diagnostics equivalent.
+
+\begin{lstlisting}
+Set IgnoreDiffuseRadiation = yes
+\end{lstlisting}
+
+\subsubsection{SutherlandHodgman: turn on (or off) the polygon clipping algorithm}\label{sutherlandhodgman-turn-on-or-off-the-polygon-clipping-algorithm}
+
+Setting to ``yes'' (internal default) causes the program to use the SutherlandHodgman polygon clipping algorithm. You might use this if you wanted to run a bunch of files with the legacy clipping algorithm (convex Weiler Atherton). There is no Output:Diagnostics equivalent.
+
+\begin{lstlisting}
+Set SutherlandHodgman = yes
+\end{lstlisting}
+
+\subsubsection{MinimalShadowing: turn on (or off) the use of Minimal Shadowing}\label{minimalshadowing-turn-on-or-off-the-use-of-minimal-shadowing}
+
+Setting to ``yes'' causes the program to use Minimal Shadowing (a speed up mechanism) in calculations. This could be useful when large files are being run to search for non-shadowing related problems. There is no Output:Diagnostics equivalent.
+
+\begin{lstlisting}
+Set MinimalShadowing = yes
+\end{lstlisting}
+
+\subsubsection{DisplayInputInAudit: turn on (or off) to show the input file in the audit file}\label{displayinputinaudit-turn-on-or-off-to-show-the-input-file-in-the-audit-file}
+
+Setting to ``yes'' causes the audit file to include a line-by-line echoing of the input file which may be useful for debugging purposes. For versions 8.2 and earlier, the default behavior was to include the line-by-line echoing of the input file into the audit file but it was changed to not do this by default as a way to speed up the input processing portion of executing EnergyPlus. When not set to ``yes'', the audit file contains a reference on using the DisplayInputInAudit environment variable to see the line-by-line echoing of the input file.
+
+\subsubsection{Caution: Environment Variables}\label{caution-environment-variables}
+
+Some combinations will cause fatal errors from EnergyPlus -- \textbf{DDOnly} and \textbf{FullAnnualRun}, for example.~ \textbf{FullAnnualRun} and \textbf{NoWeatherFile} won't cause fatal errors from EnergyPlus but probably should from the script files.~ We welcome any suggestions for future environment variables.

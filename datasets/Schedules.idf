@@ -1,0 +1,1492 @@
+!===============================================================================
+! Schedules.idf
+!
+! EnergyPlus Reference Data Set for Schedules
+!
+! Derived from the Schedules Library issued with the BLAST program.
+! Includes the building types schedules from ASHRAE 90.1-1989, Section 13.
+! Schedules are listed alphabetically, with general schedules first,
+! followed by the ten 90.1 building type schedules.
+! ScheduleType objects for the schedule defined below
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  ScheduleTypeLimits,
+    Fraction,                !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    Continuous;              !- Numeric Type
+
+  ScheduleTypeLimits,
+    On/Off,                  !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    Discrete;                !- Numeric Type
+
+! General Schedules
+! Schedule Constant
+
+  Schedule:Compact,
+    Constant,                !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+! Schedule Continuous
+
+  Schedule:Compact,
+    Continuous,              !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+! Schedule Daytime Ventilation
+
+  Schedule:Compact,
+    Daytime Ventilation,     !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 08:00,0.0,        !- Field 3
+    Until: 18:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
+    For: Weekends WinterDesignDay, !- Field 9
+    Until: 10:00,0.0,        !- Field 10
+    Until: 16:00,1.0,        !- Field 12
+    Until: 24:00,0.0,        !- Field 14
+    For: Holidays AllOtherDays, !- Field 16
+    Until: 24:00,0.0;        !- Field 17
+
+! Schedule Intermittent
+
+  Schedule:Compact,
+    Intermittent,            !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 08:00,0.0,        !- Field 3
+    Until: 18:00,1.0,        !- Field 5
+    Until: 24:00,0.0;        !- Field 7
+
+! Schedule Maximum Outside Air
+
+  Schedule:Compact,
+    Maximum Outside Air,     !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+! Schedule Minimum Outside Air
+
+  Schedule:Compact,
+    Minimum Outside Air,     !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 24:00,0.15,       !- Field 3
+    For: Weekends WinterDesignDay Holidays AllOtherDays, !- Field 5
+    Until: 24:00,0.05;       !- Field 6
+
+! Schedule Off
+
+  Schedule:Compact,
+    Off,                     !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.0;        !- Field 3
+
+! Schedule On
+
+  Schedule:Compact,
+    On,                      !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+! Schedule VAV Minimum Air Fraction
+
+  Schedule:Compact,
+    VAV Minimum Air Fraction,!- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.1;        !- Field 3
+
+! ASHRAE 90.1-1989 and other building types
+! Schedule Assembly HVAC Systems, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 18, Saturday 17, Sunday/Holidays 17
+
+  Schedule:Compact,
+    Assembly HVAC,           !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 05:00,0.0,        !- Field 3
+    Until: 23:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 06:00,0.0,        !- Field 10
+    Until: 23:00,1.0,        !- Field 12
+    Until: 24:00,0.0,        !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 06:00,0.0,        !- Field 17
+    Until: 23:00,1.0,        !- Field 19
+    Until: 24:00,0.0;        !- Field 21
+
+! Schedule Assembly Lighting and Receptacles, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 11.2, Saturday 7.6, Sunday/Holidays 8
+
+  Schedule:Compact,
+    Assembly Lighting,       !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 08:00,0.0,        !- Field 3
+    Until: 11:00,0.4,        !- Field 5
+    Until: 22:00,0.75,       !- Field 7
+    Until: 23:00,0.25,       !- Field 9
+    Until: 24:00,0.0,        !- Field 11
+    For: Saturday WinterDesignDay, !- Field 13
+    Until: 07:00,0.0,        !- Field 14
+    Until: 09:00,0.3,        !- Field 16
+    Until: 23:00,0.5,        !- Field 18
+    Until: 24:00,0.0,        !- Field 20
+    For: Sunday Holidays AllOtherDays, !- Field 22
+    Until: 07:00,0.0,        !- Field 23
+    Until: 12:00,0.3,        !- Field 25
+    Until: 22:00,0.65,       !- Field 27
+    Until: 24:00,0.0;        !- Field 29
+
+! Schedule Assembly Occupancy, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 7.1, Saturday 7.5, Sunday/Holidays 7
+
+  Schedule:Compact,
+    Assembly Occupancy,      !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 08:00,0.0,        !- Field 3
+    Until: 12:00,0.2,        !- Field 5
+    Until: 18:00,0.8,        !- Field 7
+    Until: 22:00,0.2,        !- Field 9
+    Until: 23:00,0.1,        !- Field 11
+    Until: 24:00,0.0,        !- Field 13
+    For: Saturday WinterDesignDay, !- Field 15
+    Until: 08:00,0.0,        !- Field 16
+    Until: 12:00,0.2,        !- Field 18
+    Until: 21:00,0.6,        !- Field 20
+    Until: 22:00,0.8,        !- Field 22
+    Until: 23:00,0.1,        !- Field 24
+    Until: 24:00,0.0,        !- Field 26
+    For: Sunday Holidays AllOtherDays, !- Field 28
+    Until: 08:00,0.0,        !- Field 29
+    Until: 13:00,0.1,        !- Field 31
+    Until: 22:00,0.7,        !- Field 33
+    Until: 23:00,0.2,        !- Field 35
+    Until: 24:00,0.0;        !- Field 37
+
+! Schedule Assembly Service Water Heating, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 0.7, Saturday 1.25, Sunday/Holidays 1.15
+
+  Schedule:Compact,
+    Assembly SWH,            !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 09:00,0.0,        !- Field 3
+    Until: 11:00,0.05,       !- Field 5
+    Until: 12:00,0.35,       !- Field 7
+    Until: 17:00,0.05,       !- Field 9
+    Until: 24:00,0.0,        !- Field 11
+    For: Saturday WinterDesignDay, !- Field 13
+    Until: 09:00,0.0,        !- Field 14
+    Until: 11:00,0.05,       !- Field 16
+    Until: 12:00,0.2,        !- Field 18
+    Until: 19:00,0.0,        !- Field 20
+    Until: 20:00,0.65,       !- Field 22
+    Until: 21:00,0.3,        !- Field 24
+    Until: 24:00,0.0,        !- Field 26
+    For: Sunday Holidays AllOtherDays, !- Field 28
+    Until: 09:00,0.0,        !- Field 29
+    Until: 11:00,0.05,       !- Field 31
+    Until: 12:00,0.1,        !- Field 33
+    Until: 20:00,0.0,        !- Field 35
+    Until: 21:00,0.65,       !- Field 37
+    Until: 22:00,0.3,        !- Field 39
+    Until: 24:00,0.0;        !- Field 41
+
+! Schedule Health/Institutional HVAC Systems, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: All days 24
+
+  Schedule:Compact,
+    Health HVAC,             !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+! Schedule Health/Institutional Lighting and Receptacles, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 10.6, Saturday 5.5, Sunday/Holidays 1.6
+
+  Schedule:Compact,
+    Health Lighting,         !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 07:00,0.1,        !- Field 3
+    Until: 08:00,0.5,        !- Field 5
+    Until: 16:00,0.9,        !- Field 7
+    Until: 23:00,0.3,        !- Field 9
+    Until: 24:00,0.1,        !- Field 11
+    For: Saturday WinterDesignDay, !- Field 13
+    Until: 07:00,0.1,        !- Field 14
+    Until: 08:00,0.2,        !- Field 16
+    Until: 18:00,0.4,        !- Field 18
+    Until: 24:00,0.1,        !- Field 20
+    For: Sunday Holidays AllOtherDays, !- Field 22
+    Until: 08:00,0.05,       !- Field 23
+    Until: 16:00,0.1,        !- Field 25
+    Until: 24:00,0.05;       !- Field 27
+
+! Schedule Health/Institutional Occupancy, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 8.5, Saturday 3.8, Sunday/Holidays 0.4
+
+  Schedule:Compact,
+    Health Occupancy,        !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 07:00,0.0,        !- Field 3
+    Until: 08:00,0.1,        !- Field 5
+    Until: 09:00,0.5,        !- Field 7
+    Until: 17:00,0.8,        !- Field 9
+    Until: 18:00,0.5,        !- Field 11
+    Until: 20:00,0.3,        !- Field 13
+    Until: 22:00,0.2,        !- Field 15
+    Until: 24:00,0.0,        !- Field 17
+    For: Saturday WinterDesignDay, !- Field 19
+    Until: 07:00,0.0,        !- Field 20
+    Until: 08:00,0.1,        !- Field 22
+    Until: 09:00,0.3,        !- Field 24
+    Until: 17:00,0.4,        !- Field 26
+    Until: 19:00,0.1,        !- Field 28
+    Until: 24:00,0.0,        !- Field 30
+    For: Sunday Holidays AllOtherDays, !- Field 32
+    Until: 08:00,0.0,        !- Field 33
+    Until: 16:00,0.05,       !- Field 35
+    Until: 24:00,0.0;        !- Field 37
+
+! Schedule Health/Institional Service Water Heating, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 7.83, Saturday 2.49, Sunday/Holidays 0.24
+
+  Schedule:Compact,
+    Health SWH,              !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 07:00,0.1,        !- Field 3
+    Until: 08:00,0.17,       !- Field 5
+    Until: 09:00,0.58,       !- Field 7
+    Until: 10:00,0.66,       !- Field 9
+    Until: 11:00,0.78,       !- Field 11
+    Until: 12:00,0.82,       !- Field 13
+    Until: 13:00,0.71,       !- Field 15
+    Until: 14:00,0.82,       !- Field 17
+    Until: 15:00,0.78,       !- Field 19
+    Until: 16:00,0.74,       !- Field 21
+    Until: 17:00,0.63,       !- Field 23
+    Until: 18:00,0.41,       !- Field 25
+    Until: 21:00,0.18,       !- Field 27
+    Until: 22:00,0.1,        !- Field 29
+    Until: 24:00,0.01,       !- Field 31
+    For: Saturday WinterDesignDay, !- Field 33
+    Until: 08:00,0.1,        !- Field 34
+    Until: 09:00,0.2,        !- Field 36
+    Until: 10:00,0.28,       !- Field 38
+    Until: 12:00,0.3,        !- Field 40
+    Until: 14:00,0.24,       !- Field 42
+    Until: 17:00,0.23,       !- Field 44
+    Until: 18:00,0.1,        !- Field 46
+    Until: 24:00,0.01,       !- Field 48
+    For: Sunday Holidays AllOtherDays, !- Field 50
+    Until: 24:00,0.01;       !- Field 51
+
+! Schedule Hotel/Motel HVAC Systems, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: All days 24
+
+  Schedule:Compact,
+    Hotel HVAC,              !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+! Schedule Hotel/Motel Lighting and Receptacles, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 8.55, Saturday 7.85, Sunday/Holidays 8.1
+
+  Schedule:Compact,
+    Hotel Lighting,          !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 01:00,0.2,        !- Field 3
+    Until: 02:00,0.15,       !- Field 5
+    Until: 05:00,0.1,        !- Field 7
+    Until: 06:00,0.2,        !- Field 9
+    Until: 07:00,0.4,        !- Field 11
+    Until: 08:00,0.5,        !- Field 13
+    Until: 10:00,0.4,        !- Field 15
+    Until: 18:00,0.25,       !- Field 17
+    Until: 19:00,0.6,        !- Field 19
+    Until: 20:00,0.8,        !- Field 21
+    Until: 21:00,0.9,        !- Field 23
+    Until: 22:00,0.8,        !- Field 25
+    Until: 23:00,0.6,        !- Field 27
+    Until: 24:00,0.3,        !- Field 29
+    For: Saturday WinterDesignDay, !- Field 31
+    Until: 02:00,0.2,        !- Field 32
+    Until: 06:00,0.1,        !- Field 34
+    Until: 08:00,0.3,        !- Field 36
+    Until: 10:00,0.4,        !- Field 38
+    Until: 11:00,0.3,        !- Field 40
+    Until: 18:00,0.25,       !- Field 42
+    Until: 19:00,0.6,        !- Field 44
+    Until: 22:00,0.7,        !- Field 46
+    Until: 23:00,0.6,        !- Field 48
+    Until: 24:00,0.3,        !- Field 50
+    For: Sunday Holidays AllOtherDays, !- Field 52
+    Until: 02:00,0.3,        !- Field 53
+    Until: 06:00,0.2,        !- Field 55
+    Until: 07:00,0.3,        !- Field 57
+    Until: 09:00,0.4,        !- Field 59
+    Until: 13:00,0.3,        !- Field 61
+    Until: 18:00,0.2,        !- Field 63
+    Until: 19:00,0.5,        !- Field 65
+    Until: 20:00,0.7,        !- Field 67
+    Until: 21:00,0.8,        !- Field 69
+    Until: 22:00,0.6,        !- Field 71
+    Until: 23:00,0.5,        !- Field 73
+    Until: 24:00,0.3;        !- Field 75
+
+! Schedule Hotel/Motel Occupancy, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 13.9, Saturday 13.9, Sunday/Holidays 13
+
+  Schedule:Compact,
+    Hotel Occupancy,         !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 06:00,0.9,        !- Field 3
+    Until: 07:00,0.7,        !- Field 5
+    Until: 09:00,0.4,        !- Field 7
+    Until: 15:00,0.2,        !- Field 9
+    Until: 16:00,0.3,        !- Field 11
+    Until: 19:00,0.5,        !- Field 13
+    Until: 21:00,0.7,        !- Field 15
+    Until: 22:00,0.8,        !- Field 17
+    Until: 24:00,0.9,        !- Field 19
+    For: Saturday WinterDesignDay, !- Field 21
+    Until: 06:00,0.9,        !- Field 22
+    Until: 07:00,0.7,        !- Field 24
+    Until: 09:00,0.5,        !- Field 26
+    Until: 17:00,0.3,        !- Field 28
+    Until: 18:00,0.5,        !- Field 30
+    Until: 21:00,0.6,        !- Field 32
+    Until: 24:00,0.7,        !- Field 34
+    For: Sunday Holidays AllOtherDays, !- Field 36
+    Until: 08:00,0.7,        !- Field 37
+    Until: 11:00,0.5,        !- Field 39
+    Until: 13:00,0.3,        !- Field 41
+    Until: 16:00,0.2,        !- Field 43
+    Until: 17:00,0.3,        !- Field 45
+    Until: 19:00,0.4,        !- Field 47
+    Until: 21:00,0.6,        !- Field 49
+    Until: 24:00,0.8;        !- Field 51
+
+! Schedule Hotel/Motel Service Water Heating, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 9, Saturday 9.3, Sunday/Holidays 9
+
+  Schedule:Compact,
+    Hotel SWH,               !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 01:00,0.2,        !- Field 3
+    Until: 04:00,0.15,       !- Field 5
+    Until: 05:00,0.2,        !- Field 7
+    Until: 06:00,0.25,       !- Field 9
+    Until: 07:00,0.5,        !- Field 11
+    Until: 08:00,0.6,        !- Field 13
+    Until: 09:00,0.55,       !- Field 15
+    Until: 10:00,0.45,       !- Field 17
+    Until: 11:00,0.4,        !- Field 19
+    Until: 12:00,0.45,       !- Field 21
+    Until: 13:00,0.4,        !- Field 23
+    Until: 14:00,0.35,       !- Field 25
+    Until: 17:00,0.3,        !- Field 27
+    Until: 18:00,0.4,        !- Field 29
+    Until: 19:00,0.55,       !- Field 31
+    Until: 20:00,0.6,        !- Field 33
+    Until: 21:00,0.5,        !- Field 35
+    Until: 22:00,0.55,       !- Field 37
+    Until: 23:00,0.45,       !- Field 39
+    Until: 24:00,0.25,       !- Field 41
+    For: Saturday WinterDesignDay, !- Field 43
+    Until: 01:00,0.2,        !- Field 44
+    Until: 04:00,0.15,       !- Field 46
+    Until: 05:00,0.2,        !- Field 48
+    Until: 06:00,0.25,       !- Field 50
+    Until: 07:00,0.4,        !- Field 52
+    Until: 10:00,0.5,        !- Field 54
+    Until: 11:00,0.45,       !- Field 56
+    Until: 13:00,0.5,        !- Field 58
+    Until: 14:00,0.45,       !- Field 60
+    Until: 16:00,0.4,        !- Field 62
+    Until: 17:00,0.35,       !- Field 64
+    Until: 18:00,0.4,        !- Field 66
+    Until: 20:00,0.55,       !- Field 68
+    Until: 21:00,0.5,        !- Field 70
+    Until: 22:00,0.55,       !- Field 72
+    Until: 23:00,0.4,        !- Field 74
+    Until: 24:00,0.3,        !- Field 76
+    For: Sunday Holidays AllOtherDays, !- Field 78
+    Until: 01:00,0.25,       !- Field 79
+    Until: 05:00,0.2,        !- Field 81
+    Until: 06:00,0.3,        !- Field 83
+    Until: 09:00,0.5,        !- Field 85
+    Until: 10:00,0.55,       !- Field 87
+    Until: 12:00,0.5,        !- Field 89
+    Until: 14:00,0.4,        !- Field 91
+    Until: 17:00,0.3,        !- Field 93
+    Until: 18:00,0.4,        !- Field 95
+    Until: 20:00,0.5,        !- Field 97
+    Until: 21:00,0.4,        !- Field 99
+    Until: 22:00,0.5,        !- Field 101
+    Until: 23:00,0.4,        !- Field 103
+    Until: 24:00,0.2;        !- Field 105
+
+! Schedule Light Manufacturing HVAC Systems, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 16, Saturday 12, Sunday/Holidays 0
+
+  Schedule:Compact,
+    Manufacturing HVAC,      !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 22:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 06:00,0.0,        !- Field 10
+    Until: 18:00,1.0,        !- Field 12
+    Until: 24:00,0.0,        !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 24:00,0.0;        !- Field 17
+
+! Schedule Light Manufacturing Lighting and Receptacles, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 5.37, Saturday 2.56, Sunday/Holidays 1.13
+
+  Schedule:Compact,
+    Manufacturing Lighting,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 05:00,0.05,       !- Field 3
+    Until: 07:00,0.1,        !- Field 5
+    Until: 08:00,0.3,        !- Field 7
+    Until: 12:00,0.9,        !- Field 9
+    Until: 13:00,0.8,        !- Field 11
+    Until: 17:00,0.9,        !- Field 13
+    Until: 18:00,0.5,        !- Field 15
+    Until: 20:00,0.3,        !- Field 17
+    Until: 22:00,0.2,        !- Field 19
+    Until: 23:00,0.1,        !- Field 21
+    Until: 24:00,0.05,       !- Field 23
+    For: Saturday WinterDesignDay, !- Field 25
+    Until: 06:00,0.05,       !- Field 26
+    Until: 08:00,0.1,        !- Field 28
+    Until: 12:00,0.3,        !- Field 30
+    Until: 17:00,0.15,       !- Field 32
+    Until: 24:00,0.05,       !- Field 34
+    For: Sunday Holidays AllOtherDays, !- Field 36
+    Until: 24:00,0.05;       !- Field 37
+
+! Schedule Light Manufacturing Occupancy, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 9.2, Saturday 2, Sunday/Holidays 0.6
+
+  Schedule:Compact,
+    Manufacturing Occupancy, !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 07:00,0.1,        !- Field 5
+    Until: 08:00,0.2,        !- Field 7
+    Until: 12:00,0.95,       !- Field 9
+    Until: 13:00,0.5,        !- Field 11
+    Until: 17:00,0.95,       !- Field 13
+    Until: 18:00,0.3,        !- Field 15
+    Until: 22:00,0.1,        !- Field 17
+    Until: 24:00,0.05,       !- Field 19
+    For: Saturday WinterDesignDay, !- Field 21
+    Until: 06:00,0.0,        !- Field 22
+    Until: 08:00,0.1,        !- Field 24
+    Until: 12:00,0.3,        !- Field 26
+    Until: 17:00,0.1,        !- Field 28
+    Until: 19:00,0.05,       !- Field 30
+    Until: 24:00,0.0,        !- Field 32
+    For: Sunday Holidays AllOtherDays, !- Field 34
+    Until: 06:00,0.0,        !- Field 35
+    Until: 18:00,0.05,       !- Field 37
+    Until: 24:00,0.0;        !- Field 39
+
+! Schedule Light Manufacturing Service Water Heating, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 5.37, Saturday 2.56, Sunday/Holidays 1.13
+
+  Schedule:Compact,
+    Manufacturing SWH,       !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 05:00,0.05,       !- Field 3
+    Until: 06:00,0.08,       !- Field 5
+    Until: 07:00,0.07,       !- Field 7
+    Until: 08:00,0.19,       !- Field 9
+    Until: 09:00,0.35,       !- Field 11
+    Until: 10:00,0.38,       !- Field 13
+    Until: 11:00,0.39,       !- Field 15
+    Until: 12:00,0.47,       !- Field 17
+    Until: 13:00,0.57,       !- Field 19
+    Until: 14:00,0.54,       !- Field 21
+    Until: 15:00,0.34,       !- Field 23
+    Until: 16:00,0.33,       !- Field 25
+    Until: 17:00,0.44,       !- Field 27
+    Until: 18:00,0.26,       !- Field 29
+    Until: 19:00,0.21,       !- Field 31
+    Until: 20:00,0.15,       !- Field 33
+    Until: 21:00,0.17,       !- Field 35
+    Until: 22:00,0.08,       !- Field 37
+    Until: 24:00,0.05,       !- Field 39
+    For: Saturday WinterDesignDay, !- Field 41
+    Until: 05:00,0.05,       !- Field 42
+    Until: 06:00,0.08,       !- Field 44
+    Until: 07:00,0.09,       !- Field 46
+    Until: 08:00,0.11,       !- Field 48
+    Until: 09:00,0.15,       !- Field 50
+    Until: 10:00,0.21,       !- Field 52
+    Until: 11:00,0.19,       !- Field 54
+    Until: 12:00,0.23,       !- Field 56
+    Until: 13:00,0.2,        !- Field 58
+    Until: 14:00,0.19,       !- Field 60
+    Until: 15:00,0.15,       !- Field 62
+    Until: 16:00,0.12,       !- Field 64
+    Until: 17:00,0.14,       !- Field 66
+    Until: 21:00,0.07,       !- Field 68
+    Until: 22:00,0.09,       !- Field 70
+    Until: 24:00,0.05,       !- Field 72
+    For: Sunday Holidays AllOtherDays, !- Field 74
+    Until: 05:00,0.04,       !- Field 75
+    Until: 06:00,0.07,       !- Field 77
+    Until: 11:00,0.04,       !- Field 79
+    Until: 13:00,0.06,       !- Field 81
+    Until: 14:00,0.09,       !- Field 83
+    Until: 15:00,0.06,       !- Field 85
+    Until: 21:00,0.04,       !- Field 87
+    Until: 22:00,0.07,       !- Field 89
+    Until: 24:00,0.04;       !- Field 91
+
+! Schedule Multifamily High-Rise HVAC Systems, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: All days 24
+
+  Schedule:Compact,
+    Multifamily HVAC,        !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+! Schedule Multifamily High-Rise Service Water Heating, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 6.76, Saturday 6.66, Sunday/Holidays 6.11
+
+  Schedule:Compact,
+    Multifamily SWH,         !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 06:00,0.06,       !- Field 3
+    Until: 07:00,0.28,       !- Field 5
+    Until: 08:00,0.49,       !- Field 7
+    Until: 09:00,0.42,       !- Field 9
+    Until: 10:00,0.32,       !- Field 11
+    Until: 11:00,0.27,       !- Field 13
+    Until: 12:00,0.33,       !- Field 15
+    Until: 13:00,0.41,       !- Field 17
+    Until: 14:00,0.35,       !- Field 19
+    Until: 15:00,0.34,       !- Field 21
+    Until: 16:00,0.29,       !- Field 23
+    Until: 17:00,0.32,       !- Field 25
+    Until: 18:00,0.5,        !- Field 27
+    Until: 19:00,0.49,       !- Field 29
+    Until: 20:00,0.4,        !- Field 31
+    Until: 21:00,0.36,       !- Field 33
+    Until: 22:00,0.45,       !- Field 35
+    Until: 23:00,0.3,        !- Field 37
+    Until: 24:00,0.08,       !- Field 39
+    For: Saturday WinterDesignDay, !- Field 41
+    Until: 06:00,0.06,       !- Field 42
+    Until: 07:00,0.15,       !- Field 44
+    Until: 08:00,0.32,       !- Field 46
+    Until: 09:00,0.43,       !- Field 48
+    Until: 10:00,0.39,       !- Field 50
+    Until: 11:00,0.34,       !- Field 52
+    Until: 12:00,0.36,       !- Field 54
+    Until: 13:00,0.45,       !- Field 56
+    Until: 15:00,0.39,       !- Field 58
+    Until: 16:00,0.33,       !- Field 60
+    Until: 17:00,0.35,       !- Field 62
+    Until: 19:00,0.48,       !- Field 64
+    Until: 20:00,0.44,       !- Field 66
+    Until: 22:00,0.31,       !- Field 68
+    Until: 23:00,0.28,       !- Field 70
+    Until: 24:00,0.1,        !- Field 72
+    For: Sunday Holidays AllOtherDays, !- Field 74
+    Until: 06:00,0.06,       !- Field 75
+    Until: 07:00,0.09,       !- Field 77
+    Until: 08:00,0.25,       !- Field 79
+    Until: 09:00,0.37,       !- Field 81
+    Until: 10:00,0.35,       !- Field 83
+    Until: 11:00,0.32,       !- Field 85
+    Until: 12:00,0.35,       !- Field 87
+    Until: 13:00,0.42,       !- Field 89
+    Until: 14:00,0.37,       !- Field 91
+    Until: 15:00,0.36,       !- Field 93
+    Until: 16:00,0.31,       !- Field 95
+    Until: 17:00,0.32,       !- Field 97
+    Until: 18:00,0.45,       !- Field 99
+    Until: 19:00,0.42,       !- Field 101
+    Until: 20:00,0.35,       !- Field 103
+    Until: 21:00,0.3,        !- Field 105
+    Until: 22:00,0.34,       !- Field 107
+    Until: 23:00,0.26,       !- Field 109
+    Until: 24:00,0.12;       !- Field 111
+
+! Schedule Multifamily High-Rise One-Zone Dwelling Unit Equipment, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: All days 9.97
+
+  Schedule:Compact,
+    Multifamily OneZone Equipment,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 06:00,0.22,       !- Field 3
+    Until: 07:00,0.36,       !- Field 5
+    Until: 08:00,0.76,       !- Field 7
+    Until: 09:00,0.34,       !- Field 9
+    Until: 11:00,0.36,       !- Field 11
+    Until: 13:00,0.64,       !- Field 13
+    Until: 17:00,0.36,       !- Field 15
+    Until: 18:00,0.87,       !- Field 17
+    Until: 19:00,0.97,       !- Field 19
+    Until: 22:00,0.43,       !- Field 21
+    Until: 24:00,0.31;       !- Field 23
+
+! Schedule Multifamily High-Rise One-Zone Dwelling Unit Lighting, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: All days 6.3
+
+  Schedule:Compact,
+    Multifamily OneZone Lighting,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 07:00,0.95,       !- Field 5
+    Until: 08:00,0.85,       !- Field 7
+    Until: 19:00,0.0,        !- Field 9
+    Until: 24:00,0.9;        !- Field 11
+
+! Schedule Multifamily High-Rise One-Zone Dwelling Unit Occupancy, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: All days 11.76
+
+  Schedule:Compact,
+    Multifamily OneZone Occupancy,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 07:00,0.67,       !- Field 3
+    Until: 08:00,0.49,       !- Field 5
+    Until: 17:00,0.21,       !- Field 7
+    Until: 24:00,0.67;       !- Field 9
+
+! Schedule Multifamily High-Rise Two-Zone Dwelling Unit, Bedrooms and Bathrooms Equipment, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: All days 1.25
+
+  Schedule:Compact,
+    Multifamily TwoZoneBedroom Equipment,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 06:00,0.03,       !- Field 3
+    Until: 08:00,0.06,       !- Field 5
+    Until: 19:00,0.03,       !- Field 7
+    Until: 21:00,0.09,       !- Field 9
+    Until: 22:00,0.2,        !- Field 11
+    Until: 24:00,0.12;       !- Field 13
+
+! Schedule Multifamily High-Rise Two-Zone Dwelling Unit, Bedrooms and Bathrooms Lighting, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: All days 3.24
+
+  Schedule:Compact,
+    Multifamily TwoZoneBedroom Lighting,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 07:00,0.66,       !- Field 5
+    Until: 08:00,0.23,       !- Field 7
+    Until: 19:00,0.0,        !- Field 9
+    Until: 21:00,0.31,       !- Field 11
+    Until: 22:00,0.47,       !- Field 13
+    Until: 24:00,0.63;       !- Field 15
+
+! Schedule Multifamily High-Rise Two-Zone Dwelling Unit, Bedrooms and Bathrooms Occupancy, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: All days 6.83
+
+  Schedule:Compact,
+    Multifamily TwoZoneBedroom Occupancy,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 06:00,0.67,       !- Field 3
+    Until: 07:00,0.45,       !- Field 5
+    Until: 08:00,0.27,       !- Field 7
+    Until: 19:00,0.0,        !- Field 9
+    Until: 21:00,0.21,       !- Field 11
+    Until: 22:00,0.33,       !- Field 13
+    Until: 24:00,0.67;       !- Field 15
+
+! Schedule Multifamily High-Rise Two-Zone Dwelling Unit, Other Rooms Equipment, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: All days 8.81
+
+  Schedule:Compact,
+    Multifamily TwoZoneOtherRooms Equipment,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 06:00,0.19,       !- Field 3
+    Until: 07:00,0.3,        !- Field 5
+    Until: 08:00,0.7,        !- Field 7
+    Until: 11:00,0.34,       !- Field 9
+    Until: 13:00,0.61,       !- Field 11
+    Until: 17:00,0.34,       !- Field 13
+    Until: 18:00,0.84,       !- Field 15
+    Until: 19:00,0.94,       !- Field 17
+    Until: 21:00,0.34,       !- Field 19
+    Until: 22:00,0.23,       !- Field 21
+    Until: 24:00,0.19;       !- Field 23
+
+! Schedule Multifamily High-Rise Two-Zone Dwelling Unit, Other Rooms Lighting, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: All days 3.23
+
+  Schedule:Compact,
+    Multifamily TwoZoneOtherRooms Lighting,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 07:00,0.29,       !- Field 5
+    Until: 08:00,0.59,       !- Field 7
+    Until: 19:00,0.0,        !- Field 9
+    Until: 21:00,0.63,       !- Field 11
+    Until: 22:00,0.47,       !- Field 13
+    Until: 24:00,0.31;       !- Field 15
+
+! Schedule Multifamily High-Rise Two-Zone Dwelling Unit, Other Rooms Occupancy, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: All days 4.88
+
+  Schedule:Compact,
+    Multifamily TwoZoneOtherRooms Occupancy,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 17:00,0.21,       !- Field 5
+    Until: 19:00,0.67,       !- Field 7
+    Until: 21:00,0.45,       !- Field 9
+    Until: 22:00,0.33,       !- Field 11
+    Until: 24:00,0.0;        !- Field 13
+
+! Schedule Office HVAC Systems, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 16, Saturday 12, Sunday/Holidays 0
+
+  Schedule:Compact,
+    Office HVAC,             !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 22:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 06:00,0.0,        !- Field 10
+    Until: 18:00,1.0,        !- Field 12
+    Until: 24:00,0.0,        !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 24:00,0.0;        !- Field 17
+
+! Schedule Office Lighting and Receptacles, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 10.4, Saturday 2.8, Sunday/Holidays 1.2
+
+  Schedule:Compact,
+    Office Lighting,         !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 05:00,0.05,       !- Field 3
+    Until: 07:00,0.1,        !- Field 5
+    Until: 08:00,0.3,        !- Field 7
+    Until: 17:00,0.9,        !- Field 9
+    Until: 18:00,0.5,        !- Field 11
+    Until: 20:00,0.3,        !- Field 13
+    Until: 22:00,0.2,        !- Field 15
+    Until: 23:00,0.1,        !- Field 17
+    Until: 24:00,0.05,       !- Field 19
+    For: Saturday WinterDesignDay, !- Field 21
+    Until: 06:00,0.05,       !- Field 22
+    Until: 08:00,0.1,        !- Field 24
+    Until: 12:00,0.3,        !- Field 26
+    Until: 17:00,0.15,       !- Field 28
+    Until: 24:00,0.05,       !- Field 30
+    For: Sunday Holidays AllOtherDays, !- Field 32
+    Until: 24:00,0.05;       !- Field 33
+
+! Schedule Office Occupancy, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 9.2, Saturday 2, Sunday/Holidays 0.6
+
+  Schedule:Compact,
+    Office Occupancy,        !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 07:00,0.1,        !- Field 5
+    Until: 08:00,0.2,        !- Field 7
+    Until: 12:00,0.95,       !- Field 9
+    Until: 13:00,0.5,        !- Field 11
+    Until: 17:00,0.95,       !- Field 13
+    Until: 18:00,0.3,        !- Field 15
+    Until: 22:00,0.1,        !- Field 17
+    Until: 24:00,0.05,       !- Field 19
+    For: Saturday WinterDesignDay, !- Field 21
+    Until: 06:00,0.0,        !- Field 22
+    Until: 08:00,0.1,        !- Field 24
+    Until: 12:00,0.3,        !- Field 26
+    Until: 17:00,0.1,        !- Field 28
+    Until: 19:00,0.05,       !- Field 30
+    Until: 24:00,0.0,        !- Field 32
+    For: Sunday Holidays AllOtherDays, !- Field 34
+    Until: 06:00,0.0,        !- Field 35
+    Until: 18:00,0.05,       !- Field 37
+    Until: 24:00,0.0;        !- Field 39
+
+! Schedule Office Service Water Heating, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 5.37, Saturday 2.56, Sunday/Holidays 1.13
+
+  Schedule:Compact,
+    Office SWH,              !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 05:00,0.05,       !- Field 3
+    Until: 06:00,0.08,       !- Field 5
+    Until: 07:00,0.07,       !- Field 7
+    Until: 08:00,0.19,       !- Field 9
+    Until: 09:00,0.35,       !- Field 11
+    Until: 10:00,0.38,       !- Field 13
+    Until: 11:00,0.39,       !- Field 15
+    Until: 12:00,0.47,       !- Field 17
+    Until: 13:00,0.57,       !- Field 19
+    Until: 14:00,0.54,       !- Field 21
+    Until: 15:00,0.34,       !- Field 23
+    Until: 16:00,0.33,       !- Field 25
+    Until: 17:00,0.44,       !- Field 27
+    Until: 18:00,0.26,       !- Field 29
+    Until: 19:00,0.21,       !- Field 31
+    Until: 20:00,0.15,       !- Field 33
+    Until: 21:00,0.17,       !- Field 35
+    Until: 22:00,0.08,       !- Field 37
+    Until: 24:00,0.05,       !- Field 39
+    For: Saturday WinterDesignDay, !- Field 41
+    Until: 05:00,0.05,       !- Field 42
+    Until: 06:00,0.08,       !- Field 44
+    Until: 07:00,0.07,       !- Field 46
+    Until: 08:00,0.11,       !- Field 48
+    Until: 09:00,0.15,       !- Field 50
+    Until: 10:00,0.21,       !- Field 52
+    Until: 11:00,0.19,       !- Field 54
+    Until: 12:00,0.23,       !- Field 56
+    Until: 13:00,0.20,       !- Field 58
+    Until: 14:00,0.19,       !- Field 60
+    Until: 15:00,0.15,       !- Field 62
+    Until: 16:00,0.13,       !- Field 64
+    Until: 17:00,0.14,       !- Field 66
+    Until: 21:00,0.07,       !- Field 68
+    Until: 22:00,0.09,       !- Field 70
+    Until: 24:00,0.05,       !- Field 72
+    For: Sunday Holidays AllOtherDays, !- Field 74
+    Until: 05:00,0.04,       !- Field 75
+    Until: 06:00,0.07,       !- Field 77
+    Until: 11:00,0.04,       !- Field 79
+    Until: 13:00,0.06,       !- Field 81
+    Until: 14:00,0.09,       !- Field 83
+    Until: 15:00,0.06,       !- Field 85
+    Until: 21:00,0.04,       !- Field 87
+    Until: 22:00,0.07,       !- Field 89
+    Until: 24:00,0.04;       !- Field 91
+
+! Schedule Restaurant HVAC Systems, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 20, Saturday 18, Sunday/Holidays 17
+
+  Schedule:Compact,
+    Restaurant HVAC,         !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekday SummerDesignDay, !- Field 2
+    Until: 03:00,1.0,        !- Field 3
+    Until: 07:00,0.0,        !- Field 5
+    Until: 24:00,1.0,        !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 03:00,1.0,        !- Field 10
+    Until: 09:00,0.0,        !- Field 12
+    Until: 24:00,1.0,        !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 03:00,1.0,        !- Field 17
+    Until: 10:00,0.0,        !- Field 19
+    Until: 24:00,1.0;        !- Field 21
+
+! Schedule Restaurant Lighting and Receptacles, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 14.55, Saturday 13.65, Sunday/Holidays 11.15
+
+  Schedule:Compact,
+    Restaurant Lighting,     !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekday SummerDesignDay, !- Field 2
+    Until: 05:00,0.15,       !- Field 3
+    Until: 06:00,0.2,        !- Field 5
+    Until: 08:00,0.4,        !- Field 7
+    Until: 10:00,0.6,        !- Field 9
+    Until: 22:00,0.9,        !- Field 11
+    Until: 23:00,0.5,        !- Field 13
+    Until: 24:00,0.3,        !- Field 15
+    For: Saturday WinterDesignDay, !- Field 17
+    Until: 01:00,0.2,        !- Field 18
+    Until: 06:00,0.15,       !- Field 20
+    Until: 08:00,0.3,        !- Field 22
+    Until: 10:00,0.6,        !- Field 24
+    Until: 17:00,0.8,        !- Field 26
+    Until: 22:00,0.9,        !- Field 28
+    Until: 23:00,0.5,        !- Field 30
+    Until: 24:00,0.3,        !- Field 32
+    For: Sunday Holidays AllOtherDays, !- Field 34
+    Until: 01:00,0.2,        !- Field 35
+    Until: 06:00,0.15,       !- Field 37
+    Until: 08:00,0.3,        !- Field 39
+    Until: 10:00,0.5,        !- Field 41
+    Until: 16:00,0.7,        !- Field 43
+    Until: 22:00,0.6,        !- Field 45
+    Until: 23:00,0.5,        !- Field 47
+    Until: 24:00,0.3;        !- Field 49
+
+! Schedule Restaurant Occupancy, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 7.5, Saturday 7.4, Sunday/Holidays 4.85
+
+  Schedule:Compact,
+    Restaurant Occupancy,    !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 02:00,0.15,       !- Field 3
+    Until: 03:00,0.05,       !- Field 5
+    Until: 07:00,0.0,        !- Field 7
+    Until: 10:00,0.05,       !- Field 9
+    Until: 11:00,0.2,        !- Field 11
+    Until: 12:00,0.5,        !- Field 13
+    Until: 13:00,0.8,        !- Field 15
+    Until: 14:00,0.7,        !- Field 17
+    Until: 15:00,0.4,        !- Field 19
+    Until: 16:00,0.2,        !- Field 21
+    Until: 17:00,0.25,       !- Field 23
+    Until: 18:00,0.5,        !- Field 25
+    Until: 21:00,0.8,        !- Field 27
+    Until: 22:00,0.5,        !- Field 29
+    Until: 23:00,0.35,       !- Field 31
+    Until: 24:00,0.2,        !- Field 33
+    For: Saturday WinterDesignDay, !- Field 35
+    Until: 01:00,0.3,        !- Field 36
+    Until: 02:00,0.25,       !- Field 38
+    Until: 03:00,0.05,       !- Field 40
+    Until: 09:00,0.0,        !- Field 42
+    Until: 10:00,0.05,       !- Field 44
+    Until: 11:00,0.2,        !- Field 46
+    Until: 12:00,0.45,       !- Field 48
+    Until: 14:00,0.5,        !- Field 50
+    Until: 15:00,0.35,       !- Field 52
+    Until: 18:00,0.3,        !- Field 54
+    Until: 19:00,0.7,        !- Field 56
+    Until: 20:00,0.9,        !- Field 58
+    Until: 21:00,0.7,        !- Field 60
+    Until: 22:00,0.65,       !- Field 62
+    Until: 23:00,0.55,       !- Field 64
+    Until: 24:00,0.35,       !- Field 66
+    For: Sunday Holidays AllOtherDays, !- Field 68
+    Until: 02:00,0.2,        !- Field 69
+    Until: 03:00,0.05,       !- Field 71
+    Until: 10:00,0.0,        !- Field 73
+    Until: 11:00,0.1,        !- Field 75
+    Until: 12:00,0.2,        !- Field 77
+    Until: 14:00,0.25,       !- Field 79
+    Until: 15:00,0.15,       !- Field 81
+    Until: 16:00,0.2,        !- Field 83
+    Until: 17:00,0.25,       !- Field 85
+    Until: 18:00,0.35,       !- Field 87
+    Until: 19:00,0.55,       !- Field 89
+    Until: 20:00,0.65,       !- Field 91
+    Until: 21:00,0.7,        !- Field 93
+    Until: 22:00,0.35,       !- Field 95
+    Until: 24:00,0.2;        !- Field 97
+
+! Schedule Restaurant Service Water Heating, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 7.9, Saturday 7.3, Sunday/Holidays 6.25
+
+  Schedule:Compact,
+    Restaurant SWH,          !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 01:00,0.2,        !- Field 3
+    Until: 03:00,0.15,       !- Field 5
+    Until: 07:00,0.0,        !- Field 7
+    Until: 08:00,0.6,        !- Field 9
+    Until: 09:00,0.55,       !- Field 11
+    Until: 10:00,0.45,       !- Field 13
+    Until: 11:00,0.4,        !- Field 15
+    Until: 12:00,0.45,       !- Field 17
+    Until: 13:00,0.4,        !- Field 19
+    Until: 14:00,0.35,       !- Field 21
+    Until: 17:00,0.3,        !- Field 23
+    Until: 18:00,0.4,        !- Field 25
+    Until: 19:00,0.55,       !- Field 27
+    Until: 20:00,0.6,        !- Field 29
+    Until: 21:00,0.5,        !- Field 31
+    Until: 22:00,0.55,       !- Field 33
+    Until: 23:00,0.45,       !- Field 35
+    Until: 24:00,0.25,       !- Field 37
+    For: Saturday WinterDesignDay, !- Field 39
+    Until: 01:00,0.2,        !- Field 40
+    Until: 03:00,0.15,       !- Field 42
+    Until: 09:00,0.0,        !- Field 44
+    Until: 10:00,0.5,        !- Field 46
+    Until: 11:00,0.45,       !- Field 48
+    Until: 13:00,0.5,        !- Field 50
+    Until: 14:00,0.45,       !- Field 52
+    Until: 16:00,0.4,        !- Field 54
+    Until: 17:00,0.35,       !- Field 56
+    Until: 18:00,0.4,        !- Field 58
+    Until: 20:00,0.55,       !- Field 60
+    Until: 21:00,0.5,        !- Field 62
+    Until: 22:00,0.55,       !- Field 64
+    Until: 23:00,0.4,        !- Field 66
+    Until: 24:00,0.3,        !- Field 68
+    For: Sunday Holidays AllOtherDays, !- Field 70
+    Until: 01:00,0.25,       !- Field 71
+    Until: 03:00,0.2,        !- Field 73
+    Until: 10:00,0.0,        !- Field 75
+    Until: 12:00,0.5,        !- Field 77
+    Until: 14:00,0.4,        !- Field 79
+    Until: 17:00,0.3,        !- Field 81
+    Until: 18:00,0.4,        !- Field 83
+    Until: 20:00,0.5,        !- Field 85
+    Until: 21:00,0.4,        !- Field 87
+    Until: 22:00,0.5,        !- Field 89
+    Until: 23:00,0.4,        !- Field 91
+    Until: 24:00,0.2;        !- Field 93
+
+! Schedule Retail HVAC Systems, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 15, Saturday 16, Sunday/Holidays 9
+
+  Schedule:Compact,
+    Retail HVAC,             !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 21:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 06:00,0.0,        !- Field 10
+    Until: 22:00,1.0,        !- Field 12
+    Until: 24:00,0.0,        !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 08:00,0.0,        !- Field 17
+    Until: 17:00,1.0,        !- Field 19
+    Until: 24:00,0.0;        !- Field 21
+
+! Schedule Retail Lighting and Receptacles, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 11.15, Saturday 9.85, Sunday/Holidays 5.25
+
+  Schedule:Compact,
+    Retail Lighting,         !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 07:00,0.05,       !- Field 3
+    Until: 08:00,0.2,        !- Field 5
+    Until: 09:00,0.5,        !- Field 7
+    Until: 18:00,0.9,        !- Field 9
+    Until: 20:00,0.6,        !- Field 11
+    Until: 21:00,0.5,        !- Field 13
+    Until: 22:00,0.2,        !- Field 15
+    Until: 24:00,0.05,       !- Field 17
+    For: Saturday WinterDesignDay, !- Field 19
+    Until: 07:00,0.05,       !- Field 20
+    Until: 08:00,0.1,        !- Field 22
+    Until: 09:00,0.3,        !- Field 24
+    Until: 10:00,0.6,        !- Field 26
+    Until: 18:00,0.9,        !- Field 28
+    Until: 19:00,0.5,        !- Field 30
+    Until: 21:00,0.3,        !- Field 32
+    Until: 22:00,0.1,        !- Field 34
+    Until: 24:00,0.05,       !- Field 36
+    For: Sunday Holidays AllOtherDays, !- Field 38
+    Until: 08:00,0.05,       !- Field 39
+    Until: 10:00,0.1,        !- Field 41
+    Until: 12:00,0.4,        !- Field 43
+    Until: 17:00,0.6,        !- Field 45
+    Until: 18:00,0.4,        !- Field 47
+    Until: 19:00,0.2,        !- Field 49
+    Until: 24:00,0.05;       !- Field 51
+
+! Schedule Retail Occupancy, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 7.2, Saturday 7.5, Sunday/Holidays 2.8
+
+  Schedule:Compact,
+    Retail Occupancy,        !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 07:00,0.0,        !- Field 3
+    Until: 08:00,0.1,        !- Field 5
+    Until: 09:00,0.2,        !- Field 7
+    Until: 11:00,0.5,        !- Field 9
+    Until: 15:00,0.7,        !- Field 11
+    Until: 16:00,0.8,        !- Field 13
+    Until: 17:00,0.7,        !- Field 15
+    Until: 19:00,0.5,        !- Field 17
+    Until: 21:00,0.3,        !- Field 19
+    Until: 24:00,0.0,        !- Field 21
+    For: Saturday WinterDesignDay, !- Field 23
+    Until: 07:00,0.0,        !- Field 24
+    Until: 08:00,0.1,        !- Field 26
+    Until: 09:00,0.2,        !- Field 28
+    Until: 10:00,0.5,        !- Field 30
+    Until: 11:00,0.6,        !- Field 32
+    Until: 17:00,0.8,        !- Field 34
+    Until: 18:00,0.6,        !- Field 36
+    Until: 21:00,0.2,        !- Field 38
+    Until: 22:00,0.1,        !- Field 40
+    Until: 24:00,0.0,        !- Field 42
+    For: Sunday Holidays AllOtherDays, !- Field 44
+    Until: 09:00,0.0,        !- Field 45
+    Until: 10:00,0.1,        !- Field 47
+    Until: 12:00,0.2,        !- Field 49
+    Until: 17:00,0.4,        !- Field 51
+    Until: 18:00,0.2,        !- Field 53
+    Until: 19:00,0.1,        !- Field 55
+    Until: 24:00,0.0;        !- Field 57
+
+! Schedule Retail Service Water Heating, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 6.62, Saturday 6.9, Sunday/Holidays 4.59
+
+  Schedule:Compact,
+    Retail SWH,              !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 01:00,0.04,       !- Field 3
+    Until: 03:00,0.05,       !- Field 5
+    Until: 07:00,0.04,       !- Field 7
+    Until: 08:00,0.15,       !- Field 9
+    Until: 09:00,0.23,       !- Field 11
+    Until: 10:00,0.32,       !- Field 13
+    Until: 11:00,0.41,       !- Field 15
+    Until: 12:00,0.57,       !- Field 17
+    Until: 13:00,0.62,       !- Field 19
+    Until: 14:00,0.61,       !- Field 21
+    Until: 15:00,0.5,        !- Field 23
+    Until: 16:00,0.45,       !- Field 25
+    Until: 17:00,0.46,       !- Field 27
+    Until: 18:00,0.47,       !- Field 29
+    Until: 19:00,0.42,       !- Field 31
+    Until: 20:00,0.34,       !- Field 33
+    Until: 21:00,0.33,       !- Field 35
+    Until: 22:00,0.23,       !- Field 37
+    Until: 23:00,0.13,       !- Field 39
+    Until: 24:00,0.08,       !- Field 41
+    For: Saturday WinterDesignDay, !- Field 43
+    Until: 01:00,0.11,       !- Field 44
+    Until: 02:00,0.1,        !- Field 46
+    Until: 03:00,0.08,       !- Field 48
+    Until: 06:00,0.06,       !- Field 50
+    Until: 07:00,0.07,       !- Field 52
+    Until: 08:00,0.2,        !- Field 54
+    Until: 09:00,0.24,       !- Field 56
+    Until: 10:00,0.27,       !- Field 58
+    Until: 11:00,0.42,       !- Field 60
+    Until: 12:00,0.54,       !- Field 62
+    Until: 13:00,0.59,       !- Field 64
+    Until: 14:00,0.6,        !- Field 66
+    Until: 15:00,0.49,       !- Field 68
+    Until: 16:00,0.48,       !- Field 70
+    Until: 17:00,0.47,       !- Field 72
+    Until: 18:00,0.46,       !- Field 74
+    Until: 19:00,0.44,       !- Field 76
+    Until: 20:00,0.36,       !- Field 78
+    Until: 21:00,0.29,       !- Field 80
+    Until: 22:00,0.22,       !- Field 82
+    Until: 23:00,0.16,       !- Field 84
+    Until: 24:00,0.13,       !- Field 86
+    For: Sunday Holidays AllOtherDays, !- Field 88
+    Until: 03:00,0.07,       !- Field 89
+    Until: 06:00,0.06,       !- Field 91
+    Until: 07:00,0.07,       !- Field 93
+    Until: 08:00,0.1,        !- Field 95
+    Until: 09:00,0.12,       !- Field 97
+    Until: 10:00,0.14,       !- Field 99
+    Until: 11:00,0.29,       !- Field 101
+    Until: 12:00,0.31,       !- Field 103
+    Until: 14:00,0.36,       !- Field 105
+    Until: 15:00,0.34,       !- Field 107
+    Until: 16:00,0.35,       !- Field 109
+    Until: 17:00,0.37,       !- Field 111
+    Until: 18:00,0.34,       !- Field 113
+    Until: 19:00,0.25,       !- Field 115
+    Until: 20:00,0.27,       !- Field 117
+    Until: 21:00,0.21,       !- Field 119
+    Until: 22:00,0.16,       !- Field 121
+    Until: 23:00,0.1,        !- Field 123
+    Until: 24:00,0.06;       !- Field 125
+
+! Schedule School HVAC Systems, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 15, Saturday 5, Sunday/Holidays 0
+
+  Schedule:Compact,
+    School HVAC,             !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 07:00,0.0,        !- Field 3
+    Until: 22:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 08:00,0.0,        !- Field 10
+    Until: 13:00,1.0,        !- Field 12
+    Until: 24:00,0.0,        !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 24:00,0.0;        !- Field 17
+
+! Schedule School Lighting and Receptacles, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 5.37, Saturday 2.56, Sunday/Holidays 1.13
+
+  Schedule:Compact,
+    School Lighting,         !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 07:00,0.02,       !- Field 3
+    Until: 08:00,0.3,        !- Field 5
+    Until: 09:00,0.85,       !- Field 7
+    Until: 12:00,0.95,       !- Field 9
+    Until: 15:00,0.8,        !- Field 11
+    Until: 16:00,0.7,        !- Field 13
+    Until: 18:00,0.5,        !- Field 15
+    Until: 21:00,0.35,       !- Field 17
+    Until: 22:00,0.3,        !- Field 19
+    Until: 24:00,0.02,       !- Field 21
+    For: Saturday WinterDesignDay, !- Field 23
+    Until: 07:00,0.02,       !- Field 24
+    Until: 08:00,0.05,       !- Field 26
+    Until: 13:00,0.15,       !- Field 28
+    Until: 16:00,0.05,       !- Field 30
+    Until: 24:00,0.02,       !- Field 32
+    For: Sunday Holidays AllOtherDays, !- Field 34
+    Until: 08:00,0.02,       !- Field 35
+    Until: 16:00,0.05,       !- Field 37
+    Until: 24:00,0.02;       !- Field 39
+
+! Schedule School Occupancy, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 7.1, Saturday 0.5, Sunday/Holidays 0
+
+  Schedule:Compact,
+    School Occupancy,        !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 07:00,0.0,        !- Field 3
+    Until: 08:00,0.05,       !- Field 5
+    Until: 09:00,0.75,       !- Field 7
+    Until: 11:00,0.9,        !- Field 9
+    Until: 15:00,0.8,        !- Field 11
+    Until: 16:00,0.45,       !- Field 13
+    Until: 17:00,0.15,       !- Field 15
+    Until: 18:00,0.05,       !- Field 17
+    Until: 19:00,0.15,       !- Field 19
+    Until: 21:00,0.2,        !- Field 21
+    Until: 22:00,0.1,        !- Field 23
+    Until: 24:00,0.0,        !- Field 25
+    For: Saturday WinterDesignDay, !- Field 27
+    Until: 08:00,0.0,        !- Field 28
+    Until: 13:00,0.1,        !- Field 30
+    Until: 24:00,0.0,        !- Field 32
+    For: Sunday Holidays AllOtherDays, !- Field 34
+    Until: 24:00,0.0;        !- Field 35
+
+! Schedule School Service Water Heating, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 6.91, Saturday 0.8, Sunday/Holidays 0.84
+
+  Schedule:Compact,
+    School SWH,              !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 07:00,0.05,       !- Field 3
+    Until: 08:00,0.1,        !- Field 5
+    Until: 09:00,0.34,       !- Field 7
+    Until: 10:00,0.6,        !- Field 9
+    Until: 11:00,0.63,       !- Field 11
+    Until: 12:00,0.72,       !- Field 13
+    Until: 13:00,0.79,       !- Field 15
+    Until: 14:00,0.83,       !- Field 17
+    Until: 15:00,0.61,       !- Field 19
+    Until: 16:00,0.65,       !- Field 21
+    Until: 18:00,0.1,        !- Field 23
+    Until: 19:00,0.19,       !- Field 25
+    Until: 20:00,0.25,       !- Field 27
+    Until: 22:00,0.22,       !- Field 29
+    Until: 23:00,0.12,       !- Field 31
+    Until: 24:00,0.09,       !- Field 33
+    For: Saturday WinterDesignDay, !- Field 35
+    Until: 09:00,0.03,       !- Field 36
+    Until: 13:00,0.05,       !- Field 38
+    Until: 24:00,0.03,       !- Field 40
+    For: Sunday Holidays AllOtherDays, !- Field 42
+    Until: 08:00,0.03,       !- Field 43
+    Until: 13:00,0.05,       !- Field 45
+    Until: 24:00,0.03;       !- Field 47
+
+! Schedule Warehouse HVAC Systems, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 10, Saturday 8, Sunday/Holidays 0
+
+  Schedule:Compact,
+    Warehouse HVAC,          !- Name
+    on/off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 07:00,0.0,        !- Field 3
+    Until: 17:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 08:00,0.0,        !- Field 10
+    Until: 16:00,1.0,        !- Field 12
+    Until: 24:00,0.0,        !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 24:00,0.0;        !- Field 17
+
+! Schedule Warehouse Lighting and Receptacles, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 9.02, Saturday 1.6, Sunday/Holidays 0.96
+
+  Schedule:Compact,
+    Warehouse Lighting,      !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 07:00,0.04,       !- Field 3
+    Until: 08:00,0.4,        !- Field 5
+    Until: 09:00,0.7,        !- Field 7
+    Until: 12:00,0.9,        !- Field 9
+    Until: 13:00,0.8,        !- Field 11
+    Until: 17:00,0.9,        !- Field 13
+    Until: 18:00,0.3,        !- Field 15
+    Until: 24:00,0.04,       !- Field 17
+    For: Saturday WinterDesignDay, !- Field 19
+    Until: 08:00,0.04,       !- Field 20
+    Until: 09:00,0.08,       !- Field 22
+    Until: 12:00,0.24,       !- Field 24
+    Until: 24:00,0.04,       !- Field 26
+    For: Sunday Holidays AllOtherDays, !- Field 28
+    Until: 24:00,0.04;       !- Field 29
+
+! Schedule Warehouse Occupancy, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 6.8, Saturday 1.2, Sunday/Holidays 0
+
+  Schedule:Compact,
+    Warehouse Occupancy,     !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 07:00,0.0,        !- Field 3
+    Until: 08:00,0.15,       !- Field 5
+    Until: 09:00,0.7,        !- Field 7
+    Until: 12:00,0.9,        !- Field 9
+    Until: 13:00,0.5,        !- Field 11
+    Until: 16:00,0.85,       !- Field 13
+    Until: 17:00,0.2,        !- Field 15
+    Until: 24:00,0.0,        !- Field 17
+    For: Saturday WinterDesignDay, !- Field 19
+    Until: 08:00,0.0,        !- Field 20
+    Until: 12:00,0.2,        !- Field 22
+    Until: 16:00,0.1,        !- Field 24
+    Until: 24:00,0.0,        !- Field 26
+    For: Sunday Holidays AllOtherDays, !- Field 28
+    Until: 24:00,0.0;        !- Field 29
+
+! Schedule Warehouse Service Water Heating, ASHRAE 90.1-1989, Section 13
+!  Equivalent Full-Load Hours: Weekdays 4.29, Saturday 0.91, Sunday/Holidays 0.52
+
+  Schedule:Compact,
+    Warehouse SWH,           !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 04:00,0.02,       !- Field 3
+    Until: 05:00,0.05,       !- Field 5
+    Until: 07:00,0.07,       !- Field 7
+    Until: 08:00,0.1,        !- Field 9
+    Until: 09:00,0.3,        !- Field 11
+    Until: 11:00,0.36,       !- Field 13
+    Until: 12:00,0.46,       !- Field 15
+    Until: 13:00,0.57,       !- Field 17
+    Until: 14:00,0.43,       !- Field 19
+    Until: 15:00,0.38,       !- Field 21
+    Until: 16:00,0.4,        !- Field 23
+    Until: 17:00,0.3,        !- Field 25
+    Until: 18:00,0.18,       !- Field 27
+    Until: 24:00,0.03,       !- Field 29
+    For: Saturday WinterDesignDay, !- Field 31
+    Until: 08:00,0.02,       !- Field 32
+    Until: 09:00,0.06,       !- Field 34
+    Until: 11:00,0.12,       !- Field 36
+    Until: 12:00,0.17,       !- Field 38
+    Until: 14:00,0.04,       !- Field 40
+    Until: 24:00,0.02,       !- Field 42
+    For: Sunday Holidays AllOtherDays, !- Field 44
+    Until: 12:00,0.02,       !- Field 45
+    Until: 14:00,0.04,       !- Field 47
+    Until: 24:00,0.02;       !- Field 49
+

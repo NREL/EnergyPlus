@@ -1,0 +1,549 @@
+!===============================================================================
+! MoistureMaterials.idf
+!
+! Moisture Material Reference Data Set for Effective Moisture Penetration Depth (EMPD) materials
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  MaterialProperty:MoisturePenetrationDepth:Settings,
+    Gypsum,                  !- Name
+    6,                       !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.0068,                  !- Moisture Equation Coefficient a {dimensionless}
+    0.939,                   !- Moisture Equation Coefficient b {dimensionless}
+    0.0202,                  !- Moisture Equation Coefficient c {dimensionless}
+    12.2,                    !- Moisture Equation Coefficient d {dimensionless}
+    0.019,                   !- Surface Layer Penetration Depth {m}
+    0.073,                   !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
+
+  MaterialProperty:MoisturePenetrationDepth:Settings,
+    PaintedGypsum,           !- Name
+    6,                       !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.0068,                  !- Moisture Equation Coefficient a {dimensionless}
+    0.939,                   !- Moisture Equation Coefficient b {dimensionless}
+    0.0202,                  !- Moisture Equation Coefficient c {dimensionless}
+    12.2,                    !- Moisture Equation Coefficient d {dimensionless}
+    0.019,                   !- Surface Layer Penetration Depth {m}
+    0.073,                   !- Deep Layer Penetration Depth {m}
+    0.001,                   !- Coating Layer Thickness {m}
+    200;                     !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
+
+  MaterialProperty:MoisturePenetrationDepth:Settings,
+    Carpet,                  !- Name
+    4,                       !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.136,                   !- Moisture Equation Coefficient a {dimensionless}
+    0.48,                    !- Moisture Equation Coefficient b {dimensionless}
+    0.207,                   !- Moisture Equation Coefficient c {dimensionless}
+    9.5,                     !- Moisture Equation Coefficient d {dimensionless}
+    0.0088,                  !- Surface Layer Penetration Depth {m}
+    0.03,                    !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
+
+  MaterialProperty:MoisturePenetrationDepth:Settings,
+    Concrete,                !- Name
+    6.6,                     !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.045,                   !- Moisture Equation Coefficient a {dimensionless}
+    0.352,                   !- Moisture Equation Coefficient b {dimensionless}
+    0.0859,                  !- Moisture Equation Coefficient c {dimensionless}
+    14.8,                    !- Moisture Equation Coefficient d {dimensionless}
+    0.008,                   !- Surface Layer Penetration Depth {m}
+    0.03,                    !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
+
+  MaterialProperty:MoisturePenetrationDepth:Settings,
+    Soil,                    !- Name
+    31.4298589662,           !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.020698,                !- Moisture Equation Coefficient a {dimensionless}
+    0.730957,                !- Moisture Equation Coefficient b {dimensionless}
+    0.02059,                 !- Moisture Equation Coefficient c {dimensionless}
+    4.33896,                 !- Moisture Equation Coefficient d {dimensionless}
+    0.004,                   !- Surface Layer Penetration Depth {m}
+    0,                       !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
+
+  MaterialProperty:MoisturePenetrationDepth:Settings,
+    Plywood,                 !- Name
+    400,                     !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.218,                   !- Moisture Equation Coefficient a {dimensionless}
+    1.44,                    !- Moisture Equation Coefficient b {dimensionless}
+    0.535,                   !- Moisture Equation Coefficient c {dimensionless}
+    28.16,                   !- Moisture Equation Coefficient d {dimensionless}
+    0.0006,                  !- Surface Layer Penetration Depth {m}
+    0.0024,                  !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
+
+  MaterialProperty:MoisturePenetrationDepth:Settings,
+    Wood,                    !- Name
+    150,                     !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.204,                   !- Moisture Equation Coefficient a {dimensionless}
+    2.32,                    !- Moisture Equation Coefficient b {dimensionless}
+    0.43,                    !- Moisture Equation Coefficient c {dimensionless}
+    72,                      !- Moisture Equation Coefficient d {dimensionless}
+    0.0011,                  !- Surface Layer Penetration Depth {m}
+    0.004,                   !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
+
+  MaterialProperty:MoisturePenetrationDepth:Settings,
+    Brick,                   !- Name
+    19.5897433118,           !- Water Vapor Diffusion Resistance Factor {dimensionless}
+    0.01385,                 !- Moisture Equation Coefficient a {dimensionless}
+    9.638,                   !- Moisture Equation Coefficient b {dimensionless}
+    0.02462,                 !- Moisture Equation Coefficient c {dimensionless}
+    0.6763,                  !- Moisture Equation Coefficient d {dimensionless}
+    0.017,                   !- Surface Layer Penetration Depth {m}
+    0.06,                    !- Deep Layer Penetration Depth {m}
+    0,                       !- Coating Layer Thickness {m}
+    0;                       !- Coating Layer Water Vapor Diffusion Resistance Factor {dimensionless}
+
+! Material Properties Reference Data Set for CombinedHeatAndMoistureFiniteElement materials
+!
+!-   ===========  ALL OBJECTS for Heat and Moisture Material=Concrete ===========
+
+  Material,
+    Concrete,                !- Name
+    Rough,                   !- Roughness
+    0.1,                     !- Thickness {m}
+    1.6,                     !- Conductivity {W/m-K}
+    2300,                    !- Density {kg/m3}
+    850,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+  MaterialProperty:HeatAndMoistureTransfer:Settings,
+    Concrete,                !- Material Name
+    0.76,                    !- Porosity {m3/m3}
+    0.01;                    !- Initial Water Content Ratio {kg/kg}
+
+  MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
+    Concrete,                !- Material Name
+    10,                      !- Number of Isotherm Coordinates
+    0.202,                   !- Relative Humidity Fraction 1 {dimensionless}
+    19.665,                  !- Moisture Content 1 {kg/m3}
+    0.2205,                  !- Relative Humidity Fraction 2 {dimensionless}
+    22.31,                   !- Moisture Content 2 {kg/m3}
+    0.449,                   !- Relative Humidity Fraction 3 {dimensionless}
+    38.4675,                 !- Moisture Content 3 {kg/m3}
+    0.454,                   !- Relative Humidity Fraction 4 {dimensionless}
+    38.4675,                 !- Moisture Content 4 {kg/m3}
+    0.6506,                  !- Relative Humidity Fraction 5 {dimensionless}
+    54.165,                  !- Moisture Content 5 {kg/m3}
+    0.655,                   !- Relative Humidity Fraction 6 {dimensionless}
+    54.165,                  !- Moisture Content 6 {kg/m3}
+    0.824,                   !- Relative Humidity Fraction 7 {dimensionless}
+    72.565,                  !- Moisture Content 7 {kg/m3}
+    0.8725,                  !- Relative Humidity Fraction 8 {dimensionless}
+    85.1,                    !- Moisture Content 8 {kg/m3}
+    0.924,                   !- Relative Humidity Fraction 9 {dimensionless}
+    91.08,                   !- Moisture Content 9 {kg/m3}
+    0.964,                   !- Relative Humidity Fraction 10 {dimensionless}
+    100.28;                  !- Moisture Content 10 {kg/m3}
+
+  MaterialProperty:HeatAndMoistureTransfer:Suction,
+    Concrete,                !- Material Name
+    5,                       !- Number of Suction points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0,                       !- Liquid Transport Coefficient 1 {m2/s}
+    72,                      !- Moisture Content 2 {kg/m3}
+    0.0000000000741,         !- Liquid Transport Coefficient 2 {m2/s}
+    85,                      !- Moisture Content 3 {kg/m3}
+    0.000000000253,          !- Liquid Transport Coefficient 3 {m2/s}
+    100,                     !- Moisture Content 4 {kg/m3}
+    0.00000000101,           !- Liquid Transport Coefficient 4 {m2/s}
+    118,                     !- Moisture Content 5 {kg/m3}
+    0.00000000128;           !- Liquid Transport Coefficient 5 {m2/s}
+
+  MaterialProperty:HeatAndMoistureTransfer:Redistribution,
+    Concrete,                !- Material Name
+    5,                       !- Number of Redistribution points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0,                       !- Liquid Transport Coefficient 1 {m2/s}
+    72,                      !- Moisture Content 2 {kg/m3}
+    0.00000000000741,        !- Liquid Transport Coefficient 2 {m2/s}
+    85,                      !- Moisture Content 3 {kg/m3}
+    0.0000000000253,         !- Liquid Transport Coefficient 3 {m2/s}
+    100,                     !- Moisture Content 4 {kg/m3}
+    0.000000000101,          !- Liquid Transport Coefficient 4 {m2/s}
+    118,                     !- Moisture Content 5 {kg/m3}
+    0.000000000128;          !- Liquid Transport Coefficient 5 {m2/s}
+
+  MaterialProperty:HeatAndMoistureTransfer:Diffusion,
+    Concrete,                !- Material Name
+    1,                       !- Number of Data Pairs
+    0,                       !- Relative Humidity Fraction 1 {dimensionless}
+    180;                     !- Water Vapor Diffusion Resistance Factor 1 {dimensionless}
+
+  MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity,
+    Concrete,                !- Material Name
+    2,                       !- Number of Thermal Coordinates
+    0,                       !- Moisture Content 1 {kg/m3}
+    1.6,                     !- Thermal Conductivity 1 {W/m-K}
+    180,                     !- Moisture Content 2 {kg/m3}
+    2.602;                   !- Thermal Conductivity 2 {W/m-K}
+
+!-   ===========  ALL OBJECTS for Heat and Moisture Material=Spruce ===========
+
+  Material,
+    Spruce,                  !- Name
+    Rough,                   !- Roughness
+    0.012,                   !- Thickness {m}
+    0.09,                    !- Conductivity {W/m-K}
+    455,                     !- Density {kg/m3}
+    1500,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+  MaterialProperty:HeatAndMoistureTransfer:Settings,
+    Spruce,                  !- Material Name
+    0.73,                    !- Porosity {m3/m3}
+    0.05;                    !- Initial Water Content Ratio {kg/kg}
+
+  MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
+    Spruce,                  !- Material Name
+    7,                       !- Number of Isotherm Coordinates
+    0.205,                   !- Relative Humidity Fraction 1 {dimensionless}
+    25.935,                  !- Moisture Content 1 {kg/m3}
+    0.4465,                  !- Relative Humidity Fraction 2 {dimensionless}
+    44.3625,                 !- Moisture Content 2 {kg/m3}
+    0.6515,                  !- Relative Humidity Fraction 3 {dimensionless}
+    61.99375,                !- Moisture Content 3 {kg/m3}
+    0.6545,                  !- Relative Humidity Fraction 4 {dimensionless}
+    61.99375,                !- Moisture Content 4 {kg/m3}
+    0.83,                    !- Relative Humidity Fraction 5 {dimensionless}
+    87.1325,                 !- Moisture Content 5 {kg/m3}
+    0.9525,                  !- Relative Humidity Fraction 6 {dimensionless}
+    119.665,                 !- Moisture Content 6 {kg/m3}
+    0.956,                   !- Relative Humidity Fraction 7 {dimensionless}
+    120.12;                  !- Moisture Content 7 {kg/m3}
+
+  MaterialProperty:HeatAndMoistureTransfer:Suction,
+    Spruce,                  !- Material Name
+    3,                       !- Number of Suction points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0,                       !- Liquid Transport Coefficient 1 {m2/s}
+    20,                      !- Moisture Content 2 {kg/m3}
+    0.00000000000032,        !- Liquid Transport Coefficient 2 {m2/s}
+    600,                     !- Moisture Content 3 {kg/m3}
+    0.0000000000092;         !- Liquid Transport Coefficient 3 {m2/s}
+
+  MaterialProperty:HeatAndMoistureTransfer:Redistribution,
+    Spruce,                  !- Material Name
+    3,                       !- Number of Redistribution points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0,                       !- Liquid Transport Coefficient 1 {m2/s}
+    20,                      !- Moisture Content 2 {kg/m3}
+    0.00000000000032,        !- Liquid Transport Coefficient 2 {m2/s}
+    600,                     !- Moisture Content 3 {kg/m3}
+    0.0000000000092;         !- Liquid Transport Coefficient 3 {m2/s}
+
+  MaterialProperty:HeatAndMoistureTransfer:Diffusion,
+    Spruce,                  !- Material Name
+    1,                       !- Number of Data Pairs
+    0,                       !- Relative Humidity Fraction 1 {dimensionless}
+    130;                     !- Water Vapor Diffusion Resistance Factor 1 {dimensionless}
+
+  MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity,
+    Spruce,                  !- Material Name
+    2,                       !- Number of Thermal Coordinates
+    0,                       !- Moisture Content 1 {kg/m3}
+    0.09,                    !- Thermal Conductivity 1 {W/m-K}
+    730,                     !- Moisture Content 2 {kg/m3}
+    0.278;                   !- Thermal Conductivity 2 {W/m-K}
+
+!-   ===========  ALL OBJECTS for Heat and Moisture Material=Plywood ===========
+
+  Material,
+    Plywood,                 !- Name
+    Rough,                   !- Roughness
+    0.025,                   !- Thickness {m}
+    0.14,                    !- Conductivity {W/m-K}
+    530,                     !- Density {kg/m3}
+    1880,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+  MaterialProperty:HeatAndMoistureTransfer:Settings,
+    Plywood,                 !- Material Name
+    0.5,                     !- Porosity {m3/m3}
+    0.05;                    !- Initial Water Content Ratio {kg/kg}
+
+  MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
+    Plywood,                 !- Material Name
+    12,                      !- Number of Isotherm Coordinates
+    0.2015,                  !- Relative Humidity Fraction 1 {dimensionless}
+    3.7125,                  !- Moisture Content 1 {kg/m3}
+    0.203,                   !- Relative Humidity Fraction 2 {dimensionless}
+    3.74,                    !- Moisture Content 2 {kg/m3}
+    0.435,                   !- Relative Humidity Fraction 3 {dimensionless}
+    5.8025,                  !- Moisture Content 3 {kg/m3}
+    0.439,                   !- Relative Humidity Fraction 4 {dimensionless}
+    5.83,                    !- Moisture Content 4 {kg/m3}
+    0.6495,                  !- Relative Humidity Fraction 5 {dimensionless}
+    7.7825,                  !- Moisture Content 5 {kg/m3}
+    0.6515,                  !- Relative Humidity Fraction 6 {dimensionless}
+    7.81,                    !- Moisture Content 6 {kg/m3}
+    0.8215,                  !- Relative Humidity Fraction 7 {dimensionless}
+    10.3675,                 !- Moisture Content 7 {kg/m3}
+    0.825,                   !- Relative Humidity Fraction 8 {dimensionless}
+    10.3675,                 !- Moisture Content 8 {kg/m3}
+    0.9215,                  !- Relative Humidity Fraction 9 {dimensionless}
+    13.1175,                 !- Moisture Content 9 {kg/m3}
+    0.925,                   !- Relative Humidity Fraction 10 {dimensionless}
+    13.1175,                 !- Moisture Content 10 {kg/m3}
+    0.9575,                  !- Relative Humidity Fraction 11 {dimensionless}
+    14.7125,                 !- Moisture Content 11 {kg/m3}
+    0.9605,                  !- Relative Humidity Fraction 12 {dimensionless}
+    15.345;                  !- Moisture Content 12 {kg/m3}
+
+  MaterialProperty:HeatAndMoistureTransfer:Suction,
+    Plywood,                 !- Material Name
+    1,                       !- Number of Suction points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+  MaterialProperty:HeatAndMoistureTransfer:Redistribution,
+    Plywood,                 !- Material Name
+    1,                       !- Number of Redistribution points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+  MaterialProperty:HeatAndMoistureTransfer:Diffusion,
+    Plywood,                 !- Material Name
+    3,                       !- Number of Data Pairs
+    0,                       !- Relative Humidity Fraction 1 {dimensionless}
+    700,                     !- Water Vapor Diffusion Resistance Factor 1 {dimensionless}
+    0.5,                     !- Relative Humidity Fraction 2 {dimensionless}
+    200,                     !- Water Vapor Diffusion Resistance Factor 2 {dimensionless}
+    1,                       !- Relative Humidity Fraction 3 {dimensionless}
+    20;                      !- Water Vapor Diffusion Resistance Factor 3 {dimensionless}
+
+  MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity,
+    Plywood,                 !- Material Name
+    2,                       !- Number of Thermal Coordinates
+    0,                       !- Moisture Content 1 {kg/m3}
+    0.1,                     !- Thermal Conductivity 1 {W/m-K}
+    500,                     !- Moisture Content 2 {kg/m3}
+    0.25;                    !- Thermal Conductivity 2 {W/m-K}
+
+!-   ===========  ALL OBJECTS for Heat and Moisture Material=Cellulose insulation ===========
+
+  Material,
+    Cellulose insulation,    !- Name
+    Rough,                   !- Roughness
+    0.066,                   !- Thickness {m}
+    0.04,                    !- Conductivity {W/m-K}
+    55,                      !- Density {kg/m3}
+    1880,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+  MaterialProperty:HeatAndMoistureTransfer:Settings,
+    Cellulose insulation,    !- Material Name
+    0.95,                    !- Porosity {m3/m3}
+    0.001;                   !- Initial Water Content Ratio {kg/kg}
+
+  MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
+    Cellulose insulation,    !- Material Name
+    5,                       !- Number of Isotherm Coordinates
+    0.25,                    !- Relative Humidity Fraction 1 {dimensionless}
+    2.365,                   !- Moisture Content 1 {kg/m3}
+    0.44,                    !- Relative Humidity Fraction 2 {dimensionless}
+    4.62,                    !- Moisture Content 2 {kg/m3}
+    0.66,                    !- Relative Humidity Fraction 3 {dimensionless}
+    6.655,                   !- Moisture Content 3 {kg/m3}
+    0.86,                    !- Relative Humidity Fraction 4 {dimensionless}
+    11.4125,                 !- Moisture Content 4 {kg/m3}
+    1,                       !- Relative Humidity Fraction 5 {dimensionless}
+    13;                      !- Moisture Content 5 {kg/m3}
+
+  MaterialProperty:HeatAndMoistureTransfer:Suction,
+    Cellulose insulation,    !- Material Name
+    1,                       !- Number of Suction points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+  MaterialProperty:HeatAndMoistureTransfer:Redistribution,
+    Cellulose insulation,    !- Material Name
+    1,                       !- Number of Redistribution points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+  MaterialProperty:HeatAndMoistureTransfer:Diffusion,
+    Cellulose insulation,    !- Material Name
+    1,                       !- Number of Data Pairs
+    0,                       !- Relative Humidity Fraction 1 {dimensionless}
+    1.5;                     !- Water Vapor Diffusion Resistance Factor 1 {dimensionless}
+
+  MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity,
+    Cellulose insulation,    !- Material Name
+    2,                       !- Number of Thermal Coordinates
+    0,                       !- Moisture Content 1 {kg/m3}
+    0.04,                    !- Thermal Conductivity 1 {W/m-K}
+    950,                     !- Moisture Content 2 {kg/m3}
+    0.583;                   !- Thermal Conductivity 2 {W/m-K}
+
+!-   ===========  ALL OBJECTS for Heat and Moisture Material=Glass Fiber insulation ===========
+
+  Material,
+    Glass Fiber insulation,  !- Name
+    Rough,                   !- Roughness
+    1.003,                   !- Thickness {m}
+    0.04,                    !- Conductivity {W/m-K}
+    80,                      !- Density {kg/m3}
+    840,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+  MaterialProperty:HeatAndMoistureTransfer:Settings,
+    Glass Fiber insulation,  !- Material Name
+    0.95,                    !- Porosity {m3/m3}
+    0.1;                     !- Initial Water Content Ratio {kg/kg}
+
+  MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
+    Glass Fiber insulation,  !- Material Name
+    6,                       !- Number of Isotherm Coordinates
+    0.202,                   !- Relative Humidity Fraction 1 {dimensionless}
+    0.748,                   !- Moisture Content 1 {kg/m3}
+    0.4325,                  !- Relative Humidity Fraction 2 {dimensionless}
+    1.04,                    !- Moisture Content 2 {kg/m3}
+    0.6465,                  !- Relative Humidity Fraction 3 {dimensionless}
+    1.24,                    !- Moisture Content 3 {kg/m3}
+    0.8465,                  !- Relative Humidity Fraction 4 {dimensionless}
+    1.56,                    !- Moisture Content 4 {kg/m3}
+    0.948,                   !- Relative Humidity Fraction 5 {dimensionless}
+    1.92,                    !- Moisture Content 5 {kg/m3}
+    0.978,                   !- Relative Humidity Fraction 6 {dimensionless}
+    2.72;                    !- Moisture Content 6 {kg/m3}
+
+  MaterialProperty:HeatAndMoistureTransfer:Suction,
+    Glass Fiber insulation,  !- Material Name
+    1,                       !- Number of Suction points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+  MaterialProperty:HeatAndMoistureTransfer:Redistribution,
+    Glass Fiber insulation,  !- Material Name
+    1,                       !- Number of Redistribution points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0;                       !- Liquid Transport Coefficient 1 {m2/s}
+
+  MaterialProperty:HeatAndMoistureTransfer:Diffusion,
+    Glass Fiber insulation,  !- Material Name
+    1,                       !- Number of Data Pairs
+    0,                       !- Relative Humidity Fraction 1 {dimensionless}
+    1.2543;                  !- Water Vapor Diffusion Resistance Factor 1 {dimensionless}
+
+  MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity,
+    Glass Fiber insulation,  !- Material Name
+    1,                       !- Number of Thermal Coordinates
+    0,                       !- Moisture Content 1 {kg/m3}
+    0.04;                    !- Thermal Conductivity 1 {W/m-K}
+
+!-   ===========  ALL OBJECTS for Heat and Moisture Material=Plasterboard ===========
+
+  Material,
+    Plasterboard,            !- Name
+    Rough,                   !- Roughness
+    0.012,                   !- Thickness {m}
+    0.2,                     !- Conductivity {W/m-K}
+    850,                     !- Density {kg/m3}
+    850,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.6,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+  MaterialProperty:HeatAndMoistureTransfer:Settings,
+    Plasterboard,            !- Material Name
+    0.65,                    !- Porosity {m3/m3}
+    0.2;                     !- Initial Water Content Ratio {kg/kg}
+
+  MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm,
+    Plasterboard,            !- Material Name
+    8,                       !- Number of Isotherm Coordinates
+    0.113,                   !- Relative Humidity Fraction 1 {dimensionless}
+    0.85,                    !- Moisture Content 1 {kg/m3}
+    0.328,                   !- Relative Humidity Fraction 2 {dimensionless}
+    2.55,                    !- Moisture Content 2 {kg/m3}
+    0.432,                   !- Relative Humidity Fraction 3 {dimensionless}
+    3.825,                   !- Moisture Content 3 {kg/m3}
+    0.576,                   !- Relative Humidity Fraction 4 {dimensionless}
+    5.1,                     !- Moisture Content 4 {kg/m3}
+    0.786,                   !- Relative Humidity Fraction 5 {dimensionless}
+    8.075,                   !- Moisture Content 5 {kg/m3}
+    0.843,                   !- Relative Humidity Fraction 6 {dimensionless}
+    9.35,                    !- Moisture Content 6 {kg/m3}
+    0.936,                   !- Relative Humidity Fraction 7 {dimensionless}
+    16.15,                   !- Moisture Content 7 {kg/m3}
+    0.973,                   !- Relative Humidity Fraction 8 {dimensionless}
+    23.375;                  !- Moisture Content 8 {kg/m3}
+
+  MaterialProperty:HeatAndMoistureTransfer:Suction,
+    Plasterboard,            !- Material Name
+    9,                       !- Number of Suction points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0,                       !- Liquid Transport Coefficient 1 {m2/s}
+    60,                      !- Moisture Content 2 {kg/m3}
+    0.000000003,             !- Liquid Transport Coefficient 2 {m2/s}
+    100,                     !- Moisture Content 3 {kg/m3}
+    0.0000001,               !- Liquid Transport Coefficient 3 {m2/s}
+    160,                     !- Moisture Content 4 {kg/m3}
+    0.0000001,               !- Liquid Transport Coefficient 4 {m2/s}
+    240,                     !- Moisture Content 5 {kg/m3}
+    0.00000012,              !- Liquid Transport Coefficient 5 {m2/s}
+    320,                     !- Moisture Content 6 {kg/m3}
+    0.00000022,              !- Liquid Transport Coefficient 6 {m2/s}
+    360,                     !- Moisture Content 7 {kg/m3}
+    0.0000006,               !- Liquid Transport Coefficient 7 {m2/s}
+    380,                     !- Moisture Content 8 {kg/m3}
+    0.0000009,               !- Liquid Transport Coefficient 8 {m2/s}
+    400,                     !- Moisture Content 9 {kg/m3}
+    0.00000045;              !- Liquid Transport Coefficient 9 {m2/s}
+
+  MaterialProperty:HeatAndMoistureTransfer:Redistribution,
+    Plasterboard,            !- Material Name
+    9,                       !- Number of Redistribution points
+    0,                       !- Moisture Content 1 {kg/m3}
+    0,                       !- Liquid Transport Coefficient 1 {m2/s}
+    60,                      !- Moisture Content 2 {kg/m3}
+    0.000000003,             !- Liquid Transport Coefficient 2 {m2/s}
+    100,                     !- Moisture Content 3 {kg/m3}
+    0.000000008,             !- Liquid Transport Coefficient 3 {m2/s}
+    160,                     !- Moisture Content 4 {kg/m3}
+    0.000000008,             !- Liquid Transport Coefficient 4 {m2/s}
+    240,                     !- Moisture Content 5 {kg/m3}
+    0.000000013,             !- Liquid Transport Coefficient 5 {m2/s}
+    320,                     !- Moisture Content 6 {kg/m3}
+    0.0000001,               !- Liquid Transport Coefficient 6 {m2/s}
+    360,                     !- Moisture Content 7 {kg/m3}
+    0.0000003,               !- Liquid Transport Coefficient 7 {m2/s}
+    380,                     !- Moisture Content 8 {kg/m3}
+    0.0000007,               !- Liquid Transport Coefficient 8 {m2/s}
+    400,                     !- Moisture Content 9 {kg/m3}
+    0.000001;                !- Liquid Transport Coefficient 9 {m2/s}
+
+  MaterialProperty:HeatAndMoistureTransfer:Diffusion,
+    Plasterboard,            !- Material Name
+    1,                       !- Number of Data Pairs
+    0,                       !- Relative Humidity Fraction 1 {dimensionless}
+    8.3;                     !- Water Vapor Diffusion Resistance Factor 1 {dimensionless}
+
+  MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity,
+    Plasterboard,            !- Material Name
+    2,                       !- Number of Thermal Coordinates
+    0,                       !- Moisture Content 1 {kg/m3}
+    0.2,                     !- Thermal Conductivity 1 {W/m-K}
+    650,                     !- Moisture Content 2 {kg/m3}
+    1.424;                   !- Thermal Conductivity 2 {W/m-K}
+

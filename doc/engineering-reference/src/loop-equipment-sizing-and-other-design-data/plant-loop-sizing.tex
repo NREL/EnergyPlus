@@ -1,0 +1,21 @@
+\section{Plant and Condenser Loop Sizing}\label{plant-condenser-loop-sizing}
+
+The program needs to be able to autosize the fluid flow rate in each plant fluid loop. The design plant loop flow rates are set by the sum of the needs of the demanding components on each loop. For chilled water loops these components will be cooling coils. For hot water loops - hot water coils. And for condenser loops - various types of chiller that use condenser water for cooling. Each component that uses water for heating or cooling stores its design water flow rate (in its sizing routine) in the array \emph{CompDesWaterFlow}, labeled by its inlet water supply node number. These individual component design water flow rates are then accessed, summed for each plant loop, and stored in the \emph{PlantSizingData} array. This array also contains the user specified design values for each plant loop.
+
+\subsection{Maximum Loop Flow Rate}\label{maximum-loop-flow-rate}
+
+The loop maximum volume flow rate m\(^{3}\)/s is just set equal to the value stored in the \emph{PlantSizingData} array for this loop.
+
+\subsection{Loop Volume}\label{volume-of-the-plant-loop}
+
+The loop volume m\(^{3}\) is calculated as the product of the maximum loop volume flow rate and the user input for loop circulation time which defaults to 2 minutes.
+
+\begin{equation}
+V_{loop} = \dot{V}_{loop,max} \cdot t_{loop} \cdot 60
+\end{equation}
+
+Where:
+
+\(\dot{V}_{loop,max}\) = maximum loop volume flow rate  (m\(^{3}\)/s), and
+ 
+\(t_{loop}\) = loop circulation time (minutes).

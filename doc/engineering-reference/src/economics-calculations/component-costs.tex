@@ -1,0 +1,236 @@
+\section{Component Costs}\label{component-costs}
+
+EnergyPlus provides simple cost estimating capabilities as an aid to design analysis and for life cycle costs.~ There are three broad steps involved.~ The first involves determining \emph{construction} costs by summing individual ``line items.''~ The second involves determining \emph{project} costs by adjusting construction costs to account for things like profit and design fees.~ The third involves comparing the current simulation to a reference case so that marginal increases can be calculated.~ The reference documentation contained in this section pertains to the following input object names.
+
+\begin{itemize}
+\item
+  \textbf{ComponentCost:LineItem}
+\item
+  \textbf{ComponentCost:Adjustments}
+\item
+  \textbf{ComponentCost:Reference}
+\end{itemize}
+
+\subsection{Line Item Costs}\label{line-item-costs}
+
+Line item cost calculations are generally trivial involving simple multiplication and summation.~ This section documents details of how line item costs are calculated.~ The program code consists mainly of a \textbf{Case} construct where the \textbf{Line Item Type} is used to control the details of how calculations are performed.
+
+The overall philosophy is to provide methods of calculating items using either direct entry of needed data (\textbf{`General'} using object type), or using component descriptive data entered elsewhere in the input file (e.g. \textbf{`Lights'}), or by using quantities that are calculated by the program during the simulation (e.g. \textbf{`Coil:DX'} and \textbf{`Chiller:Electric'}).
+
+The rest of this section provides details by organized by the type of line item.
+
+\subsubsection{General}\label{general}
+
+The line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-Each, \emph{P\(_{e}\)}:
+
+\begin{equation}
+L = N * {P_e}
+\end{equation}
+
+\subsubsection{Construction}\label{construction}
+
+This line item type is called ``Construction'' but is used to estimate the costs of surfaces in the model.~ The Construction attribute of Surface objects is useful for categorizing surfaces.~ The number of units, \emph{N}, is determined by summing the Area, \emph{A}, of Surface objects that have the type of construction specified in the \textbf{Item Name} field.~ Surfaces are screened to eliminate any duplicates that may exist for interior partitions creating a list of 1 to \emph{m} unique surfaces.~ If a surface is associated with a Zone, then zone multiplier, \emph{M\(_{Z}\)}, and list multipliers, \emph{M\(_{G}\)}, are applied (these are usually defaulted to 1).
+
+\begin{equation}
+N = \sum\limits_1^m {(A*{M_Z} * {M_G}} )
+\end{equation}
+
+The line item subtotal, \emph{L}, is calculated by multiplying the number of units (actually units of are here), \emph{N} (m\(^{2}\)) by the Cost-per-Area, \emph{P\(_{a}\)} , (\$/m\(^{2}\)):
+
+\begin{equation}
+L = N * {P_a}
+\end{equation}
+
+\subsubsection{Coil:DX and Coil:Cooling:DX:SingleSpeed}\label{coildx-and-coilcoolingdxsinglespeed}
+
+DX coil costs can be estimated in one of three ways: per-each, per-kW, per-kW-COP.~ The program determines which method to use based on there being non-zero values in appropriate input fields.
+
+If \textbf{cost per each} is greater than 0.0 then the number of units, \emph{N}, is the number of cooling coils.~ This will be 1 if the \textbf{Item Name} is the name of a specific coil described elsewhere.~ If the name is set to the wildcard (*) then this will equal the total number of DX:Coils in the model.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-Each, \emph{P\(_{e}\)}:
+
+\begin{equation}
+L = N * {P_e}
+\end{equation}
+
+If \textbf{cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, cooling capacity.~ This will be based on all the DX:Coils in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{kW}\)}:
+
+\begin{equation}
+L = N * {P_{kW}}
+\end{equation}
+
+If \textbf{Cost per kilowatt per coefficient-of-performance} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, cooling capacity multiplied by the nominal coefficient of performance (COP) of the DX:Coils.~ This will be based on all the DX:Coils in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt-per-COP, \emph{P\(_{kW-COP}\)}:
+
+\begin{equation}
+L = N * {P_{kW - COP}}
+\end{equation}
+
+\subsubsection{Coil:Heating:Fuel}\label{coilheatinggas}
+
+Fuel-fired heating coil costs can be estimated in one of three ways: per-each, per-kW, per-kW-COP.~ The program determines which method to use based on there being non-zero values in appropriate input fields.
+
+If \textbf{cost per each} is greater than 0.0 then the number of units, \emph{N}, is the number of heaters.~ This will be 1 if the \textbf{Item Name} is the name of a specific heater described elsewhere.~ If the name is set to the wildcard (*) then this will equal the total number of Coil:Heating:Fuel objects in the model.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-Each, \emph{P\(_{e}\)}:
+
+\begin{equation}
+L = N * {P_e}
+\end{equation}
+
+If \textbf{Cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, heating capacity.~ This will be based on all the Coil:Heating:Fuel objects in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{kW}\)}:
+
+\begin{equation}
+L = N * {P_{kW}}
+\end{equation}
+
+If \textbf{Cost per kilowatt per coefficient-of-performance} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, heating capacity multiplied by the theoretical efficiency of the heater(s).~ (Here we are treating gas heating efficiency as a Coefficient of Performance (COP)).~ This will be based on all the Coil:Heating:Fuel objects in the model if \textbf{Item Name} is set to the wildcard (*) and will be that of the named coil if set to a valid coil name.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt-per-COP, \emph{P\(_{kW-COP}\)}:
+
+\begin{equation}
+L = N * {P_{kW - COP}}
+\end{equation}
+
+\subsubsection{Chiller:Electric}\label{chillerelectric}
+
+Electric chiller costs can be estimated in one of three ways: per-each, per-kW, per-kW-COP.~ The program determines which method to use based on there being non-zero values in appropriate input fields.
+
+If \textbf{cost per each} is greater than 0.0 then the number of units, \emph{N}, is the number of chillers.~ This will be 1 if the \textbf{Item Name} is the name of a specific coil described elsewhere.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-Each, \emph{P\(_{e}\)}:
+
+\begin{equation}
+L = N * {P_e}
+\end{equation}
+
+If \textbf{Cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts of total, rated, cooling capacity for the specified chiller. Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{kW}\)}:
+
+\begin{equation}
+L = N * {P_{kW}}
+\end{equation}
+
+If \textbf{Cost per kilowatt per coefficient-of-performance} is greater than 0.0, then the number of units, \emph{N}, is the number of kilowatts of total, rated, cooling capacity multiplied by the nominal coefficient of performance (COP) of the chiller. This will be based on the named chiller (if set to a valid coil name). Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt-per-COP, \emph{P\(_{kW-COP}\)}:
+
+\begin{equation}
+L = N * {P_{kW - COP}}
+\end{equation}
+
+\subsubsection{Daylighting:Controls}\label{daylightingcontrols}
+
+The costs of controllers for harvesting daylight are determined by the number of reference points.~ The cost for each controller, \emph{P\(_{e}\)} , are input.~ The of units, \emph{N}, is determined from the number of daylight reference points in all the zones if the \textbf{Item Name} is the wildcard (*).~ If \textbf{Item Name} is set to a valid Zone name then N is the number of daylight reference points in just that zone (zones can have more than one daylight controllers).~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-Each, \emph{P\(_{e}\)}:
+
+\begin{equation}
+L = N * {P_e}
+\end{equation}
+
+\subsubsection{Shading:Zone:Detailed}\label{shadingzonedetailed}
+
+Shading surfaces need to be handled separately because they do not have the \textbf{Construction} attribute.~ The \textbf{Item Name} must be set to a valid name for a \textbf{Shading:Zone:Detailed} object defined elsewhere in the file.~ The number of units, N, is determined from the area of the named surface multiplied by zone multiplier, \emph{M\(_{Z}\)}, and list multipliers, \emph{M\(_{G}\)}:
+
+\begin{equation}
+N = A*{M_Z} * {M_g}
+\end{equation}
+
+The line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N} (m\(^{2}\)) by the Cost-per-Area, \emph{P\(_{a}\)} , (\$/m\(^{2}\)):
+
+\begin{equation}
+L = N * {P_a}
+\end{equation}
+
+\subsubsection{Lights}\label{lights}
+
+The cost of electric lighting systems can be modeled in two ways: per-each and per-kW.~ The program determines which method to use based on there being non-zero values in appropriate input fields.~ The \textbf{Item Name} must be the name of a valid Zone defined elsewhere in the input.
+
+If \textbf{cost per each} is greater than 0.0, then the number of units, \emph{N}, is the number lighting systems in the zone and is assumed to be 1.~ Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-Each, \emph{P\(_{e}\)}:
+
+\begin{equation}
+L = N * {P_e}
+\end{equation}
+
+If \textbf{Cost per kilowatt} is greater than 0.0 then the number of units, \emph{N}, is the number of kilowatts in the design level for electric lighting systems defined in Lights objects associated with the zone.~ The \textbf{Item Name} must be the name of a valid Zone defined elsewhere in the input.~ \emph{N} is then the sum of all the Lights associated with the named Zone. Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{kW}\)}:
+
+\begin{equation}
+L = N * {P_{kW}}
+\end{equation}
+
+\subsubsection{Generator:Photovoltaic}\label{generatorphotovoltaic}
+
+The costs of simple photovoltaic power systems can be modeled using cost per kilowatt.~ The number of units, N, is the nominal rated peak power of the photovoltaic panels.~ The photovoltaic generator must be modeled using the PhotovoltaicPerformance:Simple input object which is a very simplistic model and does not include input for the nominal rated peak power of the system.~ Therefore a peak power is calculated using the usual 1000 W/m\(^{2}\) of incident solar radiation, \emph{G\(_{p}\)}, multiplied by the active solar cell area, \emph{A} and the efficiency, \emph{E}, and converted to units of kilowatts.
+
+\begin{equation}
+N = \frac{{{G_p} * A * E}}{{1000.0}}
+\end{equation}
+
+Where, the cell area A is calculated by multiplying the area of the surface associated with the simple photovoltaic system and the active area fraction defined in the PhotovoltaicPerformance:Simple. Then the line item subtotal, \emph{L}, is calculated by multiplying the number of units, \emph{N}, by the Cost-per-kilowatt, \emph{P\(_{kW}\)}:
+
+\begin{equation}
+L = N * {P_{kW}}
+\end{equation}
+
+\subsection{Adjustments}\label{adjustments}
+
+Various adjustments are available to model total project costs from the component costs modeled using individual line items.~ These adjustments are provided to allow propagating how changes in component costs are amplified by things like design fees, profit, bonding, and taxes.
+
+The subtotal of individual line items, \emph{S\(_{L}\)}, is obtained by summing all line item subtotals, \emph{L}:
+
+\begin{equation}
+{S_L} = \sum L
+\end{equation}
+
+For the reference building, \emph{S\(_{L}\)}, is user input (typically from a prior run of baseline building model).
+
+The subtotal for miscellaneous construction costs (typically those costs not explicitly included as line items), \emph{S\(_{m}\)}, are calculated by multiplying the \textbf{Miscellaneous Cost Model} (per Square Meter), \emph{C\(_{m}\)},~ by the total conditioned floor area, \emph{A\(_{c}\)}:
+
+\begin{equation}
+{S_m} = {A_c} * {C_m}
+\end{equation}
+
+The subtotal for the amount that the construction costs should be altered because of regional differences in material and labor costs (e.g.~when using national average data), \emph{S\(_{r}\)}, is determined by multiplying the Regional Adjustment Factor, \emph{R\(_{f}\)}, by the sum of \emph{S\(_{L}\)}~and \emph{S\(_{m}\)}:
+
+\begin{equation}
+{S_r} = ({S_L} + {S_m}){R_f}
+\end{equation}
+
+Remaining adjustments are applied to the subtotal for construction costs, \emph{S\(_{c}\)}, which is the sum of \emph{S\(_{L}\)}, \emph{S\(_{m,}\)}, and \emph{S\(_{r}\)}:
+
+\begin{equation}
+{S_C} = {S_L} + {S_m} + {S_r}
+\end{equation}
+
+The \textbf{Design and Engineering Fee Fraction}, \emph{F\(_{d}\)}, is the fraction of construction costs, \emph{S\(_{c}\)}, attributable to costs associated with architectural and engineering services needed for the project.~ The subtotal for costs associated with these fees, \emph{S\(_{D}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{d}\)}:
+
+\begin{equation}
+{S_D} = {S_c}*{F_D}
+\end{equation}
+
+The \textbf{Contractor Fee Fraction}, \emph{F\(_{c}\)}, is the fraction of construction costs, \emph{S\(_{c}\)}, attributable to costs associated with the contractor's profit that should be included in the project.~ The subtotal for costs associated with contracting, \emph{S\(_{P}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{d}\)}:
+
+\begin{equation}
+{S_P} = {S_c}*{F_C}
+\end{equation}
+
+The \textbf{Contingency Fraction}, \emph{F\(_{S}\)}, is the fraction of construction costs, \emph{S\(_{c}\)}, which should be included in a cost estimate to provide for contingencies (perhaps related to errors and uncertainty in the estimate and project).~ The subtotal for contingency costs, \emph{S\(_{S}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{S}\)}:
+
+\begin{equation}
+{S_S} = {S_c}*{F_S}
+\end{equation}
+
+The \textbf{Permits, Bonding, Insurance Fraction}, \emph{F\(_{B}\)}, is the fraction of construction costs, \emph{S\(_{c}\)}, which should be included in a cost estimate to provide for things like taxes, bonding, insurance, and permits.~ The subtotal for these extra costs, \emph{S\(_{B}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{B}\)}:
+
+\begin{equation}
+{S_B} = {S_c}*{F_B}
+\end{equation}
+
+The \textbf{Commissioning Fee Fraction}, \emph{F\(_{CX}\)}, is the fraction of construction costs, \emph{S\(_{c}\)}, which should be included in a cost estimate to provide for commissioning the building systems.~ The subtotal for these extra costs, \emph{S\(_{CX}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{CX}\)}:
+
+\begin{equation}
+{S_{CX}} = {S_c}*{F_{CX}}
+\end{equation}
+
+Finally, the cost estimate total, \emph{T}, is obtained by summing the various subtotals:
+
+\begin{equation}
+T = {S_L} + {S_m} + {S_r} + {S_D} + {S_P} + {S_S} + {S_B} + {S_{CX}}
+\end{equation}
+
+The normalized total cost estimate, C, is calculated by dividing \emph{T} by the total conditioned floor area, \emph{A\(_{c}\)}:
+
+\begin{equation}
+C = \frac{T}{{{A_C}}}
+\end{equation}
+
+\subsection{Comparisons}\label{comparisons}
+
+The capability of comparing the current cost estimate to that of a reference building is provided because is common to consider the marginal increases in costs associated with applying different energy design measures.~ EnergyPlus calculates and reports the difference between the current model and a reference case for all the subtotals and totals discussed above.~ The reported differences are the reference values subtracted from the current value.

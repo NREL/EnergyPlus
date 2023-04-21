@@ -1,0 +1,66 @@
+\section{eplusout.dfs}\label{eplusout.dfs}
+
+The daylight factors report contains the pre-calculated hourly daylight factors for the four CIE sky types (clear, clear turbid, intermediate, and overcast sky), for each daylight reference points for each exterior window of a daylight enclosure which consists of one or more spaces. The file is CSV formatted -- ready for spreadsheet viewing. The input for requesting the report is simple:
+
+\begin{lstlisting}
+Output:DaylightFactors,
+  SizingDays;    !- Reporting Days
+\end{lstlisting}
+
+The following shows an excerpt the daylight factors for a window without shade:
+
+\begin{lstlisting}
+This file contains daylight factors for all exterior windows of daylight zones.
+MonthAndDay,Enclosure Name, Zone Name,Window Name,Window State
+Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight Factor for Overcast Sky
+01/21,Enclosure 1,ZN_1,ZN_1_WALL_NORTH_WINDOW,Base Window
+1,ZN_1_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000
+1,ZN_1_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000
+1,ZN_1_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000
+[...]
+9,ZN_1_DAYLREFPT1,2.14657E-002,1.73681E-002,1.38241E-002,1.41272E-002
+9,ZN_1_DAYLREFPT2,2.14657E-002,1.73680E-002,1.38240E-002,1.41273E-002
+9,ZN_1_DAYLREFPT3,2.14655E-002,1.73678E-002,1.38239E-002,1.41274E-002
+[...]
+24,ZN_1_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000
+24,ZN_1_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000
+24,ZN_1_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000
+\end{lstlisting}
+
+The first line describes the data in the \textbf{eplusout.dfs} file.
+
+The second line describes the header of the daily row:
+
+{\scriptsize
+\begin{longtable}[c]{>{\raggedright}p{1.0in}>{\raggedright}p{1.0in}>{\raggedright}p{2.5in}>{\raggedright}p{1.5in}}
+\toprule
+MonthAndDay & Zone Name & Window Name & Window State \tabularnewline
+\midrule
+\endfirsthead
+
+\toprule
+MonthAndDay & Zone Name & Window Name & Window State \tabularnewline
+\midrule
+\endhead
+
+01/21 & ZN\_1 & ZN\_1\_WALL\_NORTH\_WINDOW & Base Window \tabularnewline
+\bottomrule
+\end{longtable}}
+
+The Window State column has three possible outputs -- ``Base Window'' indicating windows without shades; a numeric value, from 0.0 to 180.0 for every 10.0 step, indicating the slat angle (in degrees) of the blind shading the window; ``Blind or Slat Applied'' indicating windows in shaded state by shades, screens, and blinds with fixed slat angle.
+
+The lines after it describes the hourly daylight factors at each reference point:
+
+{\scriptsize
+\begin{longtable}[c]{p{0.2in}p{1.5in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
+\caption{Hourly Daylight Factors for the considered window at each reference point and 4 CIE Sky Conditions}
+\label{tab:dfs-output-at-each-ref-pt}\\
+\hline
+Hour & Reference Point & Daylight Factor for Clear Sky & Daylight Factor for Clear Turbid Sky & Daylight Factor for Intermediate Sky & Daylight Factor for Overcast Sky \\ \hline
+\endhead
+%
+9 & ZN\_1\_DAYLREFPT1 & 0.021466 & 0.017368 & 0.013824 & 0.014127 \\ \hline
+9 & ZN\_1\_DAYLREFPT2 & 0.021466 & 0.017368 & 0.013824 & 0.014127 \\ \hline
+9 & ZN\_1\_DAYLREFPT3 & 0.021465 & 0.017368 & 0.013824 & 0.014127 \\ \hline
+10 & ZN\_1\_DAYLREFPT1 & 0.020245 & 0.016029 & 0.012201 & 0.014127 \\ \hline
+\end{longtable}}

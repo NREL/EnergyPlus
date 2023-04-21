@@ -1,0 +1,72 @@
+!===============================================================================
+! SurfaceColorSchemes.idf
+!
+! EnergyPlus Example Surface Color Schemes
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  OutputControl:SurfaceColorScheme,
+    Default;                 !- Name
+
+  OutputControl:SurfaceColorScheme,
+    Original,                !- Name
+    Text,                    !- Drawing Element 1 Type
+    3,                       !- Color for Drawing Element 1
+    Walls,                   !- Drawing Element 2 Type
+    3,                       !- Color for Drawing Element 2
+    Windows,                 !- Drawing Element 3 Type
+    4,                       !- Color for Drawing Element 3
+    GlassDoors,              !- Drawing Element 4 Type
+    4,                       !- Color for Drawing Element 4
+    Doors,                   !- Drawing Element 5 Type
+    4,                       !- Color for Drawing Element 5
+    Roofs,                   !- Drawing Element 6 Type
+    2,                       !- Color for Drawing Element 6
+    Floors,                  !- Drawing Element 7 Type
+    8,                       !- Color for Drawing Element 7
+    DetachedBuildingShades,  !- Drawing Element 8 Type
+    9,                       !- Color for Drawing Element 8
+    DetachedFixedShades,     !- Drawing Element 9 Type
+    5,                       !- Color for Drawing Element 9
+    AttachedBuildingShades,  !- Drawing Element 10 Type
+    6,                       !- Color for Drawing Element 10
+    DaylightReferencePoint1, !- Drawing Element 11 Type
+    10,                      !- Color for Drawing Element 11
+    DaylightReferencePoint2, !- Drawing Element 12 Type
+    5;                       !- Color for Drawing Element 12
+
+  OutputControl:SurfaceColorScheme,
+    Default With Colors,     !- Name
+    Text,                    !- Drawing Element 1 Type
+    3,                       !- Color for Drawing Element 1
+    Walls,                   !- Drawing Element 2 Type
+    43,                      !- Color for Drawing Element 2
+    Windows,                 !- Drawing Element 3 Type
+    143,                     !- Color for Drawing Element 3
+    GlassDoors,              !- Drawing Element 4 Type
+    143,                     !- Color for Drawing Element 4
+    Doors,                   !- Drawing Element 5 Type
+    45,                      !- Color for Drawing Element 5
+    Roofs,                   !- Drawing Element 6 Type
+    15,                      !- Color for Drawing Element 6
+    Floors,                  !- Drawing Element 7 Type
+    8,                       !- Color for Drawing Element 7
+    DetachedBuildingShades,  !- Drawing Element 8 Type
+    195,                     !- Color for Drawing Element 8
+    DetachedFixedShades,     !- Drawing Element 9 Type
+    9,                       !- Color for Drawing Element 9
+    AttachedBuildingShades,  !- Drawing Element 10 Type
+    13,                      !- Color for Drawing Element 10
+    Photovoltaics,           !- Drawing Element 11 Type
+    174,                     !- Color for Drawing Element 11
+    TubularDaylightDomes,    !- Drawing Element 12 Type
+    143,                     !- Color for Drawing Element 12
+    TubularDaylightDiffusers, !- Drawing Element 13 Type
+    143,                     !- Color for Drawing Element 13
+    DaylightReferencePoint1, !- Drawing Element 14 Type
+    10,                      !- Color for Drawing Element 14
+    DaylightReferencePoint2, !- Drawing Element 15 Type
+    5;                       !- Color for Drawing Element 15
+

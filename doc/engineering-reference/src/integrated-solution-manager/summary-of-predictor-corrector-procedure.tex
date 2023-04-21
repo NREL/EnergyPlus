@@ -1,0 +1,13 @@
+\section{Summary of Predictor-Corrector Procedure}\label{summary-of-predictor-corrector-procedure}
+
+The predictor-corrector scheme can be summarized as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  Using Equation~\ref{eq:SteadyStateSystemOutput}, an estimate is made of the air system energy required to balance the equation with the zone air temperature equal to the setpoint temperature.
+\item
+  With that quantity as a demand, the air system is simulated to determine its actual supply capability at the time of the simulation. This will include a plant simulation if necessary.
+\item
+  The actual air system capability is used in Equation~\ref{eq:ZoneTemperatureUpdateEquation} to calculate the resulting zone temperature.
+\end{itemize}

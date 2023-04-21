@@ -1,0 +1,2002 @@
+!===============================================================================
+! ElectricityUSAEnvironmentalImpactFactors.idf
+!
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  Output:EnvironmentalImpactFactors,
+    Monthly;                 !- Reporting Frequency
+
+  EnvironmentalImpactFactors,
+    0.3,                     !- District Heating Efficiency
+    3.0,                     !- District Cooling COP {W/W}
+    0.25,                    !- Steam Conversion Efficiency
+    80.7272,                 !- Total Carbon Equivalent Emission Factor From N2O {kg/kg}
+    6.2727,                  !- Total Carbon Equivalent Emission Factor From CH4 {kg/kg}
+    0.2727;                  !- Total Carbon Equivalent Emission Factor From CO2 {kg/kg}
+
+! United States 1999 national average electricity emissions factors based on eGRID, 1605, AirData
+! United States Water Emission Fuel Factors are the combined thermoelectric and hydroelectric weighted
+! averages from:
+!   Torcellini, Paul; Long, Nicholas; Judkoff, Ron; "Consumptive Water Use for U.S. Power Production";
+!      NREL Report No. TP-550-33905.  Golden, CO; 2003; http://www.nrel.gov/docs/fy04osti/33905.pdf;
+!    or
+!   Torcellini, Paul; Long, Nicholas; Judkoff, Ron; "Consumptive Water Use for U.S. Power Production";
+!      ASHRAE Transactions 2003, Vol 110, Part 1.  Atlanta, GA; January 2004;
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.253,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    168.33317,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    4.20616E-02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.39858E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.10753E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.41916E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    8.65731E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.95827E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.80450E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.15377E-02,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.10837E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    3.72332E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.36414E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    2.10074,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Alabama 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.230,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    165.30922,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.45087E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.72617E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.02311E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.80975E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.13940E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    7.91048E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    7.86328E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    4.72023E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    3.55049E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.66784E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    5.14071E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    2.62742,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Alaska 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.734,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    173.87708,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    3.71694E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    8.56786E-04,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    7.29024E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    1.12138E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    2.38136E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    8.96502E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    8.85977E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.05247E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    6.51454E-06,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.82297E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.27594E-07,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.28392,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Arizona 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.694,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    132.29777,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    8.26924E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    8.56786E-04,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    2.74423E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    1.94037E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    2.27552E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.70555E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.69322E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.23202E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.80226E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.27385E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.88997E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    8.25326,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Arkansas 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.207,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    162.03327,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    6.41833E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.57497E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    2.87149E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.55776E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    4.24991E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    9.27803E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    9.19307E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    8.49561E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    4.59383E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    3.46429E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    2.73415E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.26840,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! California 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.422,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    76.35472,                !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    2.91370E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    8.44186E-04,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    6.56449E-02,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    4.66192E-04,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    3.04915E-02,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    7.16813E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    7.07819E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    8.99402E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    4.02651E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.62453E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.38598E-07,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    4.87394,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Colorado 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    3.101,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    242.67192,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.51197E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.60017E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.74004E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    3.64134E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    5.83874E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    7.29822E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    7.23699E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    6.12291E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    9.56430E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.36770E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.62537E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    1.26003,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Connecticut 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.720,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    118.69000,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    3.21421E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    2.19236E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    1.81563E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    1.51197E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    3.78750E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.22734E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.21694E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.04033E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    2.22944E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    3.93896E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.18438E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.07805,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Delaware 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.736,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    230.57612,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.31290E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.54977E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.12517E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.86015E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.10866E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.39283E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.38287E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    9.96131E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.54469E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.74441E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.62874E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.01321,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! District of Columbia 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    4.844,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    172.11310,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    8.94585E+00,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.48677E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    7.29528E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.59556E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.62487E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.88269E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    2.84861E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    3.40760E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    8.76496E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.30080E-02,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    0,                       !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    1.69595,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Florida 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.694,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    175.64105,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    6.12954E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.88997E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.73122E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.26796E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.00584E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    4.33040E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    4.29055E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    3.98460E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.58386E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    3.39110E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.71357E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.14411,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Georgia 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.119,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    172.11310,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.05889E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.62537E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.00043E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.84755E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.11974E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.05237E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    2.03865E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.37175E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    7.51637E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.16686E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.20035E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    1.73389,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Hawaii 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.950,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    209.40848,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.17682E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    2.69635E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    7.27512E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.30576E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    5.44437E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    5.97339E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    5.90409E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    6.92999E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    3.55697E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    7.01715E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.77657E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.04066,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Idaho 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    0.213,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    3.52794,                 !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    0,                       !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.00798E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    1.07098E-02,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    4.15793E-04,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.05838E-02,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    0,                       !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    0,                       !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    0,                       !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    0,                       !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    0,                       !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    0,                       !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    8.25010,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Illinois 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.694,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    146.66153,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.85292E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.03318E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.41749E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.26796E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.11811E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.53276E-01,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.52156E-01,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.12047E-03,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    5.93583E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.77818E-02,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    4.62412E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    1.10321,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Indiana 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    3.281,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    261.57160,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    2.14058E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.80177E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    7.30284E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    4.06973E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.88846E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.18862E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    2.17008E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.85453E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    5.75861E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.87283E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    4.86352E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.43309,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Iowa 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    3.033,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    237.12801,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    7.57877E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.73877E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    5.61447E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    3.75474E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.04566E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.34564E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    2.32698E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.86674E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    9.09228E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.78644E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    6.19910E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.11960,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Kansas 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.826,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    212.18043,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    8.65983E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.41118E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    5.58801E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    3.20035E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    7.06596E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.41783E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    2.39535E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    2.24799E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    4.19292E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    5.39089E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    4.93912E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.60978,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Kentucky 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    3.234,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    253.00374,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.50857E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.76397E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    8.41036E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    4.04453E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.79257E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.69397E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.68139E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.25825E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    4.35029E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    3.80922E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    4.71232E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    5.59905,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Louisana 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.624,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    148.42550,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.68116E+04,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.18438E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    3.41958E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    1.41118E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    5.05755E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.79917E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.77843E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    2.07304E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.66720E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    1.02357E-02,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.41118E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    1.54614,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Maine 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.191,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    107.35019,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    4.92778E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    7.11888E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    1.79547E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    3.40194E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    4.04327E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    3.36399E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    3.34131E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    2.26813E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.55132E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    9.62614E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    4.53592E-07,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.12311,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Maryland 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.277,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    172.11310,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    4.89502E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.48677E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    5.37759E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.59556E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.38837E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.13382E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    2.12038E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.34391E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    7.21581E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.78881E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    4.88872E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.22587,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Massachusetts 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.729,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    161.02529,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    7.89125E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    2.19236E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    2.89165E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.00337E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    8.01347E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    8.85244E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    8.76617E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    8.62772E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.70282E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    3.49171E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.88997E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.00000,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Michigan 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.616,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    199.07665,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.69354E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.83957E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.91770E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    3.14995E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    9.76988E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    9.08755E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    9.00520E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    8.23449E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    2.22140E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.79017E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.67914E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.49992,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Minnesota 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.331,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    163.04126,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    6.96264E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.66317E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    5.02354E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.07897E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    5.06889E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    4.04781E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    4.01455E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    3.32617E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    6.74889E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.13240E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.30114E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.43508,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Mississippi 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.404,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    231.83610,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    2.17976E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.58757E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.66570E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    3.62874E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    8.98239E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    5.44446E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    5.37910E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    6.53601E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    4.06289E-02,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    1.54329E-02,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    2.45696E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.39122,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Missouri 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.857,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    192.02077,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.29753E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.97817E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    6.41707E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    3.11215E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    9.07059E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.25537E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.24368E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.16929E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    6.48638E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.98085E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    4.67452E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.31301,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Montana 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.936,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    180.68096,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    4.13147E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.36078E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    3.58212E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.86015E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    2.01219E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    3.67504E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    3.64126E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    3.37798E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    4.01020E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    3.14400E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.77994E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    17.59970,                !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Nebraska 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.195,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    176.39703,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    4.68208E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.19698E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    3.94121E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.75935E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    5.29065E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.33751E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.32829E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    9.21636E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    6.90470E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    5.23031E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.59094E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.31647,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Nevada 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.615,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    191.26478,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    3.82278E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.13398E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.01807E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.45696E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    4.02815E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.09146E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    2.07657E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.48886E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    3.79659E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    3.33440E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.36078E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    7.62598,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! New Hampshire 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.394,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    85.93055,                !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    2.63588E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    2.16716E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    2.03109E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    1.77657E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    8.71275E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    3.09503E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    3.06487E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    3.01568E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    7.16019E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.45937E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.40194E-07,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.10328,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! New Jersey 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.451,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    88.95450,                !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    2.27250E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    9.70184E-04,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    1.76649E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    9.95383E-04,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    2.31206E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    3.45712E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    3.41460E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    4.25200E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.24216E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    1.52830E-02,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.28518E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.07293,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! New Mexico 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    3.307,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    254.26372,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    8.56408E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.65057E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    6.57583E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    3.72954E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    5.70140E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    5.20754E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    5.16748E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    4.00653E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    4.41665E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    5.12951E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    8.41666E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    1.18855,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! New York 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.808,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    108.10618,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.93835E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.02058E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    1.69089E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    1.12138E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    4.68082E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    5.35802E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    5.31301E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    4.50068E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    2.22325E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.26008E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.33558E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    1.70400,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! North Carolina 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.969,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    156.48937,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.10286E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.32298E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.68712E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.55776E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.00131E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    3.40955E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    3.38325E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    2.62976E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    3.00504E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    1.73434E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.33894E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.57511,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! North Dakota 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    3.244,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    282.48725,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    9.01389E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.85217E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    6.44731E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    4.27133E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.52697E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    5.17162E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    5.13979E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    3.18277E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    6.41672E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    6.88995E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    8.71905E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    5.39683,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Ohio 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.736,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    226.79619,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.58757E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.63797E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    7.67579E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    3.62874E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    2.33562E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.38722E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.37957E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    7.64501E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.11541E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.59201E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    6.24949E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.98838,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Oklahoma 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    3.024,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    216.96835,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.67262E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.38598E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    5.11425E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.80975E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    5.11047E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.83971E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.82479E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.49160E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    9.73713E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.68484E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.88073E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    8.82545,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Oregon 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    0.526,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    35.53140,                !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.86855E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    4.15793E-04,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    5.26671E-02,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    4.28393E-04,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    7.50947E-02,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    3.47911E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    3.46199E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.71186E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    4.43277E-06,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    5.31933E-04,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.77994E-07,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    3.89900,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Pennsylvania 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.827,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    159.26132,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.85885E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.34818E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    3.29232E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.55776E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.25834E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.21604E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    2.20060E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.54356E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.47657E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    1.51542E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    6.56449E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.55632,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Rhode Island 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.561,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    132.54977,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.67955E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    8.56786E-04,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    6.21170E-02,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    5.92190E-04,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    4.53592E-03,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.03973E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.02744E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.22906E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    0,                       !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.25247E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    0,                       !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.00000,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! South Carolina 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.300,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    105.08223,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    8.38642E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.14658E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    2.54264E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    1.82697E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    6.04790E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.45530E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    2.43803E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.72632E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    2.51344E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    1.16735E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.54977E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.26771,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! South Dakota 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.192,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    100.54631,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    9.79004E+01,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    6.67789E-04,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    5.44941E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    1.52457E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    5.81354E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    4.67825E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    4.63562E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    4.26239E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    8.82976E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.63562E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    1.22218E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    76.38114,                !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Tennessee 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.902,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    163.29325,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    9.09579E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.32298E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    5.10165E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.67116E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.18123E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.51650E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    2.48944E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    2.70575E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    2.70034E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.88396E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    2.98615E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    3.78331,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Texas 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.749,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    184.46090,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    9.63405E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    9.70184E-04,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    3.27720E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    1.83957E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    4.90888E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.73147E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.71765E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.38283E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.26310E-03,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.32150E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    3.52794E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.45499,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Utah 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    3.095,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    243.67990,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    5.13063E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.68837E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    5.26545E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    3.88073E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    2.13314E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.47314E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.46364E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    9.50155E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    9.59315E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.48737E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    9.70184E-07,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    3.20895,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Vermont 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    0.306,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    3.52794,                 !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.38472E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.20958E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    1.94037E-02,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    4.91392E-04,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    2.14196E-03,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.16247E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.14873E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.37415E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    1.80704E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.12073E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    0,                       !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.26046,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Virginia 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    1.924,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    146.66153,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    9.12729E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.72617E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    3.65016E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    2.41916E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    7.86857E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    1.22315E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    1.21362E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    9.53635E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    2.93259E-04,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    2.50975E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    2.21756E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.06575,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Washington 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    0.414,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    30.99548,                !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    4.29653E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    4.66192E-04,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    5.30451E-02,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    5.03992E-04,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.90383E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    5.37627E-04,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    5.32210E-04,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    5.41708E-06,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    6.46409E-06,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    6.87348E-04,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    5.92190E-07,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    2.83436,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! West Virginia 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.917,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    248.97181,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.27938E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.72617E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    7.77659E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    3.98153E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    1.86918E+00,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    2.39677E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    2.38177E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    1.50018E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    4.25792E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    3.09497E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    6.55189E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.61189,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Wisconsin 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    2.680,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    206.88852,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    1.00471E+03,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.73877E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    4.97440E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    3.27594E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    9.25076E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    7.34187E-03,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    7.28252E-03,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    5.93472E-05,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    6.45613E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.61829E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    4.83832E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    0.48674,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+
+! Wyoming 1999 state average electricity emissions factors based on eGRID, 1065, AirData
+
+  FuelFactors,
+    Electricity,             !- Existing Fuel Resource Name
+    3.534,                   !- Source Energy Factor {J/J}
+    ,                        !- Source Energy Schedule Name
+    270.39145,               !- CO2 Emission Factor {g/MJ}
+    ,                        !- CO2 Emission Factor Schedule Name
+    9.01389E+02,             !- CO Emission Factor {g/MJ}
+    ,                        !- CO Emission Factor Schedule Name
+    1.85217E-03,             !- CH4 Emission Factor {g/MJ}
+    ,                        !- CH4 Emission Factor Schedule Name
+    5.59431E-01,             !- NOx Emission Factor {g/MJ}
+    ,                        !- NOx Emission Factor Schedule Name
+    4.25873E-03,             !- N2O Emission Factor {g/MJ}
+    ,                        !- N2O Emission Factor Schedule Name
+    5.78708E-01,             !- SO2 Emission Factor {g/MJ}
+    ,                        !- SO2 Emission Factor Schedule Name
+    5.08215E-02,             !- PM Emission Factor {g/MJ}
+    ,                        !- PM Emission Factor Schedule Name
+    5.06042E-02,             !- PM10 Emission Factor {g/MJ}
+    ,                        !- PM10 Emission Factor Schedule Name
+    2.17349E-04,             !- PM2.5 Emission Factor {g/MJ}
+    ,                        !- PM2.5 Emission Factor Schedule Name
+    5.19787E-05,             !- NH3 Emission Factor {g/MJ}
+    ,                        !- NH3 Emission Factor Schedule Name
+    4.78782E-03,             !- NMVOC Emission Factor {g/MJ}
+    ,                        !- NMVOC Emission Factor Schedule Name
+    5.27931E-06,             !- Hg Emission Factor {g/MJ}
+    ,                        !- Hg Emission Factor Schedule Name
+    0,                       !- Pb Emission Factor {g/MJ}
+    ,                        !- Pb Emission Factor Schedule Name
+    4.36542,                 !- Water Emission Factor {L/MJ}
+    ,                        !- Water Emission Factor Schedule Name
+    0,                       !- Nuclear High Level Emission Factor {g/MJ}
+    ,                        !- Nuclear High Level Emission Factor Schedule Name
+    0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+

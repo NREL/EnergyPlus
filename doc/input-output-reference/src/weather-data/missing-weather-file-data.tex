@@ -1,0 +1,38 @@
+\section{Missing Weather File Data}\label{missing-weather-file-data}
+
+The weather description of data contains ``missing'' descriptors, a new concept not introduced previously in our IDD conventions. In this case, it will be processed as though those values are ``missing'' in the weather conversions and/or EnergyPlus weather processing. This may not always be desirable though EnergyPlus will fill in ``missing'' value with something ``appropriate''. Eventually, these missing values will be available through the IDD and users will be able to supply their own values or EnergyPlus will calculate those values (such as radiation and illuminance) that are not a simple value replacement. Until then, the following are used:
+
+% table 44
+\begin{longtable}[c]{p{1.83in}p{2.67in}p{1.5in}}
+\caption{Missing weather replacement values \label{table:missing-weather-replacement-values}} \tabularnewline
+\toprule
+Data item & Supplied Value & Units \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Missing weather replacement values} \tabularnewline
+\toprule
+Data item & Supplied Value & Units \tabularnewline
+\midrule
+\endhead
+
+Dry-bulb Temperature & 6 & C \tabularnewline
+Dewpoint Temperature & 3 & C \tabularnewline
+Relative Humidity & 50 & \% \tabularnewline
+Atmospheric Pressure & Standard** Barometric Pressure (altitude based) & Pa \tabularnewline
+Wind Speed & 2.5 & m/s \tabularnewline
+Wind Direction & 180 & Deg \tabularnewline
+Total Sky Cover & 5 & (tenths) \tabularnewline
+Opaque Sky Cover & 5 & (tenths) \tabularnewline
+Visibility & 777.7 & Km \tabularnewline
+Ceiling Height & 77777 & m \tabularnewline
+Precipitable Water & 0 & Mm \tabularnewline
+Aerosol Optical Depth & 0 & Broadband turbidity \tabularnewline
+Snow Depth & 0 & Cm \tabularnewline
+Days Since Last Snow & 88 & Days \tabularnewline
+Radiation Values (Direct/Diffuse) & 0.0 & Wh/m2 \tabularnewline
+Illuminance Values & 0.0 & lux (or CD/m2) \tabularnewline
+\bottomrule
+\end{longtable}
+
+**Standard Barometric pressure based on location elevation is taken from ASHRAE 2001 Handbook of Fundamentals, Page 6.1 \& 2.

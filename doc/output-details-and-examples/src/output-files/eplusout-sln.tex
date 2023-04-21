@@ -1,0 +1,42 @@
+\section{eplusout.sln}
+
+The following shows an excerpt of “lines” report (\textbf{eplusout.sln}) for a single surface. It gives the surface name and then the coordinates in the “standard” EnergyPlus fashion (that is, UpperLeftCorner first and proceeding around, in this case, the four vertices in the surface.
+
+\begin{lstlisting}
+SPACE1-1:MAIN SOUTH OVERHANG
+     -0.65,     -1.13,      2.20,      0.00,      0.00,      2.20
+      0.00,      0.00,      2.20,     17.15,     -9.90,      2.20
+     17.15,     -9.90,      2.20,     16.50,    -11.03,      2.20
+     16.50,    -11.03,      2.20,     -0.65,     -1.13,      2.20
+\end{lstlisting}
+
+The following shows an excerpt of “lines, IDF” report (\textbf{eplusout.sln}) for a single surface. It gives the coordinates in the “standard” EnergyPlus fashion (that is, UpperLeftCorner first and proceeding around, in this case, the four vertices in the surface. Note that this is NOT a complete description of the surface but enough to change your IDF file, if you want to.
+
+\begin{lstlisting}
+Building North Axis = 0
+GlobalGeometryRules,UpperLeftCorner,CounterClockwise,WorldCoordinates;
+ Surface = SHADING, Name = ROOMSOUTH SURF6-VFIN1-6
+  4,  !- Number of (X,Y,Z) groups in this surface
+      -23.34,    -14.85,      2.41,  !- X,Y,Z = = > Vertex 1
+      -23.34,    -14.76,      2.49,  !- X,Y,Z = = > Vertex 2
+      -18.13,    -14.76,      2.49,  !- X,Y,Z = = > Vertex 3
+      -18.13,    -14.85,      2.41;  !- X,Y,Z = = > Vertex 4
+ Surface = WALL, Name = ROOMNORTH SURF3-1
+  4,  !- Number of (X,Y,Z) groups in this surface
+      -15.94,     -5.34,      3.00,  !- X,Y,Z = = > Vertex 1
+      -15.94,     -5.34,      0.00,  !- X,Y,Z = = > Vertex 2
+      -18.91,     -5.34,      0.00,  !- X,Y,Z = = > Vertex 3
+      -18.91,     -5.34,      3.00;  !- X,Y,Z = = > Vertex 4
+ Surface = WALL, Name = ROOMNORTH SURF4-1
+  4,  !- Number of (X,Y,Z) groups in this surface
+      -18.91,     -5.34,      3.00,  !- X,Y,Z = = > Vertex 1
+      -18.91,     -5.34,      0.00,  !- X,Y,Z = = > Vertex 2
+      -22.65,     -5.34,      0.00,  !- X,Y,Z = = > Vertex 3
+      -22.65,     -5.34,      3.00;  !- X,Y,Z = = > Vertex 4
+ Surface = WINDOW, Name = ROOMNORTH SURF5-1-NOSHADE
+  4,  !- Number of (X,Y,Z) groups in this surface
+      -19.02,     -5.34,      2.59,  !- X,Y,Z = = > Vertex 1
+      -19.02,     -5.34,      0.41,  !- X,Y,Z = = > Vertex 2
+      -22.54,     -5.34,      0.41,  !- X,Y,Z = = > Vertex 3
+      -22.54,     -5.34,      2.59;  !- X,Y,Z = = > Vertex 4
+\end{lstlisting}

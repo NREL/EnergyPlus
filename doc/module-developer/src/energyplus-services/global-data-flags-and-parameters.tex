@@ -1,0 +1,77 @@
+\section{Global Data: Flags and Parameters}\label{global-data-flags-and-parameters}
+
+Global data is used sparsely in EnergyPlus, according to our goals and programming standards.~ Data-only modules should be used to share data, usually across a limited number of other modules.~ Two critical data-only modules have been used:
+
+\textbf{DataGlobals} -- contains truly global data (such as number of zones, current hour, simulation status flags, interface statements to error and output routines)
+
+\textbf{DataEnvironment} -- contains weather data that is global (such as current outdoor dry-bulb temperature, barometric pressure, etc.)
+
+As an example of a limited data-only module, \textbf{DataSurfaces} contains data that is used in the modules that reference surfaces e.g., shadowing calculations, heat balance calculations.
+
+Module excerpts in this document show uses of these data-only modules.
+
+\subsection{Parameters}\label{parameters}
+
+Constants that might be useful throughout the program are defined as Fortran parameters in the DataGlobals data module. Examples include \emph{PI}, \emph{PiOvr2}, \emph{DegToRadians}, and \emph{MaxNameLength}. DataHVACGlobals contains parameters that might be useful anywhere in the HVAC simulation. Some examples are \emph{SmallTempDiff} and \emph{SmallMassFlow} that can be used for preventing divide by zero errors. The full set of global parameters can be obtained by examining the modules DataGlobals and DataHVACGlobals.
+
+\subsection{Simulation Flags}\label{simulation-flags}
+
+A number of logical flags (variables that are either \emph{true} or \emph{false}) are used throughout EnergyPlus. These flags are normally used to indicate the start or end of a time or simulation period. The following shows a complete list.
+
+\textbf{In DataGlobals:}
+
+BeginSimFlag
+
+Set to true until the actual simulation has begun, set to false after first heat balance time step.
+
+EndSimFlag
+
+Normally false, but set to true at the end of the simulation (last heat balance time step of last hour of last day of last environment).
+
+WarmupFlag
+
+Set to true during the warmup portion of a simulation; otherwise false.
+
+BeginEnvrnFlag
+
+Set to true at the start of each environment (design day or run period), set to false after first heat balance time step in environment. This flag should be used for beginning of environment initializations in most HVAC components. See the example module for correct usage.
+
+EndEnvrnFlag
+
+Normally false, but set to true at the end of each environment (last heat balance time step of last hour of last day of environment).
+
+BeginDayFlag
+
+Set to true at the start of each day, set to false after first heat balance time step in day.
+
+EndDayFlag
+
+Normally false, but set to true at the end of each day (last heat balance time step of last hour of day).
+
+BeginHourFlag
+
+Set to true at the start of each hour, set to false after first heat balance time step in hour.
+
+EndHourFlag
+
+Normally false, but set to true at the end of each hour (last heat balance time step of hour)
+
+BeginTimeStepFlag
+
+Set to true at the start of each heat balance time step, set to false after first HVAC step in the heat balance time step.
+
+\textbf{In DataHVACGlobals:}
+
+FirstTimeStepSysFlag
+
+Set to true at the start of the first HVAC time step within each heat balance time step, false at the end of the HVAC time step.~ In other words, this flag is true during the first HVAC time step in a heat balance time step, and is false otherwise.
+
+\textbf{In Subroutine SimHVAC:}
+
+FirstHVACIteration
+
+True when HVAC solution technique on first iteration, false otherwise. Passed as a subroutine argument into the HVAC equipment simulation driver routines.
+
+The most commonly used logical flag in the HVAC simulation is FirstHVACIteration that is passed around as an argument among the HVAC simulation subroutines. The HVAC simulation is solved iteratively each HVAC time step. FirstHVACIteration is true for the first iteration in each time step and false for the remaining iterations.
+
+Finally, each developer must define and set a ``GetInput'' flag to make sure input data is read in only once. In the example module Fans the GetInput flag is GetInputFlag; the new developer can follow this example in using such a flag.

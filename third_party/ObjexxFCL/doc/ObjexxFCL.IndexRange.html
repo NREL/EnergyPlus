@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>ObjexxFCL Users Guide: Index Ranges</title>
+	<meta name="description" content="Objexx Fortran-C++ Library">
+	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
+	<meta name="copyright" content="Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.">
+	<link rel="icon" type="image/png" href="img/favicon.png">
+	<link rel="stylesheet" href="css/Objexx.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#CC3366" vlink="#990033" alink="#FF3366">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+	<tr>
+		<td></td>
+		<td height="70"><a href="ObjexxFCL.html"><img src="img/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
+		<td></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.2</div></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="5" height="16" valign="top" bgcolor="#EB7A87"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td height="24" colspan="5"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td height="300">&nbsp;</td>
+		<td valign="top">
+			<div id="sectionLinksTop">
+				<a href="ObjexxFCL.html">Home</a>
+			</div>
+			<div id="sectionLinks">
+				<a href="ObjexxFCL.Release.html">Release</a>
+				<a href="ObjexxFCL.Users.html">Users Guide</a>
+				<a href="ObjexxFCL.Developers.html">Developers</a>
+				<a href="ObjexxFCL.Support.html">Support</a>
+				<a href="http://objexx.com">Web</a>
+			</div>
+		</td>
+		<td></td>
+		<td width="500" valign="top">
+			<h1 class="h3">Index Ranges</h1>
+			<p class="body">As in Fortran, each dimension of an Array can be given an arbitrary index range. An index range is specified by its lower and upper indices. The ObjexxFCL IndexRange class provides this index range capability.</p>
+			<p class="body">IndexRanges and rarely used explicitly in application code since curly brace notation of the form <span class="source">{</span><em>low,high</em><span class="source">}</span> is more convenient.</p>
+			<h2 class="h4">Construction</h2>
+			<p class="body"><b>Default constructors</b> create zero-sized ranges [1,0].</p>
+			<p class="body"><b>Copy constructors</b> are available for all IndexRange types.</p>
+			<p class="body"><b>Upper index constructors</b> taking a single argument create ranges with a lower index of 1. The upper index argument can be any value convertible to int or an underscore, <span class="source">_</span>, (an instance of <span class="source">Omit</span>) to indicate an unbounded upper index (for the last dimension of assumed-size argument arrays).</p>
+			<p class="body"><b>Index range constructors</b> taking lower and upper index arguments create ranges with the specified range. The lower and upper index arguments can be any value convertible to int. The upper index argument can also be and underscore, <span class="source">_</span>, to indicate it is unbounded.</p>
+			<p class="body">Here are some sample IndexRange constructors:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>IndexRange I; // Default construction
+IndexRange I( 10 ); // [1,10]
+IndexRange I( -5, 5 ); // [-5,5]
+IndexRange I( _ ); // [1,unbounded]
+IndexRange I( 0, _ ); // [0,unbounded]
+				</tr>
+			</table>
+			<h2 class="h4">Assignment</h2>
+			<p class="body">IndexRanges assignment operators and functions parallel the constructors. Assignments with the = operator match the single argument constructors and the <span class="source">assign</span> member functions parallel the upper index and index range constructors. Single argument <span class="source">l</span> and <span class="source">u</span> member functions can be used to assign just the lower or upper index, respectively.</p>
+			<h2 class="h4">Functions</h2>
+			<p class="body">The lower and upper indices of an IndexRange can be accessed with the <span class="source">l</span> and <span class="source">u</span> member functions and the size with the <span class="source">size</span> member function:</p>
+			<table border="1" cellspacing="0" cellpadding="12">
+				<tr>
+					<td bgcolor="#F7F4F7"><pre>IndexRange I( -5, 5 ); // [-5,5]
+std::cout &lt;&lt; I.l() &lt;&lt; std::endl; // Prints -5
+std::cout &lt;&lt; I.u() &lt;&lt; std::endl; // Prints 5
+std::cout &lt;&lt; I.size() &lt;&lt; std::endl; // Prints 11</pre></td>
+				</tr>
+			</table>
+			<p class="body">A number of predicate (boolean) functions are available for IndexRanges, including <span class="source">initialized</span>, <span class="source">bounded</span>, <span class="source">unbounded</span>, and <span class="source">legal</span>. You can also ask an IndexRange whether it <span class="source">contains</span> an index or another range or whether it <span class="source">intersects</span> another range.</p>
+			<p class="body">The <span class="source">contain</span> and <span class="source">intersect</span> modifying member functions will modify an IndexRange to contain a specified index or range or to intersect a specified range, respectively. The <span class="source">clear</span> member function will clear an IndexRange back to a default-constructed state.</p>
+			<p class="body">You can compare two index ranges with the operators { ==, !=, &gt;, &gt;=, &lt;, &lt;= }.</p>
+			<h2 class="h4">Notes on IndexRanges</h2>
+			<ul class="body">
+				<li>An index range is indicated by [<em>l</em>,<em>u</em>] in the following notes.</li>
+				<li>A <b>zero-sized</b> IndexRange is indicated by a range of the form [<i>l</i>,<i>l</i>-1].</li>
+				<li>An <b>unbounded</b> IndexRange has an unknown upper extent and is indicated by a range of the form [<i>l</i>,<i>l</i>-2] and is generally specified by passing an underscore, <span class="source">_</span>, as the upper index. Such an IndexRange includes all indices &gt;= <i>l</i>. The size of an unbounded IndexRange is set to the constant <span class="source">npos</span> defined in IndexRange. The IndexRange member functions <span class="source">bounded</span> and <span class="source">unbounded</span> can be used to test for this condition.</li>
+				<li>IndexRange has a number of useful functions to query the lower and upper indices, check whether it contains a given index or intersects another IndexRange, and functions that can modify it such as the <span class="source">contain</span> and <span class="source">intersect</span> functions.</li>
+				<li>IndexRanges are indexed by the int type.</li>
+				<li>On platforms with a 32-bit int:
+				<ul>
+					<li><em>l</em> is limited to the range: [-2147483646,2147483647]</li>
+					<li><em>u</em> is limited to the range: [-2147483648,2147483647]</li>
+				</ul>
+				Violations of these ranges are detected in assertion-enabled debug builds.</li>
+				<li><em>l</em> - 2 &lt;= <em>u</em> is required.</li>
+				<li><em>u</em> can be <em>l</em> - 1 for zero-sized range and <em>l</em> - 2 for unbounded-upper range.</li>
+				<li>The size of an unbounded IndexRange is defined as <span class="source">IndexRange::npos</span>.</li>
+			</ul>
+		</td>
+		<td></td>
+		<td width="100%" valign="top">
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td colspan="3" height="30" valign="bottom" class="footer_text">
+			<a href="ObjexxFCL.html"><span class="footer_link">Home</span></a> |
+			<a href="ObjexxFCL.Release.html"><span class="footer_link">Release Notes</span></a> |
+			<a href="ObjexxFCL.Users.html"><span class="footer_link">Users Guide</span></a> |
+			<a href="ObjexxFCL.Developers.html"><span class="footer_link">Developers Guide</span></a> |
+			<a href="ObjexxFCL.Support.html"><span class="footer_link">Support</span></a> |
+			<a href="ObjexxFCL.License.txt"><span class="footer_link">License</span></a> |
+			<a href="http://objexx.com"><span class="footer_link">Web</span></a>
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td height="21"></td>
+		<td></td>
+		<td></td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2017 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:9px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:500px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100%; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:1px"></td>
+	</tr>
+</tbody>
+</table>
+</body>
+</html>

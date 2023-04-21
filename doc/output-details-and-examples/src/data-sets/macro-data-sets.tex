@@ -1,0 +1,19 @@
+\section{Macro Data Sets}\label{macro-data-sets}
+
+\subsection{Locations-DesignDays.xls}\label{locations-designdays.xls}
+
+Strictly speaking, the locations-designdays.xls file is not a macro enabled input file. Rather, it is the ``pointer'' to other files and can be searched by city name, country, etc. All the Design Conditions from the ASHRAE Handbook of Fundamentals (2005) have been encoded into Design Day definitions and are stored on the EnergyPlus web site by WMO Region (similarly to how the weather data is stored). The spreadsheet contains a ``readme'' page as well as cities, countries, and links to the proper web pages.
+
+\subsection{SandiaPVData.idf}\label{sandiapvdata.idf}
+
+Use these PV statements for implementing PV modules in an EnergyPlus input file when using the Sandia model.
+
+\subsection{SolarCollectors.idf}\label{solarcollectors.idf}
+
+Use these SOLAR COLLECTOR PARAMETERS objects for implementing solar collector modules in an EnergyPlus input file.
+
+Data has been reproduced with permission from: ``Directory of SRCC Certified Solar Collector Ratings'' Copyright (c) 2004 by the Solar Rating and Certification Corporation. For more information, contact: Solar Rating and Certification Corporation, c/o FSEC, 1679 Clearlake Road, Cocoa, FL 32922-5703 USA~ Tel: (321) 638-1537~ Fax: (321) 638-1010~ ,~~ www.solar-rating.org
+
+\subsection{UtilityTariffObjects.imf}\label{utilitytariffobjects.imf}
+
+Use the large collections of input objects to model the costs of energy supplied by utility companies. This file is ready for use in macro processing but the input objects can readily be copied out of the macro file and used in a regular input file. The data were assembled by NREL researcher Brent Griffith and represent a best effort at putting together a comprehensive set of utility tariffs for commercial buildings for the USA as of Spring 2005. Use the data at your own risk and note that utility tariffs need to be continually updated to reflect current conditions.

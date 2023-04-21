@@ -1,0 +1,217 @@
+\section{Moisture Predictor-Corrector}\label{moisture-predictor-corrector}
+
+The transient air mass balance equation for the change in the zone humidity ratio = sum of internal scheduled latent loads + infiltration + system + multizone airflows + convection to the zone surfaces may be expressed as follows:
+
+\begin{equation}
+\begin{array}{l}
+{\rho_{air}}{V_z}{C_W}\frac{{d{W_z}}}{{dt}} = \sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}\left( {{W_{surf{s_i}}} - W_z^t} \right) + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{W_{zi}} - W_z^t} \right)\\\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; + {{\dot m}_{\inf }}\left( {{W_\infty } - W_z^t} \right) + {{\dot m}_{sys}}\left( {{W_{\sup }} - W_z^t} \right)
+\end{array}
+\end{equation}
+
+where
+
+C\(_{W}\) = humidity capacity multiplier (See the InputOutput Reference for additional information on the object ZoneCapacitanceMultiplier:ResearchSpecial)
+
+In the same manner as described above for zone air temperature (ref. Basis for the Zone and Air System Integration), the solution algorithms provided in the ZoneAirHeatBalanceAlgorithm object are also applied to zone air moisture calculations.
+
+In order to calculate the derivative term with respect to time, the first order backward finite difference method, defined as the EulerMethod in the ZoneAirHeatBalanceAlgorithm object, may be used:
+
+\begin{equation}
+\frac{{dW}}{{dt}} = {\left( {\delta t} \right)^{ - 1}}(W_z^t - W_z^{t - \delta t}) + O(\delta t)
+\end{equation}
+
+The zone air humidity ratio update at the current time step using the EulerMethod may be expressed as follows:
+
+\begin{equation}
+\begin{array}{l}{\rho_{air}}V{C_W}{\left( {\delta t} \right)^{ - 1}}\left( {W_z^t - W_z^{t - \delta t}} \right) = \sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}\left( {{W_{surf{s_i}}} - W_z^t} \right) \\
+\quad \quad \quad \quad + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{W_{zi}} - W_z^t} \right) + {{\dot m}_{\inf }}\left( {{W_\infty } - W_z^t} \right) + {{\dot m}_{sys}}\left( {{W_{\sup }} - W_z^t} \right)\end{array}
+\end{equation}
+
+To preserve the stability of the calculation of the zone humidity ratio, the third order differential approximation, derived by a Taylor Series and used in the calculation of the next time step's zone air temperature, is also applied to the zone air humidity ratio calculations. This algorithm is the default choice and is defined as 3rdOrderBackwardDifference in the ZoneAirHeatBalanceAlgorithm object.
+
+The third order derivative derived from a Taylor Series expansion is defined as:
+
+\begin{equation}
+{\left. {\frac{{d{W_z}}}{{dt}}} \right|_t} \approx \frac{{\left( {{\textstyle{\frac{11}{6}}}W_z^t - 3W_z^{t - \delta t} + {\textstyle{\frac{3}{2}}}W_z^{t - 2\delta t} - {\textstyle{\frac{1}{3}}}W_z^{t - 3\delta t}} \right)}}{{\delta t}} + O\left( {\delta {t^3}} \right) .
+\end{equation}
+
+The coefficients of the approximated derivative are very close to the coefficients of the analogous Adams-Bashforth algorithm. Then the approximated derivative is substituted into the mass balance and the terms with the humidity ratio at past time steps are all put on the right hand side of the equation. This third order derivative zone humidity ratio update increases the number of previous time steps that are used in calculating the new zone humidity ratio, and decreases the dependence on the most recent. The higher order derivative approximations have the potential to allow the use of larger time steps by smoothing transitions through sudden changes in zone operating conditions.
+
+\begin{equation}
+\begin{array}{l}\frac{{{\rho_{air}}{V_z}{C_W}}}{{\delta t}}\left( {\frac{{11}}{6}} \right)W_z^t + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}W_z^t + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} W_z^t + {{\dot m}_{\inf }}W_z^t + {{\dot m}_{sys}}W_z^t = \sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} \\
+\quad \quad \quad + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}{W_{surf{s_i}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}} + {{\dot m}_{\inf }}{W_\infty } + {{\dot m}_{sys}}{W_{\sup }} \\
+\quad \quad \quad - \frac{{{\rho_{air}}{V_z}{C_W}}}{{\delta t}}\left( { - 3W_z^{t - \delta t} + \frac{3}{2}W_z^{t - 2\delta t} - \frac{1}{2}W_z^{t - 3\delta t}} \right)\end{array}
+\end{equation}
+
+This gives us the basic air mass balance equation that will be solved two different ways, one way for the predict step and one way for the correct step.
+
+Since the third choice of solution algorithms uses an integration approach, defined as AnalyticalSolution in the ZoneAirHeatBalanceAlgorithm object, it does not require any approximations and has no truncation errors. The solutions in both prediction and correction are provided below in detail.
+
+\subsection{Moisture Prediction}\label{moisture-prediction}
+
+For the moisture prediction case, the equation is solved for the anticipated system response as shown below.
+
+\begin{equation}
+\begin{array}{l}
+    \rm{PredictedSystemLoad} = \dot{m}_{sys}*\left(W_z^t - W_{sup}\right) \\
+    \rm{MassFlow * HumRat} = \frac{kg_{air}}{sec}\frac{kg_{water}}{kg_{air}} = \frac{kg_{water}}{sec}
+  \end{array}
+\end{equation}
+
+Since the program provides three solution algorithms, the moisture prediction from each solution algorithm is given below.
+
+\subsubsection{EulerMethod}\label{eulermethod-001}
+
+For this solution algorithm, the air mass balance for the predicted air system load or response is:
+
+{\scriptsize
+\begin{equation}
+\medmuskip=0mu
+\thinmuskip=0mu
+\thickmuskip=0mu
+\nulldelimiterspace=0pt
+\scriptspace=0pt
+\begin{array}{l}{\rm{PredictedSystemLoad}}\;[k{g_{Water}}/\sec ] = {\rho_{air}}{V_z}{C_W}{\left( {\delta t} \right)^{ - 1}}\left( {W_{{\rm{setpoint}}}^t - W_z^{t - \delta t}} \right) \\
+- \left[ {\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}\left( {{W_{surf{s_i}}} - W_{{\rm{setpoint}}}^t} \right) + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{W_{zi}} - W_{{\rm{setpoint}}}^t} \right) + {{\dot m}_{\inf }}\left( {{W_\infty } - W_{{\rm{setpoint}}}^t} \right)} \right]\\\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\end{array}
+\end{equation}}
+
+\subsubsection{ThirdOrderBackwardDifference}\label{thirdorderbackwarddifference-001}
+
+For this solution algorithm, the air mass balance for the predicted system load or response is given below:
+
+{\scriptsize
+\begin{equation}
+\medmuskip=0mu
+\thinmuskip=0mu
+\thickmuskip=0mu
+\nulldelimiterspace=0pt
+\scriptspace=0pt
+\begin{array}{l}{\rm{PredictedSystemLoad}}\;[k{g_{Water}}/\sec ] = \left( {\frac{{{\rho_{air}}{V_z}{C_W}}}{{\delta t}}\left( {\frac{{11}}{6}} \right) + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}}  + {{\dot m}_{\inf }}} \right)W_z^t - \\\;\;\;\left[ {\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}{W_{surf{s_i}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}} + {{\dot m}_{\inf }}{W_\infty } + \frac{{{\rho_{air}}{V_z}{C_W}}}{{\delta t}}\left( {3W_z^{t - \delta t} - \frac{3}{2}W_z^{t - 2\delta t} + \frac{1}{3}W_z^{t - 3\delta t}} \right)} \right]\;\;\end{array}
+\end{equation}}
+
+Then, using the following substitutions, the air mass balance equation becomes:
+
+\begin{equation}
+A = \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}}  + {\dot m_{\inf }}
+\end{equation}
+
+\begin{equation}
+B = \;\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}{W_{surf{s_i}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}} + {\dot m_{\inf }}{W_\infty }\;
+\end{equation}
+
+\begin{equation}
+C = \frac{{{\rho_{air}}{V_z}{C_W}}}{{\delta t}}\;
+\end{equation}
+
+\begin{equation}
+\begin{array}{l}{\rm{PredictedSystemLoad}}\;[k{g_{Water}}/\sec ] = \left[ {\frac{{11}}{6}*C + A} \right]\;*{W_{SetPo{\mathop{\rm int}} }} - \\\;\;\;\;\;\;\;\;\;\left[ {B + C*\left( {3W_z^{t - \delta t} - \frac{3}{2}W_z^{t - 2\delta t} + \frac{1}{3}W_z^{t - 3\delta t}} \right)} \right]\end{array}
+\end{equation}
+
+\subsubsection{AnalyticalSolution}\label{analyticalsolution-001}
+
+For this solution algorithm, the air mass balance for the predicted air system load or response is given below:
+
+\begin{equation}
+\begin{array}{l}{\rm{PredictedSystemLoad}}\;[k{g_{Water}}/\sec ] = \left[ {\sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}}\; + {{\dot m}_{\inf }}} \right]*\\\;\;\;\left[ {W_{{\rm{setpoint}}}^t - W_z^{t - \delta t}*\exp \left( { - \frac{{\sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}}\; + {{\dot m}_{\inf }}}}{{{\rho_{air}}{V_z}{C_W}}}\delta t} \right)} \right]*\\\;\;\;{\left[ {1 - \exp \left( { - \frac{{\sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \; + {{\dot m}_{\inf }}}}{{{\rho_{air}}{V_z}{C_W}}}\delta t} \right)} \right]^{ - 1}} - \\\;\;\;\left( {\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}{W_{surf{s_i}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}}\; + {{\dot m}_{\inf }}{W_\infty }} \right)\end{array}
+\end{equation}
+
+At the prediction point in the simulation, the system air mass flows are not known; therefore, the system response is approximated. The predicted air system moisture load is then used in the system simulation to achieve the best results possible. The system simulation components that have moisture control will try to meet this predicted moisture load. For example, humidifiers will look for positive moisture loads and add moisture at the specified rate to achieve the relative humidity setpoint. Likewise, dehumidification processes will try to remove moisture at the specified negative predicted moisture load to meet the relative humidity setpoint.
+
+After the system simulation is completed the actual response from the air system is used in the moisture correction of step, which is shown next.
+
+\subsection{Moisture Correction}\label{moisture-correction}
+
+For the correct step, the expanded air mass balance equation is solved for the final zone humidity ratio at the current time step. When the air system is operating, the mass flow for the system outlet includes the infiltration mass flow rate, therefore the infiltration mass flow rate is not included as a separate term in the air mass balance equation. But when the air system is off, the infiltration mass flow in is then exhausted out of the zone directly.
+
+In the same manner as described above for predicting the moisture load to be met by the air system, the zone air moisture correction calculation will be described individually for the three solution algorithms.
+
+\subsubsection{EulerMethod}\label{eulermethod-1-001}
+
+\begin{equation}
+\medmuskip=0mu
+\thinmuskip=0mu
+\thickmuskip=0mu
+\nulldelimiterspace=0pt
+\scriptspace=0pt
+W_z^t = \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}{W_{surf{s_i}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}} + {{\dot m}_{\inf }}{W_\infty } + {{\dot m}_{sys}}{W_{\sup }} + {\rho_{air}}{V_z}{C_W}\frac{{W_z^{t - \delta t}}}{{\delta t}}}}{{\frac{{{\rho_{air}}{V_z}{C_W}}}{{\delta t}} + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}{\rho_{ai{r_z}}}}  + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}}  + {{\dot m}_{\inf }} + {{\dot m}_{sys}}}}
+\end{equation}
+
+\subsubsection{ThirdOrderBackwardDifference}\label{thirdorderbackwarddifference-1-001}
+
+{\scriptsize
+\begin{equation}
+\medmuskip=0mu
+\thinmuskip=0mu
+\thickmuskip=0mu
+\nulldelimiterspace=0pt
+\scriptspace=0pt
+W_z^t = \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}{W_{surf{s_i}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}} + {{\dot m}_{\inf }}{W_\infty } + {{\dot m}_{sys}}{W_{\sup }} + \frac{{{\rho_{air}}{V_z}{C_W}}}{{\delta t}}(3W_z^{t - \delta t} - \frac{3}{2}W_z^{t - 2\delta t} + \frac{1}{3}W_z^{t - 3\delta t})}}{{\frac{{{\rho_{air}}{V_z}{C_W}}}{{\delta t}}\left( {\frac{{11}}{6}} \right) + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}{\rho_{ai{r_z}}}}  + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}}  + {{\dot m}_{\inf }} + {{\dot m}_{sys}}}}
+\end{equation}}
+
+Using the same A, B, and C parameters from the prediction step modified with actual zone mass flows with the air system ON and OFF result in:
+
+\textbf{If} (ZoneSupplyAirMassFlowRate \textgreater{} 0.0) \textbf{Then}
+
+\begin{equation}
+A = \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}}  + {\dot m_{\inf }} + {\dot m_{sys}}
+\end{equation}
+
+\begin{equation}
+B = \;\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}{W_{surf{s_i}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}} + {\dot m_{\inf }}{W_\infty }\; + {\dot m_{sys}}{W_{\sup }}
+\end{equation}
+
+\begin{equation}
+C = \frac{{{\rho_{air}}{V_z}{C_W}}}{{\delta t}}\;
+\end{equation}
+
+\textbf{Else If} (ZoneSupplyAirMassFlowRate \textless{} = 0.0) \textbf{Then}
+
+\begin{equation}
+A = \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}}  + {\dot m_{\inf }} + {\dot m_{Exhaust}}
+\end{equation}
+
+\begin{equation}
+B = \;\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}{W_{surf{s_i}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}} + {\dot m_{\inf }}{W_\infty }\; + {\dot m_{Exhaust}}{W_\infty }
+\end{equation}
+
+\begin{equation}
+C = \frac{{{\rho_{air}}{V_z}{C_W}}}{{\delta t}}\;
+\end{equation}
+
+\textbf{End If}
+
+Inserting in the parameters A, B and C above in the air mass balance equation, it simplifies to:
+
+\begin{equation}
+  W_z^t = \left[ {\frac{{B + C * \left( {3W_z^{t - \delta t} - {\frac{3}{2}} W_z^{t - 2\delta t} + {\frac{1}{3}}W_z^{t - 3\delta t}} \right)}}{{\left( {\frac{11}{6}} \right) * C + A}}} \right]
+\end{equation}
+
+\subsubsection{AnalyticalSolution}\label{analyticalsolution-1-001}
+
+\begin{equation}
+\begin{array}{l}W_z^t = \left[ \begin{array}{l}W_z^{t - \delta t} - \frac{{\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}{W_{surf{s_i}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}}\; + {{\dot m}_{\inf }}{W_\infty } + {{\dot m}_{sys}}{W_{\sup }}}}{{\sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \; + {{\dot m}_{\inf }} + {{\dot m}_{sys}}}}\\\end{array} \right]*\\\;\;\;\exp \left( { - \frac{{\sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \; + {{\dot m}_{\inf }} + {{\dot m}_{sys}}}}{{{\rho_{air}}{V_z}{C_W}}}\delta t} \right) + \\\;\;\;\frac{{\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}{W_{surf{s_i}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {W_{zi}}\; + {{\dot m}_{\inf }}{W_\infty } + {{\dot m}_{sys}}{W_{\sup }}}}{{\sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}} + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \; + {{\dot m}_{\inf }} + {{\dot m}_{sys}}}}\end{array}
+\end{equation}
+
+The above solutions are implemented in the Correct Zone Air Humidity Ratio step in EnergyPlus. This moisture update equation is used for the Conduction Transfer Function (CTF) heat balance algorithm, in addition to the effective moisture penetration depth (EMPD) with conduction transfer function heat balance algorithm. The equations are identical except that the convection to the zone surfaces is non-zero for the moisture penetration depth case. This moisture update allows both methods to be updated in the same way, with the only difference being the additional moisture capacitance of the zone surfaces for the Effective Moisture Penetration Depth (EMPD) solution approach.
+
+When the HAMT (Combined Heat And Moisture Finite Element) defined in the HeatBalanceAlgorithm object is applied, the moisture update equations are also the same as the equations used in the effective moisture penetration depth (EMPD) with conduction transfer function solution algorithm.
+
+\subsection{Which moisture buffering model is best?}
+
+The 'correct' moisture buffering model depends on the questions being answered by the building energy simulation. Previous research (Woods et al., 2013a) has shown that using the effective capacitance model to account for moisture buffering of materials will provide a good estimate of energy use when humidity is not being actively controlled. See the InputOutput Reference for additional information on the object ZoneCapacitanceMultiplier:ResearchSpecial. This model has some limitations (Woods et al., 2013b):\\
+
+\begin{itemize}
+	\item it will not accurately predict indoor humidity (or thermal comfort),
+	\item it will not accurately predict energy use when humidity is being actively controlled, and
+	\item it will not provide insight into the moisture content and potential moisture problems associated with a specific wall construction.
+\end{itemize}
+
+The effective moisture penetration depth (EMPD) model will address the first two concerns above: it can accurately predict indoor humidity, and can accurately predict energy use associated with controlling humidity. The EMPD model requires more user input than the effective capacitance model, specifically  some of the moisture properties of the materials in the building. For more information, see the Effective Moisture Penetration Depth Model section in this document.
+
+Like the EMPD model, the combined heat, air, and moisture transfer (HAMT) model addresses the first two issues discussed above for the effective capacitance model. It also addresses the third, by providing temperature and moisture profiles through composite building walls, and helping to identify surfaces with high surface humidity. The HAMT model requires a few more user inputs on moisture properties of materials than the EMPD model, and this model also increases the required simulation time by an order of magnitude. For more information on this model, see the Combined Heat and Moisture Transfer (HAMT) Model section in this document.
+
+Note that the EMPD and HAMT models above ensure accurate \emph{calculations} of the effect of moisture buffering, but it will only be accurate relative to reality when given appropriate inputs for the material properties.
+
+Woods, J., J. Winkler, D. Christensen, \href{http://www.techstreet.com/products/1868073}{\emph{Moisture modeling: Effective moisture penetration depth versus effective capacitance}}, in Thermal Performance of the Exterior Envelopes of Whole Buildings XII International Conference. 2013a: Clearwater, FL.
+
+Woods, J., Winkler, J, and Christensen, D. \href{http://www.nrel.gov/docs/fy13osti/57441.pdf}{\emph{Evaluation of the Effective Moisture Penetration Depth Model for Estimating Moisture Buffering in Buildings}}, NREL/TP-5500-57441, 2013b.

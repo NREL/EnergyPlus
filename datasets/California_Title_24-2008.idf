@@ -1,0 +1,1462 @@
+!
+! Occupancy data and non-residential schedules for California Title 24-2008 compliance calculations
+!  when lighting plans are submitted for the Entire Building or when lighting compliance is not performed.
+! Data is based on Table N2-5 of the 2008 Non-residential ACM Manual.
+!
+! Created by Lawrence Berkeley National Laboratory. June 2008. Updated March 2009.
+!
+! Note: Remember to use appropriate zone name when copying these IDD objects
+!
+!OccupancyData,
+! Auditoriums,              !Occupancy type
+! 0.65,                     !Occupant density (m2/person)
+! 103,                      !Total heat per person (W/person)
+! 0.7,                      !Sensible heat fraction
+! 10.77,                    !Receptacle power density (W/m2)
+! 17.6,                     !Hot-water load (W/person)
+! 16.15,                    !Lighting power density (W/m2)
+! 0.005437,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  People,
+    Auditoriums,             !- Name
+    Auditoriums,             !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    0.65,                    !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.7,                     !- Sensible Heat Fraction
+    ActSchd103;              !- Activity Level Schedule Name
+
+  Lights,
+    Auditoriums,             !- Name
+    Auditoriums,             !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    15.15,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Auditoriums,             !- Name
+    Auditoriums,             !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    10.77,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Auditoriums,             !- Name
+    Auditoriums,             !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    17.6,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! Classroom Building,       !Occupancy type
+! 2.32,                     !Occupant density (m2/person)
+! 122,                      !Total heat per person (W/person)
+! 0.59,                     !Sensible heat fraction
+! 10.77,                    !Receptacle power density (W/m2)
+! 31.6,                     !Hot-water load (W/person)
+! 11.84,                    !Lighting power density (W/m2)
+! 0.001626,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    Classroom Building,      !- Name
+    Classroom Building,      !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    2.32,                    !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.59,                    !- Sensible Heat Fraction
+    ActSchd122;              !- Activity Level Schedule Name
+
+  Lights,
+    Classroom Building,      !- Name
+    Classroom Building,      !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    11.84,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Classroom Building,      !- Name
+    Classroom Building,      !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    10.77,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Classroom Building,      !- Name
+    Classroom Building,      !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    31.6,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! Commercial and Industrial Building,       !Occupancy type
+! 18.58,                    !Occupant density (m2/person)
+! 197,                      !Total heat per person (W/person)
+! 0.40,                     !Sensible heat fraction
+! 4.63,                     !Receptacle power density (W/m2)
+! 31.6,                     !Hot-water load (W/person)
+! 6.46,                     !Lighting power density (W/m2)
+! 0.000762,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    Commercial and Industrial Building,  !- Name
+    Commercial and Industrial Building,  !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    18.58,                   !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.40,                    !- Sensible Heat Fraction
+    ActSchd197;              !- Activity Level Schedule Name
+
+  Lights,
+    Commercial and Industrial Building,  !- Name
+    Commercial and Industrial Building,  !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    6.46,                    !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Commercial and Industrial Building,  !- Name
+    Commercial and Industrial Building,  !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    4.63,                    !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Commercial and Industrial Building,  !- Name
+    Commercial and Industrial Building,  !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    31.6,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! Convention Centers,       !Occupancy type
+! 0.68,                     !Occupant density (m2/person)
+! 105,                      !Total heat per person (W/person)
+! 0.69,                     !Sensible heat fraction
+! 10.33,                    !Receptacle power density (W/m2)
+! 16.7,                     !Hot-water load (W/person)
+! 12.92,                    !Lighting power density (W/m2)
+! 0.005183,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    Convention Centers,      !- Name
+    Convention Centers,      !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    0.68,                    !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.69,                    !- Sensible Heat Fraction
+    ActSchd105;              !- Activity Level Schedule Name
+
+  Lights,
+    Convention Centers,      !- Name
+    Convention Centers,      !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    12.92,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Convention Centers,      !- Name
+    Convention Centers,      !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    10.33,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Convention Centers,      !- Name
+    Convention Centers,      !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    16.7,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! Financial Institutions,   !Occupancy type
+! 9.29,                     !Occupant density (m2/person)
+! 146,                      !Total heat per person (W/person)
+! 0.50,                     !Sensible heat fraction
+! 16.15,                    !Receptacle power density (W/m2)
+! 35.2,                     !Hot-water load (W/person)
+! 11.84,                    !Lighting power density (W/m2)
+! 0.000762,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    Financial Institutions,  !- Name
+    Financial Institutions,  !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    9.29,                    !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.50,                    !- Sensible Heat Fraction
+    ActSchd146;              !- Activity Level Schedule Name
+
+  Lights,
+    Financial Institutions,  !- Name
+    Financial Institutions,  !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    11.84,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Financial Institutions,  !- Name
+    Financial Institutions,  !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    16.15,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Financial Institutions,  !- Name
+    Financial Institutions,  !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    35.2,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! General Commercial and Industrial Work Buildings,   !Occupancy type
+! 13.27,                    !Occupant density (m2/person)
+! 293,                      !Total heat per person (W/person)
+! 0.38,                     !Sensible heat fraction
+! 10.77,                    !Receptacle power density (W/m2)
+! 35.2,                     !Hot-water load (W/person)
+! 10.77,                    !Lighting power density (W/m2)
+! 0.000762,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    General Commercial and Industrial Work Buildings,  !- Name
+    General Commercial and Industrial Work Buildings,  !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    13.27,                   !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.38,                    !- Sensible Heat Fraction
+    ActSchd293;              !- Activity Level Schedule Name
+
+  Lights,
+    General Commercial and Industrial Work Buildings,  !- Name
+    General Commercial and Industrial Work Buildings,  !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    10.77,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    General Commercial and Industrial Work Buildings,  !- Name
+    General Commercial and Industrial Work Buildings,  !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    10.77,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    General Commercial and Industrial Work Buildings,  !- Name
+    General Commercial and Industrial Work Buildings,  !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    35.2,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! Grocery Stores,           !Occupancy type
+! 3.20,                     !Occupant density (m2/person)
+! 140,                      !Total heat per person (W/person)
+! 0.53,                     !Sensible heat fraction
+! 9.80,                     !Receptacle power density (W/m2)
+! 33.1,                     !Hot-water load (W/person)
+! 16.15,                    !Lighting power density (W/m2)
+! 0.001118,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    Grocery Stores,          !- Name
+    Grocery Stores,          !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    3.20,                    !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.53,                    !- Sensible Heat Fraction
+    ActSchd140;              !- Activity Level Schedule Name
+
+  Lights,
+    Grocery Stores,          !- Name
+    Grocery Stores,          !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    16.15,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Grocery Stores,          !- Name
+    Grocery Stores,          !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    9.80,                    !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Grocery Stores,          !- Name
+    Grocery Stores,          !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    33.1,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! Library,                  !Occupancy type
+! 9.29,                     !Occupant density (m2/person)
+! 146,                      !Total heat per person (W/person)
+! 0.50,                     !Sensible heat fraction
+! 16.15,                    !Receptacle power density (W/m2)
+! 35.2,                     !Hot-water load (W/person)
+! 13.99,                    !Lighting power density (W/m2)
+! 0.000762,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    Library,                 !- Name
+    Library,                 !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    9.29,                    !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.50,                    !- Sensible Heat Fraction
+    ActSchd146;              !- Activity Level Schedule Name
+
+  Lights,
+    Library,                 !- Name
+    Library,                 !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    13.99,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Library,                 !- Name
+    Library,                 !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    16.15,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Library,                 !- Name
+    Library,                 !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    35.2,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! Medical Buildings and Clinics,  !Occupancy type
+! 9.29,                     !Occupant density (m2/person)
+! 136,                      !Total heat per person (W/person)
+! 0.54,                     !Sensible heat fraction
+! 12.70,                    !Receptacle power density (W/m2)
+! 32.2,                     !Hot-water load (W/person)
+! 11.84,                    !Lighting power density (W/m2)
+! 0.000762,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    Medical Buildings and Clinics,  !- Name
+    Medical Buildings and Clinics,  !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    9.29,                    !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.54,                    !- Sensible Heat Fraction
+    ActSchd136;              !- Activity Level Schedule Name
+
+  Lights,
+    Medical Buildings and Clinics,  !- Name
+    Medical Buildings and Clinics,  !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    11.84,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Medical Buildings and Clinics,  !- Name
+    Medical Buildings and Clinics,  !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    12.7,                    !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Medical Buildings and Clinics,  !- Name
+    Medical Buildings and Clinics,  !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    32.2,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! Office Buildings,         !Occupancy type
+! 9.29,                     !Occupant density (m2/person)
+! 134,                      !Total heat per person (W/person)
+! 0.55,                     !Sensible heat fraction
+! 14.43,                    !Receptacle power density (W/m2)
+! 31.1,                     !Hot-water load (W/person)
+! 9.15,                     !Lighting power density (W/m2)
+! 0.000762,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    Office Buildings,        !- Name
+    Office Buildings,        !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    9.29,                    !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.55,                    !- Sensible Heat Fraction
+    ActSchd134;              !- Activity Level Schedule Name
+
+  Lights,
+    Office Buildings,        !- Name
+    Office Buildings,        !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    9.15,                    !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Office Buildings,        !- Name
+    Office Buildings,        !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    14.43,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Office Buildings,        !- Name
+    Office Buildings,        !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    31.1,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! Religious Facilities,     !Occupancy type
+! 0.68,                     !Occupant density (m2/person)
+! 105,                      !Total heat per person (W/person)
+! 0.69,                     !Sensible heat fraction
+! 10.33,                    !Receptacle power density (W/m2)
+! 16.7,                     !Hot-water load (W/person)
+! 17.22,                    !Lighting power density (W/m2)
+! 0.005234,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    Religious Facilities,    !- Name
+    Religious Facilities,    !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    0.68,                    !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.69,                    !- Sensible Heat Fraction
+    ActSchd105;              !- Activity Level Schedule Name
+
+  Lights,
+    Religious Facilities,    !- Name
+    Religious Facilities,    !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    17.22,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Religious Facilities,    !- Name
+    Religious Facilities,    !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    10.33,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Religious Facilities,    !- Name
+    Religious Facilities,    !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    16.7,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! Restaurants,              !Occupancy type
+! 2.06,                     !Occupant density (m2/person)
+! 178,                      !Total heat per person (W/person)
+! 0.45,                     !Sensible heat fraction
+! 8.50,                     !Receptacle power density (W/m2)
+! 107.2,                    !Hot-water load (W/person)
+! 12.92,                    !Lighting power density (W/m2)
+! 0.001931,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    Restaurants,             !- Name
+    Restaurants,             !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    2.06,                    !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.45,                    !- Sensible Heat Fraction
+    ActSchd178;              !- Activity Level Schedule Name
+
+  Lights,
+    Restaurants,             !- Name
+    Restaurants,             !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    12.92,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Restaurants,             !- Name
+    Restaurants,             !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    8.50,                    !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Restaurants,             !- Name
+    Restaurants,             !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    107.2,                   !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! Schools,                  !Occupancy type
+! 2.32,                     !Occupant density (m2/person)
+! 122,                      !Total heat per person (W/person)
+! 0.59,                     !Sensible heat fraction
+! 10.77,                    !Receptacle power density (W/m2)
+! 31.6,                     !Hot-water load (W/person)
+! 10.77,                    !Lighting power density (W/m2)
+! 0.001626,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    Schools,                 !- Name
+    Schools,                 !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    2.32,                    !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.59,                    !- Sensible Heat Fraction
+    ActSchd122;              !- Activity Level Schedule Name
+
+  Lights,
+    Schools,                 !- Name
+    Schools,                 !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    10.77,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Schools,                 !- Name
+    Schools,                 !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    10.77,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Schools,                 !- Name
+    Schools,                 !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    31.6,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! Theaters,                 !Occupancy type
+! 0.71,                     !Occupant density (m2/person)
+! 197,                      !Total heat per person (W/person)
+! 0.40,                     !Sensible heat fraction
+! 5.81,                     !Receptacle power density (W/m2)
+! 17.6,                     !Hot-water load (W/person)
+! 13.99,                    !Lighting power density (W/m2)
+! 0.004979,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+
+  People,
+    Theaters,                !- Name
+    Theaters,                !- Zone or ZoneList Name
+    OCC-SCHED-BldgAvg,       !- Number of People Schedule Name
+    Area/Person,             !- Number of People Calculation Method
+    ,                        !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    0.71,                    !- Zone Floor Area per Person {m2/person}
+    0.3,                     !- Fraction Radiant
+    0.40,                    !- Sensible Heat Fraction
+    ActSchd197;              !- Activity Level Schedule Name
+
+  Lights,
+    Theaters,                !- Name
+    Theaters,                !- Zone or ZoneList Name
+    LIT-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    13.99,                   !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.42,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    ,                        !- Fraction Replaceable
+    General;                 !- End-Use Subcategory
+
+  ElectricEquipment,
+    Theaters,                !- Name
+    Theaters,                !- Zone or ZoneList Name
+    EQP-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    5.81,                    !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  HotWaterEquipment,
+    Theaters,                !- Name
+    Theaters,                !- Zone or ZoneList Name
+    DHW-SCHED-BldgAvg,       !- Schedule Name
+    Watts/Person,            !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    ,                        !- Power per Zone Floor Area {W/m2}
+    17.6,                    !- Power per Person {W/Person}
+    0.2,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0.5,                     !- Fraction Lost
+    General;                 !- End-Use Subcategory
+
+!OccupancyData,
+! All Others,               !Occupancy type
+! 9.29,                     !Occupant density (m2/person)
+! 132,                      !Total heat per person (W/person)
+! 0.56,                     !Sensible heat fraction
+! 10.77,                    !Receptacle power density (W/m2)
+! 35.2,                     !Hot-water load (W/person)
+! 6.46,                     !Lighting power density (W/m2)
+! 0.000762,                 !Ventilation air flow rate (m3/s-m2)
+! California Title 24-2008, !Standard/code name
+! Entire Building,          !Specification method
+! ;                         !Reserved
+!
+! These schedules are used in compliance calculations for California Building Energy Efficiency Standards (Title 24)
+! Non-Residential schedules based on non-residential 2008 ACM manual
+! Created by Lawrence Berkeley National Lab, May 2008. Updated March 2009
+!
+
+  ScheduleTypeLimits,
+    Any Number;              !- Name
+
+  ScheduleTypeLimits,
+    Fraction,                !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    Continuous;              !- Numeric Type
+
+  ScheduleTypeLimits,
+    Temperature,             !- Name
+    -60,                     !- Lower Limit Value
+    200,                     !- Upper Limit Value
+    Continuous,              !- Numeric Type
+    Temperature;             !- Unit Type
+
+  ScheduleTypeLimits,
+    On/Off,                  !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    Discrete;                !- Numeric Type
+
+  ScheduleTypeLimits,
+    Control Type,            !- Name
+    0,                       !- Lower Limit Value
+    4,                       !- Upper Limit Value
+    Discrete;                !- Numeric Type
+
+  ScheduleTypeLimits,
+    Humidity,                !- Name
+    10,                      !- Lower Limit Value
+    90,                      !- Upper Limit Value
+    Continuous;              !- Numeric Type
+
+  ScheduleTypeLimits,
+    Number;                  !- Name
+
+!  Occupancy schedule
+
+  SCHEDULE:COMPACT,
+    OCC-SCHED-BldgAvg,       !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  4:00,0.,         !- Field 3
+    Until:  5:00,0.05,       !- Field 5
+    Until:  6:00,0.1,        !- Field 7
+    Until:  7:00,0.25,       !- Field 9
+    Until: 11:00,0.65,       !- Field 11
+    Until: 13:00,0.6,        !- Field 13
+    Until: 17:00,0.65,       !- Field 15
+    Until: 18:00,0.4,        !- Field 17
+    Until: 19:00,0.25,       !- Field 19
+    Until: 20:00,0.1,        !- Field 21
+    Until: 23:00,0.05,       !- Field 23
+    Until: 24:00,0.,         !- Field 25
+    For: Saturday,           !- Field 27
+    Until:  6:00,0.,         !- Field 28
+    Until:  7:00,0.05,       !- Field 30
+    Until: 17:00,0.15,       !- Field 32
+    Until: 20:00,0.05,       !- Field 34
+    Until: 24:00,0.,         !- Field 36
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 38
+    Until:  7:00,0.,         !- Field 39
+    Until: 20:00,0.05,       !- Field 41
+    Until: 24:00,0.;         !- Field 43
+
+  SCHEDULE:COMPACT,
+    LIT-SCHED-BldgAvg,       !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  4:00,0.05,       !- Field 3
+    Until:  5:00,0.1,        !- Field 5
+    Until:  6:00,0.2,        !- Field 7
+    Until:  7:00,0.4,        !- Field 9
+    Until:  8:00,0.7,        !- Field 11
+    Until:  9:00,0.8,        !- Field 13
+    Until:  17:00,0.85,      !- Field 15
+    Until:  18:00,0.8,       !- Field 17
+    Until:  19:00,0.35,      !- Field 19
+    Until: 24:00,0.1,        !- Field 21
+    For: Saturday,           !- Field 23
+    Until:  5:00,0.05,       !- Field 24
+    Until:  6:00,0.1,        !- Field 26
+    Until:  7:00,0.15,       !- Field 28
+    Until:  9:00,0.21,       !- Field 30
+    Until: 14:00,0.25,       !- Field 32
+    Until: 17:00,0.2,        !- Field 34
+    Until: 18:00,0.15,       !- Field 36
+    Until: 24:00,0.1,        !- Field 38
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 40
+    Until:  5:00,0.05,       !- Field 41
+    Until:  7:00,0.1,        !- Field 43
+    Until:  17:00,0.15,      !- Field 45
+    Until:  20:00,0.1,       !- Field 47
+    Until:  24:00,0.05;      !- Field 49
+
+  SCHEDULE:COMPACT,
+    LIT_BiLevel-SCHED,       !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  4:00,0.04,       !- Field 3
+    Until:  5:00,0.08,       !- Field 5
+    Until:  6:00,0.15,       !- Field 7
+    Until:  7:00,0.31,       !- Field 9
+    Until:  8:00,0.56,       !- Field 11
+    Until:  9:00,0.67,       !- Field 13
+    Until:  10:00,0.73,      !- Field 15
+    Until:  14:00,0.74,      !- Field 17
+    Until:  15:00,0.73,      !- Field 19
+    Until:  16:00,0.71,      !- Field 21
+    Until:  17:00,0.70,      !- Field 23
+    Until:  18:00,0.64,      !- Field 25
+    Until:  19:00,0.28,      !- Field 27
+    Until:  21:00,0.08,      !- Field 29
+    Until:  23:00,0.07,      !- Field 31
+    Until:  24:00,0.08,      !- Field 33
+    For: Saturday,           !- Field 35
+    Until:  5:00,0.04,       !- Field 36
+    Until:  6:00,0.08,       !- Field 38
+    Until:  7:00,0.12,       !- Field 40
+    Until:  8:00,0.2,        !- Field 42
+    Until:  14:00,0.22,      !- Field 44
+    Until:  16:00,0.17,      !- Field 46
+    Until:  17:00,0.16,      !- Field 48
+    Until:  18:00,0.12,      !- Field 50
+    Until:  21:00,0.08,      !- Field 52
+    Until:  23:00,0.07,      !- Field 54
+    Until:  24:00,0.08,      !- Field 56
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 58
+    Until:  5:00,0.04,       !- Field 59
+    Until:  7:00,0.08,       !- Field 61
+    Until:  8:00,0.12,       !- Field 63
+    Until:  16:00,0.13,      !- Field 65
+    Until:  17:00,0.12,      !- Field 67
+    Until:  20:00,0.08,      !- Field 69
+    Until:  24:00,0.04;      !- Field 71
+
+  SCHEDULE:COMPACT,
+    LIT_Stack-SCHED,         !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  4:00,0.04,       !- Field 3
+    Until:  5:00,0.09,       !- Field 5
+    Until:  6:00,0.17,       !- Field 7
+    Until:  7:00,0.34,       !- Field 9
+    Until:  8:00,0.6,        !- Field 11
+    Until:  9:00,0.68,       !- Field 13
+    Until:  17:00,0.72,      !- Field 15
+    Until:  18:00,0.68,      !- Field 17
+    Until:  19:00,0.3,       !- Field 19
+    Until: 24:00,0.09,       !- Field 21
+    For: Saturday,           !- Field 23
+    Until:  5:00,0.04,       !- Field 24
+    Until:  6:00,0.09,       !- Field 26
+    Until:  7:00,0.13,       !- Field 28
+    Until: 14:00,0.22,       !- Field 30
+    Until: 17:00,0.17,       !- Field 32
+    Until: 18:00,0.13,       !- Field 34
+    Until: 24:00,0.09,       !- Field 36
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 38
+    Until:  5:00,0.04,       !- Field 39
+    Until:  7:00,0.09,       !- Field 41
+    Until:  17:00,0.13,      !- Field 43
+    Until:  20:00,0.09,      !- Field 45
+    Until:  24:00,0.04;      !- Field 47
+
+  SCHEDULE:COMPACT,
+    LIT_Library-SCHED,       !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  4:00,0.04,       !- Field 3
+    Until:  5:00,0.08,       !- Field 5
+    Until:  6:00,0.16,       !- Field 7
+    Until:  7:00,0.33,       !- Field 9
+    Until:  8:00,0.6,        !- Field 11
+    Until:  9:00,0.73,       !- Field 13
+    Until:  10:00,0.8,       !- Field 15
+    Until:  11:00,0.81,      !- Field 17
+    Until:  13:00,0.82,      !- Field 19
+    Until:  14:00,0.81,      !- Field 21
+    Until:  15:00,0.8,       !- Field 23
+    Until:  16:00,0.78,      !- Field 25
+    Until:  17:00,0.75,      !- Field 27
+    Until:  18:00,0.66,      !- Field 29
+    Until:  19:00,0.28,      !- Field 31
+    Until:  24:00,0.08,      !- Field 33
+    For: Saturday,           !- Field 35
+    Until:  5:00,0.04,       !- Field 36
+    Until:  6:00,0.09,       !- Field 38
+    Until:  7:00,0.13,       !- Field 40
+    Until: 14:00,0.22,       !- Field 42
+    Until: 17:00,0.17,       !- Field 44
+    Until: 18:00,0.13,       !- Field 46
+    Until: 24:00,0.09,       !- Field 48
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 50
+    Until:  5:00,0.04,       !- Field 51
+    Until:  7:00,0.09,       !- Field 53
+    Until:  17:00,0.13,      !- Field 55
+    Until:  20:00,0.09,      !- Field 57
+    Until:  24:00,0.04;      !- Field 59
+
+  SCHEDULE:COMPACT,
+    LIT_ManualDimming-SCHED, !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  4:00,0.05,       !- Field 3
+    Until:  5:00,0.09,       !- Field 5
+    Until:  6:00,0.18,       !- Field 7
+    Until:  7:00,0.36,       !- Field 9
+    Until:  8:00,0.63,       !- Field 11
+    Until:  9:00,0.72,       !- Field 13
+    Until:  17:00,0.77,      !- Field 15
+    Until:  18:00,0.72,      !- Field 17
+    Until:  19:00,0.32,      !- Field 19
+    Until: 24:00,0.09,       !- Field 21
+    For: Saturday,           !- Field 23
+    Until:  5:00,0.05,       !- Field 24
+    Until:  6:00,0.09,       !- Field 26
+    Until:  7:00,0.14,       !- Field 28
+    Until: 14:00,0.23,       !- Field 30
+    Until: 17:00,0.18,       !- Field 32
+    Until: 18:00,0.14,       !- Field 34
+    Until: 24:00,0.09,       !- Field 36
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 38
+    Until:  5:00,0.05,       !- Field 39
+    Until:  7:00,0.09,       !- Field 41
+    Until:  17:00,0.14,      !- Field 43
+    Until:  20:00,0.09,      !- Field 45
+    Until:  24:00,0.05;      !- Field 47
+
+  SCHEDULE:COMPACT,
+    LIT_ProgramMulti-SCHED,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  4:00,0.04,       !- Field 3
+    Until:  5:00,0.08,       !- Field 5
+    Until:  6:00,0.16,       !- Field 7
+    Until:  7:00,0.32,       !- Field 9
+    Until:  8:00,0.56,       !- Field 11
+    Until:  9:00,0.64,       !- Field 13
+    Until:  17:00,0.68,      !- Field 15
+    Until:  18:00,0.64,      !- Field 17
+    Until:  19:00,0.28,      !- Field 19
+    Until:  24:00,0.08,      !- Field 21
+    For: Saturday,           !- Field 23
+    Until:  5:00,0.04,       !- Field 24
+    Until:  6:00,0.08,       !- Field 26
+    Until:  7:00,0.12,       !- Field 28
+    Until: 14:00,0.2,        !- Field 30
+    Until: 17:00,0.16,       !- Field 32
+    Until: 18:00,0.12,       !- Field 34
+    Until: 24:00,0.08,       !- Field 36
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 38
+    Until:  5:00,0.04,       !- Field 39
+    Until:  7:00,0.08,       !- Field 41
+    Until:  17:00,0.12,      !- Field 43
+    Until:  20:00,0.08,      !- Field 45
+    Until:  24:00,0.04;      !- Field 47
+
+  SCHEDULE:COMPACT,
+    LIT_CombinedDaylight-SCHED,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  4:00,0.04,       !- Field 3
+    Until:  5:00,0.08,       !- Field 5
+    Until:  6:00,0.15,       !- Field 7
+    Until:  7:00,0.31,       !- Field 9
+    Until:  8:00,0.56,       !- Field 11
+    Until:  9:00,0.67,       !- Field 13
+    Until:  10:00,0.73,      !- Field 15
+    Until:  14:00,0.74,      !- Field 17
+    Until:  15:00,0.73,      !- Field 19
+    Until:  16:00,0.71,      !- Field 21
+    Until:  17:00,0.7,       !- Field 23
+    Until:  18:00,0.64,      !- Field 25
+    Until:  19:00,0.28,      !- Field 27
+    Until:  21:00,0.08,      !- Field 29
+    Until:  23:00,0.07,      !- Field 31
+    Until:  24:00,0.08,      !- Field 33
+    For: Saturday,           !- Field 35
+    Until:  5:00,0.04,       !- Field 36
+    Until:  6:00,0.08,       !- Field 38
+    Until:  7:00,0.12,       !- Field 40
+    Until:  8:00,0.2,        !- Field 42
+    Until:  9:00,0.21,       !- Field 44
+    Until: 14:00,0.22,       !- Field 46
+    Until: 16:00,0.17,       !- Field 48
+    Until: 17:00,0.16,       !- Field 50
+    Until: 18:00,0.12,       !- Field 52
+    Until: 21:00,0.08,       !- Field 54
+    Until: 23:00,0.07,       !- Field 56
+    Until: 24:00,0.08,       !- Field 58
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 60
+    Until:  5:00,0.04,       !- Field 61
+    Until:  7:00,0.08,       !- Field 63
+    Until:  8:00,0.12,       !- Field 65
+    Until:  16:00,0.13,      !- Field 67
+    Until:  17:00,0.12,      !- Field 69
+    Until:  20:00,0.08,      !- Field 71
+    Until:  24:00,0.04;      !- Field 73
+
+  SCHEDULE:COMPACT,
+    LIT_CombinedDimming-SCHED,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  4:00,0.04,       !- Field 3
+    Until:  5:00,0.07,       !- Field 5
+    Until:  6:00,0.14,       !- Field 7
+    Until:  7:00,0.29,       !- Field 9
+    Until:  8:00,0.53,       !- Field 11
+    Until:  9:00,0.64,       !- Field 13
+    Until:  10:00,0.7,       !- Field 15
+    Until:  14:00,0.71,      !- Field 17
+    Until:  15:00,0.7,       !- Field 19
+    Until:  16:00,0.68,      !- Field 21
+    Until:  17:00,0.65,      !- Field 23
+    Until:  18:00,0.6,       !- Field 25
+    Until:  19:00,0.26,      !- Field 27
+    Until: 24:00,0.07,       !- Field 29
+    For: Saturday,           !- Field 31
+    Until:  5:00,0.04,       !- Field 32
+    Until:  6:00,0.07,       !- Field 34
+    Until:  7:00,0.11,       !- Field 36
+    Until:  8:00,0.19,       !- Field 38
+    Until:  9:00,0.2,        !- Field 40
+    Until: 14:00,0.21,       !- Field 42
+    Until: 16:00,0.16,       !- Field 44
+    Until: 17:00,0.15,       !- Field 46
+    Until: 18:00,0.11,       !- Field 48
+    Until: 24:00,0.07,       !- Field 50
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 52
+    Until:  5:00,0.04,       !- Field 53
+    Until:  7:00,0.07,       !- Field 55
+    Until:  8:00,0.11,       !- Field 57
+    Until:  10:00,0.12,      !- Field 59
+    Until:  14:00,0.13,      !- Field 61
+    Until:  17:00,0.12,      !- Field 63
+    Until:  18:00,0.08,      !- Field 65
+    Until:  20:00,0.07,      !- Field 67
+    Until:  24:00,0.03;      !- Field 69
+
+  SCHEDULE:COMPACT,
+    EQP-SCHED-BldgAvg,       !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  5:00,0.15,       !- Field 3
+    Until:  6:00,0.2,        !- Field 5
+    Until:  7:00,0.35,       !- Field 7
+    Until:  8:00,0.6,        !- Field 9
+    Until: 16:00,0.7,        !- Field 11
+    Until: 17:00,0.65,       !- Field 13
+    Until: 18:00,0.45,       !- Field 15
+    Until: 19:00,0.3,        !- Field 17
+    Until: 21:00,0.2,        !- Field 19
+    Until: 24:00,0.15,       !- Field 21
+    For: Saturday,           !- Field 23
+    Until:  7:00,0.15,       !- Field 24
+    Until:  8:00,0.2,        !- Field 26
+    Until: 14:00,0.25,       !- Field 28
+    Until: 17:00,0.2,        !- Field 30
+    Until: 24:00,0.15,       !- Field 32
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 34
+    Until:  7:00,0.15,       !- Field 35
+    Until: 17:00,0.2,        !- Field 37
+    Until: 24:00,0.15;       !- Field 39
+
+  SCHEDULE:COMPACT,
+    INF-SCHED-BldgAvg,       !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  5:00,1.0,        !- Field 3
+    Until: 20:00,0.0,        !- Field 5
+    Until: 24:00,1.0,        !- Field 7
+    For: Saturday,           !- Field 9
+    Until:  5:00,1.0,        !- Field 10
+    Until: 15:00,0.0,        !- Field 12
+    Until: 24:00,1.0,        !- Field 14
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 16
+    Until: 24:00,1.0;        !- Field 17
+
+  SCHEDULE:COMPACT,
+    FAN-SCHED-BldgAvg,       !- Name
+    On/Off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  5:00,0.,         !- Field 3
+    Until: 20:00,1.,         !- Field 5
+    Until: 24:00,0.,         !- Field 7
+    For: Saturday,           !- Field 9
+    Until:  5:00,0.,         !- Field 10
+    Until: 15:00,1.,         !- Field 12
+    Until: 24:00,0.,         !- Field 14
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 16
+    Until: 24:00,0.;         !- Field 17
+
+  SCHEDULE:COMPACT,
+    HTG-SCHED-BldgAvg,       !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  5:00,15.6,       !- Field 3
+    Until:  7:00,18.3,       !- Field 5
+    Until: 18:00,21.1,       !- Field 7
+    Until: 19:00,18.3,       !- Field 9
+    Until: 24:00,15.6,       !- Field 11
+    For: Weekends Holidays WinterDesignDay AllOtherDays, !- Field 13
+    Until:  5:00,15.6,       !- Field 14
+    Until: 16:00,18.3,       !- Field 16
+    Until: 24:00,15.6;       !- Field 18
+
+  SCHEDULE:COMPACT,
+    CLG-SCHED-BldgAvg,       !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until:  5:00,25.0,       !- Field 3
+    Until: 18:00,22.8,       !- Field 5
+    Until: 24:00,25.0;       !- Field 7
+
+  SCHEDULE:COMPACT,
+    DHW-SCHED-BldgAvg,       !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until:  4:00,0.,         !- Field 3
+    Until:  6:00,0.1,        !- Field 5
+    Until: 10:00,0.5,        !- Field 7
+    Until: 11:00,0.7,        !- Field 9
+    Until: 13:00,0.9,        !- Field 11
+    Until: 15:00,0.5,        !- Field 13
+    Until: 16:00,0.7,        !- Field 15
+    Until: 19:00,0.5,        !- Field 17
+    Until: 23:00,0.1,        !- Field 19
+    Until: 24:00,0.,         !- Field 21
+    For: Saturday,           !- Field 23
+    Until:  6:00,0.,         !- Field 24
+    Until:  7:00,0.1,        !- Field 26
+    Until: 17:00,0.2,        !- Field 28
+    Until: 20:00,0.1,        !- Field 30
+    Until: 24:00,0.,         !- Field 32
+    For: Sunday Holidays WinterDesignDay AllOtherDays, !- Field 34
+    Until:  7:00,0.,         !- Field 35
+    Until: 20:00,0.1,        !- Field 37
+    Until: 24:00,0.;         !- Field 39
+
+! People activity schedules
+
+  SCHEDULE:COMPACT,
+    ActSchd103,              !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,103;        !- Field 3
+
+  SCHEDULE:COMPACT,
+    ActSchd105,              !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,105;        !- Field 3
+
+  SCHEDULE:COMPACT,
+    ActSchd122,              !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,122;        !- Field 3
+
+  SCHEDULE:COMPACT,
+    ActSchd132,              !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,132;        !- Field 3
+
+  SCHEDULE:COMPACT,
+    ActSchd134,              !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,134;        !- Field 3
+
+  SCHEDULE:COMPACT,
+    ActSchd136,              !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,136;        !- Field 3
+
+  SCHEDULE:COMPACT,
+    ActSchd140,              !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,140;        !- Field 3
+
+  SCHEDULE:COMPACT,
+    ActSchd146,              !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,146;        !- Field 3
+
+  SCHEDULE:COMPACT,
+    ActSchd178,              !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,178;        !- Field 3
+
+  SCHEDULE:COMPACT,
+    ActSchd197,              !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,197;        !- Field 3
+
+  SCHEDULE:COMPACT,
+    ActSchd293,              !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,293;        !- Field 3
+

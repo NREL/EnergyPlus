@@ -1,0 +1,1692 @@
+!===============================================================================
+! WindowConstructs.idf
+!
+! EnergyPlus Reference Data Set for Window Constructions
+! Terminology used in construction names:
+!
+! Sgl            Single pane
+! Dbl            Double pane
+! Trp            Triple pane
+! Quadruple      Quadruple pane
+! Xmm            X = thickness of glass panes in mm
+! Xmm/Ymm        X = thickness of glass panes, Y = gap thickness
+! Clr            All panes are clear glass
+! Bronze, Grey, Green, Blue  One pane is tinted the indicated color
+! Tint           One pane is tinted
+! Low Iron       Glass pane with low iron content
+! Pyr            Pyrolytic coating
+! Ref-X-Y        One pane has a metallic reflective coating where:
+!                  X=A: stainless steel coating
+!                    B: titanium coating
+!                    C: pewter coating
+!                    D: tin-oxide coating
+!                  Y=L: low-transmittance coating
+!                    M: medium-transmittance coating
+!                    H: high-transmittance coating
+!
+! LoE            Low-emissivity metallic coating on one or more panes
+! eX=Y           Low-emissivity coating on pane surface X with emissivity Y
+!                   (surfaces are numbered from outside to inside)
+! Spec Sel       Spectrally selective
+! Film (XX)      Coated polyester film with nominal visible transmittance of XX percent
+! Air            Between-pane gas fill is air
+! Arg            Between-pane gas fill is argon
+! Krypton        Between-pane gas fill is krypton
+! Elec Abs       Electrochromic glass that darkens by becoming more absorptive
+! Elec Ref       Electrochromic glass that darkens by becoming more reflective
+! Bleached       Bleached (lightest) state of electrochromic glass
+! Colored        Colored (darkest) state of electrochromic glass
+!
+! Immediately preceding each construction are the following - after the exclamation point (!):
+!
+! U              Nominal Center-of-glass U-value (W/m2-K) calculated
+!                for winter conditions (-18C outside air temperature,
+!                21C inside air temperature, 5.5 m/s windspeed and zero solar radiation).
+! SC             Shading coefficient of the construction
+! SHGC           Solar heat gain coefficient of the construction calculated
+!                for summer conditions (32C outside air temperature,
+!                24C inside air temperature, 2.8 m/s windspeed and
+!                783 W/m2 incident beam solar radiation normal to glazing
+! TSOL           Solar transmittance at normal incidence of the construction
+! TVIS           Visible transmittance at normal incidence of the construction
+! U=5.894  SHGC=0.861  TSOL=0.837  TVIS=0.898
+! The objects and syntax in this dataset comply with EnergyPlus, Version 8.4.0 and above, unless otherwise noted.
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  Construction,
+    Sgl Clr 3mm,             !- Name
+    CLEAR 3MM;               !- Outside Layer
+
+! U=5.778  SHGC=0.819  TSOL=0.775  TVIS=0.881
+
+  Construction,
+    Sgl Clr 6mm,             !- Name
+    CLEAR 6MM;               !- Outside Layer
+
+! U=5.894  SHGC=0.905  TSOL=0.899  TVIS=0.913
+
+  Construction,
+    Sgl Clr Low Iron 3mm,    !- Name
+    LOW IRON 3MM;            !- Outside Layer
+
+! U=5.816  SHGC=0.898  TSOL=0.889  TVIS=0.91
+
+  Construction,
+    Sgl Clr Low Iron 5mm,    !- Name
+    LOW IRON 5MM;            !- Outside Layer
+
+! U=5.894  SHGC=0.729  TSOL=0.645  TVIS=0.685
+
+  Construction,
+    Sgl Bronze 3mm,          !- Name
+    BRONZE 3MM;              !- Outside Layer
+
+! U=5.778  SHGC=0.62  TSOL=0.482  TVIS=0.534
+
+  Construction,
+    Sgl Bronze 6mm,          !- Name
+    BRONZE 6MM;              !- Outside Layer
+
+! U=5.894  SHGC=0.722  TSOL=0.635  TVIS=0.822
+
+  Construction,
+    Sgl Green 3mm,           !- Name
+    GREEN 3MM;               !- Outside Layer
+
+! U=5.778  SHGC=0.623  TSOL=0.487  TVIS=0.749
+
+  Construction,
+    Sgl Green 6mm,           !- Name
+    GREEN 6MM;               !- Outside Layer
+
+! U=5.894  SHGC=0.716  TSOL=0.626  TVIS=0.611
+
+  Construction,
+    Sgl Grey 3mm,            !- Name
+    GREY 3MM;                !- Outside Layer
+
+! U=5.778  SHGC=0.602  TSOL=0.455  TVIS=0.431
+
+  Construction,
+    Sgl Grey 6mm,            !- Name
+    GREY 6MM;                !- Outside Layer
+
+! U=5.778  SHGC=0.62  TSOL=0.48  TVIS=0.57
+
+  Construction,
+    Sgl Blue 6mm,            !- Name
+    BLUE 6MM;                !- Outside Layer
+
+! U=4.44  SHGC=0.202  TSOL=0.066  TVIS=0.08
+
+  Construction,
+    Sgl Ref-A-L Clr 6mm,     !- Name
+    REF A CLEAR LO 6MM;      !- Outside Layer
+
+! U=4.664  SHGC=0.261  TSOL=0.11  TVIS=0.14
+
+  Construction,
+    Sgl Ref-A-M Clr 6mm,     !- Name
+    REF A CLEAR MID 6MM;     !- Outside Layer
+
+! U=4.975  SHGC=0.321  TSOL=0.16  TVIS=0.201
+
+  Construction,
+    Sgl Ref-A-H Clr 6mm,     !- Name
+    REF A CLEAR HI 6MM;      !- Outside Layer
+
+! U=4.473  SHGC=0.232  TSOL=0.04  TVIS=0.05
+
+  Construction,
+    Sgl Ref-A-L Tint 6mm,    !- Name
+    REF A TINT LO 6MM;       !- Outside Layer
+
+! U=4.664  SHGC=0.261  TSOL=0.06  TVIS=0.09
+
+  Construction,
+    Sgl Ref-A-M Tint 6mm,    !- Name
+    REF A TINT MID 6MM;      !- Outside Layer
+
+! U=4.851  SHGC=0.304  TSOL=0.1  TVIS=0.1
+
+  Construction,
+    Sgl Ref-A-H Tint 6mm,    !- Name
+    REF A TINT HI 6MM;       !- Outside Layer
+
+! U=5.005  SHGC=0.316  TSOL=0.151  TVIS=0.201
+
+  Construction,
+    Sgl Ref-B-L Clr 6mm,     !- Name
+    REF B CLEAR LO 6MM;      !- Outside Layer
+
+! U=5.067  SHGC=0.4  TSOL=0.241  TVIS=0.301
+
+  Construction,
+    Sgl Ref-B-H Clr 6mm,     !- Name
+    REF B CLEAR HI 6MM;      !- Outside Layer
+
+! U=4.473  SHGC=0.237  TSOL=0.04  TVIS=0.05
+
+  Construction,
+    Sgl Ref-B-L Tint 6mm,    !- Name
+    REF B TINT LO 6MM;       !- Outside Layer
+
+! U=4.6  SHGC=0.293  TSOL=0.1  TVIS=0.13
+
+  Construction,
+    Sgl Ref-B-M Tint 6mm,    !- Name
+    REF B TINT MID 6MM;      !- Outside Layer
+
+! U=5.067  SHGC=0.354  TSOL=0.151  TVIS=0.181
+
+  Construction,
+    Sgl Ref-B-H Tint 6mm,    !- Name
+    REF B TINT HI 6MM;       !- Outside Layer
+
+! U=4.537  SHGC=0.261  TSOL=0.11  TVIS=0.13
+
+  Construction,
+    Sgl Ref-C-L Clr 6mm,     !- Name
+    REF C CLEAR LO 6MM;      !- Outside Layer
+
+! U=4.789  SHGC=0.328  TSOL=0.171  TVIS=0.191
+
+  Construction,
+    Sgl Ref-C-M Clr 6mm,     !- Name
+    REF C CLEAR MID 6MM;     !- Outside Layer
+
+! U=4.913  SHGC=0.365  TSOL=0.201  TVIS=0.221
+
+  Construction,
+    Sgl Ref-C-H Clr 6mm,     !- Name
+    REF C CLEAR HI 6MM;      !- Outside Layer
+
+! U=4.537  SHGC=0.262  TSOL=0.07  TVIS=0.08
+
+  Construction,
+    Sgl Ref-C-L Tint 6mm,    !- Name
+    REF C TINT LO 6MM;       !- Outside Layer
+
+! U=4.789  SHGC=0.304  TSOL=0.1  TVIS=0.11
+
+  Construction,
+    Sgl Ref-C-M Tint 6mm,    !- Name
+    REF C TINT MID 6MM;      !- Outside Layer
+
+! U=4.913  SHGC=0.325  TSOL=0.12  TVIS=0.13
+
+  Construction,
+    Sgl Ref-C-H Tint 6mm,    !- Name
+    REF C TINT HI 6MM;       !- Outside Layer
+
+! U=5.72  SHGC=0.506  TSOL=0.431  TVIS=0.335
+
+  Construction,
+    Sgl Ref-D Clr 6mm,       !- Name
+    REF D CLEAR 6MM;         !- Outside Layer
+
+! U=5.72  SHGC=0.467  TSOL=0.301  TVIS=0.251
+
+  Construction,
+    Sgl Ref-D Tint 6mm,      !- Name
+    REF D TINT 6MM;          !- Outside Layer
+
+! U=4.513  SHGC=0.781  TSOL=0.75  TVIS=0.85
+
+  Construction,
+    Sgl LoE (e2=.4) Clr 3mm, !- Name
+    PYR A CLEAR 3MM;         !- Outside Layer
+
+! U=3.835  SHGC=0.768  TSOL=0.741  TVIS=0.821
+
+  Construction,
+    Sgl LoE (e2=.2) Clr 3mm, !- Name
+    PYR B CLEAR 3MM;         !- Outside Layer
+
+! U=3.779  SHGC=0.72  TSOL=0.68  TVIS=0.811
+
+  Construction,
+    Sgl LoE (e2=.2) Clr 6mm, !- Name
+    PYR B CLEAR 6MM;         !- Outside Layer
+
+! U=5.778  SHGC=0.842  TSOL=0.814  TVIS=0.847
+
+  Construction,
+    Sgl Elec Abs Bleached 6mm,  !- Name
+    ECABS-1 BLEACHED 6MM;    !- Outside Layer
+
+! U=5.778  SHGC=0.328  TSOL=0.111  TVIS=0.128
+
+  Construction,
+    Sgl Elec Abs Colored 6mm,!- Name
+    ECABS-1 COLORED 6MM;     !- Outside Layer
+
+! U=5.778  SHGC=0.733  TSOL=0.694  TVIS=0.818
+
+  Construction,
+    Sgl Elec Ref Bleached 6mm,  !- Name
+    ECREF-1 BLEACHED 6MM;    !- Outside Layer
+
+! U=5.778  SHGC=0.306  TSOL=0.099  TVIS=0.155
+
+  Construction,
+    Sgl Elec Ref Colored 6mm,!- Name
+    ECREF-1 COLORED 6MM;     !- Outside Layer
+
+! U=3.122  SHGC=0.762  TSOL=0.705  TVIS=0.812
+
+  Construction,
+    Dbl Clr 3mm/6mm Air,     !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.72  SHGC=0.764  TSOL=0.705  TVIS=0.812
+
+  Construction,
+    Dbl Clr 3mm/13mm Air,    !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.556  SHGC=0.764  TSOL=0.705  TVIS=0.812
+
+  Construction,
+    Dbl Clr 3mm/13mm Arg,    !- Name
+    CLEAR 3MM,               !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=3.058  SHGC=0.7  TSOL=0.604  TVIS=0.781
+
+  Construction,
+    Dbl Clr 6mm/6mm Air,     !- Name
+    CLEAR 6MM,               !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.67  SHGC=0.703  TSOL=0.604  TVIS=0.781
+
+  Construction,
+    Dbl Clr 6mm/13mm Air,    !- Name
+    CLEAR 6MM,               !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.511  SHGC=0.704  TSOL=0.604  TVIS=0.781
+
+  Construction,
+    Dbl Clr 6mm/13mm Arg,    !- Name
+    CLEAR 6MM,               !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=3.122  SHGC=0.828  TSOL=0.813  TVIS=0.839
+
+  Construction,
+    Dbl Clr Low Iron 3mm/6mm Air,  !- Name
+    LOW IRON 3MM,            !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    LOW IRON 3MM;            !- Layer 3
+
+! U=2.72  SHGC=0.829  TSOL=0.813  TVIS=0.839
+
+  Construction,
+    Dbl Clr Low Iron 3mm/13mm Air,  !- Name
+    LOW IRON 3MM,            !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    LOW IRON 3MM;            !- Layer 3
+
+! U=2.556  SHGC=0.829  TSOL=0.813  TVIS=0.839
+
+  Construction,
+    Dbl Clr Low Iron 3mm/13mm Arg,  !- Name
+    LOW IRON 3MM,            !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    LOW IRON 3MM;            !- Layer 3
+
+! U=3.079  SHGC=0.817  TSOL=0.795  TVIS=0.834
+
+  Construction,
+    Dbl Clr Low Iron 5mm/6mm Air,  !- Name
+    LOW IRON 5MM,            !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    LOW IRON 5MM;            !- Layer 3
+
+! U=2.686  SHGC=0.818  TSOL=0.795  TVIS=0.834
+
+  Construction,
+    Dbl Clr Low Iron 5mm/13mm Air,  !- Name
+    LOW IRON 5MM,            !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    LOW IRON 5MM;            !- Layer 3
+
+! U=2.526  SHGC=0.818  TSOL=0.795  TVIS=0.834
+
+  Construction,
+    Dbl Clr Low Iron 5mm/13mm Arg,  !- Name
+    LOW IRON 5MM,            !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    LOW IRON 5MM;            !- Layer 3
+
+! U=3.122  SHGC=0.628  TSOL=0.542  TVIS=0.618
+
+  Construction,
+    Dbl Bronze 3mm/6mm Air,  !- Name
+    BRONZE 3MM,              !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.72  SHGC=0.625  TSOL=0.542  TVIS=0.618
+
+  Construction,
+    Dbl Bronze 3mm/13mm Air, !- Name
+    BRONZE 3MM,              !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.556  SHGC=0.623  TSOL=0.542  TVIS=0.618
+
+  Construction,
+    Dbl Bronze 3mm/13mm Arg, !- Name
+    BRONZE 3MM,              !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=3.058  SHGC=0.503  TSOL=0.375  TVIS=0.473
+
+  Construction,
+    Dbl Bronze 6mm/6mm Air,  !- Name
+    BRONZE 6MM,              !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.67  SHGC=0.498  TSOL=0.375  TVIS=0.473
+
+  Construction,
+    Dbl Bronze 6mm/13mm Air, !- Name
+    BRONZE 6MM,              !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.511  SHGC=0.495  TSOL=0.375  TVIS=0.473
+
+  Construction,
+    Dbl Bronze 6mm/13mm Arg, !- Name
+    BRONZE 6MM,              !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=3.122  SHGC=0.62  TSOL=0.534  TVIS=0.743
+
+  Construction,
+    Dbl Green 3m/6mm Air,    !- Name
+    GREEN 3MM,               !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.72  SHGC=0.617  TSOL=0.534  TVIS=0.743
+
+  Construction,
+    Dbl Green 3mm/13mm Air,  !- Name
+    GREEN 3MM,               !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.556  SHGC=0.616  TSOL=0.534  TVIS=0.743
+
+  Construction,
+    Dbl Green 3mm/13mm Arg,  !- Name
+    GREEN 3MM,               !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=3.058  SHGC=0.506  TSOL=0.379  TVIS=0.664
+
+  Construction,
+    Dbl Green 6mm/6mm Air,   !- Name
+    GREEN 6MM,               !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.67  SHGC=0.501  TSOL=0.379  TVIS=0.664
+
+  Construction,
+    Dbl Green 6mm/13mm Air,  !- Name
+    GREEN 6MM,               !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.511  SHGC=0.499  TSOL=0.379  TVIS=0.664
+
+  Construction,
+    Dbl Green 6mm/13mm Arg,  !- Name
+    GREEN 6MM,               !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=3.122  SHGC=0.614  TSOL=0.526  TVIS=0.551
+
+  Construction,
+    Dbl Grey 3mm/6mm Air,    !- Name
+    GREY 3MM,                !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.72  SHGC=0.611  TSOL=0.526  TVIS=0.551
+
+  Construction,
+    Dbl Grey 3mm/13mm Air,   !- Name
+    GREY 3MM,                !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.556  SHGC=0.609  TSOL=0.526  TVIS=0.551
+
+  Construction,
+    Dbl Grey 3mm/13mm Arg,   !- Name
+    GREY 3MM,                !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=3.058  SHGC=0.485  TSOL=0.354  TVIS=0.381
+
+  Construction,
+    Dbl Grey 6mm/6mm Air,    !- Name
+    GREY 6MM,                !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.67  SHGC=0.479  TSOL=0.354  TVIS=0.381
+
+  Construction,
+    Dbl Grey 6mm/13mm Air,   !- Name
+    GREY 6MM,                !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.511  SHGC=0.476  TSOL=0.354  TVIS=0.381
+
+  Construction,
+    Dbl Grey 6mm/13mm Arg,   !- Name
+    GREY 6MM,                !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=3.058  SHGC=0.502  TSOL=0.373  TVIS=0.505
+
+  Construction,
+    Dbl Blue 6mm/6mm Air,    !- Name
+    BLUE 6MM,                !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.67  SHGC=0.497  TSOL=0.373  TVIS=0.505
+
+  Construction,
+    Dbl Blue 6mm/13mm Air,   !- Name
+    BLUE 6MM,                !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.511  SHGC=0.494  TSOL=0.373  TVIS=0.505
+
+  Construction,
+    Dbl Blue 6mm/13mm Arg,   !- Name
+    BLUE 6MM,                !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.714  SHGC=0.153  TSOL=0.053  TVIS=0.073
+
+  Construction,
+    Dbl Ref-A-L Clr 6mm/6mm Air,  !- Name
+    REF A CLEAR LO 6MM,      !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.219  SHGC=0.138  TSOL=0.053  TVIS=0.073
+
+  Construction,
+    Dbl Ref-A-L Clr 6mm/13mm Air,  !- Name
+    REF A CLEAR LO 6MM,      !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.01  SHGC=0.132  TSOL=0.053  TVIS=0.073
+
+  Construction,
+    Dbl Ref-A-L Clr 6mm/13mm Arg,  !- Name
+    REF A CLEAR LO 6MM,      !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.779  SHGC=0.2  TSOL=0.088  TVIS=0.127
+
+  Construction,
+    Dbl Ref-A-M Clr 6mm/6mm Air,  !- Name
+    REF A CLEAR MID 6MM,     !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.305  SHGC=0.185  TSOL=0.088  TVIS=0.127
+
+  Construction,
+    Dbl Ref-A-M Clr 6mm/13mm Air,  !- Name
+    REF A CLEAR MID 6MM,     !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.106  SHGC=0.179  TSOL=0.088  TVIS=0.127
+
+  Construction,
+    Dbl Ref-A-M Clr 6mm/13mm Arg,  !- Name
+    REF A CLEAR MID 6MM,     !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.864  SHGC=0.247  TSOL=0.127  TVIS=0.181
+
+  Construction,
+    Dbl Ref-A-H Clr 6mm/6mm Air,  !- Name
+    REF A CLEAR HI 6MM,      !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.416  SHGC=0.234  TSOL=0.127  TVIS=0.181
+
+  Construction,
+    Dbl Ref-A-H 6mm/13mm Air,!- Name
+    REF A CLEAR HI 6MM,      !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.232  SHGC=0.229  TSOL=0.127  TVIS=0.181
+
+  Construction,
+    Dbl Ref-A-H Clr 6mm/13mm Arg,  !- Name
+    REF A CLEAR HI 6MM,      !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.724  SHGC=0.166  TSOL=0.032  TVIS=0.046
+
+  Construction,
+    Dbl Ref-A-L Tint 6mm/6mm Air,  !- Name
+    REF A TINT LO 6MM,       !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.232  SHGC=0.145  TSOL=0.032  TVIS=0.046
+
+  Construction,
+    Dbl Ref-A-L Tint 6mm/13mm Air,  !- Name
+    REF A TINT LO 6MM,       !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.024  SHGC=0.136  TSOL=0.032  TVIS=0.046
+
+  Construction,
+    Dbl Ref-A-L Tint 6mm/13mm Arg,  !- Name
+    REF A TINT LO 6MM,       !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.779  SHGC=0.187  TSOL=0.048  TVIS=0.082
+
+  Construction,
+    Dbl Ref-A-M Tint 6mm/6mm Air,  !- Name
+    REF A TINT MID 6MM,      !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.305  SHGC=0.167  TSOL=0.048  TVIS=0.082
+
+  Construction,
+    Dbl Ref-A-M Tint 6mm/13mm Air,  !- Name
+    REF A TINT MID 6MM,      !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.106  SHGC=0.159  TSOL=0.048  TVIS=0.082
+
+  Construction,
+    Dbl Ref-A-M Tint 6mm/13mm Arg,  !- Name
+    REF A TINT MID 6MM,      !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.831  SHGC=0.222  TSOL=0.08  TVIS=0.091
+
+  Construction,
+    Dbl Ref-A-H Tint 6mm/6mm Air,  !- Name
+    REF A TINT HI 6MM,       !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.373  SHGC=0.204  TSOL=0.08  TVIS=0.091
+
+  Construction,
+    Dbl Ref-A-H Tint 6mm/13mm Air,  !- Name
+    REF A TINT HI 6MM,       !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.183  SHGC=0.197  TSOL=0.08  TVIS=0.091
+
+  Construction,
+    Dbl Ref-A-H Tint 6mm/13mm Arg,  !- Name
+    REF A TINT HI 6MM,       !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.872  SHGC=0.241  TSOL=0.12  TVIS=0.182
+
+  Construction,
+    Dbl Ref-B-L Clr 6mm/6mm Air,  !- Name
+    REF B CLEAR LO 6MM,      !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.427  SHGC=0.228  TSOL=0.12  TVIS=0.182
+
+  Construction,
+    Dbl Ref-B-L Clr 6mm/13mm Air,  !- Name
+    REF B CLEAR LO 6MM,      !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.244  SHGC=0.222  TSOL=0.12  TVIS=0.182
+
+  Construction,
+    Dbl Ref-B-L Clr 6mm/13mm Arg,  !- Name
+    REF B CLEAR LO 6MM,      !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.888  SHGC=0.316  TSOL=0.191  TVIS=0.271
+
+  Construction,
+    Dbl Ref-B-H Clr 6mm/6mm Air,  !- Name
+    REF B CLEAR HI 6MM,      !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.447  SHGC=0.305  TSOL=0.191  TVIS=0.271
+
+  Construction,
+    Dbl Ref-B-H Clr 6mm/13mm Air,  !- Name
+    REF B CLEAR HI 6MM,      !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.267  SHGC=0.3  TSOL=0.191  TVIS=0.271
+
+  Construction,
+    Dbl Ref-B-H Clr 6mm/13mm Arg,  !- Name
+    REF B CLEAR HI 6MM,      !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.724  SHGC=0.169  TSOL=0.032  TVIS=0.045
+
+  Construction,
+    Dbl Ref-B-L Tint 6mm/6mm Air,  !- Name
+    REF B TINT LO 6MM,       !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.232  SHGC=0.147  TSOL=0.032  TVIS=0.045
+
+  Construction,
+    Dbl Ref-B-L Tint 6mm/13mm Air,  !- Name
+    REF B TINT LO 6MM,       !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.024  SHGC=0.139  TSOL=0.032  TVIS=0.045
+
+  Construction,
+    Dbl Ref-B-L Tint 6mm/13mm Arg,  !- Name
+    REF B TINT LO 6MM,       !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.761  SHGC=0.219  TSOL=0.08  TVIS=0.118
+
+  Construction,
+    Dbl Ref-B-M Tint 6mm/6mm Air,  !- Name
+    REF B TINT MID 6MM,      !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.281  SHGC=0.199  TSOL=0.08  TVIS=0.118
+
+  Construction,
+    Dbl Ref-B-M Tint 6mm/13mm Air,  !- Name
+    REF B TINT MID 6MM,      !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.08  SHGC=0.192  TSOL=0.08  TVIS=0.118
+
+  Construction,
+    Dbl Ref-B-M Tint 6mm/13mm Arg,  !- Name
+    REF B TINT MID 6MM,      !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.888  SHGC=0.264  TSOL=0.119  TVIS=0.163
+
+  Construction,
+    Dbl Ref-B-H Tint 6mm/6mm Air,  !- Name
+    REF B TINT HI 6MM,       !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.447  SHGC=0.248  TSOL=0.119  TVIS=0.163
+
+  Construction,
+    Dbl Ref-B-H Tint 6mm/13mm Air,  !- Name
+    REF B TINT HI 6MM,       !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.267  SHGC=0.242  TSOL=0.119  TVIS=0.163
+
+  Construction,
+    Dbl Ref B-H Tint 6mm/13mm Arg,  !- Name
+    REF B TINT HI 6MM,       !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.743  SHGC=0.202  TSOL=0.089  TVIS=0.119
+
+  Construction,
+    Dbl Ref-C-L Clr 6mm/6mm Air,  !- Name
+    REF C CLEAR LO 6MM,      !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.257  SHGC=0.186  TSOL=0.089  TVIS=0.119
+
+  Construction,
+    Dbl Ref-C-L Clr 6mm/13mm Air,  !- Name
+    REF C CLEAR LO 6MM,      !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.052  SHGC=0.18  TSOL=0.089  TVIS=0.119
+
+  Construction,
+    Dbl Ref-C-L Clr 6mm/13mm Arg,  !- Name
+    REF C CLEAR LO 6MM,      !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.814  SHGC=0.257  TSOL=0.136  TVIS=0.173
+
+  Construction,
+    Dbl Ref-C-M Clr 6mm/6mm Air,  !- Name
+    REF C CLEAR MID 6MM,     !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.351  SHGC=0.243  TSOL=0.136  TVIS=0.173
+
+  Construction,
+    Dbl Ref-C-M Clr 6mm/13mm Air,  !- Name
+    REF C CLEAR MID 6MM,     !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.158  SHGC=0.238  TSOL=0.136  TVIS=0.173
+
+  Construction,
+    Dbl Ref-C-M Clr 6mm/13mm Arg,  !- Name
+    REF C CLEAR MID 6MM,     !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.848  SHGC=0.287  TSOL=0.16  TVIS=0.2
+
+  Construction,
+    Dbl Ref-C-H Clr 6mm/6mm Air,  !- Name
+    REF C CLEAR HI 6MM,      !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.395  SHGC=0.273  TSOL=0.16  TVIS=0.2
+
+  Construction,
+    Dbl Ref-C-H Clr 6mm/13mm Air,  !- Name
+    REF C CLEAR HI 6MM,      !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.208  SHGC=0.268  TSOL=0.16  TVIS=0.2
+
+  Construction,
+    Dbl Ref-C-H Clr 6mm/13mm Arg,  !- Name
+    REF C CLEAR HI 6MM,      !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.743  SHGC=0.192  TSOL=0.056  TVIS=0.073
+
+  Construction,
+    Dbl Ref-C-L Tint 6mm/6mm Air,  !- Name
+    REF C TINT LO 6MM,       !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.257  SHGC=0.172  TSOL=0.056  TVIS=0.073
+
+  Construction,
+    Dbl Ref-C-L Tint 6mm/13mm Air,  !- Name
+    REF C TINT LO 6MM,       !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.052  SHGC=0.164  TSOL=0.056  TVIS=0.073
+
+  Construction,
+    Dbl Ref-C-L Tint 6mm/13mm Arg,  !- Name
+    REF C TINT LO 6MM,       !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.814  SHGC=0.223  TSOL=0.08  TVIS=0.1
+
+  Construction,
+    Dbl Ref-C-M Tint 6mm/6mm Air,  !- Name
+    REF C TINT MID 6MM,      !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.351  SHGC=0.205  TSOL=0.08  TVIS=0.1
+
+  Construction,
+    Dbl Ref-C-M Tint 6mm/13mm Air,  !- Name
+    REF C TINT MID 6MM,      !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.158  SHGC=0.197  TSOL=0.08  TVIS=0.1
+
+  Construction,
+    Dbl Ref-C-M Tint 6mm/13mm Arg,  !- Name
+    REF C TINT MID 6MM,      !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.848  SHGC=0.241  TSOL=0.096  TVIS=0.118
+
+  Construction,
+    Dbl Ref-C-H Tint 6mm/6mm Air,  !- Name
+    REF C TINT HI 6MM,       !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.395  SHGC=0.224  TSOL=0.096  TVIS=0.118
+
+  Construction,
+    Dbl Ref-C-H Tint 6mm/13mm Air,  !- Name
+    REF C TINT HI 6MM,       !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.208  SHGC=0.217  TSOL=0.096  TVIS=0.118
+
+  Construction,
+    Dbl Ref-C-H Tint 6mm/13mm Arg,  !- Name
+    REF C TINT HI 6MM,       !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=3.045  SHGC=0.428  TSOL=0.343  TVIS=0.308
+
+  Construction,
+    Dbl Ref-D Clr 6mm/6mm Air,  !- Name
+    REF D CLEAR 6MM,         !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.653  SHGC=0.426  TSOL=0.343  TVIS=0.308
+
+  Construction,
+    Dbl Ref-D Clr 6mm/13mm Air,  !- Name
+    REF D CLEAR 6MM,         !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.493  SHGC=0.426  TSOL=0.343  TVIS=0.308
+
+  Construction,
+    Dbl Ref-D Clr 6mm/13mm Arg,  !- Name
+    REF D CLEAR 6MM,         !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=3.045  SHGC=0.368  TSOL=0.239  TVIS=0.229
+
+  Construction,
+    Dbl Ref-D Tint 6mm/6mm Air,  !- Name
+    REF D TINT 6MM,          !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.653  SHGC=0.359  TSOL=0.239  TVIS=0.229
+
+  Construction,
+    Dbl Ref-D Tint 6mm/13mm Air,  !- Name
+    REF D TINT 6MM,          !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.493  SHGC=0.356  TSOL=0.239  TVIS=0.229
+
+  Construction,
+    Dbl Ref-D Tint 6mm/13mm Arg,  !- Name
+    REF D TINT 6MM,          !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.765  SHGC=0.697  TSOL=0.633  TVIS=0.771
+
+  Construction,
+    Dbl LoE (e2=.4) Clr 3mm/6mm Air,  !- Name
+    PYR A CLEAR 3MM,         !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.255  SHGC=0.697  TSOL=0.633  TVIS=0.771
+
+  Construction,
+    Dbl LoE (e2=.4) Clr 3mm/13mm Air,  !- Name
+    PYR A CLEAR 3MM,         !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.041  SHGC=0.697  TSOL=0.633  TVIS=0.771
+
+  Construction,
+    Dbl LoE (e2=.4) Clr 3mm/13mm Arg,  !- Name
+    PYR A CLEAR 3MM,         !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.541  SHGC=0.691  TSOL=0.624  TVIS=0.744
+
+  Construction,
+    Dbl LoE (e2=.2) Clr 3mm/6mm Air,  !- Name
+    PYR B CLEAR 3MM,         !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=1.961  SHGC=0.691  TSOL=0.624  TVIS=0.744
+
+  Construction,
+    Dbl LoE (e2=.2) Clr 3mm/13mm Air,  !- Name
+    PYR B CLEAR 3MM,         !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=1.71  SHGC=0.691  TSOL=0.624  TVIS=0.744
+
+  Construction,
+    Dbl LoE (e2=.2) Clr 3mm/13mm Arg,  !- Name
+    PYR B CLEAR 3MM,         !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.499  SHGC=0.634  TSOL=0.531  TVIS=0.721
+
+  Construction,
+    Dbl LoE (e2=.2) Clr 6mm/6mm Air,  !- Name
+    PYR B CLEAR 6MM,         !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.932  SHGC=0.634  TSOL=0.531  TVIS=0.721
+
+  Construction,
+    Dbl LoE (e2=.2) Clr 6mm/13mm Air,  !- Name
+    PYR B CLEAR 6MM,         !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.687  SHGC=0.635  TSOL=0.531  TVIS=0.721
+
+  Construction,
+    Dbl LoE (e2=.2) Clr 6mm/13mm Arg,  !- Name
+    PYR B CLEAR 6MM,         !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.409  SHGC=0.6  TSOL=0.538  TVIS=0.769
+
+  Construction,
+    Dbl LoE (e2=.1) Clr 3mm/6mm Air,  !- Name
+    LoE CLEAR 3MM,           !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=1.785  SHGC=0.598  TSOL=0.538  TVIS=0.769
+
+  Construction,
+    Dbl LoE (e2=.1) Clr 3mm/13mm Air,  !- Name
+    LoE CLEAR 3MM,           !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=1.507  SHGC=0.597  TSOL=0.538  TVIS=0.769
+
+  Construction,
+    Dbl LoE (e2=.1) Clr 3mm/13mm Arg,  !- Name
+    LoE CLEAR 3MM,           !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+! U=2.371  SHGC=0.569  TSOL=0.474  TVIS=0.745
+
+  Construction,
+    Dbl LoE (e2=.1) Clr 6mm/6mm Air,  !- Name
+    LoE CLEAR 6MM,           !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.761  SHGC=0.568  TSOL=0.474  TVIS=0.745
+
+  Construction,
+    Dbl LoE (e2=.1) Clr 6mm/13mm Air,  !- Name
+    LoE CLEAR 6MM,           !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.493  SHGC=0.568  TSOL=0.474  TVIS=0.745
+
+  Construction,
+    Dbl LoE (e2=.1) Clr 6mm/13mm Arg,  !- Name
+    LoE CLEAR 6MM,           !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.371  SHGC=0.397  TSOL=0.284  TVIS=0.444
+
+  Construction,
+    Dbl LoE (e2=.1) Tint 6mm/6mm Air,  !- Name
+    LoE TINT 6MM,            !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.761  SHGC=0.38  TSOL=0.284  TVIS=0.444
+
+  Construction,
+    Dbl LoE (e2=.1) Tint 6mm/13mm Air,  !- Name
+    LoE TINT 6MM,            !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.493  SHGC=0.373  TSOL=0.284  TVIS=0.444
+
+  Construction,
+    Dbl LoE (e2=.1) Tint 6mm/13mm Arg,  !- Name
+    LoE TINT 6MM,            !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.409  SHGC=0.637  TSOL=0.538  TVIS=0.769
+
+  Construction,
+    Dbl LoE (e3=.1) Clr 3mm/6mm Air,  !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    LoE CLEAR 3MM Rev;       !- Layer 3
+
+! U=1.785  SHGC=0.645  TSOL=0.538  TVIS=0.769
+
+  Construction,
+    Dbl LoE (e3=.1) Clr 3mm/13mm Air,  !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    LoE CLEAR 3MM Rev;       !- Layer 3
+
+! U=1.507  SHGC=0.649  TSOL=0.538  TVIS=0.769
+
+  Construction,
+    Dbl LoE (e3=.1) Clr 3mm/13mm Arg,  !- Name
+    CLEAR 3MM,               !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    LoE CLEAR 3MM Rev;       !- Layer 3
+
+! U=2.288  SHGC=0.434  TSOL=0.359  TVIS=0.691
+
+  Construction,
+    Dbl LoE Spec Sel Clr 3mm/6mm/6mm Air,  !- Name
+    LoE SPEC SEL CLEAR 3MM,  !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.637  SHGC=0.433  TSOL=0.359  TVIS=0.691
+
+  Construction,
+    Dbl LoE Spec Sel Clr 3mm/13mm/6mm Air,  !- Name
+    LoE SPEC SEL CLEAR 3MM,  !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.341  SHGC=0.432  TSOL=0.359  TVIS=0.691
+
+  Construction,
+    Dbl LoE Spec Sel Clr 3mm/13mm/6mm Arg,  !- Name
+    LoE SPEC SEL CLEAR 3MM,  !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.272  SHGC=0.426  TSOL=0.345  TVIS=0.682
+
+  Construction,
+    Dbl LoE Spec Sel Clr 6mm/6mm Air,  !- Name
+    LoE SPEC SEL CLEAR 6MM,  !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.626  SHGC=0.421  TSOL=0.345  TVIS=0.682
+
+  Construction,
+    Dbl LoE Spec Sel Clr 6mm/13mm Air,  !- Name
+    LoE SPEC SEL CLEAR 6MM,  !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.333  SHGC=0.42  TSOL=0.345  TVIS=0.682
+
+  Construction,
+    Dbl LoE Spec Sel Clr 6mm/13mm Arg,  !- Name
+    LoE SPEC SEL CLEAR 6MM,  !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.272  SHGC=0.313  TSOL=0.208  TVIS=0.408
+
+  Construction,
+    Dbl LoE Spec Sel Tint 6mm/6mm Air,  !- Name
+    LoE SPEC SEL TINT 6MM,   !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.626  SHGC=0.292  TSOL=0.208  TVIS=0.408
+
+  Construction,
+    Dbl LoE Spec Sel Tint 6mm/13mm Air,  !- Name
+    LoE SPEC SEL TINT 6MM,   !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.333  SHGC=0.283  TSOL=0.208  TVIS=0.408
+
+  Construction,
+    Dbl LoE Spec Sel Tint 6mm/13mm Arg,  !- Name
+    LoE SPEC SEL TINT 6MM,   !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.371  SHGC=0.734  TSOL=0.635  TVIS=0.752
+
+  Construction,
+    Dbl Elec Abs Bleached 6mm/6mm Air,  !- Name
+    ECABS-2 BLEACHED 6MM,    !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.371  SHGC=0.194  TSOL=0.087  TVIS=0.114
+
+  Construction,
+    Dbl Elec Abs Colored 6mm/6mm Air,  !- Name
+    ECABS-2 COLORED 6MM,     !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.761  SHGC=0.741  TSOL=0.635  TVIS=0.752
+
+  Construction,
+    Dbl Elec Abs Bleached 6mm/13mm Air,  !- Name
+    ECABS-2 BLEACHED 6MM,    !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.761  SHGC=0.169  TSOL=0.087  TVIS=0.114
+
+  Construction,
+    Dbl Elec Abs Colored 6mm/13mm Air,  !- Name
+    ECABS-2 COLORED 6MM,     !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.493  SHGC=0.745  TSOL=0.635  TVIS=0.752
+
+  Construction,
+    Dbl Elec Abs Bleached 6mm/13mm Arg,  !- Name
+    ECABS-2 BLEACHED 6MM,    !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.493  SHGC=0.158  TSOL=0.087  TVIS=0.114
+
+  Construction,
+    Dbl Elec Abs Colored 6mm/13mm Arg,  !- Name
+    ECABS-2 COLORED 6MM,     !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.371  SHGC=0.636  TSOL=0.545  TVIS=0.727
+
+  Construction,
+    Dbl Elec Ref Bleached 6mm/6mm Air,  !- Name
+    ECREF-2 BLEACHED 6MM,    !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.371  SHGC=0.18  TSOL=0.078  TVIS=0.137
+
+  Construction,
+    Dbl Elec Ref Colored 6mm/6mm Air,  !- Name
+    ECREF-2 COLORED 6MM,     !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.761  SHGC=0.641  TSOL=0.545  TVIS=0.727
+
+  Construction,
+    Dbl Elec Ref Bleached 6mm/13mm Air,  !- Name
+    ECREF-2 BLEACHED 6MM,    !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.761  SHGC=0.155  TSOL=0.078  TVIS=0.137
+
+  Construction,
+    Dbl Elec Ref Colored 6mm/13mm Air,  !- Name
+    ECREF-2 COLORED 6MM,     !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.493  SHGC=0.643  TSOL=0.545  TVIS=0.727
+
+  Construction,
+    Dbl Elec Ref Bleached 6mm/13mm Arg,  !- Name
+    ECREF-2 BLEACHED 6MM,    !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=1.493  SHGC=0.145  TSOL=0.078  TVIS=0.137
+
+  Construction,
+    Dbl Elec Ref Colored 6mm/13mm Arg,  !- Name
+    ECREF-2 COLORED 6MM,     !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+! U=2.262  SHGC=0.469  TSOL=0.364  TVIS=0.657
+
+  Construction,
+    Dbl LoE Elec Abs Bleached 6mm/6mm Air,  !- Name
+    ECABS-2 BLEACHED 6MM,    !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    LoE SPEC SEL CLEAR 6MM Rev;  !- Layer 3
+
+! U=2.262  SHGC=0.158  TSOL=0.052  TVIS=0.099
+
+  Construction,
+    Dbl LoE Elec Abs Colored 6mm/6mm Air,  !- Name
+    ECABS-2 COLORED 6MM,     !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    LoE SPEC SEL CLEAR 6MM Rev;  !- Layer 3
+
+! U=1.614  SHGC=0.476  TSOL=0.364  TVIS=0.657
+
+  Construction,
+    Dbl LoE Elec Abs Bleached 6mm/13mm Air,  !- Name
+    ECABS-2 BLEACHED 6MM,    !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    LoE SPEC SEL CLEAR 6MM Rev;  !- Layer 3
+
+! U=1.614  SHGC=0.128  TSOL=0.052  TVIS=0.099
+
+  Construction,
+    Dbl LoE Elec Abs Colored 6mm/13mm Air,  !- Name
+    ECABS-2 COLORED 6MM,     !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    LoE SPEC SEL CLEAR 6MM Rev;  !- Layer 3
+
+! U=1.318  SHGC=0.48  TSOL=0.364  TVIS=0.657
+
+  Construction,
+    Dbl LoE Elec Abs Bleached 6mm/13mm Arg,  !- Name
+    ECABS-2 BLEACHED 6MM,    !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    LoE SPEC SEL CLEAR 6MM Rev;  !- Layer 3
+
+! U=1.318  SHGC=0.115  TSOL=0.052  TVIS=0.099
+
+  Construction,
+    Dbl LoE Elec Abs Colored 6mm/13mm Arg,  !- Name
+    ECABS-2 COLORED 6MM,     !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    LoE SPEC SEL CLEAR 6MM Rev;  !- Layer 3
+
+! U=2.262  SHGC=0.422  TSOL=0.322  TVIS=0.634
+
+  Construction,
+    Dbl LoE Elec Ref Bleached 6mm/6mm Air,  !- Name
+    ECREF-2 BLEACHED 6MM,    !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    LoE SPEC SEL CLEAR 6MM Rev;  !- Layer 3
+
+! U=2.262  SHGC=0.148  TSOL=0.047  TVIS=0.12
+
+  Construction,
+    Dbl LoE Elec Ref Colored 6mm/6mm Air,  !- Name
+    ECREF-2 COLORED 6MM,     !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    LoE SPEC SEL CLEAR 6MM Rev;  !- Layer 3
+
+! U=1.614  SHGC=0.426  TSOL=0.322  TVIS=0.634
+
+  Construction,
+    Dbl LoE Elec Ref Bleached 6mm/13mm Air,  !- Name
+    ECREF-2 BLEACHED 6MM,    !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    LoE SPEC SEL CLEAR 6MM Rev;  !- Layer 3
+
+! U=1.614  SHGC=0.119  TSOL=0.047  TVIS=0.12
+
+  Construction,
+    Dbl LoE Elec Ref Colored 6mm/13mm Air,  !- Name
+    ECREF-2 COLORED 6MM,     !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    LoE SPEC SEL CLEAR 6MM Rev;  !- Layer 3
+
+! U=1.318  SHGC=0.428  TSOL=0.322  TVIS=0.634
+
+  Construction,
+    Dbl LoE Elec Ref Bleached 6mm/13mm Arg,  !- Name
+    ECREF-2 BLEACHED 6MM,    !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    LoE SPEC SEL CLEAR 6MM Rev;  !- Layer 3
+
+! U=1.318  SHGC=0.107  TSOL=0.047  TVIS=0.12
+
+  Construction,
+    Dbl LoE Elec Ref Colored 6mm/13m Arg,  !- Name
+    ECREF-2 COLORED 6MM,     !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    LoE SPEC SEL CLEAR 6MM Rev;  !- Layer 3
+
+! U=2.143  SHGC=0.682  TSOL=0.595  TVIS=0.738
+
+  Construction,
+    Trp Clr 3mm/6mm Air,     !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 3MM,               !- Layer 3
+    AIR 6MM,                 !- Layer 4
+    CLEAR 3MM;               !- Layer 5
+
+! U=1.765  SHGC=0.684  TSOL=0.595  TVIS=0.738
+
+  Construction,
+    Trp Clr 3mm/13mm Air,    !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 3MM,               !- Layer 3
+    AIR 13MM,                !- Layer 4
+    CLEAR 3MM;               !- Layer 5
+
+! U=1.624  SHGC=0.685  TSOL=0.595  TVIS=0.738
+
+  Construction,
+    Trp Clr 3mm/13mm Arg,    !- Name
+    CLEAR 3MM,               !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 3MM,               !- Layer 3
+    ARGON 13MM,              !- Layer 4
+    CLEAR 3MM;               !- Layer 5
+
+! U=1.772  SHGC=0.579  TSOL=0.458  TVIS=0.698
+
+  Construction,
+    Trp LoE (e5=.1) Clr 3mm/6mm Air,  !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 3MM,               !- Layer 3
+    AIR 6MM,                 !- Layer 4
+    LoE CLEAR 3MM Rev;       !- Layer 5
+
+! U=1.265  SHGC=0.579  TSOL=0.458  TVIS=0.698
+
+  Construction,
+    Trp LoE (e5=.1) Clr 3mm/13mm Air,  !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 3MM,               !- Layer 3
+    AIR 13MM,                !- Layer 4
+    LoE CLEAR 3MM Rev;       !- Layer 5
+
+! U=1.062  SHGC=0.579  TSOL=0.458  TVIS=0.698
+
+  Construction,
+    Trp LoE (e5=.1) Clr 3mm/13mm Arg,  !- Name
+    CLEAR 3MM,               !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 3MM,               !- Layer 3
+    ARGON 13MM,              !- Layer 4
+    LoE CLEAR 3MM Rev;       !- Layer 5
+
+! U=1.525  SHGC=0.472  TSOL=0.358  TVIS=0.661
+
+  Construction,
+    Trp LoE (e2=e5=.1) Clr 3mm/6mm Air,  !- Name
+    LoE CLEAR 3MM,           !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 3MM,               !- Layer 3
+    AIR 6MM,                 !- Layer 4
+    LoE CLEAR 3MM Rev;       !- Layer 5
+
+! U=0.992  SHGC=0.474  TSOL=0.358  TVIS=0.661
+
+  Construction,
+    Trp LoE (e2=e5=.1) Clr 3mm/13mm Air,  !- Name
+    LoE CLEAR 3MM,           !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    CLEAR 3MM,               !- Layer 3
+    AIR 13MM,                !- Layer 4
+    LoE CLEAR 3MM Rev;       !- Layer 5
+
+! U=0.785  SHGC=0.474  TSOL=0.358  TVIS=0.661
+
+  Construction,
+    Trp LoE (e2=e5=.1) Clr 3mm/13mm Arg,  !- Name
+    LoE CLEAR 3MM,           !- Outside Layer
+    ARGON 13MM,              !- Layer 2
+    CLEAR 3MM,               !- Layer 3
+    ARGON 13MM,              !- Layer 4
+    LoE CLEAR 3MM Rev;       !- Layer 5
+
+! U=1.789  SHGC=0.569  TSOL=0.478  TVIS=0.711
+
+  Construction,
+    Trp LoE Film (88) Clr 3mm/6mm Air,  !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    COATED POLY-88,          !- Layer 3
+    AIR 6MM,                 !- Layer 4
+    CLEAR 3MM;               !- Layer 5
+
+! U=1.311  SHGC=0.576  TSOL=0.478  TVIS=0.711
+
+  Construction,
+    Trp LoE Film (88) Clr 3mm/13mm Air,  !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    COATED POLY-88,          !- Layer 3
+    AIR 13MM,                !- Layer 4
+    CLEAR 3MM;               !- Layer 5
+
+! U=1.745  SHGC=0.462  TSOL=0.377  TVIS=0.637
+
+  Construction,
+    Trp LoE Film (77) Clr 3mm/6mm Air,  !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    COATED POLY-77,          !- Layer 3
+    AIR 6MM,                 !- Layer 4
+    CLEAR 3MM;               !- Layer 5
+
+! U=1.25  SHGC=0.468  TSOL=0.377  TVIS=0.637
+
+  Construction,
+    Trp LoE Film (77) Clr 3mm/13mm Air,  !- Name
+    CLEAR 3MM,               !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    COATED POLY-77,          !- Layer 3
+    AIR 13MM,                !- Layer 4
+    CLEAR 3MM;               !- Layer 5
+
+! U=1.712  SHGC=0.358  TSOL=0.261  TVIS=0.535
+
+  Construction,
+    Trp LoE Film (66) Clr 6mm/6mm Air,  !- Name
+    CLEAR 6MM,               !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    COATED POLY-66,          !- Layer 3
+    AIR 6MM,                 !- Layer 4
+    CLEAR 6MM;               !- Layer 5
+
+! U=1.22  SHGC=0.361  TSOL=0.261  TVIS=0.535
+
+  Construction,
+    Trp LoE Film (66) Clr 6mm/13mm Air,  !- Name
+    CLEAR 6MM,               !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    COATED POLY-66,          !- Layer 3
+    AIR 13MM,                !- Layer 4
+    CLEAR 6MM;               !- Layer 5
+
+! U=1.712  SHGC=0.265  TSOL=0.161  TVIS=0.322
+
+  Construction,
+    Trp LoE Film (66) Bronze 6mm/6mm Air,  !- Name
+    BRONZE 6MM,              !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    COATED POLY-66,          !- Layer 3
+    AIR 6MM,                 !- Layer 4
+    CLEAR 6MM;               !- Layer 5
+
+! U=1.22  SHGC=0.254  TSOL=0.161  TVIS=0.322
+
+  Construction,
+    Trp LoE Film (66) Bronze 6mm/13mm Air,  !- Name
+    BRONZE 6MM,              !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    COATED POLY-66,          !- Layer 3
+    AIR 13MM,                !- Layer 4
+    CLEAR 6MM;               !- Layer 5
+
+! U=1.703  SHGC=0.306  TSOL=0.21  TVIS=0.455
+
+  Construction,
+    Trp LoE Film (55) Clr 6mm/6mm Air,  !- Name
+    CLEAR 6MM,               !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    COATED POLY-55,          !- Layer 3
+    AIR 6MM,                 !- Layer 4
+    CLEAR 6MM;               !- Layer 5
+
+! U=1.208  SHGC=0.31  TSOL=0.21  TVIS=0.455
+
+  Construction,
+    Trp LoE Film (55) Clr 6mm/13m Air,  !- Name
+    CLEAR 6MM,               !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    COATED POLY-55,          !- Layer 3
+    AIR 13MM,                !- Layer 4
+    CLEAR 6MM;               !- Layer 5
+
+! U=1.703  SHGC=0.234  TSOL=0.129  TVIS=0.274
+
+  Construction,
+    Trp LoE Film (55) Bronze 6mm/6mm Air,  !- Name
+    BRONZE 6MM,              !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    COATED POLY-55,          !- Layer 3
+    AIR 6MM,                 !- Layer 4
+    CLEAR 6MM;               !- Layer 5
+
+! U=1.208  SHGC=0.222  TSOL=0.129  TVIS=0.274
+
+  Construction,
+    Trp LoE Film (55) Bronze 6mm/13mm Air,  !- Name
+    BRONZE 6MM,              !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    COATED POLY-55,          !- Layer 3
+    AIR 13MM,                !- Layer 4
+    CLEAR 6MM;               !- Layer 5
+
+! U=1.696  SHGC=0.209  TSOL=0.1  TVIS=0.22
+
+  Construction,
+    Trp LoE Film (44) Bronze 6mm/6mm Air,  !- Name
+    BRONZE 6MM,              !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    COATED POLY-44,          !- Layer 3
+    AIR 6MM,                 !- Layer 4
+    CLEAR 6MM;               !- Layer 5
+
+! U=1.198  SHGC=0.198  TSOL=0.1  TVIS=0.22
+
+  Construction,
+    Trp LoE Film (44) Bronze 6mm/13mm Air,  !- Name
+    BRONZE 6MM,              !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    COATED POLY-44,          !- Layer 3
+    AIR 13MM,                !- Layer 4
+    CLEAR 6MM;               !- Layer 5
+
+! U=1.695  SHGC=0.169  TSOL=0.073  TVIS=0.169
+
+  Construction,
+    Trp LoE Film (33) Bronze 6mm/6mm Air,  !- Name
+    BRONZE 6MM,              !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    COATED POLY-33,          !- Layer 3
+    AIR 6MM,                 !- Layer 4
+    CLEAR 6MM;               !- Layer 5
+
+! U=1.196  SHGC=0.154  TSOL=0.073  TVIS=0.169
+
+  Construction,
+    Trp LoE Film (33) Bronze 6mm/13mm Air,  !- Name
+    BRONZE 6MM,              !- Outside Layer
+    AIR 13MM,                !- Layer 2
+    COATED POLY-33,          !- Layer 3
+    AIR 13MM,                !- Layer 4
+    CLEAR 6MM;               !- Layer 5
+
+! U=0.773  SHGC=0.466  TSOL=0.338  TVIS=0.624
+
+  Construction,
+    Quadruple LoE Films (88) 3mm/8mm Krypton,  !- Name
+    CLEAR 3MM,               !- Outside Layer
+    KRYPTON 8MM,             !- Layer 2
+    COATED POLY-88,          !- Layer 3
+    KRYPTON 3MM,             !- Layer 4
+    COATED POLY-88,          !- Layer 5
+    KRYPTON 8MM,             !- Layer 6
+    CLEAR 3MM;               !- Layer 7
+
+! End of Reference Data Set for Window Constructions

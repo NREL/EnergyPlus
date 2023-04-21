@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+  <Type Name="ObjexxFCL::Array1&lt;*&gt;">
+    <DisplayString>ObjexxFCL::Array1( {I_.l_}:{I_.u_} )</DisplayString>
+    <Expand>
+      <Item Name="l">I_.l_</Item>
+      <Item Name="u">I_.u_</Item>
+      <Item Name="size">size_</Item>
+      <ArrayItems Condition="size_ > 0">
+        <Size>size_</Size>
+        <LowerBound>I_.l_</LowerBound>
+        <ValuePointer>data_</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="ObjexxFCL::Array2&lt;*&gt;">
+    <DisplayString>ObjexxFCL::Array2( {I1_.l_}:{I1_.u_}, {I2_.l_}:{I2_.u_} )</DisplayString>
+    <Expand>
+      <Item Name="l1">I1_.l_</Item>
+      <Item Name="u1">I1_.u_</Item>
+      <Item Name="l2">I2_.l_</Item>
+      <Item Name="u2">I2_.u_</Item>
+      <Item Name="size">size_</Item>
+      <ArrayItems Condition="size_ > 0">
+        <Size>size_</Size>
+        <ValuePointer>data_</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="ObjexxFCL::Array3&lt;*&gt;">
+    <DisplayString>ObjexxFCL::Array3( {I1_.l_}:{I1_.u_}, {I2_.l_}:{I2_.u_}, {I3_.l_}:{I3_.u_} )</DisplayString>
+    <Expand>
+      <Item Name="l1">I1_.l_</Item>
+      <Item Name="u1">I1_.u_</Item>
+      <Item Name="l2">I2_.l_</Item>
+      <Item Name="u2">I2_.u_</Item>
+      <Item Name="l3">I3_.l_</Item>
+      <Item Name="u3">I3_.u_</Item>
+      <Item Name="size">size_</Item>
+      <ArrayItems Condition="size_ > 0">
+        <Size>size_</Size>
+        <ValuePointer>data_</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="ObjexxFCL::Array4&lt;*&gt;">
+    <DisplayString>ObjexxFCL::Array4( {I1_.l_}:{I1_.u_}, {I2_.l_}:{I2_.u_}, {I3_.l_}:{I3_.u_}, {I4_.l_}:{I4_.u_} )</DisplayString>
+    <Expand>
+      <Item Name="l1">I1_.l_</Item>
+      <Item Name="u1">I1_.u_</Item>
+      <Item Name="l2">I2_.l_</Item>
+      <Item Name="u2">I2_.u_</Item>
+      <Item Name="l3">I3_.l_</Item>
+      <Item Name="u3">I3_.u_</Item>
+      <Item Name="l4">I4_.l_</Item>
+      <Item Name="u4">I4_.u_</Item>
+      <Item Name="size">size_</Item>
+      <ArrayItems Condition="size_ > 0">
+        <Size>size_</Size>
+        <ValuePointer>data_</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="ObjexxFCL::Array5&lt;*&gt;">
+    <DisplayString>ObjexxFCL::Array5( {I1_.l_}:{I1_.u_}, {I2_.l_}:{I2_.u_}, {I3_.l_}:{I3_.u_}, {I4_.l_}:{I4_.u_}, {I5_.l_}:{I5_.u_} )</DisplayString>
+    <Expand>
+      <Item Name="l1">I1_.l_</Item>
+      <Item Name="u1">I1_.u_</Item>
+      <Item Name="l2">I2_.l_</Item>
+      <Item Name="u2">I2_.u_</Item>
+      <Item Name="l3">I3_.l_</Item>
+      <Item Name="u3">I3_.u_</Item>
+      <Item Name="l4">I4_.l_</Item>
+      <Item Name="u4">I4_.u_</Item>
+      <Item Name="l5">I5_.l_</Item>
+      <Item Name="u5">I5_.u_</Item>
+      <Item Name="size">size_</Item>
+      <ArrayItems Condition="size_ > 0">
+        <Size>size_</Size>
+        <ValuePointer>data_</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="ObjexxFCL::Array6&lt;*&gt;">
+    <DisplayString>ObjexxFCL::Array6( {I1_.l_}:{I1_.u_}, {I2_.l_}:{I2_.u_}, {I3_.l_}:{I3_.u_}, {I4_.l_}:{I4_.u_}, {I5_.l_}:{I5_.u_}, {I6_.l_}:{I6_.u_} )</DisplayString>
+    <Expand>
+      <Item Name="l1">I1_.l_</Item>
+      <Item Name="u1">I1_.u_</Item>
+      <Item Name="l2">I2_.l_</Item>
+      <Item Name="u2">I2_.u_</Item>
+      <Item Name="l3">I3_.l_</Item>
+      <Item Name="u3">I3_.u_</Item>
+      <Item Name="l4">I4_.l_</Item>
+      <Item Name="u4">I4_.u_</Item>
+      <Item Name="l5">I5_.l_</Item>
+      <Item Name="u5">I5_.u_</Item>
+      <Item Name="l6">I6_.l_</Item>
+      <Item Name="u6">I6_.u_</Item>
+      <Item Name="size">size_</Item>
+      <ArrayItems Condition="size_ > 0">
+        <Size>size_</Size>
+        <ValuePointer>data_</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+</AutoVisualizer>
+
