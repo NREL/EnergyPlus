@@ -22,11 +22,11 @@ The enhancement was motivated by discussions with the CBE research group at UC B
 
 We plan to enhance this direct evaporative cooler object, *EvaporativeCooler:Direct:ResearchSpecial*. This object is similar to the *EvaporativeCooler:Direct:CelDekPad* object but with additional input fields allowing for easier control of the air flow (Primary Air Design Flow Rate), cooler efficiency (cooler design effectiveness, Effectiveness Flow Ratio Modifier Curve Name, etc), pump power (Water Pump Power Modifier Curve Name).  It allows control of the evaporative cooler based on the environmental condition (Evaporative Operation Minimum Drybulb Temperature, Evaporative Operation Maximum Limit Wetbulb Temperature).
 
-The introduction of excessive moisture is one of the potential issues of direct evaporative coolers. A humidity control could become useful in preventing the evaporative cooler from raising indoor humidity to an uncomfortable level. Currently, the direct evaporative cooler can be controlled with the sensor node  temperature using AvailabilityManagers (*AvailabilityManager:LowTemperatureTurnOff* or *AvailabilityManager:HighTemperatureTurnOn*). This feature proposes to add a relative humidity (RH) control to shut down the evaporative cooler when the indoor RH is too high.
+The introduction of excessive moisture is one of the potential issues of direct evaporative coolers. A humidity control could become useful in preventing the evaporative cooler from raising indoor humidity to an uncomfortable level. Currently, the direct evaporative cooler can be controlled with the sensor node temperature using AvailabilityManagers (*AvailabilityManager:LowTemperatureTurnOff* or *AvailabilityManager:HighTemperatureTurnOn*). This feature proposes to add a relative humidity (RH) control to shut down the evaporative cooler when the indoor relative humidity is too high.
 
 ## Approach
 
-To enable a RH control, two *AvailabilityManager:\** objects will be added *AvailabilityManager:HighRHTurnOff* and *AvailabilityManager:HighTemperatureLowRHTurnOn*.
+To enable a relative humidity control, two fields will be added to the *ZoneHVAC:EvaporativeCoolerUnit* object. For the non-zone level direct evaporative coolers, a generic availability manager object, *AvailaibilityManager:SystemNodeConditions*, will be added to implement the high-relative-humidity shutoff
 
 ## Testing/Validation/Data Source(s)
 
@@ -34,54 +34,232 @@ This feature will be tested and demonstrated with a test file derived from 1Zone
 
 ## IDD Object changes
 
-Two *AvailabilityManager:\** objects, *AvailabilityManager:HighRHTurnOff* and *AvailabilityManager:HighTemperatureLowRHTurnOn* will be added to enable RH control of the direct evaporative cooling.
+Two fields (N4 and N5) will be added to the ZoneHVAC:EvaporativeCoolerUnit
 
-    AvailabilityManager:HighRHTurnOff,
-          \memo Overrides fan/pump schedules depending on relative humidity at sensor node.
-      A1 , \field Name
-          \required-field
-          \type alpha
-          \reference SystemAvailabilityManagers
-      A2 , \field Sensor Node Name
-          \note The air node where the relative humidity is monitored
-          \required-field
-          \type node
-      N1 ; \field Relative Humidity
-          \note The relative humidity at or exceeding which the system is turned off
-          \required-field
-          \type real
-          \units dimensionless
+    ZoneHVAC:EvaporativeCoolerUnit,
+        \memo Zone evaporative cooler. Forced-convection cooling-only unit with supply fan,
+        \memo 100% outdoor air supply. Optional relief exhaust node
+        \min-fields 15
+    A1 , \field Name
+        \required-field
+        \reference ZoneEquipmentNames
+    A2 , \field Availability Schedule Name
+        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+        \note If this field is blank, the system is always available.
+        \type object-list
+        \object-list ScheduleNames
+    A3,  \field Availability Manager List Name
+        \note Enter the name of an AvailabilityManagerAssignmentList object.
+        \type object-list
+        \object-list SystemAvailabilityManagerLists
+    A4 , \field Outdoor Air Inlet Node Name
+        \required-field
+        \type node
+        \note this is an outdoor air node
+    A5 , \field Cooler Outlet Node Name
+        \required-field
+        \type node
+        \note this is a zone inlet node
+    A6 , \field Zone Relief Air Node Name
+        \type node
+        \note this is a zone exhaust node, optional if flow is being balanced elsewhere
+    A7 , \field Supply Air Fan Object Type
+        \required-field
+        \type choice
+        \key Fan:SystemModel
+        \key Fan:ComponentModel
+        \key Fan:ConstantVolume
+        \key Fan:OnOff
+        \key Fan:VariableVolume
+    A8 , \field Supply Air Fan Name
+        \required-field
+        \type object-list
+        \object-list Fans
+    N1 , \field Design Supply Air Flow Rate
+        \required-field
+        \units m3/s
+        \minimum> 0
+        \autosizable
+    A9 , \field Fan Placement
+        \required-field
+        \type choice
+        \key BlowThrough
+        \key DrawThrough
+    A10, \field Cooler Unit Control Method
+        \required-field
+        \type choice
+        \key ZoneTemperatureDeadbandOnOffCycling
+        \key ZoneCoolingLoadOnOffCycling
+        \key ZoneCoolingLoadVariableSpeedFan
+    N2 , \field Throttling Range Temperature Difference
+        \note used for ZoneTemperatureDeadbandOnOffCycling hystersis range for thermostatic control
+        \type real
+        \units deltaC
+        \default 1.0
+        \minimum> 0.0
+    N3 , \field Cooling Load Control Threshold Heat Transfer Rate
+        \type real
+        \units W
+        \default 100.0
+        \note Sign convention is that positive values indicate a cooling load
+        \minimum> 0.0
+    A11, \field First Evaporative Cooler Object Type
+        \required-field
+        \type choice
+        \key EvaporativeCooler:Direct:CelDekPad
+        \key EvaporativeCooler:Direct:ResearchSpecial
+        \key EvaporativeCooler:Indirect:CelDekPad
+        \key EvaporativeCooler:Indirect:WetCoil
+        \key EvaporativeCooler:Indirect:ResearchSpecial
+    A12, \field First Evaporative Cooler Object Name
+        \required-field
+        \type object-list
+        \object-list EvapCoolerNames
+    A13, \field Second Evaporative Cooler Object Type
+        \note optional, used for direct/indirect configurations
+        \note second cooler must be immediately downstream of first cooler, if present
+        \type choice
+        \key EvaporativeCooler:Direct:CelDekPad
+        \key EvaporativeCooler:Direct:ResearchSpecial
+        \key EvaporativeCooler:Indirect:CelDekPad
+        \key EvaporativeCooler:Indirect:WetCoil
+        \key EvaporativeCooler:Indirect:ResearchSpecial
+    A14, \field Second Evaporative Cooler Name
+        \note optional, used for direct/indirect configurations
+        \type object-list
+        \object-list EvapCoolerNames
+    A15, \field Design Specification ZoneHVAC Sizing Object Name
+        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
+        \type object-list
+        \object-list DesignSpecificationZoneHVACSizingName
+    N4, \field Shut Off Relative Humidity
+        \note Zone relative humidity above which the evap cooler is shut off.
+        \type real
+        \minimum 0.00
+        \maximum 100.00
+        \units percent
+    N5; \field Turn On Relative Humidity
+        \note Zone relative humidity below which the evap cooler is allowed to turn on.
+        \type real
+        \minimum 0.00
+        \maximum 100.00
+        \units percent
 
-    AvailabilityManager:HighTemperatureLowRHTurnOn
-          \memo Overrides fan/pump schedules depending on relative humidity and temperature at sensor node.
-      A1 , \field Name
-          \required-field
-          \type alpha
-          \reference SystemAvailabilityManagers
-      A2 , \field Sensor Node Name
-          \note The air node where the temperature and the relative humidity are monitored
-          \required-field
-          \type node
-      N1 , \field Relative Humidity
-          \note When the sensor node relative humidity is lower than this RH and the sensor node temperature is higher than the temperature specified in N2, then the system is turned on.
-          \required-field
-          \type real
-          \units dimensionless
-      N2 ; \field Temperature
-          \note When the sensor node temperature is higher than this temperature and the sensor node RH is lower than the RH specified in N1, then the system is turned on.
-          \required-field
-          \type real
-          \units C
+For non-zone-equipment direct evaporative coolers, a generic *AvailabilityManager:\** object will be added, both to implement the relative humidity-dependent availability, and to facilitate future expansion of availability manager functionalities.
 
-These two corresponds two the following control methods
-* When the evaporative cooling system is always on, it will be shut down when temperature is too low or humidity is too high, using the following two availability managers 
+    AvailaibilityManager:SystemNodeConditions,
+        A1 , \field Name
+        \required-field
+        \type alpha
+        \reference SystemAvailabilityManagers
+    A2,  \field Action Type
+        \required-field
+        \type choice
+        \key TurnOn
+        \key TurnOff
+    A3 , \field Sensor Node Name
+        \note The system node where the conditions are monitored.
+        \required-field
+        \type node
+    A4 , \field Limit 1 Condition
+        \required-field
+        \type choice
+        \key Temperature
+        \key RelativeHumidity
+        \key HumidityRatio
+        \key DewPoint
+        \key Enthalpy
+        \key Schedule
+    A5,  \field Limit 1 Type
+        \required-field
+        \type choice
+        \key Maximum
+        \key Minimum
+        \note When "Maximum" is chosen, then the action is taken when the value
+        \note of A4 is less than the threshold. When "Minimum" is chosen, then the
+        \note action is taken when the value of A4 is greater than the threshold.
+    A6,  \field Limit 1 Schedule Name
+        \required-field
+        \type object-list
+        \object-list ScheduleNames
+    A7 , \field Limit 2 Condition
+        \type choice
+        \key None
+        \key Temperature
+        \key RelativeHumidity
+        \key HumidityRatio
+        \key DewPoint
+        \key Enthalpy
+        \default None
+    A8, \field Limit 2 Type
+        \type choice
+        \key None
+        \key Maximum
+        \key Minimum
+        \default None
+        \note When "Maximum" is chosen, then the action is taken when the value
+        \note of A4 is less than the threshold. When "Minimum" is chosen, then the
+        \note action is taken when the value of A4 is greater than the threshold.
+    A9; \field Limit 2 Schedule Name
+        \type object-list
+        \object-list ScheduleNames
 
-        AvailabilityManager:LowTemperatureTurnOff
-        AvailabilityManager:HighRHTurnOff (to be added in this feature)
- 
-* When the evaporative cooling system is always off, it will be turned on when temperature is too high and humidity is low enough. This will be realized using the following availability manager
+For the case where the system is always on, the following relative humidity availability manager can be specified to shut down the system when the high-humidity threshold is reached.
 
-        AvailabilityManager:HighTemperatureLowRHTurnOn (to be added in this feature)
+    AvailabilityManager:SystemNodeConditions,
+      highHumidityTurnOff,        !- Name
+      TurnOff,                    !- Action Type
+      zoneReturnAirNode,          !- Sensor Node Name
+      RelativeHumidity,           !- Limit 1 Condition
+      Minimum,                    !- Limit 1 Type
+      ,                           !- Limit 1 Schedule Name
+      ,                           !- Limit 2 Condition
+      ,                           !- Limit 2 Type
+      ;                           !- Limit 2 Schedule Name
+
+For the case where the system is always off, the following temperature-relative humidity availability manager can be specified to turn on the system when the temperature is high and the relative humidity is low enough.
+
+    AvailabilityManager:SystemNodeConditions,
+      highTemperatureLowRelativeHumidityTurnOn,      !- Name
+      TurnOn,                     !- Action Type
+      zoneReturnAirNode,          !- Sensor Node Name
+      RelativeHumidity,           !- Limit 1 Condition
+      Maximum,                    !- Limit 1 Type
+      ,                           !- Limit 1 Schedule Name
+      Temperature,                !- Limit 2 Condition
+      Minimum,                    !- Limit 2 Type
+      ;                           !- Limit 2 Schedule Name
+
+Alternatively, for the case where the system is always off, two availability managers can be specified in the Availability Manager List in the following order
+
+    AvailabilityManagerAssignmentList,
+      Evap Cooler Availability List,             !- Name
+      AvailabilityManager:SystemNodeConditions,  !- Availability Manager 1 Object Type
+      highHumidityTurnOff,                       !- Availability Manager 1 Name
+      AvailabilityManager:SystemNodeConditions,  !- Availability Manager 2 Object Type
+      highTemperatureTurnOn;                     !- Availability Manager 2 Name
+
+    AvailabilityManager:SystemNodeConditions,
+      highTemperatureTurnOn,      !- Name
+      TurnOn,                     !- Action Type
+      zoneReturnAirNode,          !- Sensor Node Name
+      Temperature,                !- Limit 1 Condition
+      Minimum,                    !- Limit 1 Type
+      ,                           !- Limit 1 Schedule Name
+      ,                           !- Limit 2 Condition
+      ,                           !- Limit 2 Type
+      ;                           !- Limit 2 Schedule Name
+
+    AvailabilityManager:SystemNodeConditions,
+      highHumidityTurnOff,        !- Name
+      TurnOff,                    !- Action Type
+      zoneReturnAirNode,          !- Sensor Node Name
+      RelativeHumidity,           !- Limit 1 Condition
+      Minimum,                    !- Limit 1 Type
+      ,                           !- Limit 1 Schedule Name
+      ,                           !- Limit 2 Condition
+      ,                           !- Limit 2 Type
+      ;                           !- Limit 2 Schedule Name
 
 ## Proposed additions to Meters:
 
