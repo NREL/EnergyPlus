@@ -1785,13 +1785,8 @@ namespace OutdoorAirUnit {
                 }
                 if (thisOutAirUnit.ExtFan) {
                     if (thisOutAirUnit.ExtFanType != DataHVACGlobals::FanType_SystemModelObject) {
-                        Fans::SimulateFanComponents(state,
-                                                    thisOutAirUnit.ExtFanName,
-                                                    FirstHVACIteration,
-                                                    thisOutAirUnit.ExtFan_Index,
-                                                    _,
-                                                    TurnFansOn,
-                                                    TurnFansOff);
+                        Fans::SimulateFanComponents(
+                            state, thisOutAirUnit.ExtFanName, FirstHVACIteration, thisOutAirUnit.ExtFan_Index, _, TurnFansOn, TurnFansOff);
                     } else {
                         state.dataHVACFan->fanObjs[thisOutAirUnit.ExtFan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
                     }
@@ -1914,13 +1909,8 @@ namespace OutdoorAirUnit {
             }
             if (thisOutAirUnit.ExtFan) {
                 if (thisOutAirUnit.ExtFanType != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(state,
-                                                thisOutAirUnit.ExtFanName,
-                                                FirstHVACIteration,
-                                                thisOutAirUnit.ExtFan_Index,
-                                                _,
-                                                TurnFansOn,
-                                                TurnFansOff);
+                    Fans::SimulateFanComponents(
+                        state, thisOutAirUnit.ExtFanName, FirstHVACIteration, thisOutAirUnit.ExtFan_Index, _, TurnFansOn, TurnFansOff);
                 } else {
                     state.dataHVACFan->fanObjs[thisOutAirUnit.ExtFan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
                 }

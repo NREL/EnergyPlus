@@ -902,8 +902,7 @@ namespace WindowAC {
         AirRelNode = state.dataWindowAC->WindAC(WindACNum).AirReliefNode;
         // Set the inlet node mass flow rate
         if (GetCurrentScheduleValue(state, state.dataWindowAC->WindAC(WindACNum).SchedPtr) <= 0.0 ||
-            (GetCurrentScheduleValue(state, state.dataWindowAC->WindAC(WindACNum).FanAvailSchedPtr) <= 0.0 && !TurnFansOn) ||
-            TurnFansOff) {
+            (GetCurrentScheduleValue(state, state.dataWindowAC->WindAC(WindACNum).FanAvailSchedPtr) <= 0.0 && !TurnFansOn) || TurnFansOff) {
             state.dataWindowAC->WindAC(WindACNum).PartLoadFrac = 0.0;
             state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = 0.0;
@@ -937,8 +936,7 @@ namespace WindowAC {
 
         // Constant fan systems are tested for ventilation load to determine if load to be met changes.
         if (state.dataWindowAC->WindAC(WindACNum).OpMode == ContFanCycCoil && state.dataWindowAC->WindAC(WindACNum).PartLoadFrac > 0.0 &&
-            (GetCurrentScheduleValue(state, state.dataWindowAC->WindAC(WindACNum).FanAvailSchedPtr) > 0.0 || TurnFansOn) &&
-            !TurnFansOn) {
+            (GetCurrentScheduleValue(state, state.dataWindowAC->WindAC(WindACNum).FanAvailSchedPtr) > 0.0 || TurnFansOn) && !TurnFansOn) {
 
             CalcWindowACOutput(state, WindACNum, FirstHVACIteration, state.dataWindowAC->WindAC(WindACNum).OpMode, 0.0, false, NoCompOutput);
 
@@ -1381,8 +1379,7 @@ namespace WindowAC {
                                             TurnFansOn,
                                             TurnFansOff);
             } else {
-                state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->simulate(
-                    state, _, TurnFansOn, TurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->simulate(state, _, TurnFansOn, TurnFansOff, _);
             }
         }
 
@@ -1438,8 +1435,7 @@ namespace WindowAC {
                                             TurnFansOn,
                                             TurnFansOff);
             } else {
-                state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->simulate(
-                    state, _, TurnFansOn, TurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->simulate(state, _, TurnFansOn, TurnFansOff, _);
             }
         }
 

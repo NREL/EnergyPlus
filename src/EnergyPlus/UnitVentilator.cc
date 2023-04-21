@@ -3071,8 +3071,7 @@ namespace UnitVentilator {
                 SimUnitVentOAMixer(state, UnitVentNum, OpMode);
             }
             if (unitVent.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
-                    state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _, TurnFansOn, TurnFansOff);
+                Fans::SimulateFanComponents(state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _, TurnFansOn, TurnFansOff);
             } else {
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
                 state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
@@ -3160,8 +3159,7 @@ namespace UnitVentilator {
                 SimUnitVentOAMixer(state, UnitVentNum, OpMode);
             }
             if (unitVent.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
-                    state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _, TurnFansOn, TurnFansOff);
+                Fans::SimulateFanComponents(state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _, TurnFansOn, TurnFansOff);
             } else {
                 state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
             }

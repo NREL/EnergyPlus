@@ -4183,13 +4183,8 @@ void CalcZoneEvapUnitOutput(EnergyPlusData &state,
         state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate;
         state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate;
         if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(state,
-                                        zoneEvapUnit.FanName,
-                                        false,
-                                        zoneEvapUnit.FanIndex,
-                                        _,
-                                        state.dataHVACGlobal->TurnFansOn,
-                                        state.dataHVACGlobal->TurnFansOff);
+            Fans::SimulateFanComponents(
+                state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff);
         } else {
             state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(
                 state, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
@@ -4205,13 +4200,8 @@ void CalcZoneEvapUnitOutput(EnergyPlusData &state,
     }
     if (zoneEvapUnit.FanLocation == FanPlacement::DrawThruFan) {
         if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(state,
-                                        zoneEvapUnit.FanName,
-                                        false,
-                                        zoneEvapUnit.FanIndex,
-                                        _,
-                                        state.dataHVACGlobal->TurnFansOn,
-                                        state.dataHVACGlobal->TurnFansOff);
+            Fans::SimulateFanComponents(
+                state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff);
         } else {
             state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(
                 state, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);

@@ -9865,8 +9865,7 @@ void SetAverageAirFlow(EnergyPlusData &state,
 
     // if the terminal unit and fan are scheduled on then set flow rate
     if (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr) > 0.0 &&
-        (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr) > 0.0 ||
-         state.dataHVACGlobal->TurnFansOn) &&
+        (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr) > 0.0 || state.dataHVACGlobal->TurnFansOn) &&
         !state.dataHVACGlobal->TurnFansOff) {
 
         // so for sure OA system TUs should use inlet node flow rate, don't overwrite inlet node flow rate

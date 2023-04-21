@@ -3048,7 +3048,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
         for (int EquipTypeNum = 1; EquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ControlledZoneNum).NumOfEquipTypes; ++EquipTypeNum) {
 
-        // Air loop system availability manager status only applies to PIU and exhaust fans
+            // Air loop system availability manager status only applies to PIU and exhaust fans
             // Reset fan SAM operation flags for zone fans.
             state.dataHVACGlobal->TurnFansOn = false;
             state.dataHVACGlobal->TurnZoneFansOnlyOn = false;

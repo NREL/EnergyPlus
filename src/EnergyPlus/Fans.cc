@@ -99,9 +99,9 @@ void SimulateFanComponents(EnergyPlusData &state,
                            bool const FirstHVACIteration,
                            int &CompIndex,
                            ObjexxFCL::Optional<Real64 const> SpeedRatio,
-                           ObjexxFCL::Optional_bool_const TurnFansOn,  // Turn fans ON signal from ZoneHVAC component
-                           ObjexxFCL::Optional_bool_const TurnFansOff, // Turn Fans OFF signal from ZoneHVAC component
-                           ObjexxFCL::Optional<Real64 const> PressureRise      // Pressure difference to use for DeltaPress
+                           ObjexxFCL::Optional_bool_const TurnFansOn,     // Turn fans ON signal from ZoneHVAC component
+                           ObjexxFCL::Optional_bool_const TurnFansOff,    // Turn Fans OFF signal from ZoneHVAC component
+                           ObjexxFCL::Optional<Real64 const> PressureRise // Pressure difference to use for DeltaPress
 )
 {
 

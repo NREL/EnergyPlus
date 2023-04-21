@@ -934,8 +934,7 @@ namespace UnitHeater {
 
         state.dataUnitHeaters->SetMassFlowRateToZero = false;
         if (GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr) > 0) {
-            if ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) > 0 || TurnFansOn) &&
-                !TurnFansOff) {
+            if ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) > 0 || TurnFansOn) && !TurnFansOff) {
                 if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOffNoHeating &&
                     ((state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP < SmallLoad) ||
                      (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)))) {
@@ -1820,8 +1819,7 @@ namespace UnitHeater {
                                             TurnFansOn,
                                             TurnFansOff);
             } else {
-                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(
-                    state, _, TurnFansOn, TurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
             }
 
             switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
@@ -1901,8 +1899,7 @@ namespace UnitHeater {
                                             TurnFansOn,
                                             TurnFansOff);
             } else {
-                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(
-                    state, _, TurnFansOn, TurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
             }
             switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
 

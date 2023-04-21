@@ -3125,8 +3125,7 @@ namespace VentilatedSlab {
                     if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                         state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
                     } else if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                        Fans::SimulateFanComponents(
-                            state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _, TurnFansOn, TurnFansOff);
+                        Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _, TurnFansOn, TurnFansOff);
                     }
 
                     CpFan = PsyCpAirFnW(state.dataLoopNodes->Node(FanOutletNode).HumRat);
@@ -3396,8 +3395,7 @@ namespace VentilatedSlab {
                     if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                         state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
                     } else if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                        Fans::SimulateFanComponents(
-                            state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _, TurnFansOn, TurnFansOff);
+                        Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _, TurnFansOn, TurnFansOff);
                     }
 
                     CpFan = PsyCpAirFnW(state.dataLoopNodes->Node(FanOutletNode).HumRat);
@@ -3449,8 +3447,7 @@ namespace VentilatedSlab {
             if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
             } else if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                Fans::SimulateFanComponents(
-                    state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _, TurnFansOn, TurnFansOff);
+                Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _, TurnFansOn, TurnFansOff);
             }
         }
 
