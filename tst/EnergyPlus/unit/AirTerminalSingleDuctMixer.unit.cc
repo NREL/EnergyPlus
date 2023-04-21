@@ -641,8 +641,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
                                    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
     state->dataUnitarySystems->unitarySys[0].MaxCoolAirMassFlow = HVACInletMassFlowRate; // supply air mass flow rate
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataUnitarySystems->unitarySys[0].m_FanOpMode = CycFanCycCoil;
     // initialize mass flow rates
@@ -993,8 +993,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
                                    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
     state->dataUnitarySystems->unitarySys[0].MaxCoolAirMassFlow = HVACInletMassFlowRate; // supply air mass flow rate
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     PTUnitNum = 0;
     state->dataUnitarySystems->unitarySys[0].m_FanOpMode = CycFanCycCoil;
@@ -1430,8 +1430,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
                                    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
     state->dataUnitarySystems->unitarySys[0].MaxCoolAirMassFlow = HVACInletMassFlowRate; // supply air mass flow rate
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     PTUnitNum = 0;
     state->dataUnitarySystems->unitarySys[0].m_FanOpMode = CycFanCycCoil;
@@ -1866,8 +1866,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
                                    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
     state->dataUnitarySystems->unitarySys[0].MaxCoolAirMassFlow = HVACInletMassFlowRate; // supply air mass flow rate
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     PTUnitNum = 1;
     state->dataUnitarySystems->unitarySys[0].m_FanOpMode = CycFanCycCoil;
@@ -2566,8 +2566,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     state->dataHVACVarRefFlow->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
     state->dataHVACVarRefFlow->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
     state->dataHVACVarRefFlow->CompOnFlowRatio = 1.0;                     // compressor is on
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     VRFNum = 1;
     VRFTUNum = 1;
@@ -3248,8 +3248,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     state->dataHVACVarRefFlow->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
     state->dataHVACVarRefFlow->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
     state->dataHVACVarRefFlow->CompOnFlowRatio = 1.0;                     // compressor is on
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     VRFNum = 1;
     VRFTUNum = 1;
@@ -5004,8 +5004,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     state->dataHVACVarRefFlow->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
     state->dataHVACVarRefFlow->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
     state->dataHVACVarRefFlow->CompOnFlowRatio = 1.0;                     // compressor is on
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     VRFNum = 1;
     VRFTUNum = 1;
@@ -6761,8 +6761,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     state->dataHVACVarRefFlow->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
     state->dataHVACVarRefFlow->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
     state->dataHVACVarRefFlow->CompOnFlowRatio = 1.0;                     // compressor is on
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     VRFNum = 1;
     VRFTUNum = 1;
@@ -7003,8 +7003,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
         Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
                                    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     UnitVentNum = 1;
     // set the mass flow rates from the input volume flow rates
@@ -7251,8 +7251,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
         Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
                                    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     UnitVentNum = 1;
     // set the mass flow rates from the input volume flow rates
@@ -8298,8 +8298,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     // set zone equipment is CyclOn based on night cycle manager status
     if (state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus) {
-        state->dataHVACGlobal->ZoneCompTurnFansOn = true;
-        state->dataHVACGlobal->ZoneCompTurnFansOff = false;
+        state->dataHVACGlobal->TurnFansOn = true;
+        state->dataHVACGlobal->TurnFansOff = false;
     }
     InitFanCoilUnits(*state, FanCoilNum, ZoneNum);
     Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);

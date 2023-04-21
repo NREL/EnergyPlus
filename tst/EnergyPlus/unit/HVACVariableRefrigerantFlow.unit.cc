@@ -6659,23 +6659,23 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 0.0; // turn off fan
     SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(0.0, state->dataLoopNodes->Node(OutsideAirNode).MassFlowRate);
-    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOn);
-    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOff);
+    EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
+    EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
     EXPECT_EQ(0.0, state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue);
 
     // turn on "Turn Fan On" flag for availability manager, result should be the same as previous non-zero result
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOn = true;
     SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(AverageOAMassFlow, state->dataLoopNodes->Node(OutsideAirNode).MassFlowRate);
-    EXPECT_TRUE(state->dataHVACGlobal->ZoneCompTurnFansOn);
-    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOff);
+    EXPECT_TRUE(state->dataHVACGlobal->TurnFansOn);
+    EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
 
     // turn on "Turn Fan Off" flag for availability manager, result should be 0
-    state->dataHVACGlobal->ZoneCompTurnFansOff = true;
+    state->dataHVACGlobal->TurnFansOff = true;
     SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(0.0, state->dataLoopNodes->Node(OutsideAirNode).MassFlowRate);
-    EXPECT_TRUE(state->dataHVACGlobal->ZoneCompTurnFansOn);
-    EXPECT_TRUE(state->dataHVACGlobal->ZoneCompTurnFansOff);
+    EXPECT_TRUE(state->dataHVACGlobal->TurnFansOn);
+    EXPECT_TRUE(state->dataHVACGlobal->TurnFansOff);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)

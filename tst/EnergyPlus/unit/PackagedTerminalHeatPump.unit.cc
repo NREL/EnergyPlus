@@ -926,8 +926,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
 
     state->dataUnitarySystems->HeatingLoad = false;
     state->dataUnitarySystems->CoolingLoad = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     // supply fan is continuous flow
     thisSys.MaxHeatAirMassFlow = HVACInletMassFlowRate;
@@ -1228,8 +1228,8 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
 
     state->dataUnitarySystems->HeatingLoad = false;
     state->dataUnitarySystems->CoolingLoad = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataScheduleMgr->Schedule(thisSys.m_FanOpModeSchedPtr).CurrentValue = 1.0; // unit is always on
     state->dataScheduleMgr->Schedule(thisSys.m_SysAvailSchedPtr).CurrentValue = 1.0;  // unit is always available

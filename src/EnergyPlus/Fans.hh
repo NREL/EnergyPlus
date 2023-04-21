@@ -207,8 +207,8 @@ namespace Fans {
                                bool FirstHVACIteration,
                                int &CompIndex,
                                ObjexxFCL::Optional<Real64 const> SpeedRatio = _,
-                               ObjexxFCL::Optional_bool_const ZoneCompTurnFansOn = _,  // Turn fans ON signal from ZoneHVAC component
-                               ObjexxFCL::Optional_bool_const ZoneCompTurnFansOff = _, // Turn Fans OFF signal from ZoneHVAC component
+                               ObjexxFCL::Optional_bool_const TurnFansOn = _,  // Turn fans ON signal from ZoneHVAC component
+                               ObjexxFCL::Optional_bool_const TurnFansOff = _, // Turn Fans OFF signal from ZoneHVAC component
                                ObjexxFCL::Optional<Real64 const> PressureRise = _      // Pressure difference to use for DeltaPress
     );
 

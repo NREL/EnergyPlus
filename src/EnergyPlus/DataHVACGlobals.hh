@@ -456,8 +456,6 @@ struct HVACGlobalsData : BaseGlobalStruct
     bool TurnZoneFansOnlyOn =
         false;                // If true overrides zone fan schedule and cycles fans on (currently used only by parallel powered induction unit)
     bool TurnFansOff = false; // If True overides fan schedule and TurnFansOn and forces fans off
-    bool ZoneCompTurnFansOn = false;  // If true overrides fan schedule and cycles fans on
-    bool ZoneCompTurnFansOff = false; // If True overides fan schedule and TurnFansOn and forces fans off
     bool SetPointErrorFlag = false;   // True if any needed setpoints not set; if true, program terminates
     bool DoSetPointTest = false;      // True one time only for sensed node setpoint test
     bool NightVentOn = false;         // set TRUE in SimAirServingZone if night ventilation is happening

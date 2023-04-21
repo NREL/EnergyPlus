@@ -806,8 +806,8 @@ namespace WindowAC {
 
         using DataHVACGlobals::SmallLoad;
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
+        auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
+        auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
         using DataZoneEquipment::CheckZoneEquipmentList;
 
         int InNode;          // inlet node number in window AC loop
@@ -902,8 +902,8 @@ namespace WindowAC {
         AirRelNode = state.dataWindowAC->WindAC(WindACNum).AirReliefNode;
         // Set the inlet node mass flow rate
         if (GetCurrentScheduleValue(state, state.dataWindowAC->WindAC(WindACNum).SchedPtr) <= 0.0 ||
-            (GetCurrentScheduleValue(state, state.dataWindowAC->WindAC(WindACNum).FanAvailSchedPtr) <= 0.0 && !ZoneCompTurnFansOn) ||
-            ZoneCompTurnFansOff) {
+            (GetCurrentScheduleValue(state, state.dataWindowAC->WindAC(WindACNum).FanAvailSchedPtr) <= 0.0 && !TurnFansOn) ||
+            TurnFansOff) {
             state.dataWindowAC->WindAC(WindACNum).PartLoadFrac = 0.0;
             state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = 0.0;
@@ -937,8 +937,8 @@ namespace WindowAC {
 
         // Constant fan systems are tested for ventilation load to determine if load to be met changes.
         if (state.dataWindowAC->WindAC(WindACNum).OpMode == ContFanCycCoil && state.dataWindowAC->WindAC(WindACNum).PartLoadFrac > 0.0 &&
-            (GetCurrentScheduleValue(state, state.dataWindowAC->WindAC(WindACNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) &&
-            !ZoneCompTurnFansOn) {
+            (GetCurrentScheduleValue(state, state.dataWindowAC->WindAC(WindACNum).FanAvailSchedPtr) > 0.0 || TurnFansOn) &&
+            !TurnFansOn) {
 
             CalcWindowACOutput(state, WindACNum, FirstHVACIteration, state.dataWindowAC->WindAC(WindACNum).OpMode, 0.0, false, NoCompOutput);
 
@@ -1343,8 +1343,8 @@ namespace WindowAC {
         // METHODOLOGY EMPLOYED:
         // Simulates the unit components sequentially in the air flow direction.
 
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
+        auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
+        auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
         using DXCoils::SimDXCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 
@@ -1378,11 +1378,11 @@ namespace WindowAC {
                                             FirstHVACIteration,
                                             state.dataWindowAC->WindAC(WindACNum).FanIndex,
                                             PartLoadFrac,
-                                            ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                                            TurnFansOn,
+                                            TurnFansOff);
             } else {
                 state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->simulate(
-                    state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state, _, TurnFansOn, TurnFansOff, _);
             }
         }
 
@@ -1435,11 +1435,11 @@ namespace WindowAC {
                                             FirstHVACIteration,
                                             state.dataWindowAC->WindAC(WindACNum).FanIndex,
                                             PartLoadFrac,
-                                            ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                                            TurnFansOn,
+                                            TurnFansOff);
             } else {
                 state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->simulate(
-                    state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state, _, TurnFansOn, TurnFansOff, _);
             }
         }
 

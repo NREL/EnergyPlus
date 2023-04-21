@@ -140,7 +140,7 @@ namespace HVACFan {
         }
 
         if (present(zoneCompTurnFansOn) && present(zoneCompTurnFansOff)) {
-            // Set module-level logic flags equal to ZoneCompTurnFansOn and ZoneCompTurnFansOff values passed into this routine
+            // Set module-level logic flags equal to TurnFansOn and TurnFansOff values passed into this routine
             // for ZoneHVAC components with system availability managers defined.
             // The module-level flags get used in the other subroutines (e.g., SimSimpleFan,SimVariableVolumeFan and SimOnOffFan)
             m_objTurnFansOn = zoneCompTurnFansOn;

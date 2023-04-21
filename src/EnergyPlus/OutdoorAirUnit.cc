@@ -1155,8 +1155,8 @@ namespace OutdoorAirUnit {
 
         // Using/Aliasing
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
+        auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
+        auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
 
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
@@ -1389,7 +1389,7 @@ namespace OutdoorAirUnit {
         // Node Set
 
         // set the mass flow rates from the input volume flow rates
-        if (OAFrac > 0.0 || (ZoneCompTurnFansOn && !ZoneCompTurnFansOff)) { // fan is available
+        if (OAFrac > 0.0 || (TurnFansOn && !TurnFansOff)) { // fan is available
             thisOutAirUnit.OutAirMassFlow = RhoAir * OAFrac * thisOutAirUnit.OutAirVolFlow;
         } else {
             thisOutAirUnit.OutAirMassFlow = 0.0;
@@ -1679,8 +1679,8 @@ namespace OutdoorAirUnit {
         // Using/Aliasing
         auto &thisOutAirUnit = state.dataOutdoorAirUnit->OutAirUnit(OAUnitNum);
 
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
+        auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
+        auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
         using HeatingCoils::CheckHeatingCoilSchedule;
         using HVACHXAssistedCoolingCoil::CheckHXAssistedCoolingCoilSchedule;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -1725,7 +1725,7 @@ namespace OutdoorAirUnit {
         thisOutAirUnit.FanEffect = false;
 
         if ((GetCurrentScheduleValue(state, thisOutAirUnit.SchedPtr) <= 0) || (GetCurrentScheduleValue(state, thisOutAirUnit.OutAirSchedPtr) <= 0) ||
-            ((GetCurrentScheduleValue(state, thisOutAirUnit.SFanAvailSchedPtr) <= 0) && !ZoneCompTurnFansOn) || ZoneCompTurnFansOff) {
+            ((GetCurrentScheduleValue(state, thisOutAirUnit.SFanAvailSchedPtr) <= 0) && !TurnFansOn) || TurnFansOff) {
             // System is off or has no load upon the unit; set the flow rates to zero and then
             // simulate the components with the no flow conditions
             if (thisOutAirUnit.ExtFan) {
@@ -1755,9 +1755,9 @@ namespace OutdoorAirUnit {
             if (thisOutAirUnit.FanPlace == BlowThru) {
                 if (thisOutAirUnit.SFanType != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(
-                        state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                        state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _, TurnFansOn, TurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
                 }
 
                 SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
@@ -1768,10 +1768,10 @@ namespace OutdoorAirUnit {
                                                     FirstHVACIteration,
                                                     thisOutAirUnit.ExtFan_Index,
                                                     _,
-                                                    ZoneCompTurnFansOn,
-                                                    ZoneCompTurnFansOff); // why not turn on/off flags here?
+                                                    TurnFansOn,
+                                                    TurnFansOff); // why not turn on/off flags here?
                     } else {
-                        state.dataHVACFan->fanObjs[thisOutAirUnit.ExtFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                        state.dataHVACFan->fanObjs[thisOutAirUnit.ExtFan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
                     }
                 }
 
@@ -1779,9 +1779,9 @@ namespace OutdoorAirUnit {
                 SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
                 if (thisOutAirUnit.SFanType != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(
-                        state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                        state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _, TurnFansOn, TurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
                 }
                 if (thisOutAirUnit.ExtFan) {
                     if (thisOutAirUnit.ExtFanType != DataHVACGlobals::FanType_SystemModelObject) {
@@ -1790,10 +1790,10 @@ namespace OutdoorAirUnit {
                                                     FirstHVACIteration,
                                                     thisOutAirUnit.ExtFan_Index,
                                                     _,
-                                                    ZoneCompTurnFansOn,
-                                                    ZoneCompTurnFansOff);
+                                                    TurnFansOn,
+                                                    TurnFansOff);
                     } else {
-                        state.dataHVACFan->fanObjs[thisOutAirUnit.ExtFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                        state.dataHVACFan->fanObjs[thisOutAirUnit.ExtFan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
                     }
                 }
             }
@@ -1831,9 +1831,9 @@ namespace OutdoorAirUnit {
             if (thisOutAirUnit.FanPlace == BlowThru) {
                 if (thisOutAirUnit.SFanType != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(
-                        state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                        state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _, TurnFansOn, TurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
                 }
                 DesOATemp = state.dataLoopNodes->Node(SFanOutletNode).Temp;
             } else if (thisOutAirUnit.FanPlace == DrawThru) {
@@ -1896,9 +1896,9 @@ namespace OutdoorAirUnit {
             if (thisOutAirUnit.FanPlace == DrawThru) {
                 if (thisOutAirUnit.SFanType != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(
-                        state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                        state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _, TurnFansOn, TurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
                 }
 
                 thisOutAirUnit.FanEffect = true; // RE-Simulation to take over the supply fan effect
@@ -1906,9 +1906,9 @@ namespace OutdoorAirUnit {
                 SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
                 if (thisOutAirUnit.SFanType != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(
-                        state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                        state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _, TurnFansOn, TurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
                 }
                 thisOutAirUnit.FanEffect = false;
             }
@@ -1919,10 +1919,10 @@ namespace OutdoorAirUnit {
                                                 FirstHVACIteration,
                                                 thisOutAirUnit.ExtFan_Index,
                                                 _,
-                                                ZoneCompTurnFansOn,
-                                                ZoneCompTurnFansOff);
+                                                TurnFansOn,
+                                                TurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[thisOutAirUnit.ExtFan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[thisOutAirUnit.ExtFan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
                 }
             }
         } // ...end of system ON/OFF IF-THEN block
