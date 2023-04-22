@@ -14363,6 +14363,10 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                                 thisDXCoil.Name));
         return;
     }
+    bool saveTurnFansOn = state.dataHVACGlobal->TurnFansOn;
+    bool saveTurnFansOff = state.dataHVACGlobal->TurnFansOff;
+    state.dataHVACGlobal->TurnFansOn = true; // enable fans, will override fan availability schedule if needed
+    state.dataHVACGlobal->TurnFansOff = false;
 
     // Calculate the Indoor fan electric power consumption.  The electric power consumption is estimated
     // using either user supplied or AHRI default value for fan power per air volume flow rate
@@ -14764,6 +14768,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
             }
         }
     } // loop over 3 part load test points
+    state.dataHVACGlobal->TurnFansOn = saveTurnFansOn;
+    state.dataHVACGlobal->TurnFansOff = saveTurnFansOff;
 
     IEER = (0.02 * EER_TestPoint_IP(1)) + (0.617 * EER_TestPoint_IP(2)) + (0.238 * EER_TestPoint_IP(3)) + (0.125 * EER_TestPoint_IP(4));
 
