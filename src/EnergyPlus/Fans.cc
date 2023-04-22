@@ -99,8 +99,6 @@ void SimulateFanComponents(EnergyPlusData &state,
                            bool const FirstHVACIteration,
                            int &CompIndex,
                            ObjexxFCL::Optional<Real64 const> SpeedRatio,
-                           ObjexxFCL::Optional_bool_const TurnFansOn,     // Turn fans ON signal from ZoneHVAC component
-                           ObjexxFCL::Optional_bool_const TurnFansOff,    // Turn Fans OFF signal from ZoneHVAC component
                            ObjexxFCL::Optional<Real64 const> PressureRise // Pressure difference to use for DeltaPress
 )
 {
@@ -148,22 +146,12 @@ void SimulateFanComponents(EnergyPlusData &state,
         }
     }
 
-    state.dataFans->LocalTurnFansOn = false;
-    state.dataFans->LocalTurnFansOff = false;
+    // Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
+    state.dataFans->LocalTurnFansOn = state.dataHVACGlobal->TurnFansOn;
+    state.dataFans->LocalTurnFansOff = state.dataHVACGlobal->TurnFansOff;
+
     // With the correct FanNum Initialize
     InitFan(state, FanNum, FirstHVACIteration); // Initialize all fan related parameters
-
-    if (present(TurnFansOn) && present(TurnFansOff)) {
-        // Set module-level logic flags equal to TurnFansOn and TurnFansOff values passed into this routine
-        // for ZoneHVAC components with system availability managers defined.
-        // The module-level flags get used in the other subroutines (e.g., SimSimpleFan,SimVariableVolumeFan and SimOnOffFan)
-        state.dataFans->LocalTurnFansOn = TurnFansOn;
-        state.dataFans->LocalTurnFansOff = TurnFansOff;
-    } else {
-        // Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
-        state.dataFans->LocalTurnFansOn = state.dataHVACGlobal->TurnFansOn;
-        state.dataFans->LocalTurnFansOff = state.dataHVACGlobal->TurnFansOff;
-    }
 
     // Calculate the Correct Fan Model with the current FanNum
     switch (state.dataFans->Fan(FanNum).FanType_Num) {

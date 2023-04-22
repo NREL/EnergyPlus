@@ -4183,8 +4183,7 @@ void CalcZoneEvapUnitOutput(EnergyPlusData &state,
         state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate;
         state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate;
         if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(
-                state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff);
+            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _);
         } else {
             state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
         }
@@ -4199,8 +4198,7 @@ void CalcZoneEvapUnitOutput(EnergyPlusData &state,
     }
     if (zoneEvapUnit.FanLocation == FanPlacement::DrawThruFan) {
         if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(
-                state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff);
+            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _);
         } else {
             state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
         }
@@ -4315,7 +4313,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
         state.dataLoopNodes->Node(zoneEvapUnit.FanOutletNodeNum).MassFlowRateMaxAvail =
             state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
         if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _, TurnFansOn, TurnFansOff);
+            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _);
         } else {
             state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
         }
@@ -4330,7 +4328,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
     }
     if (zoneEvapUnit.FanLocation == FanPlacement::DrawThruFan) {
         if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _, TurnFansOn, TurnFansOff);
+            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _);
         } else {
             state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
         }
@@ -4363,7 +4361,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
                 state.dataLoopNodes->Node(unit.FanOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate;
                 state.dataLoopNodes->Node(unit.FanOutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate;
                 if (unit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(state, unit.FanName, false, unit.FanIndex, _, TurnFansOn, TurnFansOff);
+                    Fans::SimulateFanComponents(state, unit.FanName, false, unit.FanIndex, _);
                 } else {
                     state.dataHVACFan->fanObjs[unit.FanIndex]->simulate(state, _, _);
                 }
@@ -4378,7 +4376,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
             }
             if (unit.FanLocation == FanPlacement::DrawThruFan) {
                 if (unit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(state, unit.FanName, false, unit.FanIndex, _, TurnFansOn, TurnFansOff);
+                    Fans::SimulateFanComponents(state, unit.FanName, false, unit.FanIndex, _);
                 } else {
                     state.dataHVACFan->fanObjs[unit.FanIndex]->simulate(state, _, _);
                 }

@@ -9408,13 +9408,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
                 state.dataHVACFan->fanObjs[this->FanIndex]->simulate(state, PartLoadRatio, _);
             }
         } else {
-            Fans::SimulateFanComponents(state,
-                                        "",
-                                        FirstHVACIteration,
-                                        this->FanIndex,
-                                        state.dataHVACVarRefFlow->FanSpeedRatio,
-                                        state.dataHVACGlobal->TurnFansOn,
-                                        state.dataHVACGlobal->TurnFansOff);
+            Fans::SimulateFanComponents(state, "", FirstHVACIteration, this->FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
         }
     }
 
@@ -9476,13 +9470,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
             }
 
         } else {
-            Fans::SimulateFanComponents(state,
-                                        "",
-                                        FirstHVACIteration,
-                                        this->FanIndex,
-                                        state.dataHVACVarRefFlow->FanSpeedRatio,
-                                        state.dataHVACGlobal->TurnFansOn,
-                                        state.dataHVACGlobal->TurnFansOff);
+            Fans::SimulateFanComponents(state, "", FirstHVACIteration, this->FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
         }
     }
 
@@ -12656,13 +12644,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                 state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, PartLoadRatio, _);
             }
         } else {
-            Fans::SimulateFanComponents(state,
-                                        "",
-                                        FirstHVACIteration,
-                                        this->FanIndex,
-                                        state.dataHVACVarRefFlow->FanSpeedRatio,
-                                        state.dataHVACGlobal->TurnFansOn,
-                                        state.dataHVACGlobal->TurnFansOff);
+            Fans::SimulateFanComponents(state, "", FirstHVACIteration, this->FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
         }
     }
     if (this->CoolingCoilPresent) {
@@ -12722,13 +12704,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
             }
 
         } else {
-            Fans::SimulateFanComponents(state,
-                                        "",
-                                        FirstHVACIteration,
-                                        this->FanIndex,
-                                        state.dataHVACVarRefFlow->FanSpeedRatio,
-                                        state.dataHVACGlobal->TurnFansOn,
-                                        state.dataHVACGlobal->TurnFansOff);
+            Fans::SimulateFanComponents(state, "", FirstHVACIteration, this->FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
         }
     }
 
@@ -12924,13 +12900,8 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
                     state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, PartLoadRatio, _);
                 }
             } else {
-                Fans::SimulateFanComponents(state,
-                                            "",
-                                            false,
-                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex,
-                                            state.dataHVACVarRefFlow->FanSpeedRatio,
-                                            state.dataHVACGlobal->TurnFansOn,
-                                            state.dataHVACGlobal->TurnFansOff);
+                Fans::SimulateFanComponents(
+                    state, "", false, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
             }
             Tin = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).Temp;
             Win = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).HumRat;

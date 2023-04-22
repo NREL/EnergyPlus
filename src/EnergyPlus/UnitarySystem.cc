@@ -7860,13 +7860,7 @@ namespace UnitarySystems {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _);
             } else {
                 if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state,
-                                                blankString,
-                                                FirstHVACIteration,
-                                                this->m_FanIndex,
-                                                state.dataUnitarySystems->FanSpeedRatio,
-                                                state.dataHVACGlobal->TurnFansOn,
-                                                state.dataHVACGlobal->TurnFansOff);
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 } else {
                     Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 }
@@ -7963,13 +7957,7 @@ namespace UnitarySystems {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _);
             } else {
                 if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state,
-                                                blankString,
-                                                FirstHVACIteration,
-                                                this->m_FanIndex,
-                                                state.dataUnitarySystems->FanSpeedRatio,
-                                                state.dataHVACGlobal->TurnFansOn,
-                                                state.dataHVACGlobal->TurnFansOff);
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 } else {
                     Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 }
@@ -11178,13 +11166,7 @@ namespace UnitarySystems {
                                                                        _);
             } else {
                 if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state,
-                                                blankString,
-                                                FirstHVACIteration,
-                                                this->m_FanIndex,
-                                                state.dataUnitarySystems->FanSpeedRatio,
-                                                state.dataHVACGlobal->TurnFansOn,
-                                                state.dataHVACGlobal->TurnFansOff);
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 } else {
                     Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 }
@@ -11224,13 +11206,8 @@ namespace UnitarySystems {
                                                                            _);
                 } else {
                     if (this->m_IsZoneEquipment) {
-                        Fans::SimulateFanComponents(state,
-                                                    blankString,
-                                                    FirstHVACIteration,
-                                                    this->m_FanIndex,
-                                                    state.dataUnitarySystems->FanSpeedRatio,
-                                                    state.dataHVACGlobal->TurnFansOn,
-                                                    state.dataHVACGlobal->TurnFansOff);
+                        Fans::SimulateFanComponents(
+                            state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                     } else {
                         Fans::SimulateFanComponents(
                             state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
@@ -11285,13 +11262,8 @@ namespace UnitarySystems {
                                                                            _);
                 } else {
                     if (this->m_IsZoneEquipment) {
-                        Fans::SimulateFanComponents(state,
-                                                    blankString,
-                                                    FirstHVACIteration,
-                                                    this->m_FanIndex,
-                                                    state.dataUnitarySystems->FanSpeedRatio,
-                                                    state.dataHVACGlobal->TurnFansOn,
-                                                    state.dataHVACGlobal->TurnFansOff);
+                        Fans::SimulateFanComponents(
+                            state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                     } else {
                         Fans::SimulateFanComponents(
                             state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
@@ -11328,13 +11300,7 @@ namespace UnitarySystems {
                                                                        _);
             } else {
                 if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state,
-                                                blankString,
-                                                FirstHVACIteration,
-                                                this->m_FanIndex,
-                                                state.dataUnitarySystems->FanSpeedRatio,
-                                                state.dataHVACGlobal->TurnFansOn,
-                                                state.dataHVACGlobal->TurnFansOff);
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 } else {
                     Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 }
@@ -15523,13 +15489,7 @@ namespace UnitarySystems {
                                                                        _);
             } else {
                 if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state,
-                                                blankString,
-                                                FirstHVACIteration,
-                                                this->m_FanIndex,
-                                                state.dataUnitarySystems->FanSpeedRatio,
-                                                state.dataHVACGlobal->TurnFansOn,
-                                                state.dataHVACGlobal->TurnFansOff);
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 } else {
                     Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 }
@@ -15583,13 +15543,7 @@ namespace UnitarySystems {
                                                                        _);
             } else {
                 if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state,
-                                                blankString,
-                                                FirstHVACIteration,
-                                                this->m_FanIndex,
-                                                state.dataUnitarySystems->FanSpeedRatio,
-                                                state.dataHVACGlobal->TurnFansOn,
-                                                state.dataHVACGlobal->TurnFansOff);
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 } else {
                     Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 }

@@ -1655,13 +1655,8 @@ void CalcSeriesPIU(EnergyPlusData &state,
             if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
             } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                Fans::SimulateFanComponents(state,
-                                            thisPIU.FanName,
-                                            FirstHVACIteration,
-                                            thisPIU.Fan_Index,
-                                            _,
-                                            PIUTurnFansOn,
-                                            PIUTurnFansOff); // fire the fan
+                Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index,
+                                            _); // fire the fan
             }
 
             // fan temperature rise [C]
@@ -1705,8 +1700,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
     if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
         state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
     } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _, PIUTurnFansOn,
-                                    PIUTurnFansOff); // fire the fan
+        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _); // fire the fan
     }
     // the heating load seen by the reheat coil [W]
     Real64 const QActualHeating =
@@ -1940,13 +1934,8 @@ void CalcParallelPIU(EnergyPlusData &state,
             if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
             } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                Fans::SimulateFanComponents(state,
-                                            thisPIU.FanName,
-                                            FirstHVACIteration,
-                                            thisPIU.Fan_Index,
-                                            _,
-                                            PIUTurnFansOn,
-                                            PIUTurnFansOff); // fire the fan
+                Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index,
+                                            _); // fire the fan
             }
             SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num); // fire the mixer
             // fan temperature rise [C]
@@ -1994,8 +1983,7 @@ void CalcParallelPIU(EnergyPlusData &state,
     if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
         state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
     } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _, PIUTurnFansOn,
-                                    PIUTurnFansOff); // fire the fan
+        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _); // fire the fan
     }
     // fire the mixer
     SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num);

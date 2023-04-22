@@ -1375,9 +1375,7 @@ namespace WindowAC {
                                             state.dataWindowAC->WindAC(WindACNum).FanName,
                                             FirstHVACIteration,
                                             state.dataWindowAC->WindAC(WindACNum).FanIndex,
-                                            PartLoadFrac,
-                                            TurnFansOn,
-                                            TurnFansOff);
+                                            PartLoadFrac);
             } else {
                 state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->simulate(state, _, _);
             }
@@ -1431,9 +1429,7 @@ namespace WindowAC {
                                             state.dataWindowAC->WindAC(WindACNum).FanName,
                                             FirstHVACIteration,
                                             state.dataWindowAC->WindAC(WindACNum).FanIndex,
-                                            PartLoadFrac,
-                                            TurnFansOn,
-                                            TurnFansOff);
+                                            PartLoadFrac);
             } else {
                 state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->simulate(state, _, _);
             }
