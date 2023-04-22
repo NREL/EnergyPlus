@@ -128,8 +128,9 @@ namespace HVACFan {
     )
     {
 
-        m_objTurnFansOn = false;
-        m_objTurnFansOff = false;
+        // Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
+        m_objTurnFansOn = state.dataHVACGlobal->TurnFansOn;
+        m_objTurnFansOff = state.dataHVACGlobal->TurnFansOff;
 
         init(state);
 
@@ -137,9 +138,6 @@ namespace HVACFan {
             return; // can't run calculations until sizing is completed
         }
 
-        // Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
-        m_objTurnFansOn = state.dataHVACGlobal->TurnFansOn;
-        m_objTurnFansOff = state.dataHVACGlobal->TurnFansOff;
         if (present(pressureRise) && present(massFlowRate1) && present(runTimeFraction1) && present(massFlowRate2) && present(runTimeFraction2) &&
             present(pressureRise2)) {
             Real64 flowRatio1 = massFlowRate1 / m_maxAirMassFlowRate;

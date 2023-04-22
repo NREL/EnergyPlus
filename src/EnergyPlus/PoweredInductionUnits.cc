@@ -1614,8 +1614,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
     if (GetCurrentScheduleValue(state, thisPIU.SchedPtr) <= 0.0) {
         UnitOn = false;
     }
-    if ((GetCurrentScheduleValue(state, thisPIU.FanAvailSchedPtr) <= 0.0 || state.dataHVACGlobal->TurnFansOff) &&
-        !state.dataHVACGlobal->TurnFansOn) {
+    if ((GetCurrentScheduleValue(state, thisPIU.FanAvailSchedPtr) <= 0.0 || state.dataHVACGlobal->TurnFansOff) && !state.dataHVACGlobal->TurnFansOn) {
         UnitOn = false;
     }
     if (PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow) {

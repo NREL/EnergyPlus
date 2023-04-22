@@ -14363,8 +14363,6 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                                 thisDXCoil.Name));
         return;
     }
-    state.dataHVACGlobal->TurnFansOn = true; // enable fans
-    state.dataHVACGlobal->TurnFansOff = false;
 
     // Calculate the Indoor fan electric power consumption.  The electric power consumption is estimated
     // using either user supplied or AHRI default value for fan power per air volume flow rate
