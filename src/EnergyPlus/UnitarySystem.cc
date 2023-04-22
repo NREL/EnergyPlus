@@ -7859,11 +7859,7 @@ namespace UnitarySystems {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _);
             } else {
-                if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                }
+                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
 
@@ -7956,11 +7952,7 @@ namespace UnitarySystems {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _);
             } else {
-                if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                }
+                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
 
@@ -11165,11 +11157,7 @@ namespace UnitarySystems {
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
                                                                        _);
             } else {
-                if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                }
+                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
 
@@ -11205,13 +11193,7 @@ namespace UnitarySystems {
                                                                            state.dataUnitarySystems->m_runTimeFraction2,
                                                                            _);
                 } else {
-                    if (this->m_IsZoneEquipment) {
-                        Fans::SimulateFanComponents(
-                            state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                    } else {
-                        Fans::SimulateFanComponents(
-                            state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                    }
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 }
                 if (this->m_CoolCoilExists) {
                     this->calcUnitaryCoolingSystem(
@@ -11261,13 +11243,7 @@ namespace UnitarySystems {
                                                                            state.dataUnitarySystems->m_runTimeFraction2,
                                                                            _);
                 } else {
-                    if (this->m_IsZoneEquipment) {
-                        Fans::SimulateFanComponents(
-                            state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                    } else {
-                        Fans::SimulateFanComponents(
-                            state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                    }
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 }
                 if (this->m_HeatCoilExists) {
                     this->calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad);
@@ -11299,11 +11275,7 @@ namespace UnitarySystems {
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
                                                                        _);
             } else {
-                if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                }
+                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
         if (this->m_SuppCoilExists) {
@@ -15488,11 +15460,7 @@ namespace UnitarySystems {
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
                                                                        _);
             } else {
-                if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                }
+                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
 
@@ -15542,11 +15510,7 @@ namespace UnitarySystems {
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
                                                                        _);
             } else {
-                if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                }
+                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
 
