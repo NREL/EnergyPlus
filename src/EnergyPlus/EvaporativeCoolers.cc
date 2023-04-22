@@ -1203,7 +1203,11 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         CheckThisAirSystemForSizing(state, CurSysNum, SizingDesRunThisAirSys);
         if (SizingDesRunThisAirSys) {
             HardSizeNoDesRun = false; // Check if design infomation is available
-        }
+        } //HardSizeNoDesRun is set for air loop equipment
+        CheckThisZoneForSizing(state, CurSysNum, SizingDesRunThisZone);
+        if (SizingDesRunThisZone) {
+            HardSizeNoDesRun = false; // Check if design infomation is available
+        }//HardSizeNoDesRun is set for air loop equipment
     }
     if (CurZoneEqNum > 0) {
         CheckThisZoneForSizing(state, CurZoneEqNum, SizingDesRunThisZone);
@@ -1348,8 +1352,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     } else if (CurZoneEqNum > 0) { // zone equipment
         // zone equip evap coolers
 
-        // this should be SizingDesRunThisZone
-        if (!IsAutoSize && !SizingDesRunThisAirSys) {
+        // Changed this to be SizingDesRunThisZone
+        if (!IsAutoSize && !SizingDesRunThisZone) {
             // the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
             // if ( EvapCond( EvapCoolNum ).VolFlowRate > 0.0 ) {
             // BaseSizer::reportSizerOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).Name,
