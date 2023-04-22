@@ -4186,8 +4186,7 @@ void CalcZoneEvapUnitOutput(EnergyPlusData &state,
             Fans::SimulateFanComponents(
                 state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff);
         } else {
-            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(
-                state, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
+            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
         }
     }
 
@@ -4203,8 +4202,7 @@ void CalcZoneEvapUnitOutput(EnergyPlusData &state,
             Fans::SimulateFanComponents(
                 state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff);
         } else {
-            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(
-                state, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
+            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
         }
     }
 
@@ -4319,7 +4317,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
         if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
             Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _, TurnFansOn, TurnFansOff);
         } else {
-            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
         }
     }
 
@@ -4334,7 +4332,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
         if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
             Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _, TurnFansOn, TurnFansOff);
         } else {
-            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
         }
     }
 
@@ -4367,7 +4365,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
                 if (unit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, unit.FanName, false, unit.FanIndex, _, TurnFansOn, TurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[unit.FanIndex]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+                    state.dataHVACFan->fanObjs[unit.FanIndex]->simulate(state, _, _);
                 }
             }
 
@@ -4382,7 +4380,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
                 if (unit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, unit.FanName, false, unit.FanIndex, _, TurnFansOn, TurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[unit.FanIndex]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+                    state.dataHVACFan->fanObjs[unit.FanIndex]->simulate(state, _, _);
                 }
             }
 

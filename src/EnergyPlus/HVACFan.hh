@@ -88,10 +88,7 @@ namespace HVACFan {
         FanSystem(FanSystem const &) = default;
 
         void simulate(EnergyPlusData &state,
-                      //        bool const firstHVACIteration,
                       ObjexxFCL::Optional<Real64 const> flowFraction = _,     // Flow fraction in operating mode 1
-                      ObjexxFCL::Optional_bool_const zoneCompTurnFansOn = _,  // Turn fans ON signal from ZoneHVAC component
-                      ObjexxFCL::Optional_bool_const zoneCompTurnFansOff = _, // Turn Fans OFF signal from ZoneHVAC component
                       ObjexxFCL::Optional<Real64 const> pressureRise = _,     // Pressure difference to use for DeltaPress
                       ObjexxFCL::Optional<Real64 const> massFlowRate1 = _,    // Mass flow rate in operating mode 1 [kg/s]
                       ObjexxFCL::Optional<Real64 const> runTimeFraction1 = _, // Run time fraction in operating mode 1

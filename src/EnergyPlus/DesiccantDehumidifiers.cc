@@ -2310,7 +2310,7 @@ namespace DesiccantDehumidifiers {
         if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
             Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
         } else {
-            state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _, _, _);
+            state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
         }
 
         // Call regen heating coil
@@ -2478,7 +2478,7 @@ namespace DesiccantDehumidifiers {
                     if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                         Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                     } else {
-                        state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _, _, _);
+                        state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
                     }
                     FanDeltaT =
                         state.dataLoopNodes->Node(desicDehum.RegenFanOutNode).Temp - state.dataLoopNodes->Node(desicDehum.RegenFanInNode).Temp;
@@ -2628,7 +2628,7 @@ namespace DesiccantDehumidifiers {
                         if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                             Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                         } else {
-                            state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _, _, _);
+                            state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
                         }
 
                         FanDeltaT =
@@ -2712,7 +2712,7 @@ namespace DesiccantDehumidifiers {
                 if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                 } else {
-                    state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _, _, _);
+                    state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
                 }
             }
 
@@ -2750,7 +2750,7 @@ namespace DesiccantDehumidifiers {
                 if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                 } else {
-                    state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _, _, _);
+                    state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
                 }
             }
 
@@ -2784,7 +2784,7 @@ namespace DesiccantDehumidifiers {
                 if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                 } else {
-                    state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _, _, _);
+                    state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
                 }
             }
 
@@ -2809,7 +2809,7 @@ namespace DesiccantDehumidifiers {
                 if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                 } else {
-                    state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _, _, _);
+                    state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
                 }
             }
 

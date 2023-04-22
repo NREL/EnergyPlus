@@ -9403,11 +9403,9 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     if (this->FanPlace == DataHVACGlobals::BlowThru) {
         if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (OnOffAirFlowRatio > 0.0) {
-                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
+                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(state, _, _);
             } else {
-                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
+                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(state, PartLoadRatio, _);
             }
         } else {
             Fans::SimulateFanComponents(state,
@@ -9472,11 +9470,9 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     if (this->FanPlace == DataHVACGlobals::DrawThru) {
         if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (OnOffAirFlowRatio > 0.0) {
-                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
+                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(state, _, _);
             } else {
-                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
+                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(state, PartLoadRatio, _);
             }
 
         } else {
@@ -12655,11 +12651,9 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     if (this->FanPlace == DataHVACGlobals::BlowThru) {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (OnOffAirFlowRatio > 0.0) {
-                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, _, _);
             } else {
-                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, PartLoadRatio, _);
             }
         } else {
             Fans::SimulateFanComponents(state,
@@ -12722,11 +12716,9 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     if (this->FanPlace == DataHVACGlobals::DrawThru) {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (OnOffAirFlowRatio > 0.0) {
-                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, _, _);
             } else {
-                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, PartLoadRatio, _);
             }
 
         } else {
@@ -12927,11 +12919,9 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 if (temp > 0) {
-                    state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                        state, _, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
+                    state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, _, _);
                 } else {
-                    state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                        state, PartLoadRatio, state.dataHVACGlobal->TurnFansOn, state.dataHVACGlobal->TurnFansOff, _);
+                    state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, PartLoadRatio, _);
                 }
             } else {
                 Fans::SimulateFanComponents(state,

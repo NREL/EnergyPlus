@@ -5397,14 +5397,14 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     if (FanType == DataHVACGlobals::FanType_SimpleVAV && FanOn == 1) {
         Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
     } else if (FanType == DataHVACGlobals::FanType_SystemModelObject && FanOn == 1) {
-        state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _, _, _);
+        state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _);
 
     } else { // pass through conditions
         state.dataHVACGlobal->TurnFansOff = true;
         if (FanType == DataHVACGlobals::FanType_SimpleVAV) {
             Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
         } else if (FanType == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _, state.dataHVACGlobal->TurnFansOff, _);
+            state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _);
         }
         state.dataHVACGlobal->TurnFansOff = TurnFansOffSav;
         state.dataLoopNodes->Node(FanOutNode).MassFlowRate = state.dataLoopNodes->Node(FanInNode).MassFlowRate;

@@ -3123,7 +3123,7 @@ namespace VentilatedSlab {
                     SimVentSlabOAMixer(state, Item);
 
                     if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+                        state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, _);
                     } else if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                         Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _, TurnFansOn, TurnFansOff);
                     }
@@ -3393,7 +3393,7 @@ namespace VentilatedSlab {
 
                     SimVentSlabOAMixer(state, Item);
                     if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+                        state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, _);
                     } else if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                         Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _, TurnFansOn, TurnFansOff);
                     }
@@ -3445,7 +3445,7 @@ namespace VentilatedSlab {
             state.dataLoopNodes->Node(FanOutletNode).MassFlowRateMaxAvail = 0.0;
             state.dataLoopNodes->Node(FanOutletNode).MassFlowRateMinAvail = 0.0;
             if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+                state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, _);
             } else if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                 Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _, TurnFansOn, TurnFansOff);
             }
@@ -3502,7 +3502,7 @@ namespace VentilatedSlab {
 
         SimVentSlabOAMixer(state, Item);
         if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+            state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, _);
         } else if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
             Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _, TurnFansOn, TurnFansOff);
         }

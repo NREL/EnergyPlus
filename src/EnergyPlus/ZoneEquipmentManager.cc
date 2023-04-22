@@ -3051,7 +3051,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             // Air loop system availability manager status only applies to PIU and exhaust fans
             // Reset fan SAM operation flags for zone fans.
             state.dataHVACGlobal->TurnFansOn = false;
-            state.dataHVACGlobal->TurnZoneFansOnlyOn = false;
             state.dataHVACGlobal->TurnFansOff = false;
 
             state.dataHVACGlobal->UnbalExhMassFlow = 0.0;
@@ -3122,7 +3121,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 }
                 if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) {
                     // Currently used only by parallel powered induction unit
-                    state.dataHVACGlobal->TurnZoneFansOnlyOn = true;
+                    state.dataHVACGlobal->TurnFansOn = true;
                 }
                 if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::ForceOff) {
                     state.dataHVACGlobal->TurnFansOff = true;

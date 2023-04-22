@@ -115,11 +115,9 @@ namespace HVACFan {
     }
 
     void FanSystem::simulate(EnergyPlusData &state,
-                             ObjexxFCL::Optional<Real64 const> flowFraction, // when used, this directs the fan to set the flow at this flow fraction
-                                                                             // = current flow/ max design flow rate.  It is not exactly the same as
-                                                                             // the legacy speed ratio that was used with SimulateFanComponents.
-                             ObjexxFCL::Optional_bool_const zoneCompTurnFansOn,  // can be used as turn fans ON signal from ZoneHVAC component
-                             ObjexxFCL::Optional_bool_const zoneCompTurnFansOff, // can be used as turn Fans OFF signal from ZoneHVAC component
+                             ObjexxFCL::Optional<Real64 const> flowFraction,  // when used, this directs the fan to set the flow at this flow fraction
+                                                                              // = current flow/ max design flow rate.  It is not exactly the same as
+                                                                              // the legacy speed ratio that was used with SimulateFanComponents.
                              ObjexxFCL::Optional<Real64 const> pressureRise,  // Pressure difference to use for DeltaPress, for rating DX coils at a
                                                                               // different pressure without entire duct system
                              ObjexxFCL::Optional<Real64 const> massFlowRate1, // Mass flow rate in operating mode 1 [kg/s]
@@ -139,17 +137,9 @@ namespace HVACFan {
             return; // can't run calculations until sizing is completed
         }
 
-        if (present(zoneCompTurnFansOn) && present(zoneCompTurnFansOff)) {
-            // Set module-level logic flags equal to TurnFansOn and TurnFansOff values passed into this routine
-            // for ZoneHVAC components with system availability managers defined.
-            // The module-level flags get used in the other subroutines (e.g., SimSimpleFan,SimVariableVolumeFan and SimOnOffFan)
-            m_objTurnFansOn = zoneCompTurnFansOn;
-            m_objTurnFansOff = zoneCompTurnFansOff;
-        } else {
-            // Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
-            m_objTurnFansOn = state.dataHVACGlobal->TurnFansOn;
-            m_objTurnFansOff = state.dataHVACGlobal->TurnFansOff;
-        }
+        // Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
+        m_objTurnFansOn = state.dataHVACGlobal->TurnFansOn;
+        m_objTurnFansOff = state.dataHVACGlobal->TurnFansOff;
         if (present(pressureRise) && present(massFlowRate1) && present(runTimeFraction1) && present(massFlowRate2) && present(runTimeFraction2) &&
             present(pressureRise2)) {
             Real64 flowRatio1 = massFlowRate1 / m_maxAirMassFlowRate;

@@ -7857,7 +7857,7 @@ namespace UnitarySystems {
         }
         if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _, _, _);
+                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _);
             } else {
                 if (this->m_IsZoneEquipment) {
                     Fans::SimulateFanComponents(state,
@@ -7960,7 +7960,7 @@ namespace UnitarySystems {
 
         if (this->m_FanExists && this->m_FanPlace == FanPlace::DrawThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _, _, _);
+                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _);
             } else {
                 if (this->m_IsZoneEquipment) {
                     Fans::SimulateFanComponents(state,
@@ -11048,15 +11048,8 @@ namespace UnitarySystems {
             FanOn = true;
         }
         // combine above and below into 1 logical
-        bool turnFansOn = false;
-        bool turnFansOff = false;
-        if (this->m_IsZoneEquipment) {
-            turnFansOn = state.dataHVACGlobal->TurnFansOn;
-            turnFansOff = state.dataHVACGlobal->TurnFansOff;
-        } else {
-            turnFansOn = state.dataHVACGlobal->TurnFansOn;
-            turnFansOff = state.dataHVACGlobal->TurnFansOff;
-        }
+        bool turnFansOn = state.dataHVACGlobal->TurnFansOn;
+        bool turnFansOff = state.dataHVACGlobal->TurnFansOff;
         // END - move this to Init during FirstHVACIteration
 
         if (ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) > 0.0 && ((FanOn || turnFansOn) && !turnFansOff)) {
@@ -11178,8 +11171,6 @@ namespace UnitarySystems {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
                                                                        _,
-                                                                       _,
-                                                                       _,
                                                                        state.dataUnitarySystems->m_massFlow1,
                                                                        state.dataUnitarySystems->m_runTimeFraction1,
                                                                        state.dataUnitarySystems->m_massFlow2,
@@ -11224,8 +11215,6 @@ namespace UnitarySystems {
             if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru && state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
                 if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
-                                                                           _,
-                                                                           _,
                                                                            _,
                                                                            _,
                                                                            state.dataUnitarySystems->m_massFlow1,
@@ -11289,8 +11278,6 @@ namespace UnitarySystems {
                     state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                            _,
                                                                            _,
-                                                                           _,
-                                                                           _,
                                                                            state.dataUnitarySystems->m_massFlow1,
                                                                            state.dataUnitarySystems->m_runTimeFraction1,
                                                                            state.dataUnitarySystems->m_massFlow2,
@@ -11332,8 +11319,6 @@ namespace UnitarySystems {
         if (this->m_FanExists && this->m_FanPlace == FanPlace::DrawThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
-                                                                       _,
-                                                                       _,
                                                                        _,
                                                                        _,
                                                                        state.dataUnitarySystems->m_massFlow1,
@@ -15531,8 +15516,6 @@ namespace UnitarySystems {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
                                                                        _,
-                                                                       _,
-                                                                       _,
                                                                        state.dataUnitarySystems->m_massFlow1,
                                                                        state.dataUnitarySystems->m_runTimeFraction1,
                                                                        state.dataUnitarySystems->m_massFlow2,
@@ -15591,8 +15574,6 @@ namespace UnitarySystems {
         if (this->m_FanExists && this->m_FanPlace == FanPlace::DrawThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
-                                                                       _,
-                                                                       _,
                                                                        _,
                                                                        _,
                                                                        state.dataUnitarySystems->m_massFlow1,

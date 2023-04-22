@@ -14363,6 +14363,10 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                                 thisDXCoil.Name));
         return;
     }
+    bool saveTurnFansOn = state.dataHVACGlobal->TurnFansOn;
+    bool saveTurnFansOff = state.dataHVACGlobal->TurnFansOff;
+    state.dataHVACGlobal->TurnFansOn = true; // enable fans
+    state.dataHVACGlobal->TurnFansOff = false;
 
     // Calculate the Indoor fan electric power consumption.  The electric power consumption is estimated
     // using either user supplied or AHRI default value for fan power per air volume flow rate
@@ -14409,7 +14413,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
             state.dataLoopNodes->Node(FanInletNode).Enthalpy =
                 PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, state.dataLoopNodes->Node(FanInletNode).HumRat);
             if (thisDXCoil.SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
+                state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->simulate(state, _, FanStaticPressureRise);
                 FanPowerCorrection = state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->fanPower();
             } else {
                 Fans::SimulateFanComponents(state, thisDXCoil.SupplyFanName, true, thisDXCoil.SupplyFanIndex, _, true, false, FanStaticPressureRise);
@@ -14537,7 +14541,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                     inletNode.HumRat = PsyWFnTdbTwbPb(state, dbRated, wbRated, state.dataEnvrn->OutBaroPress, RoutineName);
                     inletNode.Enthalpy = PsyHFnTdbW(dbRated, inletNode.HumRat);
                     if (coil.SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                        state.dataHVACFan->fanObjs[coil.SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
+                        state.dataHVACFan->fanObjs[coil.SupplyFanIndex]->simulate(state, _, FanStaticPressureRise);
                     } else {
                         Fans::SimulateFanComponents(state, coil.SupplyFanName, true, coil.SupplyFanIndex, _, true, false, FanStaticPressureRise);
                     }
@@ -14613,7 +14617,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 state.dataLoopNodes->Node(FanInletNode).Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
 
                 if (thisDXCoil.SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
+                    state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->simulate(state, _, FanStaticPressureRise);
                     FanPowerCorrection = state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->fanPower();
                 } else {
                     Fans::SimulateFanComponents(
@@ -14765,6 +14769,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
             }
         }
     } // loop over 3 part load test points
+    state.dataHVACGlobal->TurnFansOn = saveTurnFansOn;
+    state.dataHVACGlobal->TurnFansOff = saveTurnFansOff;
 
     IEER = (0.02 * EER_TestPoint_IP(1)) + (0.617 * EER_TestPoint_IP(2)) + (0.238 * EER_TestPoint_IP(3)) + (0.125 * EER_TestPoint_IP(4));
 

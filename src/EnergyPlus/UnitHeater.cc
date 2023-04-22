@@ -1819,7 +1819,7 @@ namespace UnitHeater {
                                             TurnFansOn,
                                             TurnFansOff);
             } else {
-                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, _);
             }
 
             switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
@@ -1899,7 +1899,7 @@ namespace UnitHeater {
                                             TurnFansOn,
                                             TurnFansOff);
             } else {
-                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, _);
             }
             switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
 

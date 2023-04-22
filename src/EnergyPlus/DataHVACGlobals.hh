@@ -453,7 +453,6 @@ struct HVACGlobalsData : BaseGlobalStruct
     Real64 BalancedExhMassFlow = 0.0;   // balanced zone exhaust (declared as so by user)  [kg/s]
     Real64 PlenumInducedMassFlow = 0.0; // secondary air mass flow rate induced from a return plenum [kg/s]
     bool TurnFansOn = false;            // If true overrides fan schedule and cycles fans on
-    bool TurnZoneFansOnlyOn = false;    // If true overrides zone fan schedule and cycles fans on (currently used only by parallel PIU)
     bool TurnFansOff = false;           // If True overides fan schedule and TurnFansOn and forces fans off
     bool SetPointErrorFlag = false;     // True if any needed setpoints not set; if true, program terminates
     bool DoSetPointTest = false;        // True one time only for sensed node setpoint test

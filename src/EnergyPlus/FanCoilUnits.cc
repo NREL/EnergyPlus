@@ -1444,7 +1444,7 @@ namespace FanCoilUnits {
                         fanCoil.FanAirVolFlow =
                             Fans::GetFanDesignVolumeFlowRate(state, DataHVACGlobals::cFanTypes(fanCoil.FanType_Num), fanCoil.FanName, ErrorsFound);
                     } else {
-                        state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _, _, _);
+                        state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                         fanCoil.FanAirVolFlow = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
                     }
                 }
@@ -1485,7 +1485,7 @@ namespace FanCoilUnits {
                 fanCoil.FanAirVolFlow =
                     Fans::GetFanDesignVolumeFlowRate(state, DataHVACGlobals::cFanTypes(fanCoil.FanType_Num), fanCoil.FanName, ErrorsFound);
             } else {
-                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _, _, _);
+                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                 fanCoil.FanAirVolFlow = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
             }
             //   Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
@@ -3343,7 +3343,7 @@ namespace FanCoilUnits {
                     Fans::SimulateFanComponents(
                         state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, fanCoil.LowSpeedRatio, TurnFansOn, TurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                 }
             } else if (fanCoil.SpeedFanSel == 2) {
 
@@ -3351,22 +3351,20 @@ namespace FanCoilUnits {
                     Fans::SimulateFanComponents(
                         state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, fanCoil.MedSpeedRatio, TurnFansOn, TurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                 }
             } else if (fanCoil.SpeedFanSel == 3) {
 
                 if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(
-                        state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, 1.0, TurnFansOn, TurnFansOff);
+                    Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, 1.0, TurnFansOn, TurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, TurnFansOn, TurnFansOff, _);
+                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                 }
             } else { // using 1.0 here for fan speed ratio seems wrong if FCU max flow rate is different than the fan maximum flow rate
                 if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(
-                        state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, 0.0, TurnFansOn, TurnFansOff);
+                    Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, 0.0, TurnFansOn, TurnFansOff);
                 } else {
-                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, 0.0, TurnFansOn, TurnFansOff, _);
+                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, 0.0, _);
                 }
             }
             if (fanCoil.CCoilType_Num == CCoil::HXAssist) {
@@ -3397,17 +3395,12 @@ namespace FanCoilUnits {
 
         } else if (fanCoil.CapCtrlMeth_Num == CCM::MultiSpeedFan) {
             if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(state,
-                                            fanCoil.FanName,
-                                            FirstHVACIteration,
-                                            fanCoil.FanIndex,
-                                            state.dataFanCoilUnits->FanFlowRatio,
-                                            TurnFansOn,
-                                            TurnFansOff);
+                Fans::SimulateFanComponents(
+                    state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, state.dataFanCoilUnits->FanFlowRatio, TurnFansOn, TurnFansOff);
             } else {
                 // FanFlowRatio needs to be accurate here for new fan model
                 Real64 ActFanFlowRatio = state.dataFanCoilUnits->FanFlowRatio * PartLoad;
-                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, ActFanFlowRatio, TurnFansOn, TurnFansOff, _);
+                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, ActFanFlowRatio, _);
             }
             if (fanCoil.CCoilType_Num == CCoil::HXAssist) {
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
@@ -3450,10 +3443,9 @@ namespace FanCoilUnits {
             // Constant fan and variable flow calculation AND variable fan
 
             if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
-                    state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, FanSpeedRatio, TurnFansOn, TurnFansOff);
+                Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, FanSpeedRatio, TurnFansOn, TurnFansOff);
             } else {
-                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, FanSpeedRatio, TurnFansOn, TurnFansOff, _);
+                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, FanSpeedRatio, _);
             }
 
             if (fanCoil.CCoilType_Num == CCoil::HXAssist) {
