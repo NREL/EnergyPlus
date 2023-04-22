@@ -4287,10 +4287,6 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
 )
 {
 
-    // Using/Aliasing
-    auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
-    auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr MaxIte(500); // maximum number of iterations
     auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
@@ -4344,10 +4340,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
     if (FullFlowSensibleOutputProvided < ZoneCoolingLoad) { // find speed ratio by regula falsi numerical method
         Real64 FanSpeedRatio = 1.0;
         auto f = [&state, UnitNum, ZoneCoolingLoad](Real64 FanSpeedRatio) {
-            auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
-            auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
             auto &unit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
-
             state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate = unit.DesignAirMassFlowRate * FanSpeedRatio;
             state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate;
             state.dataLoopNodes->Node(unit.UnitOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate;

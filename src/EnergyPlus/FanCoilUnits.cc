@@ -3253,10 +3253,6 @@ namespace FanCoilUnits {
         // METHODOLOGY EMPLOYED:
         // Simulates the unit components sequentially in the air flow direction.
 
-        // Using/Aliasing
-        auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
-        auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;            // total mass flow through the unit
         Real64 PartLoad;               // if PLR present PartLoad = PLR

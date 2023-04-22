@@ -1155,8 +1155,6 @@ namespace OutdoorAirUnit {
 
         // Using/Aliasing
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-        auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
-        auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
 
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
@@ -1389,7 +1387,7 @@ namespace OutdoorAirUnit {
         // Node Set
 
         // set the mass flow rates from the input volume flow rates
-        if (OAFrac > 0.0 || (TurnFansOn && !TurnFansOff)) { // fan is available
+        if (OAFrac > 0.0 || (state.dataHVACGlobal->TurnFansOn && !state.dataHVACGlobal->TurnFansOff)) { // fan is available
             thisOutAirUnit.OutAirMassFlow = RhoAir * OAFrac * thisOutAirUnit.OutAirVolFlow;
         } else {
             thisOutAirUnit.OutAirMassFlow = 0.0;

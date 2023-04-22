@@ -14363,8 +14363,6 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                                 thisDXCoil.Name));
         return;
     }
-    bool saveTurnFansOn = state.dataHVACGlobal->TurnFansOn;
-    bool saveTurnFansOff = state.dataHVACGlobal->TurnFansOff;
     state.dataHVACGlobal->TurnFansOn = true; // enable fans
     state.dataHVACGlobal->TurnFansOff = false;
 
@@ -14768,8 +14766,6 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
             }
         }
     } // loop over 3 part load test points
-    state.dataHVACGlobal->TurnFansOn = saveTurnFansOn;
-    state.dataHVACGlobal->TurnFansOff = saveTurnFansOff;
 
     IEER = (0.02 * EER_TestPoint_IP(1)) + (0.617 * EER_TestPoint_IP(2)) + (0.238 * EER_TestPoint_IP(3)) + (0.125 * EER_TestPoint_IP(4));
 
