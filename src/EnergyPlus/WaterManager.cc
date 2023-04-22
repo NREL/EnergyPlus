@@ -671,7 +671,7 @@ namespace WaterManager {
                     ErrorsFound = true;
                 } else if ((state.dataWaterData->RainFall.RainSchedID != 0) &&
                            (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign)) {
-                    if (!CheckScheduleValueMinMax(state, state.dataWaterData->RainFall.RainSchedID, ">=", 0.0)) {
+                    if (!CheckScheduleValueMinMax(state, state.dataWaterData->RainFall.RainSchedID, true, 0.0)) {
                         ShowSevereError(state, format("Schedule={} for {} object has values < 0.", cAlphaArgs(2), cCurrentModuleObject));
                         ErrorsFound = true;
                     }
@@ -711,7 +711,7 @@ namespace WaterManager {
                     ErrorsFound = true;
                 } else if ((state.dataWaterData->Irrigation.IrrSchedID == 0) &&
                            (state.dataWaterData->Irrigation.ModeID == DataWater::IrrigationMode::IrrSchedDesign)) {
-                    if (!CheckScheduleValueMinMax(state, state.dataWaterData->Irrigation.IrrSchedID, ">=", 0.0)) {
+                    if (!CheckScheduleValueMinMax(state, state.dataWaterData->Irrigation.IrrSchedID, true, 0.0)) {
                         ShowSevereError(state, format("Schedule={} for {} object has values < 0.", cAlphaArgs(2), cCurrentModuleObject));
                         ErrorsFound = true;
                     }
@@ -789,7 +789,7 @@ namespace WaterManager {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataWaterData->WaterStorage(Item).Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "WaterSystem",
                                     state.dataWaterData->WaterStorage(Item).QualitySubCategoryName,
@@ -873,10 +873,10 @@ namespace WaterManager {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataWaterData->RainCollector(Item).Name,
-                                    _,
+                                    {},
                                     "OnSiteWater",
                                     "Rainwater",
-                                    _,
+                                    {},
                                     "System");
             }
 
@@ -902,10 +902,10 @@ namespace WaterManager {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataWaterData->GroundwaterWell(Item).Name,
-                                    _,
+                                    {},
                                     "OnSiteWater",
                                     "Wellwater",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Water System Groundwater Well Pump Electricity Rate",
@@ -921,10 +921,10 @@ namespace WaterManager {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataWaterData->GroundwaterWell(Item).Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "WaterSystems",
-                                    _,
+                                    {},
                                     "System");
             }
 

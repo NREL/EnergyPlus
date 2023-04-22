@@ -69,20 +69,11 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Reads input and creates instance of Site:GroundTemperature:Deep object
 
-    // USE STATEMENTS:
-    using namespace GroundTemperatureManager;
-
-    // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumNums;
-    int NumAlphas;
-    int IOStat;
     bool errorsFound = false;
 
     // New shared pointer for this model object
@@ -97,6 +88,10 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
     thisModel->objectName = objectName;
 
     if (numCurrObjects == 1) {
+
+        int NumNums;
+        int NumAlphas;
+        int IOStat;
 
         // Get the object names for each construction from the input processor
         state.dataInputProcessing->inputProcessor->getObjectItem(
@@ -146,8 +141,6 @@ Real64 SiteDeepGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Returns the ground temperature for Site:GroundTemperature:Deep
@@ -162,13 +155,10 @@ Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Returns the ground temperature when input time is in seconds
 
-    // USE STATEMENTS:
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * Constant::SecsInDay / 12;
 
@@ -192,8 +182,6 @@ Real64 SiteDeepGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state, [
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Returns the ground temperature when input time is in months
