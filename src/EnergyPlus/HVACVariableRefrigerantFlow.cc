@@ -202,6 +202,7 @@ void SimulateVRF(EnergyPlusData &state,
 
     // the VRF condenser index
     VRFCondenser = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum;
+    OnOffAirFlowRatio = 1.0;
 
     if ((state.dataHVACVarRefFlow->VRF(VRFCondenser).CondenserType == DataHeatBalance::RefrigCondenserType::Water) &&
         (state.dataHVACVarRefFlow->VRF(VRFCondenser).checkPlantCondTypeOneTime)) {
@@ -9870,12 +9871,14 @@ void SetAverageAirFlow(EnergyPlusData &state,
 
     } else { // terminal unit and/or fan is off
 
-        if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+        if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) {
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+            OnOffAirFlowRatio = 0.0;
+        }
         if (OutsideAirNode > 0) {
             state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(AirRelNode).MassFlowRate = 0.0;
         }
-        OnOffAirFlowRatio = 0.0;
     }
 }
 

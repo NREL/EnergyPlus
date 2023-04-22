@@ -2601,8 +2601,6 @@ namespace VentilatedSlab {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
-        auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
         auto &ventSlab = state.dataVentilatedSlab->VentSlab(Item);
 
         using HeatingCoils::CheckHeatingCoilSchedule;
@@ -3480,8 +3478,6 @@ namespace VentilatedSlab {
         // simulation.  Other than that, the subroutine is very straightforward.
 
         // Using/Aliasing
-        auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
-        auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
         auto &ventSlab = state.dataVentilatedSlab->VentSlab(Item);
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
