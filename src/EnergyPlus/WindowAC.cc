@@ -1341,8 +1341,6 @@ namespace WindowAC {
         // METHODOLOGY EMPLOYED:
         // Simulates the unit components sequentially in the air flow direction.
 
-        auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
-        auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
         using DXCoils::SimDXCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 
