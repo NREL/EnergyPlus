@@ -293,8 +293,6 @@ namespace DesiccantDehumidifiers {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            int DesicDehumNum = DesicDehumIndex;
-
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataDesiccantDehumidifiers->UniqueDesicDehumNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             desicDehum.Name = Alphas(1);

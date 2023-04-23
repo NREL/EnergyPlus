@@ -356,7 +356,6 @@ namespace Furnaces {
     );
 
     void CalcWaterToAirHeatPump(EnergyPlusData &state,
-                                int const AirLoopNum,                              // index to air loop
                                 int const FurnaceNum,                              // index to Furnace
                                 bool const FirstHVACIteration,                     // TRUE on first HVAC iteration
                                 DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation flag (1=On, 0=Off)
@@ -460,7 +459,6 @@ namespace Furnaces {
                            int const OpMode,                                  // operating mode: CycFanCycCoil | ContFanCycCoil
                            Real64 &QZnReq,                                    // cooling or heating output needed by zone [W]
                            Real64 QLatReq,                                    // latent cooling output needed by zone [W]
-                           int const ZoneNum,                                 // Index to zone number
                            int &SpeedNum,                                     // Speed number
                            Real64 &SpeedRatio,                                // unit speed ratio for DX coils
                            Real64 &PartLoadFrac,                              // unit part load fraction

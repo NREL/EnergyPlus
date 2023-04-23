@@ -623,7 +623,7 @@ namespace Furnaces {
 
                 // simulate the heat pump
                 HeatCoilLoad = 0.0;
-                CalcWaterToAirHeatPump(state, AirLoopNum, FurnaceNum, FirstHVACIteration, CompressorOp, ZoneLoad, MoistureLoad);
+                CalcWaterToAirHeatPump(state, FurnaceNum, FirstHVACIteration, CompressorOp, ZoneLoad, MoistureLoad);
             } else if (thisFurnace.WatertoAirHPType == DataHVACGlobals::WatertoAir_VarSpeedEquationFit) {
                 // simulate the heat pump
                 HeatCoilLoad = 0.0;
@@ -8094,7 +8094,6 @@ namespace Furnaces {
     }
 
     void CalcWaterToAirHeatPump(EnergyPlusData &state,
-                                int const AirLoopNum,                                    // index to air loop
                                 int const FurnaceNum,                                    // index to Furnace
                                 bool const FirstHVACIteration,                           // TRUE on first HVAC iteration
                                 DataHVACGlobals::CompressorOperation const CompressorOp, // compressor operation flag (1=On, 0=Off)
@@ -8144,11 +8143,9 @@ namespace Furnaces {
         // Set local variables
         Real64 Dummy2 = 0.0;            // used as dummy heat and reheat coil load
         Real64 OnOffAirFlowRatio = 1.0; // Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
-        int FurnaceOutletNode = thisFurnace.FurnaceOutletNodeNum;
         int FurnaceInletNode = thisFurnace.FurnaceInletNodeNum;
         int OpMode = thisFurnace.OpMode; // fan operting mode
         thisFurnace.MdotFurnace = thisFurnace.DesignMassFlowRate;
-        bool HumControl = false; // Logical flag signaling when dehumidification is required
 
         //*********INITIAL CALCULATIONS****************
         // set the fan part load fraction
@@ -9046,7 +9043,7 @@ namespace Furnaces {
 
         // Get mass flow rate after components are simulated
         auto &outletNode = state.dataLoopNodes->Node(thisFurnace.FurnaceOutletNodeNum);
-        Real64 AirMassFlow = outletNode.MassFlowRate;
+        Real64 AirMassFlow = inletNode.MassFlowRate; // this should be outlet node as in 9897
 
         // check the DesignMaxOutletTemp and reset if necessary (for Coil:Gas:Heating or Coil:Electric:Heating only)
         if (outletNode.Temp > thisFurnace.DesignMaxOutletTemp) {
@@ -9821,7 +9818,6 @@ namespace Furnaces {
                               OpMode,
                               TotalZoneSensibleLoad,
                               TotalZoneLatentLoad,
-                              ZoneNum,
                               SpeedNum,
                               SpeedRatio,
                               PartLoadFrac,
@@ -9842,7 +9838,6 @@ namespace Furnaces {
                                   OpMode,
                                   TotalZoneSensibleLoad,
                                   TotalZoneLatentLoad,
-                                  ZoneNum,
                                   SpeedNum,
                                   SpeedRatio,
                                   PartLoadFrac,
@@ -9860,7 +9855,6 @@ namespace Furnaces {
                               OpMode,
                               TotalZoneSensibleLoad,
                               TotalZoneLatentLoad,
-                              ZoneNum,
                               SpeedNum,
                               SpeedRatio,
                               PartLoadFrac,
@@ -10050,7 +10044,6 @@ namespace Furnaces {
                            int const OpMode,                                        // operating mode: CycFanCycCoil | ContFanCycCoil
                            Real64 &QZnReq,                                          // cooling or heating output needed by zone [W]
                            Real64 QLatReq,                                          // latent cooling output needed by zone [W]
-                           int const ZoneNum,                                       // Index to zone number
                            int &SpeedNum,                                           // Speed number
                            Real64 &SpeedRatio,                                      // unit speed ratio for DX coils
                            Real64 &PartLoadFrac,                                    // unit part load fraction
