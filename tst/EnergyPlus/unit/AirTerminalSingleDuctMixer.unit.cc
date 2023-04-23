@@ -7756,8 +7756,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->DoingSizing = true;
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -8188,8 +8188,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->DoingSizing = true;
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = false;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -8297,7 +8297,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     EXPECT_EQ(DataHVACGlobals::CycleOn, AvailStatus);
     EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     // set zone equipment is CyclOn based on night cycle manager status
-    if (state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus) {
+    if (state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus == DataHVACGlobals::CycleOn) {
         state->dataHVACGlobal->TurnFansOn = true;
         state->dataHVACGlobal->TurnFansOff = false;
     }

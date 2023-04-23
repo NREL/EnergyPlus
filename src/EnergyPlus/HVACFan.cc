@@ -128,10 +128,6 @@ namespace HVACFan {
     )
     {
 
-        // Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
-        m_objTurnFansOn = state.dataHVACGlobal->TurnFansOn;
-        m_objTurnFansOff = state.dataHVACGlobal->TurnFansOff;
-
         init(state);
 
         if (m_objSizingFlag) {
@@ -361,11 +357,10 @@ namespace HVACFan {
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
           m_zoneRadFract(0.0), m_heatLossesDestination(ThermalLossDestination::Invalid), m_qdotConvZone(0.0), m_qdotRadZone(0.0), m_numSpeeds(0),
           m_inletAirMassFlowRate(0.0), m_outletAirMassFlowRate(0.0), m_maxAirMassFlowRate(0.0), m_inletAirTemp(0.0), m_outletAirTemp(0.0),
-          m_inletAirHumRat(0.0), m_outletAirHumRat(0.0), m_inletAirEnthalpy(0.0), m_outletAirEnthalpy(0.0), m_objTurnFansOn(false),
-          m_objTurnFansOff(false), m_objEnvrnFlag(true), m_objSizingFlag(true), m_fanPower(0.0), m_fanEnergy(0.0),
-          m_maxAirFlowRateEMSOverrideOn(false), m_maxAirFlowRateEMSOverrideValue(0.0), m_eMSFanPressureOverrideOn(false), m_eMSFanPressureValue(0.0),
-          m_eMSFanEffOverrideOn(false), m_eMSFanEffValue(0.0), m_eMSMaxMassFlowOverrideOn(false), m_eMSAirMassFlowValue(0.0),
-          m_faultyFilterFlag(false), m_faultyFilterIndex(0),
+          m_inletAirHumRat(0.0), m_outletAirHumRat(0.0), m_inletAirEnthalpy(0.0), m_outletAirEnthalpy(0.0), m_objEnvrnFlag(true),
+          m_objSizingFlag(true), m_fanPower(0.0), m_fanEnergy(0.0), m_maxAirFlowRateEMSOverrideOn(false), m_maxAirFlowRateEMSOverrideValue(0.0),
+          m_eMSFanPressureOverrideOn(false), m_eMSFanPressureValue(0.0), m_eMSFanEffOverrideOn(false), m_eMSFanEffValue(0.0),
+          m_eMSMaxMassFlowOverrideOn(false), m_eMSAirMassFlowValue(0.0), m_faultyFilterFlag(false), m_faultyFilterIndex(0),
 
           m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0), m_designPointFEI(0.0)
     // oneTimePowerCurveCheck_( true )
@@ -818,8 +813,8 @@ namespace HVACFan {
             }
         }
 
-        if ((ScheduleManager::GetCurrentScheduleValue(state, availSchedIndex) > 0.0 || m_objTurnFansOn) && !m_objTurnFansOff &&
-            ((localAirMassFlow[0] + localAirMassFlow[1]) > 0.0)) {
+        if ((ScheduleManager::GetCurrentScheduleValue(state, availSchedIndex) > 0.0 || state.dataHVACGlobal->TurnFansOn) &&
+            !state.dataHVACGlobal->TurnFansOff && ((localAirMassFlow[0] + localAirMassFlow[1]) > 0.0)) {
             // fan is running
 
             for (int mode = 0; mode < localNumModes; ++mode) {

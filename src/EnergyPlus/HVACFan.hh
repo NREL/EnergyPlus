@@ -225,8 +225,6 @@ namespace HVACFan {
         Real64 m_outletAirHumRat;
         Real64 m_inletAirEnthalpy;
         Real64 m_outletAirEnthalpy;
-        bool m_objTurnFansOn;
-        bool m_objTurnFansOff;
         bool m_objEnvrnFlag;  // initialize to true
         bool m_objSizingFlag; // initialize to true, set to false after sizing routine
 

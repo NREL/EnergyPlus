@@ -3119,10 +3119,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                     state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) {
                     state.dataHVACGlobal->TurnFansOn = true;
                 }
-                if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) {
-                    // Currently used only by parallel powered induction unit
-                    state.dataHVACGlobal->TurnFansOn = true;
-                }
                 if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::ForceOff) {
                     state.dataHVACGlobal->TurnFansOff = true;
                 }

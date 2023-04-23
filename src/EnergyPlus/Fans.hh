@@ -316,10 +316,8 @@ namespace Fans {
 struct FansData : BaseGlobalStruct
 {
     int NumFans = 0;
-    int NumNightVentPerf = 0;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
-    bool GetFanInputFlag = true;   // Flag set to make sure you get input once
-    bool LocalTurnFansOn = false;  // If True, overrides fan schedule and cycles ZoneHVAC component fans on
-    bool LocalTurnFansOff = false; // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
+    int NumNightVentPerf = 0;    // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
+    bool GetFanInputFlag = true; // Flag set to make sure you get input once
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false;
     Array1D_bool MySizeFlag;
