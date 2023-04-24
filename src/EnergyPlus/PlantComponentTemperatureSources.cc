@@ -197,18 +197,18 @@ namespace PlantComponentTemperatureSources {
             }
         }
 
-        if (this->tempSpecType == TempSpecType::OutletSetpointVariableFlow) {                                       // TRANE
-            if (state.dataLoopNodes->Node(this->OutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue) { // TRANE
-                this->BoundaryTemp = state.dataLoopNodes->Node(this->OutletNodeNum).TempSetPoint;                   // TRANE
-            } else {                                                                                                // TRANE
-                this->BoundaryTemp = this->InletTemp;                                                               // TRANE
-            }                                                                                                       // TRANE
-            if (Runflag) {                                                                                          // TRANE
-                this->MassFlowRate = MassFlowRateMax;                                                               // TRANE
-            } else {                                                                                                // TRANE
-                this->MassFlowRate = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;                    // TRANE
-            }                                                                                                       // TRANE
-        }                                                                                                           // TRANE
+        if (this->tempSpecType == TempSpecType::OutletSetpointVariableFlow) {
+            if (state.dataLoopNodes->Node(this->OutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue) {
+                this->BoundaryTemp = state.dataLoopNodes->Node(this->OutletNodeNum).TempSetPoint;
+            } else {
+                this->BoundaryTemp = this->InletTemp;
+            }
+            if (Runflag) {
+                this->MassFlowRate = MassFlowRateMax;
+            } else {
+                this->MassFlowRate = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
+            }
+        }
 
         PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
 
