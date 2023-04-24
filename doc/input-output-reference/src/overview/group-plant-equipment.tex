@@ -5319,7 +5319,7 @@ This output variable represents the average fluid flow rate through the source s
 
 \subsection{HeatPump:PlantLoop:EIR:Cooling (and Heating)}\label{plhp_eir}
 
-Next, the EIR-formulated model objects are described. Although the model follows the pattern of having a separate input object for cooling and heating, the inputs are essentially identical, so they are described together. Note that this component is currently a constant flow device (it will always request its full design flow from the plant), with a future addition to make it respond to outlet setpoint in order to vary the flow request.
+Next, the EIR-formulated model objects are described. Although the model follows the pattern of having a separate input object for cooling and heating, the inputs are essentially identical, so they are described together.
 
 \subsubsection{Inputs}\label{plhp_eir_inputs}
 
@@ -5383,6 +5383,79 @@ This field is the name of a bivariate curve or table that defines an EIR (1/COP)
 
 This field is the name of a univariate curve or table that defines an EIR modifier as a function of the current part load ratio. The output of this function and the output of the EIR Modifier Function of Temperature are multiplied by the reference EIR to get a current EIR .
 
+\paragraph{Field: Control Type}\label{plhp_eir_inputs_control_type}
+
+This optional choice field allows the user to choose between Load and Setpoint control. The default value is Load control.
+
+\paragraph{Field: Flow Mode}\label{plhp_eir_inputs_flow_mode}
+
+This optional choice field allows the user to choose between ConstantFlow and VariableSpeedPumping. The default value is ConstantFlow. When the plant is served by variable speed pumps the water flow through this equipment will vary.
+
+\paragraph{Field: Minimum Part Load Ratio}\label{plhp_eir_inputs_minimum_part_load_ratio}
+
+This optional numeric field specifies the minimum operating part load ratio. Below this value the compressor will cycle proportionally to the load. The default value is 0.
+
+\paragraph{Field: Minimum Source Inlet Temperature}\label{plhp_eir_inputs_minimum_source_inlet_temperature}
+
+This optional numeric field specifies the minimum entering air or water temperature at the source inlet node. Below this value the compressor will be off. The default value is -100.
+
+\paragraph{Field: Maximum Source Inlet Temperature}\label{plhp_eir_inputs_maximum_source_inlet_temperature}
+
+This optional numeric field specifies the maximum entering air or water temperature at the source inlet node. Above this value the compressor will be off. The default value is 100.
+
+\paragraph{Field: Minimum Supply Water Temperature Curve Name}\label{plhp_eir_inputs_minimum_supply_water_temperature_curve_name}
+
+This optional numeric field specifies the name of a univariate curve or table that defines the minimum supply water temperature.
+
+\paragraph{Field: Maximum Supply Water Temperature Curve Name}\label{plhp_eir_inputs_maximum_supply_water_temperature_curve_name}
+
+This optional field specifies the name of a univariate curve or table that defines the maximum supply water temperature.
+
+
+Fields specific to the HeatPump:PlantLoop:EIR:Heating object are described here:
+
+\paragraph{Field: Heating To Cooling Capacity Sizing Ratio}\label{plhp_eir_inputs_heating_to_cooling_capacity_sizing_ratio}
+
+This optional numeric field allows the user to choose a multiplier to size the Heating version of this object. The default value is 1.0. 
+
+\paragraph{Field: Heat Pump Sizing Method}\label{plhp_eir_inputs_heat_pump_sizing_method}
+
+This optional choice field specifies whether the heat pump is sized based on the cooling plant, the heating plant load, or the larger of these values. Valid choices are CoolingCapacity, HeatingCapacity or GreaterOfHeatingOrCooling. The default value is CoolingCapacity.
+
+\paragraph{Field: Dry Outdoor Correction Factor Curve Name}\label{plhp_eir_inputs_dry_outdoor_correction_factor_curve_name}
+
+This optional alpha field specifies the name of a univariate curve or table that defines the heating capacity adjustment when outdoor air moisture content is low. Since latent load at the condenser will increase heating capacity, this curve allows modeling of that specific performance impact.
+
+\paragraph{Field: Maximum Outdoor Dry Bulb Temperature For Defrost Operation}\label{plhp_eir_inputs_max_oat_for_defrost_operation}
+
+This optional numeric field allows the user to choose the maximum temperature where defrost will occur. The default value is 10.0. Defrost operation will not be active above this outdoor temperature.
+
+\paragraph{Field: Heat Pump Defrost Control}\label{plhp_eir_inputs_heat_pump_defrost_control}
+
+This optional choice field specifies the defrost model as Timed, OnDemand, or TimedEmpirical. The default value is Timed.
+
+\paragraph{Field: Heat Pump Defrost Time Period Fraction}\label{plhp_eir_inputs_heat_pump_defrost_time_period_fraction}
+
+This optional numeric field allows the user to specify the nominal defrost time in hours when Timed or TimedEmpirical defrost control methods are chosen in the previous input field. The default value is 0.058333 (5 minutes). The time that defrost operation is active will be adjusted based on outdoor weather.
+
+\paragraph{Field: Defrost Energy Input Ratio Function of Temperature Curve Name}\label{plhp_eir_inputs_defrost_eir_function_temp_curve_name}
+
+This optional alpha field specifies the name of a bivariate curve or table that defines the defrost energy based on outdoor air moisture content. This curve is used only when Timed or OnDemand defrost control is selected.
+
+The reminaing 3 fields applies only to TimedEmiprical defrost control method.
+
+\paragraph{Field: Timed Empirical Defrost Frequency Curve Name}\label{plhp_eir_inputs_timed_empirical_defrost_frequency_curve_name}
+
+This optional alpha field specifies the name of a univariate curve or table that defines the frequency of defrost based on outdoor temperature. This curve is used only when TimedEmpirical defrost control is selected.
+
+\paragraph{Field: Timed Empirical Defrost Heat Load Penalty Curve Name}\label{plhp_eir_inputs_timed_empirical_defrost_heat_load_curve_name}
+
+This optional alpha field specifies the name of a univariate or bivariant curve or table that defines the heating penalty of defrost based on outdoor conditions. This curve is used only when TimedEmpirical defrost control is selected.
+
+\paragraph{Field: Timed Empirical Defrost Heat Input Energy Fraction Curve Name}\label{plhp_eir_inputs_timed_empirical_defrost_heat_energy_fraction_curve_name}
+
+This optional alpha field specifies the name of a univariate or bivariant curve or table that defines the heating energy fraction of defrost based on outdoor conditions. This curve is used only when TimedEmpirical defrost control is selected.
+
 An idf example for a water-source application:
 
 \begin{lstlisting}
@@ -5402,6 +5475,7 @@ An idf example for a water-source application:
     CapCurveFuncTemp,        !- Heating Capacity Modifier Function of Temperature Curve Name
     EIRCurveFuncTemp,        !- Electric Input to Heating Output Ratio Modifier Function of Temperature Curve Name
     EIRCurveFuncPLR;         !- Electric Input to Heating Output Ratio Modifier Function of Part Load Ratio Curve Name
+
   HeatPump:WaterToWater:EIR:Cooling,
     Cooling Coil,            !- Name
     Cooling Coil Load Loop Intermediate Node, !- Load Side Inlet Node Name
@@ -5439,6 +5513,7 @@ Cooling Coil,            !- Companion Heat Pump Name
 CapCurveFuncTemp,        !- Heating Capacity Modifier Function of Temperature Curve Name
 EIRCurveFuncTemp,        !- Electric Input to Heating Output Ratio Modifier Function of Temperature Curve Name
 EIRCurveFuncPLR;         !- Electric Input to Heating Output Ratio Modifier Function of Part Load Ratio Curve Name
+
 HeatPump:WaterToWater:EIR:Cooling,
 Cooling Coil,            !- Name
 Cooling Coil Load Loop Intermediate Node, !- Load Side Inlet Node Name
@@ -5462,6 +5537,10 @@ EIRCurveFuncPLR2;        !- Electric Input to Heating Output Ratio Modifier Func
 This section describes the outputs available for the water to water heat pump, equation fit model; both cooling and heating.
 
 \begin{itemize}
+    \item
+    HVAC,Average,Heat Pump Part Load Ratio  {[}{]}
+    \item
+    HVAC,Average,Heat Pump Cycling Ratio  {[}{]}
     \item
     HVAC,Average,Heat Pump Electricity Rate {[}W{]}
     \item
@@ -5487,6 +5566,28 @@ This section describes the outputs available for the water to water heat pump, e
     \item
     HVAC,Average,Heat Pump Source Side Mass Flow Rate {[}kg/s{]}
 \end{itemize}
+
+Outputs specific to HeatPump:PlantLoop:EIR:Heating
+
+\begin{itemize}
+    \item
+    HVAC,Average,Heat Pump Load Due To Defrost  {[}W{]}
+    \item
+    HVAC,Average,Heat Pump Fractional Defrost Time  {[}hr{]}
+    \item
+    HVAC,Average,Heat Pump Defrost Electricity Rate  {[}W{]}
+    \item
+    HVAC,Average,Heat Pump Defrost Electricity Energy  {[}J{]}
+\end{itemize}
+
+
+\paragraph{Heat Pump Part Load Ratio {[}{]}}\label{plhp_eir_outputs_part_load_ratio}
+
+This output variable represents the average load ratio of load met to heat pump operating capacity during the specified reporting window.
+
+\paragraph{Heat Pump Cycling Ratio {[}{]}}\label{plhp_eir_outputs_cycling_ratio}
+
+This output variable represents the average cycling ratio of heat pump below the minimum operating part load ratio during the specified reporting window. When operating below the minimum part load ratio the heat pump will cycle on and off to meet the load.
 
 \paragraph{Heat Pump Electricity Rate {[}W{]}}\label{plhp_eir_outputs_power_usage}
 
@@ -5535,6 +5636,22 @@ This output variable represents the average load side mass flow rate during the 
 \paragraph{Heat Pump Source Side Mass Flow Rate {[}kg/s{]}}\label{plhp_eir_outputs_src_flow}
 
 This output variable represents the average source side mass flow rate during the specified reporting window.
+
+\paragraph{Heat Pump Load Due To Defrost {[}W{]}}\label{plhp_eir_outputs_load_due_to_defrost}
+
+This output variable represents the average defrost load in watts during the specified reporting window.
+
+\paragraph{Heat Pump Fractional Defrost Time {[}hr{]}}\label{plhp_eir_outputs_fractional_defrost_time}
+
+This output variable represents the average defrost time in hours during the specified reporting window.
+
+\paragraph{Heat Pump Defrost Electricity Rate {[}W{]}}\label{plhp_eir_outputs_defrost_electric_rate}
+
+This output variable represents the average defrost electricity rate in watts during the specified reporting window.
+
+\paragraph{Heat Pump Defrost Electricity Energy {[}J{]}}\label{plhp_eir_outputs_defrost_electric_energy}
+
+This output variable represents the average defrost electricity energy in joules during the specified reporting window.
 
 \subsection{HeatPump:AirToWater:FuelFired:Heating (and Cooling)}\label{plhp_fuelfired}
 

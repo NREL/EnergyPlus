@@ -5,7 +5,7 @@ Chiller Plant Support for Carbon Initiatives
 
 **University of Central Florida, Florida Solar Energy Center**
 
- - Original Date: Apr 18, 2023
+ - Original Date: Apr 24, 2023
  - Modified Date:
  
 *Preface:*
@@ -180,7 +180,7 @@ Updates to the HeatPump:PlantLoop:EIR:Heating object are shown below. New fields
            \object-list UniVariateFunctions
       N10, \field Maximum Outdoor Dry Bulb Temperature For Defrost Operation
            \type real
-           \default -100.0
+           \default 10.0
            \note defrost operation will not be active above this outdoor temperature
       A17, \field Heat Pump Defrost Control
            \type choice

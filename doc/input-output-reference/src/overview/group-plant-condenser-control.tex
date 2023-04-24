@@ -1,5 +1,132 @@
 \section{Group -- Plant-Condenser Control}\label{group-plant-condenser-control}
 
+\subsection{Plant Supervisory Control)}\label{operation-schemes-plant-supervisory-control}
+
+Plant operation can difficult to control when water-to-air or water-to-water heat pumps are used as plant equipment. This object will poll the building to determine estimated plant loads and dispatch equipment to meet those loads. For example, a heat pump capable of providing heating or cooling will be dispatched in heating mode. It is also possible to create a heat recovery heat pump connected between the heating and cooling plant loops where this heat pump can serve low loads on one plant while supplementing the operation of the other plant. Traditional plant controls cannot meet this type of equipment configuration. One supervisory controller can be used to control one heating and one cooling plant.
+
+\subsection{PlantEquipmentOperation:ChillerHeaterChangeover}\label{plantequipmentoperationchillerheaterchangeover}
+
+\subsubsection{Inputs}\label{inputs-plantequipmentoperationchillerheaterchangeover}
+
+\paragraph{Field: Name}\label{field-name-plantequipmentoperationchillerheaterchangeover}
+
+This required alpha field contains the identifying name given to the Plant Equipment Operation ChillerHeaterChangeover object. This name is placed in the Plant Loop object to select this scheme.
+
+\paragraph{Field: Chilled Water Temperature Setpoint}\label{field-chilled-water-temp-setpoint-plantequipmentoperationchillerheaterchangeover}
+
+This required numeric field specifies the cooling plant operating set point temperature.
+
+\paragraph{Field: Hot Water Temperature Setpoint}\label{field-hot-water-temp-setpoint-plantequipmentoperationchillerheaterchangeover}
+
+This required numeric field specifies the heating plant operating set point temperature.
+
+\paragraph{Field: Hot Water Setpoint Reset Start Temperature}\label{field-hot-water-setpoint-reset-start-temp-plantequipmentoperationchillerheaterchangeover}
+
+This required numeric field specifies the heating plant hot water set point temperature reset.
+
+\paragraph{Field: Hot Water Setpoint Reset Maximum Temperature Difference}\label{field-hot-water-setpoint-reset-max-temp-diff-plantequipmentoperationchillerheaterchangeover}
+
+This required numeric field specifies the heating plant hot water maximum set point temperature difference.
+
+\paragraph{Field: Hot Water Setpoint Reset Ratio}\label{field-hot-water-setpoint-reset-ratio-plantequipmentoperationchillerheaterchangeover}
+
+This numeric field specifies the heating plant hot water set point temperature reset ratio.
+
+\paragraph{Field: Zone Load Polling ZoneList Name}\label{field-zone-load-polling-zonelist-name-plantequipmentoperationchillerheaterchangeover}
+
+This alpha field specifies the ZoneList name that identifies each zone served by the hot and cold water plants.
+
+\paragraph{Field: Cooling Only Load Plant Equipment Operation Cooling Load Name}\label{field-cool-only-load-equip-operation-name-plantequipmentoperationchillerheaterchangeover}
+
+This alpha field specifies the PlantEquipmentOperation:CoolingLoad name that identifies the plant equipment and load ranges to meet a plant cooling load.
+
+\paragraph{Field: Heating Only Load Plant Equipment Operation Heating Load Name}\label{field-heat-only-load-equip-operation-name-plantequipmentoperationchillerheaterchangeover}
+
+This alpha field specifies the PlantEquipmentOperation:HeatingLoad name that identifies the plant equipment and load ranges to meet a plant heating load.
+
+\paragraph{Field: Simultaneous Cooling And Heating Plant Equipment Operation Cooling Load Name}\label{field-cool-only-load-equip-operation-name-plantequipmentoperationchillerheaterchangeover}
+
+This alpha field specifies the PlantEquipmentOperation:CoolingLoad name that identifies the plant equipment and load ranges to meet a plant cooling load. When simultaneous heating and cooling plant loads exist at the same time, this equipment will be dispatched to meet the cooling plant load.
+
+\paragraph{Field: Simultaneous Cooling And Heating Plant Equipment Operation Heating Load Name}\label{field-heat-only-load-equip-operation-name-plantequipmentoperationchillerheaterchangeover}
+
+This alpha field specifies the PlantEquipmentOperation:HeatingLoad name that identifies the plant equipment and load ranges to meet a plant heating load. When simultaneous heating and cooling plant loads exist at the same time, this equipment will be dispatched to meet the heating plant load.
+
+\paragraph{Field: Dedicated Chilled Water Return Recovery HeatPump Name}\label{field-dedicated-chilled-return-recovery-hp-name-plantequipmentoperationchillerheaterchangeover}
+
+This alpha field specifies the name of a water-to-water heat pump that connects to the chilled water plant. This equipment will meet low loads on the hot water plant while supplementing cooling plant operation. This equipment is off if any hot water plant heating equipment is operating.
+
+\paragraph{Field: Dedicated Hot Water Return Recovery HeatPump Name}\label{field-dedicated-hot-return-recovery-hp-name-plantequipmentoperationchillerheaterchangeover}
+
+This alpha field specifies the name of a water-to-water heat pump that connects to the hot water plant. This equipment will meet low loads on the chilled water plant while supplementing heating plant operation. This equipment is off if any chilled water plant cooling equipment is operating.
+
+Examples of this object:
+
+\begin{lstlisting}
+
+  PlantEquipmentOperation:ChillerHeaterChangeover,
+    Two AWHP Operation Scheme ,           !- Name
+    6.6 ,                                                !- Chilled Water Temperature Setpoint
+    40.0 ,                                               !- Hot Water Temperature Setpoint
+    5.0 ,                                                !- Hot Water Setpoint Reset Start Temperature
+    8.0 ,                                                !- Hot Water Setpoint Reset Maximum Temperature Difference
+    50.0 ,                                               !- Hot Water Setpoint Reset Ratio
+    All Conditioned Zones,                          !- Zone Load Polling ZoneList Name
+    Two AWHP Cooling Operation Scheme,    !- Cooling Only Load Plant Equipment Operation Cooling Load Name
+    Two AWHP Heating Operation Scheme,    !- Heating Only Load Plant Equipment Operation Heating Load Name
+    One AWHP Cooling Operation Scheme,     !- Simultaneous Cooling And Heating Plant Equipment Operation Cooling Load Name
+    One AWHP Heating Operation Scheme,     !- Simultaneous Cooling And Heating Plant Equipment Operation Heating Load Name
+    Dedicated HR Cooling Side WSHP,            !- Dedicated Chilled Water Return Recovery HeatPump Name
+    Dedicated HR Heating Side WSHP;           !- Dedicated Hot Water Return Recovery HeatPump Name
+   
+  ZoneList,
+    All Conditioned Zones,         !- Name
+    Basement,                         !- Zone name 1
+    Core_bottom,                     !- Zone name 2
+    Core_mid,                          !- Zone name 3
+    continue with all zone names attached to these plant loops;
+
+  PlantEquipmentOperation:CoolingLoad,
+    Two AWHP Cooling Operation Scheme,  !- Name
+    0.0,                                                   !- Load Range 1 Lower Limit {W}
+    50000,                                               !- Load Range 1 Upper Limit {W}
+    One AWHP Cooling Equipment List,        !- Range 1 Equipment List Name
+    50000,                                               !- Load Range 2 Lower Limit {W}
+    10000000000000,                                !- Load Range 2 Upper Limit {W}
+    Two AWHP Cooling Equipment List;        !- Range 2 Equipment List Name
+
+  PlantEquipmentList,
+    Two AWHP Cooling Equipment List,  !- Name
+    HeatPump:PlantLoop:EIR:Cooling,   !- Equipment 1 Object Type
+    AWHP_1 Cooling Side,                   !- Equipment 1 Name
+    HeatPump:PlantLoop:EIR:Cooling,   !- Equipment 2 Object Type
+    AWHP_2 Cooling Side;                   !- Equipment 2 Name  
+\end{lstlisting}
+
+\paragraph{Output reporting available with the supervisory controller:}\label{operation-scheme-heating-outputs-description}
+
+\begin{itemize}
+    \item
+    HVAC,Average,Supervisory Plant Operation Mode  {[}{]}
+    \item
+    HVAC,Average,Supervisory Plant Operation Sensed Heating Load  {[}W{]}
+    \item
+    HVAC,Average,Supervisory Plant Operation Sensed Cooling Load  {[}W{]}
+\end{itemize}
+
+\paragraph{Supervisory Plant Operation Mode}\label{operation-scheme-outputs-supervisory-plant-operation-mode}
+
+This integer output represents the plant operating mode as determined by the supervisory controller. Off = 0, Heating = 1, Cooling = 2 and Simultaneous Heating and Cooling = 3.
+
+\paragraph{Supervisory Plant Operation Sensed Heating Load}\label{operation-scheme-outputs-supervisory-plant-operation-sensed-heating-load}
+
+This numeric output represents the supervisory controller sensed building heating load in watts.
+
+\paragraph{Supervisory Plant Operation Sensed Cooling Load}\label{operation-scheme-outputs-supervisory-plant-operation-sensed-cooling-load}
+
+This numeric output represents the supervisory controller sensed building cooling load in watts.
+
+
 \subsection{Operation Schemes (Plant and Condenser)}\label{operation-schemes-plant-and-condenser}
 
 Plants and condenser loops must have some mechanism for controlling the operation of the loop and which equipment is available under what conditions. Since there may be multiple control schemes that are assigned various priorities associated with each loop, an overall operation scheme must be defined. The overall scheme consists of the object name, an identifying name that is referenced in the main plant or condenser loop statement, and a list of operation schemes. Each operation scheme must have the type of operation scheme, its identifying name, and the schedule that defines its availability. Note that the order in which the individual operation schemes appear in this list defines its priority versus the others with the same scheduled availability. The first scheme appearing in the list is given the highest priority, the second scheme has second highest priority, etc. In other words, if according to its schedule, the first operation scheme is available, then it is used by the simulation to define how the plant or condenser loop operates. If it is not available, the second operation scheme in the list is checked to see if it is available until the highest priority scheme that is also available is found.~ To allow for simultaneous heating and cooling, there is one configuration where multiple operation schemes are available at a given timestep.~ This is allowed if a user inputs both a heating range based operation and a cooling range based operation with overlapping schedules.~ The simulation will look at the current loop demand to determine if the cooling scheme should be used or the heating scheme.~ In other cases, if two schemes overlap (are available at the same time), a fatal error will be encountered.
