@@ -1440,6 +1440,11 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 condenserNodeType = DataLoopNode::NodeFluidType::Air;
                 condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
                 condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
+            } else {
+                // Again, this should be protected by the input processor
+                ShowErrorMessage(
+                    state, format("Invalid heat pump condenser type (name={}; entered type: {}", thisPLHP.name, condenserType)); // LCOV_EXCL_LINE
+                errorsFound = true;                                                                                              // LCOV_EXCL_LINE
             }
             thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                  sourceSideInletNodeName,
@@ -1658,11 +1663,11 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "HEATING",
-                                    _,
-                                    "System");
+                                    "Heat Pump",
+                                    "Plant");
             }
         }
         SetupOutputVariable(state,
