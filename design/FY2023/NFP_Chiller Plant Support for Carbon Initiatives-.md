@@ -3,16 +3,29 @@ Chiller Plant Support for Carbon Initiatives
 
 **Richard Raustad**
 
-**Florida Solar Energy Center***
+**University of Central Florida, Florida Solar Energy Center**
 
  - Original Date: Apr 18, 2023
  - Modified Date:
+ 
+*Preface:*
+
+This new feature is a request provided by Trane North America. The plant configuration(s) described herein are currently deployed at several locations in the NE US. The Trane team has invested several months of development for this new feature and the following discussion is a result of that work. 
+
+*Acknowledgments:*
+
+ - Nagappan Chidambaram, Trane North America, provided coordination of EnergyPlus engine design with 3rd party expectations<br>
+ - Ronnie Moffitt, Trane North America, provided a detailed description of chiller heater heat pump performance<br>
+- Robert Coleman, Trane North America, provided an overview of advanced plant dispatch and controls<br>
+- Lawrence Scheier, S.E.I Associates, model development coordination with historic methods
+- Brent Griffith, Trane consultant, provided design of plant supervisory controls<br>
+- Richard Raustad, FSEC, provide enhancements to existing HeatPump:PlantLoop:EIR objects<br>
 
 ## Justification for Feature Update
 
-The push for higher HVAC system efficiency and decarbonization has lead to HVAC systems with new designs for the hot and cold water plants that use heat pumps to serve both plants. Manufacturers, building owners and operators, and design professionals need better tools for modeling these advanced plant configurations for todays HVAC systems.
+The push for higher HVAC system efficiency and decarbonization has led to HVAC systems with new designs for hot and cold water plants that use heat pumps to serve both plants. Manufacturers, building owners and operators, and design professionals request improved tools to model these advanced plant configurations for todays HVAC systems.
 
-Chilled water plants have traditionally used thermal storage to minimize building peak demand to help utility companies delay construction of new power plants. Current trends are now using thermal storage as a pathway for heat recovery and improved HVAC system plant efficiency. A water plant utilizing heat pumps could make ice during early morning or late evening hours when heating is required and burn that ice during the day to offset cooling loads. These plants would use high efficiency heat pumps and alternate plant configurations that cannot be modeled in current building simulation software tools. A plant design such as this would also require advanced controls to dispatch heat recovery heat pumps, multiple chiller heaters serving the hot and cold water loops, and determine times for ice thermal storage production.
+From a historical perspective, chilled water plants have traditionally used thermal storage to minimize building peak demand to help utility companies delay construction of new power plants. Current trends are now using thermal storage as a pathway for heat recovery and improved HVAC system plant efficiency. A water plant utilizing heat pumps could make ice during early morning or late evening hours when heating is required and burn that ice during the day to offset cooling loads. These plants would use high efficiency heat pumps and optimized plant configurations that cannot be modeled in current building simulation software tools. A plant design such as this would also require advanced controls to dispatch heat recovery heat pumps, multiple chiller heaters serving the hot and cold water loops, and determine times for ice thermal storage production.
 
 This proposal outlines a new feature for a plant supervisory controller and an expansion of the existing HeatPump:PlantLoop:EIR:Cooling and HeatPump:PlantLoop:EIR:Heating objects to include typical equipment operating features and limitations. The supervisory controller will build on the existing plant control techniques by adding a new object to manage control of the hot and cold water plants and the equipment serving those plants as *PlantEquipmentOperation:ChillerHeaterChangeover*. The existing HeatPump:PlantLoop:EIR objects will be improved to include new features, for example defrost controls, operating temperature limits, and allow controls to meet either a plant load or a chiller heater leaving water set point.
 
@@ -20,22 +33,31 @@ The proposed approach would be to develop the new supervisory controller and add
 
 ## Overview ##
 
-HVAC system water plant equipment would typically include a chiller and boiler. Newer plants use heat pumps with diverting values such that one or more chiller heaters could serve either plant (return side diverting valves not shown in figure). A discussion of whether to model diverting valves or rely on the traditional EnergyPlus plant loop topology resulted in the selection of the current plant topology. The fact that this plant configuration would mix plant fluids from both loops will be mentioned here without further discussion.
+HVAC system water plant equipment would typically include a chiller and boiler. Newer plants use heat pumps with diverting values such that one or more chiller heaters could serve either plant (return side diverting valves not shown in figure). This plant configuration would mix plant fluids from both loops. A discussion of whether to model diverting valves or rely on the traditional EnergyPlus plant loop topology resulted in the selection of the current plant topology.
 
-The new supervisory controller will oversee and dispatch plant equipment by choosing which plant component will operate at any given time using the plant RunFlag variable. Figure 1 shows a traditional plant with 2 heat pumps. Either heat pump can serve either plant using diverting valves. This concept is modeled in EnergyPlus using a pair of HeatPump:PlantLoop:EIR objects, where only 1 of the pair can be on at any given time, and a PlantEquipmentOperation:ChillerHeaterChangeover object to manage operation. The figure also includes optional equipment for an auxiliary boiler, in case the chiller heater temperature limits may not allow operation, and thermal storage for heat recovery or traditional use, and various chiller heater configurations. The heat pumps can be configured as 2-pipe air-cooled, 4-pipe water-cooled, or 6-pipe heat recovery. This new feature intends to build the basic components required to operate these advanced plant configurations.
+In EnergyPlus, water plant operation will be coordinated using the supervisory control manager. This manager will identify building HVAC loads and dispatch plant equipment by choosing which plant component to operate at any given time using, tentatively, the plant RunFlag variable. The left side of Figure 1 shows a traditional plant with 2 heat pumps. Either heat pump can serve either plant loop using diverting valves. This concept can be modeled in EnergyPlus using a pair of HeatPump:PlantLoop:EIR objects, where only 1 of the pair can be active at any given time. A PlantEquipmentOperation:ChillerHeaterChangeover object will monitor building loads and manage plant operation. The figure also includes as an example optional equipment for an auxiliary boiler, in case the chiller heater temperature limits may limit operation, and thermal storage, for heat recovery or traditional use, and various chiller heater configurations. The heat pumps could be configured as 2-pipe air-cooled, 4-pipe water-cooled, or 6-pipe heat recovery. This new feature intends to build the basic components required to operate these advanced plant configurations.
 
+Notes on this figure:
+ - An ideal HX is used to connect a heat recovery heat pump between plant loops because EnergyPlus allows only a single mixer/splitter per loop. The ideal HX won't have losses.
+ - Mixing of plant fluids is not part of this feature, which is likely not an issue other than checking plant loop fluid properties and providing warnings.
+ - Optional equipment shown will operate under independent controls without supervisory control.
+ - The 4-pipe heat recovery heat pump might be placed on the supply or demand side of the plant loop to allow for both constant and variable speed pump configurations.
+ - Plant loop temperature fluctuations due to defrost are not explicitly modeled at this time (i.e., the defrost shock tank would absorb the majority of this temperature swing, but actual plant temperature changes are not modeled.
+ - Thermal ice storage dispatch is not yet included as part of this feature.
+
+ 
 ![divertingvalveplant](DivertingValvePlant.png)
 <p style="text-align: center;"> Figure 1. Advanced Heat Recovery Plant Design</p>
 
 ## Approach
 
-This new feature will include a new object **PlantEquipmentOperation:ChillerHeaterChangeover** and also include updates to the 2-pipe and 4-pipe version of a chiller heater using the existing objects *HeatPump:PlantLoop:EIR:Cooling* and *HeatPump:PlantLoop:EIR:Heating*. This new feature will not include controls for the ice storage system or auxiliary boiler discussed here. Additional equipment controls for the boiler and ice tank, if needed, may be added at a future time.
+This new feature will include a new object **PlantEquipmentOperation:ChillerHeaterChangeover** and also include updates to the 2-pipe and 4-pipe version of a chiller heater using the existing objects *HeatPump:PlantLoop:EIR:Cooling* and *HeatPump:PlantLoop:EIR:Heating*. This new feature will not include advanced controls for the ice storage system or auxiliary boiler discussed here. Additional equipment controls for the boiler and ice tank, if needed, may be added at a future time.
 
-Trane has provided capacity and power performance curves for heat pump equipment that would be (and currently are) used in this type of plant. The power curve was converted to energy input ratio to be consistent with existing models in EnergyPlus. Trane also provide a new defrost model as an alternative to those used for DX heating coils. All 3 defrost models will be included in the modifications to the HeatPump:PlantLoop:EIR:Heating object.
+Trane has provided normalized capacity and power performance curves for heat pump equipment that would be (and currently are field deployed) used in this type of plant. The power curve was converted to energy input ratio to be consistent with existing models in EnergyPlus. Trane also provide a new defrost model as an alternative to those used for DX heating coils. All 3 defrost models will be included in the modifications to the HeatPump:PlantLoop:EIR:Heating object.
 
-Trane has also identified minimum and maximum operating temperature limits which are included to more accurately model this product line.
+Trane has also identified minimum and maximum operating temperature limits which are included to more accurately model this equipment type.
 
-The advanced operation of the chilled and hot water plants will be managed by the supervisory control manager.
+The advanced operation of the chilled and hot water plants will be managed by the supervisory control manager. Zones attached to these plants will be polled for loads and summed to represent each plant load. The chiller heaters will be dispatched as either cooling only, heating only, or simultaneous cooling and heating. Controls to dispatch a heat pump heat recovery unit are being investigated (center right of figure).
 
 
 ## Testing/Validation/Data Source(s)
@@ -207,7 +229,7 @@ Updates to the HeatPump:PlantLoop:EIR:Heating object are shown below. New fields
            \note Timed Empirical Defrost Heat Input Energy in watts = rated hot load * curve output
            \note Only applicable if TimedEmpirical defrost control is specified
 
-The new object used as a supervisory controller is shown here:
+The new object used as a supervisory controller is shown here. The most notable input is the Zone Load Polling ZoneList Name input. A list of zone names associated with this plant loop pair is used to identify plant loads based on "polled" building zone loads and anticipated outdoor air loads. This method is chosen as an alternate to looking at actual plant loads, which can be hard to identify with complex plant topology. Regardless of the method, plant manager dispatch logic will determine which plant loop is active and which plant equipment will serve those loads.
 
     PlantEquipmentOperation:ChillerHeaterChangeover,
        \memo Plant equipment operation object to control switchover between chiller
@@ -290,6 +312,12 @@ HeatPump:PlantLoop:EIR:Heating
     Heat Pump Defrost Electricity Rate
     Heat Pump Defrost Electricity Energy
 
+PlantEquipmentOperation:ChillerHeaterChangeOver
+
+    Supervisory Plant Operation Mode
+    Supervisory Plant Operation Sensed Heating Load
+    Supervisory Plant Operation Sensed Cooling Load
+
 ## Engineering and Input Output Reference Documents
 
 New documentation describing each of these changes.
@@ -304,7 +332,7 @@ Not needed.
  - [Trane Installation, Operation, and Maintenance Ascend™ Air-Cooled Chiller
 Models ACS and ACX](https://www.trane.com/content/dam/Trane/Commercial/global/products-systems/equipment/chillers/air-cooled/ascend/AC-SVX002E-EN_10062021.pdf)
 
-## Code Design Documentation:
+## Code Design Documentation
 
 The HeatPump:PlantLoop:EIR object changes are fairly straight-forward. New class variables are added to represent each new input field. A code example for the new Control Type input field with a \default value = Load. Note here that the default value is not checked and assumed to be Load. The default field value will be further discussed in the next example.
 
@@ -341,5 +369,78 @@ The suggestion here is to remove defaults for specific inputs without a required
         }
     }
 
+## Water Plant Supervisory Control
+
 The larger effort of this new feature is to develop a plant supervisory controller that determines building loads and dispatches equipment according to the user specified plant equipment operation schemes.
 
+A typical plant supervisory control system will include the existing plant equipment operation scheme objects.
+
+    PlantEquipmentOperation:ChillerHeaterChangeover,
+      Two AWHP Operation Scheme ,            !- Name
+      4.44444444444444 ,                     !- Chilled Water Temperature Setpoint
+      48.8888888888889 ,                     !- Hot Water Temperature Setpoint
+      5.0 ,                  !- Hot Water Setpoint Reset Start Temperature
+      8.0 ,                  !- Hot Water Setpoint Reset Maximum Temperature Difference
+      50.0 ,                                 !- Hot Water Setpoint Reset Ratio
+      All Conditioned Zones served by Plant, !- Zone Load Polling ZoneList Name
+      Two AWHP Cooling Operation Scheme,     !- Cooling Only Load Plant Equipment
+                                                Operation Cooling Load Name
+      Two AWHP Heating Operation Scheme,     !- Heating Only Load Plant Equipment
+                                                Operation Heating Load Name
+      One AWHP Cooling Operation Scheme,     !- Simultaneous Cooling And Heating Plant
+                                                Equipment Operation Cooling Load Name
+      One AWHP Heating Operation Scheme,     !- Simultaneous Cooling And Heating Plant
+                                                Equipment Operation Heating Load Name
+      ,                                      !- Dedicated Chilled Water Return Recovery
+                                                HeatPump Name
+      ;                                      !- Dedicated Hot Water Return Recovery
+                                                HeatPump Name
+
+The controls model inlucdes inputs for 5 plant set point temperature inputs. The actual plant set point temperatures and inputs for resetting hot water plant set point. One supervisory controller would be used for each plant loop pair specified in the input.
+
+A truncated list of zones attached to this plant configuration:
+
+    ZoneList,
+      All Conditioned Zones served by Plant,
+      Zone_FC_07,
+      Zone_FC_36,
+      Zone_FC_10,
+
+
+And one example of a plant equipment operating scheme input:
+
+    PlantEquipmentOperation:CoolingLoad,
+      Two AWHP Cooling Operation Scheme,  !- Name
+      0.0,                                !- Load Range 1 Lower Limit {W}
+      50000,                              !- Load Range 1 Upper Limit {W}
+      One AWHP Cooling Equipment List,    !- Range 1 Equipment List Name
+      50000,                              !- Load Range 2 Lower Limit {W}
+      10000000000000,                     !- Load Range 2 Upper Limit {W}
+      Two AWHP Cooling Equipment List;    !- Range 2 Equipment List Name
+    
+    PlantEquipmentList,
+      One AWHP Cooling Equipment List,    !- Name
+      HeatPump:PlantLoop:EIR:Cooling,     !- Equipment 1 Object Type
+      AWHP_1 Cooling Side;                !- Equipment 1 Name
+
+    PlantEquipmentList,
+      Two AWHP Cooling Equipment List,    !- Name
+      HeatPump:PlantLoop:EIR:Cooling,     !- Equipment 1 Object Type
+      AWHP_1 Cooling Side,                !- Equipment 1 Name
+      HeatPump:PlantLoop:EIR:Cooling,     !- Equipment 2 Object Type
+      AWHP_2 Cooling Side;                !- Equipment 2 Name    
+      
+The final 2 inputs of this new object holds the name of the chiller heater used for heat recovery between plant loops. The use of a heat recovery heat pump is anticipated to be included with this new feature development effort.
+
+## Chiller Heater Heat Pump Performance
+
+A Trane systems development engineering document dated March 10, 2022 included several performance aspects of a chiller heater product. This internal document contained:
+
+ - Cooling and heating capacity curves and IP performance curve coefficients
+ - Cooling and heating power curves and IP performance curve coefficients
+ - A graph of minimum and maximum hot water temperature versus outdoor temperature with associated IP performance curve coefficients
+ - A detailed defrost model with associated IP performance curve coefficients
+ - A heating capacity adjustment model for latent loading on the condenser fins
+ - Cooling and heating part-load ratio curves with associated IP performance curve coefficients
+
+ This document was reviewed and enhancements/additions to the HeatPump:PlantLoop:EIR model were designed and implemented.

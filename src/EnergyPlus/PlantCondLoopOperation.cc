@@ -1873,6 +1873,7 @@ void GetChillerHeaterChangeoverOpSchemeInput(EnergyPlusData &state,            /
                 for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                     auto const &fields = instance.value();
                     auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                    state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
                     scheme.Name = thisObjectName;
                     scheme.TypeOf = "PlantEquipmentOperation:ChillerHeaterChangeover";
                     scheme.Type = OpScheme::ChillerHeaterSupervisory;
