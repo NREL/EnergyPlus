@@ -130,7 +130,7 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
         # exceptions listed by <FILE>:<ENUM NAME>
         exceptions = [
             "HVACInterfaceManager.cc:UpdateType",
-            "IdfParser.hh:Token"
+            "IdfParser.hh:Token",
         ]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tMissing 'Num' at position N\n"

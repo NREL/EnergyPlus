@@ -458,8 +458,6 @@ namespace DaylightingDevices {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(
-                    state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataDaylightingDevices->GetTDDInputErrorsFound);
                 // Pipe name
                 state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -827,8 +825,6 @@ namespace DaylightingDevices {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(
-                    state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataDaylightingDevices->GetShelfInputErrorsFound);
                 // Shelf name
                 state.dataDaylightingDevicesData->Shelf(ShelfNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
