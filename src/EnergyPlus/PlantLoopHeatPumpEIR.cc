@@ -1322,8 +1322,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 Real64 defaultVal = 0.0;
                 if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
                         state, cCurrentModuleObject, "maximum_source_inlet_temperature", defaultVal)) {
-                    // excluding from coverage
-                    ShowWarningError(state, // LCOV_EXCL_LINE
+                    ShowWarningError(state, // LCOV_EXCL_LINE - excluding from coverage
                                      format("EIR PLHP \"{}\": Heat Pump Minimum Source Inlet Temperature not entered and default value not found.",
                                             thisPLHP.name)); // LCOV_EXCL_LINE
                     errorsFound = true;                      // LCOV_EXCL_LINE
