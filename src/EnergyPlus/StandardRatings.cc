@@ -3085,7 +3085,9 @@ namespace StandardRatings {
         Array1A_int const &EIRFFlowCurveIndex //  | Only for HIGH SPEED
     )
     {
-        int constexpr nsp = 2; // ??
+        int constexpr nsp = 4; // As IEER Requires EER for at least 4 different Speeds,
+        // we'll be carrying out the calculations with low and high speed in such a way that we'll be having 
+        // A,B,C,D for the required IEER equation. So nsp is initialized as 4 here.
         Real64 IEER_2022(0.0);
         Real64 EER_2022(0.0);
         Real64 QAFull(0.0);
@@ -3108,8 +3110,9 @@ namespace StandardRatings {
         Real64 B(0.0); // EER, (Btu/h)/W, at 100% Capacity at AHRI Standard Rating Conditions (see Table 6)| AHRI Std.340/360-2022(IP)
         Real64 C(0.0); // EER, (Btu/h)/W, at 100% Capacity at AHRI Standard Rating Conditions (see Table 6)| AHRI Std.340/360-2022(IP)
         Real64 D(0.0); // EER, (Btu/h)/W, at 100% Capacity at AHRI Standard Rating Conditions (see Table 6)| AHRI Std.340/360-2022(IP)
-
-        for (int spnum = 1; spnum <= nsp; ++spnum) {
+        Array1D<DataHeatBalance::RefrigCondenserType> _condenserType(nsp);
+            for (int spnum = 1; spnum <= nsp; ++spnum)
+        {
             FanPowerPerEvapAirFlowRate_2023(spnum) = 0.0;
             if (spnum == 1 || spnum == 2) { // First two speeds will have Low Speed Props
                 if (FanPowerPerEvapAirFlowRateFromInput_2023(2) <= 0.0) {
@@ -3117,12 +3120,14 @@ namespace StandardRatings {
                 } else {
                     FanPowerPerEvapAirFlowRate_2023(spnum) = FanPowerPerEvapAirFlowRateFromInput_2023(2);
                 }
+                _condenserType(spnum) = CondenserType(1);
             } else if (spnum == 3 || spnum == 4) {
                 if (FanPowerPerEvapAirFlowRateFromInput_2023(1) <= 0.0) { // Last two speeds will have High Speed Props
                     FanPowerPerEvapAirFlowRate_2023(spnum) = DefaultFanPowerPerEvapAirFlowRateSEER2;
                 } else {
                     FanPowerPerEvapAirFlowRate_2023(spnum) = FanPowerPerEvapAirFlowRateFromInput_2023(1);
                 }
+                _condenserType(spnum) = CondenserType(2);
             }
         }
 
@@ -3161,7 +3166,7 @@ namespace StandardRatings {
                 }
             }
 
-            if (CondenserType(spnum) == DataHeatBalance::RefrigCondenserType::Air) { // Case: CondenserType is AirCooled
+            if (_condenserType(spnum) == DataHeatBalance::RefrigCondenserType::Air) { // Case: CondenserType is AirCooled
                 if (spnum == 3 || spnum == 4) {
                     // Cooling Coil | Calculate the net cooling capacity at the rated conditions (23.89C(75F) Wet Bulb and 35.0C(95F) Dry Bulb )
                     if (DXCoilType.find("Cooling") != std::string::npos)
@@ -3179,14 +3184,14 @@ namespace StandardRatings {
                         TotCapTempModFac(spnum) =
                             Curve::CurveValue(state, CapFTempCurveIndex(2), CoilHeatingInletAirWetBulbTemp, CoilHeatingInletAirCoolDryBulb);
                 }
-            } else if (CondenserType(spnum) == DataHeatBalance::RefrigCondenserType::Water) { // Case: CondenserType is WaterCooled
+            } else if (_condenserType(spnum) == DataHeatBalance::RefrigCondenserType::Water) { // Case: CondenserType is WaterCooled
                 // Calculate the net cooling capacity at the rated conditions (35.0C(95F) Outlet and 29.44C(85F) Inlet )
                 if (spnum == 3 || spnum == 4) {
                     TotCapTempModFac(spnum) = Curve::CurveValue(state, CapFTempCurveIndex(1), CoilWaterOutletTemp, CoilWaterInletTemp);
                 } else if (spnum == 1 || spnum == 2) {
                     TotCapTempModFac(spnum) = Curve::CurveValue(state, CapFTempCurveIndex(2), CoilWaterOutletTemp, CoilWaterInletTemp);
                 }
-            } else if (CondenserType(spnum) == DataHeatBalance::RefrigCondenserType::Evap) { // Case: CondesnerType is EvaporativelyCooled
+            } else if (_condenserType(spnum) == DataHeatBalance::RefrigCondenserType::Evap) { // Case: CondesnerType is EvaporativelyCooled
                 // Calculate the net cooling capacity at the rated conditions (23.89C(75F) Wet Bulb and 35.0C(95F) Dry Bulb )
                 if (spnum == 3 || spnum == 4) {
                     TotCapTempModFac(spnum) = Curve::CurveValue(state, CapFTempCurveIndex(1), CoilInletEvapWetBulbTemp, CoilInletEvapDryBulbTemp);
@@ -3210,41 +3215,41 @@ namespace StandardRatings {
         for (int RedCapNum = nsp; RedCapNum > 0; --RedCapNum) {
             // As per Table 9. IEER Part-Load Rating Conditions | AHRI Std.340/360-2022(IP)
             if (ReducedPLR[RedCapNum - 1] == 0.25) {
-                if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
+                if (_condenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
                     // Entering Dry Bulb Temperature (OAT)
                     OutdoorUnitInletAirDryBulbTempReduced = 18.33; // 65F
-                } else if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Water) {
+                } else if (_condenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Water) {
                     // Entering Condenser Water Temperature (EWT)
                     OutdoorUnitInletAirDryBulbTempReduced = 12.77; // 55F
-                } else if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Evap) {
+                } else if (_condenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Evap) {
                     // Entering Air Wet-bulb/Air Dry-bulb/Makeup Water Temperature EWB/DB/MW
                     // OutdoorUnitInletAirDryBulbTempReduced = 52.8F/65.0F/77.0F
                     OutdoorUnitInletAirDryBulbTempReduced = 18.33; // 65F
                 }
             } else if (ReducedPLR[RedCapNum - 1] == 0.50) {
-                if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
+                if (_condenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
                     OutdoorUnitInletAirDryBulbTempReduced = 20; // 68F
-                } else if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Water) {
+                } else if (_condenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Water) {
                     OutdoorUnitInletAirDryBulbTempReduced = 16.66; // 62F
-                } else if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Evap) {
+                } else if (_condenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Evap) {
                     // OutdoorUnitInletAirDryBulbTempReduced = 57.5F / 68.0F / 77.0F EWB / DB / MW
                     OutdoorUnitInletAirDryBulbTempReduced = 20; // 68F
                 }
             } else if (ReducedPLR[RedCapNum - 1] == 0.75) {
-                if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
+                if (_condenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
                     OutdoorUnitInletAirDryBulbTempReduced = 27.5; // 81.5F
-                } else if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Water) {
+                } else if (_condenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Water) {
                     OutdoorUnitInletAirDryBulbTempReduced = 23.05; // 73.5F
-                } else if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Evap) {
+                } else if (_condenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Evap) {
                     // OutdoorUnitInletAirDryBulbTempReduced = 66.2F / 81.5F / 77.0F EWB / DB / MW
                     OutdoorUnitInletAirDryBulbTempReduced = 27.5; // 81.5F
                 }
             } else if (ReducedPLR[RedCapNum - 1] == 1.0) {
-                if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
+                if (_condenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Air) {
                     OutdoorUnitInletAirDryBulbTempReduced = 35; // 95.0F
-                } else if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Water) {
+                } else if (_condenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Water) {
                     OutdoorUnitInletAirDryBulbTempReduced = 29.44; // 85.0F
-                } else if (CondenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Evap) {
+                } else if (_condenserType(RedCapNum) == DataHeatBalance::RefrigCondenserType::Evap) {
                     // OutdoorUnitInletAirDryBulbTempReduced = 75.0F / 95.0F / 85.0F EWB / DB / MW
                     OutdoorUnitInletAirDryBulbTempReduced = 35; // 95.0F
                 }
