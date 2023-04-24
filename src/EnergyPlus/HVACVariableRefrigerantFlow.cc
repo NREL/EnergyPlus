@@ -2322,8 +2322,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         if (!lAlphaFieldBlanks(39)) {
             // A39; \field Fuel type, Validate fuel type input
-            thisVrfSys.FuelTypeNum =
-                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, cAlphaArgs(39)));
+            thisVrfSys.FuelTypeNum = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, cAlphaArgs(39)));
             if (thisVrfSys.FuelTypeNum == Constant::eResource::Invalid) {
                 ShowSevereError(
                     state,

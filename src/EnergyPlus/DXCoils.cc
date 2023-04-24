@@ -4009,8 +4009,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // A12; \field Fuel type, Validate fuel type input
-        thisDXCoil.FuelTypeNum =
-            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, Alphas(12)));
+        thisDXCoil.FuelTypeNum = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, Alphas(12)));
 
         thisDXCoil.NumOfSpeeds = Numbers(6); // Number of speeds
         if (thisDXCoil.NumOfSpeeds < 2) {
@@ -4514,8 +4513,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // A9; \field Fuel type, Validate fuel type input
-        thisDXCoil.FuelTypeNum =
-            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, Alphas(9)));
+        thisDXCoil.FuelTypeNum = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, Alphas(9)));
 
         thisDXCoil.RegionNum = Numbers(8);   // Region Number for HSPF Calc
         thisDXCoil.NumOfSpeeds = Numbers(9); // Number of speeds
