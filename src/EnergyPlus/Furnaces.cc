@@ -8675,14 +8675,14 @@ namespace Furnaces {
                            int const FanOpMode,                                     // Cycling fan or constant fan
                            DataHVACGlobals::CompressorOperation const CompressorOp, // Compressor on/off; 1=on, 0=off
                            Real64 const CoolPartLoadRatio,                          // DX cooling coil part load ratio
-                           Real64 const HeatPartLoadRatio, // DX heating coil part load ratio (0 for other heating coil types)
-                           Real64 const HeatCoilLoad,      // Heating coil load for gas heater
-                           Real64 const ReheatCoilLoad,    // Reheating coil load for gas heater
-                           Real64 &SensibleLoadMet,        // Sensible cooling load met (furnace outlet with respect to control zone temp)
-                           Real64 &LatentLoadMet,          // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
-                           Real64 &OnOffAirFlowRatio,      // Ratio of compressor ON mass flow rate to AVERAGE
-                           bool const HXUnitOn,            // flag to enable HX based on zone moisture load
-                           ObjexxFCL::Optional<Real64 const> CoolingHeatingPLRRat // cooling PLR to heating PLR ratio, used for cycling fan RH control
+                           Real64 const HeatPartLoadRatio,     // DX heating coil part load ratio (0 for other heating coil types)
+                           Real64 const HeatCoilLoad,          // Heating coil load for gas heater
+                           Real64 const ReheatCoilLoad,        // Reheating coil load for gas heater
+                           Real64 &SensibleLoadMet,            // Sensible cooling load met (furnace outlet with respect to control zone temp)
+                           Real64 &LatentLoadMet,              // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
+                           Real64 &OnOffAirFlowRatio,          // Ratio of compressor ON mass flow rate to AVERAGE
+                           bool const HXUnitOn,                // flag to enable HX based on zone moisture load
+                           Real64 const CoolingHeatingPLRRatio // cooling PLR to heating PLR ratio, used for cycling fan RH control
     )
     {
 
@@ -8707,11 +8707,7 @@ namespace Furnaces {
         Real64 WSHPRuntimeFrac = thisFurnace.WSHPRuntimeFrac; // Compressor runtime fraction
         state.dataFurnaces->ModifiedHeatCoilLoad = 0.0;
 
-        if (present(CoolingHeatingPLRRat)) {
-            state.dataFurnaces->CoolHeatPLRRat = CoolingHeatingPLRRat;
-        } else {
-            state.dataFurnaces->CoolHeatPLRRat = 1.0;
-        }
+        state.dataFurnaces->CoolHeatPLRRat = CoolingHeatingPLRRatio;
 
         // Cooling to Heating PLR Ratio (CoolHeatPLRRat) is used to track the air mass flow rate of both the heating
         // and cooling coils when RH control is used and the heating coil operates longer than the cooling coil.
@@ -9043,7 +9039,7 @@ namespace Furnaces {
 
         // Get mass flow rate after components are simulated
         auto &outletNode = state.dataLoopNodes->Node(thisFurnace.FurnaceOutletNodeNum);
-        Real64 AirMassFlow = inletNode.MassFlowRate; // this should be outlet node as in 9897
+        Real64 AirMassFlow = inletNode.MassFlowRate; // this should be outlet node as in 9897?
 
         // check the DesignMaxOutletTemp and reset if necessary (for Coil:Gas:Heating or Coil:Electric:Heating only)
         if (outletNode.Temp > thisFurnace.DesignMaxOutletTemp) {

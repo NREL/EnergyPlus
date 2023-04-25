@@ -390,10 +390,10 @@ void GetGshpInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name,
-                            _,
+                            {},
                             "Electricity",
                             "Heating",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,

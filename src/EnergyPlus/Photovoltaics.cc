@@ -696,10 +696,10 @@ namespace Photovoltaics {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPhotovoltaic->PVarray(PVnum).Name,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "Photovoltaics",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(state,
                                 "Generator PV Array Efficiency",

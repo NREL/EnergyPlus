@@ -1484,10 +1484,10 @@ namespace DesiccantDehumidifiers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 desicDehum.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Dehumidifier Regeneration Specific Energy",
@@ -1575,10 +1575,10 @@ namespace DesiccantDehumidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     desicDehum.Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
             }
         }
