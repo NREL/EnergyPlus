@@ -108,13 +108,14 @@ print("* Generated schema existence confirmed")
 with generated_schema_file.open() as f:
     o = load(f)
 
+idf_objects: dict = o["properties"]
 print("* Processing schema into RTD contents")
 rtd_out = ""
-# schema_version_number = o["epJSON_schema_version"]
-# schema_version_sha = o["epJSON_schema_build"]
-# h.write(f"<h1>Schema {schema_version_number} - {schema_version_sha}</h1>")
-idf_objects: dict = o["properties"]
-rtd_out += f"{len(idf_objects)} objects in all.\n\n"
+# The schema version/build are not configured when running on RTD, so these aren't useful unless we want to parse CMake
+# rtd_out += f"\n* EnergyPlus Schema Version: {o['epJSON_schema_version']}"
+# rtd_out += f"\n* EnergyPlus Build Commit SHA: {o['epJSON_schema_build']}"
+rtd_out += f"\n* Total Number of Objects in Schema: {len(idf_objects)}"
+rtd_out += "\n\n"
 
 object_entries_by_group = dict()
 
@@ -125,14 +126,29 @@ for obj_name, data in idf_objects.items():
     if group_name not in all_group_names:
         all_group_names.append(group_name)
     details = ""
-    details += f"{obj_name}\n{'=' * len(obj_name)}\n\n"
+    req_prefix = f":abbr:`🅁 (Required Object)` " if obj_name in o["required"] else f""
+    formed_obj_name = f"{req_prefix}{obj_name}"
+    details += f"{formed_obj_name}\n{'=' * len(formed_obj_name)}\n\n"
     if 'memo' in data:
         memo = data['memo'].replace('*', '\\*').replace('|', '\\|')
         details += f"{memo}\n"
     pattern_props = data['patternProperties']
     value_with_unknown_key = next(iter(pattern_props.values()))  # only key could be '.*' or something else
     fields: dict = value_with_unknown_key['properties']
-    details += "\n* Fields\n\n"
+    required_fields = value_with_unknown_key['required'] if 'required' in value_with_unknown_key else []
+    details += "\n\n"
+    field_type_icon = {
+        'number': ':abbr:`Ⓝ (Numeric)`',
+        'real': ':abbr:`Ⓝ (Numeric)`',
+        'integer': ':abbr:`Ⓘ (Integer)`',
+        'string': ':abbr:`Ⓢ (String)`',
+        'array': ':abbr:`Ⓧ (Array)`',
+        'unknown field type': ':abbr:`⍰ (Unknown type)`',
+        'auto_size_numeric': ':abbr:`ⒶⓃ (Auto-sizable Numeric)`',
+        'auto_size_integer': ':abbr:`ⒶⒾ (Auto-sizable Integer)`',
+        'auto_calculate_numeric': ':abbr:`ⒶⓃ (Auto-calculable Numeric)`',
+        '': ':abbr:`⍰ (Unknown type)`',
+    }
     for field_name, field_data in fields.items():
         default_string = ''
         if 'default' in field_data:
@@ -142,16 +158,46 @@ for obj_name, data in idf_objects.items():
                 default_data = str(field_data['default']).replace('*', '\\*')
                 default_string = f" (Default: {default_data})"
         field_type = field_data.get('type', 'unknown field type')
-        this_field_type = field_type
         if field_type == 'array' and 'items' in field_data:
+            array_required = field_data['items'].get('required', [])
             this_field_type = 'Array of {'
             for i, variable_name in enumerate(field_data['items']['properties']):
-                if i == 0:
-                    this_field_type += variable_name
-                else:
-                    this_field_type += ', ' + variable_name
+                req_icon = f":abbr:`🅁 (Required Field)` " if variable_name in array_required else ""
+                variable_value = field_data['items']['properties'][variable_name]
+                type_icon = field_type_icon[variable_value['type']] if 'type' in variable_value else ""
+                nice_var_name = f"{req_icon}{type_icon} {variable_name}"
+                this_field_type += ', ' + nice_var_name if i > 0 else nice_var_name
             this_field_type += '}'
-        details += f"    - `{field_name}` [{this_field_type}]{default_string}\n"
+        else:  # could be a known type, auto-sizable numeric, or nothing
+            if 'anyOf' in field_data:
+                auto_size_found = False
+                auto_calculate_found = False
+                numeric_found = False
+                integer_found = False
+                for option in field_data['anyOf']:
+                    if 'type' in option:
+                        if option['type'] == 'number':
+                            numeric_found = True
+                        elif option['type'] == 'integer':
+                            integer_found = True
+                        elif option['type'] == 'string':
+                            if 'enum' in option:
+                                if 'Autosize' in option['enum']:
+                                    auto_size_found = True
+                                elif 'Autocalculate' in option['enum']:
+                                    auto_calculate_found = True
+                if auto_size_found and numeric_found:
+                    field_type = 'auto_size_numeric'
+                elif auto_calculate_found and numeric_found:
+                    field_type = 'auto_calculate_numeric'
+                elif auto_size_found and integer_found:
+                    field_type = 'auto_size_integer'
+                elif numeric_found:  # this handles goofy things like RefrigerationSystem:NumCompStages
+                    field_type = 'number'
+            this_field_type = field_type_icon[field_type]
+        req_prefix = f":abbr:`🅁 (Required Field)` " if field_name in required_fields else ""
+        type_prefix = this_field_type
+        details += f"* {req_prefix}{type_prefix} `{field_name}` {default_string}\n"
     final_object_snippet = details + '\n'
     if group_name in object_entries_by_group:
         object_entries_by_group[group_name].append(final_object_snippet)
@@ -226,7 +272,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
