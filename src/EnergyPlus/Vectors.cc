@@ -310,71 +310,27 @@ void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf,       // Surface Defin
     // REFERENCE:
     // Discussions and examples from Bill Carroll, LBNL.
 
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    //  TYPE(Vector) :: x3,y3,z3,v12
-    //  TYPE(Vector) :: y2
+    // LOCAL VARIABLE DECLARATIONS:
     Real64 costheta;
     Real64 rotang_0;
-    //  REAL(r64) rotang_2
 
     Real64 az;
-    //   REAL(r64) azm
     Real64 tlt;
-    //  REAL(r64) newtlt
-    //  REAL(r64) roundval
-    //   REAL(r64) xcomp
-    //   REAL(r64) ycomp
-    //   REAL(r64) zcomp
-    //   REAL(r64) proj
-    //   integer :: scount
-    //   integer :: nvert1
-    //  REAL(r64) :: tltcos
-
-    // Object Data
-
-    //!!     x3=VecNormalize(Surf(2)-Surf(1))
-    //!!     v12=Surf(3)-Surf(2)
-
-    //!!     z3=VecNormalize(x3*v12)
-    //!!     y3=z3*x3
-    //!!     roundval=10000.d0
-    //!!     CALL VecRound(x3,roundval)
-    //!!     CALL VecRound(y3,roundval)
-    //!!     CALL VecRound(z3,roundval)
-
-    //!!!  Direction cosines, local coordinates.
-    //!!!      write(OUTPUT,*) 'lcs:'
-    //!!!      write(OUTPUT,*) 'x=',x3
-    //!!!      write(OUTPUT,*) 'y=',y3
-    //!!!      write(OUTPUT,*) 'z=',z3
-
-    //!!     lcsx=x3a
-    //!!     lcsz=VecNormalize(x3a*v12a)
-    //!!     lcsy=lcsz*x3a
 
     lcsx = VecNormalize(Surf(3) - Surf(2));
     lcsz = NewellSurfaceNormalVector;
     lcsy = cross(lcsz, lcsx);
 
-    //    double costheta = dot(z3,Ref_CS[2]);
     costheta = dot(lcsz, ZUnit);
 
     //    if ( fabs(costheta) < 1.0d0) { // normal cases
     if (std::abs(costheta) < 1.0 - 1.12e-16) { // Autodesk Added - 1.12e-16 to treat 1 bit from 1.0 as 1.0 to correct different behavior seen in
                                                // release vs debug build due to slight precision differences: May want larger epsilon here
-        //    // azimuth
-        //    Vec3d    x2 = cross(Ref_CS[2],z3); // order is important; x2 = x1
-        //    RotAng[0] = ATAN2(dot(x2,Ref_CS[1]),dot(x2,Ref_CS[0]));
+        // azimuth
         Vector x2 = cross(ZUnit, lcsz);
         rotang_0 = std::atan2(dot(x2, YUnit), dot(x2, XUnit));
     } else {
-        //      // azimuth
-        //      RotAng[0] = ATAN2(dot(cs3[0],Ref_CS[1]),dot(cs3[0],Ref_CS[0]) );
+        // azimuth
         rotang_0 = std::atan2(dot(lcsx, YUnit), dot(lcsx, XUnit));
     }
 
