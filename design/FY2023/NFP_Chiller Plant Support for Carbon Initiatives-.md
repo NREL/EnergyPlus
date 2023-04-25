@@ -432,6 +432,91 @@ And one example of a plant equipment operating scheme input:
       
 The final 2 inputs of this new object holds the name of the chiller heater used for heat recovery between plant loops. The use of a heat recovery heat pump is anticipated to be included with this new feature development effort.
 
+The supervisory class will reside in the unused source file EquipAndOperations.cc. The pointer to ChillerHeaterSupervisoryOperation will be added to state.
+
+    struct TempSetpoint
+    {
+        Real64 CW = 0.0;
+        Real64 HW = 0.0;
+    };
+
+    struct TempResetData
+    {
+        Real64 HWStartTemp = 0.0;
+        Real64 HWMaxDeltaTemp = 0.0;
+        Real64 HWRatio = 0.0;
+    };
+
+    struct PlantOpsData
+    {
+        int NumOfZones = 0;           // Number of zones in the list
+        int NumOfAirLoops = 0;        // number of air loops
+        int numPlantLoadProfiles = 0; // number of load profiles
+        int NumHeatingOnlyEquipLists = 0;
+        int NumCoolingOnlyEquipLists = 0;
+        int NumSimultHeatCoolHeatingEquipLists = 0;
+        int NumSimultHeatCoolCoolingEquipLists = 0;
+        int EquipListNumForLastCoolingOnlyStage = 0;
+        int EquipListNumForLastHeatingOnlyStage = 0;
+        int EquipListNumForLastSimultHeatCoolCoolingStage = 0;
+        int EquipListNumForLastSimultHeatCoolHeatingStage = 0;
+        bool SimultHeatCoolOpAvailable = false;
+        bool SimultHeatCoolHeatingOpInput = false;
+        bool SimulHeatCoolCoolingOpInput = false;
+        bool DedicatedHR_ChWRetControl_Input = false;
+        bool DedicatedHR_HWRetControl_Input = false;
+    };
+
+    struct ReportData
+    {
+        int OutputOpMode = 0;
+        Real64 SensedHeatingLoad = 0.0;
+        Real64 SensedCoolingLoad = 0.0;
+    };
+
+    struct ChillerHeaterSupervisoryOperationData
+    // Custom supervisory plant operation scheme, control dispatch across a set of related set of plant loops
+    // For two-pipe chiller heater. 1..N chiller heater, 1..M chiller only.
+    // poll zone list to decide mode between chiller only, heater only, or simultaneous
+
+    {
+        // get rid of these strings if possible
+        std::string Name;
+        std::string TypeOf;
+        std::string ZoneListName;
+        std::string DedicatedHR_ChWRetControl_Name;
+        std::string DedicatedHR_HWRetControl_Name;
+
+        bool oneTimeSetupComplete = false;
+        DataPlant::OpScheme Type = DataPlant::OpScheme::Invalid; // Op scheme type (from keyword)
+
+        TempSetpoint Setpoint;
+        TempResetData TempReset;
+        PlantOpsData PlantOps;
+        Array1D_int ZonePtrs;
+        Array1D_int AirLoopPtrs;
+        Array1D<EquipOpList> HeatingOnlyEquipList;
+        Array1D<EquipOpList> CoolingOnlyEquipList;
+        Array1D<EquipOpList> SimultHeatCoolHeatingEquipList;
+        Array1D<EquipOpList> SimultHeatCoolCoolingEquipList;
+        EquipListCompData DedicatedHR_ChWRetControl_LoadSideComp;
+        EquipListCompData DedicatedHR_ChWRetControl_SourceSideComp;
+        EquipListCompData DedicatedHR_HWRetControl_LoadSideComp;
+        EquipListCompData DedicatedHR_HWRetControl_SourceSideComp;
+        Array1D<int> PlantLoopIndicesBeingSupervised;
+        Array1D<PlantLocation> PlantLoadProfileComps;
+        ReportData Report;
+
+        void OneTimeInitChillerHeaterChangeoverOpScheme(EnergyPlusData &state);
+
+        void EvaluateChillerHeaterChangeoverOpScheme(EnergyPlusData &state, bool const FirstHVACIteration);
+    };
+
+    struct OperationData
+    {
+        ChillerHeaterSupervisoryOperationData *ChillerHeaterSupervisoryOperation = nullptr;
+    }
+
 ## Chiller Heater Heat Pump Performance
 
 A Trane systems development engineering document dated March 10, 2022 included several performance aspects of a chiller heater product. This internal document contained:
