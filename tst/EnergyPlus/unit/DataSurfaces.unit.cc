@@ -178,8 +178,8 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
@@ -255,9 +255,9 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
         Vectors::DetermineAzimuthAndTilt(
             s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
-        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+        s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.0);
 
@@ -265,9 +265,9 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
         Vectors::DetermineAzimuthAndTilt(
             s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
-        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+        s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0);
 
@@ -275,9 +275,9 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
         Vectors::DetermineAzimuthAndTilt(
             s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
-        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+        s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0 / s.SinTilt);
 
@@ -285,9 +285,9 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
         Vectors::DetermineAzimuthAndTilt(
             s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
-        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+        s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0);
 
@@ -295,9 +295,9 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
         Vectors::DetermineAzimuthAndTilt(
             s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
-        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+        s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0);
     }
@@ -314,9 +314,9 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightTriangle)
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
         Vectors::DetermineAzimuthAndTilt(
             s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
-        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+        s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.5);
 
@@ -324,9 +324,9 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightTriangle)
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
         Vectors::DetermineAzimuthAndTilt(
             s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
-        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+        s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.5);
     }
@@ -343,9 +343,9 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightL)
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
         Vectors::DetermineAzimuthAndTilt(
             s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
-        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+        s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.75);
 
@@ -353,9 +353,9 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightL)
         Vectors::CreateNewellSurfaceNormalVector(s.Vertex, s.Vertex.size(), s.NewellSurfaceNormalVector);
         Vectors::DetermineAzimuthAndTilt(
             s.Vertex, s.Vertex.size(), s.Azimuth, s.Tilt, s.lcsx, s.lcsy, s.lcsz, s.GrossArea, s.NewellSurfaceNormalVector);
-        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+        s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
 
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.75);
     }

@@ -236,9 +236,9 @@ namespace PhotovoltaicThermalCollectors {
         int IOStatus;   // Used in GetObjectItem
         int Found;
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        using DataGlobalConstants::ScheduleAlwaysOn;
         using DataSurfaces::OSCMData;
         using ScheduleManager::GetScheduleIndex;
+        using ScheduleManager::ScheduleAlwaysOn;
 
         tmpBIPVTperf.allocate(NumBIPVTPerform);
         for (Item = 1; Item <= NumBIPVTPerform; ++Item) {
@@ -544,10 +544,10 @@ namespace PhotovoltaicThermalCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
@@ -558,10 +558,10 @@ namespace PhotovoltaicThermalCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarAir",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -707,7 +707,7 @@ namespace PhotovoltaicThermalCollectors {
 
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->WPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::HWInitConvTemp,
+                                                               Constant::HWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->WPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
 
@@ -1100,7 +1100,7 @@ namespace PhotovoltaicThermalCollectors {
 
             this->Report.ThermHeatGain = PotentialHeatGain;
             this->Report.ThermPower = this->Report.ThermHeatGain;
-            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSysSec;
             this->Report.ThermHeatLoss = 0.0;
             this->Report.TinletWorkFluid = Tinlet;
             this->Report.MdotWorkFluid = mdot;
@@ -1166,7 +1166,7 @@ namespace PhotovoltaicThermalCollectors {
             this->Report.ThermHeatLoss = mdot * CpInlet * (Tinlet - this->Report.ToutletWorkFluid);
             this->Report.ThermHeatGain = 0.0;
             this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
-            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSysSec;
             this->Simple.LastCollectorTemp = Tcollector;
             this->Report.BypassStatus = BypassFraction;
 
@@ -1223,7 +1223,7 @@ namespace PhotovoltaicThermalCollectors {
 
             this->Report.ThermHeatGain = PotentialHeatGain;
             this->Report.ThermPower = this->Report.ThermHeatGain;
-            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSysSec;
             this->Report.ThermHeatLoss = 0.0;
             this->Report.TinletWorkFluid = Tinlet;
             this->Report.MdotWorkFluid = mdot;
@@ -1272,7 +1272,7 @@ namespace PhotovoltaicThermalCollectors {
             this->Report.ThermHeatLoss = -PotentialHeatGain;
             this->Report.ThermHeatGain = 0.0;
             this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
-            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->Report.ThermEnergy = this->Report.ThermPower * state.dataHVACGlobal->TimeStepSysSec;
             if (PotentialHeatGain < 0.0) this->BIPVT.LastCollectorTemp = Tcollector;
             this->Report.BypassStatus = BypassFraction;
         } else {
@@ -1296,7 +1296,7 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // Numerical & Analytical
 
-        Real64 pi(DataGlobalConstants::Pi);
+        Real64 pi(Constant::Pi);
         // BIPVT system geometry
         Real64 l = state.dataSurface->Surface(this->SurfNum).Height;
         Real64 w = state.dataSurface->Surface(this->SurfNum).Width;

@@ -303,7 +303,7 @@ namespace HighTempRadiantSystem {
 
             state.dataHighTempRadSys->HighTempRadSys(Item).SchedName = state.dataIPShortCut->cAlphaArgs(2);
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr == 0) {
@@ -660,10 +660,10 @@ namespace HighTempRadiantSystem {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHighTempRadSys->HighTempRadSys(Item).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             if (state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType == RadHeaterType::Gas) {
                 SetupOutputVariable(state,
@@ -680,10 +680,10 @@ namespace HighTempRadiantSystem {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).Name,
-                                    _,
+                                    {},
                                     "NaturalGas",
                                     "Heating",
-                                    _,
+                                    {},
                                     "System");
             } else if (state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType == RadHeaterType::Electric) {
                 SetupOutputVariable(state,
@@ -700,10 +700,10 @@ namespace HighTempRadiantSystem {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).Name,
-                                    _,
+                                    {},
                                     "ELECTRICITY",
                                     "Heating",
-                                    _,
+                                    {},
                                     "System");
             }
         }

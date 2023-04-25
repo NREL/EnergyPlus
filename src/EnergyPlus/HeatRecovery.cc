@@ -281,7 +281,7 @@ namespace HeatRecovery {
             thisExchanger.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisExchanger.ExchType = DataHVACGlobals::HX_AIRTOAIR_FLATPLATE;
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                thisExchanger.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                thisExchanger.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 thisExchanger.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (thisExchanger.SchedPtr == 0) {
@@ -399,7 +399,7 @@ namespace HeatRecovery {
             thisExchanger.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisExchanger.ExchType = DataHVACGlobals::HX_AIRTOAIR_GENERIC;
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                thisExchanger.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                thisExchanger.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 thisExchanger.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (thisExchanger.SchedPtr == 0) {
@@ -573,7 +573,7 @@ namespace HeatRecovery {
             thisExchanger.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisExchanger.ExchType = DataHVACGlobals::HX_DESICCANT_BALANCED;
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                thisExchanger.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                thisExchanger.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 thisExchanger.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (thisExchanger.SchedPtr == 0) {
@@ -1093,10 +1093,10 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEAT RECOVERY FOR HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Cooling Rate",
@@ -1140,10 +1140,10 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEAT RECOVERY FOR COOLING",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -1160,10 +1160,10 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
-                                _,
+                                {},
                                 "ELECTRICITY",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "System");
         }
 

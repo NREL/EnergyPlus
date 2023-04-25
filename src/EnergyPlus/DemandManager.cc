@@ -348,7 +348,6 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             thisDemandMgrList.Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -673,7 +672,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else {
-                demandMgr.AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn;
+                demandMgr.AvailSchedule = ScheduleManager::ScheduleAlwaysOn;
             }
 
             // Validate Limiting Control
@@ -772,7 +771,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else {
-                demandMgr.AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn;
+                demandMgr.AvailSchedule = ScheduleManager::ScheduleAlwaysOn;
             }
 
             // Validate Limiting Control
@@ -892,7 +891,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else {
-                demandMgr.AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn;
+                demandMgr.AvailSchedule = ScheduleManager::ScheduleAlwaysOn;
             }
 
             // Validate Limiting Control
@@ -1013,7 +1012,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else {
-                demandMgr.AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn;
+                demandMgr.AvailSchedule = ScheduleManager::ScheduleAlwaysOn;
             }
 
             // Validate Limiting Control
@@ -1146,7 +1145,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else {
-                demandMgr.AvailSchedule = DataGlobalConstants::ScheduleAlwaysOn;
+                demandMgr.AvailSchedule = ScheduleManager::ScheduleAlwaysOn;
             }
 
             // Validate Limiting Control

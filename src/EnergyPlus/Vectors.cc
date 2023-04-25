@@ -335,11 +335,11 @@ void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf,       // Surface Defin
     }
 
     tlt = std::acos(NewellSurfaceNormalVector.z);
-    tlt /= DataGlobalConstants::DegToRadians;
+    tlt /= Constant::DegToRadians;
 
     az = rotang_0;
 
-    az /= DataGlobalConstants::DegToRadians;
+    az /= Constant::DegToRadians;
     az = mod(450.0 - az, 360.0);
     az += 90.0;
     if (az < 0.0) az += 360.0;

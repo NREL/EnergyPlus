@@ -83,8 +83,6 @@ namespace CTElectricGenerator {
     // MODULE INFORMATION:
     //       AUTHOR         Dan Fisher
     //       DATE WRITTEN   Sept 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This module simulates the performance of the COMBUSTION turbine
@@ -97,7 +95,7 @@ namespace CTElectricGenerator {
     // All CT Generator models are based on a polynomial fit of Generator
     // performance data.
 
-    PlantComponent *CTGeneratorData::factory(EnergyPlusData &state, std::string const &objectName)
+    CTGeneratorData *CTGeneratorData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for generators if it hasn't been done already
         if (state.dataCTElectricGenerator->getCTInputFlag) {
@@ -106,11 +104,10 @@ namespace CTElectricGenerator {
         }
 
         // Now look for this particular generator in the list
-        for (auto &CTGen : state.dataCTElectricGenerator->CTGenerator) {
-            if (CTGen.Name == objectName) {
-                return &CTGen;
-            }
-        }
+        auto myCTGen = std::find_if(state.dataCTElectricGenerator->CTGenerator.begin(),
+                                    state.dataCTElectricGenerator->CTGenerator.end(),
+                                    [&objectName](const CTGeneratorData &CTElecGen) { return CTElecGen.Name == objectName; });
+        if (myCTGen != state.dataCTElectricGenerator->CTGenerator.end()) return myCTGen;
         // If we didn't find it, fatal
         ShowFatalError(state,
                        format("LocalCombustionTurbineGeneratorFactory: Error getting inputs for combustion turbine generator named: {}",
@@ -128,8 +125,6 @@ namespace CTElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Sept. 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE: This is the CT Generator driver.  It
         // gets the input for the models, initializes simulation variables, call
@@ -182,7 +177,6 @@ namespace CTElectricGenerator {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             state.dataCTElectricGenerator->CTGenerator(genNum).Name = AlphArray(1);
 
@@ -378,10 +372,10 @@ namespace CTElectricGenerator {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -399,10 +393,10 @@ namespace CTElectricGenerator {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             this->FuelType,
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         //    general fuel use report (to match other generators)
@@ -454,10 +448,10 @@ namespace CTElectricGenerator {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -475,10 +469,10 @@ namespace CTElectricGenerator {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -706,16 +700,16 @@ namespace CTElectricGenerator {
 
         // Calculate Energy
         // Generator output (J)
-        Real64 ElectricEnergyGen = elecPowerGenerated * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ElectricEnergyGen = elecPowerGenerated * state.dataHVACGlobal->TimeStepSysSec;
 
         // Amount of Fuel Energy Required to run COMBUSTION turbine (J)
-        Real64 FuelEnergyUsed = FuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 FuelEnergyUsed = FuelUseRate * state.dataHVACGlobal->TimeStepSysSec;
 
         // recovered lube oil heat (J)
-        Real64 lubeOilEnergyRec = QLubeOilRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 lubeOilEnergyRec = QLubeOilRec * state.dataHVACGlobal->TimeStepSysSec;
 
         // recovered exhaust heat (J)
-        Real64 exhaustEnergyRec = QExhaustRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 exhaustEnergyRec = QExhaustRec * state.dataHVACGlobal->TimeStepSysSec;
 
         this->ElecPowerGenerated = elecPowerGenerated;
         this->ElecEnergyGenerated = ElectricEnergyGen;
@@ -754,7 +748,6 @@ namespace CTElectricGenerator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
         //       DATE WRITTEN   Oct 2000
-        //       MODIFIED       na
         //       RE-ENGINEERED  Brent Griffith, Sept 2010 plant upgrades, generalize fluid props
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -825,7 +818,7 @@ namespace CTElectricGenerator {
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp,
+                                                           Constant::InitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 

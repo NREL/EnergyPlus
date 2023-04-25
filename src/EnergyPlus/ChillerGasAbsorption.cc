@@ -85,7 +85,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
 //                   for Gas Research Institute
 //    DATE WRITTEN   March 2001
 //    MODIFIED       Brent Griffith, Nov 2010 plant upgrades, generalize fluid properties
-//    RE-ENGINEERED  na
+
 // PURPOSE OF THIS MODULE:
 //    This module simulates the performance of the direct fired
 //    absorption chiller.
@@ -107,7 +107,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
 //    Development of this module was funded by the Gas Research Institute.
 //    (Please see copyright and disclaimer information at end of module)
 
-PlantComponent *GasAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+GasAbsorberSpecs *GasAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data if it hasn't been done already
     if (state.dataChillerGasAbsorption->getGasAbsorberInputs) {
@@ -115,11 +115,10 @@ PlantComponent *GasAbsorberSpecs::factory(EnergyPlusData &state, std::string con
         state.dataChillerGasAbsorption->getGasAbsorberInputs = false;
     }
     // Now look for this particular pipe in the list
-    for (auto &comp : state.dataChillerGasAbsorption->GasAbsorber) {
-        if (comp.Name == objectName) {
-            return &comp;
-        }
-    }
+    auto thisObj = std::find_if(state.dataChillerGasAbsorption->GasAbsorber.begin(),
+                                state.dataChillerGasAbsorption->GasAbsorber.end(),
+                                [&objectName](const GasAbsorberSpecs &myObj) { return myObj.Name == objectName; });
+    if (thisObj != state.dataChillerGasAbsorption->GasAbsorber.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalGasAbsorberFactory: Error getting inputs for comp named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
@@ -286,7 +285,6 @@ void GetGasAbsorberInput(EnergyPlusData &state)
     int NumAlphas; // Number of elements in the alpha array
     int NumNums;   // Number of elements in the numeric array
     int IOStat;    // IO Status when calling get input subroutine
-    std::string ChillerName;
     bool Okay;
     bool Get_ErrorsFound(false);
     int NumGasAbsorbers(0); // number of Absorption Chillers specified in input
@@ -320,7 +318,6 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, Get_ErrorsFound);
 
         // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
         GlobalNames::VerifyUniqueChillerName(
@@ -328,7 +325,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
 
         auto &thisChiller = state.dataChillerGasAbsorption->GasAbsorber(AbsorberNum);
         thisChiller.Name = state.dataIPShortCut->cAlphaArgs(1);
-        ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
+        std::string ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
 
         // Assign capacities
         thisChiller.NomCoolingCap = state.dataIPShortCut->rNumericArgs(1);
@@ -548,10 +545,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -568,10 +565,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "BOILERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -588,10 +585,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -624,10 +621,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         this->FuelType,
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -652,10 +649,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         this->FuelType,
                         "Heating",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -688,10 +685,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "Electricity",
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -708,10 +705,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "Electricity",
                         "Heating",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -965,11 +962,11 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
             if (this->CDplantLoc.loopNum > 0) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDplantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CDplantLoc.loopNum).FluidIndex,
                                                         RoutineName);
             } else {
-                rho = Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
+                rho = Psychrometrics::RhoH2O(Constant::InitConvTemp);
             }
 
             this->DesCondMassFlowRate = rho * this->CondVolFlowRate;
@@ -979,11 +976,11 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
         if (this->HWplantLoc.loopNum > 0) {
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidName,
-                                                    DataGlobalConstants::HWInitConvTemp,
+                                                    Constant::HWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidIndex,
                                                     RoutineName);
         } else {
-            rho = Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
+            rho = Psychrometrics::RhoH2O(Constant::InitConvTemp);
         }
         this->DesHeatMassFlowRate = rho * this->HeatVolFlowRate;
         // init available hot water flow rate
@@ -992,11 +989,11 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
         if (this->CWplantLoc.loopNum > 0) {
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidName,
-                                                    DataGlobalConstants::CWInitConvTemp,
+                                                    Constant::CWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidIndex,
                                                     RoutineName);
         } else {
-            rho = Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
+            rho = Psychrometrics::RhoH2O(Constant::InitConvTemp);
         }
         this->DesEvapMassFlowRate = rho * this->EvapVolFlowRate;
         // init available hot water flow rate
@@ -1076,12 +1073,12 @@ void GasAbsorberSpecs::size(EnergyPlusData &state)
         if (state.dataSize->PlantSizData(PltSizCoolNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
             Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidIndex,
                                                         RoutineName);
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidName,
-                                                    DataGlobalConstants::CWInitConvTemp,
+                                                    Constant::CWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).FluidIndex,
                                                     RoutineName);
             tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizCoolNum).DeltaT * state.dataSize->PlantSizData(PltSizCoolNum).DesVolFlowRate *
@@ -1960,12 +1957,12 @@ void GasAbsorberSpecs::updateCoolRecords(EnergyPlusData &state,
     }
 
     // convert power to energy and instantaneous use to use over the time step
-    this->CoolingEnergy = this->CoolingLoad * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->TowerEnergy = this->TowerLoad * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->FuelEnergy = this->FuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->CoolFuelEnergy = this->CoolFuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->CoolElectricEnergy = this->CoolElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->CoolingEnergy = this->CoolingLoad * state.dataHVACGlobal->TimeStepSysSec;
+    this->TowerEnergy = this->TowerLoad * state.dataHVACGlobal->TimeStepSysSec;
+    this->FuelEnergy = this->FuelUseRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->CoolFuelEnergy = this->CoolFuelUseRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSysSec;
+    this->CoolElectricEnergy = this->CoolElectricPower * state.dataHVACGlobal->TimeStepSysSec;
     if (this->CoolFuelUseRate != 0.0) {
         this->FuelCOP = this->CoolingLoad / this->CoolFuelUseRate;
     } else {
@@ -1991,11 +1988,11 @@ void GasAbsorberSpecs::updateHeatRecords(EnergyPlusData &state,
     }
 
     // convert power to energy and instantaneous use to use over the time step
-    this->HeatingEnergy = this->HeatingLoad * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->FuelEnergy = this->FuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->HeatFuelEnergy = this->HeatFuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->HeatElectricEnergy = this->HeatElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->HeatingEnergy = this->HeatingLoad * state.dataHVACGlobal->TimeStepSysSec;
+    this->FuelEnergy = this->FuelUseRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->HeatFuelEnergy = this->HeatFuelUseRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSysSec;
+    this->HeatElectricEnergy = this->HeatElectricPower * state.dataHVACGlobal->TimeStepSysSec;
 }
 
 void GasAbsorberSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)

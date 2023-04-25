@@ -132,7 +132,7 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
         state.dataRuntimeLangProcessor->TrueVariableNum = NewEMSVariable(state, "TRUE", 0, state.dataRuntimeLang->True);
         state.dataRuntimeLangProcessor->OffVariableNum = NewEMSVariable(state, "OFF", 0, state.dataRuntimeLang->False);
         state.dataRuntimeLangProcessor->OnVariableNum = NewEMSVariable(state, "ON", 0, state.dataRuntimeLang->True);
-        state.dataRuntimeLangProcessor->PiVariableNum = NewEMSVariable(state, "PI", 0, SetErlValueNumber(DataGlobalConstants::Pi));
+        state.dataRuntimeLangProcessor->PiVariableNum = NewEMSVariable(state, "PI", 0, SetErlValueNumber(Constant::Pi));
         state.dataRuntimeLangProcessor->TimeStepsPerHourVariableNum =
             NewEMSVariable(state, "TIMESTEPSPERHOUR", 0, SetErlValueNumber(double(state.dataGlobal->NumOfTimeStepInHour)));
 
@@ -1947,11 +1947,11 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                 break;
 
             case ErlFunc::DegToRad:
-                ReturnValue = SetErlValueNumber(Operand(1).Number * DataGlobalConstants::DegToRadians);
+                ReturnValue = SetErlValueNumber(Operand(1).Number * Constant::DegToRadians);
                 break;
 
             case ErlFunc::RadToDeg:
-                ReturnValue = SetErlValueNumber(Operand(1).Number / DataGlobalConstants::DegToRadians);
+                ReturnValue = SetErlValueNumber(Operand(1).Number / Constant::DegToRadians);
                 break;
 
             case ErlFunc::Exp:
@@ -3515,15 +3515,15 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        1,
+                                        1,
+                                        -999,
                                         UnitsB);
                 }
                 // Last field is index key, no indexing here so mimic weather output data
@@ -3817,7 +3817,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        _,
+                                        {},
                                         ResourceTypeString,
                                         EndUseTypeString,
                                         EndUseSubCatString,
@@ -3830,10 +3830,10 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        _,
+                                        {},
                                         ResourceTypeString,
                                         EndUseTypeString,
-                                        _,
+                                        {},
                                         GroupTypeString);
                 }
             }

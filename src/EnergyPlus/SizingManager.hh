@@ -79,7 +79,7 @@ namespace SizingManager {
     void ManageSizing(EnergyPlusData &state);
 
     bool CalcdoLoadComponentPulseNow(
-        EnergyPlusData &state, bool isPulseZoneSizing, bool WarmupFlag, int HourOfDay, int TimeStep, DataGlobalConstants::KindOfSim KindOfSim);
+        EnergyPlusData &state, bool isPulseZoneSizing, bool WarmupFlag, int HourOfDay, int TimeStep, Constant::KindOfSim KindOfSim);
 
     void ManageSystemSizingAdjustments(EnergyPlusData &state);
 
@@ -158,7 +158,7 @@ namespace SizingManager {
 
     std::string TimeIndexToHrMinString(EnergyPlusData &state, int timeIndex);
 
-    void UpdateFacilitySizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator CallIndicator);
+    void UpdateFacilitySizing(EnergyPlusData &state, Constant::CallIndicator CallIndicator);
 
     void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state);
 

@@ -83,7 +83,7 @@ namespace OutputProcessor {
         Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-        std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
+        std::map<int, Constant::ResourceType> ResourceTypes;             // ResourceTypes for each variable
         Array1D_string EndUses(NumVariables);                            // EndUses for each variable
         Array1D_string Groups(NumVariables);                             // Groups for each variable
         Array1D_string Names(NumVariables);                              // Variable Names for each variable
@@ -95,7 +95,7 @@ namespace OutputProcessor {
         int NumFound;
 
         for (int varN = 1; varN <= NumVariables; ++varN) {
-            ResourceTypes.insert(std::pair<int, DataGlobalConstants::ResourceType>(varN, DataGlobalConstants::ResourceType::None));
+            ResourceTypes.insert(std::pair<int, Constant::ResourceType>(varN, Constant::ResourceType::None));
         }
 
         GetMeteredVariables(
@@ -3686,10 +3686,10 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             "Cool-1",
-                            _,
+                            {},
                             "ELECTRICITY",
                             "Cooling",
-                            _, // EndUseSubKey
+                            {}, // EndUseSubKey
                             "Plant");
 
         Real64 light_consumption = 0.;
@@ -3700,7 +3700,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "RailroadCrossing", // EndUseSubKey
@@ -3717,10 +3717,10 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             "Site",
-                            _,
+                            {},
                             "CO2",
                             "FuelOilNo2Emissions",
-                            _, // EndUseSubKey
+                            {}, // EndUseSubKey
                             "");
 
         int found;
@@ -4135,7 +4135,7 @@ namespace OutputProcessor {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 "SPACE" + std::to_string(i) + "LIGHTS",
-                                _,
+                                {},
                                 "Electricity",
                                 "InteriorLights",
                                 "GeneralLights",
@@ -4200,7 +4200,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4215,7 +4215,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4230,7 +4230,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4245,7 +4245,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4260,7 +4260,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4490,7 +4490,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4505,7 +4505,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4520,7 +4520,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4535,7 +4535,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4550,7 +4550,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4778,7 +4778,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4793,7 +4793,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4808,7 +4808,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4823,7 +4823,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -4838,7 +4838,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -5091,7 +5091,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -5106,7 +5106,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -5121,7 +5121,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -5136,7 +5136,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -5151,7 +5151,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -5347,10 +5347,10 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             PurchAir(1).Name,
-                            _,
+                            {},
                             "DISTRICTHEATING",
                             "Heating",
-                            _,
+                            {},
                             "System");
 
         PurchAir(1).TotHeatEnergy = 1.1;
@@ -5498,7 +5498,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
@@ -5601,7 +5601,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            _,
+                            {},
                             "Electricity",
                             "InteriorLights",
                             "GeneralLights",
