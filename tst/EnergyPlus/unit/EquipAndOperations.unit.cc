@@ -1,0 +1,403 @@
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
+// EnergyPlus::Standalone ERV Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
+
+// EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Plant/EquipAndOperations.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
+
+using namespace EnergyPlus;
+
+class DistributeEquipOpTest : public EnergyPlusFixture
+{
+
+public:
+    //    static void SetUpTestCase()
+    //    {
+    //        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
+    //    }
+    static void TearDownTestCase()
+    {
+    }
+
+    virtual void SetUp()
+    {
+        EnergyPlusFixture::SetUp(); // Sets up individual test cases.
+
+        // unit test for PlantEquipmentOperation:ChillerHeaterChangeover
+        state->dataHeatBal->Zone.allocate(4);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(4);
+
+        // set up two plantloop side2 with 2 branches, 2 components
+        state->dataHeatBal->NumOfZoneLists = 1;
+        state->dataHeatBal->ZoneList.allocate(1);
+        state->dataHeatBal->ZoneList(1).Name = "THIS ZONE LIST";
+        state->dataHeatBal->ZoneList(1).NumOfZones = 4;
+        state->dataHeatBal->ZoneList(1).Zone.allocate(4);
+        state->dataHeatBal->ZoneList(1).Zone(1) = 1;
+        state->dataHeatBal->ZoneList(1).Zone(2) = 2;
+        state->dataHeatBal->ZoneList(1).Zone(3) = 3;
+        state->dataHeatBal->ZoneList(1).Zone(4) = 4;
+
+        state->dataHVACGlobal->NumPrimaryAirSys = 1;
+        state->dataAirLoop->AirLoopFlow.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+        state->dataAirLoop->AirToZoneNodeInfo.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+        state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopReturnNodeNum.allocate(1);
+        state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 4;
+        state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(4);
+        state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = state->dataHeatBal->ZoneList(1).Zone(3);
+        state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(2) = state->dataHeatBal->ZoneList(1).Zone(1);
+        state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(3) = state->dataHeatBal->ZoneList(1).Zone(4);
+        state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(4) = state->dataHeatBal->ZoneList(1).Zone(2);
+
+        state->dataHVACGlobal->NumPlantLoops = 2;
+        state->dataPlnt->TotNumLoops = state->dataHVACGlobal->NumPlantLoops;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+
+        int loop = 0;
+        for (auto &thisPlantLoop : state->dataPlnt->PlantLoop) {
+
+            ++loop;
+            if (loop == 1) {
+                thisPlantLoop.Name = "Cooling Plant";
+                thisPlantLoop.OperationScheme = "Cooling Loop Operation Scheme List";
+            } else {
+                thisPlantLoop.Name = "Heating Plant";
+                thisPlantLoop.OperationScheme = "Heating Loop Operation Scheme List";
+            }
+
+            thisPlantLoop.NumOpSchemes = 1;
+            thisPlantLoop.OpScheme.allocate(thisPlantLoop.NumOpSchemes);
+            auto &opSch1 = thisPlantLoop.OpScheme(1);
+            opSch1.NumEquipLists = 1;
+            opSch1.EquipList.allocate(2);
+
+            for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
+                thisPlantLoop.LoopSide(LoopSideNum).TotalBranches = 2;
+                thisPlantLoop.LoopSide(LoopSideNum).Branch.allocate(2);
+                thisPlantLoop.LoopSide(LoopSideNum).Branch(1).TotalComponents = 1;
+                thisPlantLoop.LoopSide(LoopSideNum).Branch(2).TotalComponents = 1;
+                thisPlantLoop.LoopSide(LoopSideNum).Branch(1).Comp.allocate(1);
+                thisPlantLoop.LoopSide(LoopSideNum).Branch(2).Comp.allocate(1);
+            }
+
+            for (auto &opSch : thisPlantLoop.OpScheme) {
+                for (int eqListNum = 1; eqListNum <= opSch.EquipList.size(); ++eqListNum) {
+                    opSch.NumEquipLists = eqListNum;
+                    auto &thisEquipList(opSch.EquipList(eqListNum));
+                    thisEquipList.NumComps = eqListNum;
+                    thisEquipList.Comp.allocate(thisEquipList.NumComps);
+
+                    for (int compNum = 1; compNum <= opSch.EquipList(eqListNum).NumComps; ++compNum) {
+                        // set up equipment list data
+                        thisEquipList.Comp(compNum).CompNumPtr = compNum;
+                        thisEquipList.Comp(compNum).BranchNumPtr = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    virtual void ResetLoads()
+    {
+        // reset loads
+        for (auto &thisPlantLoop : state->dataPlnt->PlantLoop) {
+            auto &thisBranch(thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
+            for (int compNum = 1; compNum <= thisPlantLoop.OpScheme(1).EquipList(1).NumComps; ++compNum) {
+                thisBranch.Comp(compNum).MyLoad = 0.0;
+            }
+        }
+    }
+    virtual void TearDown()
+    {
+        EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
+    }
+};
+
+TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
+{
+
+    std::string_view constexpr idf_objects = R"IDF(
+
+      PlantEquipmentOperationSchemes,
+        Cooling Loop Operation Scheme List, !- Name
+        PlantEquipmentOperation:ChillerHeaterChangeover, !- Control Scheme 1 Object Type
+        Two AWHP Operation Scheme,         !- Control Scheme 1 Name
+        ALWAYS_ON;                         !- Control Scheme 1 Schedule Name
+
+      PlantEquipmentOperationSchemes,
+        Heating Loop Operation Scheme List, !- Name
+        PlantEquipmentOperation:ChillerHeaterChangeover,  !- Control Scheme 1 Object Type
+        Two AWHP Operation Scheme,         !- Control Scheme 1 Name
+        ALWAYS_ON;                         !- Control Scheme 1 Schedule Name
+
+      Schedule:Compact, ALWAYS_ON, On/Off, Through: 12/31, For: AllDays, Until: 24:00,1;
+
+      PlantEquipmentOperation:ChillerHeaterChangeover,
+        Two AWHP Operation Scheme ,        !- Name
+        6.6 ,                              !- Chilled Water Temperature Setpoint
+        40.0 ,                             !- Hot Water Temperature Setpoint
+        5.0 ,                              !- Hot Water Setpoint Reset Start Temperature
+        8.0 ,                              !- Hot Water Setpoint Reset Maximum Temperature Difference
+        50.0 ,                             !- Hot Water Setpoint Reset Ratio
+        This Zone List,                    !- Zone Load Polling ZoneList Name
+        Two AWHP Cooling Operation Scheme, !- Cooling Only Load Plant Equipment Operation Cooling Load Name
+        Two AWHP Heating Operation Scheme, !- Heating Only Load Plant Equipment Operation Heating Load Name
+        One AWHP Cooling Operation Scheme, !- Simultaneous Cooling And Heating Plant Equipment Operation Cooling Load Name
+        One AWHP Heating Operation Scheme, !- Simultaneous Cooling And Heating Plant Equipment Operation Heating Load Name
+        ,                                  !- Dedicated Chilled Water Return Recovery HeatPump Name
+        ;                                  !- Dedicated Hot Water Return Recovery HeatPump Name
+    
+      PlantEquipmentOperation:CoolingLoad,
+        Two AWHP Cooling Operation Scheme, !- Name
+        0.0,                               !- Load Range 1 Lower Limit {W}
+        50000,                             !- Load Range 1 Upper Limit {W}
+        One AWHP Cooling Equipment List,   !- Range 1 Equipment List Name
+        50000,                             !- Load Range 2 Lower Limit {W}
+        10000000000000,                    !- Load Range 2 Upper Limit {W}
+        Two AWHP Cooling Equipment List;   !- Range 2 Equipment List Name
+  
+      PlantEquipmentOperation:HeatingLoad,
+        Two AWHP Heating Operation Scheme, !- Name
+        0.0,                               !- Load Range 1 Lower Limit {W}
+        100000,                            !- Load Range 1 Upper Limit {W}
+        One AWHP Heating Equipment List,   !- Range 1 Equipment List Name
+        100000,                            !- Load Range 2 Lower Limit {W}
+        10000000000000,                    !- Load Range 2 Upper Limit {W}
+        Two AWHP Heating Equipment List;   !- Range 2 Equipment List Name
+    
+      PlantEquipmentOperation:CoolingLoad,
+        One AWHP Cooling Operation Scheme, !- Name
+        0.0,                               !- Load Range 1 Lower Limit {W}
+        10000000000000000,                 !- Load Range 1 Upper Limit {W}
+        One AWHP Cooling Equipment List;   !- Range 1 Equipment List Name
+    
+      PlantEquipmentOperation:HeatingLoad,
+        One AWHP Heating Operation Scheme, !- Name
+        0.0,                               !- Load Range 1 Lower Limit {W}
+        10000000000000000,                 !- Load Range 1 Upper Limit {W}
+        One AWHP Heating Equipment List;   !- Range 1 Equipment List Name
+
+      PlantEquipmentList,
+        One AWHP Heating Equipment List,   !- Name
+        HeatPump:PlantLoop:EIR:Heating,    !- Equipment 1 Object Type
+        AWHP_2 Heating Side;               !- Equipment 1 Name
+  
+      PlantEquipmentList,
+        One AWHP Cooling Equipment List,   !- Name
+        HeatPump:PlantLoop:EIR:Cooling,    !- Equipment 1 Object Type
+        AWHP_1 Cooling Side;               !- Equipment 1 Name
+    
+      PlantEquipmentList,
+        Two AWHP Heating Equipment List,   !- Name
+        HeatPump:PlantLoop:EIR:Heating,    !- Equipment 1 Object Type
+        AWHP_1 Heating Side,               !- Equipment 1 Name
+        HeatPump:PlantLoop:EIR:Heating,    !- Equipment 2 Object Type
+        AWHP_2 Heating Side;               !- Equipment 2 Name    
+
+      PlantEquipmentList,
+        Two AWHP Cooling Equipment List,   !- Name
+        HeatPump:PlantLoop:EIR:Cooling,    !- Equipment 1 Object Type
+        AWHP_1 Cooling Side,               !- Equipment 1 Name
+        HeatPump:PlantLoop:EIR:Cooling,    !- Equipment 2 Object Type
+        AWHP_2 Cooling Side;               !- Equipment 2 Name  
+
+      ZoneList,
+        This Zone List,                    !- Name
+        Zone1,                             !- Zone Name 1
+        Zone2,                             !- Zone Name 2
+        Zone3,                             !- Zone Name 3
+        Zone4;                             !- Zone Name 4
+     )IDF";
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    int onSchedIndex = ScheduleManager::GetScheduleIndex(*state, "ALWAYS_ON");
+
+    auto &heatComp1 = state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
+    heatComp1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    heatComp1.Name = "AWHP_1 Heating Side";
+    heatComp1.NodeNumIn = 1;
+    heatComp1.NodeNumOut = 2;
+    auto &heatComp2 = state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(2).Comp(1);
+    heatComp2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    heatComp2.Name = "AWHP_2 Heating Side";
+    heatComp2.NodeNumIn = 3;
+    heatComp2.NodeNumOut = 4;
+
+    auto &coolComp1 = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
+    coolComp1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    coolComp1.Name = "AWHP_1 Cooling Side";
+    coolComp1.NodeNumIn = 5;
+    coolComp1.NodeNumOut = 6;
+    auto &coolComp2 = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(2).Comp(1);
+    coolComp2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    coolComp2.Name = "AWHP_2 Cooling Side";
+    coolComp2.NodeNumIn = 7;
+    coolComp2.NodeNumOut = 8;
+
+    state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopReturnNodeNum(1) = 9;
+    state->dataLoopNodes->Node.allocate(10);
+
+    bool FirstHVACIteration = false;
+    std::string CurrentModuleObject = "PlantEquipmentOperation:ChillerHeaterChangeover";
+    PlantCondLoopOperation::InitLoadDistribution(*state, FirstHVACIteration);
+
+    auto &chillerHeaterSupervisor = state->dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes(1);
+    EXPECT_TRUE(chillerHeaterSupervisor.oneTimeSetupComplete); // getInput completed
+
+    EXPECT_EQ(4, chillerHeaterSupervisor.PlantOps.NumOfZones);
+    EXPECT_EQ(1, chillerHeaterSupervisor.PlantOps.NumOfAirLoops);
+    EXPECT_EQ(0, chillerHeaterSupervisor.PlantOps.numPlantLoadProfiles);
+    EXPECT_EQ(2, chillerHeaterSupervisor.PlantOps.NumHeatingOnlyEquipLists);
+    EXPECT_EQ(2, chillerHeaterSupervisor.PlantOps.NumCoolingOnlyEquipLists);
+    EXPECT_EQ(1, chillerHeaterSupervisor.PlantOps.NumSimultHeatCoolHeatingEquipLists);
+    EXPECT_EQ(1, chillerHeaterSupervisor.PlantOps.NumSimultHeatCoolCoolingEquipLists);
+
+    EXPECT_TRUE(chillerHeaterSupervisor.PlantOps.SimultHeatCoolOpAvailable);
+
+    EXPECT_NEAR(6.60, chillerHeaterSupervisor.Setpoint.CW, 0.001); // cooling set point temperature
+    EXPECT_NEAR(40.0, chillerHeaterSupervisor.Setpoint.HW, 0.001); // heating set point temperature
+
+    EXPECT_NEAR(5.00, chillerHeaterSupervisor.TempReset.HWStartTemp, 0.001);
+    EXPECT_NEAR(8.00, chillerHeaterSupervisor.TempReset.HWMaxDeltaTemp, 0.001);
+    EXPECT_NEAR(50.0, chillerHeaterSupervisor.TempReset.HWRatio, 0.001);
+
+    EXPECT_EQ(1, chillerHeaterSupervisor.ZonePtrs(1));
+    EXPECT_EQ(2, chillerHeaterSupervisor.ZonePtrs(2));
+    EXPECT_EQ(3, chillerHeaterSupervisor.ZonePtrs(3));
+    EXPECT_EQ(4, chillerHeaterSupervisor.ZonePtrs(4));
+
+    FirstHVACIteration = true;
+    auto &thisSupervisor = state->dataPlnt->PlantLoop(1).OpScheme(1).ChillerHeaterSupervisoryOperation;
+    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state, FirstHVACIteration);
+
+    // zone loads have not been initialized
+    EXPECT_EQ(0, chillerHeaterSupervisor.Report.OutputOpMode); // off
+    EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.SensedCoolingLoad);
+    EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.SensedHeatingLoad);
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(1)).OutputRequiredToHeatingSP = 100.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToHeatingSP = 200.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(3)).OutputRequiredToHeatingSP = 300.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(4)).OutputRequiredToHeatingSP = 400.0;
+
+    // zones have a heating load
+    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state, FirstHVACIteration);
+    EXPECT_EQ(1, chillerHeaterSupervisor.Report.OutputOpMode); // heating
+    EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.SensedCoolingLoad);
+    EXPECT_EQ(1000.0, chillerHeaterSupervisor.Report.SensedHeatingLoad);
+
+    // check to see if correct plant equipment are active
+    auto &eqcool = chillerHeaterSupervisor.CoolingOnlyEquipList(1).Comp(1);
+    // set cooling demand node temp above cooling set point so equipment is actived if needed
+    // heating demand temp = 0 (not initialized) so heating will active if needed (i.e., temp < heating set point)
+    state->dataLoopNodes->Node(eqcool.DemandNodeNum).Temp = 10.0;
+    auto &eqheat = chillerHeaterSupervisor.HeatingOnlyEquipList(1).Comp(1);
+    bool thisCoolEq1 = state->dataPlnt->PlantLoop(1).LoopSide(eqcool.LoopSideNumPtr).Branch(eqcool.BranchNumPtr).Comp(eqcool.CompNumPtr).ON;
+    bool thisHeatEq1 = state->dataPlnt->PlantLoop(2).LoopSide(eqheat.LoopSideNumPtr).Branch(eqheat.BranchNumPtr).Comp(eqheat.CompNumPtr).ON;
+    EXPECT_FALSE(thisCoolEq1);
+    EXPECT_TRUE(thisHeatEq1); // heating equipment active
+    EXPECT_EQ(state->dataPlnt->PlantLoop(1).Name, "Cooling Plant");
+    EXPECT_EQ(state->dataPlnt->PlantLoop(2).Name, "Heating Plant");
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(1)).OutputRequiredToHeatingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToHeatingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(3)).OutputRequiredToHeatingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(4)).OutputRequiredToHeatingSP = 0.0;
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(1)).OutputRequiredToCoolingSP = 100.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToCoolingSP = 200.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(3)).OutputRequiredToCoolingSP = 300.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(4)).OutputRequiredToCoolingSP = 400.0;
+
+    // zone heating loads are 0 and zone cooling loads are positive (no cooling)
+    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state, FirstHVACIteration);
+    EXPECT_EQ(0, chillerHeaterSupervisor.Report.OutputOpMode); // off
+    EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.SensedCoolingLoad);
+    EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.SensedHeatingLoad);
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(1)).OutputRequiredToCoolingSP = -100.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToCoolingSP = -200.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(3)).OutputRequiredToCoolingSP = -300.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(4)).OutputRequiredToCoolingSP = -400.0;
+
+    // zone heating loads are 0 and zone cooling loads are negative (cooling)
+    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state, FirstHVACIteration);
+    EXPECT_EQ(2, chillerHeaterSupervisor.Report.OutputOpMode); // cooling
+    EXPECT_EQ(-1000.0, chillerHeaterSupervisor.Report.SensedCoolingLoad);
+    EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.SensedHeatingLoad);
+    bool thisCoolEq2 = state->dataPlnt->PlantLoop(1).LoopSide(eqcool.LoopSideNumPtr).Branch(eqcool.BranchNumPtr).Comp(eqcool.CompNumPtr).ON;
+    bool thisHeatEq2 = state->dataPlnt->PlantLoop(2).LoopSide(eqheat.LoopSideNumPtr).Branch(eqheat.BranchNumPtr).Comp(eqheat.CompNumPtr).ON;
+    EXPECT_FALSE(thisHeatEq2);
+    EXPECT_TRUE(thisCoolEq2); // cooling equipment active
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(1)).OutputRequiredToHeatingSP = 100.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToHeatingSP = 200.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(3)).OutputRequiredToHeatingSP = 300.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(4)).OutputRequiredToHeatingSP = 400.0;
+
+    // zone heating loads are positive (heating) and zone cooling loads are negative (cooling)
+    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state, FirstHVACIteration);
+    EXPECT_EQ(3, chillerHeaterSupervisor.Report.OutputOpMode); // simultaneous cooling and heating
+    EXPECT_EQ(-1000.0, chillerHeaterSupervisor.Report.SensedCoolingLoad);
+    EXPECT_EQ(1000.0, chillerHeaterSupervisor.Report.SensedHeatingLoad);
+}
