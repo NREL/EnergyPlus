@@ -3077,9 +3077,9 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_3Speeds_IEER2022ValueOrigTest)
     EXPECT_TRUE(IEER_2022 > 0.0);
     EXPECT_TRUE(EER_2022 > 0.0);
     EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
-    EXPECT_NEAR(3.20, IEER_2022, 0.01);
+    EXPECT_NEAR(3.15, IEER_2022, 0.01);
     EXPECT_NEAR(4164.376, NetCoolingCapRated(thisCoil.NumOfSpeeds), 0.01);
-    EXPECT_NEAR(10.94, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(10.75, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilAir_IEER2022ValueTest)
@@ -3196,17 +3196,17 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilAir_IEER2022ValueTest)
     thisCoil.RatedAirVolFlowRate(1) = 1.3711908092591101;
     Real64 TotCapFlowModFac = Curve::CurveValue(*state, CapFFlowCurveIndex, AirMassFlowRatioRated);
     Real64 EIRFlowModFac = Curve::CurveValue(*state, EIRFFlowCurveIndex, AirMassFlowRatioRated);
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculation(*state,
-                                                                            thisCoil.DXCoilType,
-                                                                            thisCoil.CCapFTemp(1),
-                                                                            thisCoil.RatedTotCap(1),
-                                                                            TotCapFlowModFac,
-                                                                            thisCoil.FanPowerPerEvapAirFlowRate_2023(1),
-                                                                            thisCoil.RatedAirVolFlowRate(1),
-                                                                            thisCoil.EIRFTemp(1),
-                                                                            thisCoil.RatedCOP(1),
-                                                                            EIRFlowModFac,
-                                                                            thisCoil.CondenserType(1));
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationSingleSpeed(*state,
+                                                                                       thisCoil.DXCoilType,
+                                                                                       thisCoil.CCapFTemp(1),
+                                                                                       thisCoil.RatedTotCap(1),
+                                                                                       TotCapFlowModFac,
+                                                                                       thisCoil.FanPowerPerEvapAirFlowRate_2023(1),
+                                                                                       thisCoil.RatedAirVolFlowRate(1),
+                                                                                       thisCoil.EIRFTemp(1),
+                                                                                       thisCoil.RatedCOP(1),
+                                                                                       EIRFlowModFac,
+                                                                                       thisCoil.CondenserType(1));
     NetCoolingCapRated = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
     EXPECT_TRUE(EER_2022 > 0.0);
@@ -3345,17 +3345,17 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilEvap_IEER2022ValueTest)
     thisCoil.RatedAirVolFlowRate(1) = 1.70;
     Real64 TotCapFlowModFac = Curve::CurveValue(*state, CapFFlowCurveIndex, AirMassFlowRatioRated);
     Real64 EIRFlowModFac = Curve::CurveValue(*state, EIRFFlowCurveIndex, AirMassFlowRatioRated);
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculation(*state,
-                                                                            thisCoil.DXCoilType,
-                                                                            thisCoil.CCapFTemp(1),
-                                                                            thisCoil.RatedTotCap(1),
-                                                                            TotCapFlowModFac,
-                                                                            thisCoil.FanPowerPerEvapAirFlowRate_2023(1),
-                                                                            thisCoil.RatedAirVolFlowRate(1),
-                                                                            thisCoil.EIRFTemp(1),
-                                                                            thisCoil.RatedCOP(1),
-                                                                            EIRFlowModFac,
-                                                                            thisCoil.CondenserType(1));
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationSingleSpeed(*state,
+                                                                                       thisCoil.DXCoilType,
+                                                                                       thisCoil.CCapFTemp(1),
+                                                                                       thisCoil.RatedTotCap(1),
+                                                                                       TotCapFlowModFac,
+                                                                                       thisCoil.FanPowerPerEvapAirFlowRate_2023(1),
+                                                                                       thisCoil.RatedAirVolFlowRate(1),
+                                                                                       thisCoil.EIRFTemp(1),
+                                                                                       thisCoil.RatedCOP(1),
+                                                                                       EIRFlowModFac,
+                                                                                       thisCoil.CondenserType(1));
     NetCoolingCapRated = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
     EXPECT_TRUE(EER_2022 > 0.0);
@@ -3682,9 +3682,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_IEER2022ValueTest)
     EXPECT_TRUE(IEER_2022 > 0.0);
     EXPECT_TRUE(EER_2022 > 0.0);
     EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
-    EXPECT_NEAR(3.899065848, IEER_2022, 0.01);
+    EXPECT_NEAR(3.82, IEER_2022, 0.01);
     EXPECT_NEAR(33426.83, NetCoolingCapRated(thisCoil.NumOfSpeeds), 0.01);
-    EXPECT_NEAR(13.30416491, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(13.03, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCooling_2_IEER2022ValueTest)
@@ -4002,9 +4002,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_2_IEER2022ValueTest)
     EXPECT_TRUE(IEER_2022 > 0.0);
     EXPECT_TRUE(EER_2022 > 0.0);
     EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
-    EXPECT_NEAR(3.713021697, IEER_2022, 0.01);
+    EXPECT_NEAR(3.59, IEER_2022, 0.01);
     EXPECT_NEAR(30499.818, NetCoolingCapRated(thisCoil.NumOfSpeeds), 0.01);
-    EXPECT_NEAR(12.66935592, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(12.24, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCooling_3_IEER2022ValueTest)
@@ -4322,9 +4322,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_3_IEER2022ValueTest)
     EXPECT_TRUE(IEER_2022 > 0.0);
     EXPECT_TRUE(EER_2022 > 0.0);
     EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
-    EXPECT_NEAR(3.796282588, IEER_2022, 0.01);
+    EXPECT_NEAR(3.67, IEER_2022, 0.01);
     EXPECT_NEAR(6846.0884032540798, NetCoolingCapRated(thisCoil.NumOfSpeeds), 0.01);
-    EXPECT_NEAR(12.95345387, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(12.53, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCooling_7Speed_IEER2022ValueTest)
@@ -4499,16 +4499,13 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_7Speed_IEER2022ValueTest)
     });
 
     // Speed   Percent Load
-    //    1	22.55253033	  D_Low
-    //    2	27.78780704	  D_High  // Interpolation Required
-    //    3	32.94761764
-    //    4	43.07931341	  C_Low
-    //    5	52.99940811	  C_High  // Interpolation Required
-    //    6	62.73305712
-    //    7	72.29505771	  B_Low
-    //    8	81.6913288	  B_High  // Interpolation Required
-    //    9	90.92630956
-    //    10	100	          A (Exact Match)
+    // 1 31.1951205 D
+    // 2 38.4366621
+    // 3 45.5738175 C_Low
+    // 4 59.5881859 C_High  // Interpolation Required
+    // 5 73.3098635 B_Low
+    // 6 86.7736455 B_High  // Interpolation Required
+    // 7 100        A (Exact Match)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -4605,9 +4602,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_7Speed_IEER2022ValueTest)
     EXPECT_TRUE(IEER_2022 > 0.0);
     EXPECT_TRUE(EER_2022 > 0.0);
     EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
-    EXPECT_NEAR(3.9539589418147982, IEER_2022, 0.01);
+    EXPECT_NEAR(3.89, IEER_2022, 0.01);
     EXPECT_NEAR(24365.480919213001, NetCoolingCapRated(thisCoil.NumOfSpeeds), 0.01);
-    EXPECT_NEAR(13.49146792, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(13.27, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCooling_1Speed_IEER2022ValueTest)
@@ -5317,9 +5314,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_3Speed_IEER2022ValueTest)
     EXPECT_TRUE(IEER_2022 > 0.0);
     EXPECT_TRUE(EER_2022 > 0.0);
     EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
-    EXPECT_NEAR(3.74, IEER_2022, 0.01);
+    EXPECT_NEAR(3.60, IEER_2022, 0.01);
     EXPECT_NEAR(33917.499738697108, NetCoolingCapRated(thisCoil.NumOfSpeeds), 0.01);
-    EXPECT_NEAR(12.77, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(12.28, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, VariableSpeedCooling_4Speed_IEER2022ValueTest)
@@ -5771,17 +5768,17 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilAir_ExampleARHI_IEER2022ValueTes
     Real64 TotCapFlowModFac = Curve::CurveValue(*state, CapFFlowCurveIndex, AirMassFlowRatioRated);
     Real64 EIRFlowModFac = Curve::CurveValue(*state, EIRFFlowCurveIndex, AirMassFlowRatioRated);
 
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculation(*state,
-                                                                            thisCoil.DXCoilType,
-                                                                            thisCoil.CCapFTemp(1),
-                                                                            thisCoil.RatedTotCap(1),
-                                                                            TotCapFlowModFac,
-                                                                            thisCoil.FanPowerPerEvapAirFlowRate_2023(1),
-                                                                            thisCoil.RatedAirVolFlowRate(1),
-                                                                            thisCoil.EIRFTemp(1),
-                                                                            thisCoil.RatedCOP(1),
-                                                                            EIRFlowModFac,
-                                                                            thisCoil.CondenserType(1));
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationSingleSpeed(*state,
+                                                                                       thisCoil.DXCoilType,
+                                                                                       thisCoil.CCapFTemp(1),
+                                                                                       thisCoil.RatedTotCap(1),
+                                                                                       TotCapFlowModFac,
+                                                                                       thisCoil.FanPowerPerEvapAirFlowRate_2023(1),
+                                                                                       thisCoil.RatedAirVolFlowRate(1),
+                                                                                       thisCoil.EIRFTemp(1),
+                                                                                       thisCoil.RatedCOP(1),
+                                                                                       EIRFlowModFac,
+                                                                                       thisCoil.CondenserType(1));
     NetCoolingCapRated = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
     EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
@@ -6971,9 +6968,9 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
     EXPECT_TRUE(IEER_2022 > 0.0);
     EXPECT_TRUE(EER_2022 > 0.0);
     EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
-    EXPECT_NEAR(3.24, IEER_2022, 0.01);
+    EXPECT_NEAR(3.18, IEER_2022, 0.01);
     EXPECT_NEAR(4798.04, NetCoolingCapRated(nsp), 0.01);
-    EXPECT_NEAR(11.05, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(10.85, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, ChillerCondenserEnteringFluidTemp_AHRIIPTestConditions)

@@ -350,7 +350,7 @@ namespace StandardRatings {
     // Real64 NetCoolingCapRated -> Net cooling capacity for Single Speed DX Cooling Coil
     // Real64 IEER -> Integareted energy efficiency ratio for Single Speed DX cooling coil
     // Real64 EER -> Energy efficiency ratio for Single Speed DX cooling coil
-    std::tuple<Real64, Real64, Real64> IEERCalculation(
+    std::tuple<Real64, Real64, Real64> IEERCalculationSingleSpeed(
         EnergyPlus::EnergyPlusData &state,
         std::string const &DXCoilType,            // Type of DX coil
         const int &CapFTempCurveIndex,            // Index for the capacity as a function of temperature modifier curve
