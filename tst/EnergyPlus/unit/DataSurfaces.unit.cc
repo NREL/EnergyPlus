@@ -56,7 +56,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -431,9 +431,9 @@ TEST_F(EnergyPlusFixture, SurfaceTest_Azimuth_non_conv)
         EXPECT_DOUBLE_EQ(s.Azimuth, 180.0); // Orignal code without PR 9907 fix would fail this one by getting an s.Azimuth of 0.0
         EXPECT_DOUBLE_EQ(s.Tilt, 90.0);
 
-        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+        s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
 
         EXPECT_NEAR(s.SinAzim, 0.0, 1e-15);
         EXPECT_DOUBLE_EQ(s.CosAzim, -1.0);
@@ -455,9 +455,9 @@ TEST_F(EnergyPlusFixture, SurfaceTest_Azimuth_non_conv)
         EXPECT_DOUBLE_EQ(s.Azimuth, 180.0);
         EXPECT_DOUBLE_EQ(s.Tilt, 90.0);
 
-        s.SinAzim = std::sin(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.CosAzim = std::cos(s.Azimuth * DataGlobalConstants::DegToRadians);
-        s.SinTilt = std::sin(s.Tilt * DataGlobalConstants::DegToRadians);
+        s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
+        s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
+        s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
 
         EXPECT_NEAR(s.SinAzim, 0.0, 1e-15);
         EXPECT_DOUBLE_EQ(s.CosAzim, -1.0);
