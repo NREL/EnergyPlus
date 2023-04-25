@@ -292,14 +292,12 @@ void VecRound(Vector &vec, Real64 const roundto)
     vec.z = nint64(vec.z * roundto) / roundto;
 }
 
-void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf,       // Surface Definition
-                             [[maybe_unused]] int const NSides, // Number of sides to surface
-                             Real64 &Azimuth,                   // Outward Normal Azimuth Angle
-                             Real64 &Tilt,                      // Tilt angle of surface
+void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf, // Surface Definition
+                             Real64 &Azimuth,             // Outward Normal Azimuth Angle
+                             Real64 &Tilt,                // Tilt angle of surface
                              Vector &lcsx,
                              Vector &lcsy,
                              Vector &lcsz,
-                             [[maybe_unused]] Real64 const surfaceArea,
                              Vector const &NewellSurfaceNormalVector)
 {
 
