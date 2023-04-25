@@ -354,8 +354,8 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     auto &eqheat = chillerHeaterSupervisor.HeatingOnlyEquipList(1).Comp(1);
     bool thisCoolEq1 = state->dataPlnt->PlantLoop(1).LoopSide(eqcool.LoopSideNumPtr).Branch(eqcool.BranchNumPtr).Comp(eqcool.CompNumPtr).ON;
     bool thisHeatEq1 = state->dataPlnt->PlantLoop(2).LoopSide(eqheat.LoopSideNumPtr).Branch(eqheat.BranchNumPtr).Comp(eqheat.CompNumPtr).ON;
-    EXPECT_FALSE(thisCoolEq1);
-    EXPECT_TRUE(thisHeatEq1); // heating equipment active
+    EXPECT_FALSE(thisCoolEq1); // cooling equipment is not active
+    EXPECT_TRUE(thisHeatEq1);  // heating equipment active
     EXPECT_EQ(state->dataPlnt->PlantLoop(1).Name, "Cooling Plant");
     EXPECT_EQ(state->dataPlnt->PlantLoop(2).Name, "Heating Plant");
 
@@ -387,8 +387,8 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.SensedHeatingLoad);
     bool thisCoolEq2 = state->dataPlnt->PlantLoop(1).LoopSide(eqcool.LoopSideNumPtr).Branch(eqcool.BranchNumPtr).Comp(eqcool.CompNumPtr).ON;
     bool thisHeatEq2 = state->dataPlnt->PlantLoop(2).LoopSide(eqheat.LoopSideNumPtr).Branch(eqheat.BranchNumPtr).Comp(eqheat.CompNumPtr).ON;
-    EXPECT_FALSE(thisHeatEq2);
-    EXPECT_TRUE(thisCoolEq2); // cooling equipment active
+    EXPECT_FALSE(thisHeatEq2); // heating equipment is not active
+    EXPECT_TRUE(thisCoolEq2);  // cooling equipment active
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(1)).OutputRequiredToHeatingSP = 100.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToHeatingSP = 200.0;
