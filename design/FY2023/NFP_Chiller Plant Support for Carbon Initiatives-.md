@@ -232,63 +232,80 @@ Updates to the HeatPump:PlantLoop:EIR:Heating object are shown below. New fields
 The new object used as a supervisory controller is shown here. The most notable input is the Zone Load Polling ZoneList Name input. A list of zone names associated with this plant loop pair is used to identify plant loads based on "polled" building zone loads and anticipated outdoor air loads. This method is chosen as an alternate to looking at actual plant loads, which can be hard to identify with complex plant topology. Regardless of the method, plant manager dispatch logic will determine which plant loop is active and which plant equipment will serve those loads.
 
     PlantEquipmentOperation:ChillerHeaterChangeover,
-       \memo Plant equipment operation object to control switchover between chiller
-       \memo and heater operation of chiller heater heat pump serving 2 plant loops. 
-       \memo Poll zone loads and determine if plant should be in heating, cooling
-       \memo or simultaneous heating and cooling and dispatch equipment accordingly.
-    A1 , \field Name
-         \required-field
-         \reference ControlSchemeList
-    N1 , \field Chilled Water Temperature Setpoint
-         \required-field
-         \type real
-         \units C
-    N2 , \field Hot Water Temperature Setpoint
-         \required-field
-         \type real
-         \units C
-    N3 , \field Hot Water Setpoint Reset Start Temperature
-         \required-field
-         \type real
-         \units C
-         \minimum -15.0
-         \maximum 35.0
-    N4 , \field Hot Water Setpoint Reset Maximum Temperature Difference
-         \required-field
-         \type real
-         \units deltaC
-         \minimum 0.0
-         \maximum 11.1
-         \note A blank input will result in a Hot Water Setpoint Reset Maximum Temperature Difference = 0
-    N5 , \field Hot Water Setpoint Reset Ratio
-         \type real
-         \units percent
-         \minimum -80
-         \maximum 80
-         \note A blank input will result in a How Water Setpoint Reset Ratio = 0
-    A2 , \field Zone Load Polling ZoneList Name
-         \type object-list
-         \object-list ZoneListNames
-    A3 , \field Cooling Only Load Plant Equipment Operation Cooling Load Name
-         \type object-list
-         \object-list ControlSchemeList
-    A4 , \field Heating Only Load Plant Equipment Operation Heating Load Name
-         \type object-list
-         \object-list ControlSchemeList
-    A5 , \field Simultaneous Cooling And Heating Plant Equipment Operation Cooling Load Name
-         \type object-list
-         \object-list ControlSchemeList
-    A6 , \field Simultaneous Cooling And Heating Plant Equipment Operation Heating Load Name
-         \type object-list
-         \object-list ControlSchemeList
-    A7 , \field Dedicated Chilled Water Return Recovery HeatPump Name
-         \type object-list
-         \object-list validPlantEquipmentNames
-         \note Enter name of HeatPump:PlantLoop:EIR:Cooling object to control chilled water return adding heat to hot water return
-    A8 ; \field Dedicated Hot Water Return Recovery HeatPump Name
-         \type object-list
-         \object-list validPlantEquipmentNames
-         \note Enter name of HeatPump:PlantLoop:EIR:Heating object to control hot water return cooling the chilled water return
+        \memo Plant equipment operation object to control switchover between chiller
+        \memo and heater operation of chiller heater heat pump serving 2 plant loops. 
+        \memo Poll zone loads and determine if plant should be in heating, cooling
+        \memo or simultaneous heating and cooling and dispatch equipment accordingly.
+    A1, \field Name
+        \required-field
+        \reference ControlSchemeList
+    N1, \field Primary Cooling Plant Setpoint Temperature
+        \required-field
+        \type real
+        \units C
+        \minimum -10.0
+        \maximum 20.0
+    N2, \field Secondary Distribution Cooling Plant Setpoint Temperature
+        \type real
+        \units C
+        \minimum  0.0
+        \maximum 20.0
+    N3, \field Primary Heating Plant Setpoint at Outdoor High Temperature
+        \note 
+        \required-field
+        \type real
+        \units C
+        \minimum 20.0
+        \maximum 80.0
+    N4, \field Outdoor High Temperature
+        \required-field
+        \type real
+        \units C
+        \minimum 0.0
+        \maximum 35.0
+    N5, \field Primary Heating Plant Setpoint at Outdoor Low Temperature
+        \required-field
+        \type real
+        \units C
+        \minimum 20.0
+        \maximum 80.0
+    N6, \field Outdoor Low Temperature
+        \required-field
+        \type real
+        \units C
+        \minimum -20.0
+        \maximum 35.0
+    N7, \field Secondary Distribution Heating Plant Setpoint Temperature
+        \type real
+        \units C
+        \minimum 20.0
+        \maximum 80.0
+    A2, \field Zone Load Polling ZoneList Name
+        \type object-list
+        \object-list ZoneListNames
+    A3, \field Cooling Only Load Plant Equipment Operation Cooling Load Name
+        \type object-list
+        \object-list ControlSchemeList
+    A4, \field Heating Only Load Plant Equipment Operation Heating Load Name
+        \type object-list
+        \object-list ControlSchemeList
+    A5, \field Simultaneous Cooling And Heating Plant Equipment Operation Cooling Load Name
+        \type object-list
+        \object-list ControlSchemeList
+    A6, \field Simultaneous Cooling And Heating Plant Equipment Operation Heating Load Name
+        \type object-list
+        \object-list ControlSchemeList
+    A7, \field Dedicated Chilled Water Return Recovery Heat Pump Name
+        \type object-list
+        \object-list validPlantEquipmentNames
+        \note enter name of HeatPump:PlantLoop:EIR:Cooling object to control chilled water return adding heat to hot water return
+    A8, \field Dedicated Hot Water Return Recovery Heat Pump Name
+        \type object-list
+        \object-list validPlantEquipmentNames
+        \note enter name of HeatPump:PlantLoop:EIR:Heating object to control hot water return cooling the chilled water return
+    N8; \field Dedicated Recovery Heat Pump Control Load Capacity Factor
+        \type real
+        \default 0.1
   
 
 ## Proposed additions to Meters:
@@ -377,26 +394,28 @@ A typical plant supervisory control system will include the existing plant equip
 
     PlantEquipmentOperation:ChillerHeaterChangeover,
       Two AWHP Operation Scheme ,            !- Name
-      4.44444444444444 ,                     !- Chilled Water Temperature Setpoint
-      48.8888888888889 ,                     !- Hot Water Temperature Setpoint
-      5.0 ,                  !- Hot Water Setpoint Reset Start Temperature
-      8.0 ,                  !- Hot Water Setpoint Reset Maximum Temperature Difference
-      50.0 ,                                 !- Hot Water Setpoint Reset Ratio
-      All Conditioned Zones served by Plant, !- Zone Load Polling ZoneList Name
-      Two AWHP Cooling Operation Scheme,     !- Cooling Only Load Plant Equipment
-                                                Operation Cooling Load Name
-      Two AWHP Heating Operation Scheme,     !- Heating Only Load Plant Equipment
-                                                Operation Heating Load Name
-      One AWHP Cooling Operation Scheme,     !- Simultaneous Cooling And Heating Plant
-                                                Equipment Operation Cooling Load Name
-      One AWHP Heating Operation Scheme,     !- Simultaneous Cooling And Heating Plant
-                                                Equipment Operation Heating Load Name
-      ,                                      !- Dedicated Chilled Water Return Recovery
-                                                HeatPump Name
-      ;                                      !- Dedicated Hot Water Return Recovery
-                                                HeatPump Name
+      4.44444444444444 ,                     !- Primary Cooling Plant Setpoint Temperature
+      4.8888888888889 ,                      !- Secondary Distribution Cooling Plant
+                                                  Setpoint Temperature
+      48.0 ,            !- Primary Heating Plant Setpoint at Outdoor High Temperature
+      36.0 ,            !- Outdoor High Temperature
+      56.0 ,            !- Primary Heating Plant Setpoint at Outdoor Low Temperature
+      -10.0 ,           !- Outdoor Low Temperature
+      54.0 ,            !- Secondary Distribution Heating Plant Setpoint Temperature
+      All Conditioned Zones,             !- Zone Load Polling ZoneList Name
+      Two AWHP Cooling Operation Scheme, !- Cooling Only Load Plant Equipment
+                                              Operation Cooling Load Name
+      Two AWHP Heating Operation Scheme, !- Heating Only Load Plant Equipment
+                                              Operation Heating Load Name
+      One AWHP Cooling Operation Scheme, !- Simultaneous Cooling And Heating Plant
+                                              Equipment Operation Cooling Load Name
+      One AWHP Heating Operation Scheme, !- Simultaneous Cooling And Heating Plant
+                                              Equipment Operation Heating Load Name
+      ,           !- Dedicated Chilled Water Return Recovery HeatPump Name
+      ,           !- Dedicated Hot Water Return Recovery HeatPump Name
+      ;           !- Dedicated Recovery Heat Pump Control Load Capacity Factor
 
-The controls model inlucdes inputs for 5 plant set point temperature inputs. The actual plant set point temperatures and inputs for resetting hot water plant set point. One supervisory controller would be used for each plant loop pair specified in the input.
+The controls model inlucdes inputs for primary and secondary plant set point temperature inputs. One supervisory controller would be used for each plant loop pair specified in the input.
 
 A truncated list of zones attached to this plant configuration:
 
@@ -430,7 +449,7 @@ And one example of a plant equipment operating scheme input:
       HeatPump:PlantLoop:EIR:Cooling,     !- Equipment 2 Object Type
       AWHP_2 Cooling Side;                !- Equipment 2 Name    
       
-The final 2 inputs of this new object holds the name of the chiller heater used for heat recovery between plant loops. The use of a heat recovery heat pump is anticipated to be included with this new feature development effort.
+The final 3 inputs of this new object holds the name of the chiller heater used for heat recovery between plant loops and a load factor where the heat recovery chiller heater is allowed to operate. The intention of this model is that the heat recovery chiller heater will meet low loads on one of the plants. When any primary equipment on that plant are active the heat recovery chiller heater is off. The use of a heat recovery heat pump is anticipated to be included with this new feature development effort.
 
 The supervisory class will reside in the unused source file EquipAndOperations.cc. The pointer to ChillerHeaterSupervisoryOperation will be added to state.
 
