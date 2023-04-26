@@ -710,7 +710,6 @@ void SimHVAC(EnergyPlusData &state)
     Real64 SlopeMdot;
     Real64 SlopeTemps;
     Real64 AvgValue;
-    bool FoundOscillationByDuplicate;
     int ZoneNum;
     bool MonotonicIncreaseFound;
     bool MonotonicDecreaseFound;
@@ -1168,7 +1167,7 @@ void SimHVAC(EnergyPlusData &state)
                         auto &inletTemp = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature;
 
                         // Check humidity ratio
-                        FoundOscillationByDuplicate = false;
+                        bool FoundOscillationByDuplicate = false;
                         MonotonicDecreaseFound = false;
                         MonotonicIncreaseFound = false;
                         // check for evidence of oscillation by identifying duplicates when latest value not equal to average
@@ -1429,6 +1428,7 @@ void SimHVAC(EnergyPlusData &state)
                 }     // loop over zones
 
                 for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+                    bool FoundOscillationByDuplicate;
 
                     if (state.dataConvergeParams->PlantConvergence(LoopNum).PlantMassFlowNotConverged) {
                         ShowContinueError(
