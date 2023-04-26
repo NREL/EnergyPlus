@@ -703,8 +703,6 @@ void SimHVAC(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool FirstHVACIteration; // True when solution technique on first iteration
-    int LoopNum;
-
     int AirSysNum;
     int StackDepth;
     std::string HistoryTrace;
@@ -714,7 +712,6 @@ void SimHVAC(EnergyPlusData &state)
     Real64 AvgValue;
     bool FoundOscillationByDuplicate;
     int ZoneNum;
-    int NodeIndex;
     bool MonotonicIncreaseFound;
     bool MonotonicDecreaseFound;
 
@@ -818,7 +815,7 @@ void SimHVAC(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 "SimHVAC");
-            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+            for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 // init plant sizing numbers in main plant data structure
                 InitOneTimePlantSizingInfo(state, LoopNum);
             }
@@ -982,7 +979,7 @@ void SimHVAC(EnergyPlusData &state)
     }
 
     // Test plant loop for errors
-    for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+    for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
         for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys) {
             CheckPlantMixerSplitterConsistency(state, LoopNum, LoopSide, FirstHVACIteration);
             CheckForRunawayPlantTemps(state, LoopNum, LoopSide);
@@ -1164,7 +1161,7 @@ void SimHVAC(EnergyPlusData &state)
                 // loop over zones and check for issues with zone inlet nodes
                 for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
-                    for (NodeIndex = 1; NodeIndex <= state.dataConvergeParams->ZoneInletConvergence(ZoneNum).NumInletNodes; ++NodeIndex) {
+                    for (int NodeIndex = 1; NodeIndex <= state.dataConvergeParams->ZoneInletConvergence(ZoneNum).NumInletNodes; ++NodeIndex) {
 
                         auto &humRatInletNode = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio;
                         auto &mdotInletNode = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate;
@@ -1431,7 +1428,7 @@ void SimHVAC(EnergyPlusData &state)
                     } // loop over zone inlet nodes
                 }     // loop over zones
 
-                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+                for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
 
                     if (state.dataConvergeParams->PlantConvergence(LoopNum).PlantMassFlowNotConverged) {
                         ShowContinueError(
