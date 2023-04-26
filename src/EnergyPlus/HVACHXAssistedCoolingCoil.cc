@@ -236,12 +236,6 @@ namespace HVACHXAssistedCoolingCoil {
         // METHODOLOGY EMPLOYED:
         //  Uses "Get" routines to read in data.
 
-        // Using/Aliasing
-        auto const &GetDXCoilInletNode(DXCoils::GetCoilInletNode);
-        auto const &GetDXCoilOutletNode(DXCoils::GetCoilOutletNode);
-        auto const &GetWaterCoilInletNode(WaterCoils::GetCoilInletNode);
-        auto const &GetWaterCoilOutletNode(WaterCoils::GetCoilOutletNode);
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetHXAssistedCoolingCoilInput: "); // include trailing blank space
 
@@ -502,7 +496,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                    "Coil:Cooling:DX:SingleSpeed")) {
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
-                CoolingCoilInletNodeNum = GetDXCoilInletNode(state,
+                CoolingCoilInletNodeNum = DXCoils::GetCoilInletNode(state,
                                                              state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
                                                              state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                                                              CoolingCoilErrFlag);
@@ -530,7 +524,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
                 CoolingCoilErrFlag = false;
-                CoolingCoilOutletNodeNum = GetDXCoilOutletNode(state,
+                CoolingCoilOutletNodeNum = DXCoils::GetCoilOutletNode(state,
                                                                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
                                                                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                                                                CoolingCoilErrFlag);
@@ -785,7 +779,7 @@ namespace HVACHXAssistedCoolingCoil {
 
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
-                CoolingCoilInletNodeNum = GetWaterCoilInletNode(state,
+                CoolingCoilInletNodeNum = WaterCoils::GetCoilInletNode(state,
                                                                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
                                                                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                                                                 CoolingCoilErrFlag);
@@ -823,7 +817,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
                 CoolingCoilErrFlag = false;
-                CoolingCoilOutletNodeNum = GetWaterCoilOutletNode(state,
+                CoolingCoilOutletNodeNum = WaterCoils::GetCoilOutletNode(state,
                                                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
                                                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                                                                   CoolingCoilErrFlag);
