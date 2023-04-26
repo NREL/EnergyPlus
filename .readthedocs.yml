@@ -5,4 +5,4 @@ sphinx:
 
 python:
   install:
-    - requirements: docs/readthedocs/requirements.txt
+    - requirements: doc/readthedocs/requirements.txt
