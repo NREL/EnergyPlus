@@ -1834,7 +1834,7 @@ void SimHVAC(EnergyPlusData &state)
         }
 
         if (state.dataCoilCooingDX->stillNeedToReportStandardRatings) {
-            if (!state.dataGlobal->ZoneSizingCalc && !state.dataGlobal->SysSizingCalc && !state.dataGlobal->WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 CoilCoolingDX::reportAllStandardRatings(state);
             }
         }
