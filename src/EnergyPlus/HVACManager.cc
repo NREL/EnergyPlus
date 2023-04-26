@@ -1887,17 +1887,11 @@ void SimSelectedEquipment(EnergyPlusData &state,
     using SimAirServingZones::ManageAirLoops;
     using ZoneEquipmentManager::ManageZoneEquipment;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    bool ResimulateAirZone; // True when solution technique on third iteration used in AirflowNetwork
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr MaxAir(5); // Iteration Max for Air Simulation Iterations
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int IterAir; // counts iterations to enforce maximum iteration limit
-
-    IterAir = 0;
+    int IterAir = 0;
 
     // Set all plant flow locks to UNLOCKED to allow air side components to operate properly
     // This requires that the plant flow resolver carefully set the min/max avail limits on
@@ -1950,7 +1944,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
         while ((SimAirLoops || SimZoneEquipment) && (IterAir <= MaxAir)) {
             ++IterAir; // Increment the iteration counter
             // Call AirflowNetwork simulation to calculate air flows and pressures
-            ResimulateAirZone = false;
+            bool ResimulateAirZone = false;
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 state.afn->manage_balance(FirstHVACIteration, IterAir, ResimulateAirZone);
             }
@@ -2202,13 +2196,13 @@ void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir) // TRUE means air 
     // METHODOLOGY EMPLOYED:
     // Checks if loop lockout flags are .TRUE.; if so, sets SimAirLoops to .TRUE.
 
-    auto &AirLoopControlInfo = state.dataAirLoop->AirLoopControlInfo;
-
     for (int AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
+        auto &airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo(AirLoopIndex);
+
         // check if economizer ia active and if there is a request that it be locked out
-        if (AirLoopControlInfo(AirLoopIndex).EconoActive &&
-            (AirLoopControlInfo(AirLoopIndex).ReqstEconoLockoutWithCompressor || AirLoopControlInfo(AirLoopIndex).ReqstEconoLockoutWithHeating)) {
-            AirLoopControlInfo(AirLoopIndex).EconoLockout = true;
+        if (airLoopControlInfo.EconoActive &&
+            (airLoopControlInfo.ReqstEconoLockoutWithCompressor || airLoopControlInfo.ReqstEconoLockoutWithHeating)) {
+            airLoopControlInfo.EconoLockout = true;
             SimAir = true;
         }
     }
@@ -2314,7 +2308,7 @@ void UpdateZoneListAndGroupLoads(EnergyPlusData &state)
     for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
         auto &zoneList = state.dataHeatBal->ZoneList(ListNum);
         for (ZoneNum = 1; ZoneNum <= zoneList.NumOfZones; ++ZoneNum) {
-            auto &zoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneList.Zone(ZoneNum));
+            auto const &zoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneList.Zone(ZoneNum));
             Mult = state.dataHeatBal->Zone(ZoneNum).Multiplier;
             state.dataHeatBal->ZoneListSNLoadHeatEnergy(ListNum) += zoneSysEnergyDemand.ZoneSNLoadHeatEnergy * Mult;
             state.dataHeatBal->ZoneListSNLoadCoolEnergy(ListNum) += zoneSysEnergyDemand.ZoneSNLoadCoolEnergy * Mult;
@@ -2367,7 +2361,7 @@ void ReportInfiltrations(EnergyPlusData &state)
 
         int NZ = thisInfiltration.ZonePtr;
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
-        auto &thisZone = state.dataHeatBal->Zone(NZ);
+        auto const &thisZone = state.dataHeatBal->Zone(NZ);
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(NZ)) ADSCorrectionFactor=0
@@ -2543,7 +2537,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
             znAirRpt.InfilHeatLoss = thisZoneHB.MCPI * (thisZoneHB.MAT - zone.OutDryBulbTemp) * TimeStepSysSec * ADSCorrectionFactor;
             znAirRpt.InfilHeatGain = 0.0;
 
-        } else if (thisZoneHB.MAT <= zone.OutDryBulbTemp) {
+        } else {
 
             znAirRpt.InfilHeatGain = thisZoneHB.MCPI * (zone.OutDryBulbTemp - thisZoneHB.MAT) * TimeStepSysSec * ADSCorrectionFactor;
             znAirRpt.InfilHeatLoss = 0.0;
@@ -2775,14 +2769,14 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                     }     // J-1, numref connections
                 }         // zone A (zoneptr = zoneloop)
                 for (int ZoneA = 1; ZoneA <= (ZoneLoop - 1); ++ZoneA) {
-                    auto &refDoorMixing = state.dataHeatBal->RefDoorMixing(ZoneA);
+                    auto &refDoorMixingA = state.dataHeatBal->RefDoorMixing(ZoneA);
                     auto const &zoneAHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneA);
                     //    Capture impact when zoneloop is the 'mating zone'
                     //    that is, the zone of a pair with the higher zone number(matezoneptr = zoneloop)
-                    if (refDoorMixing.RefDoorMixFlag) {
-                        for (int j = 1; j <= refDoorMixing.NumRefDoorConnections; ++j) {
-                            if (refDoorMixing.MateZonePtr(j) == ZoneLoop) {
-                                if (refDoorMixing.VolRefDoorFlowRate(j) > 0.0) {
+                    if (refDoorMixingA.RefDoorMixFlag) {
+                        for (int j = 1; j <= refDoorMixingA.NumRefDoorConnections; ++j) {
+                            if (refDoorMixingA.MateZonePtr(j) == ZoneLoop) {
+                                if (refDoorMixingA.VolRefDoorFlowRate(j) > 0.0) {
                                     AirDensity = PsyRhoAirFnPbTdbW(state,
                                                                    state.dataEnvrn->OutBaroPress,
                                                                    (thisZoneHB.MAT + zoneAHB.MAT) / 2.0,
@@ -2791,14 +2785,15 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                                     CpAir = PsyCpAirFnW((thisZoneHB.ZoneAirHumRat + zoneAHB.ZoneAirHumRat) / 2.0);
                                     H2OHtOfVap = PsyHgAirFnWTdb((thisZoneHB.ZoneAirHumRat + zoneAHB.ZoneAirHumRat) / 2.0,
                                                                 (thisZoneHB.MAT + zoneAHB.MAT) / 2.0);
-                                    znAirRpt.MixVolume += refDoorMixing.VolRefDoorFlowRate(j) * TimeStepSysSec * ADSCorrectionFactor;
-                                    znAirRpt.MixVdotCurDensity += refDoorMixing.VolRefDoorFlowRate(j) * ADSCorrectionFactor;
-                                    znAirRpt.MixMass += refDoorMixing.VolRefDoorFlowRate(j) * AirDensity * TimeStepSysSec * ADSCorrectionFactor;
-                                    znAirRpt.MixMdot += refDoorMixing.VolRefDoorFlowRate(j) * AirDensity * ADSCorrectionFactor;
+                                    znAirRpt.MixVolume += refDoorMixingA.VolRefDoorFlowRate(j) * TimeStepSysSec * ADSCorrectionFactor;
+                                    znAirRpt.MixVdotCurDensity += refDoorMixingA.VolRefDoorFlowRate(j) * ADSCorrectionFactor;
+                                    znAirRpt.MixMass += refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * TimeStepSysSec * ADSCorrectionFactor;
+                                    znAirRpt.MixMdot += refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * ADSCorrectionFactor;
                                     znAirRpt.MixVdotStdDensity +=
-                                        refDoorMixing.VolRefDoorFlowRate(j) * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
-                                    MixSenLoad(ZoneLoop) += refDoorMixing.VolRefDoorFlowRate(j) * AirDensity * CpAir * (thisZoneHB.MAT - zoneAHB.MAT);
-                                    MixLatLoad(ZoneLoop) += refDoorMixing.VolRefDoorFlowRate(j) * AirDensity *
+                                        refDoorMixingA.VolRefDoorFlowRate(j) * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
+                                    MixSenLoad(ZoneLoop) +=
+                                        refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * CpAir * (thisZoneHB.MAT - zoneAHB.MAT);
+                                    MixLatLoad(ZoneLoop) += refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity *
                                                             (thisZoneHB.ZoneAirHumRat - zoneAHB.ZoneAirHumRat) * H2OHtOfVap;
                                 } // volflowrate > 0
                             }     // matezoneptr (zoneB) = Zonelooop
@@ -2932,8 +2927,6 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleMaxValue;
 
-    bool CyclingFan(false); // TRUE means air loop operates in cycling fan mode at some point
-
     if (!state.dataHVACGlobal->AirLoopsSimOnce) return;
 
     if (state.dataHVACMgr->MyOneTimeFlag) {
@@ -2974,7 +2967,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
         for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
             auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum);
             if (!zoneEquipConfig.IsControlled) continue;
-            CyclingFan = false;
+            bool CyclingFan = false; // TRUE means air loop operates in cycling fan mode at some point
             for (int zoneInNode = 1; zoneInNode <= zoneEquipConfig.NumInletNodes; ++zoneInNode) {
                 int AirLoopNum = zoneEquipConfig.InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
