@@ -2096,8 +2096,6 @@ void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir) // TRUE means air 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   December 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine checks for components lockout flags and asks for air loop resimulation
@@ -2124,8 +2122,6 @@ void ResetHVACControl(const EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   December 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine resets loop control flags and specified flow rates that may
@@ -2147,8 +2143,6 @@ void ResetNodeData(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine resets all node data to "initial" conditions.
@@ -2191,9 +2185,6 @@ void ResetNodeData(EnergyPlusData &state)
 
 void UpdateZoneListAndGroupLoads(EnergyPlusData &state)
 {
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Apparently someone who doesn't believe in documenting.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ZoneNum;
@@ -2239,10 +2230,6 @@ void ReportInfiltrations(EnergyPlusData &state)
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine currently creates the values for standard Infiltration object level reporting
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static std::string const RoutineName("ReportInfiltrations");
@@ -2816,10 +2803,9 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Uses program data structures AirLoopControlInfo and ZoneEquipInfo
 
-    // Using/Aliasing
-    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-
     if (!state.dataHVACGlobal->AirLoopsSimOnce) return;
+
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     if (state.dataHVACMgr->MyOneTimeFlag) {
         // set the air loop Any Continuous Fan flag
