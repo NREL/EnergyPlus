@@ -778,8 +778,7 @@ void SimHVAC(EnergyPlusData &state)
 
     ResetHVACControl(state);
 
-    // Before the HVAC simulation, call ManageSetPoints to set all the HVAC
-    // node setpoints
+    // Before the HVAC simulation, call ManageSetPoints to set all the HVAC node setpoints
     bool anyEMSRan = false;
     EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::BeforeHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
@@ -788,8 +787,7 @@ void SimHVAC(EnergyPlusData &state)
     // re-initialize plant loop and nodes.
     PlantManager::ReInitPlantLoopsAtFirstHVACIteration(state);
 
-    // Before the HVAC simulation, call ManageSystemAvailability to set
-    // the system on/off flags
+    // Before the HVAC simulation, call ManageSystemAvailability to set the system on/off flags
     SystemAvailabilityManager::ManageSystemAvailability(state);
 
     EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::AfterHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
@@ -1808,8 +1806,6 @@ void SimSelectedEquipment(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Russ Taylor, Rick Strand
     //       DATE WRITTEN   May 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine receives the flags from SimHVAC which determines
@@ -1947,8 +1943,6 @@ void ResetTerminalUnitFlowLimits(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   Feb 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Reset the max flow available limits at the inlet nodes of terminal units
@@ -1958,23 +1952,17 @@ void ResetTerminalUnitFlowLimits(EnergyPlusData &state)
     // served by each air loop, and resets the node MassFlowRateMaxAvail (and MinAvail) to
     // the hard max and mins.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int AirLoopIndex;
-    int ZonesCooledIndex;
-    int ZonesHeatedIndex;
-    int TermInletNode;
-
-    for (AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
-        for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled;
+    for (int AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
+        for (int ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled;
              ++ZonesCooledIndex) { // loop over the zones cooled by this air loop
-            TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
+            int TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
             // reset the max avail flow rate at the terminal unit cold air inlet to the max
             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMax;
             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMin;
         }
-        for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated;
+        for (int ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated;
              ++ZonesHeatedIndex) { // loop over the zones heated by this air loop
-            TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
+            int TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
             // reset the max avail flow rate at the terminal unit hot air inlet to the max
             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMax;
             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMin;
@@ -1988,7 +1976,6 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   August 2003
-    //       MODIFIED       na
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -2000,31 +1987,23 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
     // Sets the MassFlowRateMaxAvail on the terminal unit inlet nodes to match the
     // maximum available from the primary air loop.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int AirLoopIndex;
-    int ZonesCooledIndex;
-    int ZonesHeatedIndex;
-    int TermInletNode;
-    int SupplyIndex;
-    int SupplyNode;
-    Real64 FlowRatio;
-
-    for (AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
+    for (int AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
 
         auto &AirToZoneNodeInfo = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex);
 
-        for (SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {           // loop over the air loop supply outlets
+        for (int SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {       // loop over the air loop supply outlets
             if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == DataHVACGlobals::AirDuctType::Cooling) { // check for cooling duct
                 // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                 // node mass flow max avail to what air loop can supply
-                SupplyNode = AirToZoneNodeInfo.AirLoopSupplyNodeNum(SupplyIndex);
+                int SupplyNode = AirToZoneNodeInfo.AirLoopSupplyNodeNum(SupplyIndex);
                 if (state.dataLoopNodes->Node(SupplyNode).MassFlowRate > 0.0) {
                     // must include bypass flow for ChangeoverBypass system so that terminal units are not restricted (e.g., MaxAvail is lowered)
                     if ((state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint - state.dataLoopNodes->Node(SupplyNode).MassFlowRate -
                          state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) > DataConvergParams::HVACFlowRateToler * 0.01) {
-                        FlowRatio = state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
-                        for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo.NumZonesCooled; ++ZonesCooledIndex) {
-                            TermInletNode = AirToZoneNodeInfo.TermUnitCoolInletNodes(ZonesCooledIndex);
+                        Real64 FlowRatio =
+                            state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
+                        for (int ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo.NumZonesCooled; ++ZonesCooledIndex) {
+                            int TermInletNode = AirToZoneNodeInfo.TermUnitCoolInletNodes(ZonesCooledIndex);
                             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRate * FlowRatio;
                             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
@@ -2038,18 +2017,18 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
                             //               CALL ShowFatalError('ResolveAirLoopFlowLimits: Node MassFlowRateSetPoint = 0.0, Node='//  &
                             //                                   TRIM(state.dataLoopNodes->NodeID(SupplyNode))//  &
                             //                                   ', check for Node Connection Errors in the following messages.')
-                            for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo.NumZonesCooled; ++ZonesCooledIndex) {
-                                TermInletNode = AirToZoneNodeInfo.TermUnitCoolInletNodes(ZonesCooledIndex);
+                            for (int ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo.NumZonesCooled; ++ZonesCooledIndex) {
+                                int TermInletNode = AirToZoneNodeInfo.TermUnitCoolInletNodes(ZonesCooledIndex);
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
                                     state.dataLoopNodes->Node(TermInletNode).MassFlowRateMax;
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
                                     state.dataLoopNodes->Node(SupplyNode).MassFlowRate / double(AirToZoneNodeInfo.NumZonesCooled);
                             }
                         } else {
-                            FlowRatio =
+                            Real64 FlowRatio =
                                 state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
-                            for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo.NumZonesCooled; ++ZonesCooledIndex) {
-                                TermInletNode = AirToZoneNodeInfo.TermUnitCoolInletNodes(ZonesCooledIndex);
+                            for (int ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo.NumZonesCooled; ++ZonesCooledIndex) {
+                                int TermInletNode = AirToZoneNodeInfo.TermUnitCoolInletNodes(ZonesCooledIndex);
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
                                     state.dataLoopNodes->Node(TermInletNode).MassFlowRate * FlowRatio;
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
@@ -2061,18 +2040,19 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
                 }
             }
         }
-        for (SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {           // loop over the air loop supply outlets
+        for (int SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {       // loop over the air loop supply outlets
             if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == DataHVACGlobals::AirDuctType::Heating) { // check for heating duct
                 // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                 // node mass flow max avail to what air loop can supply
-                SupplyNode = AirToZoneNodeInfo.AirLoopSupplyNodeNum(SupplyIndex);
+                int SupplyNode = AirToZoneNodeInfo.AirLoopSupplyNodeNum(SupplyIndex);
                 if (state.dataLoopNodes->Node(SupplyNode).MassFlowRate > 0.0) {
                     // must include bypass flow for ChangeoverBypass system so that terminal units are not restricted (e.g., MaxAvail is lowered)
                     if ((state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint - state.dataLoopNodes->Node(SupplyNode).MassFlowRate -
                          state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) > DataConvergParams::HVACFlowRateToler * 0.01) {
-                        FlowRatio = state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
-                        for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo.NumZonesHeated; ++ZonesHeatedIndex) {
-                            TermInletNode = AirToZoneNodeInfo.TermUnitHeatInletNodes(ZonesHeatedIndex);
+                        Real64 FlowRatio =
+                            state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
+                        for (int ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo.NumZonesHeated; ++ZonesHeatedIndex) {
+                            int TermInletNode = AirToZoneNodeInfo.TermUnitHeatInletNodes(ZonesHeatedIndex);
                             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRate * FlowRatio;
                             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
@@ -2084,18 +2064,18 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
                          state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) < -DataConvergParams::HVACFlowRateToler * 0.01) {
                         if (state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
                             // ', check for Node Connection Errors in the following messages.')
-                            for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo.NumZonesHeated; ++ZonesHeatedIndex) {
-                                TermInletNode = AirToZoneNodeInfo.TermUnitHeatInletNodes(ZonesHeatedIndex);
+                            for (int ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo.NumZonesHeated; ++ZonesHeatedIndex) {
+                                int TermInletNode = AirToZoneNodeInfo.TermUnitHeatInletNodes(ZonesHeatedIndex);
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
                                     state.dataLoopNodes->Node(TermInletNode).MassFlowRateMax;
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
                                     state.dataLoopNodes->Node(SupplyNode).MassFlowRate / double(AirToZoneNodeInfo.NumZonesCooled);
                             }
                         } else {
-                            FlowRatio =
+                            Real64 FlowRatio =
                                 state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
-                            for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo.NumZonesHeated; ++ZonesHeatedIndex) {
-                                TermInletNode = AirToZoneNodeInfo.TermUnitHeatInletNodes(ZonesHeatedIndex);
+                            for (int ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo.NumZonesHeated; ++ZonesHeatedIndex) {
+                                int TermInletNode = AirToZoneNodeInfo.TermUnitHeatInletNodes(ZonesHeatedIndex);
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
                                     state.dataLoopNodes->Node(TermInletNode).MassFlowRate * FlowRatio;
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
