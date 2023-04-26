@@ -51,6 +51,7 @@
 // EnergyPlus Headers
 #include "../Coils/CoilCoolingDXFixture.hh"
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -208,4 +209,64 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing)
     }
 
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
+}
+
+TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
+{
+    std::string idf_objects = delimited_string(
+        {"Coil:Cooling:DX,",
+         "  Coil Cooling DX 1,                      !- Name",
+         "  Air Loop HVAC Unitary System 5 Fan - Cooling Coil Node, !- Evaporator Inlet Node Name",
+         "  Air Loop HVAC Unitary System 5 Cooling Coil - Heating Coil Node, !- Evaporator Outlet Node Name",
+         "  ,                                       !- Availability Schedule Name",
+         "  ,                                       !- Condenser Zone Name",
+         "  Coil Cooling DX 1 Condenser Inlet Node, !- Condenser Inlet Node Name",
+         "  Coil Cooling DX 1 Condenser Outlet Node, !- Condenser Outlet Node Name",
+         "  Coil Cooling DX Curve Fit Performance 1; !- Performance Object Name",
+
+         "Coil:Cooling:DX:CurveFit:Performance,",
+         "  Coil Cooling DX Curve Fit Performance 1, !- Name",
+         "  0,                                      !- Crankcase Heater Capacity {W}",
+         "  -25,                                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+         "  10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+         "  773.3,                                  !- Unit Internal Static Air Pressure {Pa}",
+         "  Discrete,                               !- Capacity Control Method",
+         "  0,                                      !- Evaporative Condenser Basin Heater Capacity {W/K}",
+         "  2,                                      !- Evaporative Condenser Basin Heater Setpoint Temperature {C}",
+         "  ,                                       !- Evaporative Condenser Basin Heater Operating Schedule Name",
+         "  Electricity,                            !- Compressor Fuel Type",
+         "  Coil Cooling DX Curve Fit Operating Mode 1, !- Base Operating Mode",
+         ",",
+         ",",
+         "heaterCapCurve;          !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+
+         "Curve:Linear,",
+         "heaterCapCurve,          !- Name",
+         "10.0,                    !- Coefficient1 Constant",
+         "2.,                      !- Coefficient2 x",
+         "10.0,                    !- Minimum Value of x",
+         "70;                      !- Maximum Value of x",
+
+         "Coil:Cooling:DX:CurveFit:OperatingMode,",
+         "  Coil Cooling DX Curve Fit Operating Mode 1, !- Name",
+         "  Autosize,                               !- Rated Gross Total Cooling Capacity {W}",
+         "  Autosize,                                    !- Rated Evaporator Air Flow Rate {m3/s}",
+         "  Autosize,                               !- Rated Condenser Air Flow Rate {m3/s}",
+         "  0,                                      !- Maximum Cycling Rate {cycles/hr}",
+         "  0,                                      !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+         "  0,                                      !- Latent Capacity Time Constant {s}",
+         "  0,                                      !- Nominal Time for Condensate Removal to Begin {s}",
+         "  No,                                     !- Apply Latent Degradation to Speeds Greater than 1",
+         "  EvaporativelyCooled,                    !- Condenser Type",
+         "  Autosize,                               !- Nominal Evaporative Condenser Pump Power {W}",
+         "  1,                                      !- Nominal Speed Number",
+         "  Coil Cooling DX Curve Fit Speed 1;      !- Speed Name 1"});
+
+    idf_objects += this->getSpeedObjectString("Coil Cooling DX Curve Fit Speed 1");
+    EXPECT_TRUE(process_idf(idf_objects, false));
+    int coilIndex = CoilCoolingDX::factory(*state, "Coil Cooling DX 1");
+    auto const &thisCoil(state->dataCoilCooingDX->coilCoolingDXs[coilIndex]);
+    EXPECT_EQ("COIL COOLING DX 1", thisCoil.name);
+    EXPECT_EQ("COIL COOLING DX CURVE FIT PERFORMANCE 1", thisCoil.performance.name);
+    EXPECT_EQ("HEATERCAPCURVE", Curve::GetCurveName(*state, thisCoil.performance.crankcaseHeaterCapacityCurveIndex));
 }

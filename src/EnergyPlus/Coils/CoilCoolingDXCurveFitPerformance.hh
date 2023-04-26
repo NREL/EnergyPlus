@@ -75,6 +75,7 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
     std::string base_operating_mode_name;
     std::string alternate_operating_mode_name;
     std::string alternate_operating_mode2_name;
+    std::string outdoor_temperature_dependent_crankcase_heater_capacity_curve_name;
     std::string capacity_control;
 };
 
@@ -117,6 +118,7 @@ struct CoilCoolingDXCurveFitPerformance
     std::string name;
     Real64 crankcaseHeaterCap = 0.0;
     Real64 crankcaseHeaterPower = 0.0;
+    Real64 crankcaseHeaterCapacityCurveIndex = 0.0;
     Real64 crankcaseHeaterElectricityConsumption = 0.0;
     Real64 minOutdoorDrybulb = 0.0;
     Real64 maxOutdoorDrybulbForBasin = 0.0;

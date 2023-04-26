@@ -1362,6 +1362,10 @@ void GetDXCoils(EnergyPlusData &state)
                 ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(18), Alphas(18)));
             }
         }
+        // A19; \field Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+        if (!lAlphaBlanks(19)) {
+            thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(19));
+        }
 
     } // end of the Doe2 DX coil loop
 
@@ -1909,6 +1913,10 @@ void GetDXCoils(EnergyPlusData &state)
                 ShowContinueError(state, "Basin heater will be available to operate throughout the simulation.");
             }
         }
+        // A16; \field Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+        if (!lAlphaBlanks(16)) {
+            thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(16));
+        }
 
     } // end of the Multimode DX coil loop
 
@@ -2359,6 +2367,10 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(16), Alphas(16)));
                 }
             }
+        }
+        // A17; \field Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+        if (!lAlphaBlanks(17)) {
+            thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(17));
         }
 
     } // end of the DX heating coil loop
@@ -4349,6 +4361,9 @@ void GetDXCoils(EnergyPlusData &state)
                 ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(37), Alphas(37)));
             }
         }
+        if (!lAlphaBlanks(38)) {
+            thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(38));
+        }
     }
 
     if (ErrorsFound) {
@@ -4844,6 +4859,9 @@ void GetDXCoils(EnergyPlusData &state)
                     }
                 }
             }
+        }
+        if (!lAlphaBlanks(43)) {
+            thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(43));
         }
     }
 

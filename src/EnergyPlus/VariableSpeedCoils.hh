@@ -210,6 +210,7 @@ namespace VariableSpeedCoils {
         bool ReportCoolingCoilCrankcasePower; // logical determines if the cooling coil crankcase heater power is reported
         Real64 CrankcaseHeaterCapacity;       // total crankcase heater capacity [W]
         Real64 CrankcaseHeaterPower;          // report variable for average crankcase heater power [W]
+        int CrankcaseHeaterCapacityCurveIndex; // Crankcase heater power-temperature curve or table index
         Real64 MaxOATCrankcaseHeater;         // maximum OAT for crankcase heater operation [C]
         Real64 CrankcaseHeaterConsumption;    // report variable for total crankcase heater energy consumption [J]
         // condenser evaporative precooling
@@ -304,7 +305,7 @@ namespace VariableSpeedCoils {
               MSWHPumpPowerPerRatedTotCap(DataHVACGlobals::MaxSpeedLevels, 0.0), SpeedNumReport(0.0), SpeedRatioReport(0.0), DefrostStrategy(0),
               DefrostControl(0), EIRFPLR(0), DefrostEIRFT(0), MinOATCompressor(0.0), OATempCompressorOn(0.0), MaxOATDefrost(0.0), DefrostTime(0.0),
               DefrostCapacity(0.0), HPCompressorRuntime(0.0), HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0),
-              DefrostConsumption(0.0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0),
+              DefrostConsumption(0.0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0), CrankcaseHeaterCapacityCurveIndex(0),
               MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0), CondenserInletNodeNum(0),
               CondenserType(DataHeatBalance::RefrigCondenserType::Air), ReportEvapCondVars(false), EvapCondPumpElecNomPower(0.0),
               EvapCondPumpElecPower(0.0), EvapWaterConsumpRate(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsump(0.0),

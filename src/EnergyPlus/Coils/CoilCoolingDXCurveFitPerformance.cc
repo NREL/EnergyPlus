@@ -124,6 +124,10 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
         setOperMode(state, this->alternateMode2, 3);
     }
 
+    if (!input_data.outdoor_temperature_dependent_crankcase_heater_capacity_curve_name.empty()) {
+        this->crankcaseHeaterCapacityCurveIndex =
+            Curve::GetCurveIndex(state, input_data.outdoor_temperature_dependent_crankcase_heater_capacity_curve_name);
+    }
     if (errorsFound) {
         ShowFatalError(
             state, std::string{routineName} + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
@@ -178,6 +182,9 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
         }
         if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
             input_specs.alternate_operating_mode2_name = state.dataIPShortCut->cAlphaArgs(7);
+        }
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+            input_specs.outdoor_temperature_dependent_crankcase_heater_capacity_curve_name = state.dataIPShortCut->cAlphaArgs(8);
         }
 
         this->instantiateFromInputSpec(state, input_specs);
