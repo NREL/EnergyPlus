@@ -39,27 +39,24 @@ pygments_style = None
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = 'sphinx_rtd_theme'
-html_logo = '../../../release/favicon.png'
+html_logo = '../../../release/favicon_white_plus.png'
 html_show_sphinx = False
 html_show_copyright = True
 html_extra_path = ['_build_c']
 html_static_path = ['_static']
 html_css_files = [
-    'https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css',
     'main.css',
 ]
 html_js_files = [
     'https://code.jquery.com/jquery-1.11.2.min.js',
-    'https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js',
     'main.js',
 ]
 extra_nav_links = {
     'Blah': 'https://energyplus.net'
 }
-# templates_path = ['.templates']
+templates_path = ['.templates']
 html_theme_options = {
     "titles_only": True,
-    'style_nav_header_background': '#343131',
 }
 # html_sidebars = {
 #     '**': [
