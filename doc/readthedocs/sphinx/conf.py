@@ -49,7 +49,7 @@ html_css_files = [
     'main.css',
 ]
 html_js_files = [
-    'http://code.jquery.com/jquery-1.11.2.min.js',
+    'https://code.jquery.com/jquery-1.11.2.min.js',
     'https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js',
     'main.js',
 ]
