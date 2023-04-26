@@ -1,4 +1,4 @@
-EnergyPlus epJSON Input Schema
+EnergyPlus EpJSON Input Schema
 ------------------------------
 
 The EnergyPlus input syntax is changing from IDD/IDF to epJSON.
@@ -17,6 +17,6 @@ Icon Legend:
 
 .. raw:: html
 
-   <h1 id="header">Object Filter</h1>
+   <input id="objectFilter" type="input" class="form__field" placeholder="Filter Objects by Name"/>
 
 {REPLACE_ME}

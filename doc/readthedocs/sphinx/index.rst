@@ -6,7 +6,7 @@ For now that is primarily the documentation of our growing API.
 Over time, that scope may grow much further.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    faq

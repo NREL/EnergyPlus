@@ -1,24 +1,24 @@
 (function ($) {
-    function listFilter(header) { // header is any element, list is an unordered list
-        // create and add the filter form to the header
-        const form = $("<form>").attr({"class": "filterform", "action": "#"});
-        const input = $("<input>").attr({"class": "filterinput", "type": "text"});
-        $(form).append(input).appendTo(header);
-
-        $(input)
+    function listFilter() { // header is any element, list is an unordered list
+        const objectFilter = $("#objectFilter")
+        objectFilter
             .change(function () {
-                const filter = $(this).val();
+                const filter = $(this).val().toUpperCase();
                 const listItems = $(".special");
-                listItems.each(function (idx, li) {
-                    const thisOne = $(li)[0];
-                    if (filter === "") {
+                if (filter === "") {
+                    listItems.each(function (idx, li) {
                         $(li).show();
-                    } else if (thisOne.children[0].innerText.includes(filter)) {
-                        $(li).show();
-                    } else {
-                        $(li).hide();
-                    }
-                });
+                    });
+                } else {
+                    listItems.each(function (idx, li) {
+                        const thisOne = $(li)[0];
+                        if (thisOne.children[0].innerText.toUpperCase().includes(filter)) {
+                            $(li).show();
+                        } else {
+                            $(li).hide();
+                        }
+                    });
+                }
                 return false;
             })
             .keyup(function () {
@@ -26,7 +26,8 @@
                 $(this).change();
             });
     }
+
     $(function () {
-        listFilter($("#header"));
+        listFilter();
     });
 }(jQuery));
