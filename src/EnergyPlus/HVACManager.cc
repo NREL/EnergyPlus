@@ -146,22 +146,6 @@ void ManageHVAC(EnergyPlusData &state)
     //  manage calls to Predictor and Corrector and other updates in ZoneTempPredictorCorrector
     //  manage variable time step and when zone air histories are updated.
 
-    // Using/Aliasing
-    using PollutionModule::CalculatePollution;
-    using RefrigeratedCase::ManageRefrigeratedCaseRacks;
-    using ScheduleManager::GetCurrentScheduleValue;
-    using SizingManager::UpdateFacilitySizing;
-    using SystemAvailabilityManager::ManageHybridVentilation;
-    using SystemReports::InitEnergyReports;
-    using SystemReports::ReportSystemEnergyUse;
-    using WaterManager::ManageWater;
-    using WaterManager::ManageWaterInits;
-    using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
-    using ZoneEquipmentManager::CalcAirFlowSimple;
-    using ZoneEquipmentManager::UpdateZoneSizing;
-    using ZoneTempPredictorCorrector::DetectOscillatingZoneTemp;
-    using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view EndOfHeaderString("End of Data Dictionary");                          // End of data dictionary marker
     static constexpr std::string_view EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
@@ -195,12 +179,13 @@ void ManageHVAC(EnergyPlusData &state)
     state.dataHeatBalFanSys->ZoneThermostatSetPointLoAver = 0.0;
     state.dataHVACMgr->PrintedWarmup = false;
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
+        state.dataContaminantBalance->OutdoorCO2 =
+            ScheduleManager::GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
         state.dataContaminantBalance->ZoneAirCO2Avg = 0.0;
     }
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
         state.dataContaminantBalance->OutdoorGC =
-            GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr);
+            ScheduleManager::GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr);
         if (allocated(state.dataContaminantBalance->ZoneAirGCAvg)) state.dataContaminantBalance->ZoneAirGCAvg = 0.0;
     }
 
@@ -231,25 +216,25 @@ void ManageHVAC(EnergyPlusData &state)
 
     OutAirNodeManager::SetOutAirNodes(state);
 
-    ManageRefrigeratedCaseRacks(state);
+    RefrigeratedCase::ManageRefrigeratedCaseRacks(state);
 
     // ZONE INITIALIZATION  'Get Zone Setpoints'
-    ManageZoneAirUpdates(state,
-                         DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints,
-                         ZoneTempChange,
-                         state.dataHVACGlobal->ShortenTimeStepSys,
-                         state.dataHVACGlobal->UseZoneTimeStepHistory,
-                         PriorTimeStep);
+    ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                     DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints,
+                                                     ZoneTempChange,
+                                                     state.dataHVACGlobal->ShortenTimeStepSys,
+                                                     state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                     PriorTimeStep);
     if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-        ManageZoneContaminanUpdates(state,
-                                    DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints,
-                                    state.dataHVACGlobal->ShortenTimeStepSys,
-                                    state.dataHVACGlobal->UseZoneTimeStepHistory,
-                                    PriorTimeStep);
+        ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                       DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints,
+                                                                       state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                       state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                       PriorTimeStep);
 
-    ManageHybridVentilation(state);
+    SystemAvailabilityManager::ManageHybridVentilation(state);
 
-    CalcAirFlowSimple(state);
+    ZoneEquipmentManager::CalcAirFlowSimple(state);
     if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
         state.afn->RollBackFlag = false;
         state.afn->manage_balance(false);
@@ -271,19 +256,19 @@ void ManageHVAC(EnergyPlusData &state)
 
     InternalHeatGains::UpdateInternalGainValues(state, true, true);
 
-    ManageZoneAirUpdates(state,
-                         DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
-                         ZoneTempChange,
-                         state.dataHVACGlobal->ShortenTimeStepSys,
-                         state.dataHVACGlobal->UseZoneTimeStepHistory,
-                         PriorTimeStep);
+    ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                     DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
+                                                     ZoneTempChange,
+                                                     state.dataHVACGlobal->ShortenTimeStepSys,
+                                                     state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                     PriorTimeStep);
 
     if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-        ManageZoneContaminanUpdates(state,
-                                    DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
-                                    state.dataHVACGlobal->ShortenTimeStepSys,
-                                    state.dataHVACGlobal->UseZoneTimeStepHistory,
-                                    PriorTimeStep);
+        ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                       DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
+                                                                       state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                       state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                       PriorTimeStep);
 
     SimHVAC(state);
 
@@ -294,7 +279,7 @@ void ManageHVAC(EnergyPlusData &state)
         }
     }
 
-    ManageWaterInits(state);
+    WaterManager::ManageWaterInits(state);
 
     // Only simulate once per zone timestep; must be after SimHVAC
     if (state.dataHVACGlobal->FirstTimeStepSysFlag && state.dataGlobal->MetersHaveBeenInitialized) {
@@ -303,18 +288,18 @@ void ManageHVAC(EnergyPlusData &state)
 
     state.dataGlobal->BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
 
-    ManageZoneAirUpdates(state,
-                         DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
-                         ZoneTempChange,
-                         state.dataHVACGlobal->ShortenTimeStepSys,
-                         state.dataHVACGlobal->UseZoneTimeStepHistory,
-                         PriorTimeStep);
+    ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                     DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
+                                                     ZoneTempChange,
+                                                     state.dataHVACGlobal->ShortenTimeStepSys,
+                                                     state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                     PriorTimeStep);
     if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-        ManageZoneContaminanUpdates(state,
-                                    DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
-                                    state.dataHVACGlobal->ShortenTimeStepSys,
-                                    state.dataHVACGlobal->UseZoneTimeStepHistory,
-                                    PriorTimeStep);
+        ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                       DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
+                                                                       state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                       state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                       PriorTimeStep);
 
     if (ZoneTempChange > state.dataConvergeParams->MaxZoneTempDiff && !state.dataGlobal->KickOffSimulation) {
         // determine value of adaptive system time step
@@ -341,8 +326,8 @@ void ManageHVAC(EnergyPlusData &state)
 
         if (state.dataHVACGlobal->TimeStepSys < state.dataGlobal->TimeStepZone) {
 
-            ManageHybridVentilation(state);
-            CalcAirFlowSimple(state, SysTimestepLoop);
+            SystemAvailabilityManager::ManageHybridVentilation(state);
+            ZoneEquipmentManager::CalcAirFlowSimple(state, SysTimestepLoop);
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 state.afn->RollBackFlag = false;
                 state.afn->manage_balance(false);
@@ -350,19 +335,19 @@ void ManageHVAC(EnergyPlusData &state)
 
             InternalHeatGains::UpdateInternalGainValues(state, true, true);
 
-            ManageZoneAirUpdates(state,
-                                 DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
-                                 ZoneTempChange,
-                                 state.dataHVACGlobal->ShortenTimeStepSys,
-                                 state.dataHVACGlobal->UseZoneTimeStepHistory,
-                                 PriorTimeStep);
+            ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                             DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
+                                                             ZoneTempChange,
+                                                             state.dataHVACGlobal->ShortenTimeStepSys,
+                                                             state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                             PriorTimeStep);
 
             if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-                ManageZoneContaminanUpdates(state,
-                                            DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
-                                            state.dataHVACGlobal->ShortenTimeStepSys,
-                                            state.dataHVACGlobal->UseZoneTimeStepHistory,
-                                            PriorTimeStep);
+                ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                               DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
+                                                                               state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                               state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                               PriorTimeStep);
             SimHVAC(state);
 
             if (state.dataGlobal->AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
@@ -372,36 +357,36 @@ void ManageHVAC(EnergyPlusData &state)
                 }
             }
 
-            ManageWaterInits(state);
+            WaterManager::ManageWaterInits(state);
 
             // Need to set the flag back since we do not need to shift the temps back again in the correct step.
             state.dataHVACGlobal->ShortenTimeStepSys = false;
 
-            ManageZoneAirUpdates(state,
-                                 DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
-                                 ZoneTempChange,
-                                 state.dataHVACGlobal->ShortenTimeStepSys,
-                                 state.dataHVACGlobal->UseZoneTimeStepHistory,
-                                 PriorTimeStep);
+            ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                             DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
+                                                             ZoneTempChange,
+                                                             state.dataHVACGlobal->ShortenTimeStepSys,
+                                                             state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                             PriorTimeStep);
             if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-                ManageZoneContaminanUpdates(state,
-                                            DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
-                                            state.dataHVACGlobal->ShortenTimeStepSys,
-                                            state.dataHVACGlobal->UseZoneTimeStepHistory,
-                                            PriorTimeStep);
+                ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                               DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
+                                                                               state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                               state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                               PriorTimeStep);
 
-            ManageZoneAirUpdates(state,
-                                 DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories,
-                                 ZoneTempChange,
-                                 state.dataHVACGlobal->ShortenTimeStepSys,
-                                 state.dataHVACGlobal->UseZoneTimeStepHistory,
-                                 PriorTimeStep);
+            ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                             DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories,
+                                                             ZoneTempChange,
+                                                             state.dataHVACGlobal->ShortenTimeStepSys,
+                                                             state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                             PriorTimeStep);
             if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-                ManageZoneContaminanUpdates(state,
-                                            DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories,
-                                            state.dataHVACGlobal->ShortenTimeStepSys,
-                                            state.dataHVACGlobal->UseZoneTimeStepHistory,
-                                            PriorTimeStep);
+                ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                               DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories,
+                                                                               state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                               state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                               PriorTimeStep);
             state.dataHVACGlobal->PreviousTimeStep = state.dataHVACGlobal->TimeStepSys;
         }
 
@@ -432,10 +417,10 @@ void ManageHVAC(EnergyPlusData &state)
             }
         }
 
-        DetectOscillatingZoneTemp(state);
+        ZoneTempPredictorCorrector::DetectOscillatingZoneTemp(state);
         UpdateZoneListAndGroupLoads(state);           // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
         IceThermalStorage::UpdateIceFractions(state); // Update fraction of ice stored in TES
-        ManageWater(state);
+        WaterManager::ManageWater(state);
         // update electricity data for net, purchased, sold etc.
         bool DummyLogical = false;
         state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
@@ -454,9 +439,9 @@ void ManageHVAC(EnergyPlusData &state)
         if (!state.dataGlobal->WarmupFlag) {
             if (state.dataGlobal->DoOutputReporting && !state.dataGlobal->ZoneSizingCalc) {
                 NodeInputManager::CalcMoreNodeInfo(state);
-                CalculatePollution(state);
-                InitEnergyReports(state);
-                ReportSystemEnergyUse(state);
+                PollutionModule::CalculatePollution(state);
+                SystemReports::InitEnergyReports(state);
+                SystemReports::ReportSystemEnergyUse(state);
             }
             if (state.dataGlobal->DoOutputReporting || (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq)) {
                 ReportAirHeatBalance(state);
@@ -473,8 +458,8 @@ void ManageHVAC(EnergyPlusData &state)
                 OutputReportTabular::UpdateTabularReports(state, OutputProcessor::TimeStepType::System);
             }
             if (state.dataGlobal->ZoneSizingCalc) {
-                UpdateZoneSizing(state, Constant::CallIndicator::DuringDay);
-                UpdateFacilitySizing(state, Constant::CallIndicator::DuringDay);
+                ZoneEquipmentManager::UpdateZoneSizing(state, Constant::CallIndicator::DuringDay);
+                SizingManager::UpdateFacilitySizing(state, Constant::CallIndicator::DuringDay);
             }
             EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation(state);
         } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && state.dataSysVars->ReportDuringWarmup) {
@@ -574,18 +559,18 @@ void ManageHVAC(EnergyPlusData &state)
         }
     }
 
-    ManageZoneAirUpdates(state,
-                         DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories,
-                         ZoneTempChange,
-                         state.dataHVACGlobal->ShortenTimeStepSys,
-                         state.dataHVACGlobal->UseZoneTimeStepHistory,
-                         PriorTimeStep);
+    ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                     DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories,
+                                                     ZoneTempChange,
+                                                     state.dataHVACGlobal->ShortenTimeStepSys,
+                                                     state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                     PriorTimeStep);
     if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-        ManageZoneContaminanUpdates(state,
-                                    DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories,
-                                    state.dataHVACGlobal->ShortenTimeStepSys,
-                                    state.dataHVACGlobal->UseZoneTimeStepHistory,
-                                    PriorTimeStep);
+        ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                       DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories,
+                                                                       state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                       state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                       PriorTimeStep);
 
     state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep = state.dataHVACGlobal->NumOfSysTimeSteps;
 
@@ -2578,11 +2563,6 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         for (int VentNum = 1; VentNum <= state.dataHeatBal->TotVentilation; ++VentNum) {
             auto const &ventilation = state.dataHeatBal->Ventilation(VentNum);
             if (ventilation.ZonePtr == ZoneLoop) {
-                // moved into CalcAirFlowSimple
-                //        znAirRpt%VentilFanElec  =
-                //        znAirRpt%VentilFanElec+ventilation%FanPower*TimeStepSys*Constant::SecInHour()
-                //        &
-                //          *ADSCorrectionFactor
                 if (ADSCorrectionFactor > 0) {
                     znAirRpt.VentilAirTemp += ventilation.AirTemp * ventilation.MCP;
                     VentZoneMassflow += ventilation.MCP;
@@ -2902,7 +2882,6 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     // Using/Aliasing
     int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
     using ScheduleManager::CheckScheduleValue;
-    using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleMaxValue;
 
     if (!state.dataHVACGlobal->AirLoopsSimOnce) return;
@@ -2990,7 +2969,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
         auto &airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo(AirLoopNum);
         if (airLoopControlInfo.CycFanSchedPtr > 0) {
-            if (GetCurrentScheduleValue(state, airLoopControlInfo.CycFanSchedPtr) == 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, airLoopControlInfo.CycFanSchedPtr) == 0.0) {
                 airLoopControlInfo.FanOpMode = CycFanCycCoil;
             } else {
                 airLoopControlInfo.FanOpMode = ContFanCycCoil;
