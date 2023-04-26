@@ -121,7 +121,6 @@ namespace HVACHXAssistedCoolingCoil {
         int HXAssistedCoilNum; // Index for HXAssistedCoolingCoil
         Real64 AirFlowRatio;   // Ratio of compressor ON air mass flow rate to AVEARAGE over time step
         bool HXUnitOn;         // flag to enable heat exchanger
-        Real64 AirMassFlow;    // HX System air mass flow rate
 
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (state.dataHVACAssistedCC->GetCoilsInputFlag) { // First time subroutine has been called, get input data
@@ -205,7 +204,7 @@ namespace HVACHXAssistedCoolingCoil {
         if (present(QTotOut)) {
             int InletNodeNum = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum;
             int OutletNodeNum = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum;
-            AirMassFlow = state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate;
+            Real64 AirMassFlow = state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate;
             QTotOut = AirMassFlow * (state.dataLoopNodes->Node(InletNodeNum).Enthalpy - state.dataLoopNodes->Node(OutletNodeNum).Enthalpy);
         }
     }
@@ -230,14 +229,11 @@ namespace HVACHXAssistedCoolingCoil {
         static constexpr std::string_view RoutineName("GetHXAssistedCoolingCoilInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int HXAssistedCoilNum;       // Index number of the HXAssistedCoolingCoil for which input data is being read from the idf
-        int NumAlphas;               // Number of alpha inputs
-        int NumNums;                 // Number of number inputs
-        int IOStat;                  // Return status from GetObjectItem call
-        bool ErrorsFound(false);     // set TRUE if errors detected in input
-        int NumHXAssistedDXCoils;    // Number of HXAssistedCoolingCoil objects using a DX coil
-        int NumHXAssistedWaterCoils; // Number of HXAssistedCoolingCoil objects using a chilled water coil
-        //    LOGICAL :: FanErrFlag              ! Error flag for fan operating mode mining call
+        int HXAssistedCoilNum;            // Index number of the HXAssistedCoolingCoil for which input data is being read from the idf
+        int NumAlphas;                    // Number of alpha inputs
+        int NumNums;                      // Number of number inputs
+        int IOStat;                       // Return status from GetObjectItem call
+        bool ErrorsFound(false);          // set TRUE if errors detected in input
         bool HXErrFlag;                   // Error flag for HX node numbers mining call
         bool CoolingCoilErrFlag;          // Error flag for cooling coil node numbers mining call
         int SupplyAirInletNode;           // supply air inlet node number mined from heat exchanger object (ExchCond structure)
@@ -254,12 +250,11 @@ namespace HVACHXAssistedCoolingCoil {
         Array1D<Real64> NumArray;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
-        int MaxNums(0);                   // Maximum number of numeric input fields
-        int MaxAlphas(0);                 // Maximum number of alpha input fields
         int TotalArgs(0);                 // Total number of alpha and numeric arguments (max) for a
 
-        NumHXAssistedDXCoils = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX:HeatExchangerAssisted");
-        NumHXAssistedWaterCoils =
+        int NumHXAssistedDXCoils =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX:HeatExchangerAssisted");
+        int NumHXAssistedWaterCoils =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted");
         state.dataHVACAssistedCC->TotalNumHXAssistedCoils = NumHXAssistedDXCoils + NumHXAssistedWaterCoils;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
@@ -272,8 +267,8 @@ namespace HVACHXAssistedCoolingCoil {
 
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "CoilSystem:Cooling:DX:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums);
-        MaxNums = max(MaxNums, NumNums);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
+        int MaxNums = max(MaxNums, NumNums);
+        int MaxAlphas = max(MaxAlphas, NumAlphas);
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "CoilSystem:Cooling:Water:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
@@ -990,16 +985,12 @@ namespace HVACHXAssistedCoolingCoil {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr MaxIter(50); // Maximum number of iterations
 
-        Real64 AirMassFlow;        // Inlet air mass flow rate
-        Real64 Error;              // Error (exiting coil temp from last iteration minus current coil exiting temp)
-        Real64 ErrorLast;          // check for oscillations
-        int Iter;                  // Number of iterations
         int CompanionCoilIndexNum; // Index to DX coil
 
-        AirMassFlow = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).MassFlowRate;
-        Error = 1.0;       // Initialize error (CoilOutputTemp last iteration minus current CoilOutputTemp)
-        ErrorLast = Error; // initialize variable used to test loop termination
-        Iter = 0;          // Initialize iteration counter to zero
+        Real64 AirMassFlow = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).MassFlowRate;
+        Real64 Error = 1.0;       // Initialize error (CoilOutputTemp last iteration minus current CoilOutputTemp)
+        Real64 ErrorLast = Error; // initialize variable used to test loop termination
+        int Iter = 0;             // Initialize iteration counter to zero
 
         // Set mass flow rate at inlet of exhaust side of heat exchanger to supply side air mass flow rate entering this compound object
         state.dataLoopNodes->Node(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum).MassFlowRate = AirMassFlow;
