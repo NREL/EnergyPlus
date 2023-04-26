@@ -649,25 +649,6 @@ void SimHVAC(EnergyPlusData &state)
     // selectable control schemes based on the logical flags used in
     // this default control algorithm.
 
-    // Using/Aliasing
-    using General::CreateSysTimeIntervalString;
-    using NonZoneEquipmentManager::ManageNonZoneEquipment;
-    using PlantCondLoopOperation::SetupPlantEMSActuators;
-    using PlantManager::GetPlantInput;
-    using PlantManager::GetPlantLoopData;
-    using PlantManager::InitOneTimePlantSizingInfo;
-    using PlantManager::ReInitPlantLoopsAtFirstHVACIteration;
-    using PlantManager::SetupBranchControlTypes;
-    using PlantManager::SetupInitialPlantCallingOrder;
-    using PlantManager::SetupReports;
-    using PlantUtilities::AnyPlantSplitterMixerLacksContinuity;
-    using PlantUtilities::CheckForRunawayPlantTemps;
-    using PlantUtilities::CheckPlantMixerSplitterConsistency;
-    using PlantUtilities::SetAllPlantSimFlagsToValue;
-    using SetPointManager::ManageSetPoints;
-    using SystemAvailabilityManager::ManageSystemAvailability;
-    using ZoneEquipmentManager::ManageZoneEquipment;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     bool constexpr SimWithPlantFlowUnlocked(false);
     bool constexpr SimWithPlantFlowLocked(true);
@@ -723,7 +704,7 @@ void SimHVAC(EnergyPlusData &state)
     state.dataHVACMgr->HVACManageIteration = 0;
     state.dataPlnt->PlantManageSubIterations = 0;
     state.dataPlnt->PlantManageHalfLoopCalls = 0;
-    SetAllPlantSimFlagsToValue(state, true);
+    PlantUtilities::SetAllPlantSimFlagsToValue(state, true);
     if (!state.dataHVACMgr->SimHVACIterSetup) {
         SetupOutputVariable(state,
                             "HVAC System Solver Iteration Count",
@@ -753,15 +734,14 @@ void SimHVAC(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
                             "SimHVAC");
-        ManageSetPoints(state); // need to call this before getting plant loop data so setpoint checks can complete okay
-        GetPlantLoopData(state);
-        GetPlantInput(state);
-        SetupInitialPlantCallingOrder(state);
-        SetupBranchControlTypes(state); // new routine to do away with input for branch control type
-        //    CALL CheckPlantLoopData
-        SetupReports(state);
+        SetPointManager::ManageSetPoints(state); // need to call this before getting plant loop data so setpoint checks can complete okay
+        PlantManager::GetPlantLoopData(state);
+        PlantManager::GetPlantInput(state);
+        PlantManager::SetupInitialPlantCallingOrder(state);
+        PlantManager::SetupBranchControlTypes(state); // new routine to do away with input for branch control type
+        PlantManager::SetupReports(state);
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            SetupPlantEMSActuators(state);
+            PlantCondLoopOperation::SetupPlantEMSActuators(state);
         }
 
         if (state.dataPlnt->TotNumLoops > 0) {
@@ -781,16 +761,17 @@ void SimHVAC(EnergyPlusData &state)
                                 "SimHVAC");
             for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 // init plant sizing numbers in main plant data structure
-                InitOneTimePlantSizingInfo(state, LoopNum);
+                PlantManager::InitOneTimePlantSizingInfo(state, LoopNum);
             }
         }
         state.dataHVACMgr->SimHVACIterSetup = true;
     }
 
     if (state.dataGlobal->ZoneSizingCalc) {
-        ManageZoneEquipment(state, FirstHVACIteration, state.dataHVACGlobal->SimZoneEquipmentFlag, state.dataHVACGlobal->SimAirLoopsFlag);
+        ZoneEquipmentManager::ManageZoneEquipment(
+            state, FirstHVACIteration, state.dataHVACGlobal->SimZoneEquipmentFlag, state.dataHVACGlobal->SimAirLoopsFlag);
         // need to call non zone equipment so water use zone gains can be included in sizing calcs
-        ManageNonZoneEquipment(state, FirstHVACIteration, state.dataHVACGlobal->SimNonZoneEquipmentFlag);
+        NonZoneEquipmentManager::ManageNonZoneEquipment(state, FirstHVACIteration, state.dataHVACGlobal->SimNonZoneEquipmentFlag);
         state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
             state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
         return;
@@ -807,14 +788,14 @@ void SimHVAC(EnergyPlusData &state)
     bool anyEMSRan = false;
     EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::BeforeHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
-    ManageSetPoints(state);
+    SetPointManager::ManageSetPoints(state);
 
     // re-initialize plant loop and nodes.
-    ReInitPlantLoopsAtFirstHVACIteration(state);
+    PlantManager::ReInitPlantLoopsAtFirstHVACIteration(state);
 
     // Before the HVAC simulation, call ManageSystemAvailability to set
     // the system on/off flags
-    ManageSystemAvailability(state);
+    SystemAvailabilityManager::ManageSystemAvailability(state);
 
     EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::AfterHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
     EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
@@ -835,7 +816,7 @@ void SimHVAC(EnergyPlusData &state)
     // simulation has converged for this system time step.
 
     state.dataHVACGlobal->SimPlantLoopsFlag = true;
-    SetAllPlantSimFlagsToValue(state, true); // set so loop to simulate at least once on non-first hvac
+    PlantUtilities::SetAllPlantSimFlagsToValue(state, true); // set so loop to simulate at least once on non-first hvac
 
     FirstHVACIteration = false;
 
@@ -879,7 +860,7 @@ void SimHVAC(EnergyPlusData &state)
         }
     }
     if (state.dataGlobal->AnyPlantInModel) {
-        if (AnyPlantSplitterMixerLacksContinuity(state)) {
+        if (PlantUtilities::AnyPlantSplitterMixerLacksContinuity(state)) {
             // rerun systems in a "Final flow lock/last iteration" mode
             // now call for one second to last plant simulation
             state.dataHVACGlobal->SimAirLoopsFlag = false;
@@ -945,8 +926,8 @@ void SimHVAC(EnergyPlusData &state)
     // Test plant loop for errors
     for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
         for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys) {
-            CheckPlantMixerSplitterConsistency(state, LoopNum, LoopSide, FirstHVACIteration);
-            CheckForRunawayPlantTemps(state, LoopNum, LoopSide);
+            PlantUtilities::CheckPlantMixerSplitterConsistency(state, LoopNum, LoopSide, FirstHVACIteration);
+            PlantUtilities::CheckForRunawayPlantTemps(state, LoopNum, LoopSide);
         }
     }
 
@@ -959,7 +940,7 @@ void SimHVAC(EnergyPlusData &state)
                                     state.dataConvergeParams->MaxIter,
                                     state.dataEnvrn->EnvironmentName,
                                     state.dataEnvrn->CurMnDy,
-                                    CreateSysTimeIntervalString(state)));
+                                    General::CreateSysTimeIntervalString(state)));
             if (state.dataHVACGlobal->SimAirLoopsFlag) {
                 ShowContinueError(state, "The solution for one or more of the Air Loop HVAC systems did not appear to converge");
             }
@@ -1843,13 +1824,11 @@ void SimSelectedEquipment(EnergyPlusData &state,
     // Each flag is checked and the appropriate manager is then called.
 
     // Using/Aliasing
-    using NonZoneEquipmentManager::ManageNonZoneEquipment;
     using PlantManager::ManagePlantLoops;
     using PlantUtilities::AnyPlantLoopSidesNeedSim;
     using PlantUtilities::ResetAllPlantInterConnectFlags;
     using PlantUtilities::SetAllFlowLocks;
     using SimAirServingZones::ManageAirLoops;
-    using ZoneEquipmentManager::ManageZoneEquipment;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr MaxAir(5); // Iteration Max for Air Simulation Iterations
@@ -1870,7 +1849,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
         // determination of which zones are connected to which air loops.
         // This call of ManageZoneEquipment does nothing except force the
         // zone equipment data to be read in.
-        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+        ZoneEquipmentManager::ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
         state.dataHVACMgr->MyEnvrnFlag2 = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
@@ -1889,9 +1868,9 @@ void SimSelectedEquipment(EnergyPlusData &state,
         state.dataHVACGlobal->AirLoopsSimOnce = true; // air loops simulated once for this environment
         ResetTerminalUnitFlowLimits(state);
         state.dataHVACMgr->FlowMaxAvailAlreadyReset = true;
-        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+        ZoneEquipmentManager::ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
         SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
-        ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
+        NonZoneEquipmentManager::ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
         state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
             state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
 
@@ -1927,7 +1906,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
                     ResolveAirLoopFlowLimits(state);
                     state.dataHVACMgr->FlowResolutionNeeded = false;
                 }
-                ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+                ZoneEquipmentManager::ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
                 SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
             }
             state.dataHVACMgr->FlowMaxAvailAlreadyReset = false;
@@ -1946,7 +1925,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
         ResolveLockoutFlags(state, SimAirLoops);
 
         if (SimNonZoneEquipment) {
-            ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
+            NonZoneEquipmentManager::ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
             SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
         }
 
