@@ -1823,13 +1823,6 @@ void SimSelectedEquipment(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Each flag is checked and the appropriate manager is then called.
 
-    // Using/Aliasing
-    using PlantManager::ManagePlantLoops;
-    using PlantUtilities::AnyPlantLoopSidesNeedSim;
-    using PlantUtilities::ResetAllPlantInterConnectFlags;
-    using PlantUtilities::SetAllFlowLocks;
-    using SimAirServingZones::ManageAirLoops;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr MaxAir(5); // Iteration Max for Air Simulation Iterations
 
@@ -1837,11 +1830,11 @@ void SimSelectedEquipment(EnergyPlusData &state,
     // This requires that the plant flow resolver carefully set the min/max avail limits on
     //  air side components to ensure they request within bounds.
     if (LockPlantFlows) {
-        SetAllFlowLocks(state, DataPlant::FlowLock::Locked);
+        PlantUtilities::SetAllFlowLocks(state, DataPlant::FlowLock::Locked);
     } else {
-        SetAllFlowLocks(state, DataPlant::FlowLock::Unlocked);
+        PlantUtilities::SetAllFlowLocks(state, DataPlant::FlowLock::Unlocked);
     }
-    ResetAllPlantInterConnectFlags(state);
+    PlantUtilities::ResetAllPlantInterConnectFlags(state);
 
     if (state.dataGlobal->BeginEnvrnFlag && state.dataHVACMgr->MyEnvrnFlag2) {
         // Following comment is incorrect!  (LKL) Even the first time through this does more than read in data.
@@ -1862,7 +1855,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
         if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
             state.afn->manage_balance(FirstHVACIteration);
         }
-        ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+        SimAirServingZones::ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
         state.dataAirLoop->AirLoopInputsFilled = true; // all air loop inputs have been read in
         SimAirLoops = true; // Need to make sure that SimAirLoop is simulated at min twice to calculate PLR in some air loop equipment
         state.dataHVACGlobal->AirLoopsSimOnce = true; // air loops simulated once for this environment
@@ -1874,7 +1867,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
         state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
             state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
 
-        ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
+        PlantManager::ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
 
         state.dataErrTracking->AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
         state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
@@ -1890,7 +1883,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
                 state.afn->manage_balance(FirstHVACIteration, IterAir, ResimulateAirZone);
             }
             if (SimAirLoops) {
-                ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+                SimAirServingZones::ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
                 SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
             }
 
@@ -1936,13 +1929,14 @@ void SimSelectedEquipment(EnergyPlusData &state,
 
         if (!SimPlantLoops) {
             // check to see if any air side component may have requested plant resim
-            if (AnyPlantLoopSidesNeedSim(state)) {
+            if (PlantUtilities::AnyPlantLoopSidesNeedSim(state)) {
                 SimPlantLoops = true;
             }
         }
 
         if (SimPlantLoops) {
-            ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
+            PlantManager::ManagePlantLoops(
+                state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
         }
 
         if (SimElecCircuits) {
@@ -2225,12 +2219,6 @@ void UpdateZoneListAndGroupLoads(EnergyPlusData &state)
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Apparently someone who doesn't believe in documenting.
-    //       DATE WRITTEN   ???
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // Using/Aliasing
-    using namespace DataHeatBalance;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ZoneNum;
