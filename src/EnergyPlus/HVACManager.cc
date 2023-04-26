@@ -177,8 +177,6 @@ void ManageHVAC(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 PriorTimeStep;       // magnitude of time step for previous history terms
     Real64 ZoneTempChange(0.0); // change in zone air temperature from timestep t-1 to t
-    bool ReportDebug;
-    bool DummyLogical;
 
     // SYSTEM INITIALIZATION
     if (state.dataHVACMgr->TriggerGetAFN) {
@@ -447,7 +445,7 @@ void ManageHVAC(EnergyPlusData &state)
         IceThermalStorage::UpdateIceFractions(state); // Update fraction of ice stored in TES
         ManageWater(state);
         // update electricity data for net, purchased, sold etc.
-        DummyLogical = false;
+        bool DummyLogical = false;
         state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
 
         // Update the plant and condenser loop capacitance model temperature history.
@@ -604,6 +602,7 @@ void ManageHVAC(EnergyPlusData &state)
     // DO FINAL UPDATE OF RECORD KEEPING VARIABLES
     // Report the Node Data to Aid in Debugging
     if (state.dataReportFlag->DebugOutput) {
+        bool ReportDebug;
         if (state.dataReportFlag->EvenDuringWarmup) {
             ReportDebug = true;
         } else {
@@ -700,13 +699,10 @@ void SimHVAC(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool FirstHVACIteration; // True when solution technique on first iteration
-    int AirSysNum;
     Real64 SlopeHumRat;
     Real64 SlopeMdot;
     Real64 SlopeTemps;
     Real64 AvgValue;
-    bool MonotonicIncreaseFound;
-    bool MonotonicDecreaseFound;
 
     static constexpr std::array<Real64, DataConvergParams::ConvergLogStackDepth> ConvergLogStackARR = {
         0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0};
@@ -1009,7 +1005,7 @@ void SimHVAC(EnergyPlusData &state)
             }
             if (state.dataGlobal->DisplayExtraWarnings) {
 
-                for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
+                for (int AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
 
                     auto &arrayRef = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACMassFlowNotConverged;
                     if (std::any_of(std::begin(arrayRef), std::end(arrayRef), [](bool i) { return i; })) {
@@ -1162,8 +1158,8 @@ void SimHVAC(EnergyPlusData &state)
 
                         // Check humidity ratio
                         bool FoundOscillationByDuplicate = false;
-                        MonotonicDecreaseFound = false;
-                        MonotonicIncreaseFound = false;
+                        bool MonotonicDecreaseFound = false;
+                        bool MonotonicIncreaseFound = false;
                         // check for evidence of oscillation by identifying duplicates when latest value not equal to average
                         Real64 summation = 0.0;
                         summation = std::accumulate(humRatInletNode.begin(), humRatInletNode.end(), 0.0);
@@ -1423,6 +1419,8 @@ void SimHVAC(EnergyPlusData &state)
 
                 for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     bool FoundOscillationByDuplicate;
+                    bool MonotonicIncreaseFound;
+                    bool MonotonicDecreaseFound;
 
                     if (state.dataConvergeParams->PlantConvergence(LoopNum).PlantMassFlowNotConverged) {
                         ShowContinueError(
@@ -2197,7 +2195,7 @@ void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir) // TRUE means air 
     }
 }
 
-void ResetHVACControl(EnergyPlusData &state)
+void ResetHVACControl(const EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
