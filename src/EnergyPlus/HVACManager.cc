@@ -2269,8 +2269,6 @@ void ReportInfiltrations(EnergyPlusData &state)
 
     // REFERENCES:
 
-    using DataHVACGlobals::CycleOn;
-    using DataHVACGlobals::CycleOnZoneFansOnly;
     // SUBROUTINE PARAMETER DEFINITIONS:
     static std::string const RoutineName("ReportInfiltrations");
 
@@ -2393,7 +2391,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, zone.OutDryBulbTemp);
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
-            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == DataHVACGlobals::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == DataHVACGlobals::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(ZoneLoop)) {
                 ADSCorrectionFactor = 0.0;
             }
@@ -2447,7 +2446,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(ZoneLoop)) ADSCorrectionFactor=0
-            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == DataHVACGlobals::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == DataHVACGlobals::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(ZoneLoop))
                 ADSCorrectionFactor = 0.0;
         }
@@ -2843,8 +2843,6 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
 
     // Using/Aliasing
     int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-    using ScheduleManager::CheckScheduleValue;
-    using ScheduleManager::GetScheduleMaxValue;
 
     if (!state.dataHVACGlobal->AirLoopsSimOnce) return;
 
@@ -2855,7 +2853,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
 
             if (airLoopControlInfo.UnitarySys) { // for unitary systems check the cycling fan schedule
                 if (airLoopControlInfo.CycFanSchedPtr > 0) {
-                    Real64 CycFanMaxVal = GetScheduleMaxValue(state, airLoopControlInfo.CycFanSchedPtr);
+                    Real64 CycFanMaxVal = ScheduleManager::GetScheduleMaxValue(state, airLoopControlInfo.CycFanSchedPtr);
                     if (CycFanMaxVal > 0.0) {
                         airLoopControlInfo.AnyContFan = true;
                     } else {
@@ -2891,7 +2889,8 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
                 int AirLoopNum = zoneEquipConfig.InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
                     if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-                        CyclingFan = CheckScheduleValue(state, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr, 0.0);
+                        CyclingFan =
+                            ScheduleManager::CheckScheduleValue(state, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr, 0.0);
                     }
                 }
             }
