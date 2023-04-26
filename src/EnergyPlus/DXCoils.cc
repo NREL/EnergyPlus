@@ -3428,6 +3428,10 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
+        if (!lAlphaBlanks(17)) {
+            thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(17));
+        }
+
         // assume compressor resides at the inlet to the DX Coil
         thisDXCoil.CondenserInletNodeNum(1) = thisDXCoil.AirInNode;
 
@@ -3807,6 +3811,11 @@ void GetDXCoils(EnergyPlusData &state)
                     }
                 }
             }
+        }
+
+        // Coil:WaterHeating:AirToWaterHeatPump:Wrapped
+        if (!lAlphaBlanks(11)) {
+            thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(11));
         }
 
         // assume compressor resides at the inlet to the DX Coil
