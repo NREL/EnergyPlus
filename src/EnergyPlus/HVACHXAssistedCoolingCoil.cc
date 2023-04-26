@@ -78,8 +78,6 @@ namespace HVACHXAssistedCoolingCoil {
     // MODULE INFORMATION:
     //       AUTHOR         Richard Raustad, FSEC
     //       DATE WRITTEN   Sept 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     //  To encapsulate the data and algorithms required to
@@ -114,16 +112,10 @@ namespace HVACHXAssistedCoolingCoil {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Sept 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         //  This subroutine manages the simulation of the
         //  cooling coil/heat exchanger combination.
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // (not used for Coil:Water:DetailedFlatCooling)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HXAssistedCoilNum; // Index for HXAssistedCoolingCoil
@@ -227,8 +219,6 @@ namespace HVACHXAssistedCoolingCoil {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Sept 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         //  Obtains input data for this compount object and stores it in data structure
@@ -945,7 +935,6 @@ namespace HVACHXAssistedCoolingCoil {
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Sep 2003
         //       MODIFIED       R. Raustad, June 2007 now using FullLoadOutletConditions from DX Coil data structure
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         //  This subroutine is for initializations of the HXAssistedCoolingCoil components
@@ -992,8 +981,6 @@ namespace HVACHXAssistedCoolingCoil {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   Sept 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         //  This subroutine models the cooling coil/air-to-air heat exchanger
@@ -1186,8 +1173,6 @@ namespace HVACHXAssistedCoolingCoil {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine sets an index for a given HX Assisted Cooling Coil -- issues error message if that
@@ -1227,8 +1212,6 @@ namespace HVACHXAssistedCoolingCoil {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This routine provides a method for outside routines to check if
