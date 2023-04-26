@@ -650,7 +650,6 @@ void SimHVAC(EnergyPlusData &state)
     // this default control algorithm.
 
     // Using/Aliasing
-    using DataPlant::NumConvergenceHistoryTerms;
     using General::CreateSysTimeIntervalString;
     using NonZoneEquipmentManager::ManageNonZoneEquipment;
     using PlantCondLoopOperation::SetupPlantEMSActuators;
@@ -1427,10 +1426,10 @@ void SimHVAC(EnergyPlusData &state)
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            AvgValue = sum(mdotHistInletNode) / double(NumConvergenceHistoryTerms);
+                            AvgValue = sum(mdotHistInletNode) / double(DataPlant::NumConvergenceHistoryTerms);
                             if (std::abs(mdotHistInletNode(1) - AvgValue) > DataConvergParams::PlantFlowRateOscillationToler) {
                                 FoundOscillationByDuplicate = false;
-                                for (int StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     if (std::abs(mdotHistInletNode(1) - mdotHistInletNode(StackDepth)) <
                                         DataConvergParams::PlantFlowRateOscillationToler) {
                                         FoundOscillationByDuplicate = true;
@@ -1448,14 +1447,14 @@ void SimHVAC(EnergyPlusData &state)
                                 Real64 mdotHistInletNodeDotProd = std::inner_product(
                                     std::begin(ConvergenceHistoryARR), std::end(ConvergenceHistoryARR), std::begin(mdotHistInletNode), 0.0);
 
-                                SlopeMdot =
-                                    (sum_ConvergenceHistoryARR * sum(mdotHistInletNode) -
-                                     double(NumConvergenceHistoryTerms) * mdotHistInletNodeDotProd) /
-                                    (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
+                                SlopeMdot = (sum_ConvergenceHistoryARR * sum(mdotHistInletNode) -
+                                             double(DataPlant::NumConvergenceHistoryTerms) * mdotHistInletNodeDotProd) /
+                                            (square_sum_ConvergenceHistoryARR -
+                                             double(DataPlant::NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
                                 if (std::abs(SlopeMdot) > DataConvergParams::PlantFlowRateSlopeToler) {
                                     if (SlopeMdot < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
-                                        for (int StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (mdotHistInletNode(StackDepth - 1) > mdotHistInletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
@@ -1470,7 +1469,7 @@ void SimHVAC(EnergyPlusData &state)
                                         }
                                     } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
-                                        for (int StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (mdotHistInletNode(StackDepth - 1) < mdotHistInletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
@@ -1489,7 +1488,7 @@ void SimHVAC(EnergyPlusData &state)
 
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
-                                for (int StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 1; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     HistoryTrace += format("{:.7R},", mdotHistInletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
@@ -1503,10 +1502,10 @@ void SimHVAC(EnergyPlusData &state)
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            AvgValue = sum(mdotHistOutletNode) / double(NumConvergenceHistoryTerms);
+                            AvgValue = sum(mdotHistOutletNode) / double(DataPlant::NumConvergenceHistoryTerms);
                             if (std::abs(mdotHistOutletNode(1) - AvgValue) > DataConvergParams::PlantFlowRateOscillationToler) {
                                 FoundOscillationByDuplicate = false;
-                                for (int StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     if (std::abs(mdotHistOutletNode(1) - mdotHistOutletNode(StackDepth)) <
                                         DataConvergParams::PlantFlowRateOscillationToler) {
                                         FoundOscillationByDuplicate = true;
@@ -1524,14 +1523,14 @@ void SimHVAC(EnergyPlusData &state)
                                 Real64 mdotHistOutletNodeDotProd = std::inner_product(
                                     std::begin(ConvergenceHistoryARR), std::end(ConvergenceHistoryARR), std::begin(mdotHistOutletNode), 0.0);
 
-                                SlopeMdot =
-                                    (sum_ConvergenceHistoryARR * sum(mdotHistOutletNode) -
-                                     double(NumConvergenceHistoryTerms) * mdotHistOutletNodeDotProd) /
-                                    (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
+                                SlopeMdot = (sum_ConvergenceHistoryARR * sum(mdotHistOutletNode) -
+                                             double(DataPlant::NumConvergenceHistoryTerms) * mdotHistOutletNodeDotProd) /
+                                            (square_sum_ConvergenceHistoryARR -
+                                             double(DataPlant::NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
                                 if (std::abs(SlopeMdot) > DataConvergParams::PlantFlowRateSlopeToler) {
                                     if (SlopeMdot < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
-                                        for (int StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (mdotHistOutletNode(StackDepth - 1) > mdotHistOutletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
@@ -1546,7 +1545,7 @@ void SimHVAC(EnergyPlusData &state)
                                         }
                                     } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
-                                        for (int StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (mdotHistOutletNode(StackDepth - 1) < mdotHistOutletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
@@ -1565,7 +1564,7 @@ void SimHVAC(EnergyPlusData &state)
 
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
-                                for (int StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 1; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     HistoryTrace += format("{:.7R},", mdotHistOutletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
@@ -1608,10 +1607,10 @@ void SimHVAC(EnergyPlusData &state)
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            AvgValue = sum(tempHistInletNode) / double(NumConvergenceHistoryTerms);
+                            AvgValue = sum(tempHistInletNode) / double(DataPlant::NumConvergenceHistoryTerms);
                             if (std::abs(tempHistInletNode(1) - AvgValue) > DataConvergParams::PlantTemperatureOscillationToler) {
                                 FoundOscillationByDuplicate = false;
-                                for (int StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     if (std::abs(tempHistInletNode(1) - tempHistInletNode(StackDepth)) <
                                         DataConvergParams::PlantTemperatureOscillationToler) {
                                         FoundOscillationByDuplicate = true;
@@ -1629,14 +1628,14 @@ void SimHVAC(EnergyPlusData &state)
                                 Real64 tempHistInletNodeDotProd = std::inner_product(
                                     std::begin(ConvergenceHistoryARR), std::end(ConvergenceHistoryARR), std::begin(tempHistInletNode), 0.0);
 
-                                SlopeTemps =
-                                    (sum_ConvergenceHistoryARR * sum(tempHistInletNode) -
-                                     double(NumConvergenceHistoryTerms) * tempHistInletNodeDotProd) /
-                                    (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
+                                SlopeTemps = (sum_ConvergenceHistoryARR * sum(tempHistInletNode) -
+                                              double(DataPlant::NumConvergenceHistoryTerms) * tempHistInletNodeDotProd) /
+                                             (square_sum_ConvergenceHistoryARR -
+                                              double(DataPlant::NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
                                 if (std::abs(SlopeTemps) > DataConvergParams::PlantTemperatureSlopeToler) {
                                     if (SlopeTemps < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
-                                        for (int StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (tempHistInletNode(StackDepth - 1) > tempHistInletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
@@ -1651,7 +1650,7 @@ void SimHVAC(EnergyPlusData &state)
                                         }
                                     } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
-                                        for (int StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (tempHistInletNode(StackDepth - 1) < tempHistInletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
@@ -1670,7 +1669,7 @@ void SimHVAC(EnergyPlusData &state)
 
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
-                                for (int StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 1; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     HistoryTrace += format("{:.5R},", tempHistInletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
@@ -1684,10 +1683,10 @@ void SimHVAC(EnergyPlusData &state)
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            AvgValue = sum(tempHistOutletNode) / double(NumConvergenceHistoryTerms);
+                            AvgValue = sum(tempHistOutletNode) / double(DataPlant::NumConvergenceHistoryTerms);
                             if (std::abs(tempHistOutletNode(1) - AvgValue) > DataConvergParams::PlantTemperatureOscillationToler) {
                                 FoundOscillationByDuplicate = false;
-                                for (int StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     if (std::abs(tempHistOutletNode(1) - tempHistOutletNode(StackDepth)) <
                                         DataConvergParams::PlantTemperatureOscillationToler) {
                                         FoundOscillationByDuplicate = true;
@@ -1705,14 +1704,14 @@ void SimHVAC(EnergyPlusData &state)
                                 Real64 tempHistOutletNodeDotProd = std::inner_product(
                                     std::begin(ConvergenceHistoryARR), std::end(ConvergenceHistoryARR), std::begin(tempHistOutletNode), 0.0);
 
-                                SlopeTemps =
-                                    (sum_ConvergenceHistoryARR * sum(tempHistOutletNode) -
-                                     double(NumConvergenceHistoryTerms) * tempHistOutletNodeDotProd) /
-                                    (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
+                                SlopeTemps = (sum_ConvergenceHistoryARR * sum(tempHistOutletNode) -
+                                              double(DataPlant::NumConvergenceHistoryTerms) * tempHistOutletNodeDotProd) /
+                                             (square_sum_ConvergenceHistoryARR -
+                                              double(DataPlant::NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
                                 if (std::abs(SlopeTemps) > DataConvergParams::PlantFlowRateSlopeToler) {
                                     if (SlopeTemps < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
-                                        for (int StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (state.dataPlnt->PlantLoop(LoopNum)
                                                     .LoopSide(ThisLoopSide)
                                                     .OutletNode.TemperatureHistory(StackDepth - 1) > tempHistOutletNode(StackDepth)) {
@@ -1729,7 +1728,7 @@ void SimHVAC(EnergyPlusData &state)
                                         }
                                     } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
-                                        for (int StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (state.dataPlnt->PlantLoop(LoopNum)
                                                     .LoopSide(ThisLoopSide)
                                                     .OutletNode.TemperatureHistory(StackDepth - 1) < tempHistOutletNode(StackDepth)) {
@@ -1750,7 +1749,7 @@ void SimHVAC(EnergyPlusData &state)
 
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
-                                for (int StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 1; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     HistoryTrace += format("{:.5R},", tempHistOutletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
