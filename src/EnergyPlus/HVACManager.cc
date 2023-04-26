@@ -117,11 +117,6 @@ namespace EnergyPlus::HVACManager {
 // The basic solution technique is iteration with lagging.
 // The timestep is shortened using a bisection method.
 
-using namespace DataEnvironment;
-using namespace DataHVACGlobals;
-using namespace DataLoopNode;
-using namespace DataAirLoop;
-
 static constexpr std::array<Real64, DataPlant::NumConvergenceHistoryTerms> ConvergenceHistoryARR = {0.0, -1.0, -2.0, -3.0, -4.0};
 constexpr Real64 sum_ConvergenceHistoryARR(-10.0);
 constexpr Real64 square_sum_ConvergenceHistoryARR(100.0);
@@ -1770,18 +1765,18 @@ void SimHVAC(EnergyPlusData &state)
         if (state.dataHVACMgr->MySetPointInit) {
             if (state.dataLoopNodes->NumOfNodes > 0) {
                 for (auto &e : state.dataLoopNodes->Node) {
-                    e.TempSetPoint = SensedNodeFlagValue;
-                    e.HumRatSetPoint = SensedNodeFlagValue;
-                    e.HumRatMin = SensedNodeFlagValue;
-                    e.HumRatMax = SensedNodeFlagValue;
-                    e.MassFlowRateSetPoint = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
+                    e.TempSetPoint = DataLoopNode::SensedNodeFlagValue;
+                    e.HumRatSetPoint = DataLoopNode::SensedNodeFlagValue;
+                    e.HumRatMin = DataLoopNode::SensedNodeFlagValue;
+                    e.HumRatMax = DataLoopNode::SensedNodeFlagValue;
+                    e.MassFlowRateSetPoint = DataLoopNode::SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
                 }
-                state.dataLoopNodes->DefaultNodeValues.TempSetPoint = SensedNodeFlagValue;
-                state.dataLoopNodes->DefaultNodeValues.HumRatSetPoint = SensedNodeFlagValue;
-                state.dataLoopNodes->DefaultNodeValues.HumRatMin = SensedNodeFlagValue;
-                state.dataLoopNodes->DefaultNodeValues.HumRatMax = SensedNodeFlagValue;
+                state.dataLoopNodes->DefaultNodeValues.TempSetPoint = DataLoopNode::SensedNodeFlagValue;
+                state.dataLoopNodes->DefaultNodeValues.HumRatSetPoint = DataLoopNode::SensedNodeFlagValue;
+                state.dataLoopNodes->DefaultNodeValues.HumRatMin = DataLoopNode::SensedNodeFlagValue;
+                state.dataLoopNodes->DefaultNodeValues.HumRatMax = DataLoopNode::SensedNodeFlagValue;
                 state.dataLoopNodes->DefaultNodeValues.MassFlowRateSetPoint =
-                    SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
+                    DataLoopNode::SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
             }
             state.dataHVACMgr->MySetPointInit = false;
             state.dataHVACGlobal->DoSetPointTest = true;
@@ -2931,9 +2926,9 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
         auto &airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo(AirLoopNum);
         if (airLoopControlInfo.CycFanSchedPtr > 0) {
             if (ScheduleManager::GetCurrentScheduleValue(state, airLoopControlInfo.CycFanSchedPtr) == 0.0) {
-                airLoopControlInfo.FanOpMode = CycFanCycCoil;
+                airLoopControlInfo.FanOpMode = DataHVACGlobals::CycFanCycCoil;
             } else {
-                airLoopControlInfo.FanOpMode = ContFanCycCoil;
+                airLoopControlInfo.FanOpMode = DataHVACGlobals::ContFanCycCoil;
             }
         }
     }
@@ -2948,7 +2943,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
             for (int zoneInNode = 1; zoneInNode <= zoneEquipConfig.NumInletNodes; ++zoneInNode) {
                 int AirLoopNum = zoneEquipConfig.InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
-                    if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == ContFanCycCoil) {
+                    if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == DataHVACGlobals::ContFanCycCoil) {
                         thisZone.NoHeatToReturnAir = false;
                         break;
                     }
@@ -2998,7 +2993,7 @@ void CheckAirLoopFlowBalance(EnergyPlusData &state)
             auto &thisAirLoopFlow = state.dataAirLoop->AirLoopFlow(AirLoopNum);
             if (!thisAirLoopFlow.FlowError) {
                 Real64 unbalancedExhaustDelta = thisAirLoopFlow.SupFlow - thisAirLoopFlow.OAFlow - thisAirLoopFlow.SysRetFlow;
-                if (unbalancedExhaustDelta > SmallMassFlow) {
+                if (unbalancedExhaustDelta > DataHVACGlobals::SmallMassFlow) {
                     ShowSevereError(state,
                                     format("CheckAirLoopFlowBalance: AirLoopHVAC {} is unbalanced. Supply is > return plus outdoor air.",
                                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name));
