@@ -147,14 +147,6 @@ void ManageHVAC(EnergyPlusData &state)
     //  manage variable time step and when zone air histories are updated.
 
     // Using/Aliasing
-    using DemandManager::ManageDemand;
-    using DemandManager::UpdateDemandManagers;
-    using EMSManager::ManageEMS;
-    using InternalHeatGains::UpdateInternalGainValues;
-    using NodeInputManager::CalcMoreNodeInfo;
-    using OutAirNodeManager::SetOutAirNodes;
-    using OutputReportTabular::GatherComponentLoadsHVAC;
-    using OutputReportTabular::UpdateTabularReports; // added for writing tabular output reports
     using PollutionModule::CalculatePollution;
     using RefrigeratedCase::ManageRefrigeratedCaseRacks;
     using ScheduleManager::GetCurrentScheduleValue;
@@ -235,9 +227,9 @@ void ManageHVAC(EnergyPlusData &state)
     state.dataHVACGlobal->FracTimeStepZone = state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
 
     bool anyEMSRan;
-    ManageEMS(state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
-    SetOutAirNodes(state);
+    OutAirNodeManager::SetOutAirNodes(state);
 
     ManageRefrigeratedCaseRacks(state);
 
@@ -277,7 +269,7 @@ void ManageHVAC(EnergyPlusData &state)
         }
     }
 
-    UpdateInternalGainValues(state, true, true);
+    InternalHeatGains::UpdateInternalGainValues(state, true, true);
 
     ManageZoneAirUpdates(state,
                          DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
@@ -306,7 +298,7 @@ void ManageHVAC(EnergyPlusData &state)
 
     // Only simulate once per zone timestep; must be after SimHVAC
     if (state.dataHVACGlobal->FirstTimeStepSysFlag && state.dataGlobal->MetersHaveBeenInitialized) {
-        ManageDemand(state);
+        DemandManager::ManageDemand(state);
     }
 
     state.dataGlobal->BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
@@ -356,7 +348,7 @@ void ManageHVAC(EnergyPlusData &state)
                 state.afn->manage_balance(false);
             }
 
-            UpdateInternalGainValues(state, true, true);
+            InternalHeatGains::UpdateInternalGainValues(state, true, true);
 
             ManageZoneAirUpdates(state,
                                  DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
@@ -455,20 +447,20 @@ void ManageHVAC(EnergyPlusData &state)
             OutputReportTabular::CalcHeatEmissionReport(state);
         }
 
-        ManageEMS(
+        EMSManager::ManageEMS(
             state, EMSManager::EMSCallFrom::EndSystemTimestepBeforeHVACReporting, anyEMSRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // This is where output processor data is updated for System Timestep reporting
         if (!state.dataGlobal->WarmupFlag) {
             if (state.dataGlobal->DoOutputReporting && !state.dataGlobal->ZoneSizingCalc) {
-                CalcMoreNodeInfo(state);
+                NodeInputManager::CalcMoreNodeInfo(state);
                 CalculatePollution(state);
                 InitEnergyReports(state);
                 ReportSystemEnergyUse(state);
             }
             if (state.dataGlobal->DoOutputReporting || (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq)) {
                 ReportAirHeatBalance(state);
-                if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsHVAC(state);
+                if (state.dataGlobal->ZoneSizingCalc) OutputReportTabular::GatherComponentLoadsHVAC(state);
             }
             if (state.dataGlobal->DoOutputReporting) {
                 SystemReports::ReportVentilationLoads(state);
@@ -478,7 +470,7 @@ void ManageHVAC(EnergyPlusData &state)
                     if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
                         state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                 }
-                UpdateTabularReports(state, OutputProcessor::TimeStepType::System);
+                OutputReportTabular::UpdateTabularReports(state, OutputProcessor::TimeStepType::System);
             }
             if (state.dataGlobal->ZoneSizingCalc) {
                 UpdateZoneSizing(state, Constant::CallIndicator::DuringDay);
@@ -520,7 +512,7 @@ void ManageHVAC(EnergyPlusData &state)
                 state.dataHVACMgr->PrintedWarmup = true;
             }
             if (!state.dataGlobal->DoingSizing) {
-                CalcMoreNodeInfo(state);
+                NodeInputManager::CalcMoreNodeInfo(state);
             }
             UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
             if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay ||
@@ -563,7 +555,7 @@ void ManageHVAC(EnergyPlusData &state)
             }
             UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
         }
-        ManageEMS(
+        EMSManager::ManageEMS(
             state, EMSManager::EMSCallFrom::EndSystemTimestepAfterHVACReporting, anyEMSRan, ObjexxFCL::Optional_int_const()); // EMS calling point
         // UPDATE SYSTEM CLOCKS
         state.dataHVACGlobal->SysTimeElapsed += state.dataHVACGlobal->TimeStepSys;
@@ -597,7 +589,7 @@ void ManageHVAC(EnergyPlusData &state)
 
     state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep = state.dataHVACGlobal->NumOfSysTimeSteps;
 
-    UpdateDemandManagers(state);
+    DemandManager::UpdateDemandManagers(state);
 
     // DO FINAL UPDATE OF RECORD KEEPING VARIABLES
     // Report the Node Data to Aid in Debugging
@@ -674,7 +666,6 @@ void SimHVAC(EnergyPlusData &state)
 
     // Using/Aliasing
     using DataPlant::NumConvergenceHistoryTerms;
-    using EMSManager::ManageEMS;
     using General::CreateSysTimeIntervalString;
     using NonZoneEquipmentManager::ManageNonZoneEquipment;
     using PlantCondLoopOperation::SetupPlantEMSActuators;
@@ -830,7 +821,7 @@ void SimHVAC(EnergyPlusData &state)
     // Before the HVAC simulation, call ManageSetPoints to set all the HVAC
     // node setpoints
     bool anyEMSRan = false;
-    ManageEMS(state, EMSManager::EMSCallFrom::BeforeHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::BeforeHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
     ManageSetPoints(state);
 
@@ -841,8 +832,8 @@ void SimHVAC(EnergyPlusData &state)
     // the system on/off flags
     ManageSystemAvailability(state);
 
-    ManageEMS(state, EMSManager::EMSCallFrom::AfterHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
-    ManageEMS(state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::AfterHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
 
     // first explicitly call each system type with FirstHVACIteration,
 
@@ -874,7 +865,7 @@ void SimHVAC(EnergyPlusData &state)
 
         if (state.dataGlobal->stopSimulation) break;
 
-        ManageEMS(state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
+        EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
 
         // Manages the various component simulations
         SimSelectedEquipment(state,
