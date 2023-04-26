@@ -2303,41 +2303,33 @@ void UpdateZoneListAndGroupLoads(EnergyPlusData &state)
     int GroupNum;
     int Mult;
 
-    auto &ZoneList = state.dataHeatBal->ZoneList;
-    auto &ZoneGroup = state.dataHeatBal->ZoneGroup;
-    auto &ZoneListSNLoadHeatEnergy = state.dataHeatBal->ZoneListSNLoadHeatEnergy;
-    auto &ZoneListSNLoadCoolEnergy = state.dataHeatBal->ZoneListSNLoadCoolEnergy;
-    auto &ZoneListSNLoadHeatRate = state.dataHeatBal->ZoneListSNLoadHeatRate;
-    auto &ZoneListSNLoadCoolRate = state.dataHeatBal->ZoneListSNLoadCoolRate;
-
     // Sum ZONE LIST and ZONE GROUP report variables
     for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
-        ZoneListSNLoadHeatEnergy(ListNum) = 0.0;
-        ZoneListSNLoadCoolEnergy(ListNum) = 0.0;
-        ZoneListSNLoadHeatRate(ListNum) = 0.0;
-        ZoneListSNLoadCoolRate(ListNum) = 0.0;
+        state.dataHeatBal->ZoneListSNLoadHeatEnergy(ListNum) = 0.0;
+        state.dataHeatBal->ZoneListSNLoadCoolEnergy(ListNum) = 0.0;
+        state.dataHeatBal->ZoneListSNLoadHeatRate(ListNum) = 0.0;
+        state.dataHeatBal->ZoneListSNLoadCoolRate(ListNum) = 0.0;
     }
 
     for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
-        for (ZoneNum = 1; ZoneNum <= ZoneList(ListNum).NumOfZones; ++ZoneNum) {
+        auto &zoneList = state.dataHeatBal->ZoneList(ListNum);
+        for (ZoneNum = 1; ZoneNum <= zoneList.NumOfZones; ++ZoneNum) {
+            auto &zoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneList.Zone(ZoneNum));
             Mult = state.dataHeatBal->Zone(ZoneNum).Multiplier;
-            ZoneListSNLoadHeatEnergy(ListNum) +=
-                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneList(ListNum).Zone(ZoneNum)).ZoneSNLoadHeatEnergy * Mult;
-            ZoneListSNLoadCoolEnergy(ListNum) +=
-                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneList(ListNum).Zone(ZoneNum)).ZoneSNLoadCoolEnergy * Mult;
-            ZoneListSNLoadHeatRate(ListNum) +=
-                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneList(ListNum).Zone(ZoneNum)).ZoneSNLoadHeatRate * Mult;
-            ZoneListSNLoadCoolRate(ListNum) +=
-                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneList(ListNum).Zone(ZoneNum)).ZoneSNLoadCoolRate * Mult;
+            state.dataHeatBal->ZoneListSNLoadHeatEnergy(ListNum) += zoneSysEnergyDemand.ZoneSNLoadHeatEnergy * Mult;
+            state.dataHeatBal->ZoneListSNLoadCoolEnergy(ListNum) += zoneSysEnergyDemand.ZoneSNLoadCoolEnergy * Mult;
+            state.dataHeatBal->ZoneListSNLoadHeatRate(ListNum) += zoneSysEnergyDemand.ZoneSNLoadHeatRate * Mult;
+            state.dataHeatBal->ZoneListSNLoadCoolRate(ListNum) += zoneSysEnergyDemand.ZoneSNLoadCoolRate * Mult;
         } // ZoneNum
     }     // ListNum
 
     for (GroupNum = 1; GroupNum <= state.dataHeatBal->NumOfZoneGroups; ++GroupNum) {
-        Mult = state.dataHeatBal->ZoneGroup(GroupNum).Multiplier;
-        state.dataHeatBal->ZoneGroupSNLoadHeatEnergy(GroupNum) = ZoneListSNLoadHeatEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
-        state.dataHeatBal->ZoneGroupSNLoadCoolEnergy(GroupNum) = ZoneListSNLoadCoolEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
-        state.dataHeatBal->ZoneGroupSNLoadHeatRate(GroupNum) = ZoneListSNLoadHeatRate(ZoneGroup(GroupNum).ZoneList) * Mult;
-        state.dataHeatBal->ZoneGroupSNLoadCoolRate(GroupNum) = ZoneListSNLoadCoolRate(ZoneGroup(GroupNum).ZoneList) * Mult;
+        auto &zoneGroup = state.dataHeatBal->ZoneGroup(GroupNum);
+        Mult = zoneGroup.Multiplier;
+        state.dataHeatBal->ZoneGroupSNLoadHeatEnergy(GroupNum) = state.dataHeatBal->ZoneListSNLoadHeatEnergy(zoneGroup.ZoneList) * Mult;
+        state.dataHeatBal->ZoneGroupSNLoadCoolEnergy(GroupNum) = state.dataHeatBal->ZoneListSNLoadCoolEnergy(zoneGroup.ZoneList) * Mult;
+        state.dataHeatBal->ZoneGroupSNLoadHeatRate(GroupNum) = state.dataHeatBal->ZoneListSNLoadHeatRate(zoneGroup.ZoneList) * Mult;
+        state.dataHeatBal->ZoneGroupSNLoadCoolRate(GroupNum) = state.dataHeatBal->ZoneListSNLoadCoolRate(zoneGroup.ZoneList) * Mult;
     } // GroupNum
 }
 
