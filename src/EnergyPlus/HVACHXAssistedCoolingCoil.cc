@@ -267,8 +267,8 @@ namespace HVACHXAssistedCoolingCoil {
 
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "CoilSystem:Cooling:DX:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums);
-        int MaxNums = max(MaxNums, NumNums);
-        int MaxAlphas = max(MaxAlphas, NumAlphas);
+        int MaxNums = NumNums;
+        int MaxAlphas = NumAlphas;
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
             state, "CoilSystem:Cooling:Water:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
@@ -1270,6 +1270,9 @@ namespace HVACHXAssistedCoolingCoil {
         // incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
         // as negative.
 
+        // Return value
+        Real64 CoilCapacity(0.0); // returned capacity of matched coil
+
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (state.dataHVACAssistedCC->GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
@@ -1291,18 +1294,19 @@ namespace HVACHXAssistedCoolingCoil {
 
                 if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                     int coolingCoilDXIndex = state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilIndex;
-                    return state.dataCoilCooingDX->coilCoolingDXs[coolingCoilDXIndex].performance.normalMode.ratedGrossTotalCap;
+                    CoilCapacity = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilDXIndex].performance.normalMode.ratedGrossTotalCap;
                 } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-                    return DXCoils::GetCoilCapacity(state,
-                                                    state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
-                                                    state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
-                                                    errFlag);
+                    CoilCapacity = DXCoils::GetCoilCapacity(state,
+                                                            state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
+                                                            state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
+                                                            errFlag);
                 } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num ==
                            DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                    return VariableSpeedCoils::GetCoilCapacityVariableSpeed(state,
-                                                                            state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
-                                                                            state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
-                                                                            errFlag);
+                    CoilCapacity =
+                        VariableSpeedCoils::GetCoilCapacityVariableSpeed(state,
+                                                                         state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
+                                                                         state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
+                                                                         errFlag);
                 }
                 if (errFlag) {
                     ShowRecurringWarningErrorAtEnd(
@@ -1312,10 +1316,10 @@ namespace HVACHXAssistedCoolingCoil {
         } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
             if (WhichCoil != 0) {
                 // coil does not have capacity in input so mine information from DX cooling coil
-                return WaterCoils::GetWaterCoilCapacity(state,
-                                                        state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
-                                                        state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
-                                                        errFlag);
+                CoilCapacity = WaterCoils::GetWaterCoilCapacity(state,
+                                                                state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
+                                                                state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
+                                                                errFlag);
                 if (errFlag) {
                     ShowRecurringWarningErrorAtEnd(
                         state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", state.dataHVACAssistedCC->ErrCount);
@@ -1329,11 +1333,12 @@ namespace HVACHXAssistedCoolingCoil {
             ShowSevereError(state, format("GetCoilCapacity: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
             ShowContinueError(state, "... Coil Capacity returned as -1000.");
             ErrorsFound = true;
+            CoilCapacity = -1000.0;
         }
 
         if (errFlag) ErrorsFound = true;
 
-        return -1000.0;
+        return CoilCapacity;
     }
 
     int GetCoilGroupTypeNum(EnergyPlusData &state,
@@ -1476,6 +1481,9 @@ namespace HVACHXAssistedCoolingCoil {
         // incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
         // as zero.
 
+        // Return value
+        int NodeNumber; // returned node number of matched coil
+
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (state.dataHVACAssistedCC->GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
@@ -1491,28 +1499,30 @@ namespace HVACHXAssistedCoolingCoil {
 
         if (WhichCoil != 0) {
             if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater) {
-                return WaterCoils::GetCoilWaterInletNode(state,
-                                                         state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
-                                                         state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
-                                                         ErrorsFound);
+                NodeNumber = WaterCoils::GetCoilWaterInletNode(state,
+                                                               state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
+                                                               state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
+                                                               ErrorsFound);
             } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
-                return WaterCoils::GetCoilWaterInletNode(state,
-                                                         state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
-                                                         state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
-                                                         ErrorsFound);
+                NodeNumber = WaterCoils::GetCoilWaterInletNode(state,
+                                                               state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
+                                                               state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
+                                                               ErrorsFound);
             } else { // even though validated in Get, still check.
                 ShowSevereError(state,
                                 format("GetCoilWaterInletNode: Invalid Cooling Coil for HX Assisted Coil, Type=\"{}\" Name=\"{}\"",
                                        state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
                                        CoilName));
                 ErrorsFound = true;
-                return 0; // Autodesk:Return Added line to set return value
+                NodeNumber = 0; // Autodesk:Return Added line to set return value
             }
         } else {
             ShowSevereError(state, format("GetCoilInletNode: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
-            return 0;
+            NodeNumber = 0;
         }
+
+        return NodeNumber;
     }
 
     int GetCoilOutletNode(EnergyPlusData &state,
@@ -1551,7 +1561,6 @@ namespace HVACHXAssistedCoolingCoil {
             ErrorsFound = true;
             return 0;
         }
-        return NodeNumber;
     }
 
     std::string GetHXDXCoilType(EnergyPlusData &state,
@@ -1886,9 +1895,6 @@ namespace HVACHXAssistedCoolingCoil {
                 false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
-        // Return value
-        bool Found = false;
-
         int WhichCoil = 0;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
             WhichCoil = UtilityRoutines::FindItem(HXName, state.dataHVACAssistedCC->HXAssistedCoil, &HXAssistedCoilParameters::HeatExchangerName);
@@ -1896,11 +1902,10 @@ namespace HVACHXAssistedCoolingCoil {
 
         if (WhichCoil != 0) {
             if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HeatExchangerType, HXType)) {
-                Found = true;
+                return true;
             }
         }
-
-        return Found;
+        return false;
     }
 
     //        End of Utility subroutines for the HXAssistedCoil Module
