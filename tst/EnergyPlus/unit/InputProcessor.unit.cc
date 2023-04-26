@@ -3767,12 +3767,13 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
                                                              "COOLCAPFT",
                                                              "COOLCAPFFF",
                                                              "COOLEIRFT",
-                                                             "COOLEIRFFF"}),
+                                                             "COOLEIRFFF",
+                                                             ""}),
                                    Alphas));
     EXPECT_TRUE(compare_containers(
         std::vector<bool>({false, false, false, false, true,  false, true,  true,  true,  false, false, false, false, false, false, false, false,
                            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-                           false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}),
+                           false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true}),
         lAlphaBlanks));
 
     EXPECT_EQ(72, NumNumbers);
