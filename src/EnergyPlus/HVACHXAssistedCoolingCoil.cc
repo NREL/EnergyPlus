@@ -548,6 +548,16 @@ namespace HVACHXAssistedCoolingCoil {
                                                     DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsParent);
+            // no need to capture CoolingCoilInletNodeNum as the return value, it's not used anywhere
+            NodeInputManager::GetOnlySingleNode(state,
+                                                state.dataLoopNodes->NodeID(SupplyAirOutletNode),
+                                                ErrorsFound,
+                                                DataLoopNode::ConnectionObjectType::CoilSystemCoolingDXHeatExchangerAssisted,
+                                                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
+                                                DataLoopNode::NodeFluidType::Air,
+                                                DataLoopNode::ConnectionType::Internal,
+                                                NodeInputManager::CompFluidStream::Primary,
+                                                DataLoopNode::ObjectIsParent);
             thisHXCoil.HXExhaustAirInletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     state.dataLoopNodes->NodeID(SecondaryAirInletNode),
@@ -728,7 +738,6 @@ namespace HVACHXAssistedCoolingCoil {
                 ShowContinueError(state, format("Invalid {}=\"{}\"", cAlphaFields(4), thisHXCoil.CoolingCoilType));
                 ErrorsFound = true;
             }
-
             BranchNodeConnections::TestCompSet(state,
                                                thisHXCoil.HXAssistedCoilType,
                                                thisHXCoil.Name,
@@ -746,6 +755,16 @@ namespace HVACHXAssistedCoolingCoil {
                                                     DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsParent);
+            // no need to capture CoolingCoilInletNodeNum as the return value, it's not used anywhere
+            NodeInputManager::GetOnlySingleNode(state,
+                                                state.dataLoopNodes->NodeID(SupplyAirOutletNode),
+                                                ErrorsFound,
+                                                DataLoopNode::ConnectionObjectType::CoilSystemCoolingWaterHeatExchangerAssisted,
+                                                state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
+                                                DataLoopNode::NodeFluidType::Air,
+                                                DataLoopNode::ConnectionType::Internal,
+                                                NodeInputManager::CompFluidStream::Primary,
+                                                DataLoopNode::ObjectIsParent);
             thisHXCoil.HXExhaustAirInletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     state.dataLoopNodes->NodeID(SecondaryAirInletNode),
