@@ -1,0 +1,7 @@
+/*.special {*/
+/*    font-weight: bold;*/
+/*}*/
+
+h2:empty {
+   display: none;
+}

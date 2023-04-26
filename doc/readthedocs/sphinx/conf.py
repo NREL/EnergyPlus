@@ -114,8 +114,8 @@ rtd_out = ""
 # The schema version/build are not configured when running on RTD, so these aren't useful unless we want to parse CMake
 # rtd_out += f"\n* EnergyPlus Schema Version: {o['epJSON_schema_version']}"
 # rtd_out += f"\n* EnergyPlus Build Commit SHA: {o['epJSON_schema_build']}"
-rtd_out += f"\n* Total Number of Objects in Schema: {len(idf_objects)}"
-rtd_out += "\n\n"
+# rtd_out += f"\n* Total Number of Objects in Schema: {len(idf_objects)}"
+# rtd_out += "\n\n"
 
 object_entries_by_group = dict()
 
@@ -205,8 +205,9 @@ for obj_name, data in idf_objects.items():
         object_entries_by_group[group_name] = [final_object_snippet]
 
 for group_name in all_group_names:
-    rtd_out += f"{group_name}\n{'*' * len(group_name)}\n\n"
+    # rtd_out += f"{group_name}\n{'*' * len(group_name)}\n\n"
     for obj_snippet in object_entries_by_group[group_name]:
+        rtd_out += ".. rst-class:: special\n\n"
         rtd_out += obj_snippet
 
 print("* Writing schema contents into template, saving at schema.rst")
@@ -222,6 +223,19 @@ print("* Schema docs complete!")
 
 # then add the folder to the sphinx extra paths so the objects get included
 html_extra_path = ['_build_c']
+
+html_static_path = ['_static']
+
+html_css_files = [
+    'https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css',
+    'main.css',
+]
+
+html_js_files = [
+    'http://code.jquery.com/jquery-1.11.2.min.js',
+    'https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js',
+    'main.js',
+]
 
 # -- Project information -----------------------------------------------------
 
