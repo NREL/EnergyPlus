@@ -831,8 +831,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                                                                bool const RunFlagElectCenter, // TRUE when Generator operating
                                                                bool const RunFlagPlant,
                                                                Real64 const MyElectricLoad, // Generator demand
-                                                               Real64 const MyThermalLoad,
-                                                               bool const FirstHVACIteration)
+                                                               Real64 const MyThermalLoad)
 {
 
     // SUBROUTINE INFORMATION:
