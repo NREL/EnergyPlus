@@ -1901,9 +1901,6 @@ namespace HVACHXAssistedCoolingCoil {
         // incorrect coil type or name is given, ErrorsFound is returned as true and capacity is returned
         // as negative.
 
-        // Using/Aliasing
-        using HeatRecovery::GetSupplyAirFlowRate;
-
         // Return value
         Real64 MaxAirFlowRate; // returned max air flow rate of matched HX
 
@@ -1922,7 +1919,8 @@ namespace HVACHXAssistedCoolingCoil {
             if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted") ||
                 UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 if (WhichCoil != 0) {
-                    MaxAirFlowRate = GetSupplyAirFlowRate(state, state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HeatExchangerName, ErrorsFound);
+                    MaxAirFlowRate =
+                        HeatRecovery::GetSupplyAirFlowRate(state, state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HeatExchangerName, ErrorsFound);
                 }
             } else {
                 WhichCoil = 0;
