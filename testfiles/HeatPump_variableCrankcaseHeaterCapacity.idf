@@ -127,7 +127,7 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No,                      !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
     No,                      !- Do HVAC Sizing Simulation for Sizing Periods
     1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
@@ -137,7 +137,7 @@
     14,                      !- Begin Day of Month
     ,                        !- Begin Year
     1,                       !- End Month
-    14,                      !- End Day of Month
+    18,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -145,21 +145,6 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-
-  RunPeriod,
-    Run Period 2,            !- Name
-    7,                       !- Begin Month
-    7,                       !- Begin Day of Month
-    ,                        !- Begin Year
-    7,                       !- End Month
-    7,                       !- End Day of Month
-    ,                        !- End Year
-    Tuesday,                 !- Day of Week for Start Day
-    Yes,                     !- Use Weather File Holidays and Special Days
-    Yes,                     !- Use Weather File Daylight Saving Period
-    No,                      !- Apply Weekend Holiday Rule
-    Yes,                     !- Use Weather File Rain Indicators
-    No;                      !- Use Weather File Snow Indicators
 
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
 
@@ -1181,6 +1166,13 @@
     0.0512,                  !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
+    
+  Curve:Linear,
+    heaterCapCurve,          !- Name
+    60.0,                    !- Coefficient1 Constant
+    -2.,                     !- Coefficient2 x
+    0.0,                     !- Minimum Value of x
+    200;                      !- Maximum Value of x
 
   NodeList,
     OutsideAirInletNodes,    !- Name
@@ -1509,10 +1501,17 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    35,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
-    200;                     !- Basin Heater Capacity {W/K}
+    200,                     !- Basin Heater Capacity {W/K}
+    ,                     
+    ,                     
+    ,                     
+    ,                     
+    ,                     
+    ,                     
+    heaterCapCurve;          !- Compressor Ambient Temperature Dependent Crankcase Heater Capacity Curve Name
 
   Coil:Heating:DX:SingleSpeed,
     Heat Pump DX Heating Coil 1,  !- Name

@@ -9327,6 +9327,9 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     // If used in a heat pump, the value of MaxOAT in the heating coil overrides that in the cooling coil (in GetInput)
     if (CompAmbTemp < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
+        if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
+            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
+        }
     } else {
         CrankcaseHeatingPower = 0.0;
     }
@@ -10306,6 +10309,9 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     // If used in a heat pump, the value of MaxOAT in the heating coil overrides that in the cooling coil (in GetInput)
     if (CompAmbTemp < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
+        if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
+            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
+        }
     } else {
         CrankcaseHeatingPower = 0.0;
     }
@@ -10960,6 +10966,9 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
     // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
     if (CompAmbTemp < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
+        if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
+            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
+        }
     } else {
         CrankcaseHeatingPower = 0.0;
     }
@@ -12723,6 +12732,9 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
     }
     if (OutdoorDryBulb < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
+        if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
+            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
+        }
     } else {
         CrankcaseHeatingPower = 0.0;
     }
@@ -13555,6 +13567,9 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
     // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
     if (OutdoorDryBulb < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
+        if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
+            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
+        }
     } else {
         CrankcaseHeatingPower = 0.0;
     }
@@ -16641,6 +16656,9 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
     // If used in a heat pump, the value of MaxOAT in the heating coil overrides that in the cooling coil (in GetInput)
     if (CompAmbTemp < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
+        if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
+            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
+        }
     } else {
         CrankcaseHeatingPower = 0.0;
     }
@@ -17051,6 +17069,9 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
     // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
     if (OutdoorDryBulb < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
+        if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
+            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
+        }
     } else {
         CrankcaseHeatingPower = 0.0;
     }
