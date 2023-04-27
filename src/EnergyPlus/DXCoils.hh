@@ -149,17 +149,17 @@ namespace DXCoils {
         int EIRFTempErrorIndex; // Used for warning messages when output of EIRFTemp is negative
         Array1D_int EIRFFlow;   // index of energy input ratio modifier curve
         // (function of actual supply air flow vs rated air flow)
-        int EIRFFlowErrorIndex;                   // Used for warning messages when output of EIRFFlow is negative
-        Array1D_int PLFFPLR;                      // index of part-load factor vs part-load ratio curve
-        bool ReportCoolingCoilCrankcasePower;     // logical determines if the cooling coil crankcase heater power is reported
-        Real64 CrankcaseHeaterCapacity;           // total crankcase heater capacity [W]
-        Real64 CrankcaseHeaterPower;              // report variable for average crankcase heater power [W]
-        Real64 MaxOATCrankcaseHeater;             // maximum OAT for crankcase heater operation [C]
+        int EIRFFlowErrorIndex;                // Used for warning messages when output of EIRFFlow is negative
+        Array1D_int PLFFPLR;                   // index of part-load factor vs part-load ratio curve
+        bool ReportCoolingCoilCrankcasePower;  // logical determines if the cooling coil crankcase heater power is reported
+        Real64 CrankcaseHeaterCapacity;        // total crankcase heater capacity [W]
+        Real64 CrankcaseHeaterPower;           // report variable for average crankcase heater power [W]
+        Real64 MaxOATCrankcaseHeater;          // maximum OAT for crankcase heater operation [C]
         int CrankcaseHeaterCapacityCurveIndex; // Crankcase heater power-temperature curve or table index
-        Real64 CrankcaseHeaterConsumption;        // report variable for total crankcase heater energy consumption [J]
-        Real64 BasinHeaterPowerFTempDiff;         // Basin heater capacity per degree C below setpoint (W/C)
-        Real64 BasinHeaterSetPointTemp;           // setpoint temperature for basin heater operation (C)
-        int CompanionUpstreamDXCoil;              // index number of the DX coil that is "upstream" of this DX coil. Currently used for
+        Real64 CrankcaseHeaterConsumption;     // report variable for total crankcase heater energy consumption [J]
+        Real64 BasinHeaterPowerFTempDiff;      // Basin heater capacity per degree C below setpoint (W/C)
+        Real64 BasinHeaterSetPointTemp;        // setpoint temperature for basin heater operation (C)
+        int CompanionUpstreamDXCoil;           // index number of the DX coil that is "upstream" of this DX coil. Currently used for
         // UnitarySystem:HeatPump:AirToAir for proper calculation of crankcase heater energy
         // consumption
         bool FindCompanionUpStreamCoil;    // Flag to get the companion coil in Init.
@@ -459,8 +459,8 @@ namespace DXCoils {
               BypassedFlowFrac(MaxModes, 0.0), RatedCBF(MaxModes, 0.0), AirInNode(0), AirOutNode(0), CCapFTemp(MaxModes, 0), CCapFTempErrorIndex(0),
               CCapFFlow(MaxModes, 0), CCapFFlowErrorIndex(0), EIRFTemp(MaxModes, 0), EIRFTempErrorIndex(0), EIRFFlow(MaxModes, 0),
               EIRFFlowErrorIndex(0), PLFFPLR(MaxModes, 0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0),
-              CrankcaseHeaterPower(0.0), MaxOATCrankcaseHeater(0.0), CrankcaseHeaterCapacityCurveIndex(0), CrankcaseHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0),
-              BasinHeaterSetPointTemp(0.0), CompanionUpstreamDXCoil(0), FindCompanionUpStreamCoil(true),
+              CrankcaseHeaterPower(0.0), MaxOATCrankcaseHeater(0.0), CrankcaseHeaterCapacityCurveIndex(0), CrankcaseHeaterConsumption(0.0),
+              BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), CompanionUpstreamDXCoil(0), FindCompanionUpStreamCoil(true),
               CondenserInletNodeNum(MaxModes, 0), LowOutletTempIndex(0), FullLoadOutAirTempLast(0.0), FullLoadInletAirTempLast(0.0),
               PrintLowOutTempMessage(false), HeatingCoilPLFCurvePTR(0), BasinHeaterSchedulePtr(0), RatedTotCap2(0.0), RatedSHR2(0.0), RatedCOP2(0.0),
               RatedAirVolFlowRate2(0.0), RatedAirMassFlowRate2(0.0), RatedCBF2(0.0), CCapFTemp2(0), EIRFTemp2(0), RatedEIR2(0.0),

@@ -3035,8 +3035,7 @@ namespace VariableSpeedCoils {
             }
 
             if (!lAlphaBlanks(71)) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex =
-                    Curve::GetCurveIndex(state, AlphArray(71));
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, AlphArray(71));
             }
 
             // CurrentModuleObject = "Coil:Waterheating:Airtowaterheatpump:Variablespeed"
