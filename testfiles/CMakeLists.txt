@@ -344,6 +344,7 @@ add_simulation_test(IDF_FILE HVACStandAloneERV_Economizer.idf EPW_FILE USA_IL_Ch
 add_simulation_test(IDF_FILE HeaderedPumpsConSpeed.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeaderedPumpsVarSpeed.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPump.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE HeatPump_variableCrankcaseHeaterCapacity.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpAirToAirWithRHcontrol.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpCycFanWithEcono.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
