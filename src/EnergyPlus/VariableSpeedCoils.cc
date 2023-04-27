@@ -6058,6 +6058,12 @@ namespace VariableSpeedCoils {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {
                 state.dataVariableSpeedCoils->CrankcaseHeatingPower_CalcVarSpeedCoilCooling =
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity;
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex > 0) {
+                    state.dataVariableSpeedCoils->CrankcaseHeatingPower_CalcVarSpeedCoilCooling =
+                        Curve::CurveValue(state,
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex,
+                                          state.dataEnvrn->OutDryBulbTemp);
+                }
             } else {
                 state.dataVariableSpeedCoils->CrankcaseHeatingPower_CalcVarSpeedCoilCooling = 0.0;
             }
@@ -6746,6 +6752,11 @@ namespace VariableSpeedCoils {
             // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
             if (state.dataEnvrn->OutDryBulbTemp < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {
                 CrankcaseHeatingPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity;
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex > 0) {
+                    CrankcaseHeatingPower = Curve::CurveValue(state,
+                                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex,
+                                                              state.dataEnvrn->OutDryBulbTemp);
+                }
             };
         }
 
@@ -7333,6 +7344,12 @@ namespace VariableSpeedCoils {
             // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
             if (state.dataVariableSpeedCoils->OutdoorDryBulb < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {
                 state.dataVariableSpeedCoils->CrankcaseHeatingPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity;
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex > 0) {
+                    state.dataVariableSpeedCoils->CrankcaseHeatingPower =
+                        Curve::CurveValue(state,
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex,
+                                          state.dataEnvrn->OutDryBulbTemp);
+                }
             } else {
                 state.dataVariableSpeedCoils->CrankcaseHeatingPower = 0.0;
             }
