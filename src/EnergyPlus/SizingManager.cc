@@ -4480,7 +4480,7 @@ void ReportSysSizing(EnergyPlusData &state,
     if (state.dataSizingManager->ReportSysSizingMyOneTimeFlag) {
         print(state.files.eio,
               "{}\n",
-              "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
+              "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity [W], Calc Des Air "
               "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak");
         state.dataSizingManager->ReportSysSizingMyOneTimeFlag = false;
     }
