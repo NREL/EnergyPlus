@@ -10662,11 +10662,7 @@ namespace UnitarySystems {
                     state.dataUnitarySystems->CompOnMassFlow = this->m_CoolMassFlowRate[this->m_EconoSpeedNum];
                     state.dataUnitarySystems->CompOnFlowRatio = this->m_MSCoolingSpeedRatio[this->m_EconoSpeedNum];
                     state.dataUnitarySystems->OACompOnMassFlow = this->m_CoolOutAirMassFlow;
-                } else if (CoolSpeedNum == 1) {
-                    state.dataUnitarySystems->CompOnMassFlow = this->m_CoolMassFlowRate[1];
-                    state.dataUnitarySystems->CompOnFlowRatio = this->m_MSCoolingSpeedRatio[1];
-                    state.dataUnitarySystems->OACompOnMassFlow = this->m_CoolOutAirMassFlow;
-                } else if (CoolSpeedNum > 1) {
+                } else if (CoolSpeedNum > 0) {
                     state.dataUnitarySystems->CompOnMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum];
                     state.dataUnitarySystems->CompOnFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum];
                     state.dataUnitarySystems->OACompOnMassFlow = this->m_CoolOutAirMassFlow;
@@ -10684,20 +10680,20 @@ namespace UnitarySystems {
                         state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
                     } else if (CoolSpeedNum == 1) {
                         state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum];
-                        state.dataUnitarySystems->CompOffFlowRatio = this->m_CoolMassFlowRate[CoolSpeedNum];
+                        state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum];
                         state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
                     } else {
                         state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum - 1];
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum - 1];
                         state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
                     }
-                } else { // cycling fan mode
-                    if (CoolSpeedNum <= 1) {
-                        state.dataUnitarySystems->CompOffMassFlow = 0.0; // #5518
-                        state.dataUnitarySystems->CompOffFlowRatio = 0.0;
-                    } else if (this->m_EconoSpeedNum > 1) { // multi-stage economizer operation; set system flow rate to economizer flow rate
+                } else {                             // cycling fan mode
+                    if (this->m_EconoSpeedNum > 1) { // multi-stage economizer operation; set system flow rate to economizer flow rate
                         state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[this->m_EconoSpeedNum];
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[this->m_EconoSpeedNum];
+                    } else if (CoolSpeedNum <= 1) {
+                        state.dataUnitarySystems->CompOffMassFlow = 0.0; // #5518
+                        state.dataUnitarySystems->CompOffFlowRatio = 0.0;
                     } else {
                         state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum - 1];
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum - 1];
@@ -10975,7 +10971,7 @@ namespace UnitarySystems {
         // Set OnOffAirFlowRatio to be used by DX coils
 
         // METHODOLOGY EMPLOYED:
-        // The air flow rate in cooling, heating, and no cooling or heating can be dIFferent.
+        // The air flow rate in cooling, heating, and no cooling or heating can be different.
         // Calculate the air flow rate based on initializations.
 
         Real64 AverageUnitMassFlow = 0.0; // average supply air mass flow rate over time step
@@ -18223,8 +18219,10 @@ namespace UnitarySystems {
                 state.dataAirLoop->AirLoopFlow(AirLoopNum).ReqSupplyFrac =
                     UnitarySystemMSEconomizer.m_CoolMassFlowRate[UnitarySystemMSEconomizer.m_EconoSpeedNum] /
                     UnitarySystemMSEconomizer.m_CoolMassFlowRate[clgSpdNum];
+                // adjust mixed air flow rate for rated air flow rate adjustment (variable speed coils only)
+                state.dataAirLoop->AirLoopFlow(AirLoopNum).ReqSupplyFrac *=
+                    UnitarySystemMSEconomizer.m_CoolMassFlowRate[clgSpdNum] / state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
                 // determine fan heat based on new mixed air flow rate
-                Real64 fanHeat = 0;
                 Real64 fanDT = 0;
                 int mixedAirNode = OACtrl.MixNode;
                 int FanInletNode = 0;
@@ -18264,8 +18262,6 @@ namespace UnitarySystems {
                                                  FirstHVACIteration,
                                                  AirLoopNum,
                                                  UnitarySystemMSEconomizer.OASysIndex);
-            } else {
-                UnitarySystemMSEconomizer.m_EconoSpeedNum = 1.0;
             }
         }
     }
