@@ -1445,30 +1445,16 @@ namespace OutputProcessor {
         // the standard resource type.
 
         ErrorsFound = false;
-        std::string const &meterType = UtilityRoutines::MakeUPPERCase(UserInputResourceType);
+        std::string const meterType = UtilityRoutines::MakeUPPERCase(UserInputResourceType);
 
         int eMeterResource = getEnumerationValue(Constant::eResourceNamesUC, meterType);
 
         if (eMeterResource == static_cast<int>(Constant::eResource::Invalid)) {
-            if (meterType == "H2O") {
-                eMeterResource = static_cast<int>(Constant::eResource::Water);
-            } else if (meterType == "WATERPRODUCED" || meterType == "ONSITE WATER") {
-                eMeterResource = static_cast<int>(Constant::eResource::OnSiteWater);
-            } else if (meterType == "WATERSUPPLY") {
-                eMeterResource = static_cast<int>(Constant::eResource::MainsWater);
-            } else if (meterType == "PRECIPITATION") {
-                eMeterResource = static_cast<int>(Constant::eResource::RainWater);
-            } else if (meterType == "GROUNDWATER") {
-                eMeterResource = static_cast<int>(Constant::eResource::WellWater);
-            } else if (meterType == "ENERGYXFER" || meterType == "XFER") {
-                eMeterResource = static_cast<int>(Constant::eResource::EnergyTransfer);
-            } else {
-                ShowSevereError(state,
-                                format("GetStandardMeterResourceType: Illegal OutResourceType (for Meters) Entered={}", UserInputResourceType));
-                ErrorsFound = true;
-                return;
-            }
+            ShowSevereError(state, format("GetStandardMeterResourceType: Illegal OutResourceType (for Meters) Entered={}", UserInputResourceType));
+            ErrorsFound = true;
+            return;
         }
+
         OutResourceType = Constant::eResourceNames[eMeterResource];
     }
 
