@@ -356,6 +356,7 @@ add_simulation_test(IDF_FILE HeatPumpSecondaryCoil.idf EPW_FILE USA_IL_Chicago-O
 add_simulation_test(IDF_FILE HeatPumpSimpleDCV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpVRP_DCV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpVSAS.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE HeatPumpVSAS_variableCrankcaseHeaterCapacity.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpWaterHeater.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpWaterHeaterStratified.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpWaterToAir.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
