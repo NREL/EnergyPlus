@@ -85,7 +85,7 @@ namespace HVACManager {
 
     void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir); // TRUE means air loops must be (re)simulated
 
-    void ResetHVACControl(const EnergyPlusData &state);
+    void ResetHVACControl(EnergyPlusData &state);
 
     void ResetNodeData(EnergyPlusData &state);
 

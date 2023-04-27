@@ -2116,7 +2116,7 @@ void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir) // TRUE means air 
     }
 }
 
-void ResetHVACControl(const EnergyPlusData &state)
+void ResetHVACControl(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
