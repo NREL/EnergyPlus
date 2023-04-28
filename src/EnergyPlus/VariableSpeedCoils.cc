@@ -1386,7 +1386,7 @@ namespace VariableSpeedCoils {
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I);
             }
 
-            // A50; \field Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+            // A50; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
             if (!lAlphaBlanks(50)) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, AlphArray(50));
             }

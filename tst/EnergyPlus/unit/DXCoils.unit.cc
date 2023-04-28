@@ -1118,7 +1118,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name",
         ",                        !- Report ASHRAE Standard 127 Performance Ratings",
         ",                        !- Zone Name for Condenser Placement",
-        "heaterCapCurve;          !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "heaterCapCurve;          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
 
         "Coil:Heating:DX:SingleSpeed,",
         "Coil:Heating:DX:SingleSpeed coil,      !- Name",
@@ -1153,7 +1153,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",                                         !- Nominal Sensible Heat Ratio of Secondary Coil",
         ",                                         !- Sensible Heat Ratio Modifier Function of Temperature Curve Name",
         ",                                         !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name",
-        "heaterCapCurve2;                          !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "heaterCapCurve2;                          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
 
         "Coil:Cooling:DX:MultiSpeed,",
         "Coil:Cooling:DX:MultiSpeed coil,                     !- Name",
@@ -1255,7 +1255,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "0.3, !- Speed 4 Evaporative Condenser Air Flow Rate{ m3 / s }",
         "100,                     !- Speed 4 Rated Evaporative Condenser Pump Power Consumption{ W }",
         ",                                         !- Zone Name for Condenser Placement",
-        "heaterCapCurve3;                          !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "heaterCapCurve3;                          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
 
         " Coil:Heating:DX:MultiSpeed,",
         "Coil:Heating:DX:MultiSpeed coil,                          !- Name",
@@ -1345,7 +1345,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",",
         ",",
         ",",
-        "heaterCapCurve4;                          !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "heaterCapCurve4;                          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
 
         "  Coil:Cooling:DX:VariableSpeed,",
         "Coil:Cooling:DX:VariableSpeed coil,    !- Name",
@@ -1469,7 +1469,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",",
         ",",
         ",",
-        "heaterCapCurve5;                          !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "heaterCapCurve5;                          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
 
         "  Coil:Heating:DX:VariableSpeed,",
         "Coil:Heating:DX:VariableSpeed coil,  !- Name",
@@ -1560,7 +1560,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    Cubic,                   !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name",
         "    Biquadratic,             !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
         "    Cubic,                   !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-        "heaterCapCurve6;             !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "heaterCapCurve6;             !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
 
         "Coil:Cooling:DX:TwoStageWithHumidityControlMode,",
         "Coil:Cooling:DX:TwoStageWithHumidityControlMode coil,       !- Name",
@@ -1585,7 +1585,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",                        !- Basin Heater Capacity",
         ",                        !- Basin Heater Setpoint Temperature",
         ",                        !- Basin Heater Operating Schedule Name",
-        "heaterCapCurve7;         !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "heaterCapCurve7;         !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
 
         "Coil:WaterHeating:AirToWaterHeatPump:Wrapped,",
         "    HPWH Coil_1,             !- Name",
@@ -1607,7 +1607,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    Biquadratic,             !- Heating COP Function of Temperature Curve Name",
         "    ,",
         "    ,",
-        "    heaterCapCurve8;         !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "    heaterCapCurve8;         !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
 
         "  Coil:WaterHeating:AirToWaterHeatPump:Pumped,",
         "    Zone4HPWHDXCoil,         !- Name",
@@ -1638,7 +1638,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    ,                        !- Heating COP Function of Air Flow Fraction Curve Name",
         "    ,                        !- Heating COP Function of Water Flow Fraction Curve Name",
         "    Cubic,                   !- Part Load Fraction Correlation Curve Name",
-        "    heaterCapCurve9;         !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "    heaterCapCurve9;         !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
 
         "  Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,",
         "    HPWHOutdoorDXCoilVS,     !- Name",
@@ -1782,7 +1782,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
         "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
         "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
-        "    heaterCapCurve10;           !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "    heaterCapCurve10;           !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
 
         "CoilPerformance:DX:Cooling,",
         "DOAS Standard Perf 1,    !- Name",

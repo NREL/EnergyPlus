@@ -1362,7 +1362,7 @@ void GetDXCoils(EnergyPlusData &state)
                 ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(18), Alphas(18)));
             }
         }
-        // A19; \field Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+        // A19; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
         if (!lAlphaBlanks(19)) {
             thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(19));
         }
@@ -1913,7 +1913,7 @@ void GetDXCoils(EnergyPlusData &state)
                 ShowContinueError(state, "Basin heater will be available to operate throughout the simulation.");
             }
         }
-        // A16; \field Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+        // A16; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
         if (!lAlphaBlanks(16)) {
             thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(16));
         }
@@ -2368,7 +2368,7 @@ void GetDXCoils(EnergyPlusData &state)
                 }
             }
         }
-        // A17; \field Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+        // A17; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
         if (!lAlphaBlanks(17)) {
             thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(17));
         }

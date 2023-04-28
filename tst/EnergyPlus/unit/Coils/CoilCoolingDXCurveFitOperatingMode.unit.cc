@@ -238,7 +238,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
          "  Coil Cooling DX Curve Fit Operating Mode 1, !- Base Operating Mode",
          ",",
          ",",
-         "heaterCapCurve;          !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+         "heaterCapCurve;          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
 
          "Curve:Linear,",
          "heaterCapCurve,          !- Name",

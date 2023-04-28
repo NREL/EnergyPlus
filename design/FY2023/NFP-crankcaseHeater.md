@@ -133,7 +133,7 @@ heater capacity.
 
 The added optional field is:
 
-    Ai, \field Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    Ai, \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
         \note A Curve:* or Table:Lookup object encoding the relationship between
         \note the crankcase heater capacity and the outdoor air temperature. When this field is 
         \note missing or empty, constant crankcase heater capacity will be assumed.
