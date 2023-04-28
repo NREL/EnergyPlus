@@ -1365,6 +1365,13 @@ void GetDXCoils(EnergyPlusData &state)
         // A19; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
         if (!lAlphaBlanks(19)) {
             thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(19));
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                                 {1},                                          // Valid dimensions
+                                                 RoutineName,                                  // Routine name
+                                                 CurrentModuleObject,                          // Object Type
+                                                 thisDXCoil.Name,                              // Object Name
+                                                 cAlphaFields(19));                            // Field Name
         }
 
     } // end of the Doe2 DX coil loop
@@ -1916,6 +1923,13 @@ void GetDXCoils(EnergyPlusData &state)
         // A16; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
         if (!lAlphaBlanks(16)) {
             thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(16));
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                                 {1},                                          // Valid dimensions
+                                                 RoutineName,                                  // Routine name
+                                                 CurrentModuleObject,                          // Object Type
+                                                 thisDXCoil.Name,                              // Object Name
+                                                 cAlphaFields(16));                            // Field Name
         }
 
     } // end of the Multimode DX coil loop
@@ -2371,6 +2385,13 @@ void GetDXCoils(EnergyPlusData &state)
         // A17; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
         if (!lAlphaBlanks(17)) {
             thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(17));
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                                 {1},                                          // Valid dimensions
+                                                 RoutineName,                                  // Routine name
+                                                 CurrentModuleObject,                          // Object Type
+                                                 thisDXCoil.Name,                              // Object Name
+                                                 cAlphaFields(17));                            // Field Name
         }
 
     } // end of the DX heating coil loop
@@ -3430,6 +3451,13 @@ void GetDXCoils(EnergyPlusData &state)
 
         if (!lAlphaBlanks(17)) {
             thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(17));
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                                 {1},                                          // Valid dimensions
+                                                 RoutineName,                                  // Routine name
+                                                 CurrentModuleObject,                          // Object Type
+                                                 thisDXCoil.Name,                              // Object Name
+                                                 cAlphaFields(17));                            // Field Name
         }
 
         // assume compressor resides at the inlet to the DX Coil
@@ -3816,6 +3844,13 @@ void GetDXCoils(EnergyPlusData &state)
         // Coil:WaterHeating:AirToWaterHeatPump:Wrapped
         if (!lAlphaBlanks(11)) {
             thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(11));
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                                 {1},                                          // Valid dimensions
+                                                 RoutineName,                                  // Routine name
+                                                 CurrentModuleObject,                          // Object Type
+                                                 thisDXCoil.Name,                              // Object Name
+                                                 cAlphaFields(11));                            // Field Name
         }
 
         // assume compressor resides at the inlet to the DX Coil
@@ -4372,6 +4407,13 @@ void GetDXCoils(EnergyPlusData &state)
         }
         if (!lAlphaBlanks(38)) {
             thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(38));
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                                 {1},                                          // Valid dimensions
+                                                 RoutineName,                                  // Routine name
+                                                 CurrentModuleObject,                          // Object Type
+                                                 thisDXCoil.Name,                              // Object Name
+                                                 cAlphaFields(38));                            // Field Name
         }
     }
 
@@ -4871,6 +4913,13 @@ void GetDXCoils(EnergyPlusData &state)
         }
         if (!lAlphaBlanks(43)) {
             thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(43));
+            ErrorsFound |= Curve::CheckCurveDims(state,
+                                                 thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                                 {1},                                          // Valid dimensions
+                                                 RoutineName,                                  // Routine name
+                                                 CurrentModuleObject,                          // Object Type
+                                                 thisDXCoil.Name,                              // Object Name
+                                                 cAlphaFields(43));                            // Field Name
         }
     }
 
