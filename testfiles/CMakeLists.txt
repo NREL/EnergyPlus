@@ -734,6 +734,7 @@ add_simulation_test(IDF_FILE WCE_DoubleClear_BSDF.idf EPW_FILE USA_IL_Chicago-OH
 add_simulation_test(IDF_FILE WCE_Interior_VB_-45_deg.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE _5ZoneAirCooled_annual.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ANNUAL_SIMULATION)
 add_simulation_test(IDF_FILE _5ZoneAirCooled_LeapYear_annual.idf EPW_FILE MadeUpLeapYear.epw ANNUAL_SIMULATION)
+add_simulation_test(IDF_FILE UnitarySystem_MultiSpeedDX_EconoStaging.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ANNUAL_SIMULATION)
 
 # ASHRAE 90.1-2019 DOE commercial prototype models
 add_simulation_test(IDF_FILE ASHRAE901_ApartmentHighRise_STD2019_Denver.idf EPW_FILE USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw)
