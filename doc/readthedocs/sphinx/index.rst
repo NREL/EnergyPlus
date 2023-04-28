@@ -14,6 +14,7 @@ Over time, that scope may grow much further.
    c
    api
    schema
+   tips_and_tricks/tips_and_tricks
 
 Indices and tables
 ==================
