@@ -69,10 +69,10 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -4682,7 +4682,6 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     EXPECT_NEAR(25118.52, state->dataHVACGlobal->SuppHeatingCoilPower, 0.01);
     EXPECT_NEAR(0.0, thisSys.m_TotalAuxElecPower, 0.01);
 }
-
 
 TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
 {
