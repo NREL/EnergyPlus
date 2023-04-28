@@ -792,34 +792,37 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
     }
 
     // check that the economizer staging operation EconomizerFirst is only used with an sensible load-based controlled AirLoopHVAC:UnitarySystem
-    auto &primaryAirSystems = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
-    bool sensLoadCtrlUnitarySystemFound = false;
-    if (primaryAirSystems.EconomizerStagingCheckFlag == false) {
-        OAControllerNum = UtilityRoutines::FindItemInList(CtrlName, state.dataMixedAir->OAController);
-        if (state.dataMixedAir->OAController(OAControllerNum).EconomizerStagingOperation == EconomizerFirst) {
-            for (int BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
-                for (int CompNum = 1; CompNum <= primaryAirSystems.Branch(BranchNum).TotalComponents; ++CompNum) {
-                    if (primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num == SimAirServingZones::CompType::UnitarySystemModel) {
-                        std::string unitarySystemName = primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name;
-                        int unitarySystemNum = UtilityRoutines::FindItemInList(
-                            unitarySystemName, state.dataUnitarySystems->unitarySys, state.dataUnitarySystems->numUnitarySystems);
-                        if (state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_ControlType ==
-                            UnitarySystems::UnitarySys::UnitarySysCtrlType::Load) {
-                            sensLoadCtrlUnitarySystemFound = true;
-                            break;
+    if (AirLoopNum > 0) {
+        auto &primaryAirSystems = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
+        bool sensLoadCtrlUnitarySystemFound = false;
+        if (primaryAirSystems.EconomizerStagingCheckFlag == false) {
+            OAControllerNum = UtilityRoutines::FindItemInList(CtrlName, state.dataMixedAir->OAController);
+            if (state.dataMixedAir->OAController(OAControllerNum).EconomizerStagingOperation == EconomizerFirst) {
+                for (int BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
+                    for (int CompNum = 1; CompNum <= primaryAirSystems.Branch(BranchNum).TotalComponents; ++CompNum) {
+                        if (primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num == SimAirServingZones::CompType::UnitarySystemModel) {
+                            std::string unitarySystemName = primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name;
+                            int unitarySystemNum = UtilityRoutines::FindItemInList(
+                                unitarySystemName, state.dataUnitarySystems->unitarySys, state.dataUnitarySystems->numUnitarySystems);
+                            if (state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_ControlType ==
+                                UnitarySystems::UnitarySys::UnitarySysCtrlType::Load) {
+                                sensLoadCtrlUnitarySystemFound = true;
+                                break;
+                            }
                         }
                     }
                 }
+                if (sensLoadCtrlUnitarySystemFound == false) {
+                    ShowWarningError(
+                        state,
+                        format(
+                            "SimOAController: EconomizerFirst was selected in the \"{}\" Controller:OutdoorAir object but the air loop it belongs to "
+                            "doesn't include a AirLoopHVAC:UnitarySystem with a Load Control Type input. EconomizerFirst will not be enforced.",
+                            state.dataMixedAir->OAController(OAControllerNum).Name));
+                }
             }
-            if (sensLoadCtrlUnitarySystemFound == false) {
-                ShowWarningError(
-                    state,
-                    format("SimOAController: EconomizerFirst was selected in the \"{}\" Controller:OutdoorAir object but the air loop it belongs to "
-                           "doesn't include a AirLoopHVAC:UnitarySystem with a Load Control Type input. EconomizerFirst will not be enforced.",
-                           state.dataMixedAir->OAController(OAControllerNum).Name));
-            }
+            primaryAirSystems.EconomizerStagingCheckFlag = true;
         }
-        primaryAirSystems.EconomizerStagingCheckFlag = true;
     }
 
     if (CtrlIndex == 0) {
