@@ -1805,7 +1805,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 Surface(loop).Name);
-            if (Surface(loop).UseSurfPropertySrdSurfTemp) {
+            if (Surface(loop).SurfHasSurroundingSurfProperty) {
                 SetupOutputVariable(state,
                                     "Surface Outside Face Thermal Radiation to Surrounding Surfaces Heat Transfer Coefficient",
                                     OutputProcessor::Unit::W_m2K,
