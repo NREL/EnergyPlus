@@ -126,7 +126,7 @@
     No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    Yes,                     !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Sizing Periods
     Yes,                     !- Run Simulation for Weather File Run Periods
     No,                      !- Do HVAC Sizing Simulation for Sizing Periods
     1;                       !- Maximum Number of HVAC Sizing Simulation Passes
@@ -1171,8 +1171,8 @@
     heaterCapCurve,          !- Name
     60.0,                    !- Coefficient1 Constant
     -2.,                     !- Coefficient2 x
-    0.0,                     !- Minimum Value of x
-    200;                      !- Maximum Value of x
+    -30,                     !- Minimum Value of x
+    40;                      !- Maximum Value of x
 
   NodeList,
     OutsideAirInletNodes,    !- Name
@@ -1507,8 +1507,8 @@
     200,                     !- Basin Heater Capacity {W/K}
     ,                     
     ,                     
-    ,                     
-    ,                     
+    ,
+    ,
     ,                     
     ,                     
     heaterCapCurve;          !- Compressor Ambient Temperature Dependent Crankcase Heater Capacity Curve Name
@@ -1532,12 +1532,21 @@
     -5.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
-    200.0,                   !- Crankcase Heater Capacity {W}
-    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Crankcase Heater Capacity {W}
+    35.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     Resistive,               !- Defrost Strategy
     TIMED,                   !- Defrost Control
     0.166667,                !- Defrost Time Period Fraction
-    20000;                   !- Resistive Defrost Heater Capacity {W}
+    20000,                   !- Resistive Defrost Heater Capacity {W}
+    ,
+    ,
+    ,
+    ,
+    ,
+    ,
+    ,
+    ,
+    heaterCapCurve;          !- Compressor Ambient Temperature Dependent Crankcase Heater Capacity Curve Name
 
   Fan:OnOff,
     Supply Fan 1,            !- Name
@@ -1550,45 +1559,11 @@
     Mixed Air Node,          !- Air Inlet Node Name
     DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Output:Variable,*,Unitary System Fan Part Load Ratio,timestep;
-
-  Output:Variable,*,Unitary System Compressor Part Load Ratio,timestep;
-
-  Output:Variable,*,Zone Air System Sensible Heating Energy,timestep;
-
-  Output:Variable,*,Zone Air System Sensible Cooling Energy,timestep;
-
-  Output:Variable,*,Zone Air Temperature,timestep;
-
-  Output:Variable,*,Zone Air Relative Humidity,timestep;
-
-  Output:Variable,*,Zone Air Humidity Ratio,timestep;
-
-  Output:Variable,*,Fan Electricity Rate,timestep;
-
-  Output:Variable,*,Cooling Coil Total Cooling Energy,timestep;
-
-  Output:Variable,*,Cooling Coil Sensible Cooling Rate,timestep;
-
-  Output:Variable,*,Cooling Coil Sensible Cooling Energy,timestep;
-
-  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
-
-  Output:Variable,*,Heating Coil Heating Rate,timestep;
-
-  Output:Variable,*,Heating Coil Heating Energy,timestep;
-
-  Output:Variable,*,Heating Coil Electricity Rate,timestep;
-
-  Output:Variable,*,Heating Coil Defrost Electricity Rate,timestep;
-
-  Output:Variable,*,Cooling Coil Basin Heater Electricity Rate,timestep;
-
-  Output:Variable,*,Cooling Coil Basin Heater Electricity Energy,timestep;
-
-  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
-
-  Output:Variable,*,Heating Coil Defrost Electricity Energy,timestep;
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
+  Output:Variable,*,Cooling Coil Crankcase Heater Electricity Rate,timestep;
+  Output:Variable,*,Cooling Coil Runtime Fraction,timestep;
+  Output:Variable,*,Heating Coil Crankcase Heater Electricity Rate,timestep;
+  Output:Variable,*,Heating Coil Runtime Fraction,timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 

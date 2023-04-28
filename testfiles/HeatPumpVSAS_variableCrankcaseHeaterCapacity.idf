@@ -141,8 +141,8 @@
     -5.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
-    200.0,                   !- Crankcase Heater Capacity {W}
-    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Crankcase Heater Capacity {W}
+    35.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     Resistive,               !- Defrost Strategy
     TIMED,                   !- Defrost Control
     0.166667,                !- Defrost Time Period Fraction
@@ -216,7 +216,8 @@
     HPACHeatCapFT,           !- Speed 10 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
-    HPACHeatEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    HPACHeatEIRFFF,          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    heaterCapCurve;
 
   Curve:Biquadratic,
     HPACHeatCapFT,           !- Name
@@ -270,8 +271,8 @@
     ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
-    200.0,                   !- Crankcase Heater Capacity {W}
-    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Crankcase Heater Capacity {W}
+    35.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -377,7 +378,8 @@
     HPACCoolCapFT,           !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
     HPACCoolCapFFF,          !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPACCOOLEIRFT,           !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
-    HPACCOOLEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    HPACCOOLEIRFFF,          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    heaterCapCurve;
 
   Building,
     NONE,                    !- Name
@@ -402,7 +404,7 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No,                      !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
     No,                      !- Do HVAC Sizing Simulation for Sizing Periods
     1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
@@ -412,7 +414,7 @@
     14,                      !- Begin Day of Month
     ,                        !- Begin Year
     1,                       !- End Month
-    14,                      !- End Day of Month
+    18,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -420,21 +422,6 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-
-  RunPeriod,
-    Run Period 2,            !- Name
-    7,                       !- Begin Month
-    7,                       !- Begin Day of Month
-    ,                        !- Begin Year
-    7,                       !- End Month
-    7,                       !- End Day of Month
-    ,                        !- End Year
-    Tuesday,                 !- Day of Week for Start Day
-    Yes,                     !- Use Weather File Holidays and Special Days
-    Yes,                     !- Use Weather File Daylight Saving Period
-    No,                      !- Apply Weekend Holiday Rule
-    Yes,                     !- Use Weather File Rain Indicators
-    No;                      !- Use Weather File Snow Indicators
 
  ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
 
@@ -1431,6 +1418,13 @@
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
 
+  Curve:Linear,
+    heaterCapCurve,          !- Name
+    60.0,                    !- Coefficient1 Constant
+    -2.,                     !- Coefficient2 x
+    -30,                     !- Minimum Value of x
+    40;                      !- Maximum Value of x
+
   NodeList,
     OutsideAirInletNodes,    !- Name
     Outside Air Inlet Node;  !- Node 1 Name
@@ -1720,27 +1714,11 @@
     Mixed Air Node,          !- Air Inlet Node Name
     DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Output:Variable,*,Unitary System Fan Part Load Ratio,timestep;
-
-  Output:Variable,*,Unitary System Compressor Part Load Ratio,timestep;
-
-  Output:Variable,*,Zone Air System Sensible Heating Energy,timestep;
-
-  Output:Variable,*,Zone Air System Sensible Cooling Energy,timestep;
-
-  Output:Variable,*,Zone Air Temperature,timestep;
-
-  Output:Variable,*,Zone Air Relative Humidity,timestep;
-
-  Output:Variable,*,Zone Air Humidity Ratio,timestep;
-
-  Output:Variable,*,Fan Electricity Rate,timestep;
-
-  Output:Variable,*,Heating Coil Heating Energy,timestep;
-
-  Output:Variable,*,Heating Coil Heating Rate,timestep;
-
-  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
+  Output:Variable,*,Cooling Coil Crankcase Heater Electricity Rate,timestep;
+  Output:Variable,*,Heating Coil Crankcase Heater Electricity Rate,timestep;
+  Output:Variable,*,Cooling Coil Runtime Fraction,timestep;
+  Output:Variable,*,Heating Coil Runtime Fraction,timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
