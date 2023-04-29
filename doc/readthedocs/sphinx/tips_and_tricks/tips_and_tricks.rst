@@ -1,6 +1,10 @@
 Tips and Tricks for Using EnergyPlus
 ************************************
 
+.. raw:: html
+
+   <form><input type="BUTTON" value="Back to top of page" onclick="window.location.href='#top'" style="position:fixed;bottom:5%;left:50%"></form>
+
 .. contents::
    :depth: 2
 
