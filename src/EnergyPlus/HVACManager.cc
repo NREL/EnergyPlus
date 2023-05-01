@@ -2397,7 +2397,7 @@ void ReportInfiltrations(EnergyPlusData &state)
         } else if (thisZoneHB.MAT <= thisZone.OutDryBulbTemp) {
 
             thisInfiltration.InfilHeatGain =
-                thisInfiltration.MCpI_temp * (thisZone.OutDryBulbTemp - thisZoneHB.MAT) * TimeStepSys * ADSCorrectionFactor;
+                thisInfiltration.MCpI_temp * (thisZone.OutDryBulbTemp - thisZoneHB.MAT) * TimeStepSysSec * ADSCorrectionFactor;
             thisInfiltration.InfilHeatLoss = 0.0;
         }
 

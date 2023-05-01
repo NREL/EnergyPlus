@@ -184,7 +184,6 @@ namespace CoolTower {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name = state.dataIPShortCut->cAlphaArgs(1);     // Name of cooltower
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Schedule = state.dataIPShortCut->cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
@@ -540,10 +539,10 @@ namespace CoolTower {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromMains) {
                 SetupOutputVariable(state,
@@ -560,10 +559,10 @@ namespace CoolTower {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
             } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
                 SetupOutputVariable(state,
@@ -587,10 +586,10 @@ namespace CoolTower {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "Cooling",
-                                    _,
+                                    {},
                                     "System");
             }
         }

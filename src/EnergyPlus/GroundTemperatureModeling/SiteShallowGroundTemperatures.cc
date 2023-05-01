@@ -69,20 +69,11 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Reads input and creates instance of Site:GroundDomain:Shallow object
 
-    // USE STATEMENTS:
-    using namespace GroundTemperatureManager;
-
-    // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumNums;
-    int NumAlphas;
-    int IOStat;
     bool errorsFound = false;
 
     // New shared pointer for this model object
@@ -97,6 +88,10 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
     thisModel->objectName = objectName;
 
     if (numCurrObjects == 1) {
+
+        int NumNums;
+        int NumAlphas;
+        int IOStat;
 
         // Get the object names for each construction from the input processor
         state.dataInputProcessing->inputProcessor->getObjectItem(
@@ -145,8 +140,6 @@ Real64 SiteShallowGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &st
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Return the ground temperature from Site:GroundTemperature:Shallow
@@ -161,8 +154,6 @@ Real64 SiteShallowGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &stat
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Returns the ground temperature when input time is in seconds
@@ -191,8 +182,6 @@ Real64 SiteShallowGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Returns the ground temperature when input time is in months

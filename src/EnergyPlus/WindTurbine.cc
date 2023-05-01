@@ -689,10 +689,10 @@ namespace WindTurbine {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 windTurbine.Name,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "WINDTURBINE",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(state,
                                 "Generator Turbine Local Wind Speed",

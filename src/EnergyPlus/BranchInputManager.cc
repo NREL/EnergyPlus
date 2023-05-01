@@ -1052,7 +1052,6 @@ namespace BranchInputManager {
                                                                              lAlphaBlanks,
                                                                              cAlphaFields,
                                                                              cNumericFields);
-                    if (UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrFound)) continue;
                     ++BCount;
                     GetSingleBranchInput(state, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
                 }
@@ -1316,7 +1315,6 @@ namespace BranchInputManager {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            if (UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrFound)) continue;
 
             ++BCount;
             state.dataBranchInputManager->BranchList(BCount).Name = Alphas(1);

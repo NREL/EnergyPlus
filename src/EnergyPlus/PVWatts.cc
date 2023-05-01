@@ -88,8 +88,9 @@ namespace PVWatts {
                                        size_t surfaceNum,
                                        Real64 groundCoverageRatio)
         : moduleType_(moduleType), arrayType_(arrayType), geometryType_(geometryType), DCtoACRatio_(1.1), inverterEfficiency_(0.96),
-          outputDCPower_(1000.0), cellTemperature_(-9999), planeOfArrayIrradiance_(-9999), shadedPercent_(0.0),
-          pvwattsModule_(ssc_module_create("pvwattsv5_1ts")), pvwattsData_(ssc_data_create()), NumTimeStepsToday_(0.0)
+          outputDCPower_(1000.0), outputDCEnergy_(0.0), outputACPower_(0.0), outputACEnergy_(0.0), cellTemperature_(-9999),
+          planeOfArrayIrradiance_(-9999), shadedPercent_(0.0), pvwattsModule_(ssc_module_create("pvwattsv5_1ts")), pvwattsData_(ssc_data_create()),
+          NumTimeStepsToday_(0.0)
 
     {
 
@@ -186,10 +187,10 @@ namespace PVWatts {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "Photovoltaics",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Generator PV Cell Temperature",

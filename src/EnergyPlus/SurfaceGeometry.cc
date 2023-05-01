@@ -8518,7 +8518,7 @@ namespace SurfaceGeometry {
                     continue;
                 }
                 // Read surrounding surfaces properties
-                SrdSurfsProp.TotSurroundingSurface = NumNumeric - 1;
+                SrdSurfsProp.TotSurroundingSurface = NumNumeric - 2;
                 SrdSurfsProp.SurroundingSurfs.allocate(SrdSurfsProp.TotSurroundingSurface);
                 for (int SurfLoop = 1; SurfLoop <= SrdSurfsProp.TotSurroundingSurface; ++SurfLoop) {
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).Name = state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 2);

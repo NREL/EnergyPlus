@@ -191,7 +191,7 @@ namespace UnitarySystems {
         }
     }
 
-    DesignSpecMSHP *DesignSpecMSHP::factory(EnergyPlusData &state, int object_type_of_num, std::string const objectName)
+    DesignSpecMSHP *DesignSpecMSHP::factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName)
     {
 
         if (state.dataUnitarySystems->getMSHPInputOnceFlag) {
@@ -316,7 +316,7 @@ namespace UnitarySystems {
     } // namespace UnitarySystems
 
     HVACSystemData *UnitarySys::factory(
-        EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
+        EnergyPlusData &state, int const object_type_of_num, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
     {
         if (state.dataUnitarySystems->getInputOnceFlag) {
             UnitarySys::getUnitarySystemInput(state, objectName, ZoneEquipment, ZoneOAUnitNum);
@@ -7398,7 +7398,7 @@ namespace UnitarySystems {
                     thisSys.input_specs.use_doas_dx_cooling_coil = "No";
                 }
                 if (fields.find("minimum_supply_air_temperature") != fields.end()) { // not required field, has default (2C), and autosizable
-                    auto &tempFieldVal = fields.at("minimum_supply_air_temperature");
+                    auto const &tempFieldVal = fields.at("minimum_supply_air_temperature");
                     if (tempFieldVal == "Autosize") {
                         thisSys.input_specs.minimum_supply_air_temperature = DataSizing::AutoSize;
                     } else {
@@ -7423,7 +7423,7 @@ namespace UnitarySystems {
                         UtilityRoutines::MakeUPPERCase(fields.at("cooling_supply_air_flow_rate_method").get<std::string>());
                 }
                 if (fields.find("cooling_supply_air_flow_rate") != fields.end()) { // not required field, autosizable
-                    auto &tempFieldVal = fields.at("cooling_supply_air_flow_rate");
+                    auto const &tempFieldVal = fields.at("cooling_supply_air_flow_rate");
                     if (tempFieldVal == "Autosize") {
                         thisSys.input_specs.cooling_supply_air_flow_rate = DataSizing::AutoSize;
                     } else {
@@ -7447,7 +7447,7 @@ namespace UnitarySystems {
                         UtilityRoutines::MakeUPPERCase(fields.at("heating_supply_air_flow_rate_method").get<std::string>());
                 }
                 if (fields.find("heating_supply_air_flow_rate") != fields.end()) { // not required field
-                    auto &tempFieldVal = fields.at("heating_supply_air_flow_rate");
+                    auto const &tempFieldVal = fields.at("heating_supply_air_flow_rate");
                     if (tempFieldVal == "Autosize") {
                         thisSys.input_specs.heating_supply_air_flow_rate = DataSizing::AutoSize;
                     } else {
@@ -7471,7 +7471,7 @@ namespace UnitarySystems {
                         UtilityRoutines::MakeUPPERCase(fields.at("no_load_supply_air_flow_rate_method").get<std::string>());
                 }
                 if (fields.find("no_load_supply_air_flow_rate") != fields.end()) { // not required field
-                    auto &tempFieldVal = fields.at("no_load_supply_air_flow_rate");
+                    auto const &tempFieldVal = fields.at("no_load_supply_air_flow_rate");
                     if (tempFieldVal == "Autosize") {
                         thisSys.input_specs.no_load_supply_air_flow_rate = DataSizing::AutoSize;
                     } else {
@@ -7499,7 +7499,7 @@ namespace UnitarySystems {
                         fields.at("no_load_supply_air_flow_rate_per_unit_of_capacity_during_heating_operation").get<Real64>();
                 }
                 if (fields.find("maximum_supply_air_temperature") != fields.end()) { // not required field, has default of 80 C
-                    auto &tempFieldVal = fields.at("maximum_supply_air_temperature");
+                    auto const &tempFieldVal = fields.at("maximum_supply_air_temperature");
                     if (tempFieldVal == "Autosize") {
                         thisSys.input_specs.maximum_supply_air_temperature = DataSizing::AutoSize;
                     } else {
@@ -11053,6 +11053,9 @@ namespace UnitarySystems {
         if (this->m_IsZoneEquipment) {
             turnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
             turnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
+            // set global flag to act on the fan operation
+            state.dataHVACGlobal->TurnFansOn = turnFansOn;
+            state.dataHVACGlobal->TurnFansOff = turnFansOff;
         } else {
             turnFansOn = state.dataHVACGlobal->TurnFansOn;
             turnFansOff = state.dataHVACGlobal->TurnFansOff;
@@ -11186,17 +11189,7 @@ namespace UnitarySystems {
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
                                                                        _);
             } else {
-                if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state,
-                                                blankString,
-                                                FirstHVACIteration,
-                                                this->m_FanIndex,
-                                                state.dataUnitarySystems->FanSpeedRatio,
-                                                state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                                state.dataHVACGlobal->ZoneCompTurnFansOff);
-                } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                }
+                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
 
@@ -11234,18 +11227,7 @@ namespace UnitarySystems {
                                                                            state.dataUnitarySystems->m_runTimeFraction2,
                                                                            _);
                 } else {
-                    if (this->m_IsZoneEquipment) {
-                        Fans::SimulateFanComponents(state,
-                                                    blankString,
-                                                    FirstHVACIteration,
-                                                    this->m_FanIndex,
-                                                    state.dataUnitarySystems->FanSpeedRatio,
-                                                    state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                                    state.dataHVACGlobal->ZoneCompTurnFansOff);
-                    } else {
-                        Fans::SimulateFanComponents(
-                            state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                    }
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 }
                 if (this->m_CoolCoilExists) {
                     this->calcUnitaryCoolingSystem(
@@ -11297,18 +11279,7 @@ namespace UnitarySystems {
                                                                            state.dataUnitarySystems->m_runTimeFraction2,
                                                                            _);
                 } else {
-                    if (this->m_IsZoneEquipment) {
-                        Fans::SimulateFanComponents(state,
-                                                    blankString,
-                                                    FirstHVACIteration,
-                                                    this->m_FanIndex,
-                                                    state.dataUnitarySystems->FanSpeedRatio,
-                                                    state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                                    state.dataHVACGlobal->ZoneCompTurnFansOff);
-                    } else {
-                        Fans::SimulateFanComponents(
-                            state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                    }
+                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
                 }
                 if (this->m_HeatCoilExists) {
                     this->calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad);
@@ -11342,17 +11313,7 @@ namespace UnitarySystems {
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
                                                                        _);
             } else {
-                if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state,
-                                                blankString,
-                                                FirstHVACIteration,
-                                                this->m_FanIndex,
-                                                state.dataUnitarySystems->FanSpeedRatio,
-                                                state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                                state.dataHVACGlobal->ZoneCompTurnFansOff);
-                } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                }
+                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
         if (this->m_SuppCoilExists) {
@@ -11646,7 +11607,7 @@ namespace UnitarySystems {
         case DataHVACGlobals::CoilDX_CoolingHXAssisted:
         case DataHVACGlobals::CoilWater_CoolingHXAssisted: {
             if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted) {
-                Real64 mdot =
+                mdot =
                     min(state.dataLoopNodes->Node(this->CoolCoilFluidOutletNodeNum).MassFlowRateMaxAvail, this->MaxCoolCoilFluidFlow * PartLoadRatio);
                 state.dataLoopNodes->Node(this->CoolCoilFluidInletNode).MassFlowRate = mdot;
             }
@@ -15633,9 +15594,6 @@ namespace UnitarySystems {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variable for the coils.
 
-        auto &OASysEqSizing = state.dataSize->OASysEqSizing;
-        auto &CurOASysNum = state.dataSize->CurOASysNum;
-
         Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         Real64 SensibleOutput = 0.0; // sensible output rate, {W}
@@ -16009,13 +15967,15 @@ namespace UnitarySystems {
             if (AirLoopNum > -1) {
                 if (!state.dataGlobal->SysSizingCalc) {
 
+                    int const CurOASysNum = state.dataSize->CurOASysNum;
                     if (CurOASysNum > 0) {
-                        OASysEqSizing(CurOASysNum).AirFlow = false;
-                        OASysEqSizing(CurOASysNum).CoolingAirFlow = false;
-                        OASysEqSizing(CurOASysNum).HeatingAirFlow = false;
-                        OASysEqSizing(CurOASysNum).Capacity = false;
-                        OASysEqSizing(CurOASysNum).CoolingCapacity = false;
-                        OASysEqSizing(CurOASysNum).HeatingCapacity = false;
+                        auto &thisOASysEqSizing = state.dataSize->OASysEqSizing(CurOASysNum);
+                        thisOASysEqSizing.AirFlow = false;
+                        thisOASysEqSizing.CoolingAirFlow = false;
+                        thisOASysEqSizing.HeatingAirFlow = false;
+                        thisOASysEqSizing.Capacity = false;
+                        thisOASysEqSizing.CoolingCapacity = false;
+                        thisOASysEqSizing.HeatingCapacity = false;
                         this->m_FirstPass = false;
                     } else if (state.dataSize->CurSysNum > 0) {
                         state.dataAirLoop->AirLoopControlInfo(state.dataSize->CurSysNum).UnitarySysSimulating = false;
@@ -17350,10 +17310,10 @@ namespace UnitarySystems {
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                            _,
+                                            {},
                                             "Electricity",
                                             "Cooling",
-                                            _,
+                                            {},
                                             "System");
                     }
                     if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatCoilExists ||
@@ -17365,10 +17325,10 @@ namespace UnitarySystems {
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                            _,
+                                            {},
                                             "Electricity",
                                             "Heating",
-                                            _,
+                                            {},
                                             "System");
                     }
 

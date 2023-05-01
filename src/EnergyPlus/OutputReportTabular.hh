@@ -613,7 +613,7 @@ namespace OutputReportTabular {
                        bool &desConditionlinepassed,
                        bool &heatingDesignlinepassed,
                        bool &coolingDesignlinepassed,
-                       bool &isKoppen,
+                       bool isKoppen,
                        bool &insideLiquidPrecipitation);
 
     void FillWeatherPredefinedEntries(EnergyPlusData &state);
@@ -860,7 +860,7 @@ namespace OutputReportTabular {
 
     void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle);
 
-    void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, ObjexxFCL::Optional_bool_const isBold = _);
+    void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, bool const useBold = false);
 
     void WriteTable(EnergyPlusData &state,
                     Array2S_string const body, // row,column

@@ -17,7 +17,6 @@
 #define BOOST_FUNCTIONAL_HASH_HASH_HPP
 
 #include <boost/container_hash/hash_fwd.hpp>
-#include <functional>
 #include <iterator>
 #include <boost/container_hash/detail/hash_float.hpp>
 #include <string>
@@ -119,17 +118,12 @@ namespace boost
 {
     namespace hash_detail
     {
-#if defined(BOOST_NO_CXX98_FUNCTION_BASE)
         template <typename T>
         struct hash_base
         {
             typedef T argument_type;
             typedef std::size_t result_type;
         };
-#else
-        template <typename T>
-        struct hash_base : std::unary_function<T, std::size_t> {};
-#endif
 
         struct enable_hash_value { typedef std::size_t type; };
 
