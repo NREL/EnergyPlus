@@ -668,6 +668,8 @@
     Main Floor WAHP Mixed Air Outlet,  !- Air Inlet Node Name
     Main Floor WAHP Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}

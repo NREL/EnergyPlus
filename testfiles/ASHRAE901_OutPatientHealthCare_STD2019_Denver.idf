@@ -46109,6 +46109,8 @@
     AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
     3.39928881549157,        !- High Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     AHU-1_OA-AHU-1_CoolCNode,!- Air Inlet Node Name
     AHU-1_CoolC-AHU-1_HeatCNode,  !- Air Outlet Node Name
@@ -46121,6 +46123,8 @@
     AUTOSIZE,                !- Low Speed Gross Rated Sensible Heat Ratio
     3.39928881549157,        !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     AHU-1_CoolCStandard10Ton_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     AHU-1_CoolCStandard10Ton_EIRFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
 
@@ -46131,6 +46135,8 @@
     AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
     3.39928881549157,        !- High Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     AHU-2_OA-AHU-2_CoolCNode,!- Air Inlet Node Name
     AHU-2_CoolC-AHU-2_HeatCNode,  !- Air Outlet Node Name
@@ -46143,6 +46149,8 @@
     AUTOSIZE,                !- Low Speed Gross Rated Sensible Heat Ratio
     3.39928881549157,        !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     AHU-2_CoolCStandard10Ton_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     AHU-2_CoolCStandard10Ton_EIRFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
 

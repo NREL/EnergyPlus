@@ -23400,6 +23400,8 @@
     0.79866,                 !- High Speed Rated Sensible Heat Ratio
     3.39928881549157,        !- High Speed Gross Rated Cooling COP {W/W}
     4.86062,                 !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     PSZ-AC_1:5_OA-PSZ-AC_1:5_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC_1:5_CoolC-PSZ-AC_1:5_HeatCNode,  !- Air Outlet Node Name
@@ -23412,6 +23414,8 @@
     0.79866,                 !- Low Speed Gross Rated Sensible Heat Ratio
     3.39928881549157,        !- Low Speed Gross Rated Cooling COP {W/W}
     3.24041333333333,        !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
     ;                        !- Condenser Air Inlet Node Name
@@ -23423,6 +23427,8 @@
     0.79866,                 !- High Speed Rated Sensible Heat Ratio
     3.39928881549157,        !- High Speed Gross Rated Cooling COP {W/W}
     5.10017,                 !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     PSZ-AC_2:6_OA-PSZ-AC_2:6_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC_2:6_CoolC-PSZ-AC_2:6_HeatCNode,  !- Air Outlet Node Name
@@ -23435,6 +23441,8 @@
     0.79866,                 !- Low Speed Gross Rated Sensible Heat Ratio
     3.39928881549157,        !- Low Speed Gross Rated Cooling COP {W/W}
     3.40011333333333,        !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
     ;                        !- Condenser Air Inlet Node Name
@@ -23446,6 +23454,8 @@
     0.79103,                 !- High Speed Rated Sensible Heat Ratio
     3.39928881549157,        !- High Speed Gross Rated Cooling COP {W/W}
     4.85481,                 !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     PSZ-AC_3:7_OA-PSZ-AC_3:7_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC_3:7_CoolC-PSZ-AC_3:7_HeatCNode,  !- Air Outlet Node Name
@@ -23458,6 +23468,8 @@
     0.79103,                 !- Low Speed Gross Rated Sensible Heat Ratio
     3.39928881549157,        !- Low Speed Gross Rated Cooling COP {W/W}
     3.23654,                 !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
     ;                        !- Condenser Air Inlet Node Name
@@ -23469,6 +23481,8 @@
     0.79660,                 !- High Speed Rated Sensible Heat Ratio
     3.73224036438218,        !- High Speed Gross Rated Cooling COP {W/W}
     2.48125,                 !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     PSZ-AC_4:8_OA-PSZ-AC_4:8_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC_4:8_CoolC-PSZ-AC_4:8_HeatCNode,  !- Air Outlet Node Name
@@ -23481,6 +23495,8 @@
     0.79660,                 !- Low Speed Gross Rated Sensible Heat Ratio
     3.73224036438218,        !- Low Speed Gross Rated Cooling COP {W/W}
     1.65416666666667,        !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
     ;                        !- Condenser Air Inlet Node Name
@@ -23492,6 +23508,8 @@
     0.79103,                 !- High Speed Rated Sensible Heat Ratio
     3.73224036438218,        !- High Speed Gross Rated Cooling COP {W/W}
     2.94784,                 !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     PSZ-AC_5:9_OA-PSZ-AC_5:9_CoolCNode,  !- Air Inlet Node Name
     PSZ-AC_5:9_CoolC-PSZ-AC_5:9_HeatCNode,  !- Air Outlet Node Name
@@ -23504,6 +23522,8 @@
     0.79103,                 !- Low Speed Gross Rated Sensible Heat Ratio
     3.73224036438218,        !- Low Speed Gross Rated Cooling COP {W/W}
     1.96522666666667,        !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
     ;                        !- Condenser Air Inlet Node Name
