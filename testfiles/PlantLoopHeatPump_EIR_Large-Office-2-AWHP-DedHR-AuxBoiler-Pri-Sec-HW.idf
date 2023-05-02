@@ -1,6 +1,6 @@
-!- PlantLoopHeatPump_EIR_Large-Office-2-AWHP-DedHR-AuxBoiler-Pri-Sec-HW
+! PlantLoopHeatPump_EIR_Large-Office-2-AWHP-DedHR-AuxBoiler-Pri-Sec-HW
 !
-!  test file for new supervisory control,  
+! Test file for new plant supervisory control,  
 !
 ! Large office, new construction 90.1-2004
 ! ASHRAE Standards 90.1-2004 and 62-1999
@@ -9358,7 +9358,7 @@ Fan:SystemModel,
     CoolSys1 Supply Inlet Branch,  !- Branch 1 Name
     CoolSys1 Supply Equipment Branch 1,  !- Branch 2 Name
     CoolSys1 Supply Equipment Branch 2,  !- Branch 2 Name
-    CoolSys1 Supply Equipment Bypass Branch,  !- Branch 4 Name
+   ! CoolSys1 Supply Equipment Bypass Branch,  !- Branch 4 Name
     CoolSys1 Supply Outlet Branch;  !- Branch 5 Name
 
   BranchList,
@@ -9373,7 +9373,7 @@ Fan:SystemModel,
     HeatSys1 Supply Inlet Branch,  !- Branch 1 Name
     HeatSys1 Supply Equipment Branch 1,  !- Branch 2 Name
     HeatSys1 Supply Equipment Branch 2,  !- Outlet Branch 1 Name
-    HeatSys1 Supply Equipment Bypass Branch,  !- Branch 4 Name
+!    HeatSys1 Supply Equipment Bypass Branch,  !- Branch 4 Name
     HeatSys1 Supply Outlet Branch;  !- Branch 4 Name
 
   Branch,
@@ -9448,13 +9448,13 @@ Fan:SystemModel,
     AWHP_2 Cooling Side Inlet Node,
     AWHP_2 Cooling Side Outlet Node;
 
-  Branch,
-    CoolSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Pressure Drop Curve Name
-    Pipe:Adiabatic,          !- Component 1 Object Type
-    CoolSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
-    CoolSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    CoolSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
+!  Branch,
+!    CoolSys1 Supply Equipment Bypass Branch,  !- Name
+!    ,                        !- Pressure Drop Curve Name
+!    Pipe:Adiabatic,          !- Component 1 Object Type
+!    CoolSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
+!    CoolSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
+!    CoolSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     CoolSys1 Supply Inlet Branch,  !- Name
@@ -9566,12 +9566,12 @@ Fan:SystemModel,
     Secondary CW Demand Load Branch 7,  !- Branch 7 Name
     Secondary CW Demand Load Branch 8,  !- Branch 8 Name
     Secondary CW Demand Load Branch 9,  !- Branch 9 Name
-    Secondary CW Demand Load Branch 10, !- Branch 9 Name
-    Secondary CW Demand Load Branch 11, !- Branch 9 Name
-    Secondary CW Demand Load Branch 12, !- Branch 9 Name
-    Secondary CW Demand Load Branch 13, !- Branch 9 Name
-    Secondary CW Demand Load Branch 14, !- Branch 9 Name
-    Secondary CW Demand Load Branch 15, !- Branch 9 Name
+    Secondary CW Demand Load Branch 10, !- Branch 10 Name
+    Secondary CW Demand Load Branch 11, !- Branch 11 Name
+    Secondary CW Demand Load Branch 12, !- Branch 12 Name
+    Secondary CW Demand Load Branch 13, !- Branch 13 Name
+    Secondary CW Demand Load Branch 14, !- Branch 14 Name
+    Secondary CW Demand Load Branch 15, !- Branch 15 Name
     Secondary Cooling Demand Bypass Branch,  !- Branch 17 Name
     Secondary Cooling Demand Outlet;  !- Branch 18 Name
 
@@ -9814,12 +9814,12 @@ Fan:SystemModel,
     Secondary CW Demand Load Branch 7,  !- Outlet Branch 7 Name
     Secondary CW Demand Load Branch 8,  !- Outlet Branch 8 Name
     Secondary CW Demand Load Branch 9,  !- Outlet Branch 9 Name
-    Secondary CW Demand Load Branch 10, !- Outlet Branch 9 Name
-    Secondary CW Demand Load Branch 11, !- Outlet Branch 9 Name
-    Secondary CW Demand Load Branch 12, !- Outlet Branch 9 Name
-    Secondary CW Demand Load Branch 13, !- Outlet Branch 9 Name
-    Secondary CW Demand Load Branch 14, !- Outlet Branch 9 Name
-    Secondary CW Demand Load Branch 15, !- Outlet Branch 9 Name
+    Secondary CW Demand Load Branch 10, !- Outlet Branch 10 Name
+    Secondary CW Demand Load Branch 11, !- Outlet Branch 11 Name
+    Secondary CW Demand Load Branch 12, !- Outlet Branch 12 Name
+    Secondary CW Demand Load Branch 13, !- Outlet Branch 13 Name
+    Secondary CW Demand Load Branch 14, !- Outlet Branch 14 Name
+    Secondary CW Demand Load Branch 15, !- Outlet Branch 15 Name
     Secondary Cooling Demand Bypass Branch;  !- Outlet Branch 16 Name
 
   Connector:Mixer,
@@ -10367,13 +10367,13 @@ Curve:Biquadratic,
 
 
 
-  Branch,
-    HeatSys1 Supply Equipment Bypass Branch,  !- Name
-    ,                        !- Pressure Drop Curve Name
-    Pipe:Adiabatic,          !- Component 1 Object Type
-    HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
-    HeatSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
-    HeatSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
+!  Branch,
+!    HeatSys1 Supply Equipment Bypass Branch,  !- Name
+!    ,                        !- Pressure Drop Curve Name
+!    Pipe:Adiabatic,          !- Component 1 Object Type
+!    HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
+!    HeatSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
+!    HeatSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     HeatSys1 Supply Inlet Branch,  !- Name
@@ -10436,8 +10436,8 @@ Curve:Biquadratic,
     CoolSys1 Supply Splitter,!- Name
     CoolSys1 Supply Inlet Branch,  !- Inlet Branch Name
     CoolSys1 Supply Equipment Branch 1,  !- Outlet Branch 1 Name  
-    CoolSys1 Supply Equipment Branch 2,
-    CoolSys1 Supply Equipment Bypass Branch;  !- Outlet Branch 3 Name
+    CoolSys1 Supply Equipment Branch 2;
+!    CoolSys1 Supply Equipment Bypass Branch;  !- Outlet Branch 3 Name
 
   Connector:Splitter,
     HeatSys1 Demand Splitter,!- Name
@@ -10455,8 +10455,8 @@ Curve:Biquadratic,
     HeatSys1 Supply Splitter,!- Name
     HeatSys1 Supply Inlet Branch,  !- Inlet Branch Name
     HeatSys1 Supply Equipment Branch 1,  !- Outlet Branch 1 Name
-    HeatSys1 Supply Equipment Branch 2,  !- Outlet Branch 1 Name    
-    HeatSys1 Supply Equipment Bypass Branch;  !- Outlet Branch 2 Name
+    HeatSys1 Supply Equipment Branch 2;  !- Outlet Branch 1 Name    
+!    HeatSys1 Supply Equipment Bypass Branch;  !- Outlet Branch 2 Name
 
   Connector:Mixer,
     CoolSys1 Demand Mixer,   !- Name
@@ -10472,15 +10472,15 @@ Curve:Biquadratic,
     CoolSys1 Supply Mixer,   !- Name
     CoolSys1 Supply Outlet Branch,  !- Outlet Branch Name
     CoolSys1 Supply Equipment Branch 1,  !- Inlet Branch 1 Name
-    CoolSys1 Supply Equipment Branch 2,
-    CoolSys1 Supply Equipment Bypass Branch;  !- Inlet Branch 3 Name
+    CoolSys1 Supply Equipment Branch 2;
+!    CoolSys1 Supply Equipment Bypass Branch;  !- Inlet Branch 3 Name
 
   Connector:Mixer,
     HeatSys1 Supply Mixer,   !- Name
     HeatSys1 Supply Outlet Branch,  !- Outlet Branch Name
     HeatSys1 Supply Equipment Branch 1,  !- Inlet Branch 1 Name
-    HeatSys1 Supply Equipment Branch 2,  !- Outlet Branch 1 Name
-    HeatSys1 Supply Equipment Bypass Branch;  !- Inlet Branch 2 Name
+    HeatSys1 Supply Equipment Branch 2;  !- Outlet Branch 1 Name
+!    HeatSys1 Supply Equipment Bypass Branch;  !- Inlet Branch 2 Name
 
   Pipe:Adiabatic,
     CoolSys1 Demand Bypass Pipe,  !- Name
@@ -10492,10 +10492,10 @@ Curve:Biquadratic,
     CoolSys1 Demand Inlet Node,  !- Inlet Node Name
     CoolSys1 Demand Inlet Pipe-CoolSys1 Demand Mixer;  !- Outlet Node Name
 
-  Pipe:Adiabatic,
-    CoolSys1 Supply Equipment Bypass Pipe,  !- Name
-    CoolSys1 Supply Equip Bypass Inlet Node,  !- Inlet Node Name
-    CoolSys1 Supply Equip Bypass Outlet Node;  !- Outlet Node Name
+!  Pipe:Adiabatic,
+!    CoolSys1 Supply Equipment Bypass Pipe,  !- Name
+!    CoolSys1 Supply Equip Bypass Inlet Node,  !- Inlet Node Name
+!    CoolSys1 Supply Equip Bypass Outlet Node;  !- Outlet Node Name
 
   Pipe:Adiabatic,
     CoolSys1 Supply Outlet Pipe,  !- Name
@@ -10512,10 +10512,10 @@ Curve:Biquadratic,
     HeatSys1 Demand Inlet Node,  !- Inlet Node Name
     HeatSys1 Demand Inlet Pipe-HeatSys1 Demand Mixer;  !- Outlet Node Name
 
-  Pipe:Adiabatic,
-    HeatSys1 Supply Equipment Bypass Pipe,  !- Name
-    HeatSys1 Supply Equip Bypass Inlet Node,  !- Inlet Node Name
-    HeatSys1 Supply Equip Bypass Outlet Node;  !- Outlet Node Name
+!  Pipe:Adiabatic,
+!    HeatSys1 Supply Equipment Bypass Pipe,  !- Name
+!    HeatSys1 Supply Equip Bypass Inlet Node,  !- Inlet Node Name
+!    HeatSys1 Supply Equip Bypass Outlet Node;  !- Outlet Node Name
 
   Pipe:Adiabatic,
     HeatSys1 Supply Outlet Pipe,  !- Name
@@ -10561,10 +10561,27 @@ Curve:Biquadratic,
     autosize,                   !- Source Side Reference Flow Rate {m3/s}
     autosize,                   !- Reference Capacity {W}
     3.5,                     !- Reference Coefficient of Performance {W/W}
-    0.1,                        !- Sizing Factor
+    0.2,                        !- Sizing Factor
     CapCurveFuncTemp,        !- Capacity Modifier Function of Temperature Curve Name
     EIRCurveFuncTemp,        !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    EIRCurveFuncPLR;         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    1.0,                         !- Heating To Cooling Capacity Sizing Ratio
+    CoolingCapacity,             !- Heat Pump Sizing Method
+    Setpoint,                    !- Control Type
+    VariableSpeedPumping,        !- Flow Mode
+    0.2,                     !- Minimum Part Load Ratio
+    -25.0,                   !- Minimum Source Inlet Temperature
+    35.0,                    !- Maximum Source Inlet Temperature
+     ,             !- Minimum Supply Water Temperature Curve Name
+     ,             !- Maximum Supply Water Temperature Curve Name
+     ,      !- Dry Outdoor Correction Factor Curve Name
+    ,             !- Maximum Outdoor Dry Bulb Temperature For Defrost Operation
+    ,          !- Heat Pump Defrost Control
+    ,               !- Heat Pump Defrost Time Period Fraction
+    ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name
+    ,   !- Timed Demand Defrost Frequency Curve Name
+    ,    !- Timed Demand Defrost Heat Load Penalty Curve Name
+    ;  !- Timed Demand Defrost Heat Input Energy Fraction Curve Name
 
   Curve:Biquadratic,
     CapCurveFuncTemp,        !- Name
@@ -10623,7 +10640,7 @@ Curve:Biquadratic,
     autosize,                   !- Source Side Reference Flow Rate {m3/s}
     autosize,                  !- Reference Capacity {W}
     3.5,                     !- Reference Coefficient of Performance {W/W}
-    0.1,                        !- Sizing Factor
+    0.2,                        !- Sizing Factor
     CapCurveFuncTemp2,       !- Capacity Modifier Function of Temperature Curve Name
     EIRCurveFuncTemp2,       !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
     EIRCurveFuncPLR2;        !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
@@ -11566,22 +11583,23 @@ Output:Variable,*,Heating Coil Heating Rate,timestep; !- HVAC Average [W]
 Output:Variable,Cooling Side WSHP Load Side Inlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 Output:Variable,Cooling Side WSHP Load Side Outlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,*,Zone Heating Setpoint Not Met While Occupied Time,timestep; !- Zone Sum [hr]
-
   PlantEquipmentOperation:ChillerHeaterChangeover,
     Two AWHP Operation Scheme , !- Name
-    6.6 ,                                           !- Chilled Water Temperature Setpoint
-    40.0 ,                                          !- Hot Water Temperature Setpoint
-    5.0 ,                                           !- Hot Water Setpoint Reset Start Temperature
-    8.0 ,                                           !- Hot Water Setpoint Reset Maximum Temperature Difference
-    50.0 ,                                          !- Hot Water Setpoint Reset Ratio
+    6.6 ,                                           !- Primary Cooling Plant Setpoint Temperature
+    13.7,                                           !- Secondary Distribution Cooling Plant Setpoint Temperature
+    59.8 ,                                          !- Primary Heating Plant Setpoint at Outdoor High Temperature
+    10.0,                                           !- Outdoor High Temperature
+    37.6 ,                                          !- Primary Heating Plant Setpoint at Outdoor Low Temperature
+    0.0 ,                                           !- Outdoor Low Temperature
+    45.0 ,                                          !- Secondary Distribution Heating Plant Setpoint Temperature
     All Conditioned Zones,                          !- Zone Load Polling ZoneList Name
     Two AWHP Cooling Operation Scheme,              !- Cooling Only Load Plant Equipment Operation Cooling Load Name
     Two AWHP Heating Operation Scheme,              !- Heating Only Load Plant Equipment Operation Heating Load Name
     One AWHP Cooling Operation Scheme,              !- Simultaneous Cooling And Heating Plant Equipment Operation Cooling Load Name
     One AWHP Heating Operation Scheme,              !- Simultaneous Cooling And Heating Plant Equipment Operation Heating Load Name
     Dedicated HR Cooling Side WSHP,                 !- Dedicated Chilled Water Return Recovery HeatPump Name
-    Dedicated HR Heating Side WSHP;                 !- Dedicated Hot Water Return Recovery HeatPump Name
+    Dedicated HR Heating Side WSHP,                 !- Dedicated Hot Water Return Recovery HeatPump Name
+    1.0;                                            !-  Dedicated Recovery Heat Pump Control Load Capacity Factor
     
   PlantEquipmentOperation:CoolingLoad,
     Two AWHP Cooling Operation Scheme,  !- Name
@@ -11603,7 +11621,7 @@ Output:Variable,*,Zone Heating Setpoint Not Met While Occupied Time,timestep; !-
   PlantEquipmentOperation:HeatingLoad,
     Two AWHP Heating Operation Scheme,  !- Name
     0.0,                                         !- Load Range 1 Lower Limit {W}
-    100000,                                      !- Load Range 1 Upper Limit {W}
+    50000,                                       !- Load Range 1 Upper Limit {W}
     One AWHP Heating Equipment List,             !- Range 1 Equipment List Name
     100000,                                      !- Load Range 2 Lower Limit {W}
     10000000000000,                              !- Load Range 2 Upper Limit {W}
@@ -11663,7 +11681,6 @@ Output:Variable,*,Zone Heating Setpoint Not Met While Occupied Time,timestep; !-
 
 
     Output:Variable,*,Fluid Heat Exchanger Heat Transfer Rate,timestep; !- HVAC Average [W]
-    Output:Variable,*,Fluid Heat Exchanger Heat Transfer Energy,timestep; !- HVAC Sum [J]
     Output:Variable,*,Fluid Heat Exchanger Loop Supply Side Mass Flow Rate,timestep; !- HVAC Average [kg/s]
     Output:Variable,*,Fluid Heat Exchanger Loop Supply Side Inlet Temperature,timestep; !- HVAC Average [C]
     Output:Variable,*,Fluid Heat Exchanger Loop Supply Side Outlet Temperature,timestep; !- HVAC Average [C]
@@ -11676,9 +11693,115 @@ Output:Variable,*,Zone Heating Setpoint Not Met While Occupied Time,timestep; !-
 Output:Variable,*,Supervisory Plant Operation Mode,timestep; !- HVAC Average [unknown]
 Output:Variable,*,Supervisory Plant Operation Sensed Heating Load,timestep; !- HVAC Average [unknown]
 Output:Variable,*,Supervisory Plant Operation Sensed Cooling Load,timestep; !- HVAC Average [unknown]
+Output:Variable,*,Supervisory Plant Dedicated Recovery Heat Pump Mode,timestep; !- HVAC Average [unknown]
 
 Output:Variable,*,Chilled Water Thermal Storage Tank Temperature,timestep; !- HVAC Average [C]
 Output:Variable,*,Chilled Water Thermal Storage Tank Heat Gain Rate,timestep; !- HVAC Average [W]
 Output:Variable,*,Chilled Water Thermal Storage Use Side Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 Output:Variable,*,Chilled Water Thermal Storage Use Side Inlet Temperature,timestep; !- HVAC Average [C]
 Output:Variable,*,Chilled Water Thermal Storage Use Side Outlet Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,*,Heat Pump Part Load Ratio,timestep; !- HVAC Average []
+Output:Variable,*,Heat Pump Cycling Ratio,timestep; !- HVAC Average []
+Output:Variable,*,Heat Pump Load Side Heat Transfer Rate,timestep; !- HVAC Average [W]
+Output:Variable,*,Heat Pump Load Side Heat Transfer Energy,timestep; !- HVAC Sum [J]
+Output:Variable,*,Heat Pump Source Side Heat Transfer Rate,timestep; !- HVAC Average [W]
+Output:Variable,*,Heat Pump Source Side Heat Transfer Energy,timestep; !- HVAC Sum [J]
+Output:Variable,*,Heat Pump Load Side Inlet Temperature,timestep; !- HVAC Average [C]
+Output:Variable,*,Heat Pump Load Side Outlet Temperature,timestep; !- HVAC Average [C]
+Output:Variable,*,Heat Pump Source Side Inlet Temperature,timestep; !- HVAC Average [C]
+Output:Variable,*,Heat Pump Source Side Outlet Temperature,timestep; !- HVAC Average [C]
+Output:Variable,*,Heat Pump Electricity Rate,timestep; !- HVAC Average [W]
+Output:Variable,*,Heat Pump Electricity Energy,timestep; !- HVAC Sum [J]
+Output:Variable,*,Heat Pump Load Side Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,*,Heat Pump Source Side Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+Output:Variable,*,Boiler Heating Rate,timestep; !- HVAC Average [W]
+Output:Variable,*,Boiler Inlet Temperature,timestep; !- HVAC Average [C]
+Output:Variable,*,Boiler Outlet Temperature,timestep; !- HVAC Average [C]
+Output:Variable,*,Boiler Mass Flow Rate,timestep;
+Output:Variable,*,Boiler Mass Flow Rate,timestep;
+
+Output:Variable,AWHP_2 Heating Side Inlet,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,AWHP_2 Heating Side Inlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+Output:Variable,AWHP_2 Heating Side Outlet,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,AWHP_2 Heating Side Outlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,AWHP_2 Heating Side Outlet,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,AWHP_1 Heating Side Outlet,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,AWHP_1 Heating Side Outlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,AWHP_1 Heating Side Outlet,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,AWHP_1 Heating Side Inlet,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,AWHP_1 Heating Side Inlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+Output:Variable,AWHP_2 Cooling Side Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,AWHP_2 Cooling Side Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,AWHP_2 Cooling Side Outlet Node,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,AWHP_2 Cooling Side Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,AWHP_2 Cooling Side Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+Output:Variable,AWHP_1 Cooling Side Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,AWHP_1 Cooling Side Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,AWHP_1 Cooling Side Outlet Node,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,AWHP_1 Cooling Side Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,AWHP_1 Cooling Side Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+Output:Variable,Cooling Side WSHP Load Side Inlet,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Cooling Side WSHP Load Side Inlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+Output:Variable, Cooling Side WSHP Load Side Outlet,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable, Cooling Side WSHP Load Side Outlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable, Cooling Side WSHP Load Side Outlet,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,Cooling Side WSHP Source Side Inlet,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Cooling Side WSHP Source Side Inlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+Output:Variable,Cooling Side WSHP Source Side Outlet,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Cooling Side WSHP Source Side Outlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Cooling Side WSHP Source Side Outlet,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,Heating Side WSHP Load Side Inlet,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Heating Side WSHP Load Side Inlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+Output:Variable,Heating Side WSHP Load Side Outlet,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Heating Side WSHP Load Side Outlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Heating Side WSHP Load Side Outlet,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,Heating Side WSHP Source Side Inlet,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Heating Side WSHP Source Side Inlet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+Output:Variable,Heating Side WSHP Source Side Oulet,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Heating Side WSHP Source Side Oulet,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+Output:Variable,Secondary HW Aux Boiler Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Secondary HW Aux Boiler Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+
+Output:Variable,Secondary Hot Supply Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Secondary Hot Supply Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Secondary Hot Supply Outlet Node,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,HeatSys1 Supply Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,HeatSys1 Supply Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,HeatSys1 Supply Outlet Node,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,Secondary CW Supply Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Secondary CW Supply Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Secondary CW Supply Outlet Node,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,CoolSys1 Supply Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,CoolSys1 Supply Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,CoolSys1 Supply Outlet Node,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+!Output:Variable,*,System Node Temperature,timestep; !- HVAC Average [C]
+!Output:Variable,*,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+!Output:Variable,*,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep; !- Zone Average [C]
+
+
+Output:Variable,*,Zone Heating Setpoint Not Met While Occupied Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,Zone Cooling Setpoint Not Met While Occupied Time,timestep; !- Zone Sum [hr]

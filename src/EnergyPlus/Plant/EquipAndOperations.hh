@@ -125,15 +125,17 @@ struct EquipOpList
 
 struct TempSetpoint
 {
-    Real64 CW = 0.0;
-    Real64 HW = 0.0;
+    Real64 PrimCW = 0.0;      // Chilled water setpoint for primary plant loop
+    Real64 SecCW = 0.0;       // Chilled water setpoint for secondary/distribution plant loop
+    Real64 PrimHW_High = 0.0; // Hot water primary plant setpoint at High Outdoor Air Temperature, or higher, Deg. C
+    Real64 PrimHW_Low = 0.0;  // Hot water primary plant setpoint at Low Outdoor Air Temperature, or Lower, Deg. C
+    Real64 SecHW = 0.0;       // hot water setpoint for secondary/distribution plant loop
 };
 
 struct TempResetData
 {
-    Real64 HWStartTemp = 0.0;
-    Real64 HWMaxDeltaTemp = 0.0;
-    Real64 HWRatio = 0.0;
+    Real64 HighOutdoorTemp = 0.0;
+    Real64 LowOutdoorTemp = 0.0;
 };
 
 struct PlantOpsData
@@ -141,6 +143,8 @@ struct PlantOpsData
     int NumOfZones = 0;           // Number of zones in the list
     int NumOfAirLoops = 0;        // number of air loops
     int numPlantLoadProfiles = 0; // number of load profiles
+    int numBoilers = 0;           // number of boilers
+    int numPlantHXs = 0;          // number of fluid to fluid heat exchangers
     int NumHeatingOnlyEquipLists = 0;
     int NumCoolingOnlyEquipLists = 0;
     int NumSimultHeatCoolHeatingEquipLists = 0;
@@ -154,13 +158,17 @@ struct PlantOpsData
     bool SimulHeatCoolCoolingOpInput = false;
     bool DedicatedHR_ChWRetControl_Input = false;
     bool DedicatedHR_HWRetControl_Input = false;
+    Real64 DedicatedHR_SecChW_DesignCapacity = 0.0;
+    Real64 DedicatedHR_SecHW_DesignCapacity = 0.0;
+    Real64 DedicatedHR_CapacityControlFactor = 0.0;
 };
 
 struct ReportData
 {
-    int OutputOpMode = 0;
+    int OutputOpMode = 0; // heating only = 1, cooling only = 2, simult heat cool = 3
     Real64 SensedHeatingLoad = 0.0;
     Real64 SensedCoolingLoad = 0.0;
+    int DedicHR_OpMode = 0; // heating led = 1, cooling led = 2, not dispatched = 0
 };
 
 struct ChillerHeaterSupervisoryOperationData
@@ -192,13 +200,21 @@ struct ChillerHeaterSupervisoryOperationData
     EquipListCompData DedicatedHR_ChWRetControl_SourceSideComp;
     EquipListCompData DedicatedHR_HWRetControl_LoadSideComp;
     EquipListCompData DedicatedHR_HWRetControl_SourceSideComp;
-    Array1D<int> PlantLoopIndicesBeingSupervised;
-    Array1D<PlantLocation> PlantLoadProfileComps;
+    Array1D<int> PlantLoopIndicesBeingSupervised;          // if non zero then points to index of a plant loop that has this supervisory scheme as its
+                                                           // operation scheme
+    Array1D<int> SecondaryPlantLoopIndicesBeingSupervised; // if not zero then points to index of a plant loop that is treated as being a
+                                                           // seconday loop, as in primary secondary distribution plant configurations.
+    Array1D<PlantLocation> PlantLoadProfileComps;          // LoadProfile:Plant objects that may be loading loop
+    Array1D<PlantLocation> PlantBoilerComps;               // Boilers that may need to be managed.
+    Array1D<PlantLocation>
+        PlantHXComps; // fluid to fluid heat exchangers that may need to be managed, these are HX connection on a supply side of a loop.
     ReportData Report;
 
     void OneTimeInitChillerHeaterChangeoverOpScheme(EnergyPlusData &state);
 
     void EvaluateChillerHeaterChangeoverOpScheme(EnergyPlusData &state, bool const FirstHVACIteration);
+
+    Real64 DetermineHWSetpointOARest(EnergyPlusData &state);
 };
 
 struct OperationData

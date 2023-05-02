@@ -958,6 +958,8 @@ namespace DataSizing {
         Real64 DesVolFlowRate = 0.0; // loop design flow rate in m3/s
         bool VolFlowSizingDone = 0;  // flag to indicate when this loop has finished sizing flow rate
         Real64 PlantSizFac = 0.0;    // hold the loop and pump sizing factor
+
+        Real64 DesCapacity;          // final capacity in W
     };
 
     // based on ZoneSizingData but only have member variables that are related to the CheckSum/

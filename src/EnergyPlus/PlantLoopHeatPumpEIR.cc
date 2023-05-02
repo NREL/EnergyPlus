@@ -279,19 +279,33 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
                         this->loadSideMassFlowRate = std::max(this->loadSideMassFlowRate, this->loadVSPumpMinLimitMassFlow);
                     }
                 }
+                if (this->waterSource && (this->sourceVSBranchPump || this->sourceVSLoopPump)) {
+                    this->sourceSideMassFlowRate *= std::max(this->partLoadRatio, this->minimumPLR);
+                    if (this->sourceVSBranchPump) {
+                        this->sourceSideMassFlowRate = std::max(this->sourceSideMassFlowRate, sourceVSPumpMinLimitMassFlow);
+                    }
+                }
             }
 
             PlantUtilities::SetComponentFlowRate(
                 state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+            if (this->waterSource) {
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->sourceSideMassFlowRate, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet, this->sourceSidePlantLoc);
+            }
         }
 
         // if there's no flow in one, try to turn the entire heat pump off
-        if (this->loadSideMassFlowRate <= 0.0) {
+        if (this->loadSideMassFlowRate <= 0.0 || this->sourceSideMassFlowRate <= 0.0) {
             this->loadSideMassFlowRate = 0.0;
             this->sourceSideMassFlowRate = 0.0;
             this->running = false;
             PlantUtilities::SetComponentFlowRate(
                 state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+            if (this->waterSource) {
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->sourceSideMassFlowRate, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet, this->sourceSidePlantLoc);
+            }
         }
     }
 }
@@ -554,6 +568,22 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
+
+    if (this->waterSource && abs(this->sourceSideOutletTemp - this->sourceSideInletTemp) > 100.0) { // whoaa out of range happenings on water loop
+        //
+        int dummy = 1.0; // gimme a break point please
+        // TODO setup recurring error warning?
+        // lets do something different than fatal the simulation
+        if ((this->sourceSideMassFlowRate / this->sourceSideDesignMassFlowRate) < 0.01) { // current source side flow is 1% of design max
+            // just send it all to skin losses and leave the fluid temperature alone
+            this->sourceSideOutletTemp = this->sourceSideInletTemp; // TRANE
+        } else if (this->sourceSideOutletTemp > this->sourceSideInletTemp) {
+            this->sourceSideOutletTemp = this->sourceSideInletTemp + 100.0; // cap it at 100C delta
+
+        } else if (this->sourceSideOutletTemp < this->sourceSideInletTemp) {
+            this->sourceSideOutletTemp = this->sourceSideInletTemp - 100.0; // cap it at 100C delta
+        }
+    }
 }
 
 void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
