@@ -106,10 +106,6 @@ namespace WaterToAirHeatPump {
                          Real64 const DesignAirflow,    // design air flow rate
                          int const CyclingScheme,       // cycling scheme--either continuous fan/cycling compressor or
                          bool const FirstHVACIteration, // first iteration flag
-                         Real64 const RuntimeFrac,      // compressor run time fraction
-                         Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
-                         Real64 &HPTimeConstant,        // Heat pump time constant [s]
-                         Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
                          bool const InitFlag,           // initialization flag used to suppress property routine errors
                          Real64 const SensLoad,         // sensible load
                          Real64 const LatentLoad,       // latent load
@@ -172,16 +168,14 @@ namespace WaterToAirHeatPump {
         // Calculate the Correct Water to Air HP Model with the current HPNum
 
         if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst) {
-            InitWatertoAirHP(
-                state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
-            CalcWatertoAirHPCooling(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
+            InitWatertoAirHP(state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
+            CalcWatertoAirHPCooling(state, HPNum, CyclingScheme, FirstHVACIteration, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
         } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) {
-            InitWatertoAirHP(
-                state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
-            CalcWatertoAirHPHeating(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
+            InitWatertoAirHP(state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
+            CalcWatertoAirHPHeating(state, HPNum, CyclingScheme, FirstHVACIteration, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
@@ -871,9 +865,6 @@ namespace WaterToAirHeatPump {
     void InitWatertoAirHP(EnergyPlusData &state,
                           int const HPNum, // index to main heat pump data structure
                           bool const InitFlag,
-                          Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
-                          Real64 const HPTimeConstant,        // Heat pump time constant [s]
-                          Real64 const FanDelayTime,          // Fan delay time, time delay for the HP's fan to
                           Real64 const SensLoad,
                           Real64 const LatentLoad,
                           Real64 const DesignAirFlow,
@@ -1006,9 +997,6 @@ namespace WaterToAirHeatPump {
                                        RoutineName);
 
             heatPump.DesignWaterMassFlowRate = rho * heatPump.DesignWaterVolFlowRate;
-            heatPump.MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
-            heatPump.HPTimeConstant = HPTimeConstant;
-            heatPump.FanDelayTime = FanDelayTime;
 
             PlantOutletNode = DataPlant::CompData::getPlantComponent(state, heatPump.plantLoc).NodeNumOut;
             InitComponentNodes(state, 0.0, heatPump.DesignWaterMassFlowRate, WaterInletNode, PlantOutletNode);
@@ -1108,10 +1096,9 @@ namespace WaterToAirHeatPump {
     }
 
     void CalcWatertoAirHPCooling(EnergyPlusData &state,
-                                 int const HPNum,               // heat pump number
-                                 int const CyclingScheme,       // fan/compressor cycling scheme indicator
-                                 bool const FirstHVACIteration, // first iteration flag
-                                 Real64 const RuntimeFrac,
+                                 int const HPNum,                      // heat pump number
+                                 int const CyclingScheme,              // fan/compressor cycling scheme indicator
+                                 bool const FirstHVACIteration,        // first iteration flag
                                  [[maybe_unused]] bool const InitFlag, // suppress property errors if true
                                  Real64 const SensDemand,
                                  DataHVACGlobals::CompressorOperation const CompressorOp,
@@ -1269,7 +1256,7 @@ namespace WaterToAirHeatPump {
         QLatActual = 0.0;
         // IF((RuntimeFrac .GE. 1.0) .OR. (Twet_rated .LE. 0.0) .OR. (Gamma_rated .LE. 0.0)) THEN
         // Cycling fan does not required latent degradation model, only the constant fan case
-        if ((RuntimeFrac >= 1.0) || (heatPump.Twet_Rated <= 0.0) || (heatPump.Gamma_Rated <= 0.0) || (CyclingScheme == CycFanCycCoil)) {
+        if ((heatPump.RunFrac >= 1.0) || (heatPump.Twet_Rated <= 0.0) || (heatPump.Gamma_Rated <= 0.0) || (CyclingScheme == CycFanCycCoil)) {
             LatDegradModelSimFlag = false;
             // Set NumIteration4=1 so that latent model would quit after 1 simulation with the actual condition
             NumIteration4 = 1;
@@ -1578,7 +1565,7 @@ namespace WaterToAirHeatPump {
                     SHRss = QSensible / QLoadTotal;
                     LoadSideInletWBTemp = PsyTwbFnTdbWPb(state, LoadSideInletDBTemp, LoadSideInletHumRat, PB);
                     SHReff = CalcEffectiveSHR(
-                        state, HPNum, SHRss, CyclingScheme, RuntimeFrac, QLatRated, QLatActual, LoadSideInletDBTemp, LoadSideInletWBTemp);
+                        state, HPNum, SHRss, CyclingScheme, heatPump.RunFrac, QLatRated, QLatActual, LoadSideInletDBTemp, LoadSideInletWBTemp);
                     //   Update sensible capacity based on effective SHR
                     QSensible = QLoadTotal * SHReff;
                     goto LOOPLatentDegradationModel_exit;
@@ -1613,7 +1600,7 @@ namespace WaterToAirHeatPump {
         // scale heat transfer rates and power to run time
         QLoadTotal *= PartLoadRatio;
         QSensible *= PartLoadRatio;
-        Power *= RuntimeFrac;
+        Power *= heatPump.RunFrac;
         QSource *= PartLoadRatio;
 
         // Update heat pump data structure
@@ -1623,7 +1610,6 @@ namespace WaterToAirHeatPump {
         heatPump.QSensible = QSensible;
         heatPump.QLatent = QLoadTotal - QSensible;
         heatPump.QSource = QSource;
-        heatPump.RunFrac = RuntimeFrac;
         heatPump.PartLoadRatio = PartLoadRatio;
 
         //  Air-side outlet conditions are already calculated above
@@ -1634,10 +1620,9 @@ namespace WaterToAirHeatPump {
     }
 
     void CalcWatertoAirHPHeating(EnergyPlusData &state,
-                                 int const HPNum,               // heat pump number
-                                 int const CyclingScheme,       // fan/compressor cycling scheme indicator
-                                 bool const FirstHVACIteration, // first iteration flag
-                                 Real64 const RuntimeFrac,
+                                 int const HPNum,                      // heat pump number
+                                 int const CyclingScheme,              // fan/compressor cycling scheme indicator
+                                 bool const FirstHVACIteration,        // first iteration flag
                                  [[maybe_unused]] bool const InitFlag, // first iteration flag
                                  Real64 const SensDemand,
                                  DataHVACGlobals::CompressorOperation const CompressorOp,
@@ -2049,7 +2034,7 @@ namespace WaterToAirHeatPump {
         }
         // scale heat transfer rates and power to run time
         QLoadTotal *= PartLoadRatio;
-        Power *= RuntimeFrac;
+        Power *= heatPump.RunFrac;
         QSource *= PartLoadRatio;
 
         // Update heat pump data structure
@@ -2059,7 +2044,6 @@ namespace WaterToAirHeatPump {
         heatPump.QSensible = QLoadTotal;
 
         heatPump.QSource = QSource;
-        heatPump.RunFrac = RuntimeFrac;
         heatPump.PartLoadRatio = PartLoadRatio;
 
         //  Air-side outlet conditions are already calculated above

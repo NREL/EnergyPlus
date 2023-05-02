@@ -196,9 +196,6 @@ namespace HVACDXHeatPumpSystem {
                                   CompName,
                                   DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
                                   DXHeatPumpSystem(DXSystemNum).FanOpMode,
-                                  state.dataHVACDXHeatPumpSys->MaxONOFFCyclesperHour,
-                                  state.dataHVACDXHeatPumpSys->HPTimeConstant,
-                                  state.dataHVACDXHeatPumpSys->FanDelayTime,
                                   CompressorOperation::On,
                                   DXHeatPumpSystem(DXSystemNum).PartLoadFrac,
                                   DXHeatPumpSystem(DXSystemNum).SpeedNum,
@@ -587,9 +584,6 @@ namespace HVACDXHeatPumpSystem {
         int SpeedNum;                 // speed number of variable speed DX cooling coil
         Real64 QZnReq;                // Zone load (W), input to variable-speed DX coil
         Real64 QLatReq;               // Zone latent load, input to variable-speed DX coil
-        Real64 MaxONOFFCyclesperHour; // Maximum cycling rate of heat pump [cycles/hr]
-        Real64 HPTimeConstant;        // Heat pump time constant [s]
-        Real64 FanDelayTime;          // Fan delay time, time delay for the HP's fan to
         Real64 OnOffAirFlowRatio;     // ratio of compressor on flow to average flow over time step
         Real64 TempSpeedOut;          // output at one speed level
         Real64 TempSpeedReqst;        // request capacity at one speed level
@@ -616,9 +610,6 @@ namespace HVACDXHeatPumpSystem {
         SpeedNum = 1;
         QZnReq = 0.0;
         QLatReq = 0.0;
-        MaxONOFFCyclesperHour = 4.0; // default number
-        HPTimeConstant = 0.0;
-        FanDelayTime = 0.0;
         OnOffAirFlowRatio = 1.0;
         TempSpeedOut = 0.0;
         TempSpeedReqst = 0.0;
@@ -789,9 +780,6 @@ namespace HVACDXHeatPumpSystem {
                         SpeedNum = 1;
                         QZnReq = 0.0;
                         QLatReq = 0.0;
-                        MaxONOFFCyclesperHour = 4.0; // default number
-                        HPTimeConstant = 0.0;
-                        FanDelayTime = 0.0;
                         OnOffAirFlowRatio = 1.0;
                         SpeedRatio = 0.0;
 
@@ -799,9 +787,6 @@ namespace HVACDXHeatPumpSystem {
                                               CompName,
                                               DXHeatPumpSystem.HeatPumpCoilIndex,
                                               FanOpMode,
-                                              MaxONOFFCyclesperHour,
-                                              HPTimeConstant,
-                                              FanDelayTime,
                                               CompressorOperation::On,
                                               PartLoadFrac,
                                               SpeedNum,
@@ -827,9 +812,6 @@ namespace HVACDXHeatPumpSystem {
                                               CompName,
                                               VSCoilIndex,
                                               FanOpMode,
-                                              MaxONOFFCyclesperHour,
-                                              HPTimeConstant,
-                                              FanDelayTime,
                                               CompressorOperation::On,
                                               PartLoadFrac,
                                               SpeedNum,
@@ -875,9 +857,6 @@ namespace HVACDXHeatPumpSystem {
                                                       CompName,
                                                       VSCoilIndex,
                                                       FanOpMode,
-                                                      MaxONOFFCyclesperHour,
-                                                      HPTimeConstant,
-                                                      FanDelayTime,
                                                       CompressorOperation::On,
                                                       PartLoadFrac,
                                                       SpeedNum,
@@ -899,9 +878,6 @@ namespace HVACDXHeatPumpSystem {
                                                               CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
-                                                              MaxONOFFCyclesperHour,
-                                                              HPTimeConstant,
-                                                              FanDelayTime,
                                                               CompressorOperation::On,
                                                               PartLoadFrac,
                                                               SpeedNum,
@@ -924,9 +900,6 @@ namespace HVACDXHeatPumpSystem {
                                                               CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
-                                                              MaxONOFFCyclesperHour,
-                                                              HPTimeConstant,
-                                                              FanDelayTime,
                                                               CompressorOperation::On,
                                                               PartLoadFrac,
                                                               SpeedNum,
@@ -1001,9 +974,6 @@ namespace HVACDXHeatPumpSystem {
                                                               CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
-                                                              MaxONOFFCyclesperHour,
-                                                              HPTimeConstant,
-                                                              FanDelayTime,
                                                               CompressorOperation::On,
                                                               PartLoadFrac,
                                                               SpeedNum,
@@ -1116,9 +1086,6 @@ namespace HVACDXHeatPumpSystem {
                                                   "",
                                                   CoilIndex,
                                                   FanOpMode,
-                                                  state.dataHVACDXHeatPumpSys->MaximumONOFFCyclesperHour,
-                                                  state.dataHVACDXHeatPumpSys->TimeConstant,
-                                                  state.dataHVACDXHeatPumpSys->HeatPumpFanDelayTime,
                                                   CompressorOperation::On,
                                                   PartLoadRatio,
                                                   state.dataHVACDXHeatPumpSys->SpeedNum,
@@ -1154,9 +1121,6 @@ namespace HVACDXHeatPumpSystem {
                                                   "",
                                                   CoilIndex,
                                                   FanOpMode,
-                                                  state.dataHVACDXHeatPumpSys->MaxONOFFCyclesperHr,
-                                                  state.dataHVACDXHeatPumpSys->HPTimeConst,
-                                                  state.dataHVACDXHeatPumpSys->HPFanDelayTime,
                                                   CompressorOperation::On,
                                                   state.dataHVACDXHeatPumpSys->SpeedPartLoadRatio,
                                                   state.dataHVACDXHeatPumpSys->SpeedNumber,

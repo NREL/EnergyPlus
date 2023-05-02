@@ -111,15 +111,11 @@ namespace WaterToAirHeatPumpSimple {
     constexpr std::array<std::string_view, static_cast<int>(WatertoAirHP::Num)> WatertoAirHPNamesUC{"HEATING", "COOLING"};
 
     void SimWatertoAirHPSimple(EnergyPlusData &state,
-                               std::string_view CompName,     // Coil Name
-                               int &CompIndex,                // Index for Component name
-                               Real64 const SensLoad,         // Sensible demand load [W]
-                               Real64 const LatentLoad,       // Latent demand load [W]
-                               int const CyclingScheme,       // Continuous fan OR cycling compressor
-                               Real64 const RuntimeFrac,      // Compressor run time fraction  or
-                               Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
-                               Real64 &HPTimeConstant,        // Heat pump time constant [s]
-                               Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
+                               std::string_view CompName, // Coil Name
+                               int &CompIndex,            // Index for Component name
+                               Real64 const SensLoad,     // Sensible demand load [W]
+                               Real64 const LatentLoad,   // Latent demand load [W]
+                               int const CyclingScheme,   // Continuous fan OR cycling compressor
                                DataHVACGlobals::CompressorOperation const CompressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
@@ -185,31 +181,13 @@ namespace WaterToAirHeatPumpSimple {
 
         if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
             // Cooling mode
-            InitSimpleWatertoAirHP(state,
-                                   HPNum,
-                                   MaxONOFFCyclesperHour,
-                                   HPTimeConstant,
-                                   FanDelayTime,
-                                   SensLoad,
-                                   LatentLoad,
-                                   CyclingScheme,
-                                   OnOffAirFlowRatio,
-                                   FirstHVACIteration);
-            CalcHPCoolingSimple(state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+            InitSimpleWatertoAirHP(state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+            CalcHPCoolingSimple(state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
         } else if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
             // Heating mode
-            InitSimpleWatertoAirHP(state,
-                                   HPNum,
-                                   MaxONOFFCyclesperHour,
-                                   HPTimeConstant,
-                                   FanDelayTime,
-                                   SensLoad,
-                                   DataPrecisionGlobals::constant_zero,
-                                   CyclingScheme,
-                                   OnOffAirFlowRatio,
-                                   FirstHVACIteration);
-            CalcHPHeatingSimple(state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+            InitSimpleWatertoAirHP(state, HPNum, SensLoad, DataPrecisionGlobals::constant_zero, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+            CalcHPHeatingSimple(state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
         } else {
             ShowFatalError(state, "SimWatertoAirHPSimple: WatertoAir heatpump not in either HEATING or COOLING mode");
@@ -884,9 +862,6 @@ namespace WaterToAirHeatPumpSimple {
 
     void InitSimpleWatertoAirHP(EnergyPlusData &state,
                                 int const HPNum,                                 // Current HPNum under simulation
-                                Real64 const MaxONOFFCyclesperHour,              // Maximum cycling rate of heat pump [cycles/hr]
-                                Real64 const HPTimeConstant,                     // Heat pump time constant [s]
-                                Real64 const FanDelayTime,                       // Fan delay time, time delay for the HP's fan to
                                 Real64 const SensLoad,                           // Control zone sensible load[W]
                                 Real64 const LatentLoad,                         // Control zone latent load[W]
                                 [[maybe_unused]] int const CyclingScheme,        // fan operating mode
@@ -1035,9 +1010,6 @@ namespace WaterToAirHeatPumpSimple {
                 simpleWatertoAirHP.COP = 0.0;
                 simpleWatertoAirHP.RunFrac = 0.0;
                 simpleWatertoAirHP.PartLoadRatio = 0.0;
-                simpleWatertoAirHP.MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
-                simpleWatertoAirHP.HPTimeConstant = HPTimeConstant;
-                simpleWatertoAirHP.FanDelayTime = FanDelayTime;
 
                 if (simpleWatertoAirHP.RatedWaterVolFlowRate != DataSizing::AutoSize) {
                     rho = FluidProperties::GetDensityGlycol(state,
@@ -1157,10 +1129,6 @@ namespace WaterToAirHeatPumpSimple {
         simpleWatertoAirHP.InletWaterEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;
         simpleWatertoAirHP.OutletWaterTemp = simpleWatertoAirHP.InletWaterTemp;
         simpleWatertoAirHP.OutletWaterEnthalpy = simpleWatertoAirHP.InletWaterEnthalpy;
-
-        simpleWatertoAirHP.MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
-        simpleWatertoAirHP.HPTimeConstant = HPTimeConstant;
-        simpleWatertoAirHP.FanDelayTime = FanDelayTime;
 
         // Outlet variables
         simpleWatertoAirHP.Power = 0.0;
@@ -2971,11 +2939,10 @@ namespace WaterToAirHeatPumpSimple {
     }
 
     void CalcHPCoolingSimple(EnergyPlusData &state,
-                             int const HPNum,                            // Heat Pump Number
-                             int const CyclingScheme,                    // Fan/Compressor cycling scheme indicator
-                             Real64 const RuntimeFrac,                   // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                             [[maybe_unused]] Real64 const SensDemand,   // Cooling Sensible Demand [W] !unused1208
-                             [[maybe_unused]] Real64 const LatentDemand, // Cooling Latent Demand [W]
+                             int const HPNum,                                         // Heat Pump Number
+                             int const CyclingScheme,                                 // Fan/Compressor cycling scheme indicator
+                             [[maybe_unused]] Real64 const SensDemand,                // Cooling Sensible Demand [W] !unused1208
+                             [[maybe_unused]] Real64 const LatentDemand,              // Cooling Latent Demand [W]
                              DataHVACGlobals::CompressorOperation const CompressorOp, // compressor operation flag
                              Real64 const PartLoadRatio,                              // compressor part load ratio
                              [[maybe_unused]] Real64 const OnOffAirFlowRatio          // ratio of compressor on flow to average flow over time step
@@ -3112,7 +3079,7 @@ namespace WaterToAirHeatPumpSimple {
         // Loop the calculation at least once depending whether the latent degradation model
         // is enabled. 1st iteration to calculate the QLatent(rated) at (TDB,TWB)indoorair=(26.7C,19.4C)
         // and 2nd iteration to calculate the  QLatent(actual)
-        if ((RuntimeFrac >= 1.0) || (Twet_Rated <= 0.0) || (Gamma_Rated <= 0.0)) {
+        if ((simpleWatertoAirHP.RunFrac >= 1.0) || (Twet_Rated <= 0.0) || (Gamma_Rated <= 0.0)) {
             LatDegradModelSimFlag = false;
             // Set NumIteration=1 so that latent model would quit after 1 simulation with the actual condition
             NumIteration = 1;
@@ -3187,7 +3154,7 @@ namespace WaterToAirHeatPumpSimple {
                                               HPNum,
                                               SHRss,
                                               CyclingScheme,
-                                              RuntimeFrac,
+                                              simpleWatertoAirHP.RunFrac,
                                               state.dataWaterToAirHeatPumpSimple->QLatRated,
                                               state.dataWaterToAirHeatPumpSimple->QLatActual,
                                               state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp,
@@ -3231,7 +3198,7 @@ namespace WaterToAirHeatPumpSimple {
                                                Psychrometrics::PsyHFnTdbW(simpleWatertoAirHP.OutletAirDBTemp,
                                                                           simpleWatertoAirHP.OutletAirHumRat)); // Why doesn't this match QLoadTotal?
         simpleWatertoAirHP.QSensible *= PartLoadRatio;
-        state.dataWaterToAirHeatPumpSimple->Winput *= RuntimeFrac;
+        state.dataWaterToAirHeatPumpSimple->Winput *= simpleWatertoAirHP.RunFrac;
         simpleWatertoAirHP.QSource = simpleWatertoAirHP.QLoadTotalReport + state.dataWaterToAirHeatPumpSimple->Winput;
         state.dataHeatBal->HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = simpleWatertoAirHP.QSource;
 
@@ -3255,12 +3222,11 @@ namespace WaterToAirHeatPumpSimple {
         simpleWatertoAirHP.EnergySensible = simpleWatertoAirHP.QSensible * TimeStepSysSec;
         simpleWatertoAirHP.EnergyLatent = (simpleWatertoAirHP.QLoadTotalReport - simpleWatertoAirHP.QSensible) * TimeStepSysSec;
         simpleWatertoAirHP.EnergySource = simpleWatertoAirHP.QSource * TimeStepSysSec;
-        if (RuntimeFrac == 0.0) {
+        if (simpleWatertoAirHP.RunFrac == 0.0) {
             simpleWatertoAirHP.COP = 0.0;
         } else {
             simpleWatertoAirHP.COP = simpleWatertoAirHP.QLoadTotalReport / state.dataWaterToAirHeatPumpSimple->Winput;
         }
-        simpleWatertoAirHP.RunFrac = RuntimeFrac;
         simpleWatertoAirHP.PartLoadRatio = PartLoadRatio;
 
         if ((simpleWatertoAirHP.WaterCyclingMode) == DataHVACGlobals::WaterCycling) {
@@ -3302,7 +3268,6 @@ namespace WaterToAirHeatPumpSimple {
     void CalcHPHeatingSimple(EnergyPlusData &state,
                              int const HPNum,                                         // Heat Pump Number
                              int const CyclingScheme,                                 // Fan/Compressor cycling scheme indicator
-                             Real64 const RuntimeFrac,                                // Runtime Fraction of compressor
                              [[maybe_unused]] Real64 const SensDemand,                // Sensible Demand [W] !unused1208
                              DataHVACGlobals::CompressorOperation const CompressorOp, // compressor operation flag
                              Real64 const PartLoadRatio,                              // compressor part load ratio
@@ -3449,7 +3414,7 @@ namespace WaterToAirHeatPumpSimple {
         simpleWatertoAirHP.QLoadTotal *= PartLoadRatio;
         simpleWatertoAirHP.QLoadTotalReport = simpleWatertoAirHP.QLoadTotal;
         simpleWatertoAirHP.QSensible *= PartLoadRatio;
-        state.dataWaterToAirHeatPumpSimple->Winput *= RuntimeFrac;
+        state.dataWaterToAirHeatPumpSimple->Winput *= simpleWatertoAirHP.RunFrac;
         simpleWatertoAirHP.QSource = simpleWatertoAirHP.QLoadTotalReport - state.dataWaterToAirHeatPumpSimple->Winput;
 
         //  Add power to global variable so power can be summed by parent object
@@ -3464,12 +3429,11 @@ namespace WaterToAirHeatPumpSimple {
         simpleWatertoAirHP.EnergySensible = simpleWatertoAirHP.QSensible * TimeStepSysSec;
         simpleWatertoAirHP.EnergyLatent = 0.0;
         simpleWatertoAirHP.EnergySource = simpleWatertoAirHP.QSource * TimeStepSysSec;
-        if (RuntimeFrac == 0.0) {
+        if (simpleWatertoAirHP.RunFrac == 0.0) {
             simpleWatertoAirHP.COP = 0.0;
         } else {
             simpleWatertoAirHP.COP = simpleWatertoAirHP.QLoadTotalReport / state.dataWaterToAirHeatPumpSimple->Winput;
         }
-        simpleWatertoAirHP.RunFrac = RuntimeFrac;
         simpleWatertoAirHP.PartLoadRatio = PartLoadRatio;
 
         if ((simpleWatertoAirHP.WaterCyclingMode) == DataHVACGlobals::WaterCycling) {

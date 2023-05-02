@@ -345,9 +345,6 @@ namespace VariableSpeedCoils {
                                std::string_view CompName,                         // Coil Name
                                int &CompIndex,                                    // Index for Component name
                                int const CyclingScheme,                           // Continuous fan OR cycling compressor
-                               Real64 &MaxONOFFCyclesperHour,                     // Maximum cycling rate of heat pump [cycles/hr]
-                               Real64 &HPTimeConstant,                            // Heat pump time constant [s]
-                               Real64 &FanDelayTime,                              // Fan delay time, time delay for the HP's fan to
                                DataHVACGlobals::CompressorOperation CompressorOp, // compressor on/off. 0 = off; 1= on
                                Real64 const PartLoadFrac,
                                int const SpeedNum,                  // compressor speed number
@@ -364,9 +361,6 @@ namespace VariableSpeedCoils {
 
     void InitVarSpeedCoil(EnergyPlusData &state,
                           int const DXCoilNum,                // Current DXCoilNum under simulation
-                          Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
-                          Real64 const HPTimeConstant,        // Heat pump time constant [s]
-                          Real64 const FanDelayTime,          // Fan delay time, time delay for the HP's fan to
                           Real64 const SensLoad,              // Control zone sensible load[W]
                           Real64 const LatentLoad,            // Control zone latent load[W]
                           int const CyclingScheme,            // fan operating mode

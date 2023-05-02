@@ -323,10 +323,6 @@ namespace UnitarySystems {
         Real64 m_MaxOATSuppHeat = 0.0;
         Real64 m_MinOATCompressorCooling = 0.0;
         Real64 m_MinOATCompressorHeating = 0.0;
-        Real64 m_MaxONOFFCyclesperHour = 0.0;
-        Real64 m_HPTimeConstant = 0.0;
-        Real64 m_OnCyclePowerFraction = 0.0;
-        Real64 m_FanDelayTime = 0.0;
         Real64 m_AncillaryOnPower = 0.0;
         Real64 m_AncillaryOffPower = 0.0;
         Real64 m_DesignHRWaterVolumeFlow = 0.0;
@@ -359,7 +355,6 @@ namespace UnitarySystems {
         PlantLocation m_SuppCoilPlantLoc;
         int m_SuppCoilFluidOutletNodeNum = 0;
 
-        Real64 m_WSHPRuntimeFrac = 0.0;
         Real64 m_CompPartLoadRatio = 0.0;
         Real64 m_CoolingCoilSensDemand = 0.0;
         Real64 m_CoolingCoilLatentDemand = 0.0;
@@ -853,11 +848,6 @@ namespace UnitarySystems {
         void calcPassiveSystem(EnergyPlusData &state,
                                int const AirLoopNum,         // Index to air loop
                                bool const FirstHVACIteration // True when first HVAC iteration
-        );
-
-        void heatPumpRunFrac(Real64 const PLR,   // part load ratio
-                             bool &errFlag,      // part load factor out of range flag
-                             Real64 &RuntimeFrac // the required run time fraction to meet part load
         );
 
         void setSpeedVariables(EnergyPlusData &state,

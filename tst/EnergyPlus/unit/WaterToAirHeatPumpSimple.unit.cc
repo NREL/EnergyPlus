@@ -407,29 +407,16 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
     DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
     int CyclingScheme(1);
     bool FirstHVACIteration(true);
-    Real64 MaxONOFFCyclesperHour(4.0);
-    Real64 HPTimeConstant(0.1);
-    Real64 FanDelayTime(60.0);
     Real64 SensLoad(38000.0);
     Real64 LatentLoad(0.0);
     Real64 PartLoadRatio(1.0);
-    Real64 RuntimeFrac(1.0);
     Real64 OnOffAirFlowRatio(1.0);
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).plantLoc.loopNum = 1;
 
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate, 1.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal, 20000 * 0.85781, 0.1);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible, 16000 * 0.89755, 0.1);
@@ -441,20 +428,10 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirDBTemp, 26.0 - (14360.848 / 1.0 / CpAir), 0.0001);
 
     PartLoadRatio = 0.5;
-    RuntimeFrac = 0.5;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         ActualAirflow * PartLoadRatio;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate, 0.5);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal, 20000 * 0.85781 * 0.5, 0.1);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible, 16000 * 0.89755 * 0.5, 0.1);
@@ -468,20 +445,10 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
     // constant fan
     CyclingScheme = 2;
     PartLoadRatio = 1.0;
-    RuntimeFrac = 1.0;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         ActualAirflow * PartLoadRatio;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate, 1.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal, 20000 * 0.85781, 0.1);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible, 16000 * 0.89755, 0.1);
@@ -493,19 +460,9 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirDBTemp, 26.0 - (14360.848 / 1.0 / CpAir), 0.0001);
 
     PartLoadRatio = 0.5;
-    RuntimeFrac = 0.5;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate = ActualAirflow;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate, 1.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal, 20000 * 0.85781 * 0.5, 0.1);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible, 16000 * 0.89755 * 0.5, 0.1);
@@ -548,32 +505,13 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
     CpAir = PsyCpAirFnW(0.004);
     // cycling fan
     CyclingScheme = 1;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
 
     PartLoadRatio = 1.0;
-    RuntimeFrac = 1.0;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         ActualAirflow * PartLoadRatio;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate, 1.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal, 20000 * 0.981844, 0.1);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible, 20000 * 0.981844, 0.1);
@@ -585,20 +523,10 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirDBTemp, 15.0 + (19636.8798 / 1.0 / CpAir), 0.0001);
 
     PartLoadRatio = 0.5;
-    RuntimeFrac = 0.5;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         ActualAirflow * PartLoadRatio;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate, 0.5);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal, 20000 * 0.981844 * 0.5, 0.1);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible, 20000 * 0.981844 * 0.5, 0.1);
@@ -612,20 +540,10 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
     // constant fan
     CyclingScheme = 2;
     PartLoadRatio = 1.0;
-    RuntimeFrac = 1.0;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         ActualAirflow * PartLoadRatio;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate, 1.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal, 20000 * 0.981844, 0.1);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible, 20000 * 0.981844, 0.1);
@@ -637,19 +555,9 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirDBTemp, 15.0 + (19636.8798 / 1.0 / CpAir), 0.0001);
 
     PartLoadRatio = 0.5;
-    RuntimeFrac = 0.5;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate = ActualAirflow;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate, 1.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal, 20000 * 0.981844 * 0.5, 0.1);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible, 20000 * 0.981844 * 0.5, 0.1);
@@ -848,108 +756,55 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
     DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
     int CyclingScheme(1);
     bool FirstHVACIteration(true);
-    Real64 MaxONOFFCyclesperHour(4.0);
-    Real64 HPTimeConstant(0.1);
-    Real64 FanDelayTime(60.0);
     Real64 SensLoad(38000.0);
     Real64 LatentLoad(0.0);
     Real64 PartLoadRatio(1.0);
-    Real64 RuntimeFrac(1.0);
     Real64 OnOffAirFlowRatio(1.0);
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).plantLoc.loopNum = 1;
 
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate, 15.0);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp, 5.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp, 5.20387, 0.00001);
 
     PartLoadRatio = 0.5;
-    RuntimeFrac = 0.5;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         DesignAirflow * PartLoadRatio;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate, 15.0);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp, 5.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp, 5.10193, 0.00001);
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterCyclingMode = WaterCycling;
     PartLoadRatio = 1.0;
-    RuntimeFrac = 1.0;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         DesignAirflow * PartLoadRatio;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate, 15.0);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp, 5.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp, 5.20387, 0.00001);
 
     PartLoadRatio = 0.5;
-    RuntimeFrac = 0.5;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         DesignAirflow * PartLoadRatio;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate, 7.5);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp, 5.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp, 5.20387, 0.00001);
 
     // test reduced flow at coil water inlet node
     PartLoadRatio = 0.25;
-    RuntimeFrac = 0.25;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         DesignAirflow * PartLoadRatio;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRate = 3.75;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPCoolingSimple(*state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate, 3.75);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp, 5.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp, 5.20387, 0.00001);
@@ -989,111 +844,52 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
 
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
 
     PartLoadRatio = 1.0;
-    RuntimeFrac = 1.0;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         DesignAirflow * PartLoadRatio;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate, 15.0);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp, 35.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp, 34.50472, 0.00001);
 
     PartLoadRatio = 0.5;
-    RuntimeFrac = 0.5;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         DesignAirflow * PartLoadRatio;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate, 15.0);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp, 35.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp, 34.75236, 0.00001);
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterCyclingMode = WaterCycling;
     PartLoadRatio = 1.0;
-    RuntimeFrac = 1.0;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         DesignAirflow * PartLoadRatio;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate, 15.0);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp, 35.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp, 34.50472, 0.00001);
 
     PartLoadRatio = 0.5;
-    RuntimeFrac = 0.5;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         DesignAirflow * PartLoadRatio;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate, 7.5);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp, 35.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp, 34.50472, 0.00001);
 
     // test reduced flow at coil water inlet node
     PartLoadRatio = 0.25;
-    RuntimeFrac = 0.25;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum).MassFlowRate =
         DesignAirflow * PartLoadRatio;
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum).MassFlowRate = 3.75;
-    InitSimpleWatertoAirHP(*state,
-                           HPNum,
-                           MaxONOFFCyclesperHour,
-                           HPTimeConstant,
-                           FanDelayTime,
-                           SensLoad,
-                           LatentLoad,
-                           CyclingScheme,
-                           OnOffAirFlowRatio,
-                           FirstHVACIteration);
-    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+    InitSimpleWatertoAirHP(*state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+    CalcHPHeatingSimple(*state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate, 3.75);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp, 35.0);
     EXPECT_NEAR(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletWaterTemp, 34.50472, 0.00001);

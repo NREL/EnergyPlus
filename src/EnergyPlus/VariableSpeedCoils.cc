@@ -122,9 +122,6 @@ namespace VariableSpeedCoils {
                                std::string_view CompName,              // Coil Name
                                int &CompIndex,                         // Index for Component name
                                int const CyclingScheme,                // Continuous fan OR cycling compressor
-                               Real64 &MaxONOFFCyclesperHour,          // Maximum cycling rate of heat pump [cycles/hr]
-                               Real64 &HPTimeConstant,                 // Heat pump time constant [s]
-                               Real64 &FanDelayTime,                   // Fan delay time, time delay for the HP's fan to
                                CompressorOperation const CompressorOp, // compressor on/off. 0 = off; 1= on
                                Real64 const PartLoadFrac,
                                int const SpeedNum,            // compressor speed number
@@ -193,17 +190,7 @@ namespace VariableSpeedCoils {
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_CoolingAirToAirVariableSpeed)) {
             // Cooling mode
-            InitVarSpeedCoil(state,
-                             DXCoilNum,
-                             MaxONOFFCyclesperHour,
-                             HPTimeConstant,
-                             FanDelayTime,
-                             SensLoad,
-                             LatentLoad,
-                             CyclingScheme,
-                             OnOffAirFlowRatio,
-                             SpeedRatio,
-                             SpeedCal);
+            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             CalcVarSpeedCoilCooling(state,
                                     DXCoilNum,
                                     CyclingScheme,
@@ -219,33 +206,13 @@ namespace VariableSpeedCoils {
         } else if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) ||
                    (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_HeatingAirToAirVariableSpeed)) {
             // Heating mode
-            InitVarSpeedCoil(state,
-                             DXCoilNum,
-                             MaxONOFFCyclesperHour,
-                             HPTimeConstant,
-                             FanDelayTime,
-                             SensLoad,
-                             LatentLoad,
-                             CyclingScheme,
-                             OnOffAirFlowRatio,
-                             SpeedRatio,
-                             SpeedCal);
+            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             CalcVarSpeedCoilHeating(
                 state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             UpdateVarSpeedCoil(state, DXCoilNum);
         } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == CoilDX_HeatPumpWaterHeaterVariableSpeed) {
             // Heating mode
-            InitVarSpeedCoil(state,
-                             DXCoilNum,
-                             MaxONOFFCyclesperHour,
-                             HPTimeConstant,
-                             FanDelayTime,
-                             SensLoad,
-                             LatentLoad,
-                             CyclingScheme,
-                             OnOffAirFlowRatio,
-                             SpeedRatio,
-                             SpeedCal);
+            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             CalcVarSpeedHPWH(state, DXCoilNum, RuntimeFrac, PartLoadFrac, SpeedRatio, SpeedNum, CyclingScheme);
             UpdateVarSpeedCoil(state, DXCoilNum);
         } else {
@@ -3897,9 +3864,6 @@ namespace VariableSpeedCoils {
 
     void InitVarSpeedCoil(EnergyPlusData &state,
                           int const DXCoilNum,                             // Current DXCoilNum under simulation
-                          Real64 const MaxONOFFCyclesperHour,              // Maximum cycling rate of heat pump [cycles/hr]
-                          Real64 const HPTimeConstant,                     // Heat pump time constant [s]
-                          Real64 const FanDelayTime,                       // Fan delay time, time delay for the HP's fan to
                           Real64 const SensLoad,                           // Control zone sensible load[W]
                           Real64 const LatentLoad,                         // Control zone latent load[W]
                           int const CyclingScheme,                         // fan operating mode
@@ -4418,10 +4382,6 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 0.0;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio = 0.0;
 
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant = HPTimeConstant;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = FanDelayTime;
-
             if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_HeatingWaterToAirHPVSEquationFit) ||
                 (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_CoolingWaterToAirHPVSEquationFit)) {
                 WaterInletNode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum;
@@ -4545,10 +4505,6 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = state.dataLoopNodes->Node(AirInletNode).Temp;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = state.dataLoopNodes->Node(AirInletNode).HumRat;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy = state.dataLoopNodes->Node(AirInletNode).Enthalpy;
-
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant = HPTimeConstant;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = FanDelayTime;
 
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirPressure = state.dataEnvrn->OutBaroPress; // temporary
         // Outlet variables

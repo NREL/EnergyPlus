@@ -14451,10 +14451,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     30.0,                                   !- Maximum Supply Air Temperature {C}
     20.0,                                   !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     System Outdoor Air Node,                !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    3.0,                                    !- Maximum Cycling Rate {cycles/hr}
-    120.0,                                  !- Heat Pump Time Constant {s}
-    0.02,                                   !- Fraction of On-Cycle Power Use
-    90,                                     !- Heat Pump Fan Delay Time {s}
     40,                                     !- Ancillary On-Cycle Electric Power {W}
     10,                                     !- Ancillary Off-Cycle Electric Power {W}
     0.005,                                  !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -14577,10 +14573,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_EQ(30.0, thisSys->DesignMaxOutletTemp);                        // checks Maximum Supply Air Temperature value
     EXPECT_EQ(20.0, thisSys->m_MaxOATSuppHeat); // checks Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation value
     EXPECT_EQ("SYSTEM OUTDOOR AIR NODE", state->dataLoopNodes->NodeID(thisSys->m_CondenserNodeNum)); // checks condenser air inlet node name
-    EXPECT_EQ(3.0, thisSys->m_MaxONOFFCyclesperHour);                                                // checks Maximum Cycling Rate value
-    EXPECT_EQ(120.0, thisSys->m_HPTimeConstant);                                                     // checks Heat Pump Time Constant value
-    EXPECT_EQ(0.02, thisSys->m_OnCyclePowerFraction);                                                // checks Fraction of On-Cycle Power Use value
-    EXPECT_EQ(90.0, thisSys->m_FanDelayTime);                                                        // checks Heat Pump Fan Delay Time value
     EXPECT_EQ(40.0, thisSys->m_AncillaryOnPower);                                                    // checks Ancillary On-Cycle Electric Power value
     EXPECT_EQ(10.0, thisSys->m_AncillaryOffPower);        // checks Ancillary Off-Cycle Electric Power value
     EXPECT_EQ(0.005, thisSys->m_DesignHRWaterVolumeFlow); // checks Design Heat Recovery Water Flow Rate value

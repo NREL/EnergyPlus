@@ -164,10 +164,6 @@ namespace WaterToAirHeatPumpSimple {
                                Real64 const SensLoad,         // Sensible demand load [W]
                                Real64 const LatentLoad,       // Latent demand load [W]
                                int const CyclingScheme,       // Continuous fan OR cycling compressor
-                               Real64 const RuntimeFrac,      // Compressor run time fraction  or
-                               Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
-                               Real64 &HPTimeConstant,        // Heat pump time constant [s]
-                               Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
                                DataHVACGlobals::CompressorOperation CompressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
@@ -184,9 +180,6 @@ namespace WaterToAirHeatPumpSimple {
 
     void InitSimpleWatertoAirHP(EnergyPlusData &state,
                                 int const HPNum,                    // Current HPNum under simulation
-                                Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
-                                Real64 const HPTimeConstant,        // Heat pump time constant [s]
-                                Real64 const FanDelayTime,          // Fan delay time, time delay for the HP's fan to
                                 Real64 const SensLoad,              // Control zone sensible load[W]
                                 Real64 const LatentLoad,            // Control zone latent load[W]
                                 int const CyclingScheme,            // fan operating mode
@@ -199,7 +192,6 @@ namespace WaterToAirHeatPumpSimple {
     void CalcHPCoolingSimple(EnergyPlusData &state,
                              int const HPNum,           // Heat Pump Number
                              int const CyclingScheme,   // Fan/Compressor cycling scheme indicator
-                             Real64 const RuntimeFrac,  // Runtime Fraction of compressor or percent on time (on-time/cycle time)
                              Real64 const SensDemand,   // Cooling Sensible Demand [W] !unused1208
                              Real64 const LatentDemand, // Cooling Latent Demand [W]
                              DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation flag
@@ -210,7 +202,6 @@ namespace WaterToAirHeatPumpSimple {
     void CalcHPHeatingSimple(EnergyPlusData &state,
                              int const HPNum,                                   // Heat Pump Number
                              int const CyclingScheme,                           // Fan/Compressor cycling scheme indicator
-                             Real64 const RuntimeFrac,                          // Runtime Fraction of compressor
                              Real64 const SensDemand,                           // Cooling Sensible Demand [W] !unused1208
                              DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation flag
                              Real64 const PartLoadRatio,                        // compressor part load ratio

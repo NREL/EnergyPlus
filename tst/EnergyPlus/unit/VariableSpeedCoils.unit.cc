@@ -2947,22 +2947,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     Real64 PartLoadFrac = 0.0;
     Real64 OnOffAirFlowRatio = 1.0;
     Real64 SpeedRatio = 0.0;
-    Real64 MaxONOFFCyclesperHour(0.0);
-    Real64 HPTimeConstant(0.0);
-    Real64 FanDelayTime(0.0);
 
     // run coil init
-    VariableSpeedCoils::InitVarSpeedCoil(*state,
-                                         DXCoilNum,
-                                         MaxONOFFCyclesperHour,
-                                         HPTimeConstant,
-                                         FanDelayTime,
-                                         SensLoad,
-                                         LatentLoad,
-                                         CyclingScheme,
-                                         OnOffAirFlowRatio,
-                                         SpeedRatio,
-                                         SpeedCal);
+    VariableSpeedCoils::InitVarSpeedCoil(*state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     // set coil inlet condition
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = 0.009;

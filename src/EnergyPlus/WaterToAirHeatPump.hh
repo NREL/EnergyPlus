@@ -170,10 +170,6 @@ namespace WaterToAirHeatPump {
                          Real64 const DesignAirflow,    // design air flow rate
                          int const CyclingScheme,       // cycling scheme--either continuous fan/cycling compressor or
                          bool const FirstHVACIteration, // first iteration flag
-                         Real64 const RuntimeFrac,      // compressor run time fraction
-                         Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
-                         Real64 &HPTimeConstant,        // Heat pump time constant [s]
-                         Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
                          bool const InitFlag,           // initialization flag used to suppress property routine errors
                          Real64 const SensLoad,         // sensible load
                          Real64 const LatentLoad,       // latent load
@@ -185,9 +181,6 @@ namespace WaterToAirHeatPump {
     void InitWatertoAirHP(EnergyPlusData &state,
                           int const HPNum, // index to main heat pump data structure
                           bool const InitFlag,
-                          Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
-                          Real64 const HPTimeConstant,        // Heat pump time constant [s]
-                          Real64 const FanDelayTime,          // Fan delay time, time delay for the HP's fan to
                           Real64 const SensLoad,
                           Real64 const LatentLoad,
                           Real64 const DesignAirFlow,
@@ -197,7 +190,6 @@ namespace WaterToAirHeatPump {
                                  int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
-                                 Real64 const RuntimeFrac,
                                  bool const InitFlag, // suppress property errors if true
                                  Real64 const SensDemand,
                                  DataHVACGlobals::CompressorOperation CompressorOp,
@@ -207,7 +199,6 @@ namespace WaterToAirHeatPump {
                                  int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
-                                 Real64 const RuntimeFrac,
                                  bool const InitFlag, // first iteration flag
                                  Real64 const SensDemand,
                                  DataHVACGlobals::CompressorOperation CompressorOp,
