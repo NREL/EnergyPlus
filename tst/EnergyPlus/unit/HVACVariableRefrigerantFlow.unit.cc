@@ -4886,7 +4886,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     EXPECT_EQ(0, state->dataHVACVarRefFlow->VRFTU(VRFTUNum).IndexToTUInTUList);
 
     // Additional tests for fuel type input
-    EXPECT_TRUE(compare_enums(state->dataHVACVarRefFlow->VRF(VRFTUNum).FuelTypeNum, Constant::eResource::Electricity));
+    EXPECT_TRUE(compare_enums(state->dataHVACVarRefFlow->VRF(VRFTUNum).FuelType, Constant::eFuel::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
@@ -8147,7 +8147,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     state->dataHeatingCoils->CoilIsSuppHeater = true;
     state->dataHeatingCoils->HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     state->dataHeatingCoils->HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
-    state->dataHeatingCoils->HeatingCoil(CoilNum).ResourceType = Constant::eResource::Electricity;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).FuelType = Constant::eFuel::Electricity;
     state->dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     state->dataHeatingCoils->HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
@@ -8212,7 +8212,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     state->dataHeatingCoils->CoilIsSuppHeater = true;
     state->dataHeatingCoils->HeatingCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     state->dataHeatingCoils->HeatingCoil(CoilNum).HeatingCoilType = thisVRFTU.SuppHeatCoilType;
-    state->dataHeatingCoils->HeatingCoil(CoilNum).ResourceType = Constant::eResource::NaturalGas;
+    state->dataHeatingCoils->HeatingCoil(CoilNum).FuelType = Constant::eFuel::NaturalGas;
     state->dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num = thisVRFTU.SuppHeatCoilType_Num;
     state->dataHeatingCoils->HeatingCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
     state->dataHeatingCoils->HeatingCoil(CoilNum).AirOutletNodeNum = thisVRFTU.SuppHeatCoilAirOutletNode;
@@ -14497,7 +14497,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(1.00, thisHeatEIRFPLR->inputLimits[0].max);
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);                           // getinput checks this
     EXPECT_GT(thisHeatEIRFPLR->inputLimits[0].min, thisVRF.MinPLR); // expect warning message
-    EXPECT_TRUE(compare_enums(thisVRF.FuelTypeNum, Constant::eResource::Electricity));
+    EXPECT_TRUE(compare_enums(thisVRF.FuelType, Constant::eFuel::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)

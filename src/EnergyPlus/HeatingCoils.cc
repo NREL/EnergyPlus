@@ -351,7 +351,7 @@ namespace HeatingCoils {
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
 
             CurrentModuleObject = "Coil:Heating:Electric";
-            heatingCoil.ResourceType = Constant::eResource::Electricity;
+            heatingCoil.FuelType = Constant::eFuel::Electricity;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -487,7 +487,7 @@ namespace HeatingCoils {
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
 
             CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
-            heatingCoil.ResourceType = Constant::eResource::Electricity;
+            heatingCoil.FuelType = Constant::eFuel::Electricity;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -674,13 +674,13 @@ namespace HeatingCoils {
             heatingCoil.HeatingCoilModel = "Fuel";
             heatingCoil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
-            heatingCoil.ResourceType = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, Alphas(3)));
-            if (!(heatingCoil.ResourceType == Constant::eResource::NaturalGas || heatingCoil.ResourceType == Constant::eResource::Propane ||
-                  heatingCoil.ResourceType == Constant::eResource::Diesel || heatingCoil.ResourceType == Constant::eResource::Gasoline ||
-                  heatingCoil.ResourceType == Constant::eResource::FuelOilNo1 || heatingCoil.ResourceType == Constant::eResource::FuelOilNo2 ||
-                  heatingCoil.ResourceType == Constant::eResource::OtherFuel1 || heatingCoil.ResourceType == Constant::eResource::OtherFuel2 ||
-                  heatingCoil.ResourceType == Constant::eResource::Coal) ||
-                heatingCoil.ResourceType == Constant::eResource::Invalid) {
+            heatingCoil.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, Alphas(3)));
+            if (!(heatingCoil.FuelType == Constant::eFuel::NaturalGas || heatingCoil.FuelType == Constant::eFuel::Propane ||
+                  heatingCoil.FuelType == Constant::eFuel::Diesel || heatingCoil.FuelType == Constant::eFuel::Gasoline ||
+                  heatingCoil.FuelType == Constant::eFuel::FuelOilNo1 || heatingCoil.FuelType == Constant::eFuel::FuelOilNo2 ||
+                  heatingCoil.FuelType == Constant::eFuel::OtherFuel1 || heatingCoil.FuelType == Constant::eFuel::OtherFuel2 ||
+                  heatingCoil.FuelType == Constant::eFuel::Coal) ||
+                heatingCoil.FuelType == Constant::eFuel::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}: Invalid {} entered ={} for {}={}",
                                        RoutineName,
@@ -691,7 +691,7 @@ namespace HeatingCoils {
                                        Alphas(1)));
                 state.dataHeatingCoils->InputErrorsFound = true;
             }
-            std::string const FuelType(Constant::eResourceNames[static_cast<int>(heatingCoil.ResourceType)]);
+            std::string const sFuelType(Constant::eFuelNames[static_cast<int>(heatingCoil.FuelType)]);
 
             heatingCoil.Efficiency = Numbers(1);
             heatingCoil.NominalCapacity = Numbers(2);
@@ -763,19 +763,19 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Average,
                                 heatingCoil.Name);
             SetupOutputVariable(state,
-                                "Heating Coil " + FuelType + " Energy",
+                                "Heating Coil " + sFuelType + " Energy",
                                 OutputProcessor::Unit::J,
                                 heatingCoil.FuelUseLoad,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 {},
-                                FuelType,
+                                sFuelType,
                                 "Heating",
                                 {},
                                 "System");
             SetupOutputVariable(state,
-                                "Heating Coil " + FuelType + " Rate",
+                                "Heating Coil " + sFuelType + " Rate",
                                 OutputProcessor::Unit::W,
                                 heatingCoil.FuelUseRate,
                                 OutputProcessor::SOVTimeStepType::System,
@@ -808,21 +808,21 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Average,
                                 heatingCoil.Name);
             SetupOutputVariable(state,
-                                "Heating Coil Ancillary " + FuelType + " Rate",
+                                "Heating Coil Ancillary " + sFuelType + " Rate",
                                 OutputProcessor::Unit::W,
                                 heatingCoil.ParasiticFuelRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 heatingCoil.Name);
             SetupOutputVariable(state,
-                                "Heating Coil Ancillary " + FuelType + " Energy",
+                                "Heating Coil Ancillary " + sFuelType + " Energy",
                                 OutputProcessor::Unit::J,
                                 heatingCoil.ParasiticFuelLoad,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 {},
-                                FuelType,
+                                sFuelType,
                                 "Heating",
                                 {},
                                 "System");
@@ -836,7 +836,7 @@ namespace HeatingCoils {
             auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
             CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
-            heatingCoil.ResourceType = Constant::eResource::NaturalGas;
+            heatingCoil.FuelType = Constant::eFuel::NaturalGas;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -1035,7 +1035,7 @@ namespace HeatingCoils {
             auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
             CurrentModuleObject = "Coil:Heating:Desuperheater";
-            heatingCoil.ResourceType = Constant::eResource::Electricity;
+            heatingCoil.FuelType = Constant::eFuel::Electricity;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,

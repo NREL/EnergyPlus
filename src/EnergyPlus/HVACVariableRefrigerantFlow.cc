@@ -2322,8 +2322,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         if (!lAlphaFieldBlanks(39)) {
             // A39; \field Fuel type, Validate fuel type input
-            thisVrfSys.FuelTypeNum = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, cAlphaArgs(39)));
-            if (thisVrfSys.FuelTypeNum == Constant::eResource::Invalid) {
+            thisVrfSys.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, cAlphaArgs(39)));
+            if (thisVrfSys.FuelType == Constant::eFuel::Invalid) {
                 ShowSevereError(
                     state,
                     format("{} = \"{}\", {} = \"{}\" was not found.", cCurrentModuleObject, thisVrfSys.Name, cAlphaFieldNames(39), cAlphaArgs(39)));
@@ -2466,7 +2466,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfFluidCtrl.Name = cAlphaArgs(1);
         thisVrfFluidCtrl.VRFSystemTypeNum = VRF_HeatPump;
         thisVrfFluidCtrl.VRFAlgorithmType = AlgorithmType::FluidTCtrl;
-        thisVrfFluidCtrl.FuelTypeNum = Constant::eResource::Electricity;
+        thisVrfFluidCtrl.FuelType = Constant::eFuel::Electricity;
 
         if (lAlphaFieldBlanks(2)) {
             thisVrfFluidCtrl.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
@@ -2867,7 +2867,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfFluidCtrlHR.HeatRecoveryUsed = true;
         thisVrfFluidCtrlHR.VRFSystemTypeNum = VRF_HeatPump;
         thisVrfFluidCtrlHR.VRFAlgorithmType = AlgorithmType::FluidTCtrl;
-        thisVrfFluidCtrlHR.FuelTypeNum = Constant::eResource::Electricity;
+        thisVrfFluidCtrlHR.FuelType = Constant::eFuel::Electricity;
 
         if (lAlphaFieldBlanks(2)) {
             thisVrfFluidCtrlHR.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
@@ -4859,7 +4859,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
     for (int NumCond = 1; NumCond <= state.dataHVACVarRefFlow->NumVRFCond; ++NumCond) {
         auto &thisVrf = state.dataHVACVarRefFlow->VRF(NumCond);
-        std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(thisVrf.FuelTypeNum)];
+        std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(thisVrf.FuelType)];
         SetupOutputVariable(state,
                             "VRF Heat Pump Total Cooling Rate",
                             OutputProcessor::Unit::W,
@@ -5048,7 +5048,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         if (thisVrf.DefrostStrategy == StandardRatings::DefrostStrat::Resistive ||
-            (thisVrf.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle && thisVrf.FuelTypeNum == Constant::eResource::Electricity)) {
+            (thisVrf.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle && thisVrf.FuelType == Constant::eFuel::Electricity)) {
             SetupOutputVariable(state,
                                 "VRF Heat Pump Defrost Electricity Rate",
                                 OutputProcessor::Unit::W,
