@@ -10,7 +10,7 @@
 ! System:   None.
 ! Plant:    PLANT LOAD PROFILE with DistrictHeating.
 
-  Version,23.1;
+  Version,23.2;
 
   Building,
     Plant Load Profile Example,  !- Name

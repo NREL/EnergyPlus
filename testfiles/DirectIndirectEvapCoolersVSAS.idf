@@ -70,7 +70,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,23.1;
+  Version,23.2;
 
   AirLoopHVAC:UnitaryHeatCool,
     FURNACE_PACU_CAV:1_Unitary_Package,  !- Name
