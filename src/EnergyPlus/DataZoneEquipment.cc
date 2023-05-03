@@ -815,7 +815,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields); //  data for one zone
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, state.dataZoneEquip->GetZoneEquipmentDataErrorsFound);
         state.dataZoneEquip->SupplyAirPath(PathNum).Name = AlphArray(1);
         state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
@@ -885,7 +884,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields); //  data for one zone
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, state.dataZoneEquip->GetZoneEquipmentDataErrorsFound);
         state.dataZoneEquip->ReturnAirPath(PathNum).Name = AlphArray(1);
         state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 

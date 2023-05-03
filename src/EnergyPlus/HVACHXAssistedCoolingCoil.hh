@@ -153,17 +153,17 @@ namespace HVACHXAssistedCoolingCoil {
     );
 
     int GetCoilGroupTypeNum(EnergyPlusData &state,
-                            std::string const &CoilType,                    // must match coil types in this module
-                            std::string const &CoilName,                    // must match coil names for the coil type
-                            bool &ErrorsFound,                              // set to true if problem
-                            ObjexxFCL::Optional_bool_const PrintWarning = _ // prints warning message if true
+                            std::string const &CoilType,   // must match coil types in this module
+                            std::string const &CoilName,   // must match coil names for the coil type
+                            bool &ErrorsFound,             // set to true if problem
+                            bool const PrintWarning = true // prints warning message if true
     );
 
     int GetCoilObjectTypeNum(EnergyPlusData &state,
-                             std::string const &CoilType,                    // must match coil types in this module
-                             std::string const &CoilName,                    // must match coil names for the coil type
-                             bool &ErrorsFound,                              // set to true if problem
-                             ObjexxFCL::Optional_bool_const PrintWarning = _ // prints warning message if true
+                             std::string const &CoilType,   // must match coil types in this module
+                             std::string const &CoilName,   // must match coil names for the coil type
+                             bool &ErrorsFound,             // set to true if problem
+                             bool const PrintWarning = true // prints warning message if true
     );
 
     int GetCoilInletNode(EnergyPlusData &state,

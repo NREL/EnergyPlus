@@ -82,7 +82,7 @@ struct BaseSizerWithFanHeatInputs : BaseSizer
                                     Real64 &motInPower,
                                     bool &fanCompModel);
 
-    Real64 calcFanDesHeatGain(Real64 &airVolFlow);
+    Real64 calcFanDesHeatGain(Real64 const &airVolFlow);
 
     void initializeWithinEP(EnergyPlusData &state,
                             std::string_view const _compType,
