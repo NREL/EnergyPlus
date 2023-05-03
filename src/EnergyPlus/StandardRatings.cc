@@ -3176,9 +3176,6 @@ namespace StandardRatings {
         int constexpr NumOfReducedCap(4);                  // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
         Real64 TotCapTempModFac(0.0);                      // Total capacity modifier (function of entering wetbulb, outside drybulb) [-]
         Real64 OutdoorUnitInletAirDryBulbTempReduced(0.0); // Outdoor unit entering air dry-bulb temperature at reduced capacity [C]
-        Real64 NetCoolingCapReduced(0.0);                  // Net Cooling Coil capacity at reduced conditions, accounting for supply fan heat [W]
-        Real64 EIRTempModFac(0.0);                         // EIR modifier (function of entering wetbulb, outside drybulb) [-]
-        Real64 EIR(0.0);                                   // Energy Efficiency Ratio at AHRI test conditions for SEER [-]
         Real64 EERReduced(0.0);                            // EER at reduced capacity test conditions (100%, 75%, 50%, and 25%)
         Real64 IEER = 0.0;                                 // Integareted energy efficiency ratio of single speed DX cooling coil
         Real64 NetCoolingCapRated = 0.0;                   // net cooling capacity of single speed DX cooling coil
