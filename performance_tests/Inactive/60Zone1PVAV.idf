@@ -38302,6 +38302,8 @@
     autosize,                !- High Speed Rated Sensible Heat Ratio
     2.857143,                !- High Speed Gross Rated Cooling COP {W/W}
     autosize,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     PVAV_Sys Mixed Air Outlet,  !- Air Inlet Node Name
     PVAV_Sys Cooling Coil Outlet,  !- Air Outlet Node Name
@@ -38314,6 +38316,8 @@
     autosize,                !- Low Speed Gross Rated Sensible Heat Ratio
     2.857143,                !- Low Speed Gross Rated Cooling COP {W/W}
     autosize,                !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     SDL-C3,                  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     SDL-C13;                 !- Low Speed Energy Input Ratio Function of Temperature Curve Name
 
