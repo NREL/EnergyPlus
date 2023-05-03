@@ -14,18 +14,18 @@ endif()
 
 include(CTest)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
-option( LIBTK205_BUILD_TESTING "Build libtk205 testing targets." ON )
+
+option(${PROJECT_NAME}_BUILD_TESTING "Build ${PROJECT_NAME} testing targets" OFF)
+option(${PROJECT_NAME}_COVERAGE "Add ${PROJECT_NAME} coverage reports" OFF)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+include(compiler-flags)
+
 add_subdirectory(src)
 add_subdirectory(vendor)
 
-if (LIBTK205_BUILD_TESTING)
+if (${PROJECT_NAME}_BUILD_TESTING)
   add_compile_definitions(TEST205_INPUT_EXAMPLES_DIR="${PROJECT_SOURCE_DIR}")
   enable_testing()
   add_subdirectory(test)
 endif()
-
-# set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-# set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-# include(CPack)

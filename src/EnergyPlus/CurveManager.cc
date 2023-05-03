@@ -2249,14 +2249,19 @@ namespace Curve {
 
                         try {
                             std::vector<Btwxt::GridAxis> gridAxes;
-                            gridAxes.emplace_back(axis, nullptr, Btwxt::Method::linear, Btwxt::Method::linear, std::pair<double, double>{0.0, 360.0}, BtwxtManager::btwxt_logger);
+                            gridAxes.emplace_back(axis,
+                                                  "",
+                                                  Btwxt::Method::linear,
+                                                  Btwxt::Method::linear,
+                                                  std::pair<double, double>{0.0, 360.0},
+                                                  BtwxtManager::btwxt_logger);
 
                             auto gridIndex = // (AUTO_OK_OBJ)
-                                    state.dataCurveManager->btwxtManager.addGrid(Alphas(1), gridAxes, BtwxtMessageCallback);
+                                    state.dataCurveManager->btwxtManager.addGrid(Alphas(1), gridAxes);
                             thisCurve->TableIndex = gridIndex;
                             thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
                         }
-                        catch (BtwxtException &e) {
+                        catch (Btwxt::BtwxtException &e) {
                             ShowSevereError(state, "GridAxis construction error.");
                         }
                     }
@@ -2399,8 +2404,7 @@ namespace Curve {
                         min_val = min(min_val, min_grid_value);
                         max_val = max(max_val, max_grid_value);
 
-                        gridAxes.emplace_back(axis, &btwxt_callback_wrapper, nullptr, extrapMethod, interpMethod,
-                                                  std::pair<double, double>{min_val, max_val});
+                        gridAxes.emplace_back(axis, "", extrapMethod, interpMethod, std::pair<double, double>{min_val, max_val}, BtwxtManager::btwxt_logger);
 
                     } else {
                         // Independent variable does not exist
@@ -2409,7 +2413,7 @@ namespace Curve {
                     }
                 }
                 // Add grid to btwxtManager
-                state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes), BtwxtMessageCallback);
+                state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), gridAxes);
             }
         }
 
@@ -2609,12 +2613,12 @@ namespace Curve {
 
     int BtwxtManager::addOutputValues(int gridIndex, std::vector<double> values)
     {
-        return (int)grids[gridIndex].add_value_table(values);
+        return (int)grids[gridIndex].add_grid_point_data_set(values);
     }
 
     int BtwxtManager::getNumGridDims(int gridIndex)
     {
-        return (int)grids[gridIndex].get_ndims();
+        return (int)grids[gridIndex].get_number_of_dimensions();
     }
 
     double BtwxtManager::getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target)
@@ -2624,7 +2628,7 @@ namespace Curve {
 
     double BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, const double scalar)
     {
-        return grids[gridIndex].normalize_values_at_target(outputIndex, target, scalar);
+        return grids[gridIndex].normalize_grid_point_data_set_at_target(outputIndex, target, scalar);
     }
 
     void BtwxtManager::clear()

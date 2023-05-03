@@ -72,15 +72,13 @@ namespace ChillerElectricASHRAE205 {
         Num,
     };
 
-    void tk205ErrCallback(tk205::MsgSeverity message_type, const std::string &message, void *context_ptr);
-
     void getChillerASHRAE205Input(EnergyPlusData &state);
 
     struct ASHRAE205ChillerSpecs : ChillerElectricEIR::ElectricEIRChillerSpecs
     {
         static constexpr std::string_view ObjectType{"Chiller:Electric:ASHRAE205"};
         std::shared_ptr<tk205::rs0001_ns::RS0001> Representation; // ASHRAE205 representation instance
-        Btwxt::Method InterpolationType{Btwxt::Method::LINEAR};
+        Btwxt::Method InterpolationType{Btwxt::Method::linear};
         int MinSequenceNumber{1};
         int MaxSequenceNumber{1};
 

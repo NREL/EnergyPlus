@@ -43,6 +43,9 @@ construct_grid_point_data_sets(const std::vector<std::vector<double>>& grid_poin
 }
 
 // Constructors
+
+RegularGridInterpolator::RegularGridInterpolator() = default;
+
 RegularGridInterpolator::RegularGridInterpolator(
     const std::vector<GridAxis>& grid_axes,
     const std::vector<GridPointDataSet>& grid_point_data_sets,
@@ -94,6 +97,8 @@ RegularGridInterpolator::RegularGridInterpolator(const std::vector<GridAxis>& gr
 {
 }
 
+RegularGridInterpolator::~RegularGridInterpolator() = default; 
+
 RegularGridInterpolatorImplementation::RegularGridInterpolatorImplementation(
     const std::vector<GridAxis>& grid_axes,
     const std::vector<GridPointDataSet>& grid_point_data_sets,
@@ -129,8 +134,8 @@ RegularGridInterpolatorImplementation::RegularGridInterpolatorImplementation(
 RegularGridInterpolator::RegularGridInterpolator(const RegularGridInterpolator& source)
 {
     *this = source;
-    this->implementation =
-        std::make_unique<RegularGridInterpolatorImplementation>(*source.implementation);
+    this->implementation = source.implementation ?
+                           std::make_unique<RegularGridInterpolatorImplementation>(*source.implementation) : nullptr;
 }
 
 RegularGridInterpolator::RegularGridInterpolator(const RegularGridInterpolator& source,
@@ -140,10 +145,9 @@ RegularGridInterpolator::RegularGridInterpolator(const RegularGridInterpolator& 
     this->implementation->set_logger(logger);
 }
 
-RegularGridInterpolator& RegularGridInterpolator::operator=(const RegularGridInterpolator& source)
-{
-    implementation =
-        std::make_unique<RegularGridInterpolatorImplementation>(*(source.implementation));
+RegularGridInterpolator& RegularGridInterpolator::operator=(const RegularGridInterpolator& source) {
+    implementation = source.implementation ?
+                     std::make_unique<RegularGridInterpolatorImplementation>(*(source.implementation)) : nullptr;
     return *this;
 }
 
@@ -198,6 +202,12 @@ std::size_t RegularGridInterpolatorImplementation::add_grid_point_data_set(
     number_of_grid_point_data_sets++;
     temporary_grid_point_data.resize(number_of_grid_point_data_sets);
     results.resize(number_of_grid_point_data_sets);
+    hypercube_grid_point_data.resize(hypercube.size(),
+                                     std::vector<double>(number_of_grid_point_data_sets));
+    hypercube_cache.clear();
+    if (target_is_set) {
+        set_results();
+    }
     return number_of_grid_point_data_sets - 1; // Returns index of new data set
 }
 
@@ -217,6 +227,11 @@ void RegularGridInterpolator::set_axis_extrapolation_limits(
     const std::size_t axis_index, const std::pair<double, double>& extrapolation_limits)
 {
     implementation->set_axis_extrapolation_limits(axis_index, extrapolation_limits);
+}
+
+std::size_t RegularGridInterpolator::get_number_of_dimensions()
+{
+    return implementation->get_number_of_grid_axes();
 }
 
 // Public normalization methods
@@ -701,12 +716,6 @@ void RegularGridInterpolatorImplementation::calculate_interpolation_coefficients
 
 void RegularGridInterpolatorImplementation::set_hypercube_grid_point_data()
 {
-    if (results.size() != number_of_grid_point_data_sets) {
-        results.resize(number_of_grid_point_data_sets);
-        hypercube_grid_point_data.resize(hypercube.size(),
-                                         std::vector<double>(number_of_grid_point_data_sets));
-        hypercube_cache.clear();
-    }
     if (hypercube_cache.count({floor_grid_point_index, hypercube_size_hash})) {
         hypercube_grid_point_data =
             hypercube_cache.at({floor_grid_point_index, hypercube_size_hash});

@@ -30,7 +30,7 @@ enum class TargetBoundsStatus {
 // this will be the public-facing class.
 class RegularGridInterpolator {
   public:
-    RegularGridInterpolator() = default;
+    RegularGridInterpolator();
 
     explicit RegularGridInterpolator(
         const std::vector<std::vector<double>>& grid_axis_vectors,
@@ -64,6 +64,8 @@ class RegularGridInterpolator {
         const std::vector<GridAxis>& grid_axes,
         const std::vector<GridPointDataSet>& grid_point_data_sets,
         const std::shared_ptr<Courierr::Courierr>& logger = std::make_shared<BtwxtLogger>());
+
+    ~RegularGridInterpolator();
 
     RegularGridInterpolator& operator=(const RegularGridInterpolator& source);
 
@@ -124,6 +126,8 @@ class RegularGridInterpolator {
 
     void set_axis_extrapolation_limits(std::size_t axis_index,
                                        const std::pair<double, double>& extrapolation_limits);
+
+    std::size_t get_number_of_dimensions();
 
     std::string write_data();
 
