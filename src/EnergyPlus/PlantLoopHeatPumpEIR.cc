@@ -633,7 +633,6 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
                     state, this->sourceSidePlantLoc, this->sourceVSBranchPump, this->sourceVSLoopPump, false);
             }
         }
-
         this->envrnInit = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
@@ -675,11 +674,11 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
         (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) ? Constant::HWInitConvTemp : Constant::CWInitConvTemp;
     // I guess I can assume the plant fluids are the same for HW and CW. So only the sizing type is an issue on which to use.
 
-    Real64 const rho = FluidProperties::GetDensityGlycol(state,
-                                                         state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
-                                                         loadSideInitTemp,
-                                                         state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
-                                                         "EIRPlantLoopHeatPump::size()");
+    Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                   state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
+                                                   loadSideInitTemp,
+                                                   state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
+                                                   "EIRPlantLoopHeatPump::size()");
     Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                              state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
                                                              loadSideInitTemp,
@@ -694,22 +693,48 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
             tmpLoadVolFlow = state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizingFactor;
             Real64 const deltaT = state.dataSize->PlantSizData(pltLoadSizNum).DeltaT;
             if (this->companionHeatPumpCoil) {
+                Real64 companionVolFlowRate = this->companionHeatPumpCoil->loadSideDesignVolFlowRate;
+                int compLoopNum = this->companionHeatPumpCoil->loadSidePlantLoc.loopNum;
+                if (companionVolFlowRate == DataSizing::AutoSize) {
+                    if (compLoopNum > 0) {
+                        companionVolFlowRate = state.dataSize->PlantSizData(compLoopNum).DesVolFlowRate * this->companionHeatPumpCoil->sizingFactor;
+                    }
+                }
+                tmpLoadVolFlow = max(tmpLoadVolFlow, companionVolFlowRate);
                 if (this->loadSideDesignVolFlowRateWasAutoSized) this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
-                tmpLoadVolFlow = max(tmpLoadVolFlow, this->companionHeatPumpCoil->loadSideDesignVolFlowRate);
-                if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling &&
-                    this->companionHeatPumpCoil->heatSizingMethod != HeatSizingType::Cooling) {
-                    tmpCapacity = this->companionHeatPumpCoil->referenceCapacity / this->companionHeatPumpCoil->heatSizingRatio;
-                    if (this->companionHeatPumpCoil->heatSizingMethod == HeatSizingType::GreaterOfCoolingOrHeating) {
-                        tmpCapacity = std::max(tmpCapacity, Cp * rho * deltaT * tmpLoadVolFlow);
+                if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) {
+                    // cooling side will always size normally
+                    tmpCapacity = Cp * rho * deltaT * tmpLoadVolFlow;
+                } else { // size heating side based on sizing method
+                    if (this->heatSizingMethod == HeatSizingType::Heating) {
+                        tmpCapacity = Cp * rho * deltaT * tmpLoadVolFlow;
+                    } else {
+                        Real64 compRefCapacity = this->companionHeatPumpCoil->referenceCapacity;
+                        Real64 const compRho = FluidProperties::GetDensityGlycol(state,
+                                                                                 state.dataPlnt->PlantLoop(compLoopNum).FluidName,
+                                                                                 Constant::CWInitConvTemp,
+                                                                                 state.dataPlnt->PlantLoop(compLoopNum).FluidIndex,
+                                                                                 "EIRPlantLoopHeatPump::size()");
+                        if (compRefCapacity == DataSizing::AutoSize) {
+                            Real64 const compCp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                                         state.dataPlnt->PlantLoop(compLoopNum).FluidName,
+                                                                                         Constant::CWInitConvTemp,
+                                                                                         state.dataPlnt->PlantLoop(compLoopNum).FluidIndex,
+                                                                                         "EIRPlantLoopHeatPump::size()");
+                            Real64 const compDeltaT = state.dataSize->PlantSizData(compLoopNum).DeltaT;
+                            compRefCapacity = compCp * compRho * compDeltaT * tmpLoadVolFlow;
+                        }
+                        if (this->heatSizingMethod == HeatSizingType::Cooling) {
+                            tmpCapacity = compRefCapacity;
+                            rho = compRho;
+                        } else {
+                            tmpCapacity = Cp * rho * deltaT * tmpLoadVolFlow;
+                            if (compRefCapacity > tmpCapacity) {
+                                rho = compRho;
+                            }
+                            tmpCapacity = std::max(tmpCapacity, compRefCapacity);
+                        }
                     }
-                } else if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating &&
-                           this->heatSizingMethod != HeatSizingType::Heating) {
-                    tmpCapacity = this->companionHeatPumpCoil->referenceCapacity * this->heatSizingRatio;
-                    if (this->heatSizingMethod == HeatSizingType::GreaterOfCoolingOrHeating) {
-                        tmpCapacity = std::max(tmpCapacity, Cp * rho * deltaT * tmpLoadVolFlow * this->heatSizingRatio);
-                    }
-                } else {
-                    tmpCapacity = Cp * rho * deltaT * tmpLoadVolFlow * this->heatSizingRatio;
                 }
             } else {
                 tmpCapacity = Cp * rho * deltaT * tmpLoadVolFlow * this->heatSizingRatio;
@@ -872,10 +897,8 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
     Real64 tmpSourceVolFlow;
 
     std::string_view const typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)];
-    Real64 sourceSideInitTemp = Constant::HWInitConvTemp;
-    if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
-        sourceSideInitTemp = Constant::CWInitConvTemp;
-    }
+    Real64 sourceSideInitTemp =
+        (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) ? Constant::CWInitConvTemp : Constant::HWInitConvTemp;
 
     Real64 const rhoSrc = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,

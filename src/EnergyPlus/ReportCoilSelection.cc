@@ -769,7 +769,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         }
 
         // call psych routine to flush out moist air metrics from those available
-        if (c->coilDesEntTemp != -999.0) {
+        if (c->coilDesEntTemp != -999.0 && c->coilDesEntHumRat != -999.0) {
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 state, c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::doFinalProcessingOfCoilData");
             if (c->coilDesEntHumRat != -999.0) {
