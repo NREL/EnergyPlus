@@ -9029,8 +9029,8 @@ ConvectionConstants::SurfConvOrientation GetSurfConvOrientation(Real64 const Til
 
 Real64 SurroundingSurfacesRadCoeffAverage(EnergyPlusData &state, int const SurfNum, Real64 const TSurfK, Real64 const AbsExt)
 {
-    // compute exterior surfaces LW radiation tranfsfer coefficient to surrounding surfaces
-    // the surface.SrdSurfTemp is weighted by surrounding surfaces view factor
+    // compute exterior surfaces LW radiation transfer coefficient to surrounding surfaces
+    // the surface.SrdSurfTemp is weighed by surrounding surfaces view factor
     Real64 HSrdSurf = 0.0;
     auto &surface = state.dataSurface->Surface(SurfNum);
     Real64 SrdSurfsTK = surface.SrdSurfTemp + Constant::KelvinConv;
