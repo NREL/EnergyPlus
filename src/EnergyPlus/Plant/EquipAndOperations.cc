@@ -1468,8 +1468,8 @@ namespace DataPlant {
                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->DedicatedHR_ChWRetControl_LoadSideComp.LoopNumPtr).TempSetPointNodeNum)
                     .TempSetPoint = this->Setpoint.SecCW;
 
-                if (this->DedicatedHR_ChWRetControl_LoadSideComp.LoopNumPtr =
-                        SecondaryPlantLoopIndicesBeingSupervised(this->DedicatedHR_ChWRetControl_LoadSideComp.LoopNumPtr)) {
+                if (this->DedicatedHR_ChWRetControl_LoadSideComp.LoopNumPtr ==
+                    SecondaryPlantLoopIndicesBeingSupervised(this->DedicatedHR_ChWRetControl_LoadSideComp.LoopNumPtr)) {
                     // search for HX on this loop and place setpoint on outlet
                     for (int HXnum = 1; HXnum <= this->PlantOps.numPlantHXs; ++HXnum) {
                         if (this->PlantHXComps(HXnum).loopNum == this->DedicatedHR_ChWRetControl_LoadSideComp.LoopNumPtr) {
@@ -1517,8 +1517,8 @@ namespace DataPlant {
                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->DedicatedHR_HWRetControl_LoadSideComp.LoopNumPtr).TempSetPointNodeNum)
                     .TempSetPoint = this->Setpoint.SecHW;
 
-                if (this->DedicatedHR_HWRetControl_LoadSideComp.LoopNumPtr =
-                        SecondaryPlantLoopIndicesBeingSupervised(this->DedicatedHR_HWRetControl_LoadSideComp.LoopNumPtr)) {
+                if (this->DedicatedHR_HWRetControl_LoadSideComp.LoopNumPtr ==
+                    SecondaryPlantLoopIndicesBeingSupervised(this->DedicatedHR_HWRetControl_LoadSideComp.LoopNumPtr)) {
                     // search for HX on this loop and place setpoint on outlet
                     for (int HXnum = 1; HXnum <= this->PlantOps.numPlantHXs; ++HXnum) {
                         if (this->PlantHXComps(HXnum).loopNum == this->DedicatedHR_HWRetControl_LoadSideComp.LoopNumPtr) {
@@ -1535,7 +1535,7 @@ namespace DataPlant {
         }
     }
 
-    void ChillerHeaterSupervisoryOperationData::ProcessAndSetAuxilBoiler(EnergyPlusData &state, bool const FirstHVACIteration)
+    void ChillerHeaterSupervisoryOperationData::ProcessAndSetAuxilBoiler(EnergyPlusData &state, [[maybe_unused]] bool const FirstHVACIteration)
     {
         // Check for boiler used as auxiliary or supplemental
         // Assume boilers are in-line on supply side outlet branch, typically on secodary loop but may be on primary loop

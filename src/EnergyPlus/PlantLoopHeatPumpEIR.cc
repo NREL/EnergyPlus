@@ -417,8 +417,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         // Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
         Real64 OutdoorCoilT = 0.82 * state.dataEnvrn->OutDryBulbTemp - 8.589;
         Real64 OutdoorCoildw =
-            max(1.0e-6,
-                (state.dataEnvrn->OutHumRat - Psychrometrics::PsyWFnTdpPb(state, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutBaroPress)));
+            max(1.0e-6, (state.dataEnvrn->OutHumRat - Psychrometrics::PsyWFnTdpPb(state, OutdoorCoilT, state.dataEnvrn->OutBaroPress)));
         if (this->defrostStrategy == DefrostControl::Timed) {
             if (this->defrostTime > 0.0) {
                 this->fractionalDefrostTime = this->defrostTime; // DefrostTime in hours
@@ -573,7 +572,6 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     if (this->waterSource && abs(this->sourceSideOutletTemp - this->sourceSideInletTemp) > 100.0) { // whoaa out of range happenings on water loop
         //
-        int dummy = 1.0; // gimme a break point please
         // TODO setup recurring error warning?
         // lets do something different than fatal the simulation
         if ((this->sourceSideMassFlowRate / this->sourceSideDesignMassFlowRate) < 0.01) { // current source side flow is 1% of design max
@@ -593,7 +591,8 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
     // This function does all one-time and begin-environment initialization
     std::string static const routineName = std::string("EIRPlantLoopHeatPump :") + __FUNCTION__;
 
-    this->oneTimeInit(state); // plant setup
+    this->oneTimeInit(state);          // plant setup
+    this->isPlantInletOrOutlet(state); // check location
 
     if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
         if (calledFromLocation.loopNum == this->loadSidePlantLoc.loopNum) {
@@ -698,13 +697,17 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
             if (this->companionHeatPumpCoil) {
                 Real64 companionVolFlowRate = this->companionHeatPumpCoil->loadSideDesignVolFlowRate;
                 int compLoopNum = this->companionHeatPumpCoil->loadSidePlantLoc.loopNum;
+                if (this->companionHeatPumpCoil->loadSideIsPlantInlet && companionVolFlowRate > 0.0) {
+                    if (compLoopNum > 0) {
+                        companionVolFlowRate = state.dataSize->PlantSizData(compLoopNum).DesVolFlowRate * this->companionHeatPumpCoil->sizingFactor;
+                    }
+                }
                 if (companionVolFlowRate == DataSizing::AutoSize) {
                     if (compLoopNum > 0) {
                         companionVolFlowRate = state.dataSize->PlantSizData(compLoopNum).DesVolFlowRate * this->companionHeatPumpCoil->sizingFactor;
                     }
                 }
                 tmpLoadVolFlow = max(tmpLoadVolFlow, companionVolFlowRate);
-                if (this->loadSideDesignVolFlowRateWasAutoSized) this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
                 if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) {
                     // cooling side will always size normally
                     tmpCapacity = Cp * rho * deltaT * tmpLoadVolFlow;
@@ -778,6 +781,10 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
             if (this->referenceCapacityWasAutoSized) tmpCapacity = 0.0;
             if (this->loadSideDesignVolFlowRateWasAutoSized) tmpLoadVolFlow = 0.0;
         }
+        if (this->loadSideIsPlantInlet) {
+            tmpLoadVolFlow = state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate;
+        }
+        if (this->loadSideDesignVolFlowRateWasAutoSized) this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
         if (this->referenceCapacityWasAutoSized) {
             this->referenceCapacity = tmpCapacity;
         }
@@ -959,6 +966,10 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
         //                              Qsrc = rho_src * Vdot_src * Cp_src * DeltaT_src
         //                              Vdot_src = Q_src / (rho_src * Cp_src * DeltaT_src)
         tmpSourceVolFlow = designSourceSideHeatTransfer / (state.dataSize->PlantSizData(plantSourceSizingIndex).DeltaT * CpSrc * rhoSrc);
+        if (this->waterSource && this->sourceSideIsPlantOutlet) {
+            // If component is on plant outlet branch, use plant flow rate.
+            tmpSourceVolFlow = state.dataSize->PlantSizData(plantSourceSizingIndex).DesVolFlowRate;
+        }
     } else {
         // just assume it's the same as the load side if we don't have any sizing information
         tmpSourceVolFlow = tmpLoadVolFlow;
@@ -1012,8 +1023,12 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
 
     // register the design volume flows with the plant, only doing half of source because the companion
     // is generally on the same loop
-    PlantUtilities::RegisterPlantCompDesignFlow(state, this->loadSideNodes.inlet, tmpLoadVolFlow);
-    PlantUtilities::RegisterPlantCompDesignFlow(state, this->sourceSideNodes.inlet, tmpSourceVolFlow / 0.5);
+    if (!this->loadSideIsPlantInlet) {
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->loadSideNodes.inlet, tmpLoadVolFlow);
+    }
+    if (!this->sourceSideIsPlantOutlet) {
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->sourceSideNodes.inlet, tmpSourceVolFlow / 0.5);
+    }
 
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
         // create predefined report
@@ -1597,6 +1612,27 @@ void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
             ShowRecurringWarningErrorAtEnd(state,
                                            "Companion heat pump objects running concurrently, check operation.  Base object name: " + thisPLHP.name,
                                            thisPLHP.recurringConcurrentOperationWarningIndex);
+        }
+    }
+}
+
+void EIRPlantLoopHeatPump::isPlantInletOrOutlet(EnergyPlusData &state)
+{
+    // check to see if component is on a plant inlet or outlet branch to determine if flow should be registered
+    // only components on plant parallel component branches should be registered
+    // this check for the load side on a plant inlet branch and source side on a plant outlet branch
+    // likely will need more checking here but this works for now with existing test file
+    for (auto thisPlant : state.dataPlnt->PlantLoop) {
+        for (auto thisLoopSide : thisPlant.LoopSide) {
+            if (this->loadSideNodes.inlet == thisLoopSide.NodeNumIn) {
+                this->loadSideIsPlantInlet = true;
+                break;
+            }
+            if (this->sourceSideNodes.outlet == thisLoopSide.NodeNumOut) {
+                this->sourceSideIsPlantOutlet = true;
+                break;
+            }
+            if (this->loadSideIsPlantInlet && this->sourceSideIsPlantOutlet) break;
         }
     }
 }

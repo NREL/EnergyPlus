@@ -141,7 +141,7 @@ public:
             }
 
             for (auto &opSch : thisPlantLoop.OpScheme) {
-                for (int eqListNum = 1; eqListNum <= opSch.EquipList.size(); ++eqListNum) {
+                for (size_t eqListNum = 1; eqListNum <= opSch.EquipList.size(); ++eqListNum) {
                     opSch.NumEquipLists = eqListNum;
                     auto &thisEquipList(opSch.EquipList(eqListNum));
                     thisEquipList.NumComps = eqListNum;
@@ -273,7 +273,6 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
      )IDF";
 
     ASSERT_TRUE(process_idf(idf_objects));
-    int onSchedIndex = ScheduleManager::GetScheduleIndex(*state, "ALWAYS_ON");
 
     auto &heatComp1 = state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
     heatComp1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;

@@ -387,7 +387,7 @@ namespace PlantComponentTemperatureSources {
                                     [[maybe_unused]] const PlantLocation &calledFromLocation,
                                     [[maybe_unused]] bool FirstHVACIteration,
                                     Real64 &CurLoad,
-                                    bool RunFlag)
+                                    [[maybe_unused]] bool RunFlag)
     {
         this->initialize(state, CurLoad);
         this->calculate(state);

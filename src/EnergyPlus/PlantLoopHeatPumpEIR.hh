@@ -174,6 +174,8 @@ namespace EIRPlantLoopHeatPumps {
         PlantLocation sourceSidePlantLoc;
         InOutNodePair loadSideNodes;
         InOutNodePair sourceSideNodes;
+        bool loadSideIsPlantInlet = false;
+        bool sourceSideIsPlantOutlet = false;
 
         // counters and indexes
         int condMassFlowRateTriggerIndex = 0;
@@ -257,6 +259,8 @@ namespace EIRPlantLoopHeatPumps {
         {
             return a - b;
         }
+
+        void isPlantInletOrOutlet(EnergyPlusData &state);
 
         void oneTimeInit(EnergyPlusData &state) override;
     };

@@ -2024,7 +2024,6 @@ MinFlowIfBranchHasVSPump(EnergyPlusData &state, PlantLocation const &plantLoc, b
 
     if (!foundBranchPump) {
         // second, if no branch pump, search for variable speed pump on inlet branch of supply side of this loop
-        DataPlant::LoopSideLocation loopSide = setFlowStatus ? plantLoc.loopSideNum : DataPlant::LoopSideLocation::Supply;
         int NumCompsOnInletBranch =
             state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents;
         for (int CompCounter = 1; CompCounter <= NumCompsOnInletBranch; ++CompCounter) {

@@ -1847,7 +1847,10 @@ void FindCompSPInput(EnergyPlusData &state,
     }
 }
 
-void GetChillerHeaterChangeoverOpSchemeInput(EnergyPlusData &state, std::string &CurrentModuleObject, int const NumSchemes, bool &ErrorsFound)
+void GetChillerHeaterChangeoverOpSchemeInput(EnergyPlusData &state,
+                                             [[maybe_unused]] std::string &CurrentModuleObject,
+                                             int const NumSchemes,
+                                             bool &ErrorsFound)
 {
     // process input objects for advanced operation scheme, use json type input patterns
 
