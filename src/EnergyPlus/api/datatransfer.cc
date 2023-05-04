@@ -126,9 +126,9 @@ int apiDataFullyReady(EnergyPlusState state)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (thisState->dataPluginManager->fullyReady) {
-        return 0;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 int apiErrorFlag(EnergyPlusState state)

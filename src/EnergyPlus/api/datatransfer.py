@@ -265,8 +265,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.
         """
-        success = self.api.apiDataFullyReady(state)
-        if success == 0:
+        if self.api.apiDataFullyReady(state) == 1:
             return True
         return False
 

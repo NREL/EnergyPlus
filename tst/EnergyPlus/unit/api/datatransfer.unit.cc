@@ -318,7 +318,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestApiDataFullyReady)
 {
     // basically, the data should not be ready at the beginning of a unit test -- ever, so just check that for now
-    EXPECT_EQ(1, apiDataFullyReady((void *)this->state)); // 1 is false
+    EXPECT_EQ(0, apiDataFullyReady((void *)this->state)); // 0 is false
     EXPECT_FALSE(apiDataFullyReady((void *)this->state));
 }
 
