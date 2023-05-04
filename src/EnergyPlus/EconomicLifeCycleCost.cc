@@ -857,7 +857,8 @@ void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state)
             //       \key Water
             //       \key OtherFuel1
             //       \key OtherFuel2
-            elcc->UsePriceEscalation(iInObj).resource = Constant::AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
+            elcc->UsePriceEscalation(iInObj).resource =
+                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, AlphaArray(2)));
             if (NumAlphas > 3) {
                 ShowWarningError(state, format("In {} contains more alpha fields than expected.", CurrentModuleObject));
             }
@@ -1007,7 +1008,7 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
             //       \key Water
             //       \key OtherFuel1
             //       \key OtherFuel2
-            elcc->UseAdjustment(iInObj).resource = Constant::AssignResourceTypeNum(AlphaArray(2)); // use function from DataGlobalConstants
+            elcc->UseAdjustment(iInObj).resource = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, AlphaArray(2)));
             if (NumAlphas > 2) {
                 ShowWarningError(state, format("In {} contains more alpha fields than expected.", CurrentModuleObject));
             }
@@ -1054,18 +1055,18 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     int firstMonth;
     int monthsBaseToService;
 
-    std::map<int, std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>> resourceCosts;
+    std::map<int, std::array<Real64, static_cast<int>(Constant::eResource::Num)>> resourceCosts;
     for (int jMonth = 1; jMonth <= 12; ++jMonth) {
-        resourceCosts[jMonth] = std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>();
+        resourceCosts[jMonth] = std::array<Real64, static_cast<int>(Constant::eResource::Num)>();
         std::fill(resourceCosts[jMonth].begin(), resourceCosts[jMonth].end(), 0.0);
     }
 
     Array1D<Real64> curResourceCosts(12);
 
-    std::array<bool, static_cast<int>(Constant::ResourceType::Num)> resourceCostNotZero{};
+    std::array<bool, static_cast<int>(Constant::eResource::Num)> resourceCostNotZero{};
     std::fill(resourceCostNotZero.begin(), resourceCostNotZero.end(), false);
 
-    std::array<Real64, static_cast<int>(Constant::ResourceType::Num)> resourceCostAnnual{};
+    std::array<Real64, static_cast<int>(Constant::eResource::Num)> resourceCostAnnual{};
     std::fill(resourceCostAnnual.begin(), resourceCostAnnual.end(), 0.0);
 
     Real64 annualCost;
@@ -1099,8 +1100,8 @@ void ExpressAsCashFlows(EnergyPlusData &state)
 
     // gather costs from EconomicTariff for each end use
     elcc->numResourcesUsed = 0;
-    for (int iResource = 0; iResource < static_cast<int>(Constant::ResourceType::Num); ++iResource) {
-        EconomicTariff::GetMonthlyCostForResource(state, static_cast<Constant::ResourceType>(iResource), curResourceCosts);
+    for (int iResource = 0; iResource < static_cast<int>(Constant::eResource::Num); ++iResource) {
+        EconomicTariff::GetMonthlyCostForResource(state, static_cast<Constant::eResource>(iResource), curResourceCosts);
         annualCost = 0.0;
         for (int jMonth = 1; jMonth <= 12; ++jMonth) {
             resourceCosts[jMonth][iResource] = curResourceCosts(jMonth);
@@ -1116,7 +1117,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     }
     // allocate the escalated energy cost arrays
     for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
-        elcc->EscalatedEnergy[year] = std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>();
+        elcc->EscalatedEnergy[year] = std::array<Real64, static_cast<int>(Constant::eResource::Num)>();
         std::fill(elcc->EscalatedEnergy[year].begin(), elcc->EscalatedEnergy[year].end(), 0.0);
     }
 
@@ -1204,45 +1205,45 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     // Put resource costs into cashflows
     // the first cash flow for resources should be after the categories, recurring and nonrecurring costs
     int cashFlowCounter = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost - 1; // Since CashFlow starts at 0
-    for (int iResource = 0; iResource < static_cast<int>(Constant::ResourceType::Num); ++iResource) {
+    for (int iResource = 0; iResource < static_cast<int>(Constant::eResource::Num); ++iResource) {
         if (resourceCostNotZero[iResource]) {
             ++cashFlowCounter;
 
-            switch (static_cast<Constant::ResourceType>(iResource)) {
-            case Constant::ResourceType::Water:
-            case Constant::ResourceType::OnSiteWater:
-            case Constant::ResourceType::MainsWater:
-            case Constant::ResourceType::RainWater:
-            case Constant::ResourceType::WellWater:
-            case Constant::ResourceType::Condensate:
+            switch (static_cast<Constant::eResource>(iResource)) {
+            case Constant::eResource::Water:
+            case Constant::eResource::OnSiteWater:
+            case Constant::eResource::MainsWater:
+            case Constant::eResource::RainWater:
+            case Constant::eResource::WellWater:
+            case Constant::eResource::Condensate:
                 elcc->CashFlow[cashFlowCounter].Category = CostCategory::Water;
                 break;
-            case Constant::ResourceType::Electricity:
-            case Constant::ResourceType::Natural_Gas:
-            case Constant::ResourceType::Gasoline:
-            case Constant::ResourceType::Diesel:
-            case Constant::ResourceType::Coal:
-            case Constant::ResourceType::FuelOil_1:
-            case Constant::ResourceType::FuelOil_2:
-            case Constant::ResourceType::Propane:
-            case Constant::ResourceType::EnergyTransfer:
-            case Constant::ResourceType::Steam:
-            case Constant::ResourceType::DistrictCooling:
-            case Constant::ResourceType::DistrictHeating:
-            case Constant::ResourceType::ElectricityProduced:
-            case Constant::ResourceType::ElectricityPurchased:
-            case Constant::ResourceType::ElectricityNet:
-            case Constant::ResourceType::SolarWater:
-            case Constant::ResourceType::SolarAir:
+            case Constant::eResource::Electricity:
+            case Constant::eResource::NaturalGas:
+            case Constant::eResource::Gasoline:
+            case Constant::eResource::Diesel:
+            case Constant::eResource::Coal:
+            case Constant::eResource::FuelOilNo1:
+            case Constant::eResource::FuelOilNo2:
+            case Constant::eResource::Propane:
+            case Constant::eResource::EnergyTransfer:
+            case Constant::eResource::Steam:
+            case Constant::eResource::DistrictCooling:
+            case Constant::eResource::DistrictHeating:
+            case Constant::eResource::ElectricityProduced:
+            case Constant::eResource::ElectricityPurchased:
+            case Constant::eResource::ElectricityNet:
+            case Constant::eResource::SolarWater:
+            case Constant::eResource::SolarAir:
                 elcc->CashFlow[cashFlowCounter].Category = CostCategory::Energy;
                 break;
             default:
                 elcc->CashFlow[cashFlowCounter].Category = CostCategory::Operation;
             }
 
-            elcc->CashFlow[cashFlowCounter].Resource = static_cast<Constant::ResourceType>(iResource);
+            elcc->CashFlow[cashFlowCounter].Resource = static_cast<Constant::eResource>(iResource);
             elcc->CashFlow[cashFlowCounter].SourceKind = SourceKindType::Resource;
-            elcc->CashFlow[cashFlowCounter].name = GetResourceTypeChar(static_cast<Constant::ResourceType>(iResource));
+            elcc->CashFlow[cashFlowCounter].name = Constant::eResourceNames[static_cast<int>(iResource)];
             if (cashFlowCounter <= elcc->numCashFlow) {
                 // put the monthly energy costs into the cashflow prior to adjustments
                 // energy costs (a.k.a. resource costs) start at the start of service and repeat
@@ -1263,7 +1264,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
                 // need to find the correct adjustment to use for the current resource
                 found = 0;
                 for (jAdj = 1; jAdj <= elcc->numUseAdjustment; ++jAdj) {
-                    if (elcc->UseAdjustment(jAdj).resource == static_cast<Constant::ResourceType>(iResource)) {
+                    if (elcc->UseAdjustment(jAdj).resource == static_cast<Constant::eResource>(iResource)) {
                         found = jAdj;
                         break;
                     }
@@ -1326,7 +1327,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
     }
     // generate a warning if resource referenced was not used
     for (int nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
-        Constant::ResourceType curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
+        Constant::eResource curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
         if (!resourceCostNotZero[static_cast<int>(curResource)] && state.dataGlobal->DoWeathSim) {
             ShowWarningError(state,
                              format("The resource referenced by LifeCycleCost:UsePriceEscalation= \"{}\" has no energy cost. ",
@@ -1346,13 +1347,13 @@ void ComputeEscalatedEnergyCosts(EnergyPlusData &state)
     for (int iCashFlow = 0; iCashFlow < elcc->numCashFlow; ++iCashFlow) {
         if (elcc->CashFlow[iCashFlow].pvKind == PrValKind::Energy) {
             // make sure this is not water
-            Constant::ResourceType curResource = elcc->CashFlow[iCashFlow].Resource;
-            if (elcc->CashFlow[iCashFlow].Resource == Constant::ResourceType::Water ||
-                (elcc->CashFlow[iCashFlow].Resource >= Constant::ResourceType::OnSiteWater &&
-                 elcc->CashFlow[iCashFlow].Resource <= Constant::ResourceType::Condensate)) {
+            Constant::eResource curResource = elcc->CashFlow[iCashFlow].Resource;
+            if (elcc->CashFlow[iCashFlow].Resource == Constant::eResource::Water ||
+                (elcc->CashFlow[iCashFlow].Resource >= Constant::eResource::OnSiteWater &&
+                 elcc->CashFlow[iCashFlow].Resource <= Constant::eResource::Condensate)) {
                 continue;
             }
-            if ((curResource != Constant::ResourceType::None)) {
+            if ((curResource != Constant::eResource::Invalid)) {
                 int found = 0;
                 for (nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
                     if (elcc->UsePriceEscalation(nUsePriceEsc).resource == curResource) {
@@ -1373,7 +1374,7 @@ void ComputeEscalatedEnergyCosts(EnergyPlusData &state)
             }
         }
     }
-    for (int kResource = 0; kResource < static_cast<int>(Constant::ResourceType::Num); ++kResource) {
+    for (int kResource = 0; kResource < static_cast<int>(Constant::eResource::Num); ++kResource) {
         for (int jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
             elcc->EscalatedTotEnergy(jYear) += elcc->EscalatedEnergy[jYear][kResource];
         }
@@ -1426,8 +1427,8 @@ void ComputePresentValue(EnergyPlusData &state)
         switch (elcc->CashFlow[iCashFlow].SourceKind) {
         case SourceKindType::Resource: {
             // only for real fuels purchased such as electricity, natural gas, etc..
-            if ((elcc->CashFlow[iCashFlow].Resource >= Constant::ResourceType::Electricity) &&
-                (elcc->CashFlow[iCashFlow].Resource <= Constant::ResourceType::ElectricitySurplusSold)) {
+            if ((elcc->CashFlow[iCashFlow].Resource >= Constant::eResource::Electricity) &&
+                (elcc->CashFlow[iCashFlow].Resource <= Constant::eResource::ElectricitySurplusSold)) {
                 elcc->CashFlow[iCashFlow].pvKind = PrValKind::Energy;
             } else {
                 elcc->CashFlow[iCashFlow].pvKind = PrValKind::NonEnergy;
@@ -1453,7 +1454,7 @@ void ComputePresentValue(EnergyPlusData &state)
     // compute the Single Present Value factors based on the discount rate
     elcc->SPV.allocate(elcc->lengthStudyYears); // Should this be energySPV?
     for (int year = 1; year <= elcc->lengthStudyYears; ++year) {
-        elcc->energySPV[year] = std::array<Real64, static_cast<int>(Constant::ResourceType::Num)>();
+        elcc->energySPV[year] = std::array<Real64, static_cast<int>(Constant::eResource::Num)>();
         std::fill(elcc->energySPV[year].begin(), elcc->energySPV[year].end(), 0.0);
     }
 
@@ -1473,14 +1474,14 @@ void ComputePresentValue(EnergyPlusData &state)
     }
     // use SPV as default values for all energy types
     for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
-        for (int iResource = 0; iResource < static_cast<int>(Constant::ResourceType::Num); ++iResource) {
+        for (int iResource = 0; iResource < static_cast<int>(Constant::eResource::Num); ++iResource) {
             elcc->energySPV[jYear][iResource] = elcc->SPV(jYear);
         }
     }
     // loop through the resources and if they match a UseEscalation use those values instead
     for (nUsePriceEsc = 1; nUsePriceEsc <= elcc->numUsePriceEscalation; ++nUsePriceEsc) {
-        Constant::ResourceType curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
-        if (curResource != Constant::ResourceType::None) {
+        Constant::eResource curResource = elcc->UsePriceEscalation(nUsePriceEsc).resource;
+        if (curResource != Constant::eResource::Invalid) {
             for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                 // the following is based on UPV* formula from NIST 135 supplement but is for a single year
                 effectiveYear = double(jYear) - DiscConv2EffectiveYearAdjustment[static_cast<int>(elcc->discountConvention)];
@@ -1501,8 +1502,8 @@ void ComputePresentValue(EnergyPlusData &state)
             break;
         }
         case PrValKind::Energy: {
-            Constant::ResourceType curResource = elcc->CashFlow[iCashFlow].Resource;
-            if (curResource != Constant::ResourceType::None) {
+            Constant::eResource curResource = elcc->CashFlow[iCashFlow].Resource;
+            if (curResource != Constant::eResource::Invalid) {
                 totalPV = 0.0;
                 for (jYear = 1; jYear <= elcc->lengthStudyYears; ++jYear) {
                     elcc->CashFlow[iCashFlow].yrPresVal(jYear) =
@@ -1750,7 +1751,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         }
         for (int jObj = 1; jObj <= elcc->numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
             columnHead(jObj) = elcc->UsePriceEscalation(jObj).name;
-            tableBody(jObj, 1) = GetResourceTypeChar(elcc->UsePriceEscalation(jObj).resource);
+            tableBody(jObj, 1) = Constant::eResourceNames[static_cast<int>(elcc->UsePriceEscalation(jObj).resource)];
             tableBody(jObj, 2) = format("{} {}",
                                         UtilityRoutines::MonthNamesCC[static_cast<int>(elcc->UsePriceEscalation(jObj).escalationStartMonth)],
                                         elcc->UsePriceEscalation(jObj).escalationStartYear);
@@ -1791,7 +1792,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             }
             for (int jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) { // loop through objects not columns to add names
                 columnHead(jObj) = elcc->UseAdjustment(jObj).name;
-                tableBody(jObj, 1) = GetResourceTypeChar(elcc->UseAdjustment(jObj).resource);
+                tableBody(jObj, 1) = Constant::eResourceNames[static_cast<int>(elcc->UseAdjustment(jObj).resource)];
             }
             for (int jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) {
                 for (int iYear = 1; iYear <= numYears; ++iYear) {
@@ -1907,8 +1908,8 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         for (int jObj = 0; jObj < elcc->numResourcesUsed; ++jObj) {
             int curCashFlow = CostCategory::Num + elcc->numRecurringCosts + elcc->numNonrecurringCost + jObj;
             columnHead(jObj + 1) = elcc->CashFlow[curCashFlow].name;
-            Constant::ResourceType curResource = elcc->CashFlow[curCashFlow].Resource;
-            if (elcc->CashFlow[curCashFlow].Resource != Constant::ResourceType::Water) {
+            Constant::eResource curResource = elcc->CashFlow[curCashFlow].Resource;
+            if (elcc->CashFlow[curCashFlow].Resource != Constant::eResource::Water) {
                 for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
                     tableBody(jObj + 1, iYear) = OutputReportTabular::RealToStr(elcc->EscalatedEnergy[iYear][static_cast<int>(curResource)], 2);
                 }
