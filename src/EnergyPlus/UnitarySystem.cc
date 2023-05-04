@@ -474,7 +474,7 @@ namespace UnitarySystems {
             }
         }
 
-        if (this->m_MyFanFlag) {
+        if (this->m_MyFanFlag) { // should include " && !this->m_MySizingCheckFlag"
             if (this->m_ActualFanVolFlowRate != DataSizing::AutoSize) {
                 if (this->m_ActualFanVolFlowRate > 0.0) {
                     this->m_HeatingFanSpeedRatio = this->m_MaxHeatAirVolFlow / this->m_ActualFanVolFlowRate;
@@ -10965,6 +10965,7 @@ namespace UnitarySystems {
 
         Real64 FanPartLoadRatio = PartLoadRatio;
         if (this->m_SimASHRAEModel) FanPartLoadRatio = this->FanPartLoadRatio;
+
         int SpeedNum = max(this->m_CoolingSpeedNum, this->m_HeatingSpeedNum);
         int InletNode = this->AirInNode;
 
