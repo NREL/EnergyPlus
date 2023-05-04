@@ -10949,7 +10949,6 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurroundingSurfacesViewFactorTest)
     srdSurfsNum = state->dataSurface->Surface(surfNum).SurfSurroundingSurfacesNum;
     auto &srdSurfsProperty_east = state->dataSurface->SurroundingSurfsProperty(srdSurfsNum);
     // check sky view factors
-    // EXPECT_DOUBLE_EQ(0.5, surface_east_wall.SkyViewFactor);
     EXPECT_DOUBLE_EQ(0.5, srdSurfsProperty_east.SkyViewFactor);
     EXPECT_DOUBLE_EQ(0.2, srdSurfsProperty_east.GroundViewFactor);
     // check surrounding surfaces view factors

@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -3780,4 +3781,299 @@ TEST_F(ConvectionCoefficientsFixture, RoofExtConvectionCoefficient)
     EXPECT_DOUBLE_EQ(9.9999, Hf_result3);
     EXPECT_EQ(state->dataSurface->Surface(1).ExtBoundCond, EnergyPlus::DataSurfaces::OtherSideCondModeledExt);
     EXPECT_TRUE(compare_err_stream(""));
+}
+
+TEST_F(ConvectionCoefficientsFixture, SurroundingSurfacesHRadCoefTest)
+{
+    std::string_view constexpr idf_objects = R"IDF(
+      Zone,
+        Zone,                         !- Name
+        0,                            !- Direction of Relative North {deg}
+        6.000000,                     !- X Origin {m}
+        6.000000,                     !- Y Origin {m}
+        0,                            !- Z Origin {m}
+        1,                            !- Type
+        1,                            !- Multiplier
+        autocalculate,                !- Ceiling Height {m}
+        autocalculate;                !- Volume {m3}
+                          
+	  Material,
+        NothWallConcreteBlock,        !- Name
+        MediumRough,                  !- Roughness
+        0.1014984,                    !- Thickness {m}
+        0.3805070,                    !- Conductivity {W/m-K}
+        608.7016,                     !- Density {kg/m3}
+        836.8000,                     !- Specific Heat {J/kg-K}
+        0.9,                          !- Thermal Absorptance",
+        0.6,                          !- Solar Absorptance",
+        1.0;                          !- Visible Absorptance",
+
+      Construction,
+        NorthWallConstruction,        !- Name
+        NothWallConcreteBlock;        !- Outside Layer
+
+	  Material,
+        EastWallConcreteBlock,        !- Name
+        MediumRough,                  !- Roughness
+        0.1014984,                    !- Thickness {m}
+        0.3805070,                    !- Conductivity {W/m-K}
+        608.7016,                     !- Density {kg/m3}
+        836.8000,                     !- Specific Heat {J/kg-K}
+        0.7,                          !- Thermal Absorptance",
+        0.6,                          !- Solar Absorptance",
+        1.0;                          !- Visible Absorptance",
+
+      Construction,
+        EastWallConstruction,         !- Name
+        EastWallConcreteBlock;        !- Outside Layer
+
+      BuildingSurface:Detailed,
+        North-Wall,                   !- Name
+        Wall,                         !- Surface Type
+        NorthWallConstruction,        !- Construction Name
+        Zone,                         !- Zone Name
+        ,                             !- Space Name
+        Outdoors,                     !- Outside Boundary Condition
+        ,                             !- Outside Boundary Condition Object
+        SunExposed,                   !- Sun Exposure
+        WindExposed,                  !- Wind Exposure
+        0.1,                          !- View Factor to Ground
+        4,                            !- Number of Vertices
+        0.0, 0.0, 10.0,               !- X,Y,Z ==> Vertex 1 {m}
+        0.0, 0.0, 0.0,                !- X,Y,Z ==> Vertex 2 {m}
+        10.0, 0.0, 0.0,               !- X,Y,Z ==> Vertex 3 {m}
+        10.0, 0.0, 10.0;              !- X,Y,Z ==> Vertex 4 {m}
+
+      SurfaceProperty:LocalEnvironment,
+        LocEnv:North-Wall,            !- Name
+        North-Wall,                   !- Exterior Surface Name
+        ,                             !- External Shading Fraction Schedule Name
+        SrdSurfs:North-Wall;          !- Surrounding Surfaces Object Name
+
+      SurfaceProperty:SurroundingSurfaces,
+        SrdSurfs:North-Wall,          !- Name
+        0.4,                          !- Sky View Factor
+        Sky Temp Sch,                 !- Sky Temperature Schedule Name
+        ,                             !- Ground View Factor
+        ,                             !- Ground Temperature Schedule Name
+        SrdSurfs:Surface 1,           !- Surrounding Surface 1 Name
+        0.3,                          !- Surrounding Surface 1 View Factor
+        Surrounding Temp Sch 1,       !- Surrounding Surface 1 Temperature Schedule Name
+        SrdSurfs:Surface 2,           !- Surrounding Surface 2 Name
+        0.2,                          !- Surrounding Surface 2 View Factor
+        Surrounding Temp Sch 2;       !- Surrounding Surface 2 Temperature Schedule Name
+
+      Schedule:Compact,
+        Sky Temp Sch,                 !- Name
+        Any Number,                   !- Schedule Type Limits Name
+        Through: 12/31,               !- Field 1
+        For: AllDays,                 !- Field 2
+        Until: 24:00, 6.0;            !- Field 3
+
+      BuildingSurface:Detailed,
+        East-Wall,                    !- Name
+        Wall,                         !- Surface Type
+        EastWallConstruction,         !- Construction Name
+        Zone,                         !- Zone Name
+        ,                             !- Space Name
+        Outdoors,                     !- Outside Boundary Condition
+        ,                             !- Outside Boundary Condition Object
+        SunExposed,                   !- Sun Exposure
+        WindExposed,                  !- Wind Exposure
+        0.4,                          !- View Factor to Ground
+        4,                            !- Number of Vertices
+        10.0, 10.0, 0.0,              !- X,Y,Z ==> Vertex 1 {m}
+        10.0, 10.0, 10.0,             !- X,Y,Z ==> Vertex 2 {m}
+        10.0, 0.0, 10.0,              !- X,Y,Z ==> Vertex 3 {m}
+        10.0, 0.0, 0.0;               !- X,Y,Z ==> Vertex 4 {m}
+
+      SurfaceProperty:LocalEnvironment,
+        LocEnv:East-Wall,             !- Name
+        East-Wall,                    !- Exterior Surface Name
+        ,                             !- External Shading Fraction Schedule Name
+        SrdSurfs:East-Wall;           !- Surrounding Surfaces Object Name
+
+      SurfaceProperty:SurroundingSurfaces,
+        SrdSurfs:East-Wall,           !- Name
+        0.3,                          !- Sky View Factor
+        Sky Temp Sch,                 !- Sky Temperature Schedule Name
+        ,                             !- Ground View Factor
+        ,                             !- Ground Temperature Schedule Name
+        SrdSurfs:Surface 3,           !- Surrounding Surface 1 Name
+        0.1,                          !- Surrounding Surface 1 View Factor
+        Surrounding Temp Sch 3,       !- Surrounding Surface 1 Temperature Schedule Name
+        SrdSurfs:Surface 4,           !- Surrounding Surface 2 Name
+        0.2,                          !- Surrounding Surface 2 View Factor
+        Surrounding Temp Sch 4;       !- Surrounding Surface 2 Temperature Schedule Name
+							
+      Schedule:Compact,
+        Surrounding Temp Sch 1,       !- Name
+        Any Number,                   !- Schedule Type Limits Name
+        Through: 12/31,               !- Field 1
+        For: AllDays,                 !- Field 2
+        Until: 24:00, 10.0;           !- Field 3
+
+      Schedule:Compact,
+        Surrounding Temp Sch 2,       !- Name
+        Any Number,                   !- Schedule Type Limits Name
+        Through: 12/31,               !- Field 1
+        For: AllDays,                 !- Field 2
+        Until: 24:00, 12.0;           !- Field 3
+
+      Schedule:Compact,
+        Surrounding Temp Sch 3,       !- Name
+        Any Number,                   !- Schedule Type Limits Name
+        Through: 12/31,               !- Field 1
+        For: AllDays,                 !- Field 2
+        Until: 24:00, 14.0;           !- Field 3
+
+      Schedule:Compact,
+        Surrounding Temp Sch 4,       !- Name
+        Any Number,                   !- Schedule Type Limits Name
+        Through: 12/31,               !- Field 1
+        For: AllDays,                 !- Field 2
+        Until: 24:00, 16.0;           !- Field 3
+
+      BuildingSurface:Detailed,
+        Floor,                        !- Name
+        Floor,                        !- Surface Type
+        NorthWallConstruction,        !- Construction Name
+        Zone,                         !- Zone Name
+        ,                             !- Space Name
+        Outdoors,                     !- Outside Boundary Condition
+        ,                             !- Outside Boundary Condition Object
+        NoSun,                        !- Sun Exposure
+        NoWind,                       !- Wind Exposure
+        1.0,                          !- View Factor to Ground
+        4,                            !- Number of Vertices
+        0.000000,0.000000,0,          !- X,Y,Z ==> Vertex 1 {m}
+        0.000000,10.000000,0,         !- X,Y,Z ==> Vertex 2 {m}
+        10.00000,10.000000,0,         !- X,Y,Z ==> Vertex 3 {m}
+        10.00000,0.000000,0;          !- X,Y,Z ==> Vertex 4 {m}
+
+    )IDF";
+
+    bool ErrorsFound = false;
+    ASSERT_TRUE(process_idf(idf_objects));
+    // set global and environmental variables
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->HourOfDay = 15;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 3600.0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->OutBaroPress = 101325;
+    // process schedules
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+    // createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    Material::GetMaterialData(*state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
+
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
+    //  reset sky and ground view factors
+    HeatBalanceSurfaceManager::InitSurfacePropertyViewFactors(*state);
+    // update schedule values for surrounding surfaces temperature
+    ScheduleManager::UpdateScheduleValues(*state);
+    HeatBalanceSurfaceManager::GetSurroundingSurfacesTemperatureAverage(*state);
+    // set outside face temperature of the exterior surfaces
+    state->dataHeatBalSurf->SurfOutsideTempHist(1).dimension(state->dataSurface->TotSurfaces, 0.0);
+    state->dataHeatBalSurf->SurfOutsideTempHist(1)(1) = 20.0;
+    state->dataHeatBalSurf->SurfOutsideTempHist(1)(2) = 30.0;
+    state->dataHeatBalSurf->SurfOutsideTempHist(1)(3) = 20.0;
+
+    int surfNum = 0;
+    int srdSurfsNum = 0;
+    int srdSurfsPropNum = 0;
+    // test 1: exterior north wall radiation coefficient
+    srdSurfsPropNum = UtilityRoutines::FindItemInList("SRDSURFS:NORTH-WALL", state->dataSurface->SurroundingSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(srdSurfsPropNum).SurroundingSurfsPtr);
+    surfNum = UtilityRoutines::FindItemInList("NORTH-WALL", state->dataSurface->Surface);
+    auto &surface_north_wall = state->dataSurface->Surface(surfNum);
+    srdSurfsNum = state->dataSurface->Surface(surfNum).SurfSurroundingSurfacesNum;
+    auto &srdSurfsProperty_north = state->dataSurface->SurroundingSurfsProperty(srdSurfsNum);
+    // check sky view factors
+    EXPECT_DOUBLE_EQ(0.4, srdSurfsProperty_north.SkyViewFactor);
+    EXPECT_NEAR(0.1, srdSurfsProperty_north.GroundViewFactor, 1.0e-06);
+    //  check surrounding surfaces view factors
+    EXPECT_EQ("SRDSURFS:SURFACE 1", srdSurfsProperty_north.SurroundingSurfs(1).Name);
+    EXPECT_DOUBLE_EQ(0.3, srdSurfsProperty_north.SurroundingSurfs(1).ViewFactor);
+    EXPECT_EQ("SRDSURFS:SURFACE 2", srdSurfsProperty_north.SurroundingSurfs(2).Name);
+    EXPECT_DOUBLE_EQ(0.2, srdSurfsProperty_north.SurroundingSurfs(2).ViewFactor);
+    // check surrounding surfaces view factors sum (viewed by an exterior surface)
+    Real64 srdSurfacesViewFactorSum_result1 =
+        srdSurfsProperty_north.SurroundingSurfs(1).ViewFactor + srdSurfsProperty_north.SurroundingSurfs(2).ViewFactor;
+    EXPECT_DOUBLE_EQ(0.5, srdSurfacesViewFactorSum_result1);
+    // calculate surrounding surface radiation coeffient
+    Real64 surf_tempExtK = state->dataHeatBalSurf->SurfOutsideTempHist(1)(surfNum) + Constant::KelvinConv;
+    auto &north_wall_const = state->dataConstruction->Construct(surface_north_wall.Construction);
+    auto *north_wall_mat = dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->Material(north_wall_const.LayerPoint(1)));
+    Real64 surf_absExt_north_wall = north_wall_mat->AbsorpThermal; // LW emitance of the exterior surface
+    // calculate surrounding surfaces radiation exchange coefficient
+    Real64 north_wall_srdSurfsTK = surface_north_wall.SrdSurfTemp + Constant::KelvinConv;
+    EXPECT_NEAR(10.80, surface_north_wall.SrdSurfTemp, 1.0e-02);
+    EXPECT_NEAR(0.9, surf_absExt_north_wall, 1.0e-06);
+    Real64 HRadSrdSurf_result1 =
+        Constant::StefanBoltzmann * 0.9 * 0.5 * (pow_4(surf_tempExtK) - pow_4(north_wall_srdSurfsTK)) / (surf_tempExtK - north_wall_srdSurfsTK);
+    // get rad exchange coefficient for exterior north wall from the function
+    Real64 HRadSrdSurf_func1 = SurroundingSurfacesRadCoeffAverage(*state, surfNum, surf_tempExtK, surf_absExt_north_wall);
+    // check the radiation exchange coefficient
+    EXPECT_DOUBLE_EQ(HRadSrdSurf_result1, 2.4525479915842845);
+    EXPECT_DOUBLE_EQ(HRadSrdSurf_result1, HRadSrdSurf_func1);
+
+    surfNum = 0;
+    srdSurfsNum = 0;
+    srdSurfsPropNum = 0;
+    // test 2: exterior east wall radiation coefficient
+    srdSurfsPropNum = UtilityRoutines::FindItemInList("SRDSURFS:EAST-WALL", state->dataSurface->SurroundingSurfsProperty);
+    EXPECT_EQ(2, state->dataSurface->SurfLocalEnvironment(srdSurfsPropNum).SurroundingSurfsPtr);
+    surfNum = UtilityRoutines::FindItemInList("EAST-WALL", state->dataSurface->Surface);
+    auto &surface_east_wall = state->dataSurface->Surface(surfNum);
+    srdSurfsNum = state->dataSurface->Surface(surfNum).SurfSurroundingSurfacesNum;
+    auto &srdSurfsProperty_east = state->dataSurface->SurroundingSurfsProperty(srdSurfsNum);
+    // check sky view factors
+    EXPECT_DOUBLE_EQ(0.3, srdSurfsProperty_east.SkyViewFactor);
+    EXPECT_DOUBLE_EQ(0.4, srdSurfsProperty_east.GroundViewFactor);
+    // check surrounding surfaces view factors
+    EXPECT_EQ("SRDSURFS:SURFACE 3", srdSurfsProperty_east.SurroundingSurfs(1).Name);
+    EXPECT_DOUBLE_EQ(0.1, srdSurfsProperty_east.SurroundingSurfs(1).ViewFactor);
+    EXPECT_EQ("SRDSURFS:SURFACE 4", srdSurfsProperty_east.SurroundingSurfs(2).Name);
+    EXPECT_DOUBLE_EQ(0.2, srdSurfsProperty_east.SurroundingSurfs(2).ViewFactor);
+    // check surrounding surfaces view factors sum (viewed by an exterior surface)
+    Real64 srdSurfacesViewFactorSum_result2 =
+        srdSurfsProperty_east.SurroundingSurfs(1).ViewFactor + srdSurfsProperty_east.SurroundingSurfs(2).ViewFactor;
+    EXPECT_DOUBLE_EQ(0.3, srdSurfacesViewFactorSum_result2);
+    // calculate surrounding surface radiation coeffient
+    surf_tempExtK = state->dataHeatBalSurf->SurfOutsideTempHist(1)(surfNum) + Constant::KelvinConv;
+    auto &east_wall_const = state->dataConstruction->Construct(surface_east_wall.Construction);
+    auto *east_wall_mat = dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->Material(east_wall_const.LayerPoint(1)));
+    Real64 surf_absExt_east_wall = east_wall_mat->AbsorpThermal; // LW emitance of the exterior surface
+    // calculate surrounding surfaces radiation exchange coefficient
+    Real64 east_wall_srdSurfsTK = surface_east_wall.SrdSurfTemp + Constant::KelvinConv;
+    EXPECT_NEAR(15.34, surface_east_wall.SrdSurfTemp, 1.0e-02);
+    EXPECT_NEAR(0.7, surf_absExt_east_wall, 1.0e-06);
+    Real64 HRadSrdSurf_result2 =
+        Constant::StefanBoltzmann * 0.7 * 0.3 * (pow_4(surf_tempExtK) - pow_4(east_wall_srdSurfsTK)) / (surf_tempExtK - east_wall_srdSurfsTK);
+    // get rad exchange coefficient for exterior east wall from the function
+    Real64 HRadSrdSurf_func2 = SurroundingSurfacesRadCoeffAverage(*state, surfNum, surf_tempExtK, surf_absExt_east_wall);
+    // check the radiation exchange coefficient
+    EXPECT_DOUBLE_EQ(HRadSrdSurf_result2, 1.2336276277402503);
+    EXPECT_DOUBLE_EQ(HRadSrdSurf_result2, HRadSrdSurf_func2);
 }

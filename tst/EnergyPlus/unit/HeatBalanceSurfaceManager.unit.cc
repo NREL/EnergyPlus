@@ -8706,7 +8706,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurroundingSurfacesTempTest)
         10.00000,10.000000,0,         !- X,Y,Z ==> Vertex 3 {m}
         10.00000,0.000000,0;          !- X,Y,Z ==> Vertex 4 {m}
 
-
     )IDF";
 
     bool ErrorsFound = false;
