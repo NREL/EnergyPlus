@@ -981,10 +981,10 @@ namespace HeatBalFiniteDiffManager {
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Summed,
                                         state.dataSurface->Surface(SurfNum).Name,
-                                        _,
+                                        {},
                                         "Electricity",
                                         "Heating",
-                                        _,
+                                        {},
                                         "Building");
                 }
             }

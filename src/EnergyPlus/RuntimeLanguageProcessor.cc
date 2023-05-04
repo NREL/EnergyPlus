@@ -3515,15 +3515,15 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        1,
+                                        1,
+                                        -999,
                                         UnitsB);
                 }
                 // Last field is index key, no indexing here so mimic weather output data
@@ -3819,7 +3819,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        _,
+                                        {},
                                         ResourceTypeString,
                                         EndUseTypeString,
                                         EndUseSubCatString,
@@ -3832,10 +3832,10 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        _,
+                                        {},
                                         ResourceTypeString,
                                         EndUseTypeString,
-                                        _,
+                                        {},
                                         GroupTypeString);
                 }
             }

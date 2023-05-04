@@ -532,10 +532,10 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "Heating",
-                                _,
+                                {},
                                 "Plant"); // is EndUseKey right?
 
             SetupOutputVariable(state,
@@ -545,10 +545,10 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "Heating",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -558,10 +558,10 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "Cooling",
-                                _,
+                                {},
                                 "Plant");
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {

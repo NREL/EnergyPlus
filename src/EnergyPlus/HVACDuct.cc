@@ -161,8 +161,6 @@ namespace HVACDuct {
             }
         }
 
-        InitDuct(state, DuctNum);
-
         CalcDuct(DuctNum);
 
         UpdateDuct(state, DuctNum);
@@ -249,62 +247,6 @@ namespace HVACDuct {
         if (ErrorsFound) {
             ShowFatalError(state, format("{} Errors found in input", RoutineName));
         }
-    }
-
-    void InitDuct(EnergyPlusData &state, int const DuctNum) // number of the current duct being simulated
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   17May2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for initializations of the Duct Components
-
-        // METHODOLOGY EMPLOYED:
-        // Uses the status flags to trigger initializations
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool MyOneTimeFlag(true);
-        Array1D_bool MyEnvrnFlag;
-
-        // do one time initializations
-        if (MyOneTimeFlag) {
-            // initialize the environment and sizing flags
-            MyEnvrnFlag.dimension(state.dataHVACDuct->NumDucts, true);
-
-            MyOneTimeFlag = false;
-        }
-
-        // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DuctNum)) {
-        }
-
-        if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(DuctNum) = true;
-        }
-
-        // do these initializations every HVAC time step
     }
 
     void CalcDuct([[maybe_unused]] int const DuctNum) // number of the current duct being simulated !unused1208
