@@ -951,8 +951,9 @@ namespace DataPlant {
                                                                    "DetermineCurrentPlantLoads");
 
         Real64 HW_Qdot = max(0.0,
-                             HW_RetMdot * CpHW * (this->DetermineHWSetpointOARest(state) -
-                                 state.dataLoopNodes->Node(HWSupInletNode).Temp)); // power = Mdot Cp Delta T, heating load is positive
+                             HW_RetMdot * CpHW *
+                                 (this->DetermineHWSetpointOARest(state) -
+                                  state.dataLoopNodes->Node(HWSupInletNode).Temp)); // power = Mdot Cp Delta T, heating load is positive
         this->Report.AirSourcePlantHeatingLoad = HW_Qdot;
     }
 
@@ -1108,8 +1109,8 @@ namespace DataPlant {
     {
         // TODO this routine is currently code to compare building wide loads to the ranges in the equipment lists,
         // will need to test if real current plant loads can be used instead and revise this.
-     //   Real64 CoolingLoadSignal = this->Report.BuildingPolledCoolingLoad;
-     //   Real64 HeatingLoadSignal = this->Report.BuildingPolledHeatingLoad;
+        //   Real64 CoolingLoadSignal = this->Report.BuildingPolledCoolingLoad;
+        //   Real64 HeatingLoadSignal = this->Report.BuildingPolledHeatingLoad;
         Real64 CoolingLoadSignal = this->Report.AirSourcePlantCoolingLoad;
         Real64 HeatingLoadSignal = this->Report.AirSourcePlantHeatingLoad;
 
@@ -1118,8 +1119,7 @@ namespace DataPlant {
             // use zone loads to find range based cooling loads
             for (int equipListNum = 1; equipListNum <= this->PlantOps.NumCoolingOnlyEquipLists; ++equipListNum) {
                 // zone cooling loads are negative, switch to positive for range based limiting
-                if (CoolingLoadSignal * DataPrecisionGlobals::constant_minusone >
-                        this->CoolingOnlyEquipList(equipListNum).RangeLowerLimit &&
+                if (CoolingLoadSignal * DataPrecisionGlobals::constant_minusone > this->CoolingOnlyEquipList(equipListNum).RangeLowerLimit &&
                     this->CoolingOnlyEquipList(equipListNum).RangeUpperLimit > CoolingLoadSignal * DataPrecisionGlobals::constant_minusone) {
                     // found that this equipment list load ranges match the zone predicted cooling loads
 
