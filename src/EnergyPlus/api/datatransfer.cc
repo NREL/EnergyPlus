@@ -829,7 +829,7 @@ int getConstructionHandle(EnergyPlusState state, const char *constructionName)
             return handle;
         }
     }
-    return 0;
+    return -1; // return -1 if it wasn't found
 }
 
 int actualTime(EnergyPlusState)
