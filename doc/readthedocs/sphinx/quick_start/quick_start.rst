@@ -446,33 +446,29 @@ features, and the following documents are installed in
 /Documentation and provide additional details on the
 features:
 
--  EnergyPlus Essentials
-
-   * A longer introduction to the use of EnergyPlus,
+EnergyPlus Essentials
+     A longer introduction to the use of EnergyPlus,
      including more background on the program itself and
      the ecosystem. It also provides some guidance as to
      how to determine what potential sources of errors
      are when EnergyPlus runs into problems and how
      serious those problems might be.
 
--  Engineering Reference
-
-   * The Engineering Reference provides in-depth
+Engineering Reference
+     The Engineering Reference provides in-depth
      coverage of the theoretical basis behind the
      various calculations contained in the program. This
      reference includes more information on modeling
      equations, limitations, and literature references.
 
--  Input Output Reference
-
-   * This document is a thorough description of the
+Input Output Reference
+     This document is a thorough description of the
      various input and output files related to
      EnergyPlus, the format of these files, and how the
      files interact and interrelate
 
--  Output Details and Examples
-
-   * While the Input Output Reference document touches
+Output Details and Examples
+     While the Input Output Reference document touches
      on some of the outputs from EnergyPlus, this
      document has more details and specific examples. It
      also addresses the reference data sets that are
