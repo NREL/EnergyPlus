@@ -634,7 +634,6 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
                     state, this->sourceSidePlantLoc, this->sourceVSBranchPump, this->sourceVSLoopPump, false);
             }
         }
-
         this->envrnInit = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
