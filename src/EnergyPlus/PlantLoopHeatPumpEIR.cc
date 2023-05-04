@@ -682,11 +682,11 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
                                                    loadSideInitTemp,
                                                    state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
                                                    "EIRPlantLoopHeatPump::size()");
-    Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                             state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
-                                                             loadSideInitTemp,
-                                                             state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
-                                                             "EIRPlantLoopHeatPump::size()");
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                       state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
+                                                       loadSideInitTemp,
+                                                       state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
+                                                       "EIRPlantLoopHeatPump::size()");
 
     int pltLoadSizNum = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).PlantSizNum;
     if (pltLoadSizNum > 0) {
@@ -694,7 +694,7 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
         // these represent what the unit would size those to, whether it is doing auto-sizing or not
         if (state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
             tmpLoadVolFlow = state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizingFactor;
-            Real64 const deltaT = state.dataSize->PlantSizData(pltLoadSizNum).DeltaT;
+            Real64 deltaT = state.dataSize->PlantSizData(pltLoadSizNum).DeltaT;
             if (this->companionHeatPumpCoil) {
                 Real64 companionVolFlowRate = this->companionHeatPumpCoil->loadSideDesignVolFlowRate;
                 int compLoopNum = this->companionHeatPumpCoil->loadSidePlantLoc.loopNum;
@@ -713,18 +713,25 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
                         tmpCapacity = Cp * rho * deltaT * tmpLoadVolFlow;
                     } else {
                         Real64 compRefCapacity = this->companionHeatPumpCoil->referenceCapacity;
-                        Real64 const compRho = FluidProperties::GetDensityGlycol(state,
-                                                                                 state.dataPlnt->PlantLoop(compLoopNum).FluidName,
-                                                                                 Constant::CWInitConvTemp,
-                                                                                 state.dataPlnt->PlantLoop(compLoopNum).FluidIndex,
-                                                                                 "EIRPlantLoopHeatPump::size()");
+                        Real64 compRho = rho;
+                        if (compLoopNum > 0) {
+                            compRho = FluidProperties::GetDensityGlycol(state,
+                                                                        state.dataPlnt->PlantLoop(compLoopNum).FluidName,
+                                                                        Constant::CWInitConvTemp,
+                                                                        state.dataPlnt->PlantLoop(compLoopNum).FluidIndex,
+                                                                        "EIRPlantLoopHeatPump::size()");
+                        }
                         if (compRefCapacity == DataSizing::AutoSize) {
-                            Real64 const compCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                                         state.dataPlnt->PlantLoop(compLoopNum).FluidName,
-                                                                                         Constant::CWInitConvTemp,
-                                                                                         state.dataPlnt->PlantLoop(compLoopNum).FluidIndex,
-                                                                                         "EIRPlantLoopHeatPump::size()");
-                            Real64 const compDeltaT = state.dataSize->PlantSizData(compLoopNum).DeltaT;
+                            Real64 compCp = Cp;
+                            Real64 compDeltaT = deltaT;
+                            if (compLoopNum > 0) {
+                                compCp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                                state.dataPlnt->PlantLoop(compLoopNum).FluidName,
+                                                                                Constant::CWInitConvTemp,
+                                                                                state.dataPlnt->PlantLoop(compLoopNum).FluidIndex,
+                                                                                "EIRPlantLoopHeatPump::size()");
+                                compDeltaT = state.dataSize->PlantSizData(compLoopNum).DeltaT;
+                            }
                             compRefCapacity = compCp * compRho * compDeltaT * tmpLoadVolFlow;
                         }
                         if (this->heatSizingMethod == HeatSizingType::Cooling) {
@@ -744,7 +751,29 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
             }
         } else if (this->companionHeatPumpCoil && this->companionHeatPumpCoil->loadSideDesignVolFlowRate > 0.0) {
             tmpLoadVolFlow = this->companionHeatPumpCoil->loadSideDesignVolFlowRate;
-            tmpCapacity = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow * this->heatSizingRatio;
+            if (this->companionHeatPumpCoil->referenceCapacity == DataSizing::AutoSize) {
+                // use reverse init temp, e.g., if this is cooling use HWInitConvTemp
+                Real64 compLoadSideInitTemp =
+                    (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) ? Constant::HWInitConvTemp : Constant::CWInitConvTemp;
+                int compLoopNum = this->companionHeatPumpCoil->loadSidePlantLoc.loopNum;
+                if (compLoopNum > 0) {
+                    Real64 const compRho = FluidProperties::GetDensityGlycol(state,
+                                                                             state.dataPlnt->PlantLoop(compLoopNum).FluidName,
+                                                                             compLoadSideInitTemp,
+                                                                             state.dataPlnt->PlantLoop(compLoopNum).FluidIndex,
+                                                                             "EIRPlantLoopHeatPump::size()");
+                    Real64 const compCp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                                 state.dataPlnt->PlantLoop(compLoopNum).FluidName,
+                                                                                 Constant::CWInitConvTemp,
+                                                                                 state.dataPlnt->PlantLoop(compLoopNum).FluidIndex,
+                                                                                 "EIRPlantLoopHeatPump::size()");
+                    rho = compRho;
+                    Cp = compCp;
+                }
+                tmpCapacity = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow * this->heatSizingRatio;
+            } else {
+                tmpCapacity = this->companionHeatPumpCoil->referenceCapacity;
+            }
         } else {
             if (this->referenceCapacityWasAutoSized) tmpCapacity = 0.0;
             if (this->loadSideDesignVolFlowRateWasAutoSized) tmpLoadVolFlow = 0.0;

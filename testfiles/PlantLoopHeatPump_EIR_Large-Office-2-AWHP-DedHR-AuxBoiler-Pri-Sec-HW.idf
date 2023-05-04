@@ -4705,26 +4705,26 @@ Fan:SystemModel,
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Core_bottom CoolSense,  !- Name
+    Core_bottom PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Core_bottom CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Core_bottom CoolSense Secondary Inlet Node,     !- Secondary Air Inlet Node Name
-    Core_bottom CoolSense Outlet Node Name,         !- Outlet Node Name
-    Core_bottom CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Core_bottom CoolSense Mixer,  !- Zone Mixer Name
-    Core_bottom CoolSense Fan,  !- Fan Name
+    Core_bottom PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Core_bottom PIUHEATING Secondary Inlet Node,     !- Secondary Air Inlet Node Name
+    Core_bottom PIUHEATING Outlet Node Name,         !- Outlet Node Name
+    Core_bottom PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Core_bottom PIUHEATING Mixer,  !- Zone Mixer Name
+    Core_bottom PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Core_bottom CoolSense Reheat Coil, !- Reheat Coil Name
+    Core_bottom PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Core_bottom CoolSense Mixer,      !- Name
-    Core_bottom CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Core_bottom CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Core_bottom CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Core_bottom PIUHEATING Mixer,      !- Name
+    Core_bottom PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Core_bottom PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Core_bottom PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Core_bottom,             !- Zone Name
@@ -4736,7 +4736,7 @@ Fan:SystemModel,
 
   NodeList,
     Core_bottom Inlet Nodes,                !- Name
-    Core_bottom CoolSense Outlet Node Name, !- Node 1 Name
+    Core_bottom PIUHEATING Outlet Node Name, !- Node 1 Name
     Core_bottom_ZoneInlet Node;             !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -4774,8 +4774,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Core_bottom CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Core_bottom CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Core_bottom PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Core_bottom PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Core_bottom_FanOutlet Node,        !- Air Inlet Node Name
     Core_bottom_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -4786,7 +4786,7 @@ Fan:SystemModel,
     HVACOperationSchd,        !- Availability Schedule Name
     Core_bottom_ZoneOutlet Node, !- Air Inlet Node Name
     Core_bottom_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    4.2,                     !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -4799,10 +4799,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Core_bottom CoolSense Fan,        !- Name
+    Core_bottom PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Core_bottom CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Core_bottom CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Core_bottom PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Core_bottom PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -4830,14 +4830,14 @@ Fan:SystemModel,
     Dimensionless;                          !- Input Unit Type for X
 
   Coil:Heating:Water,
-    Core_bottom CoolSense Reheat Coil,      !- Name
+    Core_bottom PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Core_bottom CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Core_bottom CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Core_bottom CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Core_bottom CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Core_bottom PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Core_bottom PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Core_bottom PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Core_bottom PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -4848,26 +4848,26 @@ Fan:SystemModel,
 
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Core_mid CoolSense,  !- Name
+    Core_mid PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Core_mid CoolSense Primary Inlet Node Name,  !- Primary Supply Air Inlet Node Name
-    Core_mid CoolSense Secondary Inlet Node,  !- Secondary Induced Air Inlet Node Name
-    Core_mid CoolSense Outlet Node Name,  !- Air Terminal Outlet Node Name
-    Core_mid CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Core_mid CoolSense Mixer,  !- Zone Mixer Name
-    Core_mid CoolSense Fan,  !- Fan Name
+    Core_mid PIUHEATING Primary Inlet Node Name,  !- Primary Supply Air Inlet Node Name
+    Core_mid PIUHEATING Secondary Inlet Node,  !- Secondary Induced Air Inlet Node Name
+    Core_mid PIUHEATING Outlet Node Name,  !- Air Terminal Outlet Node Name
+    Core_mid PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Core_mid PIUHEATING Mixer,  !- Zone Mixer Name
+    Core_mid PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Core_mid CoolSense Reheat Coil, !- Reheat Coil Name
+    Core_mid PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Core_mid CoolSense Mixer,      !- Name
-    Core_mid CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Core_mid CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Core_mid CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Core_mid PIUHEATING Mixer,      !- Name
+    Core_mid PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Core_mid PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Core_mid PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Core_mid,                !- Zone Name
@@ -4879,7 +4879,7 @@ Fan:SystemModel,
 
   NodeList,
     Core_mid Inlet Nodes,                !- Name
-    Core_mid CoolSense Outlet Node Name, !- Node 1 Name
+    Core_mid PIUHEATING Outlet Node Name, !- Node 1 Name
     Core_mid_ZoneInlet Node;             !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -4917,8 +4917,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Core_mid CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Core_mid CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Core_mid PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Core_mid PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Core_mid_FanOutlet Node,        !- Air Inlet Node Name
     Core_mid_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -4929,7 +4929,7 @@ Fan:SystemModel,
     HVACOperationSchd,        !- Availability Schedule Name
     Core_mid_ZoneOutlet Node, !- Air Inlet Node Name
     Core_mid_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    4.2,                     !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -4942,10 +4942,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Core_mid CoolSense Fan,        !- Name
+    Core_mid PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Core_mid CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Core_mid CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Core_mid PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Core_mid PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -4960,14 +4960,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Core_mid CoolSense Reheat Coil,      !- Name
+    Core_mid PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Core_mid CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Core_mid CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Core_mid CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Core_mid CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Core_mid PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Core_mid PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Core_mid PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Core_mid PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -4977,26 +4977,26 @@ Fan:SystemModel,
     ;                        !- Rated Ratio for Air and Water Convection
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Core_top CoolSense,  !- Name
+    Core_top PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Core_top CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Core_top CoolSense Secondary Inlet Node,     !- Secondary Air Inlet Node Name
-    Core_top CoolSense Outlet Node Name,         !- Outlet Node Name
-    Core_top CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Core_top CoolSense Mixer,  !- Zone Mixer Name
-    Core_top CoolSense Fan,  !- Fan Name
+    Core_top PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Core_top PIUHEATING Secondary Inlet Node,     !- Secondary Air Inlet Node Name
+    Core_top PIUHEATING Outlet Node Name,         !- Outlet Node Name
+    Core_top PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Core_top PIUHEATING Mixer,  !- Zone Mixer Name
+    Core_top PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Electric, !- Reheat Coil Object Type
-    Core_top CoolSense Reheat Coil, !- Reheat Coil Name
+    Core_top PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Core_top CoolSense Mixer,      !- Name
-    Core_top CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Core_top CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Core_top CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Core_top PIUHEATING Mixer,      !- Name
+    Core_top PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Core_top PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Core_top PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Core_top,                !- Zone Name
@@ -5008,7 +5008,7 @@ Fan:SystemModel,
 
   NodeList,
     Core_top Inlet Nodes,                !- Name
-    Core_top CoolSense Outlet Node Name, !- Node 1 Name
+    Core_top PIUHEATING Outlet Node Name, !- Node 1 Name
     Core_top_ZoneInlet Node;             !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -5046,8 +5046,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Core_top CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Core_top CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Core_top PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Core_top PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Core_top_FanOutlet Node,        !- Air Inlet Node Name
     Core_top_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -5058,7 +5058,7 @@ Fan:SystemModel,
     HVACOperationSchd,        !- Availability Schedule Name
     Core_top_ZoneOutlet Node, !- Air Inlet Node Name
     Core_top_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    4.2,                     !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -5071,10 +5071,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Core_top CoolSense Fan,        !- Name
+    Core_top PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Core_top CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Core_top CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Core_top PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Core_top PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -5089,34 +5089,34 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Electric,
-    Core_top CoolSense Reheat Coil,      !- Name
+    Core_top PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,   !- Availability Schedule Name
     1.0,                     !- Efficiency
     autosize,                !- Nominal Capacity {W}
-    Core_top CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Core_top CoolSense Outlet Node Name;        !- Air Outlet Node Name
+    Core_top PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Core_top PIUHEATING Outlet Node Name;        !- Air Outlet Node Name
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Perimeter_bot_ZN_1 CoolSense,  !- Name
+    Perimeter_bot_ZN_1 PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Perimeter_bot_ZN_1 CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Perimeter_bot_ZN_1 CoolSense Secondary Inlet Node,     !- Secondary Air Inlet Node Name
-    Perimeter_bot_ZN_1 CoolSense Outlet Node Name,         !- Outlet Node Name
-    Perimeter_bot_ZN_1 CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Perimeter_bot_ZN_1 CoolSense Mixer,  !- Zone Mixer Name
-    Perimeter_bot_ZN_1 CoolSense Fan,  !- Fan Name
+    Perimeter_bot_ZN_1 PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Secondary Inlet Node,     !- Secondary Air Inlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Outlet Node Name,         !- Outlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Mixer,  !- Zone Mixer Name
+    Perimeter_bot_ZN_1 PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Perimeter_bot_ZN_1 CoolSense Reheat Coil, !- Reheat Coil Name
+    Perimeter_bot_ZN_1 PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Perimeter_bot_ZN_1 CoolSense Mixer,      !- Name
-    Perimeter_bot_ZN_1 CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Perimeter_bot_ZN_1 CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Perimeter_bot_ZN_1 CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Mixer,      !- Name
+    Perimeter_bot_ZN_1 PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_bot_ZN_1,      !- Zone Name
@@ -5128,7 +5128,7 @@ Fan:SystemModel,
 
   NodeList,
     Perimeter_bot_ZN_1 Inlet Nodes,                !- Name
-    Perimeter_bot_ZN_1 CoolSense Outlet Node Name, !- Node 1 Name
+    Perimeter_bot_ZN_1 PIUHEATING Outlet Node Name, !- Node 1 Name
     Perimeter_bot_ZN_1_ZoneInlet Node;             !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -5166,8 +5166,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Perimeter_bot_ZN_1 CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_bot_ZN_1 CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Perimeter_bot_ZN_1_FanOutlet Node,        !- Air Inlet Node Name
     Perimeter_bot_ZN_1_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -5191,10 +5191,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Perimeter_bot_ZN_1 CoolSense Fan,        !- Name
+    Perimeter_bot_ZN_1 PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Perimeter_bot_ZN_1 CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Perimeter_bot_ZN_1 CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -5209,14 +5209,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Perimeter_bot_ZN_1 CoolSense Reheat Coil,      !- Name
+    Perimeter_bot_ZN_1 PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Perimeter_bot_ZN_1 CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_bot_ZN_1 CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Perimeter_bot_ZN_1 CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Perimeter_bot_ZN_1 CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -5226,26 +5226,26 @@ Fan:SystemModel,
     ;                        !- Rated Ratio for Air and Water Convection
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Perimeter_bot_ZN_2 CoolSense,  !- Name
+    Perimeter_bot_ZN_2 PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Perimeter_bot_ZN_2 CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Perimeter_bot_ZN_2 CoolSense Secondary Inlet Node,     !- Secondary Air Inlet Node Name
-    Perimeter_bot_ZN_2 CoolSense Outlet Node Name,         !- Outlet Node Name
-    Perimeter_bot_ZN_2 CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Perimeter_bot_ZN_2 CoolSense Mixer,  !- Zone Mixer Name
-    Perimeter_bot_ZN_2 CoolSense Fan,  !- Fan Name
+    Perimeter_bot_ZN_2 PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Secondary Inlet Node,     !- Secondary Air Inlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Outlet Node Name,         !- Outlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Mixer,  !- Zone Mixer Name
+    Perimeter_bot_ZN_2 PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Perimeter_bot_ZN_2 CoolSense Reheat Coil, !- Reheat Coil Name
+    Perimeter_bot_ZN_2 PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Perimeter_bot_ZN_2 CoolSense Mixer,      !- Name
-    Perimeter_bot_ZN_2 CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Perimeter_bot_ZN_2 CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Perimeter_bot_ZN_2 CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Mixer,      !- Name
+    Perimeter_bot_ZN_2 PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_bot_ZN_2,      !- Zone Name
@@ -5257,7 +5257,7 @@ Fan:SystemModel,
 
   NodeList,
     Perimeter_bot_ZN_2 Inlet Nodes,                !- Name
-    Perimeter_bot_ZN_2 CoolSense Outlet Node Name, !- Node 1 Name
+    Perimeter_bot_ZN_2 PIUHEATING Outlet Node Name, !- Node 1 Name
     Perimeter_bot_ZN_2_ZoneInlet Node;             !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -5295,8 +5295,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Perimeter_bot_ZN_2 CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_bot_ZN_2 CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Perimeter_bot_ZN_2_FanOutlet Node,        !- Air Inlet Node Name
     Perimeter_bot_ZN_2_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -5320,10 +5320,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Perimeter_bot_ZN_2 CoolSense Fan,        !- Name
+    Perimeter_bot_ZN_2 PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Perimeter_bot_ZN_2 CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Perimeter_bot_ZN_2 CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -5338,14 +5338,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Perimeter_bot_ZN_2 CoolSense Reheat Coil,      !- Name
+    Perimeter_bot_ZN_2 PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Perimeter_bot_ZN_2 CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_bot_ZN_2 CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Perimeter_bot_ZN_2 CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Perimeter_bot_ZN_2 CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -5355,26 +5355,26 @@ Fan:SystemModel,
     ;                        !- Rated Ratio for Air and Water Convection
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Perimeter_bot_ZN_3 CoolSense,  !- Name
+    Perimeter_bot_ZN_3 PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Perimeter_bot_ZN_3 CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Perimeter_bot_ZN_3 CoolSense Secondary Inlet Node,     !- Secondary Air Inlet Node Name
-    Perimeter_bot_ZN_3 CoolSense Outlet Node Name,         !- Outlet Node Name
-    Perimeter_bot_ZN_3 CoolSense Reheat Coil Air In Node,     !- Reheat Coil Air Inlet Node Name
-    Perimeter_bot_ZN_3 CoolSense Mixer,  !- Zone Mixer Name
-    Perimeter_bot_ZN_3 CoolSense Fan,  !- Fan Name
+    Perimeter_bot_ZN_3 PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Secondary Inlet Node,     !- Secondary Air Inlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Outlet Node Name,         !- Outlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Reheat Coil Air In Node,     !- Reheat Coil Air Inlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Mixer,  !- Zone Mixer Name
+    Perimeter_bot_ZN_3 PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Perimeter_bot_ZN_3 CoolSense Reheat Coil, !- Reheat Coil Name
+    Perimeter_bot_ZN_3 PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Perimeter_bot_ZN_3 CoolSense Mixer,      !- Name
-    Perimeter_bot_ZN_3 CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Perimeter_bot_ZN_3 CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Perimeter_bot_ZN_3 CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Mixer,      !- Name
+    Perimeter_bot_ZN_3 PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_bot_ZN_3,      !- Zone Name
@@ -5386,7 +5386,7 @@ Fan:SystemModel,
 
   NodeList,
     Perimeter_bot_ZN_3 Inlet Nodes,                !- Name
-    Perimeter_bot_ZN_3 CoolSense Outlet Node Name, !- Node 1 Name
+    Perimeter_bot_ZN_3 PIUHEATING Outlet Node Name, !- Node 1 Name
     Perimeter_bot_ZN_3_ZoneInlet Node;             !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -5424,8 +5424,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Perimeter_bot_ZN_3 CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_bot_ZN_3 CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Perimeter_bot_ZN_3_FanOutlet Node,        !- Air Inlet Node Name
     Perimeter_bot_ZN_3_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -5449,10 +5449,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Perimeter_bot_ZN_3 CoolSense Fan,        !- Name
+    Perimeter_bot_ZN_3 PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Perimeter_bot_ZN_3 CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Perimeter_bot_ZN_3 CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -5467,14 +5467,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Perimeter_bot_ZN_3 CoolSense Reheat Coil,      !- Name
+    Perimeter_bot_ZN_3 PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Perimeter_bot_ZN_3 CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_bot_ZN_3 CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Perimeter_bot_ZN_3 CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Perimeter_bot_ZN_3 CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -5484,26 +5484,26 @@ Fan:SystemModel,
     ;                        !- Rated Ratio for Air and Water Convection
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Perimeter_bot_ZN_4 CoolSense,  !- Name
+    Perimeter_bot_ZN_4 PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Perimeter_bot_ZN_4 CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Perimeter_bot_ZN_4 CoolSense Secondary Inlet Node,     !- Secondary Air Inlet Node Name
-    Perimeter_bot_ZN_4 CoolSense Outlet Node Name,         !- Outlet Node Name
-    Perimeter_bot_ZN_4 CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Perimeter_bot_ZN_4 CoolSense Mixer,  !- Zone Mixer Name
-    Perimeter_bot_ZN_4 CoolSense Fan,  !- Fan Name
+    Perimeter_bot_ZN_4 PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Secondary Inlet Node,     !- Secondary Air Inlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Outlet Node Name,         !- Outlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Mixer,  !- Zone Mixer Name
+    Perimeter_bot_ZN_4 PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Perimeter_bot_ZN_4 CoolSense Reheat Coil, !- Reheat Coil Name
+    Perimeter_bot_ZN_4 PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Perimeter_bot_ZN_4 CoolSense Mixer,      !- Name
-    Perimeter_bot_ZN_4 CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Perimeter_bot_ZN_4 CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Perimeter_bot_ZN_4 CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Mixer,      !- Name
+    Perimeter_bot_ZN_4 PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_bot_ZN_4,      !- Zone Name
@@ -5515,7 +5515,7 @@ Fan:SystemModel,
 
   NodeList,
     Perimeter_bot_ZN_4 Inlet Nodes,                !- Name
-    Perimeter_bot_ZN_4 CoolSense Outlet Node Name, !- Node 1 Name
+    Perimeter_bot_ZN_4 PIUHEATING Outlet Node Name, !- Node 1 Name
     Perimeter_bot_ZN_4_ZoneInlet Node;             !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -5553,8 +5553,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Perimeter_bot_ZN_4 CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_bot_ZN_4 CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Perimeter_bot_ZN_4_FanOutlet Node,        !- Air Inlet Node Name
     Perimeter_bot_ZN_4_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -5578,10 +5578,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Perimeter_bot_ZN_4 CoolSense Fan,        !- Name
+    Perimeter_bot_ZN_4 PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Perimeter_bot_ZN_4 CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Perimeter_bot_ZN_4 CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -5596,14 +5596,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Perimeter_bot_ZN_4 CoolSense Reheat Coil,      !- Name
+    Perimeter_bot_ZN_4 PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Perimeter_bot_ZN_4 CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_bot_ZN_4 CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Perimeter_bot_ZN_4 CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Perimeter_bot_ZN_4 CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -5613,26 +5613,26 @@ Fan:SystemModel,
     ;                        !- Rated Ratio for Air and Water Convection
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Perimeter_mid_ZN_1 CoolSense,  !- Name
+    Perimeter_mid_ZN_1 PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Perimeter_mid_ZN_1 CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Perimeter_mid_ZN_1 CoolSense Secondary Inlet Node,     !- Secondary Air Inlet Node Name
-    Perimeter_mid_ZN_1 CoolSense Outlet Node Name,         !- Outlet Node Name
-    Perimeter_mid_ZN_1 CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Perimeter_mid_ZN_1 CoolSense Mixer,  !- Zone Mixer Name
-    Perimeter_mid_ZN_1 CoolSense Fan,  !- Fan Name
+    Perimeter_mid_ZN_1 PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Secondary Inlet Node,     !- Secondary Air Inlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Outlet Node Name,         !- Outlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Mixer,  !- Zone Mixer Name
+    Perimeter_mid_ZN_1 PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Perimeter_mid_ZN_1 CoolSense Reheat Coil, !- Reheat Coil Name
+    Perimeter_mid_ZN_1 PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Perimeter_mid_ZN_1 CoolSense Mixer,      !- Name
-    Perimeter_mid_ZN_1 CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Perimeter_mid_ZN_1 CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Perimeter_mid_ZN_1 CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Mixer,      !- Name
+    Perimeter_mid_ZN_1 PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_mid_ZN_1,      !- Zone Name
@@ -5644,7 +5644,7 @@ Fan:SystemModel,
 
   NodeList,
     Perimeter_mid_ZN_1 Inlet Nodes,                !- Name
-    Perimeter_mid_ZN_1 CoolSense Outlet Node Name, !- Node 1 Name
+    Perimeter_mid_ZN_1 PIUHEATING Outlet Node Name, !- Node 1 Name
     Perimeter_mid_ZN_1_ZoneInlet Node;             !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -5682,8 +5682,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Perimeter_mid_ZN_1 CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_mid_ZN_1 CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Perimeter_mid_ZN_1_FanOutlet Node,        !- Air Inlet Node Name
     Perimeter_mid_ZN_1_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -5707,10 +5707,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Perimeter_mid_ZN_1 CoolSense Fan,        !- Name
+    Perimeter_mid_ZN_1 PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Perimeter_mid_ZN_1 CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Perimeter_mid_ZN_1 CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -5725,14 +5725,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Perimeter_mid_ZN_1 CoolSense Reheat Coil,      !- Name
+    Perimeter_mid_ZN_1 PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Perimeter_mid_ZN_1 CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_mid_ZN_1 CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Perimeter_mid_ZN_1 CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Perimeter_mid_ZN_1 CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -5742,26 +5742,26 @@ Fan:SystemModel,
     ;                        !- Rated Ratio for Air and Water Convection
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Perimeter_mid_ZN_2 CoolSense,  !- Name
+    Perimeter_mid_ZN_2 PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Perimeter_mid_ZN_2 CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Perimeter_mid_ZN_2 CoolSense Secondary Inlet Node,  !- Secondary Air Inlet Node Name
-    Perimeter_mid_ZN_2 CoolSense Outlet Node Name,  !- Outlet Node Name
-    Perimeter_mid_ZN_2 CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Perimeter_mid_ZN_2 CoolSense Mixer,  !- Zone Mixer Name
-    Perimeter_mid_ZN_2 CoolSense Fan,  !- Fan Name
+    Perimeter_mid_ZN_2 PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Secondary Inlet Node,  !- Secondary Air Inlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Outlet Node Name,  !- Outlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Mixer,  !- Zone Mixer Name
+    Perimeter_mid_ZN_2 PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Perimeter_mid_ZN_2 CoolSense Reheat Coil, !- Reheat Coil Name
+    Perimeter_mid_ZN_2 PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Perimeter_mid_ZN_2 CoolSense Mixer,      !- Name
-    Perimeter_mid_ZN_2 CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Perimeter_mid_ZN_2 CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Perimeter_mid_ZN_2 CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Mixer,      !- Name
+    Perimeter_mid_ZN_2 PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_mid_ZN_2,      !- Zone Name
@@ -5773,7 +5773,7 @@ Fan:SystemModel,
 
   NodeList,
     Perimeter_mid_ZN_2 Inlet Nodes,                !- Name
-    Perimeter_mid_ZN_2 CoolSense Outlet Node Name, !- Node 1 Name
+    Perimeter_mid_ZN_2 PIUHEATING Outlet Node Name, !- Node 1 Name
     Perimeter_mid_ZN_2_ZoneInlet Node;             !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -5811,8 +5811,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Perimeter_mid_ZN_2 CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_mid_ZN_2 CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Perimeter_mid_ZN_2_FanOutlet Node,        !- Air Inlet Node Name
     Perimeter_mid_ZN_2_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -5836,10 +5836,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Perimeter_mid_ZN_2 CoolSense Fan,        !- Name
+    Perimeter_mid_ZN_2 PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Perimeter_mid_ZN_2 CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Perimeter_mid_ZN_2 CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -5854,14 +5854,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Perimeter_mid_ZN_2 CoolSense Reheat Coil,      !- Name
+    Perimeter_mid_ZN_2 PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Perimeter_mid_ZN_2 CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_mid_ZN_2 CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Perimeter_mid_ZN_2 CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Perimeter_mid_ZN_2 CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -5871,26 +5871,26 @@ Fan:SystemModel,
     ;                        !- Rated Ratio for Air and Water Convection
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Perimeter_mid_ZN_3 CoolSense,  !- Name
+    Perimeter_mid_ZN_3 PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Perimeter_mid_ZN_3 CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Perimeter_mid_ZN_3 CoolSense Secondary Inlet Node,  !- Secondary Air Inlet Node Name
-    Perimeter_mid_ZN_3 CoolSense Outlet Node Name,  !- Outlet Node Name
-    Perimeter_mid_ZN_3 CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Perimeter_mid_ZN_3 CoolSense Mixer,  !- Zone Mixer Name
-    Perimeter_mid_ZN_3 CoolSense Fan,  !- Fan Name
+    Perimeter_mid_ZN_3 PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Secondary Inlet Node,  !- Secondary Air Inlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Outlet Node Name,  !- Outlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Mixer,  !- Zone Mixer Name
+    Perimeter_mid_ZN_3 PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Perimeter_mid_ZN_3 CoolSense Reheat Coil, !- Reheat Coil Name
+    Perimeter_mid_ZN_3 PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Perimeter_mid_ZN_3 CoolSense Mixer,      !- Name
-    Perimeter_mid_ZN_3 CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Perimeter_mid_ZN_3 CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Perimeter_mid_ZN_3 CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Mixer,      !- Name
+    Perimeter_mid_ZN_3 PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_mid_ZN_3,      !- Zone Name
@@ -5902,7 +5902,7 @@ Fan:SystemModel,
 
   NodeList,
     Perimeter_mid_ZN_3 Inlet Nodes,                !- Name
-    Perimeter_mid_ZN_3 CoolSense Outlet Node Name, !- Node 1 Name
+    Perimeter_mid_ZN_3 PIUHEATING Outlet Node Name, !- Node 1 Name
     Perimeter_mid_ZN_3_ZoneInlet Node;             !- Node 1 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -5940,8 +5940,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Perimeter_mid_ZN_3 CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_mid_ZN_3 CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Perimeter_mid_ZN_3_FanOutlet Node,        !- Air Inlet Node Name
     Perimeter_mid_ZN_3_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -5965,10 +5965,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Perimeter_mid_ZN_3 CoolSense Fan,        !- Name
+    Perimeter_mid_ZN_3 PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Perimeter_mid_ZN_3 CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Perimeter_mid_ZN_3 CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -5983,14 +5983,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Perimeter_mid_ZN_3 CoolSense Reheat Coil,      !- Name
+    Perimeter_mid_ZN_3 PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Perimeter_mid_ZN_3 CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_mid_ZN_3 CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Perimeter_mid_ZN_3 CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Perimeter_mid_ZN_3 CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -6000,26 +6000,26 @@ Fan:SystemModel,
     ;                        !- Rated Ratio for Air and Water Convection
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Perimeter_mid_ZN_4 CoolSense,  !- Name
+    Perimeter_mid_ZN_4 PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Perimeter_mid_ZN_4 CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Perimeter_mid_ZN_4 CoolSense Secondary Inlet Node,  !- Secondary Air Inlet Node Name
-    Perimeter_mid_ZN_4 CoolSense Outlet Node Name,  !- Outlet Node Name
-    Perimeter_mid_ZN_4 CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Perimeter_mid_ZN_4 CoolSense Mixer,  !- Zone Mixer Name
-    Perimeter_mid_ZN_4 CoolSense Fan,  !- Fan Name
+    Perimeter_mid_ZN_4 PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Secondary Inlet Node,  !- Secondary Air Inlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Outlet Node Name,  !- Outlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Mixer,  !- Zone Mixer Name
+    Perimeter_mid_ZN_4 PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Perimeter_mid_ZN_4 CoolSense Reheat Coil, !- Reheat Coil Name
+    Perimeter_mid_ZN_4 PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Perimeter_mid_ZN_4 CoolSense Mixer,      !- Name
-    Perimeter_mid_ZN_4 CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Perimeter_mid_ZN_4 CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Perimeter_mid_ZN_4 CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Mixer,      !- Name
+    Perimeter_mid_ZN_4 PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_mid_ZN_4,      !- Zone Name
@@ -6031,7 +6031,7 @@ Fan:SystemModel,
 
   NodeList,
     Perimeter_mid_ZN_4 Inlet Nodes,                !- Name
-    Perimeter_mid_ZN_4 CoolSense Outlet Node Name, !- Node 1 Name
+    Perimeter_mid_ZN_4 PIUHEATING Outlet Node Name, !- Node 1 Name
     Perimeter_mid_ZN_4_ZoneInlet Node;             !- Node 1 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -6069,8 +6069,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Perimeter_mid_ZN_4 CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_mid_ZN_4 CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Perimeter_mid_ZN_4_FanOutlet Node,        !- Air Inlet Node Name
     Perimeter_mid_ZN_4_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -6094,10 +6094,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Perimeter_mid_ZN_4 CoolSense Fan,        !- Name
+    Perimeter_mid_ZN_4 PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Perimeter_mid_ZN_4 CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Perimeter_mid_ZN_4 CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -6112,14 +6112,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Perimeter_mid_ZN_4 CoolSense Reheat Coil,      !- Name
+    Perimeter_mid_ZN_4 PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Perimeter_mid_ZN_4 CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_mid_ZN_4 CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Perimeter_mid_ZN_4 CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Perimeter_mid_ZN_4 CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -6129,26 +6129,26 @@ Fan:SystemModel,
     ;                        !- Rated Ratio for Air and Water Convection
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Perimeter_top_ZN_1 CoolSense,  !- Name
+    Perimeter_top_ZN_1 PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Perimeter_top_ZN_1 CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Perimeter_top_ZN_1 CoolSense Secondary Inlet Node,     !- Secondary Air Inlet Node Name
-    Perimeter_top_ZN_1 CoolSense Outlet Node Name,         !- Outlet Node Name
-    Perimeter_top_ZN_1 CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Perimeter_top_ZN_1 CoolSense Mixer,  !- Zone Mixer Name
-    Perimeter_top_ZN_1 CoolSense Fan,  !- Fan Name
+    Perimeter_top_ZN_1 PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING Secondary Inlet Node,     !- Secondary Air Inlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING Outlet Node Name,         !- Outlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING Mixer,  !- Zone Mixer Name
+    Perimeter_top_ZN_1 PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Perimeter_top_ZN_1 CoolSense Reheat Coil, !- Reheat Coil Name
+    Perimeter_top_ZN_1 PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Perimeter_top_ZN_1 CoolSense Mixer,      !- Name
-    Perimeter_top_ZN_1 CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Perimeter_top_ZN_1 CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Perimeter_top_ZN_1 CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Perimeter_top_ZN_1 PIUHEATING Mixer,      !- Name
+    Perimeter_top_ZN_1 PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Perimeter_top_ZN_1 PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_top_ZN_1,                 !- Zone Name
@@ -6160,7 +6160,7 @@ Fan:SystemModel,
 
   NodeList,
     Perimeter_top_ZN_1 Inlet Nodes,                !- Name
-    Perimeter_top_ZN_1 CoolSense Outlet Node Name, !- Node 1 Name
+    Perimeter_top_ZN_1 PIUHEATING Outlet Node Name, !- Node 1 Name
     Perimeter_top_ZN_1_ZoneInlet Node;             !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -6199,8 +6199,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Perimeter_top_ZN_1 CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_top_ZN_1 CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Perimeter_top_ZN_1_FanOutlet Node,        !- Air Inlet Node Name
     Perimeter_top_ZN_1_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -6224,10 +6224,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Perimeter_top_ZN_1 CoolSense Fan,        !- Name
+    Perimeter_top_ZN_1 PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Perimeter_top_ZN_1 CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Perimeter_top_ZN_1 CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -6242,14 +6242,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Perimeter_top_ZN_1 CoolSense Reheat Coil,      !- Name
+    Perimeter_top_ZN_1 PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Perimeter_top_ZN_1 CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_top_ZN_1 CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Perimeter_top_ZN_1 CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Perimeter_top_ZN_1 CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -6259,26 +6259,26 @@ Fan:SystemModel,
     ;                        !- Rated Ratio for Air and Water Convection
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Perimeter_top_ZN_2 CoolSense,  !- Name
+    Perimeter_top_ZN_2 PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Perimeter_top_ZN_2 CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Perimeter_top_ZN_2 CoolSense Secondary Inlet Node,  !- Secondary Air Inlet Node Name
-    Perimeter_top_ZN_2 CoolSense Outlet Node Name,  !- Outlet Node Name
-    Perimeter_top_ZN_2 CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Perimeter_top_ZN_2 CoolSense Mixer,  !- Zone Mixer Name
-    Perimeter_top_ZN_2 CoolSense Fan,  !- Fan Name
+    Perimeter_top_ZN_2 PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING Secondary Inlet Node,  !- Secondary Air Inlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING Outlet Node Name,  !- Outlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING Mixer,  !- Zone Mixer Name
+    Perimeter_top_ZN_2 PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Perimeter_top_ZN_2 CoolSense Reheat Coil, !- Reheat Coil Name
+    Perimeter_top_ZN_2 PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   AirLoopHVAC:ZoneMixer,
-    Perimeter_top_ZN_2 CoolSense Mixer,      !- Name
-    Perimeter_top_ZN_2 CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Perimeter_top_ZN_2 CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Perimeter_top_ZN_2 CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Perimeter_top_ZN_2 PIUHEATING Mixer,      !- Name
+    Perimeter_top_ZN_2 PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Perimeter_top_ZN_2 PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   ZoneHVAC:EquipmentConnections,
     Perimeter_top_ZN_2,                 !- Zone Name
@@ -6290,7 +6290,7 @@ Fan:SystemModel,
 
   NodeList,
     Perimeter_top_ZN_2 Inlet Nodes,                !- Name
-    Perimeter_top_ZN_2 CoolSense Outlet Node Name, !- Node 1 Name
+    Perimeter_top_ZN_2 PIUHEATING Outlet Node Name, !- Node 1 Name
     Perimeter_top_ZN_2_ZoneInlet Node;             !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -6329,8 +6329,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Perimeter_top_ZN_2 CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_top_ZN_2 CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Perimeter_top_ZN_2_FanOutlet Node,        !- Air Inlet Node Name
     Perimeter_top_ZN_2_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -6354,10 +6354,10 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   Fan:SystemModel,
-    Perimeter_top_ZN_2 CoolSense Fan,        !- Name  
+    Perimeter_top_ZN_2 PIUHEATING Fan,        !- Name  
     HVACOperationSchd,    !- Availability Schedule Name
-    Perimeter_top_ZN_2 CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Perimeter_top_ZN_2 CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -6372,14 +6372,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Perimeter_top_ZN_2 CoolSense Reheat Coil,      !- Name
+    Perimeter_top_ZN_2 PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Perimeter_top_ZN_2 CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_top_ZN_2 CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Perimeter_top_ZN_2 CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Perimeter_top_ZN_2 CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -6389,19 +6389,19 @@ Fan:SystemModel,
     ;                        !- Rated Ratio for Air and Water Convection
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Perimeter_top_ZN_3 CoolSense,  !- Name
+    Perimeter_top_ZN_3 PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Perimeter_top_ZN_3 CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Perimeter_top_ZN_3 CoolSense Secondary Inlet Node,     !- Secondary Air Inlet Node Name
-    Perimeter_top_ZN_3 CoolSense Outlet Node Name,         !- Outlet Node Name
-    Perimeter_top_ZN_3 CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Perimeter_top_ZN_3 CoolSense Mixer,  !- Zone Mixer Name
-    Perimeter_top_ZN_3 CoolSense Fan,  !- Fan Name
+    Perimeter_top_ZN_3 PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING Secondary Inlet Node,     !- Secondary Air Inlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING Outlet Node Name,         !- Outlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING Mixer,  !- Zone Mixer Name
+    Perimeter_top_ZN_3 PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Perimeter_top_ZN_3 CoolSense Reheat Coil, !- Reheat Coil Name
+    Perimeter_top_ZN_3 PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   ZoneHVAC:EquipmentConnections,
@@ -6414,7 +6414,7 @@ Fan:SystemModel,
 
   NodeList,
     Perimeter_top_ZN_3 Inlet Nodes,  !- Name
-    Perimeter_top_ZN_3 CoolSense Outlet Node Name, !- Node 1 Name
+    Perimeter_top_ZN_3 PIUHEATING Outlet Node Name, !- Node 1 Name
     Perimeter_top_ZN_3_ZoneInlet Node;  !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -6453,8 +6453,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Perimeter_top_ZN_3 CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_top_ZN_3 CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Perimeter_top_ZN_3_FanOutlet Node,        !- Air Inlet Node Name
     Perimeter_top_ZN_3_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -6478,16 +6478,16 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   AirLoopHVAC:ZoneMixer,
-    Perimeter_top_ZN_3 CoolSense Mixer,      !- Name
-    Perimeter_top_ZN_3 CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Perimeter_top_ZN_3 CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Perimeter_top_ZN_3 CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Perimeter_top_ZN_3 PIUHEATING Mixer,      !- Name
+    Perimeter_top_ZN_3 PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Perimeter_top_ZN_3 PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   Fan:SystemModel,
-    Perimeter_top_ZN_3 CoolSense Fan,        !- Name
+    Perimeter_top_ZN_3 PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Perimeter_top_ZN_3 CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Perimeter_top_ZN_3 CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -6502,14 +6502,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Perimeter_top_ZN_3 CoolSense Reheat Coil,      !- Name
+    Perimeter_top_ZN_3 PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Perimeter_top_ZN_3 CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_top_ZN_3 CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Perimeter_top_ZN_3 CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Perimeter_top_ZN_3 CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -6519,19 +6519,19 @@ Fan:SystemModel,
     ;                        !- Rated Ratio for Air and Water Convection
 
   AirTerminal:SingleDuct:SeriesPIU:Reheat,
-    Perimeter_top_ZN_4 CoolSense,  !- Name
+    Perimeter_top_ZN_4 PIUHEATING,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     AUTOSIZE,  !- Maximum Total Air Flow Rate
     AUTOSIZE,  !- Design Primary Air Volume Flow Rate
     AUTOSIZE,  !- Minimum Primary Air Volume Flow Fraction
-    Perimeter_top_ZN_4 CoolSense Primary Inlet Node Name,  !- Supply Air Inlet Node Name
-    Perimeter_top_ZN_4 CoolSense Secondary Inlet Node,  !- Secondary Air Inlet Node Name
-    Perimeter_top_ZN_4 CoolSense Outlet Node Name,  !- Outlet Node Name
-    Perimeter_top_ZN_4 CoolSense Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
-    Perimeter_top_ZN_4 CoolSense Mixer,  !- Zone Mixer Name
-    Perimeter_top_ZN_4 CoolSense Fan,  !- Fan Name
+    Perimeter_top_ZN_4 PIUHEATING Primary Inlet Node Name,  !- Supply Air Inlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING Secondary Inlet Node,  !- Secondary Air Inlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING Outlet Node Name,  !- Outlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING Reheat Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING Mixer,  !- Zone Mixer Name
+    Perimeter_top_ZN_4 PIUHEATING Fan,  !- Fan Name
     Coil:Heating:Water, !- Reheat Coil Object Type
-    Perimeter_top_ZN_4 CoolSense Reheat Coil, !- Reheat Coil Name
+    Perimeter_top_ZN_4 PIUHEATING Reheat Coil, !- Reheat Coil Name
     autosize;                !- Maximum Hot Water or Steam Flow Rate {m3/s}
 
   ZoneHVAC:EquipmentConnections,
@@ -6544,7 +6544,7 @@ Fan:SystemModel,
 
   NodeList,
     Perimeter_top_ZN_4 Inlet Nodes,  !- Name
-    Perimeter_top_ZN_4 CoolSense Outlet Node Name, !- Node 1 Name
+    Perimeter_top_ZN_4 PIUHEATING Outlet Node Name, !- Node 1 Name
     Perimeter_top_ZN_4_ZoneInlet Node;  !- Node 2 Name
 
   AirLoopHVAC:UnitarySystem,
@@ -6582,8 +6582,8 @@ Fan:SystemModel,
     autosize,                !- Design Outlet Air Temperature {C}
     autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    Perimeter_top_ZN_4 CoolSense CW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_top_ZN_4 CoolSense CW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING CW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING CW Outlet Node,  !- Water Outlet Node Name
     Perimeter_top_ZN_4_FanOutlet Node,        !- Air Inlet Node Name
     Perimeter_top_ZN_4_ZoneInlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
@@ -6607,16 +6607,16 @@ Fan:SystemModel,
     0.7;                     !- Fan Total Efficiency
 
   AirLoopHVAC:ZoneMixer,
-    Perimeter_top_ZN_4 CoolSense Mixer,      !- Name
-    Perimeter_top_ZN_4 CoolSense Fan Inlet Node,  !- Outlet Node Name
-    Perimeter_top_ZN_4 CoolSense Primary Inlet Node Name,    !- Inlet 1 Node Name
-    Perimeter_top_ZN_4 CoolSense Secondary Inlet Node;   !- Inlet 2 Node Name
+    Perimeter_top_ZN_4 PIUHEATING Mixer,      !- Name
+    Perimeter_top_ZN_4 PIUHEATING Fan Inlet Node,  !- Outlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING Primary Inlet Node Name,    !- Inlet 1 Node Name
+    Perimeter_top_ZN_4 PIUHEATING Secondary Inlet Node;   !- Inlet 2 Node Name
 
   Fan:SystemModel,
-    Perimeter_top_ZN_4 CoolSense Fan,        !- Name
+    Perimeter_top_ZN_4 PIUHEATING Fan,        !- Name
     HVACOperationSchd,    !- Availability Schedule Name
-    Perimeter_top_ZN_4 CoolSense Fan Inlet Node,  !- Air Inlet Node Name
-    Perimeter_top_ZN_4 CoolSense Reheat Coil Air In Node,  !- Air Outlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING Fan Inlet Node,  !- Air Inlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING Reheat Coil Air In Node,  !- Air Outlet Node Name
     autosize,                !- Maximum Flow Rate {m3/s}
     Continuous,
     0.39,                                   !- Electric Power Minimum Flow Rate Fraction
@@ -6631,14 +6631,14 @@ Fan:SystemModel,
     fan curve 1;                !- Electric Power Function of Flow Fraction Curve Name
 
   Coil:Heating:Water,
-    Perimeter_top_ZN_4 CoolSense Reheat Coil,      !- Name
+    Perimeter_top_ZN_4 PIUHEATING Reheat Coil,      !- Name
     ALWAYS_ON,    !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    Perimeter_top_ZN_4 CoolSense HW Inlet Node,  !- Water Inlet Node Name
-    Perimeter_top_ZN_4 CoolSense HW Outlet Node,  !- Water Outlet Node Name
-    Perimeter_top_ZN_4 CoolSense Reheat Coil Air In Node,  !- Air Inlet Node Name
-    Perimeter_top_ZN_4 CoolSense Outlet Node Name,        !- Air Outlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING HW Inlet Node,  !- Water Inlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING HW Outlet Node,  !- Water Outlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING Reheat Coil Air In Node,  !- Air Inlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING Outlet Node Name,        !- Air Outlet Node Name
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     autosize,                !- Rated Capacity {W}
     45.0,                    !- Rated Inlet Water Temperature {C}
@@ -6672,7 +6672,7 @@ Fan:SystemModel,
     Core_bottom Equipment,   !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Core_bottom CoolSense ADU,  !- Zone Equipment 1 Name
+    Core_bottom PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6686,7 +6686,7 @@ Fan:SystemModel,
     Core_mid Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Core_mid CoolSense ADU,     !- Zone Equipment 1 Name
+    Core_mid PIUHEATING ADU,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6700,7 +6700,7 @@ Fan:SystemModel,
     Core_top Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Core_top CoolSense ADU,     !- Zone Equipment 1 Name
+    Core_top PIUHEATING ADU,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6714,7 +6714,7 @@ Fan:SystemModel,
     Perimeter_bot_ZN_1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Perimeter_bot_ZN_1 CoolSense ADU,  !- Zone Equipment 1 Name
+    Perimeter_bot_ZN_1 PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6728,7 +6728,7 @@ Fan:SystemModel,
     Perimeter_bot_ZN_2 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Perimeter_bot_ZN_2 CoolSense ADU,  !- Zone Equipment 1 Name
+    Perimeter_bot_ZN_2 PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6742,7 +6742,7 @@ Fan:SystemModel,
     Perimeter_bot_ZN_3 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Perimeter_bot_ZN_3 CoolSense ADU,  !- Zone Equipment 1 Name
+    Perimeter_bot_ZN_3 PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6756,7 +6756,7 @@ Fan:SystemModel,
     Perimeter_bot_ZN_4 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Perimeter_bot_ZN_4 CoolSense ADU,  !- Zone Equipment 1 Name
+    Perimeter_bot_ZN_4 PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6770,7 +6770,7 @@ Fan:SystemModel,
     Perimeter_mid_ZN_1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Perimeter_mid_ZN_1 CoolSense ADU,  !- Zone Equipment 1 Name
+    Perimeter_mid_ZN_1 PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6784,7 +6784,7 @@ Fan:SystemModel,
     Perimeter_mid_ZN_2 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Perimeter_mid_ZN_2 CoolSense ADU,  !- Zone Equipment 1 Name
+    Perimeter_mid_ZN_2 PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6798,7 +6798,7 @@ Fan:SystemModel,
     Perimeter_mid_ZN_3 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Perimeter_mid_ZN_3 CoolSense ADU,  !- Zone Equipment 1 Name
+    Perimeter_mid_ZN_3 PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6812,7 +6812,7 @@ Fan:SystemModel,
     Perimeter_mid_ZN_4 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Perimeter_mid_ZN_4 CoolSense ADU,  !- Zone Equipment 1 Name
+    Perimeter_mid_ZN_4 PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6826,7 +6826,7 @@ Fan:SystemModel,
     Perimeter_top_ZN_1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Perimeter_top_ZN_1 CoolSense ADU,  !- Zone Equipment 1 Name
+    Perimeter_top_ZN_1 PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6840,7 +6840,7 @@ Fan:SystemModel,
     Perimeter_top_ZN_2 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Perimeter_top_ZN_2 CoolSense ADU,  !- Zone Equipment 1 Name
+    Perimeter_top_ZN_2 PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6854,7 +6854,7 @@ Fan:SystemModel,
     Perimeter_top_ZN_3 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Perimeter_top_ZN_3 CoolSense ADU,  !- Zone Equipment 1 Name
+    Perimeter_top_ZN_3 PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6876,7 +6876,7 @@ Fan:SystemModel,
     Perimeter_top_ZN_4 Equipment,  !- Name
     SequentialLoad,                !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Perimeter_top_ZN_4 CoolSense ADU,  !- Zone Equipment 1 Name
+    Perimeter_top_ZN_4 PIUHEATING ADU,  !- Zone Equipment 1 Name
     1,                             !- Zone Equipment 1 Cooling Sequence
     1,                             !- Zone Equipment 1 Heating or No-Load Sequence
     Primary Zone Equip Load Fraction Sched, !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -6888,7 +6888,7 @@ Fan:SystemModel,
 
 ! ***SIZING & CONTROLS***
   DesignSpecification:ZoneAirDistribution,
-    CoolSense Vent Distribution,     !- Name
+    PIUHEATING Vent Distribution,     !- Name
     1,                       !- Zone Air Distribution Effectiveness in Cooling Mode {dimensionless}
     0.8,                       !- Zone Air Distribution Effectiveness in Heating Mode {dimensionless}
     ,                        !- Zone Air Distribution Effectiveness Schedule Name
@@ -6949,7 +6949,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,     !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,     !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -6985,7 +6985,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7021,7 +7021,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7057,7 +7057,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7094,7 +7094,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7130,7 +7130,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7166,7 +7166,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7202,7 +7202,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7238,7 +7238,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7274,7 +7274,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7310,7 +7310,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7346,7 +7346,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7382,7 +7382,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7418,7 +7418,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -7454,7 +7454,7 @@ Fan:SystemModel,
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    CoolSense Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
+    PIUHEATING Vent Distribution,                        !- Design Specification Zone Air Distribution Object Name
     YES,                     !- Account for Dedicated Outdoor Air System
     ColdSupplyAir,           !- Dedicated Outdoor Air System Control Strategy
     9.89,                    !- Dedicated Outdoor Air Low Setpoint Temperature for Design
@@ -8068,94 +8068,94 @@ Fan:SystemModel,
     Basement VAV Box Component;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Core_bottom CoolSense ADU,  !- Name
-    Core_bottom CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Core_bottom PIUHEATING ADU,  !- Name
+    Core_bottom PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Core_bottom CoolSense;  !- Air Terminal Name
+    Core_bottom PIUHEATING;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Core_mid CoolSense ADU,     !- Name
-    Core_mid CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Core_mid PIUHEATING ADU,     !- Name
+    Core_mid PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Core_mid CoolSense;     !- Air Terminal Name
+    Core_mid PIUHEATING;     !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Core_top CoolSense ADU,     !- Name
-    Core_top CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Core_top PIUHEATING ADU,     !- Name
+    Core_top PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Core_top CoolSense;     !- Air Terminal Name
+    Core_top PIUHEATING;     !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Perimeter_bot_ZN_1 CoolSense ADU,  !- Name
-    Perimeter_bot_ZN_1 CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING ADU,  !- Name
+    Perimeter_bot_ZN_1 PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Perimeter_bot_ZN_1 CoolSense;  !- Air Terminal Name
+    Perimeter_bot_ZN_1 PIUHEATING;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Perimeter_bot_ZN_2 CoolSense ADU,  !- Name
-    Perimeter_bot_ZN_2 CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING ADU,  !- Name
+    Perimeter_bot_ZN_2 PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Perimeter_bot_ZN_2 CoolSense;  !- Air Terminal Name
+    Perimeter_bot_ZN_2 PIUHEATING;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Perimeter_bot_ZN_3 CoolSense ADU,  !- Name
-    Perimeter_bot_ZN_3 CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING ADU,  !- Name
+    Perimeter_bot_ZN_3 PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Perimeter_bot_ZN_3 CoolSense;  !- Air Terminal Name
+    Perimeter_bot_ZN_3 PIUHEATING;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Perimeter_bot_ZN_4 CoolSense ADU,  !- Name
-    Perimeter_bot_ZN_4 CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING ADU,  !- Name
+    Perimeter_bot_ZN_4 PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Perimeter_bot_ZN_4 CoolSense;  !- Air Terminal Name
+    Perimeter_bot_ZN_4 PIUHEATING;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Perimeter_mid_ZN_1 CoolSense ADU,  !- Name
-    Perimeter_mid_ZN_1 CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING ADU,  !- Name
+    Perimeter_mid_ZN_1 PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Perimeter_mid_ZN_1 CoolSense;  !- Air Terminal Name
+    Perimeter_mid_ZN_1 PIUHEATING;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Perimeter_mid_ZN_2 CoolSense ADU,  !- Name
-    Perimeter_mid_ZN_2 CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING ADU,  !- Name
+    Perimeter_mid_ZN_2 PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Perimeter_mid_ZN_2 CoolSense;  !- Air Terminal Name
+    Perimeter_mid_ZN_2 PIUHEATING;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Perimeter_mid_ZN_3 CoolSense ADU,  !- Name
-    Perimeter_mid_ZN_3 CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING ADU,  !- Name
+    Perimeter_mid_ZN_3 PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Perimeter_mid_ZN_3 CoolSense;  !- Air Terminal Name
+    Perimeter_mid_ZN_3 PIUHEATING;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Perimeter_mid_ZN_4 CoolSense ADU,  !- Name
-    Perimeter_mid_ZN_4 CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING ADU,  !- Name
+    Perimeter_mid_ZN_4 PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Perimeter_mid_ZN_4 CoolSense;  !- Air Terminal Name
+    Perimeter_mid_ZN_4 PIUHEATING;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Perimeter_top_ZN_1 CoolSense ADU,  !- Name
-    Perimeter_top_ZN_1 CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING ADU,  !- Name
+    Perimeter_top_ZN_1 PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Perimeter_top_ZN_1 CoolSense;  !- Air Terminal Name
+    Perimeter_top_ZN_1 PIUHEATING;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Perimeter_top_ZN_2 CoolSense ADU,  !- Name
-    Perimeter_top_ZN_2 CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING ADU,  !- Name
+    Perimeter_top_ZN_2 PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Perimeter_top_ZN_2 CoolSense;  !- Air Terminal Name
+    Perimeter_top_ZN_2 PIUHEATING;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Perimeter_top_ZN_3 CoolSense ADU,  !- Name
-    Perimeter_top_ZN_3 CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING ADU,  !- Name
+    Perimeter_top_ZN_3 PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Perimeter_top_ZN_3 CoolSense;  !- Air Terminal Name
+    Perimeter_top_ZN_3 PIUHEATING;  !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
-    Perimeter_top_ZN_4 CoolSense ADU,  !- Name
-    Perimeter_top_ZN_4 CoolSense Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING ADU,  !- Name
+    Perimeter_top_ZN_4 PIUHEATING Outlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type
-    Perimeter_top_ZN_4 CoolSense;  !- Air Terminal Name
+    Perimeter_top_ZN_4 PIUHEATING;  !- Air Terminal Name
 
   NodeList,
     VAV_1_OANode List,       !- Name
@@ -8576,29 +8576,29 @@ Fan:SystemModel,
   AirLoopHVAC:ZoneSplitter,
     VAV_1 Supply Air Splitter,  !- Name
     VAV_1 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Core_bottom CoolSense Primary Inlet Node Name,  !- Outlet 1 Node Name
-    Perimeter_bot_ZN_3 CoolSense Primary Inlet Node Name,  !- Outlet 2 Node Name
-    Perimeter_bot_ZN_2 CoolSense Primary Inlet Node Name,  !- Outlet 3 Node Name
-    Perimeter_bot_ZN_1 CoolSense Primary Inlet Node Name,  !- Outlet 4 Node Name
-    Perimeter_bot_ZN_4 CoolSense Primary Inlet Node Name;  !- Outlet 5 Node Name
+    Core_bottom PIUHEATING Primary Inlet Node Name,  !- Outlet 1 Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Primary Inlet Node Name,  !- Outlet 2 Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Primary Inlet Node Name,  !- Outlet 3 Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Primary Inlet Node Name,  !- Outlet 4 Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Primary Inlet Node Name;  !- Outlet 5 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     VAV_2 Supply Air Splitter,  !- Name
     VAV_2 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Core_mid CoolSense Primary Inlet Node Name,  !- Outlet 1 Node Name
-    Perimeter_mid_ZN_3 CoolSense Primary Inlet Node Name,  !- Outlet 2 Node Name
-    Perimeter_mid_ZN_2 CoolSense Primary Inlet Node Name,  !- Outlet 3 Node Name
-    Perimeter_mid_ZN_1 CoolSense Primary Inlet Node Name,  !- Outlet 4 Node Name
-    Perimeter_mid_ZN_4 CoolSense Primary Inlet Node Name;  !- Outlet 5 Node Name
+    Core_mid PIUHEATING Primary Inlet Node Name,  !- Outlet 1 Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Primary Inlet Node Name,  !- Outlet 2 Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Primary Inlet Node Name,  !- Outlet 3 Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Primary Inlet Node Name,  !- Outlet 4 Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Primary Inlet Node Name;  !- Outlet 5 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     VAV_3 Supply Air Splitter,  !- Name
     VAV_3 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Core_top CoolSense Primary Inlet Node Name,  !- Outlet 1 Node Name
-    Perimeter_top_ZN_3 CoolSense Primary Inlet Node Name,  !- Outlet 2 Node Name
-    Perimeter_top_ZN_2 CoolSense Primary Inlet Node Name,  !- Outlet 3 Node Name
-    Perimeter_top_ZN_1 CoolSense Primary Inlet Node Name,  !- Outlet 4 Node Name
-    Perimeter_top_ZN_4 CoolSense Primary Inlet Node Name;  !- Outlet 5 Node Name
+    Core_top PIUHEATING Primary Inlet Node Name,  !- Outlet 1 Node Name
+    Perimeter_top_ZN_3 PIUHEATING Primary Inlet Node Name,  !- Outlet 2 Node Name
+    Perimeter_top_ZN_2 PIUHEATING Primary Inlet Node Name,  !- Outlet 3 Node Name
+    Perimeter_top_ZN_1 PIUHEATING Primary Inlet Node Name,  !- Outlet 4 Node Name
+    Perimeter_top_ZN_4 PIUHEATING Primary Inlet Node Name;  !- Outlet 5 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     VAV_5 Supply Air Splitter,  !- Name
@@ -8649,11 +8649,11 @@ Fan:SystemModel,
 
   NodeList,
    MIDFLOOR_PLENUM Induced Air Nodes,
-   Core_mid CoolSense Secondary Inlet Node,
-   Perimeter_mid_ZN_3 CoolSense Secondary Inlet Node,
-   Perimeter_mid_ZN_2 CoolSense Secondary Inlet Node,
-   Perimeter_mid_ZN_1 CoolSense Secondary Inlet Node,
-   Perimeter_mid_ZN_4 CoolSense Secondary Inlet Node;
+   Core_mid PIUHEATING Secondary Inlet Node,
+   Perimeter_mid_ZN_3 PIUHEATING Secondary Inlet Node,
+   Perimeter_mid_ZN_2 PIUHEATING Secondary Inlet Node,
+   Perimeter_mid_ZN_1 PIUHEATING Secondary Inlet Node,
+   Perimeter_mid_ZN_4 PIUHEATING Secondary Inlet Node;
    
   AirLoopHVAC:ReturnPlenum,
     VAV_1 Return Plenum,     !- Name
@@ -8669,11 +8669,11 @@ Fan:SystemModel,
 
   NodeList,
    GROUNDFLOOR_PLENUM Induced Air Nodes,
-   Core_bottom CoolSense Secondary Inlet Node,
-   Perimeter_bot_ZN_3 CoolSense Secondary Inlet Node,
-   Perimeter_bot_ZN_2 CoolSense Secondary Inlet Node,
-   Perimeter_bot_ZN_1 CoolSense Secondary Inlet Node,
-   Perimeter_bot_ZN_4 CoolSense Secondary Inlet Node;
+   Core_bottom PIUHEATING Secondary Inlet Node,
+   Perimeter_bot_ZN_3 PIUHEATING Secondary Inlet Node,
+   Perimeter_bot_ZN_2 PIUHEATING Secondary Inlet Node,
+   Perimeter_bot_ZN_1 PIUHEATING Secondary Inlet Node,
+   Perimeter_bot_ZN_4 PIUHEATING Secondary Inlet Node;
 
   AirLoopHVAC:ReturnPlenum,
     VAV_3 Return Plenum,     !- Name
@@ -8689,11 +8689,11 @@ Fan:SystemModel,
 
   NodeList,
    TOPFLOOR_PLENUM Induced Air Nodes,
-   Core_top CoolSense Secondary Inlet Node,
-   Perimeter_top_ZN_3 CoolSense Secondary Inlet Node,
-   Perimeter_top_ZN_2 CoolSense Secondary Inlet Node,
-   Perimeter_top_ZN_1 CoolSense Secondary Inlet Node,
-   Perimeter_top_ZN_4 CoolSense Secondary Inlet Node;
+   Core_top PIUHEATING Secondary Inlet Node,
+   Perimeter_top_ZN_3 PIUHEATING Secondary Inlet Node,
+   Perimeter_top_ZN_2 PIUHEATING Secondary Inlet Node,
+   Perimeter_top_ZN_1 PIUHEATING Secondary Inlet Node,
+   Perimeter_top_ZN_4 PIUHEATING Secondary Inlet Node;
 
   AirLoopHVAC:ZoneMixer,
     VAV_1 Return Air Mixer,  !- Name
@@ -9607,120 +9607,120 @@ Fan:SystemModel,
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Perimeter_top_ZN_1 Cooling Coil,  !- Component 1 Name
-    Perimeter_top_ZN_1 CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_1 CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 5,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Perimeter_top_ZN_2 Cooling Coil,  !- Component 1 Name
-    Perimeter_top_ZN_2 CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_2 CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 6,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Perimeter_top_ZN_3 Cooling Coil,  !- Component 1 Name
-    Perimeter_top_ZN_3 CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_3 CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 7,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Perimeter_top_ZN_4 Cooling Coil,  !- Component 1 Name
-    Perimeter_top_ZN_4 CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_4 CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 8,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Perimeter_mid_ZN_1 Cooling Coil,  !- Component 1 Name
-    Perimeter_mid_ZN_1 CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_mid_ZN_1 CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 9,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Perimeter_bot_ZN_4 Cooling Coil,  !- Component 1 Name
-    Perimeter_bot_ZN_4 CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_4 CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 10,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Perimeter_bot_ZN_3 Cooling Coil,  !- Component 1 Name
-    Perimeter_bot_ZN_3 CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_3 CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 11,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Perimeter_bot_ZN_2 Cooling Coil,  !- Component 1 Name
-    Perimeter_bot_ZN_2 CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_2 CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 12,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Perimeter_bot_ZN_1 Cooling Coil,  !- Component 1 Name
-    Perimeter_bot_ZN_1 CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_1 CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 13,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Core_top Cooling Coil,  !- Component 1 Name
-    Core_top CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Core_top CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Core_top PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Core_top PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 14,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Core_mid Cooling Coil,  !- Component 1 Name
-    Core_mid CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Core_mid CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Core_mid PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Core_mid PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 15,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Core_bottom Cooling Coil,  !- Component 1 Name
-    Core_bottom CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Core_bottom CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Core_bottom PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Core_bottom PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 1,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Perimeter_mid_ZN_2 Cooling Coil,  !- Component 1 Name
-    Perimeter_mid_ZN_2 CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_mid_ZN_2 CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 2,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Perimeter_mid_ZN_3 Cooling Coil,  !- Component 1 Name
-    Perimeter_mid_ZN_3 CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_mid_ZN_3 CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary CW Demand Load Branch 3,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Cooling:Water,  !- Component 1 Object Type
     Perimeter_mid_ZN_4 Cooling Coil,  !- Component 1 Name
-    Perimeter_mid_ZN_4 CoolSense CW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_mid_ZN_4 CoolSense CW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING CW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING CW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Cooling Demand Bypass Branch,  !- Name
@@ -9895,116 +9895,116 @@ Fan:SystemModel,
     Secondary Heating Demand Load Branch 2,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,  !- Component 1 Object Type
-    Core_bottom CoolSense Reheat Coil,  !- Component 1 Name
-    Core_bottom CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Core_bottom CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Core_bottom PIUHEATING Reheat Coil,  !- Component 1 Name
+    Core_bottom PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Core_bottom PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Heating Demand Load Branch 3,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,  !- Component 1 Object Type
-    Core_mid CoolSense Reheat Coil,     !- Component 1 Name
-    Core_mid CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Core_mid CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Core_mid PIUHEATING Reheat Coil,     !- Component 1 Name
+    Core_mid PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Core_mid PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
 
   Branch,
     Secondary Heating Demand Load Branch 5,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
-    Perimeter_bot_ZN_3 CoolSense Reheat Coil,  !- Component 1 Name
-    Perimeter_bot_ZN_3 CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_3 CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING Reheat Coil,  !- Component 1 Name
+    Perimeter_bot_ZN_3 PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_bot_ZN_3 PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Heating Demand Load Branch 6,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
-    Perimeter_bot_ZN_2 CoolSense Reheat Coil,  !- Component 1 Name
-    Perimeter_bot_ZN_2 CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_2 CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING Reheat Coil,  !- Component 1 Name
+    Perimeter_bot_ZN_2 PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_bot_ZN_2 PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Heating Demand Load Branch 7,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
-    Perimeter_bot_ZN_1 CoolSense Reheat Coil,  !- Component 1 Name
-    Perimeter_bot_ZN_1 CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_1 CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING Reheat Coil,  !- Component 1 Name
+    Perimeter_bot_ZN_1 PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_bot_ZN_1 PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Heating Demand Load Branch 8,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
-    Perimeter_bot_ZN_4 CoolSense Reheat Coil,  !- Component 1 Name
-    Perimeter_bot_ZN_4 CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_bot_ZN_4 CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING Reheat Coil,  !- Component 1 Name
+    Perimeter_bot_ZN_4 PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_bot_ZN_4 PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
 
   Branch,
     Secondary Heating Demand Load Branch 9,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
-    Perimeter_mid_ZN_3 CoolSense Reheat Coil,  !- Component 1 Name
-    Perimeter_mid_ZN_3 CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_mid_ZN_3 CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING Reheat Coil,  !- Component 1 Name
+    Perimeter_mid_ZN_3 PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_mid_ZN_3 PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
 
   Branch,
     Secondary Heating Demand Load Branch 10,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
-    Perimeter_mid_ZN_2 CoolSense Reheat Coil,  !- Component 1 Name
-    Perimeter_mid_ZN_2 CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_mid_ZN_2 CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING Reheat Coil,  !- Component 1 Name
+    Perimeter_mid_ZN_2 PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_mid_ZN_2 PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Heating Demand Load Branch 11,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
-    Perimeter_mid_ZN_1 CoolSense Reheat Coil,  !- Component 1 Name
-    Perimeter_mid_ZN_1 CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_mid_ZN_1 CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING Reheat Coil,  !- Component 1 Name
+    Perimeter_mid_ZN_1 PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_mid_ZN_1 PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Heating Demand Load Branch 12,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
-    Perimeter_mid_ZN_4 CoolSense Reheat Coil,  !- Component 1 Name
-    Perimeter_mid_ZN_4 CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_mid_ZN_4 CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING Reheat Coil,  !- Component 1 Name
+    Perimeter_mid_ZN_4 PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_mid_ZN_4 PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Heating Demand Load Branch 13,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
-    Perimeter_top_ZN_3 CoolSense Reheat Coil,  !- Component 1 Name
-    Perimeter_top_ZN_3 CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_3 CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING Reheat Coil,  !- Component 1 Name
+    Perimeter_top_ZN_3 PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_top_ZN_3 PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Heating Demand Load Branch 14,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
-    Perimeter_top_ZN_2 CoolSense Reheat Coil,  !- Component 1 Name
-    Perimeter_top_ZN_2 CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_2 CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING Reheat Coil,  !- Component 1 Name
+    Perimeter_top_ZN_2 PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_top_ZN_2 PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Heating Demand Load Branch 15,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
-    Perimeter_top_ZN_1 CoolSense Reheat Coil,  !- Component 1 Name
-    Perimeter_top_ZN_1 CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_1 CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING Reheat Coil,  !- Component 1 Name
+    Perimeter_top_ZN_1 PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_top_ZN_1 PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Heating Demand Load Branch 16,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
-    Perimeter_top_ZN_4 CoolSense Reheat Coil,  !- Component 1 Name
-    Perimeter_top_ZN_4 CoolSense HW Inlet Node,  !- Component 1 Inlet Node Name
-    Perimeter_top_ZN_4 CoolSense HW Outlet Node;  !- Component 1 Outlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING Reheat Coil,  !- Component 1 Name
+    Perimeter_top_ZN_4 PIUHEATING HW Inlet Node,  !- Component 1 Inlet Node Name
+    Perimeter_top_ZN_4 PIUHEATING HW Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Secondary Heating Demand Load Branch 17,  !- Name
@@ -11481,25 +11481,25 @@ Curve:Biquadratic,
 
 Output:Variable,*,Zone Air Terminal Heating Rate,timestep; !- HVAC Average [W]
 Output:Variable,*,Zone Air Terminal Sensible Cooling Rate,timestep; !- HVAC Sum [W]
-Output:Variable,Core_bottom CoolSense Primary Inlet Node Name,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_bottom CoolSense Primary Inlet Node Name,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_bottom PIUHEATING Primary Inlet Node Name,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_bottom PIUHEATING Primary Inlet Node Name,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,Core_bottom CoolSense Secondary Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_bottom CoolSense Secondary Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_bottom PIUHEATING Secondary Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_bottom PIUHEATING Secondary Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,Core_bottom CoolSense Outlet Node Name,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_bottom CoolSense Outlet Node Name,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_bottom PIUHEATING Outlet Node Name,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_bottom PIUHEATING Outlet Node Name,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,Core_bottom CoolSense Fan Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_bottom CoolSense Fan Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_bottom PIUHEATING Fan Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_bottom PIUHEATING Fan Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,Core_bottom CoolSense Reheat Coil Air In Node,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_bottom CoolSense Reheat Coil Air In Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_bottom PIUHEATING Reheat Coil Air In Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_bottom PIUHEATING Reheat Coil Air In Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,Core_bottom CoolSense Fan,Fan Air Mass Flow Rate,timestep; !- HVAC Average [kg/s]
-Output:Variable,Core_bottom CoolSense Fan,Fan Electricity Rate,timestep; !- HVAC Average [W]
-Output:Variable,Core_bottom CoolSense Fan,Fan Rise in Air Temperature,timestep; !- HVAC Average [deltaC]
-Output:Variable,Core_bottom CoolSense Fan,Fan Heat Gain to Air,timestep; !- HVAC Average [W]
+Output:Variable,Core_bottom PIUHEATING Fan,Fan Air Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_bottom PIUHEATING Fan,Fan Electricity Rate,timestep; !- HVAC Average [W]
+Output:Variable,Core_bottom PIUHEATING Fan,Fan Rise in Air Temperature,timestep; !- HVAC Average [deltaC]
+Output:Variable,Core_bottom PIUHEATING Fan,Fan Heat Gain to Air,timestep; !- HVAC Average [W]
 
 Output:Variable,Core_bottom,Zone Air System Sensible Heating Rate,timestep; !- HVAC Average [W]
 Output:Variable,Core_bottom,Zone Air System Sensible Cooling Rate,timestep; !- HVAC Average [W]
@@ -11508,44 +11508,44 @@ Output:Variable,Core_bottom,Zone Air System Sensible Cooling Rate,timestep; !- H
 Output:Variable,Core_bottom,Zone Thermostat Heating Setpoint Temperature,timestep; !- HVAC Average [C]
 Output:Variable,Core_bottom,Zone Thermostat Cooling Setpoint Temperature,timestep; !- HVAC Average [C]
 
-Output:Variable,Core_bottom CoolSense CW Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_bottom CoolSense CW Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_bottom PIUHEATING CW Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_bottom PIUHEATING CW Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,Core_bottom CoolSense CW Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_bottom CoolSense CW Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_bottom PIUHEATING CW Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_bottom PIUHEATING CW Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
 Output:Variable,*,Plant Supply Side Inlet Temperature,timestep; !- HVAC Average [C]
 Output:Variable,*,Plant Supply Side Outlet Temperature,timestep; !- HVAC Average [C]
 
-Output:Variable,Core_mid CoolSense Primary Inlet Node Name,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_mid CoolSense Primary Inlet Node Name,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_mid PIUHEATING Primary Inlet Node Name,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_mid PIUHEATING Primary Inlet Node Name,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,Core_mid CoolSense Secondary Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_mid CoolSense Secondary Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_mid PIUHEATING Secondary Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_mid PIUHEATING Secondary Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,Core_mid CoolSense Outlet Node Name,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_mid CoolSense Outlet Node Name,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_mid PIUHEATING Outlet Node Name,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_mid PIUHEATING Outlet Node Name,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,Core_mid CoolSense Fan Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_mid CoolSense Fan Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_mid PIUHEATING Fan Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_mid PIUHEATING Fan Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,Core_mid CoolSense Reheat Coil Air In Node,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_mid CoolSense Reheat Coil Air In Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_mid PIUHEATING Reheat Coil Air In Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_mid PIUHEATING Reheat Coil Air In Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,Core_mid CoolSense Fan,Fan Air Mass Flow Rate,timestep; !- HVAC Average [kg/s]
-Output:Variable,Core_mid CoolSense Fan,Fan Electricity Rate,timestep; !- HVAC Average [W]
-Output:Variable,Core_mid CoolSense Fan,Fan Rise in Air Temperature,timestep; !- HVAC Average [deltaC]
-Output:Variable,Core_mid CoolSense Fan,Fan Heat Gain to Air,timestep; !- HVAC Average [W]
+Output:Variable,Core_mid PIUHEATING Fan,Fan Air Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_mid PIUHEATING Fan,Fan Electricity Rate,timestep; !- HVAC Average [W]
+Output:Variable,Core_mid PIUHEATING Fan,Fan Rise in Air Temperature,timestep; !- HVAC Average [deltaC]
+Output:Variable,Core_mid PIUHEATING Fan,Fan Heat Gain to Air,timestep; !- HVAC Average [W]
 
 
 Output:Variable,Core_mid,Zone Thermostat Heating Setpoint Temperature,timestep; !- HVAC Average [C]
 Output:Variable,Core_mid,Zone Thermostat Cooling Setpoint Temperature,timestep; !- HVAC Average [C]
 
-Output:Variable,Core_mid CoolSense CW Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_mid CoolSense CW Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_mid PIUHEATING CW Inlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_mid PIUHEATING CW Inlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
-Output:Variable,Core_mid CoolSense CW Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
-Output:Variable,Core_mid CoolSense CW Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,Core_mid PIUHEATING CW Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,Core_mid PIUHEATING CW Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 
 Output:Variable,*,Air System Outdoor Air Flow Fraction,timestep; !- HVAC Average []
 Output:Variable,*,Air System Outdoor Air Minimum Flow Fraction,timestep; !- HVAC Average []
@@ -11604,9 +11604,9 @@ Output:Variable,Cooling Side WSHP Load Side Outlet,System Node Mass Flow Rate,ti
   PlantEquipmentOperation:CoolingLoad,
     Two AWHP Cooling Operation Scheme,  !- Name
     0.0,                                         !- Load Range 1 Lower Limit {W}
-    50000,                                      !- Load Range 1 Upper Limit {W}
+    50000,                                       !- Load Range 1 Upper Limit {W}
     One AWHP Cooling Equipment List,             !- Range 1 Equipment List Name
-    50000,                                      !- Load Range 2 Lower Limit {W}
+    50000,                                       !- Load Range 2 Lower Limit {W}
     10000000000000,                              !- Load Range 2 Upper Limit {W}
     Two AWHP Cooling Equipment List;             !- Range 2 Equipment List Name
   
@@ -11796,12 +11796,37 @@ Output:Variable,CoolSys1 Supply Outlet Node,System Node Temperature,timestep; !-
 Output:Variable,CoolSys1 Supply Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
 Output:Variable,CoolSys1 Supply Outlet Node,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
 
-!Output:Variable,*,System Node Temperature,timestep; !- HVAC Average [C]
-!Output:Variable,*,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
-!Output:Variable,*,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+Output:Variable,VAV_1 Supply Equipment Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,VAV_1 Supply Equipment Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,VAV_1 Supply Equipment Outlet Node,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,VAV_2 Supply Equipment Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,VAV_2 Supply Equipment Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,VAV_2 Supply Equipment Outlet Node,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,VAV_3_OA-VAV_3_CoolCNode,System Node Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,VAV_1_CoolCDemand Inlet Node,System Node Standard Density Volume Flow Rate,timestep;
+Output:Variable,VAV_2_CoolCDemand Inlet Node,System Node Standard Density Volume Flow Rate,timestep;
+Output:Variable,VAV_3_CoolCDemand Inlet Node,System Node Standard Density Volume Flow Rate,timestep;
+Output:Variable,VAV_5_CoolCDemand Inlet Node,System Node Standard Density Volume Flow Rate,timestep;
+
+Output:Variable,VAV_1_HeatCDemand Inlet Node,System Node Standard Density Volume Flow Rate,timestep;
+Output:Variable,VAV_2_HeatCDemand Inlet Node,System Node Standard Density Volume Flow Rate,timestep;
+Output:Variable,VAV_3_HeatCDemand Inlet Node,System Node Standard Density Volume Flow Rate,timestep;
+Output:Variable,VAV_5_HeatCDemand Inlet Node,System Node Standard Density Volume Flow Rate,timestep;
+
+Output:Variable,VAV_3 Supply Equipment Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,VAV_3 Supply Equipment Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,VAV_3 Supply Equipment Outlet Node,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
+
+Output:Variable,VAV_5 Supply Equipment Outlet Node,System Node Temperature,timestep; !- HVAC Average [C]
+Output:Variable,VAV_5 Supply Equipment Outlet Node,System Node Mass Flow Rate,timestep; !- HVAC Average [kg/s]
+Output:Variable,VAV_5 Supply Equipment Outlet Node,System Node Setpoint Temperature,timestep; !- HVAC Average [C]
 
 Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep; !- Zone Average [C]
 
+Output:Variable,*,Availability Manager Night Cycle Control Status,timestep; !- HVAC Average []
 
 Output:Variable,*,Zone Heating Setpoint Not Met While Occupied Time,timestep; !- Zone Sum [hr]
 Output:Variable,*,Zone Cooling Setpoint Not Met While Occupied Time,timestep; !- Zone Sum [hr]
