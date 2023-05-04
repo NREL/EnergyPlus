@@ -552,7 +552,8 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     this->powerEnergy = this->powerUsage * reportingInterval;
 
     // energy balance on heat pump
-    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
+   //test this->sourceSideHeatTransfer = max(0.0, this->calcQsource(this->loadSideHeatTransfer, this->powerUsage)); // TODO don't let it go negative, or is it negative cooling and shouldn't get positive?
+    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage); // ?? sign convention??
     this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
 
     // calculate source side outlet conditions

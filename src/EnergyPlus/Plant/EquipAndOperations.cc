@@ -73,23 +73,37 @@ namespace DataPlant {
         if (this->oneTimeSetupComplete) return;
 
         SetupOutputVariable(state,
-                            "Supervisory Plant Operation Mode",
+                            "Supervisory Air Source Plant Operation Mode",
                             OutputProcessor::Unit::unknown,
-                            this->Report.OutputOpMode,
+                            this->Report.AirSourcePlant_OpMode,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
-                            "Supervisory Plant Operation Sensed Heating Load",
+                            "Supervisory Plant Operation Polled Building Heating Load",
                             OutputProcessor::Unit::W,
-                            this->Report.SensedHeatingLoad,
+                            this->Report.BuildingPolledHeatingLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
-                            "Supervisory Plant Operation Sensed Cooling Load",
+                            "Supervisory Plant Operation Polled Building Cooling Load",
                             OutputProcessor::Unit::W,
-                            this->Report.SensedCoolingLoad,
+                            this->Report.BuildingPolledCoolingLoad,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Supervisory Plant Operation Primary Plant Heating Load",
+                            OutputProcessor::Unit::W,
+                            this->Report.AirSourcePlantHeatingLoad,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Supervisory Plant Operation Primary Plant Cooling Load",
+                            OutputProcessor::Unit::W,
+                            this->Report.AirSourcePlantCoolingLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
@@ -100,7 +114,13 @@ namespace DataPlant {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
-
+        SetupOutputVariable(state,
+                            "Supervisory Plant Auxiliary Boiler Mode",
+                            OutputProcessor::Unit::unknown,
+                            this->Report.BoilerAux_OpMode,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         // routine for setup of chiller heater supervisory plant operation scheme
         for (int zoneListNum = 1; zoneListNum <= state.dataHeatBal->NumOfZoneLists; ++zoneListNum) {
             if (this->ZoneListName == state.dataHeatBal->ZoneList(zoneListNum).Name) {
@@ -290,7 +310,7 @@ namespace DataPlant {
                         this_equip.LoopSideNumPtr = compLoc.loopSideNum;
                         this_equip.BranchNumPtr = compLoc.branchNum;
                         this_equip.CompNumPtr = compLoc.compNum;
-
+                        this->PlantOps.PrimaryChWLoopIndex = compLoc.loopNum;
                     } else if (NumSearchResults > 1) {
                         bool foundit = false;
                         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
@@ -378,6 +398,7 @@ namespace DataPlant {
                         this_equip.LoopSideNumPtr = compLoc.loopSideNum;
                         this_equip.BranchNumPtr = compLoc.branchNum;
                         this_equip.CompNumPtr = compLoc.compNum;
+                        this->PlantOps.PrimaryHWLoopIndex = compLoc.loopNum;
 
                     } else if (NumSearchResults > 1) {
 
@@ -655,6 +676,7 @@ namespace DataPlant {
                                 int pltSizNum = state.dataPlnt->PlantLoop(this->DedicatedHR_ChWRetControl_LoadSideComp.LoopNumPtr).PlantSizNum;
 
                                 this->PlantOps.DedicatedHR_SecChW_DesignCapacity = state.dataSize->PlantSizData(pltSizNum).DesCapacity;
+                                this->PlantOps.SecondaryChWLoopIndex = this->DedicatedHR_ChWRetControl_LoadSideComp.LoopNumPtr;
                             }
                         } else if (state.dataSize->PlantSizData(PltSizNum).LoopType == DataSizing::TypeOfPlantLoop::Heating) {
                             PlantUtilities::ScanPlantLoopsForObject(
@@ -764,6 +786,7 @@ namespace DataPlant {
 
                                 int pltSizNum = state.dataPlnt->PlantLoop(this->DedicatedHR_HWRetControl_LoadSideComp.LoopNumPtr).PlantSizNum;
                                 this->PlantOps.DedicatedHR_SecHW_DesignCapacity = state.dataSize->PlantSizData(pltSizNum).DesCapacity;
+                                this->PlantOps.SecondaryHWLoopIndex = this->DedicatedHR_HWRetControl_LoadSideComp.LoopNumPtr;
                             }
                         }
                     }
@@ -836,6 +859,17 @@ namespace DataPlant {
     void ChillerHeaterSupervisoryOperationData::EvaluateChillerHeaterChangeoverOpScheme(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
+        DetermineCurrentBuildingLoads(state);
+        DetermineCurrentPlantLoads(state);
+        ProcessSupervisoryControlLogicForAirSourcePlants(state);
+        InitAirSourcePlantEquipmentOff(state, FirstHVACIteration);
+        ProcessAndSetAirSourcePlantEquipLists(state);
+        ProcessAndSetDedicatedHeatRecovWWHP(state, FirstHVACIteration);
+        ProcessAndSetAuxilBoiler(state, FirstHVACIteration);
+    }
+
+    void ChillerHeaterSupervisoryOperationData::DetermineCurrentBuildingLoads(EnergyPlusData &state)
+    {
         // Poll the loads on the zones to help decide how to run
 
         Real64 sumZonePredictedHeatingLoad(0.0);
@@ -870,7 +904,7 @@ namespace DataPlant {
             }
         }
 
-        // now add in process loads from plant load profiles on the controlled loops.
+        // now add in any process loads from plant load profiles on the controlled loops.
         Real64 sumLoadProfileHeatingLoad(0.0);
         Real64 sumLoadProfileCoolingLoad(0.0);
         for (int NumProcLoad = 1; NumProcLoad <= this->PlantOps.numPlantLoadProfiles; ++NumProcLoad) {
@@ -883,56 +917,110 @@ namespace DataPlant {
             }
         }
 
-        this->Report.SensedCoolingLoad = sumZonePredictedCoolingLoad + sumAirSysVentCoolingLoad + sumLoadProfileCoolingLoad;
-        this->Report.SensedHeatingLoad = sumZonePredictedHeatingLoad + sumAirSysVentHeatingLoad + sumLoadProfileHeatingLoad;
+        this->Report.BuildingPolledCoolingLoad = sumZonePredictedCoolingLoad + sumAirSysVentCoolingLoad + sumLoadProfileCoolingLoad;
+        this->Report.BuildingPolledHeatingLoad = sumZonePredictedHeatingLoad + sumAirSysVentHeatingLoad + sumLoadProfileHeatingLoad;
+        // end  collect loads.
+    }
 
+    void ChillerHeaterSupervisoryOperationData::DetermineCurrentPlantLoads(EnergyPlusData &state)
+    {
+
+        // Calculate load on primary chilled water loop and store in AirSourcePlantCoolingLoad
+        int ChWSupInletNode =
+            state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).NodeNumIn;
+        Real64 CW_RetMdot = state.dataLoopNodes->Node(ChWSupInletNode).MassFlowRate;
+        Real64 const CpCW = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).FluidName,
+                                                                   state.dataLoopNodes->Node(ChWSupInletNode).Temp,
+                                                                   state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).FluidIndex,
+                                                                   "DetermineCurrentPlantLoads");
+        Real64 CW_Qdot =
+            min(0.0,
+                CW_RetMdot * CpCW *
+                    (this->Setpoint.PrimCW - state.dataLoopNodes->Node(ChWSupInletNode).Temp)); // power = Mdot Cp Delta T, cooling load is negative
+        this->Report.AirSourcePlantCoolingLoad = CW_Qdot;
+
+        // Calculate load on primary hot water loop and store in AirSourcePlantHeatingLoad
+        int HWSupInletNode =
+            state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).NodeNumIn;
+        Real64 HW_RetMdot = state.dataLoopNodes->Node(HWSupInletNode).MassFlowRate;
+        Real64 const CpHW = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).FluidName,
+                                                                   state.dataLoopNodes->Node(HWSupInletNode).Temp,
+                                                                   state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).FluidIndex,
+                                                                   "DetermineCurrentPlantLoads");
+
+        Real64 HW_Qdot = max(0.0,
+                             HW_RetMdot * CpHW * (this->DetermineHWSetpointOARest(state) -
+                                 state.dataLoopNodes->Node(HWSupInletNode).Temp)); // power = Mdot Cp Delta T, heating load is positive
+        this->Report.AirSourcePlantHeatingLoad = HW_Qdot;
+    }
+
+    void ChillerHeaterSupervisoryOperationData::ProcessSupervisoryControlLogicForAirSourcePlants(EnergyPlusData &state)
+    {
+        // this routine decides which of three modes the plants should operate in,  Heating Only, Cooling Only, Simultaneous Heating and Cooling.
         // process logic based on poll results
-        bool CoolingOnly(false);
+        this->PlantOps.AirSourcePlantCoolingOnly = false;
         bool CoolingDominated(false);
-        bool HeatingOnly(false);
+        this->PlantOps.AirSourcePlantHeatingOnly = false;
         bool HeatingDominated(false);
-        bool SimultaneousHeatingAndCooling(false);
+        this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = false;
         bool SimultaneousHeatingAndCoolingRequested(false);
-        if (sumZonePredictedHeatingLoad < DataHVACGlobals::SmallLoad &&
-            sumZonePredictedCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) {
-            CoolingOnly = true;
-        } else if (sumZonePredictedCoolingLoad > DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad &&
-                   sumZonePredictedHeatingLoad > DataHVACGlobals::SmallLoad) {
-            HeatingOnly = true;
+        if (this->Report.BuildingPolledHeatingLoad < DataHVACGlobals::SmallLoad &&
+            this->Report.BuildingPolledCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) {
+            this->PlantOps.AirSourcePlantCoolingOnly = true;
+        } else if (this->Report.BuildingPolledCoolingLoad > DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad &&
+                   this->Report.BuildingPolledHeatingLoad > DataHVACGlobals::SmallLoad) {
+            this->PlantOps.AirSourcePlantHeatingOnly = true;
 
             if (state.dataEnvrn->OutDryBulbTemp < this->TempReset.LowOutdoorTemp) { // too cold for airsource HPs
-                HeatingOnly = false;
+                this->PlantOps.AirSourcePlantHeatingOnly = false;
             }
 
-        } else if (sumZonePredictedCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad &&
-                   sumZonePredictedHeatingLoad > DataHVACGlobals::SmallLoad) {
+        } else if ((this->Report.BuildingPolledCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) &&
+                   (this->Report.BuildingPolledHeatingLoad > DataHVACGlobals::SmallLoad)) {
             SimultaneousHeatingAndCoolingRequested = true;
-            SimultaneousHeatingAndCooling = true;
-            if (sumZonePredictedHeatingLoad > abs(sumZonePredictedCoolingLoad)) {
+            this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = true;
+            if (this->Report.BuildingPolledHeatingLoad > abs(this->Report.BuildingPolledCoolingLoad)) {
                 HeatingDominated = true;
                 if (this->PlantOps.SimultHeatCoolOpAvailable) {
-                    SimultaneousHeatingAndCooling = true;
+                    this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = true;
                 } else {
-                    HeatingOnly = true;
-                    SimultaneousHeatingAndCooling = false;
+                    this->PlantOps.AirSourcePlantHeatingOnly = true;
+                    this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = false;
                 }
-            } else if (abs(sumZonePredictedCoolingLoad) > sumZonePredictedHeatingLoad) {
+            } else if (abs(this->Report.BuildingPolledCoolingLoad) > this->Report.BuildingPolledHeatingLoad) {
                 CoolingDominated = true;
                 if (this->PlantOps.SimultHeatCoolOpAvailable) {
-                    SimultaneousHeatingAndCooling = true;
+                    this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = true;
                 } else {
-                    CoolingOnly = true;
-                    SimultaneousHeatingAndCooling = false;
+                    this->PlantOps.AirSourcePlantCoolingOnly = true;
+                    this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = false;
                 }
             }
             if (state.dataEnvrn->OutDryBulbTemp < this->TempReset.LowOutdoorTemp) { // too cold for airsource HPs
-                SimultaneousHeatingAndCooling = false;
+                this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = false;
             }
         }
 
+        // convert logical flags into integers for output variable reporting
+        if (this->PlantOps.AirSourcePlantHeatingOnly) {
+            this->Report.AirSourcePlant_OpMode = 1;
+        } else if (this->PlantOps.AirSourcePlantCoolingOnly) {
+            this->Report.AirSourcePlant_OpMode = 2;
+        } else if (this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) {
+            this->Report.AirSourcePlant_OpMode = 3;
+        } else {
+            this->Report.AirSourcePlant_OpMode = 0;
+        }
+    }
+
+    void ChillerHeaterSupervisoryOperationData::InitAirSourcePlantEquipmentOff(EnergyPlusData &state, bool const FirstHVACIteration)
+    {
         //_____________________________________________________________________________
         // initialize all possible equipment to turn off machines before applying controls to turn them on.
-        // turn .Available and .ON to false in plant structure
+        // set .Available and .ON to false in plant structure, assumes no machines will get turned on after FirstHVACIteration and later turned off at
+        // subsequent iteration of plant solver.  This is faster but may need to remove the trap and reinit everytime.
         if (FirstHVACIteration) {
 
             if (this->PlantOps.NumCoolingOnlyEquipLists > 0) {
@@ -1014,15 +1102,25 @@ namespace DataPlant {
             }
         }
         // end init machines off
+    }
+
+    void ChillerHeaterSupervisoryOperationData::ProcessAndSetAirSourcePlantEquipLists(EnergyPlusData &state)
+    {
+        // TODO this routine is currently code to compare building wide loads to the ranges in the equipment lists,
+        // will need to test if real current plant loads can be used instead and revise this.
+     //   Real64 CoolingLoadSignal = this->Report.BuildingPolledCoolingLoad;
+     //   Real64 HeatingLoadSignal = this->Report.BuildingPolledHeatingLoad;
+        Real64 CoolingLoadSignal = this->Report.AirSourcePlantCoolingLoad;
+        Real64 HeatingLoadSignal = this->Report.AirSourcePlantHeatingLoad;
+
         //___________________________________________________________________________
-        if (CoolingOnly) {
+        if (this->PlantOps.AirSourcePlantCoolingOnly) {
             // use zone loads to find range based cooling loads
             for (int equipListNum = 1; equipListNum <= this->PlantOps.NumCoolingOnlyEquipLists; ++equipListNum) {
                 // zone cooling loads are negative, switch to positive for range based limiting
-                if (sumZonePredictedCoolingLoad * DataPrecisionGlobals::constant_minusone >
+                if (CoolingLoadSignal * DataPrecisionGlobals::constant_minusone >
                         this->CoolingOnlyEquipList(equipListNum).RangeLowerLimit &&
-                    this->CoolingOnlyEquipList(equipListNum).RangeUpperLimit >
-                        sumZonePredictedCoolingLoad * DataPrecisionGlobals::constant_minusone) {
+                    this->CoolingOnlyEquipList(equipListNum).RangeUpperLimit > CoolingLoadSignal * DataPrecisionGlobals::constant_minusone) {
                     // found that this equipment list load ranges match the zone predicted cooling loads
 
                     int NumComps = this->CoolingOnlyEquipList(equipListNum).NumComps;
@@ -1060,13 +1158,13 @@ namespace DataPlant {
         }
 
         //____________________________________________________________________________
-        if (HeatingOnly) { // Use Heating Only equipment operation
+        if (this->PlantOps.AirSourcePlantHeatingOnly) { // Use Heating Only equipment operation
 
             Real64 HWsetpt = DetermineHWSetpointOARest(state);
             // use zone loads to find range based heating loads
             for (int equipListNum = 1; equipListNum <= this->PlantOps.NumHeatingOnlyEquipLists; ++equipListNum) {
-                if (sumZonePredictedHeatingLoad > this->HeatingOnlyEquipList(equipListNum).RangeLowerLimit &&
-                    this->HeatingOnlyEquipList(equipListNum).RangeUpperLimit > sumZonePredictedHeatingLoad) {
+                if (HeatingLoadSignal > this->HeatingOnlyEquipList(equipListNum).RangeLowerLimit &&
+                    this->HeatingOnlyEquipList(equipListNum).RangeUpperLimit > HeatingLoadSignal) {
                     // found that this equipment list load ranges match the zone predicted heating loads
 
                     int NumComps = this->HeatingOnlyEquipList(equipListNum).NumComps;
@@ -1101,15 +1199,15 @@ namespace DataPlant {
             }
         }
 
-        if (SimultaneousHeatingAndCooling) {
+        if (this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) {
 
             // use zone cooling loads to find range based equipment
             for (int equipListNum = 1; equipListNum <= this->PlantOps.NumSimultHeatCoolCoolingEquipLists; ++equipListNum) {
                 // zone cooling loads are negative, switch to positive for range based limiting
-                if (sumZonePredictedCoolingLoad * DataPrecisionGlobals::constant_minusone >
+                if (CoolingLoadSignal * DataPrecisionGlobals::constant_minusone >
                         this->SimultHeatCoolCoolingEquipList(equipListNum).RangeLowerLimit &&
                     this->SimultHeatCoolCoolingEquipList(equipListNum).RangeUpperLimit >
-                        sumZonePredictedCoolingLoad * DataPrecisionGlobals::constant_minusone) {
+                        CoolingLoadSignal * DataPrecisionGlobals::constant_minusone) {
                     // found that this equipment list load ranges match the zone predicted cooling loads
 
                     int NumComps = this->SimultHeatCoolCoolingEquipList(equipListNum).NumComps;
@@ -1145,8 +1243,8 @@ namespace DataPlant {
             // use zone loads to find range based heating loads
             Real64 HWsetpt = DetermineHWSetpointOARest(state);
             for (int equipListNum = 1; equipListNum <= this->PlantOps.NumSimultHeatCoolHeatingEquipLists; ++equipListNum) {
-                if (sumZonePredictedHeatingLoad > this->SimultHeatCoolHeatingEquipList(equipListNum).RangeLowerLimit &&
-                    this->SimultHeatCoolHeatingEquipList(equipListNum).RangeUpperLimit > sumZonePredictedHeatingLoad) {
+                if (HeatingLoadSignal > this->SimultHeatCoolHeatingEquipList(equipListNum).RangeLowerLimit &&
+                    this->SimultHeatCoolHeatingEquipList(equipListNum).RangeUpperLimit > HeatingLoadSignal) {
                     // found that this equipment list load ranges match the zone predicted heating loads
 
                     int NumComps = this->SimultHeatCoolHeatingEquipList(equipListNum).NumComps;
@@ -1180,18 +1278,11 @@ namespace DataPlant {
                 }
             }
         }
+    }
 
-        if (HeatingOnly) {
-            this->Report.OutputOpMode = 1;
-        } else if (CoolingOnly) {
-            this->Report.OutputOpMode = 2;
-        } else if (SimultaneousHeatingAndCooling) {
-            this->Report.OutputOpMode = 3;
-        } else {
-            this->Report.OutputOpMode = 0;
-        }
-
-        // evaluate if and how dedicated heat exchanger should run
+    void ChillerHeaterSupervisoryOperationData::ProcessAndSetDedicatedHeatRecovWWHP(EnergyPlusData &state, bool const FirstHVACIteration)
+    {
+        // evaluate if and how dedicated heat recovery WWHP should run
 
         if (FirstHVACIteration) {
             // initialize off
@@ -1239,25 +1330,6 @@ namespace DataPlant {
                     .Comp(this->DedicatedHR_HWRetControl_SourceSideComp.CompNumPtr)
                     .ON = false;
             }
-            if (this->PlantOps.numBoilers > 0) {
-                for (int BoilerNum = 1; BoilerNum <= this->PlantOps.numBoilers; ++BoilerNum) {
-                    state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
-                        .LoopSide(this->PlantBoilerComps(BoilerNum).loopSideNum)
-                        .Branch(this->PlantBoilerComps(BoilerNum).branchNum)
-                        .Comp(this->PlantBoilerComps(BoilerNum).compNum)
-                        .Available = false;
-                    state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
-                        .LoopSide(this->PlantBoilerComps(BoilerNum).loopSideNum)
-                        .Branch(this->PlantBoilerComps(BoilerNum).branchNum)
-                        .Comp(this->PlantBoilerComps(BoilerNum).compNum)
-                        .ON = false;
-                    state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
-                        .LoopSide(this->PlantBoilerComps(BoilerNum).loopSideNum)
-                        .Branch(this->PlantBoilerComps(BoilerNum).branchNum)
-                        .Comp(this->PlantBoilerComps(BoilerNum).compNum)
-                        .MyLoad = 0.0;
-                }
-            }
         }
 
         if ((PlantOps.DedicatedHR_ChWRetControl_Input) && (PlantOps.DedicatedHR_HWRetControl_Input)) {
@@ -1296,7 +1368,7 @@ namespace DataPlant {
             Real64 const CpCW =
                 FluidProperties::GetSpecificHeatGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->DedicatedHR_HWRetControl_SourceSideComp.LoopNumPtr).FluidName,
-                                                       Constant::CWInitConvTemp,
+                                                       state.dataLoopNodes->Node(inletChWReturnNodeNum).Temp,
                                                        state.dataPlnt->PlantLoop(this->DedicatedHR_HWRetControl_SourceSideComp.LoopNumPtr).FluidIndex,
                                                        "EvaluateChillerHeaterChangeoverOpScheme");
             Real64 CW_Qdot =
@@ -1304,7 +1376,7 @@ namespace DataPlant {
             Real64 const CpHW = FluidProperties::GetSpecificHeatGlycol(
                 state,
                 state.dataPlnt->PlantLoop(this->DedicatedHR_ChWRetControl_SourceSideComp.LoopNumPtr).FluidName,
-                Constant::HWInitConvTemp,
+                state.dataLoopNodes->Node(inletHWReturnNodeNum).Temp,
                 state.dataPlnt->PlantLoop(this->DedicatedHR_ChWRetControl_SourceSideComp.LoopNumPtr).FluidIndex,
                 "EvaluateChillerHeaterChangeoverOpScheme");
             Real64 HW_Qdot =
@@ -1381,6 +1453,12 @@ namespace DataPlant {
                     .Comp(this->DedicatedHR_ChWRetControl_LoadSideComp.CompNumPtr)
                     .CurOpSchemeType = this->Type;
 
+                state.dataPlnt->PlantLoop(this->DedicatedHR_ChWRetControl_LoadSideComp.LoopNumPtr)
+                    .LoopSide(this->DedicatedHR_ChWRetControl_LoadSideComp.LoopSideNumPtr)
+                    .Branch(this->DedicatedHR_ChWRetControl_LoadSideComp.BranchNumPtr)
+                    .Comp(this->DedicatedHR_ChWRetControl_LoadSideComp.CompNumPtr)
+                    .MyLoad = CW_Qdot;
+
                 int OutletChWReturnNodeNum = state.dataPlnt->PlantLoop(this->DedicatedHR_ChWRetControl_LoadSideComp.LoopNumPtr)
                                                  .LoopSide(this->DedicatedHR_ChWRetControl_LoadSideComp.LoopSideNumPtr)
                                                  .Branch(this->DedicatedHR_ChWRetControl_LoadSideComp.BranchNumPtr)
@@ -1423,6 +1501,11 @@ namespace DataPlant {
                     .Branch(this->DedicatedHR_HWRetControl_LoadSideComp.BranchNumPtr)
                     .Comp(this->DedicatedHR_HWRetControl_LoadSideComp.CompNumPtr)
                     .CurOpSchemeType = this->Type;
+                state.dataPlnt->PlantLoop(this->DedicatedHR_HWRetControl_LoadSideComp.LoopNumPtr)
+                    .LoopSide(this->DedicatedHR_HWRetControl_LoadSideComp.LoopSideNumPtr)
+                    .Branch(this->DedicatedHR_HWRetControl_LoadSideComp.BranchNumPtr)
+                    .Comp(this->DedicatedHR_HWRetControl_LoadSideComp.CompNumPtr)
+                    .MyLoad = HW_Qdot;
 
                 int OutletHWReturnNodeNum = state.dataPlnt->PlantLoop(this->DedicatedHR_HWRetControl_LoadSideComp.LoopNumPtr)
                                                 .LoopSide(this->DedicatedHR_HWRetControl_LoadSideComp.LoopSideNumPtr)
@@ -1450,9 +1533,35 @@ namespace DataPlant {
                 }
             }
         }
+    }
 
+    void ChillerHeaterSupervisoryOperationData::ProcessAndSetAuxilBoiler(EnergyPlusData &state, bool const FirstHVACIteration)
+    {
         // Check for boiler used as auxiliary or supplemental
         // Assume boilers are in-line on supply side outlet branch, typically on secodary loop but may be on primary loop
+        this->Report.BoilerAux_OpMode = 0;
+        if (this->PlantOps.numBoilers <= 0) return;
+
+        if (this->PlantOps.numBoilers > 0) {
+            for (int BoilerNum = 1; BoilerNum <= this->PlantOps.numBoilers; ++BoilerNum) {
+                state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
+                    .LoopSide(this->PlantBoilerComps(BoilerNum).loopSideNum)
+                    .Branch(this->PlantBoilerComps(BoilerNum).branchNum)
+                    .Comp(this->PlantBoilerComps(BoilerNum).compNum)
+                    .Available = false;
+                state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
+                    .LoopSide(this->PlantBoilerComps(BoilerNum).loopSideNum)
+                    .Branch(this->PlantBoilerComps(BoilerNum).branchNum)
+                    .Comp(this->PlantBoilerComps(BoilerNum).compNum)
+                    .ON = false;
+                state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
+                    .LoopSide(this->PlantBoilerComps(BoilerNum).loopSideNum)
+                    .Branch(this->PlantBoilerComps(BoilerNum).branchNum)
+                    .Comp(this->PlantBoilerComps(BoilerNum).compNum)
+                    .MyLoad = 0.0;
+            }
+        }
+
         if (this->PlantOps.numBoilers > 0) {
             // Boilers will run if outdoor air temperature is too low and there is flow in HW return loop
 
@@ -1487,10 +1596,10 @@ namespace DataPlant {
                 Real64 const CpHW =
                     FluidProperties::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).FluidName,
-                                                           Constant::HWInitConvTemp,
+                                                           Tin,
                                                            state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).FluidIndex,
                                                            "EvaluateChillerHeaterChangeoverOpScheme");
-                Real64 LoadToSetpoint = Mdot * CpHW * (HWsetpt - Tin);
+                Real64 LoadToSetpoint = max(0.0, Mdot * CpHW * (HWsetpt - Tin));
                 int pltSizNum = state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).PlantSizNum;
                 Real64 const thresholdPlantLoad =
                     0.001 * state.dataSize->PlantSizData(pltSizNum)
@@ -1524,6 +1633,7 @@ namespace DataPlant {
                     state.dataLoopNodes->Node(OutletBoilerNodeNum).TempSetPoint = HWsetpt;
                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).TempSetPointNodeNum).TempSetPoint =
                         HWsetpt;
+                    this->Report.BoilerAux_OpMode = 1;
                 }
             }
         }

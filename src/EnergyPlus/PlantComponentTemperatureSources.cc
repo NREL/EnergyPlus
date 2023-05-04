@@ -109,7 +109,7 @@ namespace PlantComponentTemperatureSources {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WaterSourceSpecs::initialize(EnergyPlusData &state, Real64 &MyLoad, bool Runflag)
+    void WaterSourceSpecs::initialize(EnergyPlusData &state, Real64 &MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -194,19 +194,6 @@ namespace PlantComponentTemperatureSources {
                 this->MassFlowRate = min(this->MassFlowRate, this->MassFlowRateMax);
             } else {
                 this->MassFlowRate = min(this->MassFlowRate, this->EMSOverrideValueMassFlowRateMax);
-            }
-        }
-
-        if (this->tempSpecType == TempSpecType::OutletSetpointVariableFlow) {
-            if (state.dataLoopNodes->Node(this->OutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue) {
-                this->BoundaryTemp = state.dataLoopNodes->Node(this->OutletNodeNum).TempSetPoint;
-            } else {
-                this->BoundaryTemp = this->InletTemp;
-            }
-            if (Runflag) {
-                this->MassFlowRate = MassFlowRateMax;
-            } else {
-                this->MassFlowRate = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
             }
         }
 
@@ -402,7 +389,7 @@ namespace PlantComponentTemperatureSources {
                                     Real64 &CurLoad,
                                     bool RunFlag)
     {
-        this->initialize(state, CurLoad, RunFlag);
+        this->initialize(state, CurLoad);
         this->calculate(state);
         this->update(state);
     }
@@ -424,7 +411,7 @@ namespace PlantComponentTemperatureSources {
     void WaterSourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
     {
         Real64 myLoad = 0.0;
-        this->initialize(state, myLoad, false);
+        this->initialize(state, myLoad);
         this->autosize(state);
     }
     void WaterSourceSpecs::oneTimeInit(EnergyPlusData &state)
@@ -554,8 +541,6 @@ namespace PlantComponentTemperatureSources {
                                              state.dataIPShortCut->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
-            } else if (state.dataIPShortCut->cAlphaArgs(4) == "OUTLETSETPOINTVARIABLEFLOW") {
-                state.dataPlantCompTempSrc->WaterSource(SourceNum).tempSpecType = TempSpecType::OutletSetpointVariableFlow;
             } else {
                 ShowSevereError(state, format("Input error for {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
