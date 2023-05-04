@@ -659,7 +659,6 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestMiscSimData)
     warmupFlag((void *)this->state);
     kindOfSim((void *)this->state);
     currentEnvironmentNum((void *)this->state);
-    // getConstructionHandle();
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_EMS_Override)
