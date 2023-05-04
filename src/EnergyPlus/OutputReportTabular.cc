@@ -8661,15 +8661,16 @@ void WriteBEPSTable(EnergyPlusData &state)
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchLeedEusTotal,
                              "Total",
-                             unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15) + useVal(colElectricity, 15) +
-                                          useVal(colGas, 15)),
+                             unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeatWtr, 15) + useVal(colPurchHeatSt, 15) +
+                                          useVal(colElectricity, 15) + useVal(colGas, 15)),
                              2);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchLeedEusProc,
                              "Total",
-                             unconvert * (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) +
-                                          useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13) + useVal(colElectricity, 5) +
-                                          useVal(colElectricity, 13) + useVal(colGas, 5) + useVal(colGas, 13)),
+                             unconvert *
+                                 (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) +
+                                  useVal(colPurchHeatWtr, 5) + useVal(colPurchHeatWtr, 13) + useVal(colPurchHeatSt, 5) + useVal(colPurchHeatSt, 13) +
+                                  useVal(colElectricity, 5) + useVal(colElectricity, 13) + useVal(colGas, 5) + useVal(colGas, 13)),
                              2);
         }
 
@@ -10151,8 +10152,9 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             collapsedIndEndUse(9, jEndUse) = ort->gatherDemandIndEndUse(13, jEndUse);                 // otherfuel1
             collapsedIndEndUse(10, jEndUse) = ort->gatherDemandIndEndUse(14, jEndUse);                // otherfuel2
             collapsedIndEndUse(11, jEndUse) = ort->gatherDemandIndEndUse(3, jEndUse);                 // purchased cooling
-            collapsedIndEndUse(12, jEndUse) = ort->gatherDemandIndEndUse(distrHeatSelected, jEndUse); // district heating
-            collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);                 // water
+            collapsedIndEndUse(12, jEndUse) = ort->gatherDemandIndEndUse(4, jEndUse); // district heating water
+            collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(5, jEndUse);                 // district heating steam
+            collapsedIndEndUse(14, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);                 // water
         }
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
             for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
