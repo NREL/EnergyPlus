@@ -57,7 +57,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,23.1;
+  Version,23.2;
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
