@@ -48,8 +48,8 @@
 #ifndef PlantOperationEquipAndOperations_hh_INCLUDED
 #define PlantOperationEquipAndOperations_hh_INCLUDED
 
-#include <ObjexxFCL/Array1D.hh>
-
+//#include <EnergyPlus/Plant/Component.hh>
+//#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -161,14 +161,26 @@ struct PlantOpsData
     Real64 DedicatedHR_SecChW_DesignCapacity = 0.0;
     Real64 DedicatedHR_SecHW_DesignCapacity = 0.0;
     Real64 DedicatedHR_CapacityControlFactor = 0.0;
+    bool AirSourcePlantHeatingOnly = false;                   // operation mode, if true primary plant appears to only need heating
+    bool AirSourcePlantCoolingOnly = false;                   // operation mode, if true primary plant appears to only need cooling
+    bool AirSourcePlantSimultaneousHeatingAndCooling = false; // operation mode, if true primary plant appears to need both heating and cooling
+    int PrimaryHWLoopIndex = 0;
+    int PrimaryChWLoopIndex = 0;
+    int SecondaryHWLoopIndex = 0;
+    int SecondaryChWLoopIndex = 0;
 };
 
 struct ReportData
 {
-    int OutputOpMode = 0; // heating only = 1, cooling only = 2, simult heat cool = 3
-    Real64 SensedHeatingLoad = 0.0;
-    Real64 SensedCoolingLoad = 0.0;
-    int DedicHR_OpMode = 0; // heating led = 1, cooling led = 2, not dispatched = 0
+    int AirSourcePlant_OpMode = 0;          //  heating only = 1, cooling only = 2, simult heat cool = 3
+    Real64 BuildingPolledHeatingLoad = 0.0; // current  building heating loads from predicted sensible zone loads, air system ventilation loads, and
+                                            // any plant load profile process laods
+    Real64 BuildingPolledCoolingLoad = 0.0; //  current building Cooling loads from predicted sensible zone loads, air system ventilation loads, and
+                                            //  any plant load profile process laods
+    Real64 AirSourcePlantHeatingLoad = 0.0; // current apparant plant load on hot water plant served by air source heatpumps
+    Real64 AirSourcePlantCoolingLoad = 0.0; // current apparant plant load on chilled water plant served by air source heatpumps
+    int DedicHR_OpMode = 0;                 //  heating led = 1, cooling led = 2, , not dispatched = 0
+    int BoilerAux_OpMode = 0; // Not Dispatched = 0, Secondary Boiler On = 1, Primary Boiler On = 3, Both Secondary and Primary Boiler On = 4
 };
 
 struct ChillerHeaterSupervisoryOperationData
@@ -213,6 +225,20 @@ struct ChillerHeaterSupervisoryOperationData
     void OneTimeInitChillerHeaterChangeoverOpScheme(EnergyPlusData &state);
 
     void EvaluateChillerHeaterChangeoverOpScheme(EnergyPlusData &state, bool const FirstHVACIteration);
+
+    void DetermineCurrentBuildingLoads(EnergyPlusData &state);
+
+    void DetermineCurrentPlantLoads(EnergyPlusData &state);
+
+    void ProcessSupervisoryControlLogicForAirSourcePlants(EnergyPlusData &state);
+
+    void InitAirSourcePlantEquipmentOff(EnergyPlusData &state, bool const FirstHVACIteration);
+
+    void ProcessAndSetAirSourcePlantEquipLists(EnergyPlusData &state);
+
+    void ProcessAndSetDedicatedHeatRecovWWHP(EnergyPlusData &state, bool const FirstHVACIteration);
+
+    void ProcessAndSetAuxilBoiler(EnergyPlusData &state, bool const FirstHVACIteration);
 
     Real64 DetermineHWSetpointOARest(EnergyPlusData &state);
 };
