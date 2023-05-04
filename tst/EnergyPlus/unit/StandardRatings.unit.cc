@@ -120,7 +120,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelType = "Electricity";
+    Coil.FuelType = Constant::eResource::Electricity;
     Coil.RegionNum = 4;
     Coil.OATempCompressorOn = -5.0;
     Coil.OATempCompressorOnOffBlank = "true";
@@ -316,7 +316,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelType = "Electricity";
+    Coil.FuelType = Constant::eResource::Electricity;
     Coil.RegionNum = 4;
     Coil.OATempCompressorOn = -5.0;
     Coil.OATempCompressorOnOffBlank = "true";
@@ -503,7 +503,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     Coil.DefrostTime = 0.167;                                        //
     Coil.DefrostCapacity = 20000;                                    //
     Coil.PLRImpact = false;
-    Coil.FuelType = "Electricity";
+    Coil.FuelType = Constant::eResource::Electricity;
     Coil.RegionNum = 4; //
     Coil.OATempCompressorOn = -5.0;
     Coil.OATempCompressorOnOffBlank = "true";
