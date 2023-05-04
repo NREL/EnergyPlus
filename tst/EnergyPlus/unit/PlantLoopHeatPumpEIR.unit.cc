@@ -678,8 +678,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     thisCoolingPLHP->sourceSideDesignVolFlowRate = expectedSourceFlow;
     thisCoolingPLHP->referenceCapacity = expectedCapacity;
     Real64 const designSourceSideHeatTransfer = expectedCapacity * (1 + 1 / thisHeatingPLHP->referenceCOP);
-    expectedSourceFlow =
-        designSourceSideHeatTransfer / (state->dataSize->PlantSizData(2).DeltaT * expectedSourceCp * expectedSourceRho);
+    expectedSourceFlow = designSourceSideHeatTransfer / (state->dataSize->PlantSizData(2).DeltaT * expectedSourceCp * expectedSourceRho);
     expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
     thisHeatingPLHP->sizeLoadSide(*state);
     thisHeatingPLHP->sizeSrcSideWSHP(*state);
@@ -2505,7 +2504,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     EXPECT_NEAR(expectedLoadFlow, thisHeatingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(expectedSourceFlow, thisHeatingPLHP->sourceSideDesignVolFlowRate, 0.1);
     EXPECT_NEAR(expectedCapacity, thisHeatingPLHP->referenceCapacity, 0.0001);
-} 
+}
 
 TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_AirSource)
 {
