@@ -10,6 +10,7 @@ Over time, that scope may grow much further.
    :caption: Contents:
 
    faq
+   quick_start/quick_start
    python
    c
    api
