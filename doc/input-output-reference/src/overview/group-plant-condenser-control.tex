@@ -2,9 +2,23 @@
 
 \subsection{Plant Supervisory Control)}\label{operation-schemes-plant-supervisory-control}
 
-Plant operation can difficult to control when water-to-air or water-to-water heat pumps are used as plant equipment. This object will poll the building to determine estimated plant loads and dispatch equipment to meet those loads. For example, a heat pump capable of providing heating or cooling will be dispatched in heating mode. It is also possible to create a heat recovery heat pump connected between the heating and cooling plant loops where this heat pump can serve low loads on one plant while supplementing the operation of the other plant. Traditional plant controls cannot meet this type of equipment configuration. One supervisory controller can be used to control one heating and one cooling plant.
+Plant operation can difficult to control when water-to-air or water-to-water heat pumps are used as plant equipment.  Individual machines can be operated either as cooling or heat devices at any given time.  This object will poll the building to determine what type of loads are dominant and determine how the plant equipment should operate. Once the mode of operation is set the apparant plant loads are dispatch to equipment listed to meet those loads. For example, a heat pump capable of providing heating or cooling will be dispatched in heating mode. It is also possible to create a heat recovery heat pump connected between the heating and cooling plant loops where this heat pump can serve low loads on one plant while supplementing the operation of the other plant. Traditional plant controls cannot meet this type of equipment configuration. One supervisory controller can be used to control one heating and one cooling plant.
 
 \subsection{PlantEquipmentOperation:ChillerHeaterChangeover}\label{plantequipmentoperationchillerheaterchangeover}
+
+This object is used as a special plant operation scheme intended for a specific type of plant with both heating and cooling plant loops served by heat pumps which can switch between heating and cooling.  EnergyPlus's usual plant operation schemes focus on one plant at a time, however the need to cleanly control heat pumps  switching between heating and cooling modes requires an operation scheme that considers both the heating and cooling plant loops at the same time.  This object is intended to allow controlling both heating and cooling heating plants served by heat pumps that can changeover between heating and cooling.  The main focus is air-source heat pumps serving seperate cooling and heating plant loops.  The scheme is also able to control operation of secondary heating and cooling loops.  The fullest application of this scheme include boiler backup and control of a special water to water heat pump situated to exchange heat between the return hot water and return chilled water on the secondary loops.  
+
+This operation scheme also acts like a setpoint manager.  It calculates and apply setpoints to the outlet nodes of managed equipment, heat exchangers used for primary/secondary connections, boilers, and supply loop outlet ndoes.  Traditional setpoint managers may be needed to get input past certain checks, but those are overwritten when using this supervisory plant controller.
+
+This plant operation scheme is unique in that the same instance of a PlantEquipmentOperation:ChillerHeaterChangeover is named in each of the plant loops being controlled.  So up to four plant loops will all use the same name of a PlantEquipmentOperation:ChillerHeaterChangeover at the scheme for that plant.  That is each of the plant's PlantEquipmentOperationSchemes will list the same name for the PlantEquipmentOperation:ChillerHeaterChangeover.  It is expected there are two or four plant loops using the same operation scheme.  Two plants, one heating and cooling, are used if there is only simple primary loop and no secondary loop.  Four plants are expected for the most capabilities with both the heating system and the coolign system having primary/secondary loop arrangement (with a fluid to fluid heat exchanger connecting them). 
+
+This supervisory plant controller polls the building to see how the current loads favor operating the plants in either a cooling-only, heating-only, or simultaneous cooling and heating mode.  The building loads include the predicted sensible loads to setpoint for the listed zones, the ventilation loads on any central air handlers connected to those zones, and the loads from any process loads on plant (from a LoadProfile:Plant object).  The controller determines which of the three modes the plant should be in based on the polled building loads. 
+
+Once the mode of operaton is determined, the controller dispatches the equipment based on the inputs for the operation schemen and equipment lists input for that mode using the current load on the primary plant side.  
+
+This controller includes special handing of boiler backup.  If a simple hot water boiler is present on the heating loops, it will be operated as a supplemental or auxilary heater to be used when the heat pumps cannot deliver.  For example when the outdoor air is below the Low Outdoor Air Temperature limit the air source heat pumps cannot operate and a boiler is used to meeting the setpoint. 
+
+This controller includes a special handling of a dedicated water to water heat pump used to recover heat between the return hot water and return chlled water.  The cooling side and the heating side of this heat pump are named in the object.  These are used to efficiently exchange heat between the return flows on the secondary hot and chilled water returns. 
 
 \subsubsection{Inputs}\label{inputs-plantequipmentoperationchillerheaterchangeover}
 
@@ -12,37 +26,45 @@ Plant operation can difficult to control when water-to-air or water-to-water hea
 
 This required alpha field contains the identifying name given to the Plant Equipment Operation ChillerHeaterChangeover object. This name is placed in the Plant Loop object to select this scheme.
 
-\paragraph{Field: Chilled Water Temperature Setpoint}\label{field-chilled-water-temp-setpoint-plantequipmentoperationchillerheaterchangeover}
+\paragraph{Field: Primary Cooling Plant Setpoint Temperature}\label{field-primary-chilled-water-temp-setpoint-plantequipmentoperationchillerheaterchangeover}
 
-This required numeric field specifies the cooling plant operating set point temperature.
+This required numeric field specifies the cooling plant operating setpoint temperature.  This is the primary chilled water plant loop.  The heat pumps in cooling mode will be operated to meet this setpoint. Degrees C.
 
-\paragraph{Field: Hot Water Temperature Setpoint}\label{field-hot-water-temp-setpoint-plantequipmentoperationchillerheaterchangeover}
+\paragraph{Field: Secondary Distribution Cooling Plant Setpoint Temperature}\label{field-secondary-chilled-water-temp-setpoint-plantequipmentoperationchillerheaterchangeover}
 
-This required numeric field specifies the heating plant operating set point temperature.
+This numeric field specifies the cooling plant operating setpoint for a secondary chilled water loop.  Degrees C. 
 
-\paragraph{Field: Hot Water Setpoint Reset Start Temperature}\label{field-hot-water-setpoint-reset-start-temp-plantequipmentoperationchillerheaterchangeover}
+\paragraph{Field: Primary Heating Plant Setpoint at Outdoor High Temperature}\label{field-primary-hot-water-temp-setpoint-High-OA-plantequipmentoperationchillerheaterchangeover}
 
-This required numeric field specifies the heating plant hot water set point temperature reset.
+This required numeric field specifies the heating plant operating set point temperature at the high outdoor air temperature. Degrees C.
 
-\paragraph{Field: Hot Water Setpoint Reset Maximum Temperature Difference}\label{field-hot-water-setpoint-reset-max-temp-diff-plantequipmentoperationchillerheaterchangeover}
+\paragraph{Field: Outdoor High Temperature}\label{field-hot-water-high-outdoor-air-temp-plantequipmentoperationchillerheaterchangeover}
 
-This required numeric field specifies the heating plant hot water maximum set point temperature difference.
+This required numeric field specifies the high outdoor air temperature used for outdoor air reset and heat pump control.  Degrees C.
 
-\paragraph{Field: Hot Water Setpoint Reset Ratio}\label{field-hot-water-setpoint-reset-ratio-plantequipmentoperationchillerheaterchangeover}
+\paragraph{Field: Primary Heating Plant Setpoint at Outdoor Low Temperature}\label{field-hot-water-setpoint-reset-max-temp-diff-plantequipmentoperationchillerheaterchangeover}
 
-This numeric field specifies the heating plant hot water set point temperature reset ratio.
+This required numeric field specifies the heating plant operating set point temperature at the low outdoor air temperature. Degress C.
+
+\paragraph{Field: Outdoor Low Temperature}\label{field-hot-water-setpoint-reset-ratio-plantequipmentoperationchillerheaterchangeover}
+
+This required numeric field specifies the low outdoor air temperature used for outdoor air reset and heat pump control.  This serves as the lower limit for when air source heat pumps can operate in heaing mode.  If the outdoor air is colder than this setting, the air source heat pumps cannot operate.  Degrees C.
+
+\paragraph{Field: Secondary Distribution Heating Plant Setpoint Temperature}\label{secondary-distribution-heating-plant-setpoint-temperature}
+
+This numeric field specifies the heating plant operating setpoint for a secondary hot water loop.  Degrees C.  If the primary heating loop setpoint has been set below this as for outdoor air reset, then the secondary distribution loop may be set to the lower of this value and the outdoor air reset value. 
 
 \paragraph{Field: Zone Load Polling ZoneList Name}\label{field-zone-load-polling-zonelist-name-plantequipmentoperationchillerheaterchangeover}
 
-This alpha field specifies the ZoneList name that identifies each zone served by the hot and cold water plants.
+This alpha field specifies the ZoneList name that identifies each zone served by the hot and cold water plants. These zones are used to poll the current state of the building loads and are used to decide how the heat pump loops should be operated. 
 
 \paragraph{Field: Cooling Only Load Plant Equipment Operation Cooling Load Name}\label{field-cool-only-load-equip-operation-name-plantequipmentoperationchillerheaterchangeover}
 
-This alpha field specifies the PlantEquipmentOperation:CoolingLoad name that identifies the plant equipment and load ranges to meet a plant cooling load.
+This alpha field specifies the PlantEquipmentOperation:CoolingLoad name that identifies the plant equipment and load ranges to meet a plant cooling load. This operation scheme is used when the supervisory control determines that the plants should be operated in a cool-only mode. 
 
 \paragraph{Field: Heating Only Load Plant Equipment Operation Heating Load Name}\label{field-heat-only-load-equip-operation-name-plantequipmentoperationchillerheaterchangeover}
 
-This alpha field specifies the PlantEquipmentOperation:HeatingLoad name that identifies the plant equipment and load ranges to meet a plant heating load.
+This alpha field specifies the PlantEquipmentOperation:HeatingLoad name that identifies the plant equipment and load ranges to meet a plant heating load. This operation scheme is used when the supervisory control determines that the plants should be operated in a heat-only mode. 
 
 \paragraph{Field: Simultaneous Cooling And Heating Plant Equipment Operation Cooling Load Name}\label{field-cool-only-load-equip-operation-name-plantequipmentoperationchillerheaterchangeover}
 
@@ -54,30 +76,37 @@ This alpha field specifies the PlantEquipmentOperation:HeatingLoad name that ide
 
 \paragraph{Field: Dedicated Chilled Water Return Recovery HeatPump Name}\label{field-dedicated-chilled-return-recovery-hp-name-plantequipmentoperationchillerheaterchangeover}
 
-This alpha field specifies the name of a water-to-water heat pump that connects to the chilled water plant. This equipment will meet low loads on the hot water plant while supplementing cooling plant operation. This equipment is off if any hot water plant heating equipment is operating.
+This alpha field specifies the name of a water-to-water heat pump (HeatPump:PlantLoop:EIR:Cooling) that connects its load side to the chilled water plant. This equipment will meet low loads on the chilled water plant while supplementing heating plant operation. It is expected the load side of this heat pump is located on the supply side of a secondary chilled water plant on the supply side inlet branch. The source side of this component is expected to be located on the demand side of a secondary hot water plant on the demand side outlet branch. This equipment may be switch off if chilled water plant loads are high depending on the load capacity factor set below.
 
 \paragraph{Field: Dedicated Hot Water Return Recovery HeatPump Name}\label{field-dedicated-hot-return-recovery-hp-name-plantequipmentoperationchillerheaterchangeover}
 
-This alpha field specifies the name of a water-to-water heat pump that connects to the hot water plant. This equipment will meet low loads on the chilled water plant while supplementing heating plant operation. This equipment is off if any chilled water plant cooling equipment is operating.
+This alpha field specifies the name of a water-to-water heat pump (HeatPump:PlantLoop:EIR:Heating) that connects its load side to the hot water plant. This equipment will meet low loads on the hot water plant while supplementing cooling plant operation. It is expected the load side of this heat pump is located on the supply side of a secondary hot water plant on the supply side inlet branch. The source side of this component is expected to be located on the demand side of a secondary chilled water plant on the demand side outlet branch. This equipment may be switch off if hot water plant loads are high depending on the load capacity factor set below.
+
+\paragraph{Field: Dedicated Recovery Heat Pump Control Load Capacity Factor}\label{field-dedicated-recovery-heat-pump-control-load-capacity-factor}
+
+This numeric field specifies the upper limit of what portion of the load the dedicated recovery heat pump is expected to attempt to meet.  Number between 0.0 and 1.0.  If the loads are higher than the loop design capacity multiplied by this factor, the dedicated recovery heat pump will not be run to attempt to meet the load.  One way of operating the dedicated recovery heat pump is to only run it during times of low load to avoid running the primary plant.  This factor will control what the threshold is for when to shut down the dedicated heat recovery machine and just run the primary equipment (typically air source heat pumps). 
 
 Examples of this object:
 
 \begin{lstlisting}
 
   PlantEquipmentOperation:ChillerHeaterChangeover,
-    Two AWHP Operation Scheme ,           !- Name
-    6.6 ,                                                !- Chilled Water Temperature Setpoint
-    40.0 ,                                               !- Hot Water Temperature Setpoint
-    5.0 ,                                                !- Hot Water Setpoint Reset Start Temperature
-    8.0 ,                                                !- Hot Water Setpoint Reset Maximum Temperature Difference
-    50.0 ,                                               !- Hot Water Setpoint Reset Ratio
+    Two AWHP Operation Scheme , !- Name
+    6.6 ,                                           !- Primary Cooling Plant Setpoint Temperature
+    10.0,                                           !- Secondary Distribution Cooling Plant Setpoint Temperature
+    59.8 ,                                          !- Primary Heating Plant Setpoint at Outdoor High Temperature
+    10.0,                                           !- Outdoor High Temperature
+    37.6 ,                                          !- Primary Heating Plant Setpoint at Outdoor Low Temperature
+    0.0 ,                                           !- Outdoor Low Temperature
+    45.0 ,                                          !- Secondary Distribution Heating Plant Setpoint Temperature
     All Conditioned Zones,                          !- Zone Load Polling ZoneList Name
-    Two AWHP Cooling Operation Scheme,    !- Cooling Only Load Plant Equipment Operation Cooling Load Name
-    Two AWHP Heating Operation Scheme,    !- Heating Only Load Plant Equipment Operation Heating Load Name
-    One AWHP Cooling Operation Scheme,     !- Simultaneous Cooling And Heating Plant Equipment Operation Cooling Load Name
-    One AWHP Heating Operation Scheme,     !- Simultaneous Cooling And Heating Plant Equipment Operation Heating Load Name
-    Dedicated HR Cooling Side WSHP,            !- Dedicated Chilled Water Return Recovery HeatPump Name
-    Dedicated HR Heating Side WSHP;           !- Dedicated Hot Water Return Recovery HeatPump Name
+    Two AWHP Cooling Operation Scheme,              !- Cooling Only Load Plant Equipment Operation Cooling Load Name
+    Two AWHP Heating Operation Scheme,              !- Heating Only Load Plant Equipment Operation Heating Load Name
+    One AWHP Cooling Operation Scheme,              !- Simultaneous Cooling And Heating Plant Equipment Operation Cooling Load Name
+    One AWHP Heating Operation Scheme,              !- Simultaneous Cooling And Heating Plant Equipment Operation Heating Load Name
+    Dedicated HR Cooling Side WSHP,                 !- Dedicated Chilled Water Return Recovery HeatPump Name
+    Dedicated HR Heating Side WSHP,                 !- Dedicated Hot Water Return Recovery HeatPump Name
+    0.5;                                            !-  Dedicated Recovery Heat Pump Control Load Capacity Factor
    
   ZoneList,
     All Conditioned Zones,         !- Name
