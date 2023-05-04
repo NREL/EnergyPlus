@@ -112,5 +112,9 @@ int main(int argc, const char *argv[])
     requestVariable(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
     requestVariable(state, "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
     energyplus(state, argc, argv);
+    if (handlesRetrieved == 0) {
+        fprintf(stderr, "We never got ANY handles\n");
+        return 1;
+    }
     return 0;
 }
