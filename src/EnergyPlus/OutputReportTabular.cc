@@ -7635,9 +7635,9 @@ void WriteBEPSTable(EnergyPlusData &state)
     Array2D<Real64> normalVal(14, 4);
     Array1D<Real64> collapsedTotal(14);
     Array2D<Real64> collapsedEndUse(14, static_cast<int>(Constant::EndUse::Num));
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
+    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 14);
     Array2D<Real64> endUseSubOther(14, static_cast<int>(Constant::EndUse::Num));
-    Array3D<Real64> collapsedEndUseSpType(state.dataOutputProcessor->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), 13);
+    Array3D<Real64> collapsedEndUseSpType(state.dataOutputProcessor->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), 14);
 
     // Jan 2021: Added temp storage
     Real64 gtPowerFuelFireGen = ort->gatherPowerFuelFireGen;
