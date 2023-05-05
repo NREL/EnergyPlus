@@ -15,6 +15,6 @@ if (${PROJECT_NAME}_BUILD_TESTING AND NOT TARGET gtest)
     # when building with Visual Studio
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     set(BUILD_GTEST ON CACHE BOOL "" FORCE)
-    #add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/btwxt/vendor/googletest")
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/btwxt/vendor/googletest)
 
 endif()

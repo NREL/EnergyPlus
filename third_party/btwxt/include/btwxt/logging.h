@@ -1,7 +1,8 @@
 /* Copyright (c) 2023 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
-#pragma once
+#ifndef BTWXT_LOGGING_H_
+#define BTWXT_LOGGING_H_
 
 #include <courierr/courierr.h>
 
@@ -34,3 +35,5 @@ namespace Btwxt {
         }
     };
 }
+
+#endif // define BTWXT_LOGGING_H_

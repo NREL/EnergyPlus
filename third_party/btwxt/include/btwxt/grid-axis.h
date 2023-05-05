@@ -1,7 +1,9 @@
 /* Copyright (c) 2018 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
-#pragma once
+//#pragma once
+#ifndef GRID_AXIS_H_
+#define GRID_AXIS_H_
 
 // Standard
 #include <algorithm>
@@ -105,3 +107,5 @@ std::vector<std::vector<T>> cartesian_product(const std::vector<std::vector<T>>&
 std::vector<double> linspace(double start, double stop, std::size_t number_of_points);
 
 } // namespace Btwxt
+
+#endif // define GRID_AXIS_H_
