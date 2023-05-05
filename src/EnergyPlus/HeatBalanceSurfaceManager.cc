@@ -1814,7 +1814,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::State,
                                     Surface(loop).Name);
                 SetupOutputVariable(state,
-                                    "Surrounding Surfaces Average Temperature",
+                                    "Surface Outside Face Surrounding Surfaces Average Temperature",
                                     OutputProcessor::Unit::C,
                                     Surface(loop).SrdSurfTemp,
                                     OutputProcessor::SOVTimeStepType::Zone,
