@@ -126,9 +126,9 @@ int apiDataFullyReady(EnergyPlusState state)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (thisState->dataPluginManager->fullyReady) {
-        return 0;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 int apiErrorFlag(EnergyPlusState state)
@@ -829,7 +829,7 @@ int getConstructionHandle(EnergyPlusState state, const char *constructionName)
             return handle;
         }
     }
-    return 0;
+    return -1; // return -1 if it wasn't found
 }
 
 int actualTime(EnergyPlusState)
