@@ -1368,13 +1368,11 @@ namespace SurfaceGeometry {
                                                 state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Sides,
                                                 state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).NewellSurfaceNormalVector);
                 DetermineAzimuthAndTilt(state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Vertex,
-                                        state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Sides,
                                         SurfWorldAz,
                                         SurfTilt,
                                         state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).lcsx,
                                         state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).lcsy,
                                         state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).lcsz,
-                                        state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).GrossArea,
                                         state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).NewellSurfaceNormalVector);
                 state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Azimuth = SurfWorldAz;
                 state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Tilt = SurfTilt;
@@ -4892,13 +4890,11 @@ namespace SurfaceGeometry {
                                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
                                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
         DetermineAzimuthAndTilt(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
                                 SurfAzimuth,
                                 SurfTilt,
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsx,
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsy,
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsz,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea,
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth = SurfAzimuth;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt = SurfTilt;
@@ -6413,13 +6409,11 @@ namespace SurfaceGeometry {
                                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
                                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
         DetermineAzimuthAndTilt(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
                                 SurfAzimuth,
                                 SurfTilt,
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsx,
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsy,
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsz,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea,
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth = SurfAzimuth;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt = SurfTilt;
@@ -9545,13 +9539,11 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea;
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NetAreaShadowCalc = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area;
             DetermineAzimuthAndTilt(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
                                     SurfWorldAz,
                                     SurfTilt,
                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsx,
                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsy,
                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsz,
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea,
                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
             dotp = dot(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector, TestVector);
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Roof && dotp < -0.000001) {
@@ -9716,13 +9708,11 @@ namespace SurfaceGeometry {
                                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
                                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
         DetermineAzimuthAndTilt(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
                                 SurfAzimuth,
                                 SurfTilt,
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsx,
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsy,
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsz,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea,
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
         if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Roof && SurfTilt > 80.0) {
             TiltString = format("{:.1R}", SurfTilt);
@@ -9831,13 +9821,11 @@ namespace SurfaceGeometry {
                                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
                                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
             DetermineAzimuthAndTilt(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
                                     SurfWorldAz,
                                     SurfTilt,
                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsx,
                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsy,
                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsz,
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea,
                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth = SurfWorldAz;
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt = SurfTilt;
