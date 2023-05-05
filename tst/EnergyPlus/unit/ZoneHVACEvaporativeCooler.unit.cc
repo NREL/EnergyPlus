@@ -531,10 +531,6 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
 }
 
 TEST_F(ZoneHVACEvapCoolerUnitTest, RHcontrol) {
-    int ActualZoneNum = 1;
-    int ZoneEquipIndex = 1;
-    Real64 SensOutputProvided(0.0);
-    Real64 LatOutputProvided(0.0);
 
     std::string const idf_objects = delimited_string({
                                                              " ZoneHVAC:EvaporativeCoolerUnit,",
@@ -556,8 +552,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, RHcontrol) {
                                                              "   ,",
                                                              "   ,",
                                                              "   ,",
-                                                             "   90,                           !- Shut Off Relative Humidity",
-                                                             "   30;                           !- Turn On Relative Humidity",
+                                                             "   90;                           !- Shut Off Relative Humidity",
 
                                                              " Fan:OnOff,",
                                                              "    ZoneEvapCool Supply Fan,     !- Name",
@@ -599,5 +594,4 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, RHcontrol) {
     auto &thisZoneEvapCooler(state->dataEvapCoolers->ZoneEvapUnit(UnitNum));
 
     EXPECT_EQ(thisZoneEvapCooler.ShutOffRelativeHumidity, 90);
-    EXPECT_EQ(thisZoneEvapCooler.TurnOnRelativeHumidity, 30);
 }

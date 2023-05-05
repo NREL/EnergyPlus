@@ -1360,7 +1360,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         }
 
     } else { // zone equipment
-             // can't do zone equip evap coolers yet
+        // can't do zone equip evap coolers yet
     }
     if (!HardSizeNoDesRun) {
         if (IsAutoSize) {
@@ -2930,7 +2930,8 @@ void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
             CapFlowSys = thisEvapCond.InletMassFlowRate * CpAirSys;
             QHXRate = CapFlowSys * (thisEvapCond.InletTemp - OutletTemp);
             SecOutletEnthalpy = thisEvapCond.SecInletEnthalpy + QHXRate / AirMassFlowSec;
-            SecOutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, EDBTSec, SecOutletEnthalpy); // assumes constant temperature moisture addition
+            SecOutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, EDBTSec,
+                                                            SecOutletEnthalpy); // assumes constant temperature moisture addition
             // we may need check based on maximum allowed humidity ratio
             thisEvapCond.SecOutletTemp = EDBTSec;
             thisEvapCond.SecOutletHumRat = SecOutletAirHumRat;
@@ -2991,7 +2992,8 @@ void CalcSecondaryAirOutletCondition(EnergyPlusData &state,
                 Psychrometrics::PsyTwbFnTdbWPb(state, thisEvapCond.SecOutletTemp, EHumRatSec, state.dataEnvrn->OutBaroPress);
         } else if ((OperatingMode == OperatingMode::WetModulated || OperatingMode == OperatingMode::WetFull)) {
             SecOutletEnthalpy = thisEvapCond.SecInletEnthalpy + QHXTotal / AirMassFlowSec;
-            SecOutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, EDBTSec, SecOutletEnthalpy); // assumes a constant temperature moisture addition
+            SecOutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, EDBTSec,
+                                                            SecOutletEnthalpy); // assumes a constant temperature moisture addition
             thisEvapCond.SecOutletTemp = EDBTSec;
             thisEvapCond.SecOutletHumRat = SecOutletAirHumRat;
             thisEvapCond.SecOutletEnthalpy = SecOutletEnthalpy;
@@ -3433,8 +3435,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             if (lAlphaBlanks(2)) {
                 thisZoneEvapUnit.AvailSchedIndex = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                thisZoneEvapUnit.AvailSchedIndex =
-                    ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
+                thisZoneEvapUnit.AvailSchedIndex = ScheduleManager::GetScheduleIndex(state,
+                                                                                     Alphas(2)); // convert schedule name to pointer (index number)
                 if (thisZoneEvapUnit.AvailSchedIndex == 0) {
                     ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
                     ShowContinueError(state, format("invalid-not found {}=\"{}\".", cAlphaFields(2), Alphas(2)));
@@ -3607,9 +3609,6 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             if (!lNumericBlanks(4)) {
                 // Shut Off Relative Humidity
                 thisZoneEvapUnit.ShutOffRelativeHumidity = Numbers(4);
-            }
-            if (!lNumericBlanks(5)) {
-                thisZoneEvapUnit.TurnOnRelativeHumidity = Numbers(5);
             }
 
             // Add fan to component sets array
@@ -4050,6 +4049,20 @@ void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
     {
         auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
+
+        Real64 relativeHumidity = 100.0 * Psychrometrics::PsyRhFnTdbWPb(state,
+                                                                        state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).Temp,
+                                                                        state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).HumRat,
+                                                                        state.dataEnvrn->OutBaroPress,
+                                                                        "CalcZoneEvaporativeCoolerUnit");
+        if (relativeHumidity > zoneEvapUnit.ShutOffRelativeHumidity) {
+            // unit is off when humidity is too high
+            PartLoadRatio = 0.0;
+            zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
+            CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
+            zoneEvapUnit.IsOnThisTimestep = false;
+            return;
+        }
 
         if (zoneEvapUnit.ControlSchemeType == ControlType::ZoneTemperatureDeadBandOnOffCycling) {
             ZoneTemp = state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).Temp;

@@ -27,15 +27,15 @@ Each evaporative cooler in this object can be a direct or indirect. This feature
 
 ## Approach
 
-To enable a relative humidity control, two fields will be added to the *ZoneHVAC:EvaporativeCoolerUnit* object. See Section IDD object change for details.
+To enable a high-relative-humidity-cutoff control, a field will be added to the *ZoneHVAC:EvaporativeCoolerUnit* object. See Section IDD object change for details.
 
 ## Testing/Validation/Data Source(s)
 
-This feature will be tested and demonstrated with a test file derived from 1ZoneEvapCooler.idf. Manual check of the time-step EnergyPlus simulation results will be conducted to confirm the added feature is working correctly. 
+This feature will be tested and demonstrated with a test file derived from StripMallZoneEvapCooler.idf. Manual check of the time-step EnergyPlus simulation results will be conducted to confirm the added feature is working correctly. 
 
 ## IDD Object changes
 
-Two fields (N4 and N5) will be added to the ZoneHVAC:EvaporativeCoolerUnit
+A field (N4) will be added to the ZoneHVAC:EvaporativeCoolerUnit
 
     ZoneHVAC:EvaporativeCoolerUnit,
         \memo Zone evaporative cooler. Forced-convection cooling-only unit with supply fan,
@@ -133,14 +133,8 @@ Two fields (N4 and N5) will be added to the ZoneHVAC:EvaporativeCoolerUnit
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
-    N4, \field Shut Off Relative Humidity
+    N4; \field Shut Off Relative Humidity
         \note Zone relative humidity above which the evap cooler is shut off.
-        \type real
-        \minimum 0.00
-        \maximum 100.00
-        \units percent
-    N5; \field Turn On Relative Humidity
-        \note Zone relative humidity below which the evap cooler is allowed to turn on.
         \type real
         \minimum 0.00
         \maximum 100.00
