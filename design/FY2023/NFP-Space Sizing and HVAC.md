@@ -4,6 +4,7 @@ Extend Spaces to Sizing and HVAC
 **Michael J. Witte, GARD Analytics, Inc.**
 
  - Original April 26, 2023
+ - Revised May 5, 2023 - and now for something somewhat different
 
 ## Table of Contents ##
 
@@ -48,7 +49,7 @@ This NFP proposes additional optional capabilities:
 
 ## E-mail and Conference Call Conclusions ##
 
-n/a
+Lots of useful comments and input from Rich R.
 
 ## Overview ##
 
@@ -75,12 +76,24 @@ When "Do Space Heat Balance for Sizing" is active, the following sizing changes 
 Inputs will be added to describe optional Space-level HVAC equipment, such as:
 
 1. Space air terminal units supplied by a single zone-level air distribution unit. e.g. A zone-level VAV damper supplying multiple space diffusers.
-2. Self-contained zone equipment, such as PTACs and fancoil units may be assigned to a Space. Maybe?
+2. Self-contained zone equipment, such as PTACs and fancoil units may be distribute to one or more Spaces.
 3. Thermostats will still control a Zone, but they may be placed in a specific Space and will control that Space's temperature.
 4. Finish adding Space Name options to various features such as ZoneThermalChimney (if budget allows, otherwise restrict these to single-space zones).
 
 
 ## Approach ##
+### Sizing
+* Refactor sizing so it can be at the Zone or Space level, with reporting for both.
+
+### HVAC
+* Leave exsiting ZoneHVAC inputs as-is with the addition of an optional field or two.
+* Add inputs to distribute Zone HVAC equipment supply air flows to one or more Spaces within a Zone.
+* Add inputs to distribute non-air Zone HVAC equipment output to one or more Spaces within a Zone.
+* Allow thermostat control to be placed in a specific Space or averaged across the Zone.
+* Keep return flows at the Zone level.
+
+![SpaceHVACSchematic](SpaceHVACSchematic.png)
+
 
 
 ## Testing/Validation/Data Sources ##
@@ -92,12 +105,23 @@ Some new objects and some changes to existing objects are proposed.
 
 ### ZoneControl:Thermostat:\*
 * *Change field "Zone or ZoneList Name" to "Zone or ZoneList or Space or SpaceList Name."*
-* When a thermostat is assigned to a zone, it will calculate the lumped loads to setpoint for all spaces in the zone.
-* When a thermostat is assigned to a space, it will calculate the loads to setpoint for that space.
+* When a thermostat is assigned to a Zone, it will calculate the lumped loads to setpoint for all spaces in the zone.
+* When a thermostat is assigned to a Space, it will calculate the loads to setpoint for that Space.
+
+### ZoneHVAC:EquipmentConnections
+* *Add a new ield to list ZoneHVAC:SpaceDistribution objects.*
+
+```
+ZoneHVAC:EquipmentConnections,
+
+  A9, \field Space Distribution List Name
+      \type object-list
+      \object-list SpaceDistributionLists
+```
 
 
 ### SpaceHVAC:EquipmentConnections
-* *New object to connect nodes to a Space, similar to ZoneHVAC:EquipmentConnections.*
+* *New object to connect nodes to a Space, same as ZoneHVAC:EquipmentConnections, but for Spaces.*
 
 ```
 SpaceHVAC:EquipmentConnections,
@@ -114,48 +138,198 @@ SpaceHVAC:EquipmentConnections,
        \type node
 ```
 
-### ZoneHVAC:SpaceSplitter
-* *New object, splits the air flow from a single piece of zone equipment to one or more Spaces.*
+### ZoneHVAC:SpaceDistributionList
+* *New object to list ZoneHVAC:SpaceDistribution objects for a Zone.*
 ```
-ZoneHVAC:SpaceSplitter,
+  A1 , \field Name
+       \ memo List of ZoneHVAC:SpaceDisribution objects for a given Zone.
+       \ memo There must be one space distribution object for each piece of equipment in the ZoneHVAC:EquipmentList (order does not matter).
        \extensible:2
-       \memo Split one air stream into N outlet streams. Node names
-       \memo Node names must be unique across all ZoneHVAC:SpaceSplitter objects.
-   A1, \field Name
        \required-field
-       \reference SpaceSplitters
-   A2, \field Inlet Node Name
-       \required-field
-       \type node
-   A3, \field Outlet 1 Node Name
+       \reference SpaceDistributionLists
+  A2 , \field Space Distribution 1 Object Type
        \begin-extensible
        \required-field
-       \type node
-   N1, \field Outlet 1 Flow Fraction
-       \units dimensionless
-       \type real
-       \minimum 0
-       \maximum 1.0
-       \autosizable
-       \default autosize
-   A4, \field Outlet 2 Node Name
+       \type choice
+       \key ZoneHVAC:SpaceDistribution:AirFlow
+       \key ZoneHVAC:SpaceDistribution:ANonirFlow
+  A3 , \field Space Distribution 1 Name
        \required-field
-       \type node
-   N2, \field Outlet 2 Flow Fraction
-       \units dimensionless
-       \type real
-       \minimum 0
-       \maximum 1.0
-       \autosizable
-       \default autosize
+       \type object-list
+       \object-list SpaceDistributionNames
+    
 ```
 
-### ZoneHVAC:AirDistributionUnit
-* *Add new field.*
-
-  A6 ; \field Space Splitter Name
+### ZoneHVAC:SpaceDistribution:AirFlow
+* *New object, splits the air flow from a single piece of zone equipment to one or more Spaces.*
+* *Would likely also add a ZoneHVAC:SpaceDistributionList that's referenced at the end of the ZoneHVAC:EquuipmentConnections object
+```
+ZoneHVAC:SpaceDistribution:AirFlow,
+       \extensible:3
+       \memo Distributes the airflow from a piece of zone equipment to one or more Spaces in the Zone.
+   A1, \field Name
+       \required-field
+       \reference SpaceDistributionNames
+   A2, \field Zone Equipment Object Type
+       \required-field
+       \type choice
+       \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+       \key ZoneHVAC:AirDistributionUnit
+       \key ZoneHVAC:EnergyRecoveryVentilator
+       \key ZoneHVAC:EvaporativeCoolerUnit
+       \key ZoneHVAC:HybridUnitaryHVAC
+       \key ZoneHVAC:ForcedAir:UserDefined
+       \key ZoneHVAC:FourPipeFanCoil
+       \key ZoneHVAC:OutdoorAirUnit
+       \key ZoneHVAC:PackagedTerminalAirConditioner
+       \key ZoneHVAC:PackagedTerminalHeatPump
+       \key ZoneHVAC:UnitHeater
+       \key ZoneHVAC:UnitVentilator
+       \key ZoneHVAC:VentilatedSlab
+       \key ZoneHVAC:WaterToAirHeatPump
+       \key ZoneHVAC:WindowAirConditioner
+       \key ZoneHVAC:Dehumidifier:DX
+       \key ZoneHVAC:IdealLoadsAirSystem
+       \key ZoneHVAC:RefrigerationChillerSet
+       \key Fan:ZoneExhaust
+       \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
+       \key HeatExchanger:AirToAir:FlatPlate
+       \key AirLoopHVAC:UnitarySystem
+   A3, \field Zone Equipment Name
+       \required-field
        \type object-list
-       \object-list SpaceSplitters
+       \object-list ZoneEquipmentNames
+   A4, \field Zone Equipment Outlet Node Name
+       \required-field
+       \type node
+   A5, \field Thermostat Control Method
+       \type choice
+       \key SingleSpace
+       \key SpaceAverage
+       \default SpaceAverage
+   A6, \field Thermostat Space Name
+       \note Used with SingleSpace thermostat control method
+       \type object-list
+       \object-list SpaceNames
+   A7, \field Space Sizing Basis
+       \type choice
+       \default DesignLoad
+       \key DesignLoad
+       \key FloorArea
+       \key Volume
+       \key PerimeterLength
+   A8, \field Space 1 Name
+       \begin-extensible
+       \required-field
+       \type object-list
+       \object-list SpaceNames
+   A9, \field Space 1 Supply Node Name
+       \note Matches a SpaceHVAC:EquipmentConnections Inlet Node Name
+       \required-field
+       \type node
+   N1, \field Space 1 Maximum Air Flow Rate
+       \default autosize
+       \units m3/s
+       \minimum 0.0
+       \autosizable
+  A10, \field Space 2 Name
+       \required-field
+       \type object-list
+       \object-list SpaceNames
+  A11, \field Space 2 Supply Node Name
+       \required-field
+       \type node
+   N2; \field Space 2 Maximum Air Flow Rate
+       \default autosize
+       \units m3/s
+       \minimum 0.0
+       \autosizable
+```
+
+### ZoneHVAC:SpaceDistribution:NonAirFlow
+* *New object, splits the output from a single piece of zone equipment to one or more Spaces.*
+* *Would likely also add a ZoneHVAC:SpaceDistributionList that's referenced at the end of the ZoneHVAC:EquuipmentConnections object
+```
+ZoneHVAC:SpaceDistribution:NonAirFlow,
+       \extensible:2
+       \memo Distributes the output from a piece of zone equipment to one or more Spaces in the Zone.
+   A1, \field Name
+       \required-field
+       \reference SpaceDistribution
+   A2, \field Zone Equipment Object Type
+       \required-field
+       \type choice
+       \key ZoneHVAC:Baseboard:RadiantConvective:Electric
+       \key ZoneHVAC:Baseboard:RadiantConvective:Water
+       \key ZoneHVAC:Baseboard:RadiantConvective:Steam
+       \key ZoneHVAC:CoolingPanel:RadiantConvective:Water
+       \key ZoneHVAC:Baseboard:Convective:Electric
+       \key ZoneHVAC:Baseboard:Convective:Water
+       \key ZoneHVAC:HighTemperatureRadiant
+       \key ZoneHVAC:LowTemperatureRadiant:VariableFlow
+       \key ZoneHVAC:LowTemperatureRadiant:ConstantFlow
+       \key ZoneHVAC:LowTemperatureRadiant:Electric
+   A3, \field Zone Equipment Name
+       \required-field
+       \type object-list
+       \object-list ZoneEquipmentNames
+   A5, \field Thermostat Control Method
+       \type choice
+       \key SingleSpace
+       \key SpaceAverage
+       \default SpaceAverage
+   A6, \field Thermostat Space Name
+       \note Used with SingleSpace thermostat control method
+       \type object-list
+       \object-list SpaceNames
+   A7, \field Space Sizing Basis
+       \type choice
+       \default DesignLoad
+       \key DesignLoad
+       \key FloorArea
+       \key Volume
+       \key PerimeterLength
+   A8, \field Space 1 Name
+       \begin-extensible
+       \required-field
+       \type object-list
+       \object-list SpaceNames
+   N1, \field Space 1 Output Fraction
+       \default autosize
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+       \autosizable
+   A9, \field Space 2 Name
+       \required-field
+       \type object-list
+       \object-list SpaceNames
+   N2, \field Space 2 Output Fraction
+       \default autosize
+       \units dimensionless
+       \minimum 0.0
+       \maximum 1.0
+       \autosizable
+```
+
+### SpaceHVAC:EquipmentConnections
+* *New object to connect nodes to a Space, same as ZoneHVAC:EquipmentConnections, but for Spaces.*
+
+```
+SpaceHVAC:EquipmentConnections,
+       \memo Specifies the HVAC equipment connections for a Space. Node names are specified for the
+       \memo Space air node and air inlet nodes.
+  A1 , \field Space Name
+       \required-field
+       \type object-list
+       \object-list SpaceNames
+  A2 , \field Space Air Node Name
+       \required-field
+       \type node
+  A3 ; \field Space Air Inlet Node or NodeList Name
+       \type node
+```
 
 ### ZoneRefrigerationDoorMixing
 (If budget allows, otherwise limit these to single-space zones.)
@@ -170,6 +344,81 @@ ZoneHVAC:SpaceSplitter,
 ### ZoneThermalChimney
 (If budget allows, otherwise limit these to single-space zones.)
 * *Change field "Zone N Name" to "Inlet Zone or Space Name N."*
+
+### idf Example
+```
+ZoneHVAC:EquipmentConnections,
+  Zone 1,                !- Zone Name
+  Zone 1 Eq,             !- Zone Conditioning Equipment List Name
+  Zone 1 In Node,        !- Zone Air Inlet Node or NodeList Name
+  ,                      !- Zone Air Exhaust Node or NodeList Name
+  Zone 1 Node,           !- Zone Air Node Name
+  Zone 1 Out Node;       !- Zone Return Air Node or NodeList Name
+  ,                      !- Zone Return Air Node 1 Flow Rate Fraction Schedule Name
+  ,                      !- Zone Return Air Node 1 Flow Rate Basis Node or NodeList Name
+  Zone 1 Space Distribution; !- Space Distribution List Name
+  
+ZoneHVAC:EquipmentList,
+  Zone 1 Eq,               !- Name
+  SequentialLoad,          !- Load Distribution Scheme
+  ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 1 Object Type
+  Zone 1 Baseboard,        !- Zone Equipment 1 Name
+  1,                       !- Zone Equipment 1 Cooling Sequence
+  1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+  ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+  ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+  ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+  Zone 1 ATU,              !- Zone Equipment 1 Name
+  2,                       !- Zone Equipment 1 Cooling Sequence
+  2,                       !- Zone Equipment 1 Heating or No-Load Sequence
+  ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+  ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+
+ZoneHVAC:SpaceDistributionList,
+  Zone 1 Space Distribution,  !- Name
+  ZoneHVAC:SpaceDistribution:AirFlow, !- Space Distribution 1 Object Type
+  Zone 1 VAV Splitter,   !- Space Distribution 1 Object Name
+  ZoneHVAC:SpaceDistribution:NonAirFlow, !- Space Distribution 1 Object Type
+  Zone 1 Baseboard Splitter; !- Space Distribution 2 Object Name
+    
+SpaceHVAC:EquipmentConnections,
+  Space 1A, !-Space Name
+  Space 1A Node, !-Space Air Node Name
+  Space 1A VAV Supply Node; !-Space Air Inlet Node or NodeList Name
+
+SpaceHVAC:EquipmentConnections,
+  Space 1B, !-Space Name
+  Space 1B Node, !-Space Air Node Name
+  Space 1B VAV Supply Node; !-Space Air Inlet Node or NodeList Name
+
+ZoneHVAC:SpaceDistribution:AirFlow,
+   Zone 1 VAV Splitter, !-Name
+   ZoneHVAC:AirDistributionUnit, !-Zone Equipment Object Type
+   Zone 1 VAV Box,      !-Zone Equipment Name
+   Zone 1 VAV Outlet Node, !-Zone Equipment Outlet Node Name
+   SingleSpace,         !-Thermostat Control Method
+   Space 1A,            !-Thermostat Space Name
+   DesignLoad,          !-Space Sizing Basis
+   Space 1A,            !-Space 1 Name
+   Space 1A VAV Supply Node, !-Space 1 Supply Node Name
+   autosize,            !-Space 2 Maximum Air Flow Rate {m3/s}
+   Space 1B,            !-Space 2 Name
+   Space 1B VAV Supply Node, !-Space 2 Supply Node Name
+   autosize;            !-Space 2 Maximum Air Flow Rate {m3/s}
+
+ZoneHVAC:SpaceDistribution:NonAirFlow,
+   Zone 1 Baseboard Splitter, !-Name
+   ZoneHVAC:Baseboard:Convective:Electric, !-Zone Equipment Object Type
+   Zone 1 Baseboard,    !-Zone Equipment Name
+   SpaceAverage,        !-Thermostat Control Method
+   Space 1A,            !-Thermostat Space Name
+   PerimeterLength,     !-Space Sizing Basis
+   Space 1A,            !-Space 1 Name
+   autosize,            !-Space 1 Output Fraction
+   Space 1B,            !-Space 2 Name
+   autosize;            !-Space 2 Output Fraction
+```
+
 
 ## Outputs Description ##
 Existing relevant Space Output Variables (from 5ZoneAirCooledWithSpaceHeatBalance.rdd)
