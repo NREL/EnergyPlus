@@ -197,10 +197,13 @@ class EnumScopeEvaluator:
             if len(e.usages) == 0:
                 apparent_enums_in_zero_source_files.append(e.describe())
             unique_files_in_usages: Set[str] = set()
-            for u in e.usages:
-                unique_files_in_usages.add(u.file_path.name)
-            if len(unique_files_in_usages) == 1:
-                apparent_enums_in_only_one_source_file.append(f"{e.describe()} in {next(iter(unique_files_in_usages))}")
+            # exceptions listed by <FILE>:<ENUM NAME>
+            exceptions = ["DataGlobalConstants.hh:eFuel", "DataGlobalConstants.hh:ePollutant"]
+            if f"{e.file_path.name}:{e.enum_name}" not in exceptions:
+                for u in e.usages:
+                    unique_files_in_usages.add(u.file_path.name)
+                if len(unique_files_in_usages) == 1:
+                    apparent_enums_in_only_one_source_file.append(f"{e.describe()} in {next(iter(unique_files_in_usages))}")
 
         if verbose:
             print("Reporting results")
