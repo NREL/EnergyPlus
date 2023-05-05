@@ -1813,6 +1813,13 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     Surface(loop).Name);
+                SetupOutputVariable(state,
+                                    "Surrounding Surfaces Average Temperature",
+                                    OutputProcessor::Unit::C,
+                                    Surface(loop).SrdSurfTemp,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
+                                    Surface(loop).Name);
             }
             SetupOutputVariable(state,
                                 "Surface Outside Face Thermal Radiation to Air Heat Transfer Rate",
