@@ -179,7 +179,6 @@ set(SRC
     DataEnvironment.hh
     DataErrorTracking.hh
     DataGenerators.hh
-    DataGlobalConstants.cc
     DataGlobalConstants.hh
     DataGlobals.hh
     DataHVACControllers.hh

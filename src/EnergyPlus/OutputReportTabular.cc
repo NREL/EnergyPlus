@@ -4385,7 +4385,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisDXCoil.EvapCondPumpElecConsumption + thisDXCoil.BasinHeaterConsumption +
                                                                  thisDXCoil.EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
             }
-            if (thisDXCoil.FuelTypeNum != Constant::ResourceType::Electricity) {
+            if (thisDXCoil.FuelType != Constant::eResource::Electricity) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisDXCoil.MSFuelWasteHeat * TimeStepSysSec;
             }
         } else if (thisDXCoil.DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
@@ -10991,15 +10991,15 @@ void WriteVeriSumTable(EnergyPlusData &state)
                     curArea += frameArea;
                 }
                 int const zonePt = thisSurf.Zone;
-                auto const &thisZone = state.dataHeatBal->Zone(zonePt);
 
-                bool const isConditioned = (zonePt > 0) && (thisZone.SystemZoneNodeNumber > 0);
+                bool const isConditioned = (zonePt > 0) && (state.dataHeatBal->Zone(zonePt).SystemZoneNodeNumber > 0);
                 if ((thisSurf.Tilt >= 60.0) && (thisSurf.Tilt <= 120.0)) {
                     // vertical walls and windows
                     switch (thisSurf.Class) {
                     case SurfaceClass::Wall:
                     case SurfaceClass::Floor:
                     case SurfaceClass::Roof: {
+                        auto const &thisZone = state.dataHeatBal->Zone(zonePt);
                         Real64 const mult = thisZone.Multiplier * thisZone.ListMultiplier;
                         if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
                             wallAreaN += curArea * mult;
@@ -11038,6 +11038,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
                     } break;
                     case SurfaceClass::Window:
                     case SurfaceClass::TDD_Dome: {
+                        auto const &thisZone = state.dataHeatBal->Zone(zonePt);
                         Real64 const mult = thisZone.Multiplier * thisZone.ListMultiplier * thisSurf.Multiplier;
                         if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
                             windowAreaN += curArea * mult;
@@ -11068,6 +11069,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
                     case SurfaceClass::Wall:
                     case SurfaceClass::Floor:
                     case SurfaceClass::Roof: {
+                        auto const &thisZone = state.dataHeatBal->Zone(zonePt);
                         Real64 const mult = thisZone.Multiplier * thisZone.ListMultiplier;
                         roofArea += curArea * mult;
                         if (DetailedWWR) {
@@ -11078,6 +11080,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
                     } break;
                     case SurfaceClass::Window:
                     case SurfaceClass::TDD_Dome: {
+                        auto const &thisZone = state.dataHeatBal->Zone(zonePt);
                         Real64 const mult = thisZone.Multiplier * thisZone.ListMultiplier * thisSurf.Multiplier;
                         skylightArea += curArea * mult;
                         if (DetailedWWR) {
