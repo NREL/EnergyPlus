@@ -3604,6 +3604,14 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                 }
             }
 
+            if (!lNumericBlanks(4)) {
+                // Shut Off Relative Humidity
+                thisZoneEvapUnit.ShutOffRelativeHumidity = Numbers(4);
+            }
+            if (!lNumericBlanks(5)) {
+                thisZoneEvapUnit.TurnOnRelativeHumidity = Numbers(5);
+            }
+
             // Add fan to component sets array
             BranchNodeConnections::SetUpCompSets(state,
                                                  CurrentModuleObject,

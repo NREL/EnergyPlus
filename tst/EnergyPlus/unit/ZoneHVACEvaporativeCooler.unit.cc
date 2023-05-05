@@ -529,3 +529,75 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     EvaporativeCoolers::CalcZoneEvapUnitOutput(*state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
 }
+
+TEST_F(ZoneHVACEvapCoolerUnitTest, RHcontrol) {
+    int ActualZoneNum = 1;
+    int ZoneEquipIndex = 1;
+    Real64 SensOutputProvided(0.0);
+    Real64 LatOutputProvided(0.0);
+
+    std::string const idf_objects = delimited_string({
+                                                             " ZoneHVAC:EvaporativeCoolerUnit,",
+                                                             "   ZoneEvapCooler Unit,          !- Name",
+                                                             "   ,                             !- Availability Schedule Name",
+                                                             "   ,                             !- Availability Manager List Name",
+                                                             "   ZoneEvapCool OA Inlet,        !- Outdoor Air Inlet Node Name",
+                                                             "   ZoneEvapCool Inlet Node,      !- Cooler Outlet Node Name",
+                                                             "   ZoneEvapCool Relief Node,     !- Zone Relief Air Node Name",
+                                                             "   Fan:OnOff,                    !- Supply Air Fan Object Type",
+                                                             "   ZoneEvapCool Supply Fan,      !- Supply Air Fan Name",
+                                                             "   1.0,                          !- Design Supply Air Flow Rate {m3/s}",
+                                                             "   BlowThrough,                  !- Fan Placement",
+                                                             "   ZoneTemperatureDeadbandOnOffCycling,  !- Cooler Unit Control Method",
+                                                             "   1.0,                          !- Throttling Range Temperature Difference {deltaC}",
+                                                             "   100.0,                        !- Cooling Load Control Threshold Heat Transfer Rate {W}",
+                                                             "   EvaporativeCooler:Direct:CelDekPad,  !- First Evaporative Cooler Object Type",
+                                                             "   Direct CelDekPad EvapCooler,  !- First Evaporative Cooler Object Name",
+                                                             "   ,",
+                                                             "   ,",
+                                                             "   ,",
+                                                             "   90,                           !- Shut Off Relative Humidity",
+                                                             "   30;                           !- Turn On Relative Humidity",
+
+                                                             " Fan:OnOff,",
+                                                             "    ZoneEvapCool Supply Fan,     !- Name",
+                                                             "    ,                            !- Availability Schedule Name",
+                                                             "    0.7,                         !- Fan Total Efficiency",
+                                                             "    300.0,                       !- Pressure Rise {Pa}",
+                                                             "    1.0,                         !- Maximum Flow Rate {m3/s}",
+                                                             "    0.9,                         !- Motor Efficiency",
+                                                             "    1.0,                         !- Motor In Airstream Fraction",
+                                                             "    ZoneEvapCool OA Inlet,       !- Air Inlet Node Name",
+                                                             "    ZoneEvapCool Fan outlet;     !- Air Outlet Node Name",
+
+                                                             " EvaporativeCooler:Direct:CelDekPad,",
+                                                             "    Direct CelDekPad EvapCooler, !- Name",
+                                                             "    ,                            !- Availability Schedule Name",
+                                                             "    0.6,                         !- Direct Pad Area {m2}",
+                                                             "    0.17,                        !- Direct Pad Depth {m}",
+                                                             "    55,                          !- Recirculating Water Pump Power Consumption {W}",
+                                                             "    ZoneEvapCool Fan outlet,     !- Air Inlet Node Name",
+                                                             "    ZoneEvapCool Inlet Node,     !- Air Outlet Node Name",
+                                                             "    ;                            !- Control Type",
+
+                                                     });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+
+    Fans::GetFanInput(*state);
+    ASSERT_FALSE(ErrorsFound);
+    EvaporativeCoolers::GetEvapInput(*state);
+    ASSERT_FALSE(ErrorsFound);
+    EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(*state);
+    ASSERT_FALSE(ErrorsFound);
+
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+
+    auto &thisZoneEvapCooler(state->dataEvapCoolers->ZoneEvapUnit(UnitNum));
+
+    EXPECT_EQ(thisZoneEvapCooler.ShutOffRelativeHumidity, 90);
+    EXPECT_EQ(thisZoneEvapCooler.TurnOnRelativeHumidity, 30);
+}
