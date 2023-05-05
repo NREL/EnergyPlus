@@ -308,23 +308,24 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                         {},
                         "System");
 
-    if (this->performance.compressorFuelType != Constant::ResourceType::Electricity) {
+    if (this->performance.compressorFuelType != Constant::eResource::Electricity) {
+        std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(this->performance.compressorFuelType)];
         SetupOutputVariable(state,
-                            "Cooling Coil " + this->performance.compressorFuelTypeForOutput + " Rate",
+                            format("Cooling Coil {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
                             this->performance.compressorFuelRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
-                            "Cooling Coil " + this->performance.compressorFuelTypeForOutput + " Energy",
+                            format("Cooling Coil {} Energy", sFuelType),
                             OutputProcessor::Unit::J,
                             this->performance.compressorFuelConsumption,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             {},
-                            this->performance.compressorFuelTypeForOutput,
+                            sFuelType,
                             "COOLING",
                             {},
                             "System");
