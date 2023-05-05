@@ -73,7 +73,7 @@ namespace DataPlant {
         if (this->oneTimeSetupComplete) return;
 
         SetupOutputVariable(state,
-                            "Supervisory Air Source Plant Operation Mode",
+                            "Supervisory Plant Heat Pump Operation Mode",
                             OutputProcessor::Unit::unknown,
                             this->Report.AirSourcePlant_OpMode,
                             OutputProcessor::SOVTimeStepType::System,
@@ -108,7 +108,7 @@ namespace DataPlant {
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
-                            "Supervisory Plant Dedicated Recovery Heat Pump Mode",
+                            "Supervisory Plant Heat Recovery Operation Mode",
                             OutputProcessor::Unit::unknown,
                             this->Report.DedicHR_OpMode,
                             OutputProcessor::SOVTimeStepType::System,

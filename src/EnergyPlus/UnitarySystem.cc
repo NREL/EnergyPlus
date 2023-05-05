@@ -474,7 +474,7 @@ namespace UnitarySystems {
             }
         }
 
-        if (this->m_MyFanFlag) { // should include " && !this->m_MySizingCheckFlag"
+        if (this->m_MyFanFlag && !this->m_MySizingCheckFlag) { // should include " && !this->m_MySizingCheckFlag"
             if (this->m_ActualFanVolFlowRate != DataSizing::AutoSize) {
                 if (this->m_ActualFanVolFlowRate > 0.0) {
                     this->m_HeatingFanSpeedRatio = this->m_MaxHeatAirVolFlow / this->m_ActualFanVolFlowRate;

@@ -2669,19 +2669,20 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                 if (this_op_scheme.Type == OpScheme::ChillerHeaterSupervisory) {
                     // do one time set up for custom chillerheater controls
                     bool found = false;
-                    if (int NumSchemes = state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes.size() > 0) {
-                        for (auto &s : state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes)
-                            if (s.Name == this_op_scheme.Name) {
-                                this_op_scheme.ChillerHeaterSupervisoryOperation = &s; // assign as pointer
-                                found = true;
-                            }
+                    for (auto &s : state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes) {
+                        if (s.Name == this_op_scheme.Name) {
+                            this_op_scheme.ChillerHeaterSupervisoryOperation = &s; // assign as pointer
+                            found = true;
+                            break;
+                        }
                     }
                     if (found) {
                         this_op_scheme.ChillerHeaterSupervisoryOperation->OneTimeInitChillerHeaterChangeoverOpScheme(state);
                     } else {
                         ShowSevereError(state,
-                                        "InitLoadDistribution: PlantLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
-                                            this_op_scheme.Name + "\", was not found, check input");
+                                        format("InitLoadDistribution: PlantLoop=\"{}\", Operation Scheme=\"{}\", was not found, check input",
+                                               this_plant_loop.Name,
+                                               this_op_scheme.Name));
                         ShowFatalError(state, "Program halted because ChillerHeaterSupervisory operation scheme not found.");
                     }
                 }
@@ -2716,7 +2717,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                             dummy_op_scheme_1.OpSchemePtr = OpNum;
                             dummy_op_scheme_1.EquipList(1).ListPtr = ListNum;
                             dummy_op_scheme_1.EquipList(1).CompPtr = EquipNum;
-                        } else if (dummy_loop_equip.NumOpSchemes > 0) { // already an op scheme
+                        } else { // already an op scheme
                             OldNumOpSchemes = dummy_loop_equip.NumOpSchemes;
 
                             // could be new list on existing scheme or new scheme with new list.  Check and see
