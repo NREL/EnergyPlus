@@ -3337,27 +3337,27 @@ namespace HVACMultiSpeedHeatPump {
                 CalcMSHeatPump(
                     state, MSHeatPumpNum, FirstHVACIteration, CompressorOp, 1, 0.0, 0.0, TempOutput0, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
 
-                for (int i = 1; i <= MSHeatPump.NumOfSpeedHeating; ++i) {
-                    if (i == 1) {
+                for (int k = 1; k <= MSHeatPump.NumOfSpeedHeating; ++k) {
+                    if (k == 1) {
                         CalcMSHeatPump(state,
                                        MSHeatPumpNum,
                                        FirstHVACIteration,
                                        CompressorOp,
-                                       i,
+                                       k,
                                        0.0,
                                        1.0,
-                                       MSHeatPump.FullOutput(i),
+                                       MSHeatPump.FullOutput(k),
                                        QZnReq,
                                        OnOffAirFlowRatio,
                                        SupHeaterLoad);
-                        if (QZnReq <= MSHeatPump.FullOutput(i)) {
-                            SpeedNum = i;
-                            PartLoadFrac = (QZnReq - TempOutput0) / (MSHeatPump.FullOutput(i) - TempOutput0);
+                        if (QZnReq <= MSHeatPump.FullOutput(k)) {
+                            SpeedNum = k;
+                            PartLoadFrac = (QZnReq - TempOutput0) / (MSHeatPump.FullOutput(k) - TempOutput0);
                             CalcMSHeatPump(state,
                                            MSHeatPumpNum,
                                            FirstHVACIteration,
                                            CompressorOp,
-                                           i,
+                                           k,
                                            0.0,
                                            PartLoadFrac,
                                            TempOutput,
@@ -3371,22 +3371,22 @@ namespace HVACMultiSpeedHeatPump {
                                        MSHeatPumpNum,
                                        FirstHVACIteration,
                                        CompressorOp,
-                                       i,
+                                       k,
                                        1.0,
                                        1.0,
-                                       MSHeatPump.FullOutput(i),
+                                       MSHeatPump.FullOutput(k),
                                        QZnReq,
                                        OnOffAirFlowRatio,
                                        SupHeaterLoad);
-                        if (QZnReq <= MSHeatPump.FullOutput(i)) {
-                            SpeedNum = i;
+                        if (QZnReq <= MSHeatPump.FullOutput(k)) {
+                            SpeedNum = k;
                             PartLoadFrac = 1.0;
-                            SpeedRatio = (QZnReq - MSHeatPump.FullOutput(i - 1)) / (MSHeatPump.FullOutput(i) - MSHeatPump.FullOutput(i - 1));
+                            SpeedRatio = (QZnReq - MSHeatPump.FullOutput(k - 1)) / (MSHeatPump.FullOutput(k) - MSHeatPump.FullOutput(k - 1));
                             CalcMSHeatPump(state,
                                            MSHeatPumpNum,
                                            FirstHVACIteration,
                                            CompressorOp,
-                                           i,
+                                           k,
                                            SpeedRatio,
                                            1.0,
                                            TempOutput,
