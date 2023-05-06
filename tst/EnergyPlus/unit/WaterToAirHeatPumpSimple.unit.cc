@@ -243,6 +243,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
         "   TotCoolCapCurve,         !- Total Cooling Capacity Curve Name",
         "   SensCoolCapCurve,        !- Sensible Cooling Capacity Curve Name",
         "   CoolPowCurve,            !- Cooling Power Consumption Curve Name",
+        "   PLFFPLR,                 !- Part Load Fraction Correlation Curve Name",
         "   0,                       !- Nominal Time for Condensate Removal to Begin {s}",
         "   0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 
@@ -260,7 +261,8 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
         "  ,                         !- Rated Entering Air Dry-Bulb Temperature",
         "  ,                         !- Ratio of Rated Heating Capacity to Rated Cooling Capacity",
         "  HeatCapCurve,             !- Heating Capacity Curve Name",
-        "  HeatPowCurve;             !- Heating Power Curve Name",
+        "  HeatPowCurve,             !- Heating Power Curve Name",
+        "  PLFFPLR;                  !- Part Load Fraction Correlation Curve Name",
 
         "Curve:QuintLinear,",
         "  SensCoolCapCurve,     ! Curve Name",
@@ -354,6 +356,8 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
         "  100,                  ! Maximum Value of z",
         "  0.,                   ! Minimum Curve Output",
         "  38.;                  ! Maximum Curve Output",
+
+        "Curve:Quadratic, PLFFPLR, 0.85, 0.83, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless; ",
 
     });
 
@@ -593,6 +597,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
         "   TotCoolCapCurve,         !- Total Cooling Capacity Curve Name",
         "   SensCoolCapCurve,        !- Sensible Cooling Capacity Curve Name",
         "   CoolPowCurve,            !- Cooling Power Consumption Curve Name",
+        "   PLFFPLR,                 !- Part Load Fraction Correlation Curve Name",
         "   0,                       !- Nominal Time for Condensate Removal to Begin {s}",
         "   0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 
@@ -610,7 +615,8 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
         "  ,                         !- Rated Entering Air Dry-Bulb Temperature",
         "  ,                         !- Ratio of Rated Heating Capacity to Rated Cooling Capacity",
         "  HeatCapCurve,             !- Heating Capacity Curve Name",
-        "  HeatPowCurve;             !- Heating Power Curve Name",
+        "  HeatPowCurve,             !- Heating Power Curve Name",
+        "  PLFFPLR;                  !- Part Load Fraction Correlation Curve Name",
 
         "Curve:QuintLinear,",
         "  SensCoolCapCurve,     ! Curve Name",
@@ -704,6 +710,8 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
         "  100,                  ! Maximum Value of z",
         "  0.,                   ! Minimum Curve Output",
         "  38.;                  ! Maximum Curve Output",
+
+        "Curve:Quadratic, PLFFPLR, 0.85, 0.83, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless; ",
 
     });
 

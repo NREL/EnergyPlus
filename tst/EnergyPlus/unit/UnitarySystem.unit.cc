@@ -9287,6 +9287,7 @@ Coil:Cooling:WaterToAirHeatPump:EquationFit,
   TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
   SensCoolCapCurve,        !- Sensible Cooling Capacity Curve Name
   CoolPowCurve,            !- Cooling Power Consumption Curve Name
+  PLFFPLR,                 !- Part Load Fraction Correlation Curve Name
   0,                       !- Nominal Time for Condensate Removal to Begin {s}
   0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
 
@@ -9304,7 +9305,8 @@ Coil:Heating:WaterToAirHeatPump:EquationFit,
   ,                         !- Rated Entering Air Dry-Bulb Temperature
   ,                         !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
   HeatCapCurve,             !- Heating Capacity Curve Name
-  HeatPowCurve;             !- Heating Power Consumption Curve Name
+  HeatPowCurve,             !- Heating Power Consumption Curve Name
+  PLFFPLR;                  !- Part Load Fraction Correlation Curve Name
 
 Coil:Heating:Fuel,
   Humidistat Reheat Coil 1, !- Name
@@ -9784,6 +9786,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump_SetPointControl)
       TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
       SensCoolCapCurve,        !- Sensible Cooling Capacity Curve Name
       CoolPowCurve,            !- Cooling Power Consumption Curve Name
+      PLFFPLR,                 !- Part Load Fraction Correlation Curve Name
       0,                       !- Nominal Time for Condensate Removal to Begin {s}
       0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
 
@@ -9801,7 +9804,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump_SetPointControl)
       ,                         !- Rated Entering Air Dry-Bulb Temperature
       ,                         !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
       HeatCapCurve,             !- Heating Capacity Curve Name
-      HeatPowCurve;             !- Heating Power Consumption Curve Name
+      HeatPowCurve,             !- Heating Power Consumption Curve Name
+      PLFFPLR;                  !- Part Load Fraction Correlation Curve Name
 
     Coil:Heating:Fuel,
       Humidistat Reheat Coil 1, !- Name
