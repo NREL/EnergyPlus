@@ -3868,8 +3868,6 @@ namespace HVACMultiSpeedHeatPump {
         int InletNode;             // MSHP air inlet node
         Real64 OutsideDryBulbTemp; // Outdoor dry bulb temperature [C]
         Real64 AirMassFlow;        // Air mass flow rate [kg/s]
-        int FanInletNode;          // MSHP air outlet node
-        int FanOutletNode;         // MSHP air inlet node
         Real64 SavePartloadRatio;
         Real64 SaveSpeedRatio;
         Real64 QCoilActual;  // coil load actually delivered returned to calling component
@@ -3899,8 +3897,6 @@ namespace HVACMultiSpeedHeatPump {
         } else {
             OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
         }
-        FanOutletNode = MSHeatPump(MSHeatPumpNum).FanOutletNode;
-        FanInletNode = MSHeatPump(MSHeatPumpNum).FanInletNode;
 
         state.dataHVACMultiSpdHP->SaveCompressorPLR = 0.0;
         SavePartloadRatio = 0.0;
@@ -4597,31 +4593,31 @@ namespace HVACMultiSpeedHeatPump {
 
         QCoilActual = 0.0;
 
-        auto &MSHeatPump = state.dataHVACMultiSpdHP->MSHeatPump;
+        auto &MSHeatPump = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum);
 
         if (present(PartLoadFrac)) {
-            HeatCoilType = MSHeatPump(MSHeatPumpNum).HeatCoilType;
-            state.dataHVACMultiSpdHP->HeatCoilName = MSHeatPump(MSHeatPumpNum).HeatCoilName;
-            HeatCoilNum = MSHeatPump(MSHeatPumpNum).HeatCoilNum;
-            MaxCoilFluidFlow = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow;
-            CoilControlNode = MSHeatPump(MSHeatPumpNum).CoilControlNode;
-            CoilOutletNode = MSHeatPump(MSHeatPumpNum).CoilOutletNode;
-            plantLoc = MSHeatPump(MSHeatPumpNum).plantLoc;
+            HeatCoilType = MSHeatPump.HeatCoilType;
+            state.dataHVACMultiSpdHP->HeatCoilName = MSHeatPump.HeatCoilName;
+            HeatCoilNum = MSHeatPump.HeatCoilNum;
+            MaxCoilFluidFlow = MSHeatPump.MaxCoilFluidFlow;
+            CoilControlNode = MSHeatPump.CoilControlNode;
+            CoilOutletNode = MSHeatPump.CoilOutletNode;
+            plantLoc = MSHeatPump.plantLoc;
         } else {
-            HeatCoilType = MSHeatPump(MSHeatPumpNum).SuppHeatCoilType;
-            state.dataHVACMultiSpdHP->HeatCoilName = MSHeatPump(MSHeatPumpNum).SuppHeatCoilName;
-            HeatCoilNum = MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum;
-            MaxCoilFluidFlow = MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow;
-            CoilControlNode = MSHeatPump(MSHeatPumpNum).SuppCoilControlNode;
-            CoilOutletNode = MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode;
-            plantLoc = MSHeatPump(MSHeatPumpNum).SuppPlantLoc;
+            HeatCoilType = MSHeatPump.SuppHeatCoilType;
+            state.dataHVACMultiSpdHP->HeatCoilName = MSHeatPump.SuppHeatCoilName;
+            HeatCoilNum = MSHeatPump.SuppHeatCoilNum;
+            MaxCoilFluidFlow = MSHeatPump.MaxSuppCoilFluidFlow;
+            CoilControlNode = MSHeatPump.SuppCoilControlNode;
+            CoilOutletNode = MSHeatPump.SuppCoilOutletNode;
+            plantLoc = MSHeatPump.SuppPlantLoc;
         }
 
-        MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc = plantLoc;
-        MSHeatPump(MSHeatPumpNum).HotWaterCoilControlNode = CoilControlNode;
-        MSHeatPump(MSHeatPumpNum).HotWaterCoilOutletNode = CoilOutletNode;
-        MSHeatPump(MSHeatPumpNum).HotWaterCoilName = state.dataHVACMultiSpdHP->HeatCoilName;
-        MSHeatPump(MSHeatPumpNum).HotWaterCoilNum = HeatCoilNum;
+        MSHeatPump.HotWaterPlantLoc = plantLoc;
+        MSHeatPump.HotWaterCoilControlNode = CoilControlNode;
+        MSHeatPump.HotWaterCoilOutletNode = CoilOutletNode;
+        MSHeatPump.HotWaterCoilName = state.dataHVACMultiSpdHP->HeatCoilName;
+        MSHeatPump.HotWaterCoilNum = HeatCoilNum;
 
         if (HeatingLoad > SmallLoad) {
 
@@ -4664,11 +4660,11 @@ namespace HVACMultiSpeedHeatPump {
                         };
                         SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, f, MinWaterFlow, MaxHotWaterFlow);
                         if (SolFlag == -1) {
-                            if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex == 0) {
+                            if (MSHeatPump.HotWaterCoilMaxIterIndex == 0) {
                                 ShowWarningMessage(state,
                                                    format("CalcNonDXHeatingCoils: Hot water coil control failed for {}=\"{}\"",
                                                           CurrentModuleObject,
-                                                          MSHeatPump(MSHeatPumpNum).Name));
+                                                          MSHeatPump.Name));
                                 ShowContinueErrorTimeStamp(state, "");
                                 ShowContinueError(state,
                                                   format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
@@ -4678,14 +4674,14 @@ namespace HVACMultiSpeedHeatPump {
                                 format("CalcNonDXHeatingCoils: Hot water coil control failed (iteration limit [{}]) for {}=\"{}",
                                        SolveMaxIter,
                                        CurrentModuleObject,
-                                       MSHeatPump(MSHeatPumpNum).Name),
-                                MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex);
+                                       MSHeatPump.Name),
+                                MSHeatPump.HotWaterCoilMaxIterIndex);
                         } else if (SolFlag == -2) {
-                            if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2 == 0) {
+                            if (MSHeatPump.HotWaterCoilMaxIterIndex2 == 0) {
                                 ShowWarningMessage(state,
                                                    format("CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for {}=\"{}\"",
                                                           CurrentModuleObject,
-                                                          MSHeatPump(MSHeatPumpNum).Name));
+                                                          MSHeatPump.Name));
                                 ShowContinueErrorTimeStamp(state, "");
                                 ShowContinueError(state, "...Bad hot water maximum flow rate limits");
                                 ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
@@ -4693,8 +4689,8 @@ namespace HVACMultiSpeedHeatPump {
                             }
                             ShowRecurringWarningErrorAtEnd(state,
                                                            "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
-                                                               std::string{CurrentModuleObject} + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"",
-                                                           MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2,
+                                                               std::string{CurrentModuleObject} + "=\"" + MSHeatPump.Name + "\"",
+                                                           MSHeatPump.HotWaterCoilMaxIterIndex2,
                                                            MaxHotWaterFlow,
                                                            MinWaterFlow,
                                                            _,
@@ -4709,10 +4705,10 @@ namespace HVACMultiSpeedHeatPump {
             } break;
             case Coil_HeatingSteam: {
                 if (present(PartLoadFrac)) {
-                    mdot = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow * PartLoadFrac;
+                    mdot = MSHeatPump.MaxCoilFluidFlow * PartLoadFrac;
                     SteamCoilHeatingLoad = HeatingLoad * PartLoadFrac;
                 } else {
-                    mdot = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow;
+                    mdot = MSHeatPump.MaxCoilFluidFlow;
                     SteamCoilHeatingLoad = HeatingLoad;
                 }
                 SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
