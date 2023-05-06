@@ -1993,7 +1993,6 @@ namespace HVACMultiSpeedHeatPump {
         Real64 SteamDensity(0.0);       // density of steam at 100C, used for steam heating coils
         Real64 CoilMaxVolFlowRate(0.0); // coil fluid maximum volume flow rate
         Real64 QActual(0.0);            // coil actual capacity
-        int CoilAvailSchPtr(0);         // DX coil availability schedule pointer
 
         auto &MSHeatPump = state.dataHVACMultiSpdHP->MSHeatPump;
 
@@ -2167,10 +2166,10 @@ namespace HVACMultiSpeedHeatPump {
         if (allocated(state.dataZoneEquip->ZoneEquipConfig) && MSHeatPump(MSHeatPumpNum).MyCheckFlag) {
             int zoneNum = MSHeatPump(MSHeatPumpNum).ControlZoneNum;
             int zoneInlet = MSHeatPump(MSHeatPumpNum).ZoneInletNode;
-            int coolingPriority = 0;
-            int heatingPriority = 0;
             // setup furnace zone equipment sequence information based on finding matching air terminal
             if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
+                int coolingPriority = 0;
+                int heatingPriority = 0;
                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex)
                     .getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
                 MSHeatPump(MSHeatPumpNum).ZoneSequenceCoolingNum = coolingPriority;
@@ -2623,6 +2622,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // Check availability of DX coils
         if (GetCurrentScheduleValue(state, MSHeatPump(MSHeatPumpNum).AvaiSchedPtr) > 0.0) {
+            int CoilAvailSchPtr; // DX coil availability schedule pointer
             if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::CoolingMode) {
                 CoilAvailSchPtr = GetDXCoilAvailSchPtr( // TODO: Why isn't this stored on the struct?
                     state,
