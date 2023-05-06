@@ -3039,31 +3039,31 @@ namespace HVACMultiSpeedHeatPump {
         OnOffAirFlowRatio = 0.0;
         SupHeaterLoad = 0.0;
 
-        auto &MSHeatPump = state.dataHVACMultiSpdHP->MSHeatPump;
+        auto &MSHeatPump = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum);
 
         // Get EMS output
         SpeedNum = ceil(SpeedVal);
         bool useMaxedSpeed = false;
         std::string useMaxedSpeedCoilName;
-        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::HeatingMode) {
-            if (SpeedNum > MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating) {
-                SpeedNum = MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating;
+        if (MSHeatPump.HeatCoolMode == ModeOfOperation::HeatingMode) {
+            if (SpeedNum > MSHeatPump.NumOfSpeedHeating) {
+                SpeedNum = MSHeatPump.NumOfSpeedHeating;
                 useMaxedSpeed = true;
-                useMaxedSpeedCoilName = MSHeatPump(MSHeatPumpNum).DXHeatCoilName;
+                useMaxedSpeedCoilName = MSHeatPump.DXHeatCoilName;
             }
-        } else if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::CoolingMode) {
-            if (SpeedNum > MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling) {
-                SpeedNum = MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling;
+        } else if (MSHeatPump.HeatCoolMode == ModeOfOperation::CoolingMode) {
+            if (SpeedNum > MSHeatPump.NumOfSpeedCooling) {
+                SpeedNum = MSHeatPump.NumOfSpeedCooling;
                 useMaxedSpeed = true;
-                useMaxedSpeedCoilName = MSHeatPump(MSHeatPumpNum).DXCoolCoilName;
+                useMaxedSpeedCoilName = MSHeatPump.DXCoolCoilName;
             }
         }
         if (useMaxedSpeed) {
-            MSHeatPump(MSHeatPumpNum).CoilSpeedErrIndex++;
+            MSHeatPump.CoilSpeedErrIndex++;
             ShowRecurringWarningErrorAtEnd(state,
                                            "Wrong coil speed EMS override value, for unit=\"" + useMaxedSpeedCoilName +
                                                "\". Exceeding maximum coil speed level. Speed level is set to the maximum coil speed level allowed.",
-                                           MSHeatPump(MSHeatPumpNum).CoilSpeedErrIndex,
+                                           MSHeatPump.CoilSpeedErrIndex,
                                            SpeedVal,
                                            SpeedVal,
                                            _,
@@ -3146,11 +3146,11 @@ namespace HVACMultiSpeedHeatPump {
         // if the DX heating coil cannot meet the load, trim with supplemental heater
         // occurs with constant fan mode when compressor is on or off
         // occurs with cycling fan mode when compressor PLR is equal to 1
-        auto &MSHeatPump = state.dataHVACMultiSpdHP->MSHeatPump;
+        auto &MSHeatPump = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum);
 
         if ((QZnReq > SmallLoad && QZnReq > EMSOutput)) {
             Real64 TempOutput;
-            if (state.dataEnvrn->OutDryBulbTemp <= MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp) {
+            if (state.dataEnvrn->OutDryBulbTemp <= MSHeatPump.SuppMaxAirTemp) {
                 SupHeaterLoad = QZnReq - EMSOutput;
             } else {
                 SupHeaterLoad = 0.0;
@@ -3169,7 +3169,7 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         // check the outlet of the supplemental heater to be lower than the maximum supplemental heater supply air temperature
-        if (state.dataLoopNodes->Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).Temp > MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp &&
+        if (state.dataLoopNodes->Node(MSHeatPump.AirOutletNodeNum).Temp > MSHeatPump.SuppMaxAirTemp &&
             SupHeaterLoad > 0.0) {
 
             //   If the supply air temperature is to high, turn off the supplemental heater to recalculate the outlet temperature
@@ -3181,11 +3181,11 @@ namespace HVACMultiSpeedHeatPump {
             //   the supplemental heater, otherwise leave the supplemental heater off. If the supplemental heater is to be turned on,
             //   use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
             //   of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
-            if (state.dataLoopNodes->Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).Temp < MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp) {
-                Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).HumRat);
+            if (state.dataLoopNodes->Node(MSHeatPump.AirOutletNodeNum).Temp < MSHeatPump.SuppMaxAirTemp) {
+                Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(MSHeatPump.AirOutletNodeNum).HumRat);
                 SupHeaterLoad =
-                    state.dataLoopNodes->Node(MSHeatPump(MSHeatPumpNum).AirInletNodeNum).MassFlowRate * CpAir *
-                    (MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp - state.dataLoopNodes->Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).Temp);
+                    state.dataLoopNodes->Node(MSHeatPump.AirInletNodeNum).MassFlowRate * CpAir *
+                    (MSHeatPump.SuppMaxAirTemp - state.dataLoopNodes->Node(MSHeatPump.AirOutletNodeNum).Temp);
 
             } else {
                 SupHeaterLoad = 0.0;
