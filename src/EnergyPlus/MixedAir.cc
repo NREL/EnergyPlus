@@ -488,7 +488,7 @@ void SimOAComponent(EnergyPlusData &state,
             CompIndex = HVACFan::getFanObjectVectorIndex(state, CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
         }
         if (Sim) {
-            state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
+            state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _); // vector is 0 based, but CompIndex is 1 based so shift
         }
         break;
     }
