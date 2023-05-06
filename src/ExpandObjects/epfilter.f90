@@ -1343,22 +1343,21 @@ INTEGER,PARAMETER :: wahpSuppHeatAvailSchedNameOff = 25
 INTEGER,PARAMETER :: wahpSuppHeatCoilCapOff = 26
 INTEGER,PARAMETER :: wahpMaxCycRateOff = 27
 INTEGER,PARAMETER :: wahpTimeConstOff = 28
-INTEGER,PARAMETER :: wahpFractOnPowerOff = 29
-INTEGER,PARAMETER :: wahpFanDelayOff = 30
-INTEGER,PARAMETER :: wahpDedOutAirSysNameOff = 31
-INTEGER,PARAMETER :: wahpSuppHeatCoilKindOff = 32
-INTEGER,PARAMETER :: wahpCoolDesignTempMethodOff = 33
-INTEGER,PARAMETER :: wahpCoolDesignTempOff = 34
-INTEGER,PARAMETER :: wahpCoolDesignTempDiffOff = 35
-INTEGER,PARAMETER :: wahpHeatDesignTempMethodOff = 36
-INTEGER,PARAMETER :: wahpHeatDesignTempOff = 37
-INTEGER,PARAMETER :: wahpHeatDesignTempDiffOff = 38
-INTEGER,PARAMETER :: wahpHPCoilWaterFlowMode = 39
-INTEGER,PARAMETER :: wahpDesSpecOANameOff = 40
-INTEGER,PARAMETER :: wahpDesSpecOADistNameOff = 41
-INTEGER,PARAMETER :: wahpBaseboardTypeOff = 42
-INTEGER,PARAMETER :: wahpBaseboardAvailSchedNameOff = 43
-INTEGER,PARAMETER :: wahpBaseboardCapOff = 44
+INTEGER,PARAMETER :: wahpFanDelayOff = 29
+INTEGER,PARAMETER :: wahpDedOutAirSysNameOff = 30
+INTEGER,PARAMETER :: wahpSuppHeatCoilKindOff = 31
+INTEGER,PARAMETER :: wahpCoolDesignTempMethodOff = 32
+INTEGER,PARAMETER :: wahpCoolDesignTempOff = 33
+INTEGER,PARAMETER :: wahpCoolDesignTempDiffOff = 34
+INTEGER,PARAMETER :: wahpHeatDesignTempMethodOff = 35
+INTEGER,PARAMETER :: wahpHeatDesignTempOff = 36
+INTEGER,PARAMETER :: wahpHeatDesignTempDiffOff = 37
+INTEGER,PARAMETER :: wahpHPCoilWaterFlowMode = 38
+INTEGER,PARAMETER :: wahpDesSpecOANameOff = 39
+INTEGER,PARAMETER :: wahpDesSpecOADistNameOff = 40
+INTEGER,PARAMETER :: wahpBaseboardTypeOff = 41
+INTEGER,PARAMETER :: wahpBaseboardAvailSchedNameOff = 42
+INTEGER,PARAMETER :: wahpBaseboardCapOff = 43
 
 INTEGER,PARAMETER :: mwpNameOff = 1
 INTEGER,PARAMETER :: mwpPumpSchedNameOff = 2
@@ -7476,7 +7475,6 @@ DO iZone= 1, prelimCount
     CALL SetIfBlank(fldValStart + wahpSuppHeatCoilCapOff, 'autosize')
     CALL SetIfBlank(fldValStart + wahpMaxCycRateOff, '2.5')
     CALL SetIfBlank(fldValStart + wahpTimeConstOff, '60')
-    CALL SetIfBlank(fldValStart + wahpFractOnPowerOff, '0.01')
     CALL SetIfBlank(fldValStart + wahpFanDelayOff, '60')
     CALL SetIfBlank(fldValStart + wahpSuppHeatCoilKindOff, 'Electric')
     CALL SetIfBlank(fldValStart + wahpCoolDesignTempMethodOff, 'SupplyAirTemperature')
@@ -9313,7 +9311,7 @@ DO iZone = 1, numCompactZoneFPVAV
     END IF
     CALL AddToObjFld('Inlet Node Name', base + fpvzNameOff,' Zone Return Plenum Inlet',.TRUE.)
   END IF
-  !ZONE EQUIPMENT LIST ~ line 61 of FPVAV tab 
+  !ZONE EQUIPMENT LIST ~ line 61 of FPVAV tab
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base + fpvzNameOff,' Equipment')
   CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
@@ -12459,7 +12457,7 @@ DO iSys = 1, numCompactSysPVAV
         CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 1')
         CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', &
                          'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsDehumSetPtOff)),.TRUE.)
-  
+
         CALL AddAlwaysSchedule('1')
         CALL AddAlwaysSchedule(FldVal(base + pvavsDehumSetPtOff))
       ENDIF
@@ -12472,7 +12470,7 @@ DO iSys = 1, numCompactSysPVAV
         CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name', &
                          'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsHumidSetPtOff)))
         CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 100',.TRUE.)
-  
+
         CALL AddAlwaysSchedule(FldVal(base + pvavsHumidSetPtOff))
         CALL AddAlwaysSchedule('100')
       ENDIF
@@ -16100,10 +16098,6 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL AddToObjStr('Maximum Supply Air Temperature {C}', 'Autosize')
   CALL AddToObjFld('Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}', base + ussSuppReHeatMaxODBOff,'')
   CALL AddToObjStr('Outdoor Dry-Bulb Temperature Sensor Node Name', '')
-  CALL AddToObjStr('Maximum Cycling Rate', '')
-  CALL AddToObjStr('Heat Pump Time Constant', '')
-  CALL AddToObjStr('Fraction of On-Cycle Power Use', '')
-  CALL AddToObjStr('Heat Pump Fan Delay Time', '')
   CALL AddToObjStr('Ancilliary On-Cycle Electric Power', '')
   CALL AddToObjStr('Ancilliary Off-Cycle Electric Power', '')
   CALL AddToObjStr('Design Heat Recovery Water Flow Rate', '')
@@ -17088,8 +17082,12 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjFld('Total Cooling Capacity Curve Name',base + ussAirHandlerNameOff,' WAHP ClgTotCapCurve')
       CALL AddToObjFld('Sensible Cooling Capacity Curve Name',base + ussAirHandlerNameOff,' WAHP ClgSensCapCurve')
       CALL AddToObjFld('Cooling Power Consumption Curve Name',base + ussAirHandlerNameOff,' WAHP ClgPowCurve')
+      CALL AddToObjFld('Part Load Fraction Correlation Curve Name',base + ussAirHandlerNameOff,' WAHP ClgPLFCurve')
       CALL AddToObjStr('Nominal Time for Condensate Removal to Begin {s}','0')
-      CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}','0',.TRUE.)
+      CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}','0')
+      CALL AddToObjStr('Maximum Cycling Rate {cycles/hr}','')
+      CALL AddToObjStr('Latent Capacity Time Constant {s}','')
+      CALL AddToObjStr('Fan Delay Time {s}','',.TRUE.)
       CALL CreateNewObj('Curve:QuadLinear')
       CALL WriteComment('Total Cooling Capacity Function Curve for water-to-air heat pump')
       CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' WAHP ClgTotCapCurve')
@@ -17141,7 +17139,14 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Maximum Value of y','100.0')
       CALL AddToObjStr('Minimum Value of z','-100.0')
       CALL AddToObjStr('Maximum Value of z','100.0',.TRUE.)
-      !***Branch
+      CALL WriteComment('Part Load Fraction Curve for water-to-air heat pump')
+      CALL CreateNewObj('Curve:Quadratic')
+      CALL AddToObjFld('Name', base + doasNameOff,' WAHP ClgPLFCurve')
+      CALL AddToObjStr('Coefficient1 Constant','0.85')
+      CALL AddToObjStr('Coefficient2 x','0.15')
+      CALL AddToObjStr('Coefficient3 x**2','0.0')
+      CALL AddToObjStr('Minimum Value of x','0.0')
+      CALL AddToObjStr('Maximum Value of x','1.0',.TRUE.)      !***Branch
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Cooling Condenser Branch')
       CALL AddToStrList(TRIM(FldVal(base + ussAirHandlerNameOff)) // ' Cooling Condenser Branch',handleMixedDemanBranch)
@@ -17592,7 +17597,8 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Rated Entering Air Dry-Bulb Temperature', '20.0')
     CALL AddToObjStr('Ratio of Rated Heating Capacity to Rated Cooling Capacity', '1.0')
     CALL AddToObjFld('Heating Capacity Curve Name',base + ussAirHandlerNameOff,' WAHP HtgCapCurve')
-    CALL AddToObjFld('Heating Power Consumption Curve Name',base + ussAirHandlerNameOff,' WAHP HtgPowCurve',.TRUE.)
+    CALL AddToObjFld('Heating Power Consumption Curve Name',base + wahpNameOff,' WAHP HtgPowCurve')
+    CALL AddToObjFld('Part Load Fraction Correlation Curve Name',base + wahpNameOff,' WAHP HtgPLFCurve',.TRUE.)
     CALL CreateNewObj('Curve:QuadLinear')
     CALL WriteComment('Heating Capacity Function Curve for water-to-air heat pump')
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' WAHP HtgCapCurve')
@@ -17625,6 +17631,14 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Maximum Value of y','100.0')
     CALL AddToObjStr('Minimum Value of z','-100.0')
     CALL AddToObjStr('Maximum Value of z','100.0',.TRUE.)
+    CALL WriteComment('Part Load Fraction Curve for water-to-air heat pump')
+    CALL CreateNewObj('Curve:Quadratic')
+    CALL AddToObjFld('Name', base + doasNameOff,' WAHP HtgPLFCurve')
+    CALL AddToObjStr('Coefficient1 Constant','0.85')
+    CALL AddToObjStr('Coefficient2 x','0.15')
+    CALL AddToObjStr('Coefficient3 x**2','0.0')
+    CALL AddToObjStr('Minimum Value of x','0.0')
+    CALL AddToObjStr('Maximum Value of x','1.0',.TRUE.)
     !***Branch
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Heating Condenser Branch')
@@ -23863,7 +23877,7 @@ IF (.NOT. isBaseboardNone) THEN
   CALL AddToObjFld('Air Inlet Node Name', base + fczNameOff,' Mixed Air Outlet')
   CALL AddToObjFld('Air Outlet Node Name', base + fczNameOff,' Supply Fan Outlet')
   CALL AddToObjStr('Design Maximum Air Flow Rate {m3/s}','autosize')
-  IF ((capacityControlKind == capctrlVarFanConstFlow) .or. & 
+  IF ((capacityControlKind == capctrlVarFanConstFlow) .or. &
         (capacityControlKind == capctrlVarFanVarFlow) .or. &
         (capacityControlKind == capctrlASHRAE90VarFan)) THEN
     CALL AddToObjStr('Speed Control Method', 'Continuous')
@@ -24081,7 +24095,7 @@ IF (.NOT. isBaseboardNone) THEN
     CALL AddToObjFld('Air Outlet Node Name', base + fczNameOff,' Supply Inlet')
     CALL AddToObjStr('Coil Temp Setpoint Node','',.TRUE.)
   END IF
-  
+
   !Baseboards
   SELECT CASE (baseboardKind)
     CASE (HotWater)
@@ -30004,10 +30018,6 @@ DO iZone = 1, numCompactWaterAirHP
   CALL AddToObjFld('Heating Coil Name', base + wahpNameOff,' WAHP Heating Coil')
   CALL AddToObjStr('Cooling Coil Object Type','Coil:Cooling:WaterToAirHeatPump:EquationFit')
   CALL AddToObjFld('Cooling Coil Name', base + wahpNameOff,' WAHP Cooling Coil')
-  CALL AddToObjFld('Maximum Cycling Rate {cycles/hr}',base + wahpMaxCycRateOff,'')
-  CALL AddToObjFld('Heat Pump Time Constant {s}',base + wahpTimeConstOff,'')
-  CALL AddToObjFld('Fraction of On-Cycle Power Use',base + wahpFractOnPowerOff,'')
-  CALL AddToObjFld('Heat Pump Fan Delay Time {s}',base + wahpFanDelayOff,'')
   IF (suppHeatCoilKind == shcElectric) THEN
     CALL AddToObjStr('Supplemental Heating Coil Object Type','Coil:Heating:Electric')
   ELSEIF (suppHeatCoilKind == shcWater) THEN
@@ -30104,8 +30114,12 @@ DO iZone = 1, numCompactWaterAirHP
   CALL AddToObjFld('Total Cooling Capacity Curve Name',base + wahpNameOff,' WAHP ClgTotCapCurve')
   CALL AddToObjFld('Sensible Cooling Capacity Curve Name',base + wahpNameOff,' WAHP ClgSensCapCurve')
   CALL AddToObjFld('Cooling Power Consumption Curve Name',base + wahpNameOff,' WAHP ClgPowCurve')
+  CALL AddToObjFld('Part Load Fraction Correlation Curve Name',base + wahpNameOff,' WAHP ClgPLFCurve')
   CALL AddToObjStr('Nominal Time for Condensate Removal to Begin {s}','0')
-  CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}','0',.TRUE.)
+  CALL AddToObjStr('Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}','0')
+  CALL AddToObjFld('Maximum Cycling Rate {cycles/hr}',base + wahpMaxCycRateOff,'')
+  CALL AddToObjFld('Latent Capacity Time Constant {s}',base + wahpTimeConstOff,'')
+  CALL AddToObjFld('Fan Delay Time {s}',base + wahpFanDelayOff,'',.TRUE.)
   CALL CreateNewObj('Curve:QuadLinear')
   CALL WriteComment('Total Cooling Capacity Function Curve for water-to-air heat pump')
   CALL AddToObjFld('Name', base + wahpNameOff,' WAHP ClgTotCapCurve')
@@ -30157,6 +30171,14 @@ DO iZone = 1, numCompactWaterAirHP
   CALL AddToObjStr('Maximum Value of y','100.0')
   CALL AddToObjStr('Minimum Value of z','-100.0')
   CALL AddToObjStr('Maximum Value of z','100.0',.TRUE.)
+  CALL WriteComment('Part Load Fraction Curve for water-to-air heat pump')
+  CALL CreateNewObj('Curve:Quadratic')
+  CALL AddToObjFld('Name', base + doasNameOff,' WAHP ClgPLFCurve')
+  CALL AddToObjStr('Coefficient1 Constant','0.85')
+  CALL AddToObjStr('Coefficient2 x','0.15')
+  CALL AddToObjStr('Coefficient3 x**2','0.0')
+  CALL AddToObjStr('Minimum Value of x','0.0')
+  CALL AddToObjStr('Maximum Value of x','1.0',.TRUE.)
   !***Coil:Heating:WaterToAirHeatPump:EquationFit
   CALL WriteComment('Performance coefficients assume rated Capacity and COP are at:')
   CALL WriteComment('21.11C (70F) entering air dry-bulb temperature and 21.11C (70F) entering water temperature')
@@ -30174,7 +30196,8 @@ DO iZone = 1, numCompactWaterAirHP
   CALL AddToObjStr('Rated Entering Air Dry-Bulb Temperature', '20.0')
   CALL AddToObjStr('Ratio of Rated Heating Capacity to Rated Cooling Capacity', '1.0')
   CALL AddToObjFld('Heating Capacity Curve Name',base + wahpNameOff,' WAHP HtgCapCurve')
-  CALL AddToObjFld('Heating Power Consumption Curve Name',base + wahpNameOff,' WAHP HtgPowCurve',.TRUE.)
+  CALL AddToObjFld('Heating Power Consumption Curve Name',base + wahpNameOff,' WAHP HtgPowCurve')
+  CALL AddToObjFld('Part Load Fraction Correlation Curve Name',base + wahpNameOff,' WAHP HtgPLFCurve',.TRUE.)
   CALL CreateNewObj('Curve:QuadLinear')
   CALL WriteComment('Heating Capacity Function Curve for water-to-air heat pump')
   CALL AddToObjFld('Name', base + wahpNameOff,' WAHP HtgCapCurve')
@@ -30207,6 +30230,14 @@ DO iZone = 1, numCompactWaterAirHP
   CALL AddToObjStr('Maximum Value of y','100.0')
   CALL AddToObjStr('Minimum Value of z','-100.0')
   CALL AddToObjStr('Maximum Value of z','100.0',.TRUE.)
+  CALL WriteComment('Part Load Fraction Curve for water-to-air heat pump')
+  CALL CreateNewObj('Curve:Quadratic')
+  CALL AddToObjFld('Name', base + doasNameOff,' WAHP HtgPLFCurve')
+  CALL AddToObjStr('Coefficient1 Constant','0.85')
+  CALL AddToObjStr('Coefficient2 x','0.15')
+  CALL AddToObjStr('Coefficient3 x**2','0.0')
+  CALL AddToObjStr('Minimum Value of x','0.0')
+  CALL AddToObjStr('Maximum Value of x','1.0',.TRUE.)
   SELECT CASE (suppHeatCoilKind)
     CASE (shcElectric)
       !***Coil:Heating:Electric
