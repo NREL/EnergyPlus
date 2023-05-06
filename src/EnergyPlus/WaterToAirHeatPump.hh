@@ -132,6 +132,7 @@ namespace WaterToAirHeatPump {
         // Pressure Ratio and Leakage Rate [~]
         Real64 SourceSideHTR1;         // Source Side Heat Transfer Resistance coefficient 1 [~]
         Real64 SourceSideHTR2;         // Source Side Heat Transfer Resistance coefficient 2 [k/kW]
+        int PLFCurveIndex = 0;         // Index of the Part Load Factor curve
         Real64 HighPressCutoff;        // High Pressure Cut-off [Pa]
         Real64 LowPressCutoff;         // Low Pressure Cut-off [Pa]
         CompressorType compressorType; // Type of Compressor ie. Reciprocating,Rotary or Scroll
@@ -190,7 +191,7 @@ namespace WaterToAirHeatPump {
                                  int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
-                                 bool const InitFlag, // suppress property errors if true
+                                 bool const InitFlag,           // suppress property errors if true
                                  Real64 const SensDemand,
                                  DataHVACGlobals::CompressorOperation CompressorOp,
                                  Real64 const PartLoadRatio);
@@ -199,7 +200,7 @@ namespace WaterToAirHeatPump {
                                  int const HPNum,               // heat pump number
                                  int const CyclingScheme,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
-                                 bool const InitFlag, // first iteration flag
+                                 bool const InitFlag,           // first iteration flag
                                  Real64 const SensDemand,
                                  DataHVACGlobals::CompressorOperation CompressorOp,
                                  Real64 const PartLoadRatio);

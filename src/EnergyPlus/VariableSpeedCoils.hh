@@ -360,23 +360,22 @@ namespace VariableSpeedCoils {
     //******************************************************************************
 
     void InitVarSpeedCoil(EnergyPlusData &state,
-                          int const DXCoilNum,                // Current DXCoilNum under simulation
-                          Real64 const SensLoad,              // Control zone sensible load[W]
-                          Real64 const LatentLoad,            // Control zone latent load[W]
-                          int const CyclingScheme,            // fan operating mode
-                          Real64 const OnOffAirFlowRatio,     // ratio of compressor on flow to average flow over time step
-                          Real64 const SpeedRatio,            // compressor speed ratio
-                          int const SpeedNum                  // compressor speed number
+                          int const DXCoilNum,            // Current DXCoilNum under simulation
+                          Real64 const SensLoad,          // Control zone sensible load[W]
+                          Real64 const LatentLoad,        // Control zone latent load[W]
+                          int const CyclingScheme,        // fan operating mode
+                          Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
+                          Real64 const SpeedRatio,        // compressor speed ratio
+                          int const SpeedNum              // compressor speed number
     );
 
     void SizeVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum, bool &ErrorsFound);
 
     void CalcVarSpeedCoilCooling(EnergyPlusData &state,
-                                 int const DXCoilNum,       // Heat Pump Number
-                                 int const CyclingScheme,   // Fan/Compressor cycling scheme indicator
-                                 Real64 &RuntimeFrac,       // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                                 Real64 const SensDemand,   // Cooling Sensible Demand [W] !unused1208
-                                 Real64 const LatentDemand, // Cooling Latent Demand [W]
+                                 int const DXCoilNum,                               // Heat Pump Number
+                                 int const CyclingScheme,                           // Fan/Compressor cycling scheme indicator
+                                 Real64 const SensDemand,                           // Cooling Sensible Demand [W] !unused1208
+                                 Real64 const LatentDemand,                         // Cooling Latent Demand [W]
                                  DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation flag
                                  Real64 const PartLoadRatio,                        // compressor part load ratio
                                  Real64 const OnOffAirFlowRatio,                    // ratio of compressor on flow to average flow over time step
@@ -385,10 +384,9 @@ namespace VariableSpeedCoils {
     );
 
     void CalcVarSpeedCoilHeating(EnergyPlusData &state,
-                                 int const DXCoilNum,     // Heat Pump Number
-                                 int const CyclingScheme, // Fan/Compressor cycling scheme indicator
-                                 Real64 &RuntimeFrac,     // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                                 Real64 const SensDemand, // Cooling Sensible Demand [W] !unused1208
+                                 int const DXCoilNum,                               // Heat Pump Number
+                                 int const CyclingScheme,                           // Fan/Compressor cycling scheme indicator
+                                 Real64 const SensDemand,                           // Cooling Sensible Demand [W] !unused1208
                                  DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation flag
                                  Real64 const PartLoadRatio,                        // compressor part load ratio
                                  Real64 const OnOffAirFlowRatio,                    // ratio of compressor on flow to average flow over time step
@@ -505,7 +503,6 @@ namespace VariableSpeedCoils {
 
     void CalcVarSpeedHPWH(EnergyPlusData &state,
                           int const DXCoilNum,        // the number of the DX coil to be simulated
-                          Real64 &RuntimeFrac,        // Runtime Fraction of compressor or percent on time (on-time/cycle time)
                           Real64 const PartLoadRatio, // sensible water heating load / full load sensible water heating capacity
                           Real64 const SpeedRatio,    // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
                           int const SpeedNum,         // Speed number, high bound capacity

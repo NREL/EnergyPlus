@@ -132,6 +132,7 @@ namespace WaterToAirHeatPumpSimple {
         int TotalCoolCapCurveIndex = 0;              // Index of the Total Cooling capacity performance curve
         int SensCoolCapCurveIndex = 0;               // Index of the Sensible Cooling capacity performance curve
         int CoolPowCurveIndex = 0;                   // Index of the Cooling power consumption curve
+        int PLFCurveIndex = 0;                       // Index of the Part Load Factor curve
         int AirInletNodeNum = 0;                     // Node Number of the Air Inlet
         int AirOutletNodeNum = 0;                    // Node Number of the Air Outlet
         int WaterInletNodeNum = 0;                   // Node Number of the Water Onlet
@@ -159,11 +160,11 @@ namespace WaterToAirHeatPumpSimple {
     };
 
     void SimWatertoAirHPSimple(EnergyPlusData &state,
-                               std::string_view CompName,     // Coil Name
-                               int &CompIndex,                // Index for Component name
-                               Real64 const SensLoad,         // Sensible demand load [W]
-                               Real64 const LatentLoad,       // Latent demand load [W]
-                               int const CyclingScheme,       // Continuous fan OR cycling compressor
+                               std::string_view CompName, // Coil Name
+                               int &CompIndex,            // Index for Component name
+                               Real64 const SensLoad,     // Sensible demand load [W]
+                               Real64 const LatentLoad,   // Latent demand load [W]
+                               int const CyclingScheme,   // Continuous fan OR cycling compressor
                                DataHVACGlobals::CompressorOperation CompressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
@@ -179,21 +180,21 @@ namespace WaterToAirHeatPumpSimple {
     //******************************************************************************
 
     void InitSimpleWatertoAirHP(EnergyPlusData &state,
-                                int const HPNum,                    // Current HPNum under simulation
-                                Real64 const SensLoad,              // Control zone sensible load[W]
-                                Real64 const LatentLoad,            // Control zone latent load[W]
-                                int const CyclingScheme,            // fan operating mode
-                                Real64 const OnOffAirFlowRatio,     // ratio of compressor on flow to average flow over time step
-                                bool const FirstHVACIteration       // Iteration flag
+                                int const HPNum,                // Current HPNum under simulation
+                                Real64 const SensLoad,          // Control zone sensible load[W]
+                                Real64 const LatentLoad,        // Control zone latent load[W]
+                                int const CyclingScheme,        // fan operating mode
+                                Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
+                                bool const FirstHVACIteration   // Iteration flag
     );
 
     void SizeHVACWaterToAir(EnergyPlusData &state, int const HPNum);
 
     void CalcHPCoolingSimple(EnergyPlusData &state,
-                             int const HPNum,           // Heat Pump Number
-                             int const CyclingScheme,   // Fan/Compressor cycling scheme indicator
-                             Real64 const SensDemand,   // Cooling Sensible Demand [W] !unused1208
-                             Real64 const LatentDemand, // Cooling Latent Demand [W]
+                             int const HPNum,                                   // Heat Pump Number
+                             int const CyclingScheme,                           // Fan/Compressor cycling scheme indicator
+                             Real64 const SensDemand,                           // Cooling Sensible Demand [W] !unused1208
+                             Real64 const LatentDemand,                         // Cooling Latent Demand [W]
                              DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation flag
                              Real64 const PartLoadRatio,                        // compressor part load ratio
                              Real64 const OnOffAirFlowRatio                     // ratio of compressor on flow to average flow over time step

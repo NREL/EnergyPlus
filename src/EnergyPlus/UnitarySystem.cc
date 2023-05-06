@@ -7040,12 +7040,6 @@ namespace UnitarySystems {
                             thisSys.input_specs.heat_conv_tol = ip->getRealFieldValue(fields, objectSchemaProps, "heating_convergence_tolerance");
                             thisSys.input_specs.cool_conv_tol = ip->getRealFieldValue(fields, objectSchemaProps, "cooling_convergence_tolerance");
                         } else if (getPTUnitType == 3) {
-                            thisSys.input_specs.maximum_cycling_rate = ip->getRealFieldValue(fields, objectSchemaProps, "maximum_cycling_rate");
-                            thisSys.input_specs.heat_pump_time_constant = ip->getRealFieldValue(fields, objectSchemaProps, "heat_pump_time_constant");
-                            thisSys.input_specs.fraction_of_on_cycle_power_use =
-                                ip->getRealFieldValue(fields, objectSchemaProps, "fraction_of_on_cycle_power_use");
-                            thisSys.input_specs.heat_pump_fan_delay_time =
-                                ip->getRealFieldValue(fields, objectSchemaProps, "heat_pump_fan_delay_time");
                             thisSys.input_specs.outdoor_dry_bulb_temperature_sensor_node_name =
                                 ip->getAlphaFieldValue(fields, objectSchemaProps, "outdoor_dry_bulb_temperature_sensor_node_name");
                             thisSys.input_specs.heat_pump_coil_water_flow_mode =
@@ -7487,18 +7481,6 @@ namespace UnitarySystems {
                 if (fields.find("outdoor_dry_bulb_temperature_sensor_node_name") != fields.end()) { // not required field
                     thisSys.input_specs.outdoor_dry_bulb_temperature_sensor_node_name =
                         UtilityRoutines::MakeUPPERCase(fields.at("outdoor_dry_bulb_temperature_sensor_node_name").get<std::string>());
-                }
-                if (fields.find("maximum_cycling_rate") != fields.end()) { // not required field, has default
-                    thisSys.input_specs.maximum_cycling_rate = fields.at("maximum_cycling_rate").get<Real64>();
-                }
-                if (fields.find("heat_pump_time_constant") != fields.end()) { // not required field, has default
-                    thisSys.input_specs.heat_pump_time_constant = fields.at("heat_pump_time_constant").get<Real64>();
-                }
-                if (fields.find("fraction_of_on_cycle_power_use") != fields.end()) { // not required field, has default
-                    thisSys.input_specs.fraction_of_on_cycle_power_use = fields.at("fraction_of_on_cycle_power_use").get<Real64>();
-                }
-                if (fields.find("heat_pump_fan_delay_time") != fields.end()) { // not required field, has default
-                    thisSys.input_specs.heat_pump_fan_delay_time = fields.at("heat_pump_fan_delay_time").get<Real64>();
                 }
                 if (fields.find("ancillary_on_cycle_electric_power") != fields.end()) { // not required field, has default
                     thisSys.input_specs.ancillary_on_cycle_electric_power = fields.at("ancillary_on_cycle_electric_power").get<Real64>();

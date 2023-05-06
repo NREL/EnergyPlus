@@ -95,8 +95,6 @@ namespace WaterToAirHeatPump {
     // Oklahoma State University.
 
     using namespace DataLoopNode;
-    using DataHVACGlobals::ContFanCycCoil;
-    using DataHVACGlobals::CycFanCycCoil;
 
     static constexpr std::string_view fluidNameWater("WATER");
 
@@ -390,6 +388,70 @@ namespace WaterToAirHeatPump {
             heatPump.SourceSideUACoeff = NumArray(18);
             heatPump.SourceSideHTR1 = NumArray(19);
             heatPump.SourceSideHTR2 = NumArray(20);
+            heatPump.PLFCurveIndex = Curve::GetCurveIndex(state, AlphArray(8)); // convert curve name to number
+
+            if (heatPump.PLFCurveIndex == 0) {
+                if (lAlphaBlanks(8)) {
+                    ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, heatPump.Name));
+                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(8)));
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, heatPump.Name));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(8), AlphArray(8)));
+                }
+                ErrorsFound = true;
+            } else {
+                // Verify Curve Object, only legal types are Quadratic or Cubic
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     heatPump.PLFCurveIndex, // Curve index
+                                                     {1},                    // Valid dimensions
+                                                     RoutineName,            // Routine name
+                                                     CurrentModuleObject,    // Object Type
+                                                     heatPump.Name,          // Object Name
+                                                     cAlphaFields(8));       // Field Name
+
+                if (!ErrorsFound) {
+                    //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
+                    Real64 MinCurveVal = 999.0;
+                    Real64 MaxCurveVal = -999.0;
+                    Real64 CurveInput = 0.0;
+                    Real64 MinCurvePLR{0.0};
+                    Real64 MaxCurvePLR{0.0};
+
+                    while (CurveInput <= 1.0) {
+                        Real64 CurveVal = Curve::CurveValue(state, heatPump.PLFCurveIndex, CurveInput);
+                        if (CurveVal < MinCurveVal) {
+                            MinCurveVal = CurveVal;
+                            MinCurvePLR = CurveInput;
+                        }
+                        if (CurveVal > MaxCurveVal) {
+                            MaxCurveVal = CurveVal;
+                            MaxCurvePLR = CurveInput;
+                        }
+                        CurveInput += 0.01;
+                    }
+                    if (MinCurveVal < 0.7) {
+                        ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, heatPump.Name));
+                        ShowContinueError(state, format("...{}=\"{}\" has out of range values.", cAlphaFields(8), AlphArray(8)));
+                        ShowContinueError(state,
+                                          format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
+                        ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
+                        Curve::SetCurveOutputMinValue(state, heatPump.PLFCurveIndex, ErrorsFound, 0.7);
+                    }
+
+                    if (MaxCurveVal > 1.0) {
+                        ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, heatPump.Name));
+                        ShowContinueError(state, format("...{} = {} has out of range value.", cAlphaFields(8), AlphArray(8)));
+                        ShowContinueError(state,
+                                          format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
+                        ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
+                        Curve::SetCurveOutputMaxValue(state, heatPump.PLFCurveIndex, ErrorsFound, 1.0);
+                    }
+                }
+            }
+
+            heatPump.MaxONOFFCyclesperHour = NumArray(21);
+            heatPump.HPTimeConstant = NumArray(22);
+            heatPump.FanDelayTime = NumArray(23);
 
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Water Nodes");
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(6), AlphArray(7), "Air Nodes");
@@ -573,6 +635,67 @@ namespace WaterToAirHeatPump {
             heatPump.SourceSideUACoeff = NumArray(15);
             heatPump.SourceSideHTR1 = NumArray(16);
             heatPump.SourceSideHTR2 = NumArray(17);
+
+            heatPump.PLFCurveIndex = Curve::GetCurveIndex(state, AlphArray(8)); // convert curve name to number
+
+            if (heatPump.PLFCurveIndex == 0) {
+                if (lAlphaBlanks(8)) {
+                    ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, heatPump.Name));
+                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(8)));
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, heatPump.Name));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(8), AlphArray(8)));
+                }
+                ErrorsFound = true;
+            } else {
+                // Verify Curve Object, only legal types are Quadratic or Cubic
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     heatPump.PLFCurveIndex, // Curve index
+                                                     {1},                    // Valid dimensions
+                                                     RoutineName,            // Routine name
+                                                     CurrentModuleObject,    // Object Type
+                                                     heatPump.Name,          // Object Name
+                                                     cAlphaFields(8));       // Field Name
+
+                if (!ErrorsFound) {
+                    //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
+                    Real64 MinCurveVal = 999.0;
+                    Real64 MaxCurveVal = -999.0;
+                    Real64 CurveInput = 0.0;
+                    Real64 MinCurvePLR{0.0};
+                    Real64 MaxCurvePLR{0.0};
+
+                    while (CurveInput <= 1.0) {
+                        Real64 CurveVal = Curve::CurveValue(state, heatPump.PLFCurveIndex, CurveInput);
+                        if (CurveVal < MinCurveVal) {
+                            MinCurveVal = CurveVal;
+                            MinCurvePLR = CurveInput;
+                        }
+                        if (CurveVal > MaxCurveVal) {
+                            MaxCurveVal = CurveVal;
+                            MaxCurvePLR = CurveInput;
+                        }
+                        CurveInput += 0.01;
+                    }
+                    if (MinCurveVal < 0.7) {
+                        ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, heatPump.Name));
+                        ShowContinueError(state, format("...{}=\"{}\" has out of range values.", cAlphaFields(9), AlphArray(9)));
+                        ShowContinueError(state,
+                                          format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
+                        ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
+                        Curve::SetCurveOutputMinValue(state, heatPump.PLFCurveIndex, ErrorsFound, 0.7);
+                    }
+
+                    if (MaxCurveVal > 1.0) {
+                        ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, heatPump.Name));
+                        ShowContinueError(state, format("...{} = {} has out of range value.", cAlphaFields(9), AlphArray(9)));
+                        ShowContinueError(state,
+                                          format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
+                        ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
+                        Curve::SetCurveOutputMaxValue(state, heatPump.PLFCurveIndex, ErrorsFound, 1.0);
+                    }
+                }
+            }
 
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Water Nodes");
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(6), AlphArray(7), "Air Nodes");
@@ -1252,11 +1375,22 @@ namespace WaterToAirHeatPump {
         // is enabled. 1st iteration to calculate the QLatent(rated) at (TDB,TWB)indoorair=(26.7C,19.4C)
         // and 2nd iteration to calculate the  QLatent(actual)
 
+        // Calculate Part Load Factor and Runtime Fraction
+        Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
+        if (heatPump.PLFCurveIndex > 0) {
+            PLF = Curve::CurveValue(state, heatPump.PLFCurveIndex, PartLoadRatio); // Calculate part-load factor
+        }
+        if (CyclingScheme == DataHVACGlobals::CycFanCycCoil) {
+            state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
+        }
+        heatPump.RunFrac = PartLoadRatio / PLF;
+
         QLatRated = 0.0;
         QLatActual = 0.0;
         // IF((RuntimeFrac .GE. 1.0) .OR. (Twet_rated .LE. 0.0) .OR. (Gamma_rated .LE. 0.0)) THEN
         // Cycling fan does not required latent degradation model, only the constant fan case
-        if ((heatPump.RunFrac >= 1.0) || (heatPump.Twet_Rated <= 0.0) || (heatPump.Gamma_Rated <= 0.0) || (CyclingScheme == CycFanCycCoil)) {
+        if ((heatPump.RunFrac >= 1.0) || (heatPump.Twet_Rated <= 0.0) || (heatPump.Gamma_Rated <= 0.0) ||
+            (CyclingScheme == DataHVACGlobals::CycFanCycCoil)) {
             LatDegradModelSimFlag = false;
             // Set NumIteration4=1 so that latent model would quit after 1 simulation with the actual condition
             NumIteration4 = 1;
@@ -1585,7 +1719,7 @@ namespace WaterToAirHeatPump {
         SourceSideOutletTemp = heatPump.InletWaterTemp + QSource / (heatPump.InletWaterMassFlowRate * CpWater);
 
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == ContFanCycCoil) {
+        if (CyclingScheme == DataHVACGlobals::ContFanCycCoil) {
             // continuous fan, cycling compressor
             heatPump.OutletAirEnthalpy = PartLoadRatio * LoadSideAirOutletEnth + (1.0 - PartLoadRatio) * LoadSideAirInletEnth;
             heatPump.OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + (1.0 - PartLoadRatio) * LoadSideInletHumRat;
@@ -2021,7 +2155,7 @@ namespace WaterToAirHeatPump {
 
         // Calculate actual outlet conditions for the run time fraction
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == ContFanCycCoil) {
+        if (CyclingScheme == DataHVACGlobals::ContFanCycCoil) {
             // continuous fan, cycling compressor
             heatPump.OutletAirEnthalpy = PartLoadRatio * LoadSideAirOutletEnth + (1.0 - PartLoadRatio) * heatPump.InletAirEnthalpy;
             heatPump.OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + (1.0 - PartLoadRatio) * heatPump.InletAirHumRat;
@@ -2032,6 +2166,17 @@ namespace WaterToAirHeatPump {
             heatPump.OutletAirHumRat = LoadSideOutletHumRat;
             heatPump.OutletAirDBTemp = LoadSideOutletDBTemp;
         }
+
+        // Calculate Part Load Factor and Runtime Fraction
+        Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
+        if (heatPump.PLFCurveIndex > 0) {
+            PLF = Curve::CurveValue(state, heatPump.PLFCurveIndex, PartLoadRatio); // Calculate part-load factor
+        }
+        if (CyclingScheme == DataHVACGlobals::CycFanCycCoil) {
+            state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
+        }
+        heatPump.RunFrac = PartLoadRatio / PLF;
+
         // scale heat transfer rates and power to run time
         QLoadTotal *= PartLoadRatio;
         Power *= heatPump.RunFrac;
@@ -2230,7 +2375,7 @@ namespace WaterToAirHeatPump {
         //  Calculate the compressor on and off times using a conventional thermostat curve
         Ton = 3600.0 / (4.0 * heatPump.MaxONOFFCyclesperHour * (1.0 - RTF)); // duration of cooling coil on-cycle (sec)
 
-        if ((CyclingScheme == CycFanCycCoil) && (heatPump.FanDelayTime != 0.0)) {
+        if ((CyclingScheme == DataHVACGlobals::CycFanCycCoil) && (heatPump.FanDelayTime != 0.0)) {
             //  For CycFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
             //  until the fan cycle off. Assume no evaporation from the coil after the fan shuts off.
             Toff = heatPump.FanDelayTime;

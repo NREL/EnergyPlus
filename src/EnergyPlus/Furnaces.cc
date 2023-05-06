@@ -9971,7 +9971,6 @@ namespace Furnaces {
         Real64 HeatCoilLoad;      // Heating coil load for gas heater
         Real64 ZoneSensLoadMet;   // Sensible cooling load met (furnace outlet with respect to control zone temp)
         Real64 ZoneLatLoadMet;    // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
-        Real64 RuntimeFrac;
         Real64 Dummy;
         Real64 HPCoilSensDemand;
         Real64 OnOffAirFlowRatio;
@@ -9988,16 +9987,37 @@ namespace Furnaces {
         //        Real64 ZoneSensLoadMetFanONCompOFF = Par[7];
         //        Real64 par9_HXUnitOne = Par[8];
 
+        int CoilIndex;
         if (par6_loadTypeFlag == 1.0) {
             CoolPartLoadRatio = PartLoadRatio;
             HeatPartLoadRatio = 0.0;
             HeatCoilLoad = 0.0;
+            CoilIndex = state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex;
         } else {
             CoolPartLoadRatio = 0.0;
             HeatPartLoadRatio = PartLoadRatio;
+            CoilIndex = state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex;
         }
 
-        // TODO: Get child RuntimeFrac
+        // Get child component RuntimeFrac
+        Real64 RuntimeFrac;
+        switch (state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType) {
+        case WatertoAir_Simple: {
+            RuntimeFrac = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(CoilIndex).RunFrac;
+            break;
+        }
+        case WatertoAir_ParEst: {
+            RuntimeFrac = state.dataWaterToAirHeatPump->WatertoAirHP(CoilIndex).RunFrac;
+            break;
+        }
+        case WatertoAir_VarSpeedEquationFit: {
+            RuntimeFrac = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).RunFrac;
+            break;
+        }
+        default:
+            RuntimeFrac = 1.0; // Programming error. Assert failure?
+        }
+
         state.dataFurnaces->OnOffFanPartLoadFractionSave = state.dataHVACGlobal->OnOffFanPartLoadFraction;
         // update fan and compressor run times
         state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = PartLoadRatio;
