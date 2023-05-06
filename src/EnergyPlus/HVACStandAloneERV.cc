@@ -874,8 +874,7 @@ void GetStandAloneERV(EnergyPlusData &state)
         auto &thisOAController = state.dataMixedAir->OAController(OutAirNum);
 
         thisOAController.Name = Alphas(1);
-        thisOAController.ControllerType = CurrentModuleObject;
-        thisOAController.ControllerType_Num = MixedAir::MixedAirControllerType::ControllerStandAloneERV;
+        thisOAController.ControllerType = MixedAir::MixedAirControllerType::ControllerStandAloneERV;
         WhichERV = UtilityRoutines::FindItemInList(Alphas(1), state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
         if (WhichERV != 0) {
             AirFlowRate = state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow;
