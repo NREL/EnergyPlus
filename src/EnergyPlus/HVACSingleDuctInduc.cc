@@ -222,7 +222,6 @@ namespace HVACSingleDuctInduc {
         static constexpr std::string_view RoutineName("GetIndUnits "); // include trailing blank space
 
         int IUIndex;                     // loop index
-        int IUNum;                       // current fan coil number
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
@@ -236,7 +235,6 @@ namespace HVACSingleDuctInduc {
         //  certain object in the input file
         int IOStatus;            // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        bool IsNotOK;            // Flag to verify name
         int CtrlZone;            // controlled zome do loop index
         int SupAirIn;            // controlled zone supply air inlet index
         int ADUNum;
@@ -276,7 +274,7 @@ namespace HVACSingleDuctInduc {
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
-            IUNum = IUIndex;
+            int IUNum = IUIndex;
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name = Alphas(1);
@@ -343,7 +341,7 @@ namespace HVACSingleDuctInduc {
             }
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil = Alphas(7); // name of heating coil object
-            IsNotOK = false;
+            bool IsNotOK = false;
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWControlNode = GetCoilWaterInletNode(
                 state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil, IsNotOK);
             if (IsNotOK) {
