@@ -4101,11 +4101,6 @@ namespace HVACMultiSpeedHeatPump {
         // PURPOSE OF THIS SUBROUTINE:
         //  Calculate the heat recovered from MSHP
 
-        // Using/Aliasing
-        auto const &MSHPWasteHeat = state.dataHVACGlobal->MSHPWasteHeat;
-        using FluidProperties::GetSpecificHeatGlycol;
-        using PlantUtilities::SafeCopyPlantNode;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("MSHPHeatRecovery");
 
@@ -4128,16 +4123,16 @@ namespace HVACMultiSpeedHeatPump {
         // Set heat recovery mass flow rates
         HeatRecMassFlowRate = state.dataLoopNodes->Node(HeatRecInNode).MassFlowRate;
 
-        QHeatRec = MSHPWasteHeat;
+        QHeatRec = state.dataHVACGlobal->MSHPWasteHeat;
 
         if (HeatRecMassFlowRate > 0.0) {
 
-            CpHeatRec =
-                GetSpecificHeatGlycol(state,
-                                      state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidName,
-                                      HeatRecInletTemp,
-                                      state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidIndex,
-                                      RoutineName);
+            CpHeatRec = FluidProperties::GetSpecificHeatGlycol(
+                state,
+                state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidName,
+                HeatRecInletTemp,
+                state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidIndex,
+                RoutineName);
 
             HeatRecOutletTemp = QHeatRec / (HeatRecMassFlowRate * CpHeatRec) + HeatRecInletTemp;
             if (HeatRecOutletTemp > state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).MaxHeatRecOutletTemp) {
@@ -4149,7 +4144,7 @@ namespace HVACMultiSpeedHeatPump {
             QHeatRec = 0.0;
         }
 
-        SafeCopyPlantNode(state, HeatRecInNode, HeatRecOutNode);
+        PlantUtilities::SafeCopyPlantNode(state, HeatRecInNode, HeatRecOutNode);
         // changed outputs
         state.dataLoopNodes->Node(HeatRecOutNode).Temp = HeatRecOutletTemp;
 
