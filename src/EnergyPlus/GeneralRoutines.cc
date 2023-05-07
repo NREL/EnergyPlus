@@ -534,7 +534,6 @@ void ControlCompOutput(EnergyPlusData &state,
             bool BBConvergeCheckFlag = BBConvergeCheck(SimCompNum, ZoneInterHalf.MaxFlow, ZoneInterHalf.MinFlow);
             if (BBConvergeCheckFlag) {
                 // Set to converged controller
-                Converged = true;
                 ZoneInterHalf.MaxFlowCalc = true;
                 ZoneInterHalf.MinFlowCalc = false;
                 ZoneInterHalf.NormFlowCalc = false;
