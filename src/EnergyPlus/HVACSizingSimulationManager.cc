@@ -71,8 +71,6 @@ namespace EnergyPlus {
 
 void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded(EnergyPlusData &state)
 {
-    using DataSizing::Coincident;
-
     // currently the only type of advanced sizing analysis available is for coincident plant sizing
     // expect more specialized sizing analysis objects to be added, so minimizing code here and jump to a worker method once we know an instance is to
     // be created.
@@ -80,7 +78,7 @@ void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded(EnergyPlusData &
     // Loop over PlantSizData struct and find those plant loops that are to use coincident sizing
     for (int i = 1; i <= state.dataSize->NumPltSizInput; ++i) {
 
-        if (state.dataSize->PlantSizData(i).ConcurrenceOption == Coincident) {
+        if (state.dataSize->PlantSizData(i).ConcurrenceOption == DataSizing::Coincident) {
 
             // create an instance of analysis object for each loop
             CreateNewCoincidentPlantAnalysisObject(state, state.dataSize->PlantSizData(i).PlantLoopName, i);
@@ -92,8 +90,6 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
                                                                          std::string const &PlantLoopName,
                                                                          int const PlantSizingIndex)
 {
-    using namespace FluidProperties;
-
     Real64 density;
     Real64 cp;
 
@@ -101,16 +97,16 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
     for (int i = 1; i <= state.dataPlnt->TotNumLoops; ++i) {
         if (PlantLoopName == state.dataPlnt->PlantLoop(i).Name) { // found it
 
-            density = GetDensityGlycol(state,
-                                       state.dataPlnt->PlantLoop(i).FluidName,
-                                       Constant::CWInitConvTemp,
-                                       state.dataPlnt->PlantLoop(i).FluidIndex,
-                                       "createNewCoincidentPlantAnalysisObject");
-            cp = GetSpecificHeatGlycol(state,
-                                       state.dataPlnt->PlantLoop(i).FluidName,
-                                       Constant::CWInitConvTemp,
-                                       state.dataPlnt->PlantLoop(i).FluidIndex,
-                                       "createNewCoincidentPlantAnalysisObject");
+            density = FluidProperties::GetDensityGlycol(state,
+                                                        state.dataPlnt->PlantLoop(i).FluidName,
+                                                        Constant::CWInitConvTemp,
+                                                        state.dataPlnt->PlantLoop(i).FluidIndex,
+                                                        "createNewCoincidentPlantAnalysisObject");
+            cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                        state.dataPlnt->PlantLoop(i).FluidName,
+                                                        Constant::CWInitConvTemp,
+                                                        state.dataPlnt->PlantLoop(i).FluidIndex,
+                                                        "createNewCoincidentPlantAnalysisObject");
 
             plantCoincAnalyObjs.emplace_back(PlantLoopName,
                                              i,
@@ -155,10 +151,6 @@ void HVACSizingSimulationManager::PostProcessLogs()
 
 void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(EnergyPlusData &state, int const HVACSizingIterCount)
 {
-    using namespace DataPlant;
-    using namespace PlantManager;
-    using namespace DataSizing;
-
     // first pass through coincident plant objects to check new sizes and see if more iteration needed
     plantCoinAnalyRequestsAnotherIteration = false;
     for (auto &P : plantCoincAnalyObjs) {
@@ -219,7 +211,6 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
     hvacSizingSimulationManager = std::make_unique<HVACSizingSimulationManager>();
 
-    bool Available; // an environment is available to process
     int HVACSizingIterCount;
 
     hvacSizingSimulationManager->DetermineSizingAnalysesNeeded(state);
@@ -240,7 +231,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
         AddDesignSetToEnvironmentStruct(state, HVACSizingIterCount);
 
         state.dataGlobal->WarmupFlag = true;
-        Available = true;
+        bool Available = true;
         for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) { // loop over environments
 
             GetNextEnvironment(state, Available, ErrorsFound);
