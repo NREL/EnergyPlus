@@ -785,10 +785,10 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     // called from "Demand to Supply" interface or "Supply to Demand" interface. Update the node temperatures
     // accordingly.
 
-    auto &plantCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe(LoopNum);
-
     // One time call to set up report variables and set common pipe 'type' flag
     if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
+
+    auto &plantCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe(LoopNum);
 
     // fill local node indexes
     int NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn;
