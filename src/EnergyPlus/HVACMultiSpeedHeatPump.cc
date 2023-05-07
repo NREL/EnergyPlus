@@ -3752,11 +3752,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // REFERENCES: na
 
-        // Using/Aliasing
-        using DXCoils::SimDXCoilMultiSpeed;
-        using Fans::SimulateFanComponents;
-        using HeatingCoils::SimulateHeatingCoilComponents;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -3813,114 +3808,114 @@ namespace HVACMultiSpeedHeatPump {
         AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         // if blow through, simulate fan then coils
         if (MSHeatPump.FanPlaceType == DataHVACGlobals::BlowThru) {
-            SimulateFanComponents(state, MSHeatPump.FanName, FirstHVACIteration, MSHeatPump.FanNum, state.dataHVACMultiSpdHP->FanSpeedRatio);
+            Fans::SimulateFanComponents(state, MSHeatPump.FanName, FirstHVACIteration, MSHeatPump.FanNum, state.dataHVACMultiSpdHP->FanSpeedRatio);
             if (QZnReq < (-1.0 * DataHVACGlobals::SmallLoad)) {
                 if (OutsideDryBulbTemp > MSHeatPump.MinOATCompressorCooling) {
-                    SimDXCoilMultiSpeed(state,
-                                        MSHeatPump.DXCoolCoilName,
-                                        SpeedRatio,
-                                        PartLoadFrac,
-                                        MSHeatPump.DXCoolCoilIndex,
-                                        SpeedNum,
-                                        MSHeatPump.OpMode,
-                                        CompressorOp);
+                    DXCoils::SimDXCoilMultiSpeed(state,
+                                                 MSHeatPump.DXCoolCoilName,
+                                                 SpeedRatio,
+                                                 PartLoadFrac,
+                                                 MSHeatPump.DXCoolCoilIndex,
+                                                 SpeedNum,
+                                                 MSHeatPump.OpMode,
+                                                 CompressorOp);
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
                 } else {
-                    SimDXCoilMultiSpeed(
+                    DXCoils::SimDXCoilMultiSpeed(
                         state, MSHeatPump.DXCoolCoilName, 0.0, 0.0, MSHeatPump.DXCoolCoilIndex, SpeedNum, MSHeatPump.OpMode, CompressorOp);
                 }
                 state.dataHVACMultiSpdHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(MSHeatPump.DXCoolCoilIndex);
             } else {
-                SimDXCoilMultiSpeed(
+                DXCoils::SimDXCoilMultiSpeed(
                     state, MSHeatPump.DXCoolCoilName, 0.0, 0.0, MSHeatPump.DXCoolCoilIndex, SpeedNum, MSHeatPump.OpMode, CompressorOp);
             }
             if (MSHeatPump.HeatCoilType == MultiSpeedHeatingCoil) {
                 if (QZnReq > DataHVACGlobals::SmallLoad) {
                     if (OutsideDryBulbTemp > MSHeatPump.MinOATCompressorHeating) {
-                        SimDXCoilMultiSpeed(state,
-                                            MSHeatPump.DXHeatCoilName,
-                                            SpeedRatio,
-                                            PartLoadFrac,
-                                            MSHeatPump.DXHeatCoilIndex,
-                                            SpeedNum,
-                                            MSHeatPump.OpMode,
-                                            CompressorOp);
+                        DXCoils::SimDXCoilMultiSpeed(state,
+                                                     MSHeatPump.DXHeatCoilName,
+                                                     SpeedRatio,
+                                                     PartLoadFrac,
+                                                     MSHeatPump.DXHeatCoilIndex,
+                                                     SpeedNum,
+                                                     MSHeatPump.OpMode,
+                                                     CompressorOp);
                         SavePartloadRatio = PartLoadFrac;
                         SaveSpeedRatio = SpeedRatio;
                     } else {
-                        SimDXCoilMultiSpeed(
+                        DXCoils::SimDXCoilMultiSpeed(
                             state, MSHeatPump.DXHeatCoilName, 0.0, 0.0, MSHeatPump.DXHeatCoilIndex, SpeedNum, MSHeatPump.OpMode, CompressorOp);
                     }
                     state.dataHVACMultiSpdHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(MSHeatPump.DXHeatCoilIndex);
                 } else {
-                    SimDXCoilMultiSpeed(
+                    DXCoils::SimDXCoilMultiSpeed(
                         state, MSHeatPump.DXHeatCoilName, 0.0, 0.0, MSHeatPump.DXHeatCoilIndex, SpeedNum, MSHeatPump.OpMode, CompressorOp);
                 }
             } else if (MSHeatPump.HeatCoilType == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
                        MSHeatPump.HeatCoilType == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
                 if (QZnReq > DataHVACGlobals::SmallLoad) {
-                    SimulateHeatingCoilComponents(
+                    HeatingCoils::SimulateHeatingCoilComponents(
                         state, MSHeatPump.HeatCoilName, FirstHVACIteration, _, 0, _, _, MSHeatPump.OpMode, PartLoadFrac, SpeedNum, SpeedRatio);
                 } else {
-                    SimulateHeatingCoilComponents(
+                    HeatingCoils::SimulateHeatingCoilComponents(
                         state, MSHeatPump.HeatCoilName, FirstHVACIteration, _, 0, _, _, MSHeatPump.OpMode, 0.0, SpeedNum, 0.0);
                 }
             } else {
                 CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, QZnReq, MSHeatPump.OpMode, QCoilActual, PartLoadFrac);
             }
             // Call twice to ensure the fan outlet conditions are updated
-            SimulateFanComponents(state, MSHeatPump.FanName, FirstHVACIteration, MSHeatPump.FanNum, state.dataHVACMultiSpdHP->FanSpeedRatio);
+            Fans::SimulateFanComponents(state, MSHeatPump.FanName, FirstHVACIteration, MSHeatPump.FanNum, state.dataHVACMultiSpdHP->FanSpeedRatio);
             if (QZnReq < (-1.0 * DataHVACGlobals::SmallLoad)) {
                 if (OutsideDryBulbTemp > MSHeatPump.MinOATCompressorCooling) {
-                    SimDXCoilMultiSpeed(state,
-                                        MSHeatPump.DXCoolCoilName,
-                                        SpeedRatio,
-                                        PartLoadFrac,
-                                        MSHeatPump.DXCoolCoilIndex,
-                                        SpeedNum,
-                                        MSHeatPump.OpMode,
-                                        CompressorOp);
+                    DXCoils::SimDXCoilMultiSpeed(state,
+                                                 MSHeatPump.DXCoolCoilName,
+                                                 SpeedRatio,
+                                                 PartLoadFrac,
+                                                 MSHeatPump.DXCoolCoilIndex,
+                                                 SpeedNum,
+                                                 MSHeatPump.OpMode,
+                                                 CompressorOp);
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
                 } else {
-                    SimDXCoilMultiSpeed(
+                    DXCoils::SimDXCoilMultiSpeed(
                         state, MSHeatPump.DXCoolCoilName, 0.0, 0.0, MSHeatPump.DXCoolCoilIndex, SpeedNum, MSHeatPump.OpMode, CompressorOp);
                 }
                 state.dataHVACMultiSpdHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(MSHeatPump.DXCoolCoilIndex);
             } else {
-                SimDXCoilMultiSpeed(
+                DXCoils::SimDXCoilMultiSpeed(
                     state, MSHeatPump.DXCoolCoilName, 0.0, 0.0, MSHeatPump.DXCoolCoilIndex, SpeedNum, MSHeatPump.OpMode, CompressorOp);
             }
             if (MSHeatPump.HeatCoilType == MultiSpeedHeatingCoil) {
                 if (QZnReq > DataHVACGlobals::SmallLoad) {
                     if (OutsideDryBulbTemp > MSHeatPump.MinOATCompressorHeating) {
-                        SimDXCoilMultiSpeed(state,
-                                            MSHeatPump.DXHeatCoilName,
-                                            SpeedRatio,
-                                            PartLoadFrac,
-                                            MSHeatPump.DXHeatCoilIndex,
-                                            SpeedNum,
-                                            MSHeatPump.OpMode,
-                                            CompressorOp);
+                        DXCoils::SimDXCoilMultiSpeed(state,
+                                                     MSHeatPump.DXHeatCoilName,
+                                                     SpeedRatio,
+                                                     PartLoadFrac,
+                                                     MSHeatPump.DXHeatCoilIndex,
+                                                     SpeedNum,
+                                                     MSHeatPump.OpMode,
+                                                     CompressorOp);
                         SavePartloadRatio = PartLoadFrac;
                         SaveSpeedRatio = SpeedRatio;
                     } else {
-                        SimDXCoilMultiSpeed(
+                        DXCoils::SimDXCoilMultiSpeed(
                             state, MSHeatPump.DXHeatCoilName, 0.0, 0.0, MSHeatPump.DXHeatCoilIndex, SpeedNum, MSHeatPump.OpMode, CompressorOp);
                     }
                     state.dataHVACMultiSpdHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(MSHeatPump.DXHeatCoilIndex);
                 } else {
-                    SimDXCoilMultiSpeed(
+                    DXCoils::SimDXCoilMultiSpeed(
                         state, MSHeatPump.DXHeatCoilName, 0.0, 0.0, MSHeatPump.DXHeatCoilIndex, SpeedNum, MSHeatPump.OpMode, CompressorOp);
                 }
             } else if (MSHeatPump.HeatCoilType == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
                        MSHeatPump.HeatCoilType == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
                 if (QZnReq > DataHVACGlobals::SmallLoad) {
-                    SimulateHeatingCoilComponents(
+                    HeatingCoils::SimulateHeatingCoilComponents(
                         state, MSHeatPump.HeatCoilName, FirstHVACIteration, _, 0, _, _, MSHeatPump.OpMode, PartLoadFrac, SpeedNum, SpeedRatio);
                 } else {
-                    SimulateHeatingCoilComponents(
+                    HeatingCoils::SimulateHeatingCoilComponents(
                         state, MSHeatPump.HeatCoilName, FirstHVACIteration, _, 0, _, _, MSHeatPump.OpMode, 0.0, SpeedNum, 0.0);
                 }
             } else {
@@ -3933,60 +3928,60 @@ namespace HVACMultiSpeedHeatPump {
         } else { // otherwise simulate DX coils then fan then supplemental heater
             if (QZnReq < (-1.0 * DataHVACGlobals::SmallLoad)) {
                 if (OutsideDryBulbTemp > MSHeatPump.MinOATCompressorCooling) {
-                    SimDXCoilMultiSpeed(state,
-                                        MSHeatPump.DXCoolCoilName,
-                                        SpeedRatio,
-                                        PartLoadFrac,
-                                        MSHeatPump.DXCoolCoilIndex,
-                                        SpeedNum,
-                                        MSHeatPump.OpMode,
-                                        CompressorOp);
+                    DXCoils::SimDXCoilMultiSpeed(state,
+                                                 MSHeatPump.DXCoolCoilName,
+                                                 SpeedRatio,
+                                                 PartLoadFrac,
+                                                 MSHeatPump.DXCoolCoilIndex,
+                                                 SpeedNum,
+                                                 MSHeatPump.OpMode,
+                                                 CompressorOp);
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
                 } else {
-                    SimDXCoilMultiSpeed(
+                    DXCoils::SimDXCoilMultiSpeed(
                         state, MSHeatPump.DXCoolCoilName, 0.0, 0.0, MSHeatPump.DXCoolCoilIndex, SpeedNum, MSHeatPump.OpMode, CompressorOp);
                 }
                 state.dataHVACMultiSpdHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(MSHeatPump.DXCoolCoilIndex);
             } else {
-                SimDXCoilMultiSpeed(
+                DXCoils::SimDXCoilMultiSpeed(
                     state, MSHeatPump.DXCoolCoilName, 0.0, 0.0, MSHeatPump.DXCoolCoilIndex, SpeedNum, MSHeatPump.OpMode, CompressorOp);
             }
             if (MSHeatPump.HeatCoilType == MultiSpeedHeatingCoil) {
                 if (QZnReq > DataHVACGlobals::SmallLoad) {
                     if (OutsideDryBulbTemp > MSHeatPump.MinOATCompressorHeating) {
-                        SimDXCoilMultiSpeed(state,
-                                            MSHeatPump.DXHeatCoilName,
-                                            SpeedRatio,
-                                            PartLoadFrac,
-                                            MSHeatPump.DXHeatCoilIndex,
-                                            SpeedNum,
-                                            MSHeatPump.OpMode,
-                                            CompressorOp);
+                        DXCoils::SimDXCoilMultiSpeed(state,
+                                                     MSHeatPump.DXHeatCoilName,
+                                                     SpeedRatio,
+                                                     PartLoadFrac,
+                                                     MSHeatPump.DXHeatCoilIndex,
+                                                     SpeedNum,
+                                                     MSHeatPump.OpMode,
+                                                     CompressorOp);
                         SavePartloadRatio = PartLoadFrac;
                         SaveSpeedRatio = SpeedRatio;
                     } else {
-                        SimDXCoilMultiSpeed(
+                        DXCoils::SimDXCoilMultiSpeed(
                             state, MSHeatPump.DXHeatCoilName, 0.0, 0.0, MSHeatPump.DXHeatCoilIndex, SpeedNum, MSHeatPump.OpMode, CompressorOp);
                     }
                     state.dataHVACMultiSpdHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(MSHeatPump.DXHeatCoilIndex);
                 } else {
-                    SimDXCoilMultiSpeed(
+                    DXCoils::SimDXCoilMultiSpeed(
                         state, MSHeatPump.DXHeatCoilName, 0.0, 0.0, MSHeatPump.DXHeatCoilIndex, SpeedNum, MSHeatPump.OpMode, CompressorOp);
                 }
             } else if (MSHeatPump.HeatCoilType == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
                        MSHeatPump.HeatCoilType == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
                 if (QZnReq > DataHVACGlobals::SmallLoad) {
-                    SimulateHeatingCoilComponents(
+                    HeatingCoils::SimulateHeatingCoilComponents(
                         state, MSHeatPump.HeatCoilName, FirstHVACIteration, _, 0, _, _, MSHeatPump.OpMode, PartLoadFrac, SpeedNum, SpeedRatio);
                 } else {
-                    SimulateHeatingCoilComponents(
+                    HeatingCoils::SimulateHeatingCoilComponents(
                         state, MSHeatPump.HeatCoilName, FirstHVACIteration, _, 0, _, _, MSHeatPump.OpMode, 0.0, SpeedNum, 0.0);
                 }
             } else {
                 CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, QZnReq, MSHeatPump.OpMode, QCoilActual, PartLoadFrac);
             }
-            SimulateFanComponents(state, MSHeatPump.FanName, FirstHVACIteration, MSHeatPump.FanNum, state.dataHVACMultiSpdHP->FanSpeedRatio);
+            Fans::SimulateFanComponents(state, MSHeatPump.FanName, FirstHVACIteration, MSHeatPump.FanNum, state.dataHVACMultiSpdHP->FanSpeedRatio);
             //  Simulate supplemental heating coil for draw through fan
             if (MSHeatPump.SuppHeatCoilNum > 0) {
                 CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, SupHeaterLoad, MSHeatPump.OpMode, QCoilActual);
