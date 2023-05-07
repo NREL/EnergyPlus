@@ -1090,8 +1090,6 @@ namespace HVACSingleDuctInduc {
                                                      state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name));
                             ErrorsFound = true;
                         }
-                    }
-                    if (IsAutoSize) {
                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxVolColdWaterFlow = MaxVolColdWaterFlowDes;
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
@@ -1218,7 +1216,6 @@ namespace HVACSingleDuctInduc {
         Real64 PriAirMassFlow;   // primary air mass flow rate [kg/s]
         Real64 SecAirMassFlow;   // secondary air mass flow rate [kg/s]
         Real64 InducRat;         // Induction Ratio
-        int SolFlag;
         Real64 ErrTolerance;
         int HWOutletNode;
         int CWOutletNode;
@@ -1265,6 +1262,7 @@ namespace HVACSingleDuctInduc {
 
         if (UnitOn) {
 
+            int SolFlag = 0;
             if (QToHeatSetPt - QPriOnly > SmallLoad) {
                 // heating coil
                 // check that it can meet the load
