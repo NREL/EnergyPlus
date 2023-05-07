@@ -817,8 +817,6 @@ namespace HVACSingleDuctInduc {
         MaxVolColdWaterFlowDes = 0.0;
         MaxVolColdWaterFlowUser = 0.0;
 
-        auto &TermUnitSizing = state.dataSize->TermUnitSizing;
-
         if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
@@ -1131,30 +1129,32 @@ namespace HVACSingleDuctInduc {
         }
 
         if (state.dataSize->CurTermUnitSizingNum > 0) {
+            auto &termUnitSizing = state.dataSize->TermUnitSizing(state.dataSize->CurTermUnitSizingNum);
+
             // note we save the induced air flow for use by the hw and cw coil sizing routines
-            TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow *
-                                                                              state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio /
-                                                                              (1.0 + state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio);
+            termUnitSizing.AirVolFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow *
+                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio /
+                                        (1.0 + state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio);
             // save the max hot and cold water flows for use in coil sizing
-            TermUnitSizing(state.dataSize->CurTermUnitSizingNum).MaxHWVolFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxVolHotWaterFlow;
-            TermUnitSizing(state.dataSize->CurTermUnitSizingNum).MaxCWVolFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxVolColdWaterFlow;
+            termUnitSizing.MaxHWVolFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxVolHotWaterFlow;
+            termUnitSizing.MaxCWVolFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxVolColdWaterFlow;
             // save the design load used for reporting
-            TermUnitSizing(state.dataSize->CurTermUnitSizingNum).DesCoolingLoad = state.dataHVACSingleDuctInduc->IndUnit(IUNum).DesCoolingLoad;
-            TermUnitSizing(state.dataSize->CurTermUnitSizingNum).DesHeatingLoad = state.dataHVACSingleDuctInduc->IndUnit(IUNum).DesHeatingLoad;
+            termUnitSizing.DesCoolingLoad = state.dataHVACSingleDuctInduc->IndUnit(IUNum).DesCoolingLoad;
+            termUnitSizing.DesHeatingLoad = state.dataHVACSingleDuctInduc->IndUnit(IUNum).DesHeatingLoad;
             // save the induction ratio for use in subsequent sizing calcs
-            TermUnitSizing(state.dataSize->CurTermUnitSizingNum).InducRat = state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio;
+            termUnitSizing.InducRat = state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio;
             if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
                 SetCoilDesFlow(state,
                                state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType,
                                state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil,
-                               TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow,
+                               termUnitSizing.AirVolFlow,
                                ErrorsFound);
             }
             if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
                 SetCoilDesFlow(state,
                                state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType,
                                state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
-                               TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow,
+                               termUnitSizing.AirVolFlow,
                                ErrorsFound);
             }
         }
