@@ -98,9 +98,6 @@ namespace HVACMultiSpeedHeatPump {
     //                      zone from the furnace object input field. Now, the flow fraction is calculated internally
     //                      Brent Griffith, NREL, Dec 2010 -- upgrade to new plant for heat recovery, general fluid props.
     //                      Bereket Nigusse, FSEC, Jan. 2012 -- added hot water and steam heating coil
-
-    //       RE-ENGINEERED  na
-
     // PURPOSE OF THIS MODULE:
     // To encapsulate the data and algorithms required to simulate Multi Speed Heat Pump in
     // EnergyPlus.
@@ -136,13 +133,6 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, Florida Solar Energy Center
         //       DATE WRITTEN   June. 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Manages the simulation of multispeed heat pump.
-
-        // Using/Aliasing
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int MSHeatPumpNum;        // index of fan coil unit being simulated
@@ -212,7 +202,6 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   June 2007
-        //       MODIFIED       na
         //       RE-ENGINEERED  Revised based on SimPTHP
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -461,13 +450,10 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    July 2007
-        //       MODIFIED         na
-        //       RE-ENGINEERED    na
 
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will get the input required by the multispeed heat pump model
 
-        // Locals
         // PARAMETERS
         static constexpr std::string_view RoutineName("GetMSHeatPumpInput: "); // include trailing blank space
         static constexpr std::string_view RoutineNameNoColon("GetMSHeatPumpInput");
@@ -1877,7 +1863,6 @@ namespace HVACMultiSpeedHeatPump {
         //       DATE WRITTEN:    July 2007
         //       MODIFIED         Bereket Nigusse, June 2010 - added a procedure to calculate supply air flow fraction
         //                        through controlled zone
-        //       RE-ENGINEERED    na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the multispeed heat pump (MSHP) components.
@@ -2763,16 +2748,9 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    June 2007
-        //       MODIFIED         na
-        //       RE-ENGINEERED    na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for sizing multispeed heat pump airflow rates and flow fraction.
-
-        // Using/Aliasing
-        using namespace DataSizing;
-
-        using PlantUtilities::RegisterPlantCompDesignFlow;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumOfSpeedCooling; // Number of speeds for cooling
@@ -2800,12 +2778,12 @@ namespace HVACMultiSpeedHeatPump {
 
         for (i = NumOfSpeedCooling; i >= 1; --i) {
 
-            if (MSHeatPump.CoolVolumeFlowRate(i) == AutoSize) {
+            if (MSHeatPump.CoolVolumeFlowRate(i) == DataSizing::AutoSize) {
                 if (state.dataSize->CurSysNum > 0) {
                     if (i == NumOfSpeedCooling) {
                         CheckSysSizing(state, state.dataHVACMultiSpdHP->CurrentModuleObject, MSHeatPump.Name);
                         MSHeatPump.CoolVolumeFlowRate(i) = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                        if (MSHeatPump.FanVolFlow < MSHeatPump.CoolVolumeFlowRate(i) && MSHeatPump.FanVolFlow != AutoSize) {
+                        if (MSHeatPump.FanVolFlow < MSHeatPump.CoolVolumeFlowRate(i) && MSHeatPump.FanVolFlow != DataSizing::AutoSize) {
                             MSHeatPump.CoolVolumeFlowRate(i) = MSHeatPump.FanVolFlow;
                             ShowWarningError(state, format("{} \"{}\"", state.dataHVACMultiSpdHP->CurrentModuleObject, MSHeatPump.Name));
                             ShowContinueError(state,
@@ -2837,12 +2815,12 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         for (i = NumOfSpeedHeating; i >= 1; --i) {
-            if (MSHeatPump.HeatVolumeFlowRate(i) == AutoSize) {
+            if (MSHeatPump.HeatVolumeFlowRate(i) == DataSizing::AutoSize) {
                 if (state.dataSize->CurSysNum > 0) {
                     if (i == NumOfSpeedHeating) {
                         CheckSysSizing(state, state.dataHVACMultiSpdHP->CurrentModuleObject, MSHeatPump.Name);
                         MSHeatPump.HeatVolumeFlowRate(i) = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                        if (MSHeatPump.FanVolFlow < MSHeatPump.HeatVolumeFlowRate(i) && MSHeatPump.FanVolFlow != AutoSize) {
+                        if (MSHeatPump.FanVolFlow < MSHeatPump.HeatVolumeFlowRate(i) && MSHeatPump.FanVolFlow != DataSizing::AutoSize) {
                             MSHeatPump.HeatVolumeFlowRate(i) = MSHeatPump.FanVolFlow;
                             ShowWarningError(state, format("{} \"{}\"", state.dataHVACMultiSpdHP->CurrentModuleObject, MSHeatPump.Name));
                             ShowContinueError(state,
@@ -2873,11 +2851,11 @@ namespace HVACMultiSpeedHeatPump {
             }
         }
 
-        if (MSHeatPump.IdleVolumeAirRate == AutoSize) {
+        if (MSHeatPump.IdleVolumeAirRate == DataSizing::AutoSize) {
             if (state.dataSize->CurSysNum > 0) {
                 CheckSysSizing(state, state.dataHVACMultiSpdHP->CurrentModuleObject, MSHeatPump.Name);
                 MSHeatPump.IdleVolumeAirRate = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                if (MSHeatPump.FanVolFlow < MSHeatPump.IdleVolumeAirRate && MSHeatPump.FanVolFlow != AutoSize) {
+                if (MSHeatPump.FanVolFlow < MSHeatPump.IdleVolumeAirRate && MSHeatPump.FanVolFlow != DataSizing::AutoSize) {
                     MSHeatPump.IdleVolumeAirRate = MSHeatPump.FanVolFlow;
                     ShowWarningError(state, format("{} \"{}\"", state.dataHVACMultiSpdHP->CurrentModuleObject, MSHeatPump.Name));
                     ShowContinueError(state,
@@ -2899,7 +2877,7 @@ namespace HVACMultiSpeedHeatPump {
             }
         }
 
-        if (MSHeatPump.SuppMaxAirTemp == AutoSize) {
+        if (MSHeatPump.SuppMaxAirTemp == DataSizing::AutoSize) {
             if (state.dataSize->CurSysNum > 0) {
                 if (MSHeatPump.SuppHeatCoilType == 1) { // Gas
                     CheckZoneSizing(state, "Coil:Heating:Fuel", MSHeatPump.Name);
@@ -2915,7 +2893,7 @@ namespace HVACMultiSpeedHeatPump {
             }
         }
 
-        if (MSHeatPump.DesignSuppHeatingCapacity == AutoSize) {
+        if (MSHeatPump.DesignSuppHeatingCapacity == DataSizing::AutoSize) {
             if (state.dataSize->CurSysNum > 0) {
                 if (MSHeatPump.SuppHeatCoilType == 1) { // Gas
                     CheckSysSizing(state, "Coil:Heating:Fuel", MSHeatPump.Name);
@@ -2935,7 +2913,7 @@ namespace HVACMultiSpeedHeatPump {
         state.dataSize->SuppHeatCap = MSHeatPump.DesignSuppHeatingCapacity;
 
         if (MSHeatPump.HeatRecActive) {
-            RegisterPlantCompDesignFlow(state, MSHeatPump.HeatRecInletNodeNum, MSHeatPump.DesignHeatRecFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, MSHeatPump.HeatRecInletNodeNum, MSHeatPump.DesignHeatRecFlowRate);
         }
     }
 
@@ -3129,7 +3107,6 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   June 2007
-        //       MODIFIED       na
         //       RE-ENGINEERED  Revised for multispeed heat pump use based on ControlPTHPOutput
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -3741,29 +3718,9 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    June 2007
-        //       MODIFIED         na
-        //       RE-ENGINEERED    na
 
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will calcultes MSHP performance based on given system load
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES: na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        //  INTEGER, PARAMETER  ::   On  = 1           ! Compressor on flag
-        //  INTEGER, PARAMETER  ::   Off = 2           ! Compressor off flag
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVMS TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutletNode;            // MSHP air outlet node
@@ -4008,17 +3965,9 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    June 2007
-        //       MODIFIED         na
-        //       RE-ENGINEERED    na
 
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will update MSHP performance and calculate heat recovery rate and crankcase heater power
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // Calculate heat recovery
         if (state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HeatRecActive) {
@@ -4046,13 +3995,9 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
         //       DATE WRITTEN:    June 2007
-        //       MODIFIED         na
-        //       RE-ENGINEERED    na
 
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will write values to output variables in MSHP
-
-        // METHODOLOGY EMPLOYED:
 
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
@@ -4096,7 +4041,6 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu
         //       DATE WRITTEN:    June 2007
-        //       MODIFIED:        na
         //       RE-ENGINEERED    Revised to calculate MSHP heat recovery rate based on EIR Chiller heat recovery subroutine
         // PURPOSE OF THIS SUBROUTINE:
         //  Calculate the heat recovered from MSHP
@@ -4105,29 +4049,23 @@ namespace HVACMultiSpeedHeatPump {
         static constexpr std::string_view RoutineName("MSHPHeatRecovery");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int HeatRecInNode;          // Node number of heat recovery water inlet node
-        int HeatRecOutNode;         // Node number of heat recovery water outlet node
-        Real64 QHeatRec;            // Total heat recovered [W]
-        Real64 HeatRecInletTemp;    // Heat reclaim inlet temp [C]
-        Real64 HeatRecOutletTemp;   // Heat reclaim outlet temp [C]
-        Real64 HeatRecMassFlowRate; // Heat reclaim mass flow rate [m3/s]
-        Real64 CpHeatRec;           // Heat reclaim water inlet specific heat [J/kg-K]
+        Real64 HeatRecOutletTemp; // Heat reclaim outlet temp [C]
 
         // Begin routine
-        HeatRecInNode = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HeatRecInletNodeNum;
-        HeatRecOutNode = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HeatRecOutletNodeNum;
+        int HeatRecInNode = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HeatRecInletNodeNum;
+        int HeatRecOutNode = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HeatRecOutletNodeNum;
 
         // Inlet node to the heat recovery heat exchanger
-        HeatRecInletTemp = state.dataLoopNodes->Node(HeatRecInNode).Temp;
+        Real64 HeatRecInletTemp = state.dataLoopNodes->Node(HeatRecInNode).Temp;
 
         // Set heat recovery mass flow rates
-        HeatRecMassFlowRate = state.dataLoopNodes->Node(HeatRecInNode).MassFlowRate;
+        Real64 HeatRecMassFlowRate = state.dataLoopNodes->Node(HeatRecInNode).MassFlowRate;
 
-        QHeatRec = state.dataHVACGlobal->MSHPWasteHeat;
+        Real64 QHeatRec = state.dataHVACGlobal->MSHPWasteHeat;
 
         if (HeatRecMassFlowRate > 0.0) {
-
-            CpHeatRec = FluidProperties::GetSpecificHeatGlycol(
+            // Heat reclaim water inlet specific heat [J/kg-K]
+            Real64 CpHeatRec = FluidProperties::GetSpecificHeatGlycol(
                 state,
                 state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidName,
                 HeatRecInletTemp,
@@ -4166,7 +4104,6 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing
         //       DATE WRITTEN   June 2007
-        //       MODIFIED       na
         //       RE-ENGINEERED  Resived to meet requirements of multispeed heat pump based on the same subroutine
         //                      in PTHP module
 
@@ -4289,8 +4226,6 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket Nigusse, FSEC/UCF
         //       DATE WRITTEN   January 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the four non dx heating coil types: Gas, Electric, hot water and steam.
@@ -4299,25 +4234,12 @@ namespace HVACMultiSpeedHeatPump {
         // Simply calls the different heating coil component.  The hot water flow rate matching the coil load
         // is calculated iteratively.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Locals
         static constexpr std::string_view CurrentModuleObject("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed");
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr ErrTolerance(0.001); // convergence limit for hotwater coil
         int constexpr SolveMaxIter(50);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QCoilActual;     // actual heating load met
