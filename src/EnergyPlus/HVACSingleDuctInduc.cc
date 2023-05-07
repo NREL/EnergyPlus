@@ -194,15 +194,6 @@ namespace HVACSingleDuctInduc {
         // METHODOLOGY EMPLOYED:
         // Uses "Get" routines to read in data.
 
-        // Using/Aliasing
-        using BranchNodeConnections::SetUpCompSets;
-        using BranchNodeConnections::TestCompSet;
-        using NodeInputManager::GetOnlySingleNode;
-        using namespace DataSizing;
-
-        using MixerComponent::GetZoneMixerIndex;
-        using WaterCoils::GetCoilWaterInletNode;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetIndUnits "); // include trailing blank space
 
@@ -328,7 +319,7 @@ namespace HVACSingleDuctInduc {
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil = Alphas(7); // name of heating coil object
             bool IsNotOK = false;
-            state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWControlNode = GetCoilWaterInletNode(
+            state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWControlNode = WaterCoils::GetCoilWaterInletNode(
                 state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil, IsNotOK);
             if (IsNotOK) {
                 ShowContinueError(state, format("In {} = {}", CurrentModuleObject, state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name));
@@ -349,7 +340,7 @@ namespace HVACSingleDuctInduc {
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil = Alphas(9); // name of cooling coil object
             IsNotOK = false;
-            state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWControlNode = GetCoilWaterInletNode(
+            state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWControlNode = WaterCoils::GetCoilWaterInletNode(
                 state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil, IsNotOK);
             if (IsNotOK) {
                 ShowContinueError(state, format("In {} = {}", CurrentModuleObject, state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name));
@@ -363,40 +354,40 @@ namespace HVACSingleDuctInduc {
             // Get the Zone Mixer name and check that it is OK
             bool errFlag = false;
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).MixerName = Alphas(10);
-            GetZoneMixerIndex(state,
-                              state.dataHVACSingleDuctInduc->IndUnit(IUNum).MixerName,
-                              state.dataHVACSingleDuctInduc->IndUnit(IUNum).Mixer_Num,
-                              errFlag,
-                              CurrentModuleObject);
+            MixerComponent::GetZoneMixerIndex(state,
+                                              state.dataHVACSingleDuctInduc->IndUnit(IUNum).MixerName,
+                                              state.dataHVACSingleDuctInduc->IndUnit(IUNum).Mixer_Num,
+                                              errFlag,
+                                              CurrentModuleObject);
             if (errFlag) {
                 ShowContinueError(state, format("...specified in {} = {}", CurrentModuleObject, state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name));
                 ErrorsFound = true;
             }
 
             // Add heating coil to component sets array
-            SetUpCompSets(state,
-                          state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
-                          state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
-                          state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType,
-                          state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil,
-                          Alphas(4),
-                          "UNDEFINED");
+            BranchNodeConnections::SetUpCompSets(state,
+                                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
+                                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
+                                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType,
+                                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil,
+                                                 Alphas(4),
+                                                 "UNDEFINED");
             // Add cooling coil to component sets array
-            SetUpCompSets(state,
-                          state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
-                          state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
-                          state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType,
-                          state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
-                          "UNDEFINED",
-                          "UNDEFINED");
+            BranchNodeConnections::SetUpCompSets(state,
+                                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
+                                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
+                                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType,
+                                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
+                                                 "UNDEFINED",
+                                                 "UNDEFINED");
 
             // Register component set data
-            TestCompSet(state,
-                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
-                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
-                        state.dataLoopNodes->NodeID(state.dataHVACSingleDuctInduc->IndUnit(IUNum).PriAirInNode),
-                        state.dataLoopNodes->NodeID(state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode),
-                        "Air Nodes");
+            BranchNodeConnections::TestCompSet(state,
+                                               state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
+                                               state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
+                                               state.dataLoopNodes->NodeID(state.dataHVACSingleDuctInduc->IndUnit(IUNum).PriAirInNode),
+                                               state.dataLoopNodes->NodeID(state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode),
+                                               "Air Nodes");
 
             for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                 if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
