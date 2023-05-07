@@ -337,7 +337,7 @@ x'_2 = x_0 + t_2 \Delta x
 y'_2 = y_0 + t_2 \Delta y
 \end{equation}
 
-The Slater-Barsky algorithm uses space subdivision to reduce the number of pre-emptive calculations. We break the plane into 9 parts, where region (4) is the clipping region.
+The Slater-Barsky algorithm uses space subdivision to reduce the number of preemptive calculations. We break the plane into 9 parts, where region (4) is the clipping region.
 
 
 | 6 | 7 | 8 | \\
@@ -538,7 +538,7 @@ This case is the same interior distribution as the preceding option but uses ext
 
 \subsection{Details of the Interior Solar Distribution Calculation}\label{details-of-the-interior-solar-distribution-calculation}
 
-EnergyPlus calculates the distribution of short-wave radiation in the interior of each thermal zone. This radiation consists of beam solar radiation, diffuse solar radiation, and short-wave radiation from electric lights. The program determines the amount of this radiation that is (1) absorbed on the inside face of opaque surfaces, (2) absorbed in the glass and shading device layers of the zone's exterior and interior windows, (3) transmitted through the zone's interior windows to adjacent zones, and (4) transmitted back out of the exterior windows. The effects of movable shading devices on the exterior windows are taken into account; \emph{the program does not allow shading devices on interior windows}. Most of this calculation is done in subroutine CalcInteriorSolarDistribution in the SolarShading module. EnergyPlus will use either Polygon Clipping or Pixel Counting--depending on the method of shading algorithm selected by the user--to determine interior solar distibution if full interior solar distribution is requested.
+EnergyPlus calculates the distribution of short-wave radiation in the interior of each thermal zone. This radiation consists of beam solar radiation, diffuse solar radiation, and short-wave radiation from electric lights. The program determines the amount of this radiation that is (1) absorbed on the inside face of opaque surfaces, (2) absorbed in the glass and shading device layers of the zone's exterior and interior windows, (3) transmitted through the zone's interior windows to adjacent zones, and (4) transmitted back out of the exterior windows. The effects of movable shading devices on the exterior windows are taken into account; \emph{the program does not allow shading devices on interior windows}. Most of this calculation is done in subroutine CalcInteriorSolarDistribution in the SolarShading module. EnergyPlus will use either Polygon Clipping or Pixel Counting--depending on the method of shading algorithm selected by the user--to determine interior solar distribution if full interior solar distribution is requested.
 
 \subsubsection{Initial Distribution of Diffuse Solar Transmitted through Exterior and Interior Windows}\label{initial-distribution-of-diffuse-solar-transmitted-through-exterior-and-interior-windows}
 

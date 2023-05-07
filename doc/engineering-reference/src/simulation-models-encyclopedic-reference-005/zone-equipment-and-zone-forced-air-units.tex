@@ -412,7 +412,7 @@ The input object ZoneHVAC:WindowAirConditioner provides a model for a window air
 
 \subsubsection{Model}\label{model-4}
 
-The window air conditioner is modeled as a compound component consisting of 3 sub-components: an outdoor air mixer, a fan, and a DX coil. In terms of EnergyPlus objects these are OutdoorAir:Mixer, Fan:ConstantVolume or Fan:OnOff, and Coil:Coolilng:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted. The unit is a forward model: its inputs are defined by the state of its inlets: namely its 2 air streams -- recirculated and outdoor air. The outputs of the model are the conditions of the outlet air stream: flow rate, temperature and humidity ratio. The model is also an averaged model: the performance of the unit is averaged over the time step. That is, the unit is assumed to cycle on/off during the time step and this on/off cycling is averaged over the simulation time step. The unit data and simulation are encapsulated in the module WindowAC.
+The window air conditioner is modeled as a compound component consisting of 3 sub-components: an outdoor air mixer, a fan, and a DX coil. In terms of EnergyPlus objects these are OutdoorAir:Mixer, Fan:ConstantVolume or Fan:OnOff, and Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted. The unit is a forward model: its inputs are defined by the state of its inlets: namely its 2 air streams -- recirculated and outdoor air. The outputs of the model are the conditions of the outlet air stream: flow rate, temperature and humidity ratio. The model is also an averaged model: the performance of the unit is averaged over the time step. That is, the unit is assumed to cycle on/off during the time step and this on/off cycling is averaged over the simulation time step. The unit data and simulation are encapsulated in the module WindowAC.
 
 \subsubsection{Inputs and Data}\label{inputs-and-data-5}
 
@@ -1432,7 +1432,7 @@ The input object ZoneHVAC:EvaporativeCoolerUnit provides a zone equipment model 
 
 There are three choices for control methods.
 
-\textbf{ZoneTemperatureDeadbandOnOffCycling}. This control method operates the cooler unit in a manner similar to how a normal, real-world themostat operates.~ The control uses input for throttling temperature range, \(\Delta {T_{throttle}}\), the most recent result for zone air node temperature, \({T_{zone}}\), and the current cooling setpoint temperature, \({T_{set}}\).~ The controller also stores the history of whether or not the unit was operating during the previous timestep to model hysteresis control where the unit retains its mode when it passes through the throttling range (to avoid short cycling).
+\textbf{ZoneTemperatureDeadbandOnOffCycling}. This control method operates the cooler unit in a manner similar to how a normal, real-world thermostat operates.~ The control uses input for throttling temperature range, \(\Delta {T_{throttle}}\), the most recent result for zone air node temperature, \({T_{zone}}\), and the current cooling setpoint temperature, \({T_{set}}\).~ The controller also stores the history of whether or not the unit was operating during the previous timestep to model hysteresis control where the unit retains its mode when it passes through the throttling range (to avoid short cycling).
 
 The following algorithm is used to determine if the unit will operate.
 
@@ -1470,7 +1470,7 @@ ZoneHVAC:HybridUnitaryHVAC is a black-box model designed to allow empirical repr
 \subsubsection{Model}
 ZoneHVAC:HybridUnitaryHVAC will operate to provide cooling, heating, ventilation, humidification, or dehumidification for a zone. A ZoneHVAC:HybridUnitaryHVAC object is assigned to a zone using ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections. The object must be assigned a supply air node (which must be a zone inlet node), a return air node (which must be a zone outlet node), and an outdoor air node. In the case when the hybrid system modeled does not utilize either return air or outdoor air, a return air node and an outdoor air node must still be assigned. The resulting mass flow rate on those nodes will be zero.
 
-The zone sensible cooling or heating load is determined in each time step according to temperature set points specified in a ZoneControl:Thermostat object. The zone humidification or dehumidifaction load is determined in each time step according to relative humidity set points specified in a ZoneControl:Humidistat object (Ref: Zone Controls). The intended zone ventilation rate is specified in a DesignSpecification:OutdoorAir object (Ref: Design Outdoor Air Calculation).
+The zone sensible cooling or heating load is determined in each time step according to temperature set points specified in a ZoneControl:Thermostat object. The zone humidification or dehumidification load is determined in each time step according to relative humidity set points specified in a ZoneControl:Humidistat object (Ref: Zone Controls). The intended zone ventilation rate is specified in a DesignSpecification:OutdoorAir object (Ref: Design Outdoor Air Calculation).
 
 The performance of a hybrid system is not directly given as a result of the loads and the environmental conditions. A hybrid system may have numerous discrete operating modes, within which other variables may be adjusted in fine intervals. There may be many settings in which a hybrid system could feasibly operate at a given time. Therefore, ZoneHVAC:HybridUnitaryHVAC is structured as a constrained optimization problem that is solved in each time step. The feasible settings are the unique combinations of operating mode, outdoor air fraction, and supply air mass flow rate that satisfy constraints. In each time step the hybrid model will choose to operate at one or more settings so as to best satisfy the sensible load, latent load, and scheduled ventilation rate while minimizing resource consumption.
 
@@ -2023,7 +2023,7 @@ The earth tube model (input object ZoneEarthtube) provides a simple earth tube m
 \item
   Convection flow inside the pipe is hydrodynamically and thermally developed.
 \item
-  Soil temperature in the pipe vicinity is uniform after the particular distance from the center of the pipe(thickness of the annulus), so that pipe surface temperature is uniform after the distance `r' from the center of the pipe, where `r'is the pipe radius.
+  Soil temperature in the pipe vicinity is uniform after the particular distance from the center of the pipe(thickness of the annulus), so that pipe surface temperature is uniform after the distance `r' from the center of the pipe, where `r' is the pipe radius.
 \item
   The temperature profile in the pipe vicinity is not affected by the presence of the pipe, so that pipe surface temperature is uniform at axial direction.
 \item
