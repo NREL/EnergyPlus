@@ -4304,15 +4304,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // USE STATEMENTS:
 
-        // Using/Aliasing
-        using DataHVACGlobals::SmallLoad;
-
-        using General::SolveRoot;
-        using HeatingCoils::SimulateHeatingCoilComponents;
-        using PlantUtilities::SetComponentFlowRate;
-        using SteamCoils::SimulateSteamCoilComponents;
-        using WaterCoils::SimulateWaterCoilComponents;
-
         // Locals
         static constexpr std::string_view CurrentModuleObject("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed");
 
@@ -4371,24 +4362,26 @@ namespace HVACMultiSpeedHeatPump {
         MSHeatPump.HotWaterCoilName = state.dataHVACMultiSpdHP->HeatCoilName;
         MSHeatPump.HotWaterCoilNum = HeatCoilNum;
 
-        if (HeatingLoad > SmallLoad) {
+        if (HeatingLoad > DataHVACGlobals::SmallLoad) {
 
             switch (HeatCoilType) {
             case SuppHeatingCoilGas:
             case SuppHeatingCoilElec: {
-                SimulateHeatingCoilComponents(
+                HeatingCoils::SimulateHeatingCoilComponents(
                     state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
             } break;
             case DataHVACGlobals::Coil_HeatingWater: {
                 if (present(PartLoadFrac)) {
                     MaxHotWaterFlow = MaxCoilFluidFlow * PartLoadFrac;
-                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, plantLoc);
-                    SimulateWaterCoilComponents(state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                    PlantUtilities::SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, plantLoc);
+                    WaterCoils::SimulateWaterCoilComponents(
+                        state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                 } else {
                     MaxHotWaterFlow = MaxCoilFluidFlow;
-                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, plantLoc);
-                    SimulateWaterCoilComponents(state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
-                    if (QCoilActual > (HeatingLoad + SmallLoad)) {
+                    PlantUtilities::SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, plantLoc);
+                    WaterCoils::SimulateWaterCoilComponents(
+                        state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                    if (QCoilActual > (HeatingLoad + DataHVACGlobals::SmallLoad)) {
                         // control water flow to obtain output matching HeatingLoad
                         int SolFlag = 0;
                         MinWaterFlow = 0.0;
@@ -4410,7 +4403,7 @@ namespace HVACMultiSpeedHeatPump {
                                 return 0.0;
                             }
                         };
-                        SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, f, MinWaterFlow, MaxHotWaterFlow);
+                        General::SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, f, MinWaterFlow, MaxHotWaterFlow);
                         if (SolFlag == -1) {
                             if (MSHeatPump.HotWaterCoilMaxIterIndex == 0) {
                                 ShowWarningMessage(state,
@@ -4450,7 +4443,7 @@ namespace HVACMultiSpeedHeatPump {
                                                            "[kg/s]");
                         }
                         // simulate hot water supplemental heating coil
-                        SimulateWaterCoilComponents(
+                        WaterCoils::SimulateWaterCoilComponents(
                             state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                     }
                 }
@@ -4463,9 +4456,9 @@ namespace HVACMultiSpeedHeatPump {
                     mdot = MSHeatPump.MaxCoilFluidFlow;
                     SteamCoilHeatingLoad = HeatingLoad;
                 }
-                SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
+                PlantUtilities::SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
                 // simulate steam supplemental heating coil
-                SimulateSteamCoilComponents(
+                SteamCoils::SimulateSteamCoilComponents(
                     state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, SteamCoilHeatingLoad, QCoilActual, FanMode);
             } break;
             default:
@@ -4477,19 +4470,20 @@ namespace HVACMultiSpeedHeatPump {
             switch (HeatCoilType) {
             case SuppHeatingCoilGas:
             case SuppHeatingCoilElec: {
-                SimulateHeatingCoilComponents(
+                HeatingCoils::SimulateHeatingCoilComponents(
                     state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
             } break;
             case DataHVACGlobals::Coil_HeatingWater: {
                 mdot = 0.0;
-                SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
-                SimulateWaterCoilComponents(state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                PlantUtilities::SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
+                WaterCoils::SimulateWaterCoilComponents(
+                    state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
             } break;
             case DataHVACGlobals::Coil_HeatingSteam: {
                 mdot = 0.0;
-                SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
+                PlantUtilities::SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
                 // simulate the steam supplemental heating coil
-                SimulateSteamCoilComponents(
+                SteamCoils::SimulateSteamCoilComponents(
                     state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, HeatingLoad, QCoilActual, FanMode);
             } break;
             default:
