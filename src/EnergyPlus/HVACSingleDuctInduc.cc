@@ -1485,24 +1485,17 @@ namespace HVACSingleDuctInduc {
         // Given a mixer name, this routine determines if that mixer is found on
         // PIUnits.
 
-        // Return value
-        bool YesNo; // True if found
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int ItemNum;
-
         if (state.dataHVACSingleDuctInduc->GetIUInputFlag) {
             GetIndUnits(state);
             state.dataHVACSingleDuctInduc->GetIUInputFlag = false;
         }
 
-        YesNo = false;
         if (state.dataHVACSingleDuctInduc->NumIndUnits > 0) {
-            ItemNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACSingleDuctInduc->IndUnit, &IndUnitData::MixerName);
-            if (ItemNum > 0) YesNo = true;
+            int ItemNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACSingleDuctInduc->IndUnit, &IndUnitData::MixerName);
+            if (ItemNum > 0) return true;
         }
 
-        return YesNo;
+        return false;
     }
 
     void IndUnitData::ReportIndUnit(EnergyPlusData &state)
