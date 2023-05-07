@@ -176,14 +176,12 @@ void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(EnergyPl
 }
 void HVACSizingSimulationManager::RedoKickOffAndResize(EnergyPlusData &state)
 {
-    using namespace WeatherManager;
-    using namespace SimulationManager;
-    bool ErrorsFound(false);
+    bool ErrorsFound = false;
     state.dataGlobal->KickOffSimulation = true;
     state.dataGlobal->RedoSizesHVACSimulation = true;
 
-    ResetEnvironmentCounter(state);
-    SetupSimulation(state, ErrorsFound);
+    WeatherManager::ResetEnvironmentCounter(state);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
 
     state.dataGlobal->KickOffSimulation = false;
     state.dataGlobal->RedoSizesHVACSimulation = false;
