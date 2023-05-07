@@ -538,12 +538,6 @@ namespace HVACMultiSpeedHeatPump {
         int i;                         // Index to speeds
         int j;                         // Index to speeds
         bool Found;                    // Flag to find autosize
-        int HeatingCoilInletNode;      // Heating coil inlet node number
-        int HeatingCoilOutletNode;     // Heating coil outlet node number
-        int CoolingCoilInletNode;      // Cooling coil inlet node number
-        int CoolingCoilOutletNode;     // Cooling coil outlet node number
-        int SuppHeatCoilInletNode;     // Supplemental heating coil inlet node number
-        int SuppHeatCoilOutletNode;    // Supplemental heating coil outlet node number
         bool LocalError;               // Local error flag
         Array1D_string Alphas;         // Alpha input items for object
         Array1D_string cAlphaFields;   // Alpha field names
@@ -594,12 +588,12 @@ namespace HVACMultiSpeedHeatPump {
         // Load arrays with reformulated electric EIR chiller data
         for (MSHPNum = 1; MSHPNum <= state.dataHVACMultiSpdHP->NumMSHeatPumps; ++MSHPNum) {
 
-            HeatingCoilInletNode = 0;
-            HeatingCoilOutletNode = 0;
-            CoolingCoilInletNode = 0;
-            CoolingCoilOutletNode = 0;
-            SuppHeatCoilInletNode = 0;
-            SuppHeatCoilOutletNode = 0;
+            int HeatingCoilInletNode = 0;
+            int HeatingCoilOutletNode = 0;
+            int CoolingCoilInletNode = 0;
+            int CoolingCoilOutletNode = 0;
+            int SuppHeatCoilInletNode = 0;
+            int SuppHeatCoilOutletNode = 0;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHVACMultiSpdHP->CurrentModuleObject,
@@ -1963,18 +1957,13 @@ namespace HVACMultiSpeedHeatPump {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static constexpr std::string_view RoutineName("InitMSHeatPump");
-        int InNode;     // Inlet node number in MSHP loop
-        int OutNode;    // Outlet node number in MSHP loop
-        int ZoneInNode; // Zone inlet node number in the controlled zone for MSHP
-        Real64 RhoAir;  // Air density at InNode
+        Real64 RhoAir; // Air density at InNode
 
         Real64 QSensUnitOut; // Output of MSHP system with coils off
         Real64 PartLoadFrac; // Part-load ratio
         int ZoneNum;
-        int i;                 // Index to speed
-        int NumOfSpeedCooling; // Number of speeds for cooling
-        int NumOfSpeedHeating; // Number of speeds for heating
-        Real64 DeltaMassRate;  // Difference of mass flow rate between inlet node and system outlet node
+        int i;                // Index to speed
+        Real64 DeltaMassRate; // Difference of mass flow rate between inlet node and system outlet node
 
         int NumAirLoopZones(0);                           // number of zone inlet nodes in an air loop
         Real64 SumOfMassFlowRateMax(0.0);                 // the sum of mass flow rates at inlet to zones in an airloop
@@ -1985,7 +1974,6 @@ namespace HVACMultiSpeedHeatPump {
         Real64 ZoneLoadToHeatSPSequenced;
 
         bool ErrorsFound(false);        // flag returned from mining call
-        int SteamIndex(0);              // index of steam quality for steam heating coil
         Real64 mdot(0.0);               // local temporary for mass flow rate (kg/s)
         Real64 SteamDensity(0.0);       // density of steam at 100C, used for steam heating coils
         Real64 CoilMaxVolFlowRate(0.0); // coil fluid maximum volume flow rate
@@ -1993,10 +1981,10 @@ namespace HVACMultiSpeedHeatPump {
 
         auto &MSHeatPump = state.dataHVACMultiSpdHP->MSHeatPump;
 
-        InNode = MSHeatPump(MSHeatPumpNum).AirInletNodeNum;
-        OutNode = MSHeatPump(MSHeatPumpNum).AirOutletNodeNum;
-        NumOfSpeedCooling = MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling;
-        NumOfSpeedHeating = MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating;
+        int InNode = MSHeatPump(MSHeatPumpNum).AirInletNodeNum;
+        int OutNode = MSHeatPump(MSHeatPumpNum).AirOutletNodeNum;
+        int NumOfSpeedCooling = MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling;
+        int NumOfSpeedHeating = MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating;
 
         ++state.dataHVACMultiSpdHP->AirLoopPass;
         if (state.dataHVACMultiSpdHP->AirLoopPass > 2) state.dataHVACMultiSpdHP->AirLoopPass = 1;
@@ -2073,7 +2061,7 @@ namespace HVACMultiSpeedHeatPump {
                 MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow =
                     SteamCoils::GetCoilMaxSteamFlowRate(state, MSHeatPump(MSHeatPumpNum).HeatCoilNum, ErrorsFound);
                 if (MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow > 0.0) {
-                    SteamIndex =
+                    int SteamIndex =
                         0; // Function GetSatDensityRefrig will look up steam index if 0 is passed // TODO: Why do you want to re-look this up?
                     SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataHVACMultiSpdHP->TempSteamIn, 1.0, SteamIndex, RoutineName);
                     MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow *= SteamDensity;
@@ -2134,7 +2122,7 @@ namespace HVACMultiSpeedHeatPump {
                 MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow =
                     SteamCoils::GetCoilMaxSteamFlowRate(state, MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum, ErrorsFound);
                 if (MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow > 0.0) {
-                    SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                    int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                     SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataHVACMultiSpdHP->TempSteamIn, 1.0, SteamIndex, RoutineName);
                     MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow *= SteamDensity;
                 }
@@ -2303,7 +2291,7 @@ namespace HVACMultiSpeedHeatPump {
                         CoilMaxVolFlowRate = SteamCoils::GetCoilMaxSteamFlowRate(state, MSHeatPump(MSHeatPumpNum).HeatCoilNum, ErrorsFound);
 
                         if (CoilMaxVolFlowRate != AutoSize) {
-                            SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                            int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                             SteamDensity =
                                 GetSatDensityRefrig(state, fluidNameSteam, state.dataHVACMultiSpdHP->TempSteamIn, 1.0, SteamIndex, RoutineName);
                             MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
@@ -2349,7 +2337,7 @@ namespace HVACMultiSpeedHeatPump {
                         CoilMaxVolFlowRate = SteamCoils::GetCoilMaxSteamFlowRate(state, MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum, ErrorsFound);
 
                         if (CoilMaxVolFlowRate != AutoSize) {
-                            SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                            int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                             SteamDensity =
                                 GetSatDensityRefrig(state, fluidNameSteam, state.dataHVACMultiSpdHP->TempSteamIn, 1.0, SteamIndex, RoutineName);
                             MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
@@ -2485,7 +2473,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // Calcuate air distribution losses
         if (!FirstHVACIteration && state.dataHVACMultiSpdHP->AirLoopPass == 1) {
-            ZoneInNode = MSHeatPump(MSHeatPumpNum).ZoneInletNode;
+            int ZoneInNode = MSHeatPump(MSHeatPumpNum).ZoneInletNode;
             DeltaMassRate = state.dataLoopNodes->Node(OutNode).MassFlowRate -
                             state.dataLoopNodes->Node(ZoneInNode).MassFlowRate / MSHeatPump(MSHeatPumpNum).FlowFraction;
             if (DeltaMassRate < 0.0) DeltaMassRate = 0.0;
@@ -4413,7 +4401,6 @@ namespace HVACMultiSpeedHeatPump {
         Real64 MinWaterFlow;    // coil minimum hot water mass flow rate, kg/s
         Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
         Real64 HotWaterMdot;    // actual hot water mass flow rate
-        int SolFlag;
 
         int HeatCoilType;
         int HeatCoilNum;
@@ -4470,7 +4457,7 @@ namespace HVACMultiSpeedHeatPump {
                     SimulateWaterCoilComponents(state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                     if (QCoilActual > (HeatingLoad + SmallLoad)) {
                         // control water flow to obtain output matching HeatingLoad
-                        SolFlag = 0;
+                        int SolFlag = 0;
                         MinWaterFlow = 0.0;
                         auto f = [&state, MSHeatPumpNum, FirstHVACIteration, HeatingLoad](Real64 const HWFlow) {
                             // Calculates residual function (QCoilActual - SupHeatCoilLoad) / SupHeatCoilLoad
