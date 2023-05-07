@@ -197,17 +197,15 @@ namespace HVACSingleDuctInduc {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetIndUnits "); // include trailing blank space
 
-        int IUIndex;                     // loop index
-        std::string CurrentModuleObject; // for ease in getting objects
-        Array1D_string Alphas;           // Alpha input items for object
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        int NumAlphas(0);                // Number of Alphas for each GetObjectItem call
-        int NumNumbers(0);               // Number of Numbers for each GetObjectItem call
-        int TotalArgs(0);                // Total number of alpha and numeric arguments (max) for a
+        Array1D_string Alphas;         // Alpha input items for object
+        Array1D_string cAlphaFields;   // Alpha field names
+        Array1D_string cNumericFields; // Numeric field names
+        Array1D<Real64> Numbers;       // Numeric input items for object
+        Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
+        Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
+        int NumAlphas(0);              // Number of Alphas for each GetObjectItem call
+        int NumNumbers(0);             // Number of Numbers for each GetObjectItem call
+        int TotalArgs(0);              // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
         int IOStatus;            // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
@@ -215,10 +213,8 @@ namespace HVACSingleDuctInduc {
         int SupAirIn;            // controlled zone supply air inlet index
         int ADUNum;
 
-        auto &ZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig;
-
         // find the number of each type of induction unit
-        CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
+        std::string CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
         state.dataHVACSingleDuctInduc->NumFourPipes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         state.dataHVACSingleDuctInduc->NumIndUnits = state.dataHVACSingleDuctInduc->NumFourPipes;
         // allocate the data structures
@@ -235,7 +231,7 @@ namespace HVACSingleDuctInduc {
         lNumericBlanks.dimension(NumNumbers, true);
 
         // loop over Series PIUs; get and load the input data
-        for (IUIndex = 1; IUIndex <= state.dataHVACSingleDuctInduc->NumFourPipes; ++IUIndex) {
+        for (int IUIndex = 1; IUIndex <= state.dataHVACSingleDuctInduc->NumFourPipes; ++IUIndex) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -409,10 +405,12 @@ namespace HVACSingleDuctInduc {
                 // Fill the Zone Equipment data with the supply air inlet node number of this unit.
                 bool AirNodeFound = false;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                        if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                            if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                    auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZone);
+
+                    if (!zoneEquipConfig.IsControlled) continue;
+                    for (SupAirIn = 1; SupAirIn <= zoneEquipConfig.NumInletNodes; ++SupAirIn) {
+                        if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode == zoneEquipConfig.InletNode(SupAirIn)) {
+                            if (zoneEquipConfig.AirDistUnitCool(SupAirIn).OutNode > 0) {
                                 ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                                 ShowContinueError(state,
                                                   format("{} already connects to another zone",
@@ -424,12 +422,12 @@ namespace HVACSingleDuctInduc {
                                 ShowContinueError(state, "Check terminal unit node names for errors");
                                 ErrorsFound = true;
                             } else {
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
+                                zoneEquipConfig.AirDistUnitCool(SupAirIn).InNode =
                                     state.dataHVACSingleDuctInduc->IndUnit(IUNum).PriAirInNode;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode =
+                                zoneEquipConfig.AirDistUnitCool(SupAirIn).OutNode =
                                     state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode;
                                 state.dataDefineEquipment->AirDistUnit(state.dataHVACSingleDuctInduc->IndUnit(IUNum).ADUNum).TermUnitSizingNum =
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                    zoneEquipConfig.AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                                 state.dataDefineEquipment->AirDistUnit(state.dataHVACSingleDuctInduc->IndUnit(IUNum).ADUNum).ZoneEqNum = CtrlZone;
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).CtrlZoneNum = CtrlZone;
                             }
@@ -479,8 +477,7 @@ namespace HVACSingleDuctInduc {
         //       DATE WRITTEN   June 21 2004
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for initialization of the passive induction
-        // terminal boxes
+        // This subroutine is for initialization of the passive induction terminal boxes
 
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
@@ -733,31 +730,20 @@ namespace HVACSingleDuctInduc {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DesCoilLoad;
-        Real64 DesPriVolFlow;
-        Real64 RhoAir;
-        Real64 CpAir;
-        bool ErrorsFound;
         Real64 Cp;  // local fluid specific heat
         Real64 rho; // local fluid density
-        bool IsAutoSize;
-        Real64 MaxTotAirVolFlowDes;     // Desing size maximum air volume flow for reproting
-        Real64 MaxTotAirVolFlowUser;    // User hard-sized maximum air volume flow for reporting
-        Real64 MaxVolHotWaterFlowDes;   // Desing size maximum hot water flow for reproting
-        Real64 MaxVolHotWaterFlowUser;  // User hard-sized maximum hot water flow for reporting
-        Real64 MaxVolColdWaterFlowDes;  // Desing size maximum cold water flow for reproting
-        Real64 MaxVolColdWaterFlowUser; // User hard-sized maximum cold water flow for reporting
 
-        DesPriVolFlow = 0.0;
-        CpAir = 0.0;
-        RhoAir = state.dataEnvrn->StdRhoAir;
-        ErrorsFound = false;
-        IsAutoSize = false;
-        MaxTotAirVolFlowDes = 0.0;
-        MaxTotAirVolFlowUser = 0.0;
-        MaxVolHotWaterFlowDes = 0.0;
-        MaxVolHotWaterFlowUser = 0.0;
-        MaxVolColdWaterFlowDes = 0.0;
-        MaxVolColdWaterFlowUser = 0.0;
+        Real64 DesPriVolFlow = 0.0;
+        Real64 CpAir = 0.0;
+        Real64 RhoAir = state.dataEnvrn->StdRhoAir;
+        bool ErrorsFound = false;
+        bool IsAutoSize = false;
+        Real64 MaxTotAirVolFlowDes = 0.0;     // Desing size maximum air volume flow for reproting
+        Real64 MaxTotAirVolFlowUser = 0.0;    // User hard-sized maximum air volume flow for reporting
+        Real64 MaxVolHotWaterFlowDes = 0.0;   // Desing size maximum hot water flow for reproting
+        Real64 MaxVolHotWaterFlowUser = 0.0;  // User hard-sized maximum hot water flow for reporting
+        Real64 MaxVolColdWaterFlowDes = 0.0;  // Desing size maximum cold water flow for reproting
+        Real64 MaxVolColdWaterFlowUser = 0.0; // User hard-sized maximum cold water flow for reporting
 
         if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow == DataSizing::AutoSize) {
             IsAutoSize = true;
@@ -1132,60 +1118,42 @@ namespace HVACSingleDuctInduc {
         int constexpr SolveMaxIter(50);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 QZnReq;           // heating or cooling needed by zone [Watts]
-        Real64 QToHeatSetPt;     // [W]  remaining load to heating setpoint
-        Real64 QToCoolSetPt;     // [W]  remaining load to cooling setpoint
-        Real64 PowerMet;         // power supplied
-        bool UnitOn;             // TRUE if unit is on
-        Real64 MaxHotWaterFlow;  // maximum water flow for heating [kg/s]
-        Real64 MinHotWaterFlow;  // minimum water flow for heating [kg/s]
-        Real64 MaxColdWaterFlow; // maximum water flow for cooling [kg/s]
-        Real64 MinColdWaterFlow; // minimum water flow for cooling [kg/s]
-        Real64 HWFlow;           // hot water flow [kg/s]
-        Real64 CWFlow;           // cold water flow [kg/s]
-        int PriNode;             // unit primary air inlet node
-        int SecNode;             // unit secondary air inlet node
-        int OutletNode;          // unit air outlet node
-        int HotControlNode;      // hot water coil inlet node
-        int ColdControlNode;     // cold water coil inlet node
-        Real64 QPriOnly;         // unit output with no zone coils active
-        Real64 PriAirMassFlow;   // primary air mass flow rate [kg/s]
-        Real64 SecAirMassFlow;   // secondary air mass flow rate [kg/s]
-        Real64 InducRat;         // Induction Ratio
+        Real64 HWFlow;   // hot water flow [kg/s]
+        Real64 CWFlow;   // cold water flow [kg/s]
+        Real64 QPriOnly; // unit output with no zone coils active
         Real64 ErrTolerance;
-        int HWOutletNode;
-        int CWOutletNode;
-        UnitOn = true;
-        PowerMet = 0.0;
-        InducRat = state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio;
-        PriNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).PriAirInNode;
-        SecNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).SecAirInNode;
-        OutletNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode;
-        HotControlNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWControlNode;
-        HWOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc).NodeNumOut;
-        ColdControlNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWControlNode;
-        CWOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc).NodeNumOut;
-        PriAirMassFlow = state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail;
-        SecAirMassFlow = InducRat * PriAirMassFlow;
-        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
-        QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+
+        bool UnitOn = true;
+        Real64 PowerMet = 0.0;
+        Real64 InducRat = state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio;
+        int PriNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).PriAirInNode;
+        int SecNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).SecAirInNode;
+        int OutletNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode;
+        int HotControlNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWControlNode;
+        int HWOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc).NodeNumOut;
+        int ColdControlNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWControlNode;
+        int CWOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc).NodeNumOut;
+        Real64 PriAirMassFlow = state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail;
+        Real64 SecAirMassFlow = InducRat * PriAirMassFlow;
+        Real64 QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
+        Real64 QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        Real64 QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
         // On the first HVAC iteration the system values are given to the controller, but after that
         // the demand limits are in place and there needs to be feedback to the Zone Equipment
 
-        MaxHotWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxHotWaterFlow;
+        Real64 MaxHotWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxHotWaterFlow;
         PlantUtilities::SetComponentFlowRate(
             state, MaxHotWaterFlow, HotControlNode, HWOutletNode, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc);
 
-        MinHotWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinHotWaterFlow;
+        Real64 MinHotWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinHotWaterFlow;
         PlantUtilities::SetComponentFlowRate(
             state, MinHotWaterFlow, HotControlNode, HWOutletNode, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc);
 
-        MaxColdWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxColdWaterFlow;
+        Real64 MaxColdWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxColdWaterFlow;
         PlantUtilities::SetComponentFlowRate(
             state, MaxColdWaterFlow, ColdControlNode, CWOutletNode, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc);
 
-        MinColdWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinColdWaterFlow;
+        Real64 MinColdWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinColdWaterFlow;
         PlantUtilities::SetComponentFlowRate(
             state, MinColdWaterFlow, ColdControlNode, CWOutletNode, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc);
 
@@ -1414,8 +1382,6 @@ namespace HVACSingleDuctInduc {
 
     void IndUnitData::ReportIndUnit(EnergyPlusData &state)
     {
-        // Purpose: this subroutine for reporting
-
         // set zone OA volume flow rate
         this->CalcOutdoorAirVolumeFlowRate(state);
     }
