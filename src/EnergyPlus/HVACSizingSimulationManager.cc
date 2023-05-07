@@ -199,12 +199,6 @@ void HVACSizingSimulationManager::UpdateSizingLogsSystemStep(EnergyPlusData &sta
 
 void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 {
-    using EMSManager::ManageEMS;
-    using ExteriorEnergyUse::ManageExteriorEnergyUse;
-    using PlantPipingSystemsManager::SimulateGroundDomains;
-    using namespace WeatherManager;
-    using namespace HeatBalanceManager;
-
     auto &hvacSizingSimulationManager = state.dataHVACSizingSimMgr->hvacSizingSimulationManager;
 
     hvacSizingSimulationManager = std::make_unique<HVACSizingSimulationManager>();
@@ -219,20 +213,20 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
     state.dataGlobal->DoingHVACSizingSimulations = true;
     state.dataGlobal->DoOutputReporting = true;
 
-    ResetEnvironmentCounter(state);
+    WeatherManager::ResetEnvironmentCounter(state);
 
     // iterations over set of sizing periods for HVAC sizing Simulation, will break out if no more are needed
     for (HVACSizingIterCount = 1; HVACSizingIterCount <= state.dataGlobal->HVACSizingSimMaxIterations; ++HVACSizingIterCount) {
 
         // need to extend Environment structure array to distinguish the HVAC Sizing Simulations from the regular run of that sizing period, repeats
         // for each set
-        AddDesignSetToEnvironmentStruct(state, HVACSizingIterCount);
+        WeatherManager::AddDesignSetToEnvironmentStruct(state, HVACSizingIterCount);
 
         state.dataGlobal->WarmupFlag = true;
         bool Available = true;
         for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) { // loop over environments
 
-            GetNextEnvironment(state, Available, ErrorsFound);
+            WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
             if (ErrorsFound) break;
             if (!Available) continue;
 
@@ -308,7 +302,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                     for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->NumOfTimeStepInHour;
                          ++state.dataGlobal->TimeStep) {
                         if (state.dataGlobal->AnySlabsInModel || state.dataGlobal->AnyBasementsInModel) {
-                            SimulateGroundDomains(state, false);
+                            PlantPipingSystemsManager::SimulateGroundDomains(state, false);
                         }
 
                         state.dataGlobal->BeginTimeStepFlag = true;
@@ -330,9 +324,9 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                             }
                         }
 
-                        ManageWeather(state);
+                        WeatherManager::ManageWeather(state);
 
-                        ManageExteriorEnergyUse(state);
+                        ExteriorEnergyUse::ManageExteriorEnergyUse(state);
 
                         ManageHeatBalance(state);
 
