@@ -209,9 +209,6 @@ namespace HVACSingleDuctInduc {
         //  certain object in the input file
         int IOStatus;            // Used in GetObjectItem
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        int CtrlZone;            // controlled zome do loop index
-        int SupAirIn;            // controlled zone supply air inlet index
-        int ADUNum;
 
         // find the number of each type of induction unit
         std::string CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
@@ -385,7 +382,7 @@ namespace HVACSingleDuctInduc {
                                                state.dataLoopNodes->NodeID(state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode),
                                                "Air Nodes");
 
-            for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
+            for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                 if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                     state.dataHVACSingleDuctInduc->IndUnit(IUNum).ADUNum = ADUNum;
                 }
@@ -404,11 +401,11 @@ namespace HVACSingleDuctInduc {
             } else {
                 // Fill the Zone Equipment data with the supply air inlet node number of this unit.
                 bool AirNodeFound = false;
-                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
+                for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZone);
 
                     if (!zoneEquipConfig.IsControlled) continue;
-                    for (SupAirIn = 1; SupAirIn <= zoneEquipConfig.NumInletNodes; ++SupAirIn) {
+                    for (int SupAirIn = 1; SupAirIn <= zoneEquipConfig.NumInletNodes; ++SupAirIn) {
                         if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode == zoneEquipConfig.InletNode(SupAirIn)) {
                             if (zoneEquipConfig.AirDistUnitCool(SupAirIn).OutNode > 0) {
                                 ShowSevereError(state, "Error in connecting a terminal unit to a zone");
@@ -422,10 +419,8 @@ namespace HVACSingleDuctInduc {
                                 ShowContinueError(state, "Check terminal unit node names for errors");
                                 ErrorsFound = true;
                             } else {
-                                zoneEquipConfig.AirDistUnitCool(SupAirIn).InNode =
-                                    state.dataHVACSingleDuctInduc->IndUnit(IUNum).PriAirInNode;
-                                zoneEquipConfig.AirDistUnitCool(SupAirIn).OutNode =
-                                    state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode;
+                                zoneEquipConfig.AirDistUnitCool(SupAirIn).InNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).PriAirInNode;
+                                zoneEquipConfig.AirDistUnitCool(SupAirIn).OutNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode;
                                 state.dataDefineEquipment->AirDistUnit(state.dataHVACSingleDuctInduc->IndUnit(IUNum).ADUNum).TermUnitSizingNum =
                                     zoneEquipConfig.AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                                 state.dataDefineEquipment->AirDistUnit(state.dataHVACSingleDuctInduc->IndUnit(IUNum).ADUNum).ZoneEqNum = CtrlZone;
