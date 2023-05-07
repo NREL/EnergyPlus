@@ -97,16 +97,6 @@ namespace HVACSingleDuctInduc {
     // The terminal boxes are modeled as compound components: heating coil, cooling coil and
     // mixer. The combined components are controlled to meet the zone load.
 
-    // Using/Aliasing
-    using namespace DataLoopNode;
-    using namespace ScheduleManager;
-    using DataHVACGlobals::SmallAirVolFlow;
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
-    using Psychrometrics::PsyCpAirFnW;
-    using Psychrometrics::PsyHFnTdbW;
-    using Psychrometrics::PsyRhoAirFnPbTdbW;
-
     void SimIndUnit(EnergyPlusData &state,
                     std::string_view CompName,     // name of the terminal unit
                     bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
@@ -284,7 +274,8 @@ namespace HVACSingleDuctInduc {
             if (lAlphaBlanks(2)) {
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
+                state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr =
+                    ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}{}: invalid {} entered ={} for {}={}",
@@ -310,7 +301,7 @@ namespace HVACSingleDuctInduc {
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::ConnectionType::Inlet,
                                   NodeInputManager::CompFluidStream::Primary,
-                                  ObjectIsParent,
+                                  DataLoopNode::ObjectIsParent,
                                   cAlphaFields(3));
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).SecAirInNode =
                 GetOnlySingleNode(state,
@@ -321,7 +312,7 @@ namespace HVACSingleDuctInduc {
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::ConnectionType::Inlet,
                                   NodeInputManager::CompFluidStream::Primary,
-                                  ObjectIsParent,
+                                  DataLoopNode::ObjectIsParent,
                                   cAlphaFields(4));
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode =
                 GetOnlySingleNode(state,
@@ -332,7 +323,7 @@ namespace HVACSingleDuctInduc {
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::ConnectionType::Outlet,
                                   NodeInputManager::CompFluidStream::Primary,
-                                  ObjectIsParent,
+                                  DataLoopNode::ObjectIsParent,
                                   cAlphaFields(5));
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType = Alphas(6); // type (key) of heating coil
@@ -711,7 +702,7 @@ namespace HVACSingleDuctInduc {
         // Do the start of HVAC time step initializations
         if (FirstHVACIteration) {
             // check for upstream zero flow. If nonzero and schedule ON, set primary flow to max
-            if (GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) > 0.0 &&
+            if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) > 0.0 &&
                 state.dataLoopNodes->Node(PriNode).MassFlowRate > 0.0) {
                 if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
                                                 "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
@@ -723,7 +714,7 @@ namespace HVACSingleDuctInduc {
                 state.dataLoopNodes->Node(SecNode).MassFlowRate = 0.0;
             }
             // reset the max and min avail flows
-            if (GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) > 0.0 &&
+            if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) > 0.0 &&
                 state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail > 0.0) {
                 if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
                                                 "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
@@ -820,7 +811,7 @@ namespace HVACSingleDuctInduc {
                 } else {
                     MaxTotAirVolFlowDes = 0.0;
                 }
-                if (MaxTotAirVolFlowDes < SmallAirVolFlow) {
+                if (MaxTotAirVolFlowDes < DataHVACGlobals::SmallAirVolFlow) {
                     MaxTotAirVolFlowDes = 0.0;
                 }
                 if (IsAutoSize) {
@@ -890,10 +881,12 @@ namespace HVACSingleDuctInduc {
                                                                ErrorsFound);
                         if (PltSizHeatNum > 0) {
 
-                            if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
+                            if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatMassFlow >=
+                                DataHVACGlobals::SmallAirVolFlow) {
                                 DesPriVolFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow /
                                                 (1.0 + state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio);
-                                CpAir = PsyCpAirFnW(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).HeatDesHumRat);
+                                CpAir = Psychrometrics::PsyCpAirFnW(
+                                    state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).HeatDesHumRat);
                                 // the design heating coil load is the zone load minus whatever the central system does. Note that
                                 // DesHeatCoilInTempTU is really the primary air inlet temperature for the unit.
                                 if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtHeatPeak > 0.0) {
@@ -1023,10 +1016,12 @@ namespace HVACSingleDuctInduc {
                                                                ErrorsFound);
                         if (PltSizCoolNum > 0) {
 
-                            if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolMassFlow >= SmallAirVolFlow) {
+                            if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolMassFlow >=
+                                DataHVACGlobals::SmallAirVolFlow) {
                                 DesPriVolFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow /
                                                 (1.0 + state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio);
-                                CpAir = PsyCpAirFnW(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).CoolDesHumRat);
+                                CpAir = Psychrometrics::PsyCpAirFnW(
+                                    state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).CoolDesHumRat);
                                 // the design cooling coil load is the zone load minus whatever the central system does. Note that
                                 // DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
                                 if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
@@ -1229,8 +1224,8 @@ namespace HVACSingleDuctInduc {
         MinColdWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinColdWaterFlow;
         SetComponentFlowRate(state, MinColdWaterFlow, ColdControlNode, CWOutletNode, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc);
 
-        if (GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) <= 0.0) UnitOn = false;
-        if (PriAirMassFlow <= SmallMassFlow) UnitOn = false;
+        if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) <= 0.0) UnitOn = false;
+        if (PriAirMassFlow <= DataHVACGlobals::SmallMassFlow) UnitOn = false;
 
         // Set the unit's air inlet nodes mass flow rates
         state.dataLoopNodes->Node(PriNode).MassFlowRate = PriAirMassFlow;
@@ -1243,11 +1238,11 @@ namespace HVACSingleDuctInduc {
         if (UnitOn) {
 
             int SolFlag = 0;
-            if (QToHeatSetPt - QPriOnly > SmallLoad) {
+            if (QToHeatSetPt - QPriOnly > DataHVACGlobals::SmallLoad) {
                 // heating coil
                 // check that it can meet the load
                 CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MaxHotWaterFlow, MinColdWaterFlow, PowerMet);
-                if (PowerMet > QToHeatSetPt + SmallLoad) {
+                if (PowerMet > QToHeatSetPt + DataHVACGlobals::SmallLoad) {
                     ErrTolerance = state.dataHVACSingleDuctInduc->IndUnit(IUNum).HotControlOffset;
                     auto f = // (AUTO_OK_LAMBDA)
                         [&state, IUNum, FirstHVACIteration, ZoneNodeNum, MinColdWaterFlow, QToHeatSetPt, QPriOnly, PowerMet](Real64 const HWFlow) {
@@ -1295,11 +1290,11 @@ namespace HVACSingleDuctInduc {
                                                        "[kg/s]");
                     }
                 }
-            } else if (QToCoolSetPt - QPriOnly < -SmallLoad) {
+            } else if (QToCoolSetPt - QPriOnly < -DataHVACGlobals::SmallLoad) {
                 // cooling coil
                 // check that it can meet the load
                 CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MaxColdWaterFlow, PowerMet);
-                if (PowerMet < QToCoolSetPt - SmallLoad) {
+                if (PowerMet < QToCoolSetPt - DataHVACGlobals::SmallLoad) {
                     ErrTolerance = state.dataHVACSingleDuctInduc->IndUnit(IUNum).ColdControlOffset;
                     auto f = // (AUTO_OK_LAMBDA)
                         [&state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, QToCoolSetPt, QPriOnly, PowerMet](Real64 const CWFlow) {
