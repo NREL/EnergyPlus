@@ -3138,9 +3138,6 @@ namespace HVACMultiSpeedHeatPump {
         // METHODOLOGY EMPLOYED:
         // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
 
-        using General::SolveRoot;
-        using Psychrometrics::PsyCpAirFnW;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr MaxIte(500); // maximum number of iterations
 
@@ -3422,7 +3419,7 @@ namespace HVACMultiSpeedHeatPump {
                                        tmpHeaterLoad);
                         return (ActualOutput - QZnReq) / QZnReq;
                     };
-                    SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
+                    General::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
                             if (state.dataHVACMultiSpdHP->ErrCountCyc == 0) {
@@ -3506,7 +3503,7 @@ namespace HVACMultiSpeedHeatPump {
                                        localHeaterLoad);
                         return (ActualOutput - QZnReq) / QZnReq;
                     };
-                    SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, f, 0.0, 1.0);
+                    General::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, f, 0.0, 1.0);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
                             if (state.dataHVACMultiSpdHP->ErrCountVar == 0) {
@@ -3559,7 +3556,7 @@ namespace HVACMultiSpeedHeatPump {
                                                tmpHeaterLoad);
                                 return (ActualOutput - QZnReq) / QZnReq;
                             };
-                            SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
+                            General::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                             if (SolFla == -1) {
                                 if (!state.dataGlobal->WarmupFlag) {
                                     if (state.dataHVACMultiSpdHP->ErrCountCyc == 0) {
@@ -3638,7 +3635,7 @@ namespace HVACMultiSpeedHeatPump {
                                                        localHeaterLoad);
                                         return (ActualOutput - QZnReq) / QZnReq;
                                     };
-                                SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, f, 0.0, 1.0);
+                                General::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, f, 0.0, 1.0);
                                 if (SolFla == -1) {
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (state.dataHVACMultiSpdHP->ErrCountVar == 0) {
@@ -3712,7 +3709,7 @@ namespace HVACMultiSpeedHeatPump {
             //   use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
             //   of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
             if (state.dataLoopNodes->Node(MSHeatPump.AirOutletNodeNum).Temp < MSHeatPump.SuppMaxAirTemp) {
-                CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(MSHeatPump.AirOutletNodeNum).HumRat);
+                CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(MSHeatPump.AirOutletNodeNum).HumRat);
                 SupHeaterLoad = state.dataLoopNodes->Node(MSHeatPump.AirInletNodeNum).MassFlowRate * CpAir *
                                 (MSHeatPump.SuppMaxAirTemp - state.dataLoopNodes->Node(MSHeatPump.AirOutletNodeNum).Temp);
 
