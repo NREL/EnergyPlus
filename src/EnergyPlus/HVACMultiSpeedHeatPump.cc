@@ -468,18 +468,8 @@ namespace HVACMultiSpeedHeatPump {
         //  This routine will get the input required by the multispeed heat pump model
 
         // Using/Aliasing
-        using BranchNodeConnections::TestCompSet;
-        using DataHVACGlobals::FanType_SimpleConstVolume;
-        using DataHVACGlobals::FanType_SimpleOnOff;
-        using DataSizing::AutoSize;
-        using Fans::GetFanIndex;
-        using Fans::GetFanInletNode;
-        using Fans::GetFanOutletNode;
-        using Fans::GetFanType;
-        using Fans::GetFanVolFlow;
         using FluidProperties::FindGlycol;
 
-        using BranchNodeConnections::SetUpCompSets;
         using DXCoils::GetDXCoilIndex;
         using DXCoils::GetDXCoilNumberOfSpeeds;
         using DXCoils::SetMSHPDXCoilHeatRecoveryFlag;
@@ -623,7 +613,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                      DataLoopNode::ObjectIsParent);
 
-            TestCompSet(state, state.dataHVACMultiSpdHP->CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            BranchNodeConnections::TestCompSet(state, state.dataHVACMultiSpdHP->CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             // Get the Controlling Zone or Location of the engine driven heat pump Thermostat
             MSHeatPump(MSHPNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(5), state.dataHeatBal->Zone);
@@ -706,30 +696,30 @@ namespace HVACMultiSpeedHeatPump {
             MSHeatPump(MSHPNum).FanName = Alphas(7);
             if (UtilityRoutines::SameString(Alphas(6), "Fan:OnOff") || UtilityRoutines::SameString(Alphas(6), "Fan:ConstantVolume")) {
                 if (UtilityRoutines::SameString(Alphas(6), "Fan:OnOff")) {
-                    MSHeatPump(MSHPNum).FanType = FanType_SimpleOnOff;
-                    SetUpCompSets(state,
-                                  state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                  MSHeatPump(MSHPNum).Name,
-                                  "Fan:OnOff",
-                                  MSHeatPump(MSHPNum).FanName,
-                                  "UNDEFINED",
-                                  "UNDEFINED");
-                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode(state, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
-                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanType = DataHVACGlobals::FanType_SimpleOnOff;
+                    BranchNodeConnections::SetUpCompSets(state,
+                                                         state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                         MSHeatPump(MSHPNum).Name,
+                                                         "Fan:OnOff",
+                                                         MSHeatPump(MSHPNum).FanName,
+                                                         "UNDEFINED",
+                                                         "UNDEFINED");
+                    MSHeatPump(MSHPNum).FanInletNode = Fans::GetFanInletNode(state, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanOutletNode = Fans::GetFanOutletNode(state, "Fan:OnOff", MSHeatPump(MSHPNum).FanName, ErrorsFound);
                 } else {
-                    MSHeatPump(MSHPNum).FanType = FanType_SimpleConstVolume;
-                    SetUpCompSets(state,
-                                  state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                  MSHeatPump(MSHPNum).Name,
-                                  "Fan:ConstantVolume",
-                                  MSHeatPump(MSHPNum).FanName,
-                                  "UNDEFINED",
-                                  "UNDEFINED");
-                    MSHeatPump(MSHPNum).FanInletNode = GetFanInletNode(state, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
-                    MSHeatPump(MSHPNum).FanOutletNode = GetFanOutletNode(state, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanType = DataHVACGlobals::FanType_SimpleConstVolume;
+                    BranchNodeConnections::SetUpCompSets(state,
+                                                         state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                         MSHeatPump(MSHPNum).Name,
+                                                         "Fan:ConstantVolume",
+                                                         MSHeatPump(MSHPNum).FanName,
+                                                         "UNDEFINED",
+                                                         "UNDEFINED");
+                    MSHeatPump(MSHPNum).FanInletNode = Fans::GetFanInletNode(state, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
+                    MSHeatPump(MSHPNum).FanOutletNode = Fans::GetFanOutletNode(state, "Fan:ConstantVolume", MSHeatPump(MSHPNum).FanName, ErrorsFound);
                 }
-                GetFanIndex(state, Alphas(7), MSHeatPump(MSHPNum).FanNum, ErrorsFound, state.dataHVACMultiSpdHP->CurrentModuleObject);
-                GetFanType(state, Alphas(7), FanType, ErrorsFound);
+                Fans::GetFanIndex(state, Alphas(7), MSHeatPump(MSHPNum).FanNum, ErrorsFound, state.dataHVACMultiSpdHP->CurrentModuleObject);
+                Fans::GetFanType(state, Alphas(7), FanType, ErrorsFound);
                 if (FanType != MSHeatPump(MSHPNum).FanType) {
                     ShowSevereError(state,
                                     format("{}, \"{}\", {} and {} do not match in Fan objects.",
@@ -781,7 +771,7 @@ namespace HVACMultiSpeedHeatPump {
                 ErrorsFound = true;
             }
 
-            if (MSHeatPump(MSHPNum).FanSchedPtr > 0 && MSHeatPump(MSHPNum).FanType == FanType_SimpleConstVolume) {
+            if (MSHeatPump(MSHPNum).FanSchedPtr > 0 && MSHeatPump(MSHPNum).FanType == DataHVACGlobals::FanType_SimpleConstVolume) {
                 if (!ScheduleManager::CheckScheduleValueMinMax(state, MSHeatPump(MSHPNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                     ShowSevereError(state, format("{} \"{}\"", state.dataHVACMultiSpdHP->CurrentModuleObject, MSHeatPump(MSHPNum).Name));
                     ShowContinueError(state,
@@ -838,13 +828,13 @@ namespace HVACMultiSpeedHeatPump {
                                       format("...for heating coil. Occurs in {} \"{}\"", state.dataHVACMultiSpdHP->CurrentModuleObject, Alphas(1)));
                     LocalError = false;
                 }
-                SetUpCompSets(state,
-                              state.dataHVACMultiSpdHP->CurrentModuleObject,
-                              MSHeatPump(MSHPNum).Name,
-                              "Coil:Heating:DX:MultiSpeed",
-                              MSHeatPump(MSHPNum).DXHeatCoilName,
-                              "UNDEFINED",
-                              "UNDEFINED");
+                BranchNodeConnections::SetUpCompSets(state,
+                                                     state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                     MSHeatPump(MSHPNum).Name,
+                                                     "Coil:Heating:DX:MultiSpeed",
+                                                     MSHeatPump(MSHPNum).DXHeatCoilName,
+                                                     "UNDEFINED",
+                                                     "UNDEFINED");
             } else if (UtilityRoutines::SameString(Alphas(10), "Coil:Heating:Electric:MultiStage") ||
                        UtilityRoutines::SameString(Alphas(10), "Coil:Heating:Gas:MultiStage")) {
 
@@ -905,21 +895,21 @@ namespace HVACMultiSpeedHeatPump {
                     LocalError = false;
                 }
                 if (UtilityRoutines::SameString(Alphas(10), "Coil:Heating:Electric:MultiStage")) {
-                    SetUpCompSets(state,
-                                  state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                  MSHeatPump(MSHPNum).Name,
-                                  "Coil:Heating:Electric:MultiStage",
-                                  MSHeatPump(MSHPNum).HeatCoilName,
-                                  "UNDEFINED",
-                                  "UNDEFINED");
+                    BranchNodeConnections::SetUpCompSets(state,
+                                                         state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                         MSHeatPump(MSHPNum).Name,
+                                                         "Coil:Heating:Electric:MultiStage",
+                                                         MSHeatPump(MSHPNum).HeatCoilName,
+                                                         "UNDEFINED",
+                                                         "UNDEFINED");
                 } else {
-                    SetUpCompSets(state,
-                                  state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                  MSHeatPump(MSHPNum).Name,
-                                  "Coil:Heating:Gas:MultiStage",
-                                  MSHeatPump(MSHPNum).HeatCoilName,
-                                  "UNDEFINED",
-                                  "UNDEFINED");
+                    BranchNodeConnections::SetUpCompSets(state,
+                                                         state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                         MSHeatPump(MSHPNum).Name,
+                                                         "Coil:Heating:Gas:MultiStage",
+                                                         MSHeatPump(MSHPNum).HeatCoilName,
+                                                         "UNDEFINED",
+                                                         "UNDEFINED");
                 }
             } else if (UtilityRoutines::SameString(Alphas(10), "Coil:Heating:Water")) {
                 MSHeatPump(MSHPNum).HeatCoilType = DataHVACGlobals::Coil_HeatingWater;
@@ -968,13 +958,13 @@ namespace HVACMultiSpeedHeatPump {
                                           format("Occurs in {} = {}", state.dataHVACMultiSpdHP->CurrentModuleObject, MSHeatPump(MSHPNum).Name));
                         ErrorsFound = true;
                     }
-                    SetUpCompSets(state,
-                                  state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                  MSHeatPump(MSHPNum).Name,
-                                  "Coil:Heating:Water",
-                                  MSHeatPump(MSHPNum).HeatCoilName,
-                                  state.dataLoopNodes->NodeID(HeatingCoilInletNode),
-                                  state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
+                    BranchNodeConnections::SetUpCompSets(state,
+                                                         state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                         MSHeatPump(MSHPNum).Name,
+                                                         "Coil:Heating:Water",
+                                                         MSHeatPump(MSHPNum).HeatCoilName,
+                                                         state.dataLoopNodes->NodeID(HeatingCoilInletNode),
+                                                         state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
                 }
             } else if (UtilityRoutines::SameString(Alphas(10), "Coil:Heating:Steam")) {
                 MSHeatPump(MSHPNum).HeatCoilType = DataHVACGlobals::Coil_HeatingSteam;
@@ -1037,13 +1027,13 @@ namespace HVACMultiSpeedHeatPump {
                         ErrorsFound = true;
                     }
 
-                    SetUpCompSets(state,
-                                  state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                  MSHeatPump(MSHPNum).Name,
-                                  "Coil:Heating:Steam",
-                                  MSHeatPump(MSHPNum).HeatCoilName,
-                                  state.dataLoopNodes->NodeID(HeatingCoilInletNode),
-                                  state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
+                    BranchNodeConnections::SetUpCompSets(state,
+                                                         state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                         MSHeatPump(MSHPNum).Name,
+                                                         "Coil:Heating:Steam",
+                                                         MSHeatPump(MSHPNum).HeatCoilName,
+                                                         state.dataLoopNodes->NodeID(HeatingCoilInletNode),
+                                                         state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
                 }
             } else {
                 ShowSevereError(state,
@@ -1109,13 +1099,13 @@ namespace HVACMultiSpeedHeatPump {
                 ShowContinueError(state, format("The entered {} = \"{}\".", cAlphaFields(12), Alphas(12)));
                 ErrorsFound = true;
             }
-            SetUpCompSets(state,
-                          state.dataHVACMultiSpdHP->CurrentModuleObject,
-                          MSHeatPump(MSHPNum).Name,
-                          "Coil:Cooling:DX:MultiSpeed",
-                          MSHeatPump(MSHPNum).DXCoolCoilName,
-                          "UNDEFINED",
-                          "UNDEFINED");
+            BranchNodeConnections::SetUpCompSets(state,
+                                                 state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                 MSHeatPump(MSHPNum).Name,
+                                                 "Coil:Cooling:DX:MultiSpeed",
+                                                 MSHeatPump(MSHPNum).DXCoolCoilName,
+                                                 "UNDEFINED",
+                                                 "UNDEFINED");
 
             // Get supplemental heating coil data
             MSHeatPump(MSHPNum).SuppHeatCoilName = Alphas(15);
@@ -1154,13 +1144,13 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                SetUpCompSets(state,
-                              state.dataHVACMultiSpdHP->CurrentModuleObject,
-                              MSHeatPump(MSHPNum).Name,
-                              "Coil:Heating:Fuel",
-                              MSHeatPump(MSHPNum).SuppHeatCoilName,
-                              "UNDEFINED",
-                              "UNDEFINED");
+                BranchNodeConnections::SetUpCompSets(state,
+                                                     state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                     MSHeatPump(MSHPNum).Name,
+                                                     "Coil:Heating:Fuel",
+                                                     MSHeatPump(MSHPNum).SuppHeatCoilName,
+                                                     "UNDEFINED",
+                                                     "UNDEFINED");
             }
             if (UtilityRoutines::SameString(Alphas(14), "Coil:Heating:Electric")) {
                 MSHeatPump(MSHPNum).SuppHeatCoilType = SuppHeatingCoilElec;
@@ -1198,13 +1188,13 @@ namespace HVACMultiSpeedHeatPump {
                     LocalError = false;
                 }
 
-                SetUpCompSets(state,
-                              state.dataHVACMultiSpdHP->CurrentModuleObject,
-                              MSHeatPump(MSHPNum).Name,
-                              "Coil:Heating:Electric",
-                              MSHeatPump(MSHPNum).SuppHeatCoilName,
-                              "UNDEFINED",
-                              "UNDEFINED");
+                BranchNodeConnections::SetUpCompSets(state,
+                                                     state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                     MSHeatPump(MSHPNum).Name,
+                                                     "Coil:Heating:Electric",
+                                                     MSHeatPump(MSHPNum).SuppHeatCoilName,
+                                                     "UNDEFINED",
+                                                     "UNDEFINED");
             }
 
             if (UtilityRoutines::SameString(Alphas(14), "Coil:Heating:Water")) {
@@ -1255,13 +1245,13 @@ namespace HVACMultiSpeedHeatPump {
                                           format("Occurs in {} = {}", state.dataHVACMultiSpdHP->CurrentModuleObject, MSHeatPump(MSHPNum).Name));
                         ErrorsFound = true;
                     }
-                    SetUpCompSets(state,
-                                  state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                  MSHeatPump(MSHPNum).Name,
-                                  "Coil:Heating:Water",
-                                  MSHeatPump(MSHPNum).SuppHeatCoilName,
-                                  state.dataLoopNodes->NodeID(SuppHeatCoilInletNode),
-                                  state.dataLoopNodes->NodeID(SuppHeatCoilOutletNode));
+                    BranchNodeConnections::SetUpCompSets(state,
+                                                         state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                         MSHeatPump(MSHPNum).Name,
+                                                         "Coil:Heating:Water",
+                                                         MSHeatPump(MSHPNum).SuppHeatCoilName,
+                                                         state.dataLoopNodes->NodeID(SuppHeatCoilInletNode),
+                                                         state.dataLoopNodes->NodeID(SuppHeatCoilOutletNode));
                 }
             }
             if (UtilityRoutines::SameString(Alphas(14), "Coil:Heating:Steam")) {
@@ -1327,13 +1317,13 @@ namespace HVACMultiSpeedHeatPump {
                         ErrorsFound = true;
                     }
 
-                    SetUpCompSets(state,
-                                  state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                  MSHeatPump(MSHPNum).Name,
-                                  "Coil:Heating:Steam",
-                                  MSHeatPump(MSHPNum).SuppHeatCoilName,
-                                  state.dataLoopNodes->NodeID(SuppHeatCoilInletNode),
-                                  state.dataLoopNodes->NodeID(SuppHeatCoilOutletNode));
+                    BranchNodeConnections::SetUpCompSets(state,
+                                                         state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                         MSHeatPump(MSHPNum).Name,
+                                                         "Coil:Heating:Steam",
+                                                         MSHeatPump(MSHPNum).SuppHeatCoilName,
+                                                         state.dataLoopNodes->NodeID(SuppHeatCoilInletNode),
+                                                         state.dataLoopNodes->NodeID(SuppHeatCoilOutletNode));
                 }
             }
 
@@ -1417,7 +1407,8 @@ namespace HVACMultiSpeedHeatPump {
                         format("{}, \"{}\", Missing {}.", state.dataHVACMultiSpdHP->CurrentModuleObject, MSHeatPump(MSHPNum).Name, cAlphaFields(17)));
                     ErrorsFound = true;
                 }
-                TestCompSet(state, state.dataHVACMultiSpdHP->CurrentModuleObject, Alphas(1), Alphas(16), Alphas(17), "MSHP Heat receovery Nodes");
+                BranchNodeConnections::TestCompSet(
+                    state, state.dataHVACMultiSpdHP->CurrentModuleObject, Alphas(1), Alphas(16), Alphas(17), "MSHP Heat receovery Nodes");
                 SetMSHPDXCoilHeatRecoveryFlag(state, MSHeatPump(MSHPNum).DXCoolCoilIndex);
                 if (MSHeatPump(MSHPNum).DXHeatCoilIndex > 0) {
                     SetMSHPDXCoilHeatRecoveryFlag(state, MSHeatPump(MSHPNum).DXHeatCoilIndex);
@@ -1455,7 +1446,7 @@ namespace HVACMultiSpeedHeatPump {
             }
 
             MSHeatPump(MSHPNum).IdleVolumeAirRate = Numbers(8);
-            if (MSHeatPump(MSHPNum).IdleVolumeAirRate < 0.0 && MSHeatPump(MSHPNum).IdleVolumeAirRate != AutoSize) {
+            if (MSHeatPump(MSHPNum).IdleVolumeAirRate < 0.0 && MSHeatPump(MSHPNum).IdleVolumeAirRate != DataSizing::AutoSize) {
                 ShowSevereError(state,
                                 format("{}, \"{}\", {} cannot be less than zero.",
                                        state.dataHVACMultiSpdHP->CurrentModuleObject,
@@ -1504,7 +1495,7 @@ namespace HVACMultiSpeedHeatPump {
                 for (i = 1; i <= MSHeatPump(MSHPNum).NumOfSpeedHeating; ++i) {
                     MSHeatPump(MSHPNum).HeatVolumeFlowRate(i) = Numbers(10 + i);
                     if (MSHeatPump(MSHPNum).HeatCoilType == MultiSpeedHeatingCoil) {
-                        if (MSHeatPump(MSHPNum).HeatVolumeFlowRate(i) <= 0.0 && MSHeatPump(MSHPNum).HeatVolumeFlowRate(i) != AutoSize) {
+                        if (MSHeatPump(MSHPNum).HeatVolumeFlowRate(i) <= 0.0 && MSHeatPump(MSHPNum).HeatVolumeFlowRate(i) != DataSizing::AutoSize) {
                             ShowSevereError(state,
                                             format("{}, \"{}\", {} must be greater than zero.",
                                                    state.dataHVACMultiSpdHP->CurrentModuleObject,
@@ -1516,10 +1507,10 @@ namespace HVACMultiSpeedHeatPump {
                 }
                 // Ensure flow rate at high speed should be greater or equal to the flow rate at low speed
                 for (i = 2; i <= MSHeatPump(MSHPNum).NumOfSpeedHeating; ++i) {
-                    if (MSHeatPump(MSHPNum).HeatVolumeFlowRate(i) == AutoSize) continue;
+                    if (MSHeatPump(MSHPNum).HeatVolumeFlowRate(i) == DataSizing::AutoSize) continue;
                     Found = false;
                     for (j = i - 1; j >= 1; --j) {
-                        if (MSHeatPump(MSHPNum).HeatVolumeFlowRate(i) != AutoSize) {
+                        if (MSHeatPump(MSHPNum).HeatVolumeFlowRate(i) != DataSizing::AutoSize) {
                             Found = true;
                             break;
                         }
@@ -1551,7 +1542,7 @@ namespace HVACMultiSpeedHeatPump {
                 MSHeatPump(MSHPNum).CoolingSpeedRatio = 1.0;
                 for (i = 1; i <= MSHeatPump(MSHPNum).NumOfSpeedCooling; ++i) {
                     MSHeatPump(MSHPNum).CoolVolumeFlowRate(i) = Numbers(14 + i);
-                    if (MSHeatPump(MSHPNum).CoolVolumeFlowRate(i) <= 0.0 && MSHeatPump(MSHPNum).CoolVolumeFlowRate(i) != AutoSize) {
+                    if (MSHeatPump(MSHPNum).CoolVolumeFlowRate(i) <= 0.0 && MSHeatPump(MSHPNum).CoolVolumeFlowRate(i) != DataSizing::AutoSize) {
                         ShowSevereError(state,
                                         format("{}, \"{}\", {} must be greater than zero.",
                                                state.dataHVACMultiSpdHP->CurrentModuleObject,
@@ -1562,10 +1553,10 @@ namespace HVACMultiSpeedHeatPump {
                 }
                 // Ensure flow rate at high speed should be greater or equal to the flow rate at low speed
                 for (i = 2; i <= MSHeatPump(MSHPNum).NumOfSpeedCooling; ++i) {
-                    if (MSHeatPump(MSHPNum).CoolVolumeFlowRate(i) == AutoSize) continue;
+                    if (MSHeatPump(MSHPNum).CoolVolumeFlowRate(i) == DataSizing::AutoSize) continue;
                     Found = false;
                     for (j = i - 1; j >= 1; --j) {
-                        if (MSHeatPump(MSHPNum).CoolVolumeFlowRate(i) != AutoSize) {
+                        if (MSHeatPump(MSHPNum).CoolVolumeFlowRate(i) != DataSizing::AutoSize) {
                             Found = true;
                             break;
                         }
