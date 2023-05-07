@@ -784,8 +784,6 @@ namespace HVACSingleDuctInduc {
         static constexpr std::string_view RoutineName("SizeIndUnit");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int PltSizHeatNum; // index of plant sizing object for 1st heating loop
-        int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
         Real64 DesCoilLoad;
         Real64 DesPriVolFlow;
         Real64 RhoAir;
@@ -803,8 +801,6 @@ namespace HVACSingleDuctInduc {
         Real64 MaxVolColdWaterFlowDes;  // Desing size maximum cold water flow for reproting
         Real64 MaxVolColdWaterFlowUser; // User hard-sized maximum cold water flow for reporting
 
-        PltSizHeatNum = 0;
-        PltSizCoolNum = 0;
         DesPriVolFlow = 0.0;
         CpAir = 0.0;
         RhoAir = state.dataEnvrn->StdRhoAir;
@@ -900,12 +896,12 @@ namespace HVACSingleDuctInduc {
                     CoilWaterOutletNode =
                         GetCoilWaterOutletNode(state, "Coil:Heating:Water", state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil, ErrorsFound);
                     if (IsAutoSize) {
-                        PltSizHeatNum = MyPlantSizingIndex(state,
-                                                           "Coil:Heating:Water",
-                                                           state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil,
-                                                           CoilWaterInletNode,
-                                                           CoilWaterOutletNode,
-                                                           ErrorsFound);
+                        int PltSizHeatNum = MyPlantSizingIndex(state,
+                                                               "Coil:Heating:Water",
+                                                               state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil,
+                                                               CoilWaterInletNode,
+                                                               CoilWaterOutletNode,
+                                                               ErrorsFound);
                         if (PltSizHeatNum > 0) {
 
                             if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
@@ -1035,12 +1031,12 @@ namespace HVACSingleDuctInduc {
                                                                  state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
                                                                  ErrorsFound);
                     if (IsAutoSize) {
-                        PltSizCoolNum = MyPlantSizingIndex(state,
-                                                           state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType,
-                                                           state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
-                                                           CoilWaterInletNode,
-                                                           CoilWaterOutletNode,
-                                                           ErrorsFound);
+                        int PltSizCoolNum = MyPlantSizingIndex(state,
+                                                               state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType,
+                                                               state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
+                                                               CoilWaterInletNode,
+                                                               CoilWaterOutletNode,
+                                                               ErrorsFound);
                         if (PltSizCoolNum > 0) {
 
                             if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolMassFlow >= SmallAirVolFlow) {
