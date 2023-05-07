@@ -442,6 +442,7 @@ add_simulation_test(IDF_FILE PlantLoopHeatPump_EIR_AirSource.idf EPW_FILE USA_IL
 add_simulation_test(IDF_FILE PlantLoopHeatPump_EIR_WaterSource.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE PlantLoopHeatPump_Fuel-Fired.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE PlantLoopHeatPump_EIR_Large-Office-2-AWHP-DedHR-AuxBoiler-Pri-Sec-HW.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE PlantLoopHeatPump_EIR_LargeOffice-2-AWHP-AuxBoiler-Pri-Sec-4PipeBeam.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE PlantPressureDrop.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE PlantPressure_PumpCurve.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE PlantPressure_VFD_Scheduled.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
