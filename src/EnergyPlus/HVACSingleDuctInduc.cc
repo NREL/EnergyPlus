@@ -88,7 +88,6 @@ namespace HVACSingleDuctInduc {
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   June 15 2004
     //       MODIFIED       Brent Griffith, Sept 2010, plant upgrades, fluid props
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // To encapsulate the data and algorithms needed to simulate 4 pipe induction terminal units
@@ -109,8 +108,6 @@ namespace HVACSingleDuctInduc {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 18 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Manages the simulation of a passive (no fan) induction terminal unit.
@@ -189,8 +186,6 @@ namespace HVACSingleDuctInduc {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 15 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Obtains input data for passive induction air terminal units and stores it in the
@@ -491,8 +486,6 @@ namespace HVACSingleDuctInduc {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 21 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initialization of the passive induction
@@ -502,7 +495,6 @@ namespace HVACSingleDuctInduc {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
@@ -753,7 +745,6 @@ namespace HVACSingleDuctInduc {
         using namespace DataSizing;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-
         using PlantUtilities::MyPlantSizingIndex;
         using WaterCoils::GetCoilWaterInletNode;
         using WaterCoils::GetCoilWaterOutletNode;
@@ -1146,8 +1137,6 @@ namespace HVACSingleDuctInduc {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 23 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Simulate a 4 pipe induction unit; adjust its heating or cooling
@@ -1163,7 +1152,6 @@ namespace HVACSingleDuctInduc {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
 
@@ -1370,29 +1358,12 @@ namespace HVACSingleDuctInduc {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Simulate the components making up the 4 pipe induction unit.
 
         // METHODOLOGY EMPLOYED:
         // Simulates the unit components sequentially in the air flow direction.
-
-        // REFERENCES:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutletNode;        // unit air outlet node
@@ -1447,12 +1418,9 @@ namespace HVACSingleDuctInduc {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   September 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // Given a mixer name, this routine determines if that mixer is found on
-        // PIUnits.
+        // Given a mixer name, this routine determines if that mixer is found on PIUnits.
 
         if (state.dataHVACSingleDuctInduc->GetIUInputFlag) {
             GetIndUnits(state);
