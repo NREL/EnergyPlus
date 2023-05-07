@@ -135,8 +135,6 @@ namespace HVACSingleDuctInduc {
             state.dataHVACSingleDuctInduc->GetIUInputFlag = false;
         }
 
-        auto &IndUnit = state.dataHVACSingleDuctInduc->IndUnit;
-
         // Get the induction unit index
         if (CompIndex == 0) {
             IUNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACSingleDuctInduc->IndUnit);
@@ -154,7 +152,7 @@ namespace HVACSingleDuctInduc {
                                       CompName));
             }
             if (state.dataHVACSingleDuctInduc->CheckEquipName(IUNum)) {
-                if (CompName != IndUnit(IUNum).Name) {
+                if (CompName != state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name) {
                     ShowFatalError(state,
                                    format("SimIndUnit: Invalid CompIndex passed={}, Induction Unit name={}, stored Induction Unit for that index={}",
                                           CompIndex,
@@ -165,21 +163,22 @@ namespace HVACSingleDuctInduc {
             }
         }
 
-        state.dataSize->CurTermUnitSizingNum =
-            state.dataDefineEquipment->AirDistUnit(state.dataHVACSingleDuctInduc->IndUnit(IUNum).ADUNum).TermUnitSizingNum;
+        auto &indUnit = state.dataHVACSingleDuctInduc->IndUnit(IUNum);
+
+        state.dataSize->CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(indUnit.ADUNum).TermUnitSizingNum;
         // initialize the unit
         InitIndUnit(state, IUNum, FirstHVACIteration);
 
         state.dataSize->TermUnitIU = true;
 
         // Select the correct unit type
-        switch (state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType_Num) {
+        switch (indUnit.UnitType_Num) {
         case SingleDuct_CV::FourPipeInduc: {
             SimFourPipeIndUnit(state, IUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
         } break;
         default: {
-            ShowSevereError(state, format("Illegal Induction Unit Type used={}", state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType));
-            ShowContinueError(state, format("Occurs in Induction Unit={}", state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name));
+            ShowSevereError(state, format("Illegal Induction Unit Type used={}", indUnit.UnitType));
+            ShowContinueError(state, format("Occurs in Induction Unit={}", indUnit.Name));
             ShowFatalError(state, "Preceding condition causes termination.");
         } break;
         }
@@ -191,7 +190,7 @@ namespace HVACSingleDuctInduc {
         // Update the current unit's outlet nodes. No update needed
 
         // Fill the report variables. There are no report variables
-        state.dataHVACSingleDuctInduc->IndUnit(IUNum).ReportIndUnit(state);
+        indUnit.ReportIndUnit(state);
     }
 
     void GetIndUnits(EnergyPlusData &state)
@@ -240,9 +239,7 @@ namespace HVACSingleDuctInduc {
         bool IsNotOK;            // Flag to verify name
         int CtrlZone;            // controlled zome do loop index
         int SupAirIn;            // controlled zone supply air inlet index
-        bool AirNodeFound;
         int ADUNum;
-        bool errFlag;
 
         auto &ZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig;
 
@@ -380,7 +377,7 @@ namespace HVACSingleDuctInduc {
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).ColdControlOffset = Numbers(8);
 
             // Get the Zone Mixer name and check that it is OK
-            errFlag = false;
+            bool errFlag = false;
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).MixerName = Alphas(10);
             GetZoneMixerIndex(state,
                               state.dataHVACSingleDuctInduc->IndUnit(IUNum).MixerName,
@@ -417,7 +414,6 @@ namespace HVACSingleDuctInduc {
                         state.dataLoopNodes->NodeID(state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode),
                         "Air Nodes");
 
-            AirNodeFound = false;
             for (ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                 if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                     state.dataHVACSingleDuctInduc->IndUnit(IUNum).ADUNum = ADUNum;
@@ -436,6 +432,7 @@ namespace HVACSingleDuctInduc {
                 ErrorsFound = true;
             } else {
                 // Fill the Zone Equipment data with the supply air inlet node number of this unit.
+                bool AirNodeFound = false;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
@@ -526,11 +523,11 @@ namespace HVACSingleDuctInduc {
         static constexpr std::string_view RoutineName("InitIndUnit");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int PriNode;    // primary air inlet node number
-        int SecNode;    // secondary air inlet node number
-        Real64 IndRat;  // unit induction ratio
-        Real64 RhoAir;  // air density at outside pressure and standard temperature and humidity
-        Real64 rho;     // local fluid density
+        int PriNode;   // primary air inlet node number
+        int SecNode;   // secondary air inlet node number
+        Real64 IndRat; // unit induction ratio
+        Real64 RhoAir; // air density at outside pressure and standard temperature and humidity
+        Real64 rho;    // local fluid density
 
         auto &ZoneEquipmentListChecked = state.dataHVACSingleDuctInduc->ZoneEquipmentListChecked;
 
