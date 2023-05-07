@@ -272,7 +272,6 @@ void ControlCompOutput(EnergyPlusData &state,
             // First check to see if the component is running; if not converge and return
             if (ZoneInterHalf.MaxResult == ZoneInterHalf.MinResult) {
                 // Set to converged controller
-                Converged = true;
                 ZoneInterHalf.MaxFlowCalc = true;
                 ZoneInterHalf.MinFlowCalc = false;
                 ZoneInterHalf.NormFlowCalc = false;
