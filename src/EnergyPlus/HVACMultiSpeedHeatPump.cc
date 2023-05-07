@@ -222,11 +222,6 @@ namespace HVACMultiSpeedHeatPump {
         // METHODOLOGY EMPLOYED:
         // Calls ControlMSHPOutput to obtain the desired unit output
 
-        // Using/Aliasing
-        using namespace DataZoneEnergyDemands;
-        using DataHVACGlobals::SmallLoad;
-        using DataHVACGlobals::SmallMassFlow;
-
         // Locals
         Real64 SupHeaterLoad;
 
@@ -266,12 +261,13 @@ namespace HVACMultiSpeedHeatPump {
         // set the on/off flags
         if (multiSpeedHeatPump.OpMode == DataHVACGlobals::CycFanCycCoil) {
             // cycling unit only runs if there is a cooling or heating load.
-            if (std::abs(QZnReq) < SmallLoad || AirMassFlow < SmallMassFlow || state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
+            if (std::abs(QZnReq) < DataHVACGlobals::SmallLoad || AirMassFlow < DataHVACGlobals::SmallMassFlow ||
+                state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 UnitOn = false;
             }
         } else if (multiSpeedHeatPump.OpMode == DataHVACGlobals::ContFanCycCoil) {
             // continuous unit: fan runs if scheduled on; coil runs only if there is a cooling or heating load
-            if (AirMassFlow < SmallMassFlow) {
+            if (AirMassFlow < DataHVACGlobals::SmallMassFlow) {
                 UnitOn = false;
             }
         }
