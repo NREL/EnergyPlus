@@ -1382,11 +1382,6 @@ namespace HVACSingleDuctInduc {
         // REFERENCES:
         // na
 
-        // Using/Aliasing
-        using MixerComponent::SimAirMixer;
-        using PlantUtilities::SetComponentFlowRate;
-        using WaterCoils::SimulateWaterCoilComponents;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1426,19 +1421,20 @@ namespace HVACSingleDuctInduc {
         CWOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc).NodeNumOut;
 
         mdotHW = HWFlow;
-        SetComponentFlowRate(state, mdotHW, HotControlNode, HWOutletNode, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc);
+        PlantUtilities::SetComponentFlowRate(state, mdotHW, HotControlNode, HWOutletNode, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc);
 
         //  Node(HotControlNode)%MassFlowRate = HWFlow
 
         mdotCW = CWFlow;
-        SetComponentFlowRate(state, mdotCW, ColdControlNode, CWOutletNode, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc);
+        PlantUtilities::SetComponentFlowRate(state, mdotCW, ColdControlNode, CWOutletNode, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc);
         //  Node(ColdControlNode)%MassFlowRate = CWFlow
 
-        SimulateWaterCoilComponents(
+        WaterCoils::SimulateWaterCoilComponents(
             state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil, FirstHVACIteration, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil_Num);
-        SimulateWaterCoilComponents(
+        WaterCoils::SimulateWaterCoilComponents(
             state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil, FirstHVACIteration, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil_Num);
-        SimAirMixer(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).MixerName, state.dataHVACSingleDuctInduc->IndUnit(IUNum).Mixer_Num);
+        MixerComponent::SimAirMixer(
+            state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).MixerName, state.dataHVACSingleDuctInduc->IndUnit(IUNum).Mixer_Num);
         LoadMet = TotAirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(state.dataLoopNodes->Node(OutletNode).Temp,
                                                                               state.dataLoopNodes->Node(OutletNode).HumRat,
                                                                               state.dataLoopNodes->Node(ZoneNode).Temp,
