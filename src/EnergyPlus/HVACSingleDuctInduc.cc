@@ -788,8 +788,6 @@ namespace HVACSingleDuctInduc {
         Real64 DesPriVolFlow;
         Real64 RhoAir;
         Real64 CpAir;
-        int CoilWaterInletNode(0);
-        int CoilWaterOutletNode(0);
         bool ErrorsFound;
         Real64 Cp;  // local fluid specific heat
         Real64 rho; // local fluid density
@@ -891,9 +889,9 @@ namespace HVACSingleDuctInduc {
 
                 if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
 
-                    CoilWaterInletNode =
+                    int CoilWaterInletNode =
                         GetCoilWaterInletNode(state, "Coil:Heating:Water", state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil, ErrorsFound);
-                    CoilWaterOutletNode =
+                    int CoilWaterOutletNode =
                         GetCoilWaterOutletNode(state, "Coil:Heating:Water", state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil, ErrorsFound);
                     if (IsAutoSize) {
                         int PltSizHeatNum = MyPlantSizingIndex(state,
@@ -949,8 +947,6 @@ namespace HVACSingleDuctInduc {
                                                      state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name));
                             ErrorsFound = true;
                         }
-                    }
-                    if (IsAutoSize) {
                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
@@ -1022,14 +1018,14 @@ namespace HVACSingleDuctInduc {
                 if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water") ||
                     UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
 
-                    CoilWaterInletNode = GetCoilWaterInletNode(state,
-                                                               state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType,
-                                                               state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
-                                                               ErrorsFound);
-                    CoilWaterOutletNode = GetCoilWaterOutletNode(state,
-                                                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType,
-                                                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
-                                                                 ErrorsFound);
+                    int CoilWaterInletNode = GetCoilWaterInletNode(state,
+                                                                   state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType,
+                                                                   state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
+                                                                   ErrorsFound);
+                    int CoilWaterOutletNode = GetCoilWaterOutletNode(state,
+                                                                     state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType,
+                                                                     state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
+                                                                     ErrorsFound);
                     if (IsAutoSize) {
                         int PltSizCoolNum = MyPlantSizingIndex(state,
                                                                state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType,
