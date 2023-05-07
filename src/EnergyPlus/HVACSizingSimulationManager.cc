@@ -328,7 +328,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
                         ExteriorEnergyUse::ManageExteriorEnergyUse(state);
 
-                        ManageHeatBalance(state);
+                        HeatBalanceManager::ManageHeatBalance(state);
 
                         state.dataGlobal->BeginHourFlag = false;
                         state.dataGlobal->BeginDayFlag = false;
