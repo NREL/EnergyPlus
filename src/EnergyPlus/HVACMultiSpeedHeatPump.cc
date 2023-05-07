@@ -1976,14 +1976,11 @@ namespace HVACMultiSpeedHeatPump {
         int NumOfSpeedHeating; // Number of speeds for heating
         Real64 DeltaMassRate;  // Difference of mass flow rate between inlet node and system outlet node
 
-        int ZoneInSysIndex(0);                            // number of zone inlet nodes counter in an airloop
         int NumAirLoopZones(0);                           // number of zone inlet nodes in an air loop
-        int ZoneInletNodeNum(0);                          // zone inlet nodes node number
         Real64 SumOfMassFlowRateMax(0.0);                 // the sum of mass flow rates at inlet to zones in an airloop
         Real64 CntrlZoneTerminalUnitMassFlowRateMax(0.0); // Maximum mass flow rate through controlled zone terminal unit
-        bool errFlag;
-        Real64 rho;    // local fluid density
-        Real64 MdotHR; // local temporary for heat recovery fluid mass flow rate (kg/s)
+        Real64 rho;                                       // local fluid density
+        Real64 MdotHR;                                    // local temporary for heat recovery fluid mass flow rate (kg/s)
         Real64 ZoneLoadToCoolSPSequenced;
         Real64 ZoneLoadToHeatSPSequenced;
 
@@ -2005,6 +2002,7 @@ namespace HVACMultiSpeedHeatPump {
         if (state.dataHVACMultiSpdHP->AirLoopPass > 2) state.dataHVACMultiSpdHP->AirLoopPass = 1;
 
         if (MSHeatPump(MSHeatPumpNum).MyPlantScantFlag && allocated(state.dataPlnt->PlantLoop)) {
+            bool errFlag;
             if (MSHeatPump(MSHeatPumpNum).HeatRecActive) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
@@ -2193,7 +2191,7 @@ namespace HVACMultiSpeedHeatPump {
             state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled + state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
         if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && MSHeatPump(MSHeatPumpNum).MyFlowFracFlag) {
             state.dataHVACMultiSpdHP->FlowFracFlagReady = true;
-            for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
+            for (int ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
                 // zone inlet nodes for cooling
                 if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled > 0) {
                     if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) == -999) {
@@ -2212,8 +2210,8 @@ namespace HVACMultiSpeedHeatPump {
         }
         if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && state.dataHVACMultiSpdHP->FlowFracFlagReady) {
             SumOfMassFlowRateMax = 0.0; // initialize the sum of the maximum flows
-            for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
-                ZoneInletNodeNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
+            for (int ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
+                int ZoneInletNodeNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
                 SumOfMassFlowRateMax += state.dataLoopNodes->Node(ZoneInletNodeNum).MassFlowRateMax;
                 if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZoneInSysIndex) == MSHeatPump(MSHeatPumpNum).ControlZoneNum) {
                     CntrlZoneTerminalUnitMassFlowRateMax = state.dataLoopNodes->Node(ZoneInletNodeNum).MassFlowRateMax;
