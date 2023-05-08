@@ -136,25 +136,48 @@ Examples of this object:
 
 \begin{itemize}
     \item
-    HVAC,Average,Supervisory Plant Operation Mode  {[}{]}
+    HVAC,Average,Supervisory Plant Heat Pump Operation Mode  {[}{]}
     \item
-    HVAC,Average,Supervisory Plant Operation Sensed Heating Load  {[}W{]}
+    HVAC,Average,Supervisory Plant Operation Polled Building Heating Load  {[}W{]}
     \item
-    HVAC,Average,Supervisory Plant Operation Sensed Cooling Load  {[}W{]}
+    HVAC,Average,Supervisory Plant Operation Polled Building Cooling Load  {[}W{]}
+    \item 
+    HVAC,Average,Supervisory Plant Operation Primary Plant Heating Load  {[}W{]}
+    \item
+    HVAC,Average,Supervisory Plant Operation Primary Plant Cooling Load  {[}W{]}
+    \item
+    HVAC,Average,Supervisory Plant Heat Recovery Operation Mode  {[}{]}
+    \item
+    HVAC,Average,Supervisory Plant Auxiliary Boiler Mode  {[}{]}
 \end{itemize}
 
-\paragraph{Supervisory Plant Operation Mode}\label{operation-scheme-outputs-supervisory-plant-operation-mode}
+\paragraph{Supervisory Plant Heat Pump Operation Mode}\label{operation-scheme-outputs-supervisory-plant-operation-mode}
 
-This integer output represents the plant operating mode as determined by the supervisory controller. Off = 0, Heating = 1, Cooling = 2 and Simultaneous Heating and Cooling = 3.
+This integer output represents the plant operating mode for the heat pumps as determined by the supervisory controller. Off = 0, Heating = 1, Cooling = 2 and Simultaneous Heating and Cooling = 3.This is the sum of the predicted zone sensible loads for the zones listed in the node list for this object, the ventilation loads on any central air systems connected to those zones, and the loads from any LoadProfile:Plant objects on the plant loops being supervised. 
 
-\paragraph{Supervisory Plant Operation Sensed Heating Load}\label{operation-scheme-outputs-supervisory-plant-operation-sensed-heating-load}
+\paragraph{Supervisory Plant Operation Polled Building Heating Load}\label{operation-scheme-outputs-supervisory-plant-operation-sensed-heating-load}
 
-This numeric output represents the supervisory controller sensed building heating load in watts.
+This numeric output represents the supervisory controller sensed building heating load in watts.  This is the sum of the predicted zone sensible loads for the zones listed in the node list for this object, the ventilation loads on any central air systems connected to those zones, and the loads from any LoadProfile:Plant objects on the plant loops being supervised. 
 
-\paragraph{Supervisory Plant Operation Sensed Cooling Load}\label{operation-scheme-outputs-supervisory-plant-operation-sensed-cooling-load}
+\paragraph{Supervisory Plant Operation Polled Building Cooling Load}\label{operation-scheme-outputs-supervisory-plant-operation-sensed-cooling-load}
 
-This numeric output represents the supervisory controller sensed building cooling load in watts.
+This numeric output represents the supervisory controller sensed building cooling load in watts.  This is the sum of the predicted zone sensible loads for the zones listed in the node list for this object, the ventilation loads on any central air systems connected to those zones, and the loads from any LoadProfile:Plant objects on the plant loops being supervised. Cooling loads are negative values.
 
+\paragraph{Supervisory Plant Operation Primary Plant Heating Load}\label{operation-scheme-outputs-supervisory-plant-heating-loads}
+
+This numeric output represents the supervisory controller sensed loads on the primary plant heating loop in watts.
+
+\paragraph{Supervisory Plant Operation Primary Plant Cooling Load}\label{operation-scheme-outputs-supervisory-plant-cooling-loads}
+
+This numeric output represents the supervisory controller sensed loads on the primary plant cooling loop in watts.  Cooling loads are negative values.
+
+\paragraph{Supervisory Plant Heat Recovery Operation Mode}\label{operation-scheme-outputs-hr-operation-mode}
+
+This integer output represents the plant operating mode for the recovery water to water heat pump.  Off = 0, Heating led = 1, Cooling led = 2
+
+\paragraph{Supervisory Plant Auxiliary Boiler Mode}\label{operation-scheme-outputs-boiler-operation-mode}
+
+This integer output represents the plant operating mode for the auxilary and/or supplemental boiler. Off = 0, Heating = 1.
 
 \subsection{Operation Schemes (Plant and Condenser)}\label{operation-schemes-plant-and-condenser}
 

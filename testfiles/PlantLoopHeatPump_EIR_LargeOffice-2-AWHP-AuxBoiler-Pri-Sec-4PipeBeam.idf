@@ -8682,8 +8682,8 @@ Curve:Biquadratic,
 
   Curve:Quadratic,
     FakeEIRCurveFuncPLR,         !- Name
-    1.0,                     !- Coefficient1 Constant
-    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient1 Constant
+    1.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
@@ -10360,12 +10360,12 @@ Curve:Biquadratic,
   Output:Variable,*,Fluid Heat Exchanger Operation Status,hourly; !- HVAC Average []
   Output:Variable,*,Fluid Heat Exchanger Effectiveness,hourly; !- HVAC Average []
 
-  Output:Variable,*,Supervisory Air Source Plant Operation Mode,hourly; !- HVAC Average [unknown]
+  Output:Variable,*,Supervisory Plant Heat Pump Operation Mode,hourly; !- HVAC Average [unknown]
   Output:Variable,*,Supervisory Plant Operation Polled Building Heating Load,hourly; !- HVAC Average [W]
   Output:Variable,*,Supervisory Plant Operation Polled Building Cooling Load,hourly; !- HVAC Average [W]
   Output:Variable,*,Supervisory Plant Operation Primary Plant Heating Load,hourly; !- HVAC Average [W]
   Output:Variable,*,Supervisory Plant Operation Primary Plant Cooling Load,hourly; !- HVAC Average [W]
-  Output:Variable,*,Supervisory Plant Dedicated Recovery Heat Pump Mode,hourly; !- HVAC Average [unknown]
+  Output:Variable,*,Supervisory Plant Heat Recovery Operation Mode,hourly; !- HVAC Average [unknown]
   Output:Variable,*,Supervisory Plant Auxiliary Boiler Mode,hourly; !- HVAC Average [unknown]
 
   Output:Variable,*,Heat Pump Part Load Ratio,hourly; !- HVAC Average []
