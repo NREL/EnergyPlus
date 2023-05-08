@@ -792,64 +792,43 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
         BoilerNomEff = BoilerNomEff_ff * this->FaultyBoilerFoulingFactor;
     }
 
-    // Set the current load equal to the boiler load
+    // Set the current load equal to the boiler load, but then trim it if it is out of range
     this->BoilerLoad = MyLoad;
+    if (this->BoilerLoad > BoilerNomCap * BoilerMaxPLR) this->BoilerLoad = BoilerNomCap * BoilerMaxPLR;
+    if (this->BoilerLoad < BoilerNomCap * BoilerMinPLR) this->BoilerLoad = BoilerNomCap * BoilerMinPLR;
 
-    // Initialize the delta temperature to zero
-    Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference, set in all necessary code paths so no initialization required
-
-    if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
-        // Either set the flow to the Constant value or calculate the flow for the variable volume
-        if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
-            // Then find the flow rate and outlet temp
-            this->BoilerMassFlowRate = BoilerMassFlowRateMax;
-            PlantUtilities::SetComponentFlowRate(state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->plantLoc);
-
-            if ((this->BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
-                BoilerDeltaTemp = this->BoilerLoad / this->BoilerMassFlowRate / Cp;
-            } else {
-                BoilerDeltaTemp = 0.0;
-            }
-            this->BoilerOutletTemp = BoilerDeltaTemp + state.dataLoopNodes->Node(BoilerInletNode).Temp;
-
-        } else if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
-            // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
-            // Then find the flow rate and outlet temp
-
-            if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                BoilerDeltaTemp = state.dataLoopNodes->Node(BoilerOutletNode).TempSetPoint - state.dataLoopNodes->Node(BoilerInletNode).Temp;
-            } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
-                BoilerDeltaTemp = state.dataLoopNodes->Node(BoilerOutletNode).TempSetPointLo - state.dataLoopNodes->Node(BoilerInletNode).Temp;
-            }
-
-            this->BoilerOutletTemp = BoilerDeltaTemp + state.dataLoopNodes->Node(BoilerInletNode).Temp;
-
-            if ((BoilerDeltaTemp > 0.0) && (this->BoilerLoad > 0.0)) {
-                this->BoilerMassFlowRate = this->BoilerLoad / Cp / BoilerDeltaTemp;
-                this->BoilerMassFlowRate = min(BoilerMassFlowRateMax, this->BoilerMassFlowRate);
-            } else {
-                this->BoilerMassFlowRate = 0.0;
-            }
-            PlantUtilities::SetComponentFlowRate(state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->plantLoc);
-
-        } // End of Constant/Variable Flow If Block
-
-    } else { // If FlowLock is True
-        // Set the boiler flow rate from inlet node and then check performance
-        this->BoilerMassFlowRate = state.dataLoopNodes->Node(BoilerInletNode).MassFlowRate;
-
-        if ((MyLoad > 0.0) && (this->BoilerMassFlowRate > 0.0)) { // this boiler has a heat load
-            this->BoilerLoad = MyLoad;
-            if (this->BoilerLoad > BoilerNomCap * BoilerMaxPLR) this->BoilerLoad = BoilerNomCap * BoilerMaxPLR;
-            if (this->BoilerLoad < BoilerNomCap * BoilerMinPLR) this->BoilerLoad = BoilerNomCap * BoilerMinPLR;
-            this->BoilerOutletTemp = state.dataLoopNodes->Node(BoilerInletNode).Temp + this->BoilerLoad / (this->BoilerMassFlowRate * Cp);
+    // Determine the desired flow based on the flow control type
+    if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
+        // For this flow control, always try to get the max mass flow rate
+        this->BoilerMassFlowRate = BoilerMassFlowRateMax;
+    } else if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
+        // For setpoint control, calculate the Delta Temp from the inlet temp to the boiler outlet setpoint to calculate a scaled mass flow
+        Real64 deltaTtoSetPoint;
+        if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
+            deltaTtoSetPoint = state.dataLoopNodes->Node(BoilerOutletNode).TempSetPoint - state.dataLoopNodes->Node(BoilerInletNode).Temp;
+        } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
+            deltaTtoSetPoint = state.dataLoopNodes->Node(BoilerOutletNode).TempSetPointLo - state.dataLoopNodes->Node(BoilerInletNode).Temp;
+        }
+        if ((deltaTtoSetPoint > 0.0) && (this->BoilerLoad > 0.0)) {
+            this->BoilerMassFlowRate = this->BoilerLoad / Cp / deltaTtoSetPoint;
+            this->BoilerMassFlowRate = min(BoilerMassFlowRateMax, this->BoilerMassFlowRate);
         } else {
-            this->BoilerLoad = 0.0;
-            this->BoilerOutletTemp = state.dataLoopNodes->Node(BoilerInletNode).Temp;
+            this->BoilerMassFlowRate = 0.0;
         }
     }
 
-    // Limit BoilerOutletTemp.  If > max temp, trip boiler off
+    // Once we've decided the flow rate we would _like_ to have, ask Plant for that much, and take whatever comes back
+    PlantUtilities::SetComponentFlowRate(state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->plantLoc);
+    Real64 BoilerDeltaTemp = 0.0;
+    if ((MyLoad > 0.0) && (this->BoilerMassFlowRate > 0.0)) {
+        BoilerDeltaTemp = this->BoilerLoad / this->BoilerMassFlowRate / Cp;
+    } else {
+        this->BoilerLoad = 0.0;
+        BoilerDeltaTemp = 0.0;
+    }
+    this->BoilerOutletTemp = BoilerDeltaTemp + state.dataLoopNodes->Node(BoilerInletNode).Temp;
+
+    // Limit BoilerOutletTemp.  If > max temp, trip boiler off.  Flow rate needs to stay in place as decided by the flow resolver, but update temp.
     if (this->BoilerOutletTemp > TempUpLimitBout) {
         this->BoilerLoad = 0.0;
         this->BoilerOutletTemp = state.dataLoopNodes->Node(BoilerInletNode).Temp;
