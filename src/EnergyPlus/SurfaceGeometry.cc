@@ -8402,12 +8402,11 @@ namespace SurfaceGeometry {
                     }
                     if (SurfLocalEnv.SurroundingSurfsPtr != 0) {
                         surface.SurfHasSurroundingSurfProperty = true;
-                        surface.UseSurfPropertySrdSurfTemp = true;
                         surface.SurfSurroundingSurfacesNum = SurfLocalEnv.SurroundingSurfsPtr;
                         surface.ViewFactorSrdSurfs =
                             state.dataSurface->SurroundingSurfsProperty(surface.SurfSurroundingSurfacesNum).SurfsViewFactorSum;
                         if (surface.ViewFactorSrdSurfs == 0.0) {
-                            surface.UseSurfPropertySrdSurfTemp = false;
+                            surface.SurfHasSurroundingSurfProperty = false;
                         }
                     }
                     if (SurfLocalEnv.GroundSurfsPtr != 0) {

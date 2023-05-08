@@ -7438,7 +7438,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                         }
                     }
                     // Calculate LWR from surrounding surfaces if defined for an exterior surface
-                    if (state.dataSurface->Surface(SurfNum).UseSurfPropertySrdSurfTemp) {
+                    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
                         Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
                         state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) =
                             state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) * (state.dataSurface->Surface(SurfNum).SrdSurfTemp - TSurf);
@@ -9914,11 +9914,8 @@ void GetSurroundingSurfacesTemperatureAverage(EnergyPlusData &state)
     Real64 SrdSurfaceTemp;
     Real64 SrdSurfViewFactor;
     Real64 SrdSurfaceTempSum;
-
-    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        auto &surface = state.dataSurface->Surface(SurfNum);
+    for (auto &surface : state.dataSurface->Surface) {
         if (!surface.SurfHasSurroundingSurfProperty) continue;
-        if (!surface.UseSurfPropertySrdSurfTemp) continue;
         auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(surface.SurfSurroundingSurfacesNum);
         SrdSurfaceTempSum = 0.0;
         for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {

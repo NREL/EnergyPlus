@@ -10492,7 +10492,7 @@ void SkyDifSolarShading(EnergyPlusData &state)
         }
         surface.ViewFactorGroundIR = 1.0 - surface.ViewFactorSkyIR;
 
-        if (surface.UseSurfPropertySrdSurfTemp) {
+        if (surface.SurfHasSurroundingSurfProperty) {
             surface.ViewFactorGroundIR = 1.0 - surface.ViewFactorSkyIR - surface.ViewFactorSrdSurfs;
         }
     }

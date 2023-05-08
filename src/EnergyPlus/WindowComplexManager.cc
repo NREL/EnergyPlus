@@ -2777,7 +2777,7 @@ namespace WindowComplexManager {
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                    if (state.dataSurface->Surface(SurfNum).UseSurfPropertySrdSurfTemp) {
+                    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
                         SrdSurfTempAbs = state.dataSurface->Surface(SurfNum).SrdSurfTemp + Constant::KelvinConv;
                         OutSrdIR = Constant::StefanBoltzmann * state.dataSurface->Surface(SurfNum).ViewFactorSrdSurfs * pow_4(SrdSurfTempAbs);
                     }
