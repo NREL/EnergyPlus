@@ -5804,9 +5804,9 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI5_IEER2022ValueTest)
         "    450,                                   !- Unit Internal Static Air Pressure {Pa}",
         "    Mixed Air Node 1,                      !- Air Inlet Node Name",
         "    Main Cooling Coil 1 Outlet Node,       !- Air Outlet Node Name",
-        "    VarSpeedCoolCapFT,                     !- Total Cooling Capacity Function of Temperature Curve Name",   // High Speed CapFT
+        "    VarSpeedCoolCapFT,                     !- Total Cooling Capacity Function of Temperature Curve Name",   // High Speed CapFTemp
         "    PackagedRatedCoolCapFFlow,             !- Total Cooling Capacity Function of Flow Fraction Curve Name", // High Speed CapFlow
-        "    VarSpeedCoolEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name",       // High Speed EIRFT
+        "    VarSpeedCoolEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name",       // High Speed EIRFTemp
         "    PackagedRatedCoolEIRFFlow,             !- Energy Input Ratio Function of Flow Fraction Curve Name",     // High Speed EIRFlow
         "    VarSpeedCyclingPLFFPLR,                !- Part Load Fraction Correlation Curve Name",
         "    18463.47741,                           !- Low Speed Gross Rated Total Cooling Capacity {W}", // 63,000 Btu/h
@@ -6063,19 +6063,17 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI5_IEER2022ValueTest)
     TSRatedCOP.push_back(thisCoil.RatedCOP(1));
     TSRatedCOP.push_back(thisCoil.RatedCOP2);
 
-    // condenser type array values for first and second index ?? TODO
-    // Create TEST with EVAP COOLED
     std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(*state,
                                                                                     thisCoil.DXCoilType,
                                                                                     thisCoil.CondenserType,
                                                                                     TSCCapFTemp,
                                                                                     TSRatedTotCap,
-                                                                                    thisCoil.CCapFFlow(1),
+                                                                                    thisCoil.CCapFFlow,
                                                                                     TSFanPowerPerEvapAirFlowRate2023,
                                                                                     TSRatedAirVolFlowRate,
                                                                                     TSEIRFTemp,
                                                                                     TSRatedCOP,
-                                                                                    thisCoil.EIRFFlow(1));
+                                                                                    thisCoil.EIRFFlow);
 
     NetCoolingCapRated = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -6367,7 +6365,7 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI6_IEER2022ValueTest)
                                                                                     thisCoil.CondenserType,
                                                                                     TSCCapFTemp,
                                                                                     TSRatedTotCap,
-                                                                                    thisCoil.CCapFFlow(1),
+                                                                                    thisCoil.CCapFFlow,
                                                                                     TSFanPowerPerEvapAirFlowRate2023,
                                                                                     TSRatedAirVolFlowRate,
                                                                                     TSEIRFTemp,

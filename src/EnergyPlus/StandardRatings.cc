@@ -1527,8 +1527,6 @@ namespace StandardRatings {
         TSCCapFTemp.push_back(CapFTempCurveIndex(1));
         TSCCapFTemp.push_back(CCapFTemp2);
 
-        const int HSCCapFlow = CapFFlowCurveIndex(1);
-
         Array1D<Real64> TSFanPowerPerEvapAirFlowRate2023;
         TSFanPowerPerEvapAirFlowRate2023.push_back(FanPowerPerEvapAirFlowRate_2023(1));
         TSFanPowerPerEvapAirFlowRate2023.push_back(FanPowerPerEvapAirFlowRate_2023_LowSpeed(1));
@@ -1549,21 +1547,18 @@ namespace StandardRatings {
         TSRatedCOP.push_back(RatedCOP(1));
         TSRatedCOP.push_back(RatedCOP2);
 
-        const int HSEIRFFlow = EIRFFlowCurveIndex(1);
-
         // Calculate the IEER 2022 Standard ratings for Two Speed DX cooling coil
         std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(state,
                                                                                         DXCoilType,
                                                                                         CondenserType,
                                                                                         TSCCapFTemp,
                                                                                         TSRatedTotCap,
-                                                                                        HSCCapFlow, // Only for HIGH SPEED
+                                                                                        CapFFlowCurveIndex,
                                                                                         TSFanPowerPerEvapAirFlowRate2023,
                                                                                         TSRatedAirVolFlowRate,
                                                                                         TSEIRFTemp,
                                                                                         TSRatedCOP,
-                                                                                        HSEIRFFlow // Only for HIGH SPEED
-        );
+                                                                                        EIRFFlowCurveIndex);
         NetCoolingCapRated_2023(ns) = NetCoolingCapRated2022;
 
         // Writes the SEER value to the EIO file and standard tabular output tables
