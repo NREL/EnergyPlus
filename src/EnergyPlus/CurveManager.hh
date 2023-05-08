@@ -226,8 +226,8 @@ namespace Curve {
     public:
         void error(const std::string_view message) override;
         void warning(const std::string_view message) override;
-        void info(const std::string_view message)  override {}
-        void debug(const std::string_view message) override {}
+        void info(const std::string_view)  override {}
+        void debug(const std::string_view) override {}
     };
 
     // Container for Btwxt N-d Objects
@@ -240,7 +240,7 @@ namespace Curve {
             grids.emplace_back(grid, btwxt_logger);
             gridMap.emplace(indVarListName, grids.size() - 1);
             return static_cast<int>(grids.size()) - 1;
-        };
+        }
         void setLoggingContext(void* context) {
             for (auto &btwxt : grids) {
                 btwxt.get_logger()->set_message_context(context); // TODO: set_context can be its own function
@@ -261,7 +261,7 @@ namespace Curve {
         std::vector<Btwxt::RegularGridInterpolator> grids;
     };
 
-    void ResetPerformanceCurveOutput(EnergyPlusData &state);
+    void ResetPerformanceCurveOutput(const EnergyPlusData &state);
 
     Real64 CurveValue(EnergyPlusData &state,
                       int CurveIndex, // index of curve in curve array
