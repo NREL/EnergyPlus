@@ -207,9 +207,7 @@ namespace Fans {
                                bool FirstHVACIteration,
                                int &CompIndex,
                                ObjexxFCL::Optional<Real64 const> SpeedRatio = _,
-                               ObjexxFCL::Optional_bool_const ZoneCompTurnFansOn = _,  // Turn fans ON signal from ZoneHVAC component
-                               ObjexxFCL::Optional_bool_const ZoneCompTurnFansOff = _, // Turn Fans OFF signal from ZoneHVAC component
-                               ObjexxFCL::Optional<Real64 const> PressureRise = _      // Pressure difference to use for DeltaPress
+                               ObjexxFCL::Optional<Real64 const> PressureRise = _ // Pressure difference to use for DeltaPress
     );
 
     void GetFanInput(EnergyPlusData &state);
@@ -318,10 +316,8 @@ namespace Fans {
 struct FansData : BaseGlobalStruct
 {
     int NumFans = 0;
-    int NumNightVentPerf = 0;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
-    bool GetFanInputFlag = true;   // Flag set to make sure you get input once
-    bool LocalTurnFansOn = false;  // If True, overrides fan schedule and cycles ZoneHVAC component fans on
-    bool LocalTurnFansOff = false; // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
+    int NumNightVentPerf = 0;    // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
+    bool GetFanInputFlag = true; // Flag set to make sure you get input once
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false;
     Array1D_bool MySizeFlag;

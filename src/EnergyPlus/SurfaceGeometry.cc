@@ -3016,6 +3016,21 @@ namespace SurfaceGeometry {
             }
         }
     }
+
+    Real64 rotAzmDiffDeg(Real64 const &AzmA, Real64 const &AzmB)
+    {
+        // This function takes two (azimuth) angles in Degree(s),
+        // and returns the rotational angle difference in Degree(s).
+
+        Real64 diff = AzmB - AzmA;
+        if (diff > 180.0) {
+            diff = 360.0 - diff;
+        } else if (diff < -180.0) {
+            diff = 360.0 + diff;
+        }
+        return std::abs(diff);
+    }
+
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,
                                 SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
@@ -3051,7 +3066,7 @@ namespace SurfaceGeometry {
             // Is base surface horizontal? If so, ignore azimuth differences
             if (std::abs(baseSurface.Tilt) <= 1.0e-5 || std::abs(baseSurface.Tilt - 180.0) <= 1.0e-5) baseSurfHoriz = true;
 
-            if (((std::abs(baseSurface.Azimuth - subSurface.Azimuth) > errorTolerance) && !baseSurfHoriz) ||
+            if (((rotAzmDiffDeg(baseSurface.Azimuth, subSurface.Azimuth) > errorTolerance) && !baseSurfHoriz) ||
                 (std::abs(baseSurface.Tilt - subSurface.Tilt) > errorTolerance)) {
                 surfaceError = true;
                 ShowSevereError(
@@ -3062,7 +3077,7 @@ namespace SurfaceGeometry {
                                   format("Subsurface=\"{}\" Tilt = {:.1R}  Azimuth = {:.1R}", subSurface.Name, subSurface.Tilt, subSurface.Azimuth));
                 ShowContinueError(
                     state, format("Base surface=\"{}\" Tilt = {:.1R}  Azimuth = {:.1R}", baseSurface.Name, baseSurface.Tilt, baseSurface.Azimuth));
-            } else if (((std::abs(baseSurface.Azimuth - subSurface.Azimuth) > warningTolerance) && !baseSurfHoriz) ||
+            } else if (((rotAzmDiffDeg(baseSurface.Azimuth, subSurface.Azimuth) > warningTolerance) && !baseSurfHoriz) ||
                        (std::abs(baseSurface.Tilt - subSurface.Tilt) > warningTolerance)) {
                 ++state.dataSurfaceGeometry->checkSubSurfAzTiltNormErrCount;
                 if (state.dataSurfaceGeometry->checkSubSurfAzTiltNormErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
