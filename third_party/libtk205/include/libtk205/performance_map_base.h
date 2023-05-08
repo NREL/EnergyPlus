@@ -25,7 +25,7 @@ public:
   /// @brief	
   /// @param	j
   // ----------------------------------------------------------------------------------------------
-    virtual void initialize(const nlohmann::json& j, std::shared_ptr<::Courierr::Courierr> logger) = 0;
+    virtual void initialize(const nlohmann::json& j) = 0;
 
   // ----------------------------------------------------------------------------------------------
   /// @brief	
@@ -54,8 +54,8 @@ public:
   // ----------------------------------------------------------------------------------------------
   /// @brief	
   // ----------------------------------------------------------------------------------------------
-    inline void finalize_grid() {
-        btwxt = std::make_unique<Btwxt::RegularGridInterpolator>(grid_axes, courier);
+    inline void finalize_grid(const std::shared_ptr<::Courierr::Courierr>& logger) {
+        btwxt = std::make_unique<Btwxt::RegularGridInterpolator>(grid_axes, logger);
     }
 
   // ----------------------------------------------------------------------------------------------
@@ -91,7 +91,6 @@ public:
 private:
     std::unique_ptr<Btwxt::RegularGridInterpolator> btwxt;
     std::vector<std::vector<double>> grid_axes;
-    std::shared_ptr<Courierr::Courierr> courier{std::make_shared<Courierr::SimpleCourierr>()};
 };
 
 #endif

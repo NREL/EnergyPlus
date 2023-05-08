@@ -9,6 +9,10 @@ if (NOT TARGET courierr)
     add_subdirectory(courierr)
 endif()
 
+if (NOT TARGET nlohmann_json)
+    add_subdirectory(json)
+endif()
+
 if (${PROJECT_NAME}_BUILD_TESTING AND NOT TARGET gtest)
 
     # Prevent GoogleTest from overriding our compiler/linker options

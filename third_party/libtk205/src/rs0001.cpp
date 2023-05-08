@@ -577,7 +577,7 @@ namespace tk205  {
 			add_grid_axis(performance_map, condenser_liquid_volumetric_flow_rate);
 			add_grid_axis(performance_map, condenser_liquid_entering_temperature);
 			add_grid_axis(performance_map, compressor_sequence_number);
-			performance_map->finalize_grid();
+			performance_map->finalize_grid(RS0001::logger);
 		}
 		const std::string_view GridVariablesCooling::evaporator_liquid_volumetric_flow_rate_units = "m3/s";
 
@@ -691,7 +691,7 @@ namespace tk205  {
 			a205_json_get<rs0001_ns::LookupVariablesCooling>(j, *RS0001::logger, "lookup_variables", x.lookup_variables, x.lookup_variables_is_set, true);
 			x.lookup_variables.populate_performance_map(&x);
 		}
-		void PerformanceMapCooling::initialize(const nlohmann::json& j, std::shared_ptr<::Courierr::Courierr> logger) {
+		void PerformanceMapCooling::initialize(const nlohmann::json& j) {
 			a205_json_get<rs0001_ns::GridVariablesCooling>(j, *RS0001::logger, "grid_variables", grid_variables, grid_variables_is_set, true);
 			grid_variables.populate_performance_map(this);
 			a205_json_get<rs0001_ns::LookupVariablesCooling>(j, *RS0001::logger, "lookup_variables", lookup_variables, lookup_variables_is_set, true);
@@ -720,7 +720,7 @@ namespace tk205  {
 		}
 		void GridVariablesStandby::populate_performance_map(PerformanceMapBase* performance_map) {
 			add_grid_axis(performance_map, environment_dry_bulb_temperature);
-			performance_map->finalize_grid();
+			performance_map->finalize_grid(RS0001::logger);
 		}
 		const std::string_view GridVariablesStandby::environment_dry_bulb_temperature_units = "K";
 
@@ -746,7 +746,7 @@ namespace tk205  {
 			a205_json_get<rs0001_ns::LookupVariablesStandby>(j, *RS0001::logger, "lookup_variables", x.lookup_variables, x.lookup_variables_is_set, true);
 			x.lookup_variables.populate_performance_map(&x);
 		}
-		void PerformanceMapStandby::initialize(const nlohmann::json& j, std::shared_ptr<::Courierr::Courierr> logger) {
+		void PerformanceMapStandby::initialize(const nlohmann::json& j) {
 			a205_json_get<rs0001_ns::GridVariablesStandby>(j, *RS0001::logger, "grid_variables", grid_variables, grid_variables_is_set, true);
 			grid_variables.populate_performance_map(this);
 			a205_json_get<rs0001_ns::LookupVariablesStandby>(j, *RS0001::logger, "lookup_variables", lookup_variables, lookup_variables_is_set, true);

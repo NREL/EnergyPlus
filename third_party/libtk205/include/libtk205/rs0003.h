@@ -265,7 +265,7 @@ namespace tk205  {
 		};
 		class PerformanceMapContinuous  : public PerformanceMapBase {
 		public:
-			void initialize (const nlohmann::json& j, std::shared_ptr<::Courierr::Courierr> logger) override;
+			void initialize (const nlohmann::json& j) override;
 			rs0003_ns::GridVariablesContinuous grid_variables;
 			rs0003_ns::LookupVariablesContinuous lookup_variables;
 			bool grid_variables_is_set;
@@ -330,7 +330,7 @@ namespace tk205  {
 		};
 		class PerformanceMapDiscrete  : public PerformanceMapBase {
 		public:
-			void initialize (const nlohmann::json& j, std::shared_ptr<::Courierr::Courierr> logger) override;
+			void initialize (const nlohmann::json& j) override;
 			rs0003_ns::GridVariablesDiscrete grid_variables;
 			rs0003_ns::LookupVariablesDiscrete lookup_variables;
 			bool grid_variables_is_set;

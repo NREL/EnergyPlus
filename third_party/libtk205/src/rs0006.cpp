@@ -45,7 +45,7 @@ namespace tk205  {
 		void GridVariables::populate_performance_map(PerformanceMapBase* performance_map) {
 			add_grid_axis(performance_map, output_power);
 			add_grid_axis(performance_map, output_frequency);
-			performance_map->finalize_grid();
+			performance_map->finalize_grid(RS0006::logger);
 		}
 		const std::string_view GridVariables::output_power_units = "W";
 
@@ -77,7 +77,7 @@ namespace tk205  {
 			a205_json_get<rs0006_ns::LookupVariables>(j, *RS0006::logger, "lookup_variables", x.lookup_variables, x.lookup_variables_is_set, true);
 			x.lookup_variables.populate_performance_map(&x);
 		}
-		void PerformanceMap::initialize(const nlohmann::json& j, std::shared_ptr<::Courierr::Courierr> logger) {
+		void PerformanceMap::initialize(const nlohmann::json& j) {
 			a205_json_get<rs0006_ns::GridVariables>(j, *RS0006::logger, "grid_variables", grid_variables, grid_variables_is_set, true);
 			grid_variables.populate_performance_map(this);
 			a205_json_get<rs0006_ns::LookupVariables>(j, *RS0006::logger, "lookup_variables", lookup_variables, lookup_variables_is_set, true);

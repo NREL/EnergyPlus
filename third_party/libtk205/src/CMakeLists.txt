@@ -14,11 +14,9 @@ else ()
     add_library(${PROJECT_NAME} SHARED ${sources})
 endif ()
 
-target_link_libraries(libtk205 PUBLIC courierr fmt)
+target_link_libraries(libtk205 PUBLIC courierr fmt nlohmann_json)
 target_include_directories(libtk205 PUBLIC ${PROJECT_SOURCE_DIR}/include/libtk205)
 target_include_directories(libtk205 PUBLIC ${PROJECT_SOURCE_DIR}/vendor/btwxt/include/btwxt)
-target_include_directories(libtk205 PRIVATE ${PROJECT_SOURCE_DIR}/vendor/json/single_include)
-target_include_directories(libtk205 PRIVATE ${PROJECT_SOURCE_DIR}/vendor/json/include)
 target_include_directories(libtk205 PRIVATE ${PROJECT_SOURCE_DIR}/vendor/valijson/include)
 
 target_compile_options(${PROJECT_NAME} PRIVATE

@@ -113,13 +113,13 @@ namespace tk205  {
 			if (x.operation_speed_control_type == ashrae205_ns::SpeedControlType::CONTINUOUS) {
 				x.performance_map = std::make_unique<rs0003_ns::PerformanceMapContinuous>();
 				if (x.performance_map) {
-					x.performance_map->initialize(j.at("performance_map"), RS0003::logger);
+					x.performance_map->initialize(j.at("performance_map"));
 				}
 			}
 			if (x.operation_speed_control_type == ashrae205_ns::SpeedControlType::DISCRETE) {
 				x.performance_map = std::make_unique<rs0003_ns::PerformanceMapDiscrete>();
 				if (x.performance_map) {
-					x.performance_map->initialize(j.at("performance_map"), RS0003::logger);
+					x.performance_map->initialize(j.at("performance_map"));
 				}
 			}
 		}
@@ -232,7 +232,7 @@ namespace tk205  {
 		void GridVariablesContinuous::populate_performance_map(PerformanceMapBase* performance_map) {
 			add_grid_axis(performance_map, standard_air_volumetric_flow_rate);
 			add_grid_axis(performance_map, static_pressure_difference);
-			performance_map->finalize_grid();
+			performance_map->finalize_grid(RS0003::logger);
 		}
 		const std::string_view GridVariablesContinuous::standard_air_volumetric_flow_rate_units = "m3/s";
 
@@ -272,7 +272,7 @@ namespace tk205  {
 			a205_json_get<rs0003_ns::LookupVariablesContinuous>(j, *RS0003::logger, "lookup_variables", x.lookup_variables, x.lookup_variables_is_set, true);
 			x.lookup_variables.populate_performance_map(&x);
 		}
-		void PerformanceMapContinuous::initialize(const nlohmann::json& j, std::shared_ptr<::Courierr::Courierr> logger) {
+		void PerformanceMapContinuous::initialize(const nlohmann::json& j) {
 			a205_json_get<rs0003_ns::GridVariablesContinuous>(j, *RS0003::logger, "grid_variables", grid_variables, grid_variables_is_set, true);
 			grid_variables.populate_performance_map(this);
 			a205_json_get<rs0003_ns::LookupVariablesContinuous>(j, *RS0003::logger, "lookup_variables", lookup_variables, lookup_variables_is_set, true);
@@ -303,7 +303,7 @@ namespace tk205  {
 		void GridVariablesDiscrete::populate_performance_map(PerformanceMapBase* performance_map) {
 			add_grid_axis(performance_map, speed_number);
 			add_grid_axis(performance_map, static_pressure_difference);
-			performance_map->finalize_grid();
+			performance_map->finalize_grid(RS0003::logger);
 		}
 		const std::string_view GridVariablesDiscrete::speed_number_units = "-";
 
@@ -351,7 +351,7 @@ namespace tk205  {
 			a205_json_get<rs0003_ns::LookupVariablesDiscrete>(j, *RS0003::logger, "lookup_variables", x.lookup_variables, x.lookup_variables_is_set, true);
 			x.lookup_variables.populate_performance_map(&x);
 		}
-		void PerformanceMapDiscrete::initialize(const nlohmann::json& j, std::shared_ptr<::Courierr::Courierr> logger) {
+		void PerformanceMapDiscrete::initialize(const nlohmann::json& j) {
 			a205_json_get<rs0003_ns::GridVariablesDiscrete>(j, *RS0003::logger, "grid_variables", grid_variables, grid_variables_is_set, true);
 			grid_variables.populate_performance_map(this);
 			a205_json_get<rs0003_ns::LookupVariablesDiscrete>(j, *RS0003::logger, "lookup_variables", lookup_variables, lookup_variables_is_set, true);
