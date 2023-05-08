@@ -135,7 +135,7 @@ INTEGER, PARAMETER                            :: handleTowerOutletNode = 6
 INTEGER, PARAMETER                            :: handleHWSupplyBranch = 7
 INTEGER, PARAMETER                            :: handleCondenserSupplyBranch = 8
 INTEGER, PARAMETER                            :: handleMixedSupplyBranch = 9
-INTEGER, PARAMETER                            :: handleMixedDemanBranch = 10
+INTEGER, PARAMETER                            :: handleMixedDemandBranch = 10
 INTEGER, PARAMETER                            :: handleMixedTowerOutletNode = 11
 INTEGER, PARAMETER                            :: handleMixedBoilerOutletNode = 12
 !Use AddToStrList(ToList,SubListHandle)
@@ -2301,7 +2301,7 @@ CALL AddObjToProcess('HVACTemplate:Plant:Tower:ObjectReference',.TRUE.,  twrorPr
 CALL AddObjToProcess('HVACTemplate:Plant:HotWaterLoop',.TRUE.,      hwpNameOff,                  hwpLdDistSchmOff,          21)
 CALL AddObjToProcess('HVACTemplate:Plant:Boiler',.TRUE.,            blrPriorityOff,              blrLoopTypeOff,            11)
 CALL AddObjToProcess('HVACTemplate:Plant:Boiler:ObjectReference',.TRUE.,  blrorPriorityOff,      blrorLoopTypeOff,           4)
-CALL AddObjToProcess('HVACTemplate:Zone:WaterToAirHeatPump',.TRUE., wahpTStatNameOff,            wahpBaseboardCapOff,       44)
+CALL AddObjToProcess('HVACTemplate:Zone:WaterToAirHeatPump',.TRUE., wahpTStatNameOff,            wahpBaseboardCapOff,       43)
 CALL AddObjToProcess('HVACTemplate:Plant:MixedWaterLoop',.TRUE.,    mwpNameOff,                  mwpLdDistSchmOff,          17)
 CALL AddObjToProcess('HVACTemplate:System:DedicatedOutdoorAir',.TRUE.,doasNameOff,              doasHumidSetPtSchedNameOff, 46)
 ! Detailed Plant Objects
@@ -17141,15 +17141,16 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Maximum Value of z','100.0',.TRUE.)
       CALL WriteComment('Part Load Fraction Curve for water-to-air heat pump')
       CALL CreateNewObj('Curve:Quadratic')
-      CALL AddToObjFld('Name', base + doasNameOff,' WAHP ClgPLFCurve')
+      CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' WAHP ClgPLFCurve')
       CALL AddToObjStr('Coefficient1 Constant','0.85')
       CALL AddToObjStr('Coefficient2 x','0.15')
       CALL AddToObjStr('Coefficient3 x**2','0.0')
       CALL AddToObjStr('Minimum Value of x','0.0')
-      CALL AddToObjStr('Maximum Value of x','1.0',.TRUE.)      !***Branch
+      CALL AddToObjStr('Maximum Value of x','1.0',.TRUE.)
+      !***Branch
       CALL CreateNewObj('Branch')
       CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Cooling Condenser Branch')
-      CALL AddToStrList(TRIM(FldVal(base + ussAirHandlerNameOff)) // ' Cooling Condenser Branch',handleMixedDemanBranch)
+      CALL AddToStrList(TRIM(FldVal(base + ussAirHandlerNameOff)) // ' Cooling Condenser Branch',handleMixedDemandBranch)
       CALL AddToObjStr('Pressure Drop Curve Name','')
       CALL AddToObjStr('Component Object Type','Coil:Cooling:WaterToAirHeatPump:EquationFit')
       CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Cooling Coil')
@@ -17633,7 +17634,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Maximum Value of z','100.0',.TRUE.)
     CALL WriteComment('Part Load Fraction Curve for water-to-air heat pump')
     CALL CreateNewObj('Curve:Quadratic')
-    CALL AddToObjFld('Name', base + doasNameOff,' WAHP HtgPLFCurve')
+    CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' WAHP HtgPLFCurve')
     CALL AddToObjStr('Coefficient1 Constant','0.85')
     CALL AddToObjStr('Coefficient2 x','0.15')
     CALL AddToObjStr('Coefficient3 x**2','0.0')
@@ -17642,7 +17643,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     !***Branch
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Heating Condenser Branch')
-    CALL AddToStrList(TRIM(FldVal(base + ussAirHandlerNameOff)) // ' Heating Condenser Branch',handleMixedDemanBranch)
+    CALL AddToStrList(TRIM(FldVal(base + ussAirHandlerNameOff)) // ' Heating Condenser Branch',handleMixedDemandBranch)
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','Coil:Heating:WaterToAirHeatPump:EquationFit')
     CALL AddToObjFld('Component Name', base + ussAirHandlerNameOff,' Heating Coil')
@@ -23183,7 +23184,7 @@ DO iSys = 1, numCompactSysVRF
   IF (isCondWaterCooled) THEN
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + vrfsNameOff,' VRF Condenser Branch')
-    CALL AddToStrList(TRIM(FldVal(base + vrfsNameOff)) // ' VRF Condenser Branch',handleMixedDemanBranch)
+    CALL AddToStrList(TRIM(FldVal(base + vrfsNameOff)) // ' VRF Condenser Branch',handleMixedDemandBranch)
     CALL AddToObjStr('Pressure Drop Curve Name','')
     CALL AddToObjStr('Component Object Type','AirConditioner:VariableRefrigerantFlow')
     CALL AddToObjFld('Component Name', base + vrfsNameOff,' VRF Heat Pump')
@@ -30173,7 +30174,7 @@ DO iZone = 1, numCompactWaterAirHP
   CALL AddToObjStr('Maximum Value of z','100.0',.TRUE.)
   CALL WriteComment('Part Load Fraction Curve for water-to-air heat pump')
   CALL CreateNewObj('Curve:Quadratic')
-  CALL AddToObjFld('Name', base + doasNameOff,' WAHP ClgPLFCurve')
+  CALL AddToObjFld('Name', base + wahpNameOff,' WAHP ClgPLFCurve')
   CALL AddToObjStr('Coefficient1 Constant','0.85')
   CALL AddToObjStr('Coefficient2 x','0.15')
   CALL AddToObjStr('Coefficient3 x**2','0.0')
@@ -30232,7 +30233,7 @@ DO iZone = 1, numCompactWaterAirHP
   CALL AddToObjStr('Maximum Value of z','100.0',.TRUE.)
   CALL WriteComment('Part Load Fraction Curve for water-to-air heat pump')
   CALL CreateNewObj('Curve:Quadratic')
-  CALL AddToObjFld('Name', base + doasNameOff,' WAHP HtgPLFCurve')
+  CALL AddToObjFld('Name', base + wahpNameOff,' WAHP HtgPLFCurve')
   CALL AddToObjStr('Coefficient1 Constant','0.85')
   CALL AddToObjStr('Coefficient2 x','0.15')
   CALL AddToObjStr('Coefficient3 x**2','0.0')
@@ -30295,7 +30296,7 @@ DO iZone = 1, numCompactWaterAirHP
   !***Branch
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + wahpNameOff,' Cooling Condenser Branch')
-  CALL AddToStrList(TRIM(FldVal(base + wahpNameOff)) // ' Cooling Condenser Branch',handleMixedDemanBranch)
+  CALL AddToStrList(TRIM(FldVal(base + wahpNameOff)) // ' Cooling Condenser Branch',handleMixedDemandBranch)
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Coil:Cooling:WaterToAirHeatPump:EquationFit')
   CALL AddToObjFld('Component Name', base + wahpNameOff,' WAHP Cooling Coil')
@@ -30304,7 +30305,7 @@ DO iZone = 1, numCompactWaterAirHP
   !***Branch
   CALL CreateNewObj('Branch')
   CALL AddToObjFld('Name', base + wahpNameOff,' Heating Condenser Branch')
-  CALL AddToStrList(TRIM(FldVal(base + wahpNameOff)) // ' Heating Condenser Branch',handleMixedDemanBranch)
+  CALL AddToStrList(TRIM(FldVal(base + wahpNameOff)) // ' Heating Condenser Branch',handleMixedDemandBranch)
   CALL AddToObjStr('Pressure Drop Curve Name','')
   CALL AddToObjStr('Component Object Type','Coil:Heating:WaterToAirHeatPump:EquationFit')
   CALL AddToObjFld('Component Name', base + wahpNameOff,' WAHP Heating Coil')
@@ -30953,7 +30954,7 @@ CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Demand Side Branches')
 CALL AddToObjFld('Name', base + mwpNameOff,' Mixed Demand Inlet Branch')
 !The names of all of the branches for the heating coils have been previously gathered
 DO iStr = 1, numStrList
-  IF (StrList(iStr)%Handle .EQ. handleMixedDemanBranch) THEN
+  IF (StrList(iStr)%Handle .EQ. handleMixedDemandBranch) THEN
     CALL AddToObjStr('Name', StrList(iStr)%StrToSave)
   END IF
 END DO
@@ -30977,12 +30978,12 @@ IF (isDemandBypassYes) THEN
 END IF
 !The names of all of the branches for the heating coils have been previously gathered
 DO iStr = 1, numStrList
-  IF (StrList(iStr)%Handle .EQ. handleMixedDemanBranch) THEN
+  IF (StrList(iStr)%Handle .EQ. handleMixedDemandBranch) THEN
     lastBranch = iStr
   END IF
 END DO
 DO iStr = 1, numStrList
-  IF (StrList(iStr)%Handle .EQ. handleMixedDemanBranch) THEN
+  IF (StrList(iStr)%Handle .EQ. handleMixedDemandBranch) THEN
     CALL AddToObjStr('Name', StrList(iStr)%StrToSave, iStr .EQ. lastBranch)
   END IF
 END DO
@@ -30995,7 +30996,7 @@ IF (isDemandBypassYes) THEN
 END IF
 !The names of all of the branches for the heating coils have been previously gathered
 DO iStr = 1, numStrList
-  IF (StrList(iStr)%Handle .EQ. handleMixedDemanBranch) THEN
+  IF (StrList(iStr)%Handle .EQ. handleMixedDemandBranch) THEN
     CALL AddToObjStr('Name', StrList(iStr)%StrToSave, iStr .EQ. lastBranch)
   END IF
 END DO

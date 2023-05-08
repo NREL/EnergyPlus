@@ -2919,11 +2919,10 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
                            lAlphaBlanks));
 
     EXPECT_EQ(17, NumNumbers);
-    EXPECT_TRUE(compare_containers(std::vector<bool>({true, true, false, true,  true, true, false, true, true, true, false, true, true,
-                                                      true, true, true,  false, true, true, true,  true, true, true, true,  true, true}),
+    EXPECT_TRUE(compare_containers(std::vector<bool>({true, true, false, true, true, true,  false, true, true, true, false,
+                                                      true, true, true,  true, true, false, true,  true, true, true, true}),
                                    lNumericBlanks));
-    EXPECT_TRUE(
-        compare_containers(std::vector<Real64>({1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 0, 0, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0}), Numbers));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 0, 0, 80, 0, 0, 0, 0, 0}), Numbers));
     EXPECT_EQ(1, IOStatus);
 }
 

@@ -619,10 +619,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
           80.0,                           !- Maximum Supply Air Temperature{ C }
           ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
           ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-          ,                               !- Maximum Cycling Rate
-          ,                               !- Heat Pump Time Constant
-          ,                               !- Fraction of On-Cycle Power Use
-          ,                               !- Heat Pump Fan Delay Time
+
           100,                            !- Ancilliary On-Cycle Electric Power
           50,                             !- Ancilliary Off-Cycle Electric Power
           ,                               !- Design Heat Recovery Water Flow Rate
@@ -1108,10 +1105,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
           80.0,                           !- Maximum Supply Air Temperature{ C }
           ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
           ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-          ,                               !- Maximum Cycling Rate
-          ,                               !- Heat Pump Time Constant
-          ,                               !- Fraction of On-Cycle Power Use
-          ,                               !- Heat Pump Fan Delay Time
           ,                               !- Ancilliary On-Cycle Electric Power
           ,                               !- Ancilliary Off-Cycle Electric Power
           ,                               !- Design Heat Recovery Water Flow Rate
@@ -1469,10 +1462,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
           80.0,                           !- Maximum Supply Air Temperature{ C }
           ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
           ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-          ,                               !- Maximum Cycling Rate
-          ,                               !- Heat Pump Time Constant
-          ,                               !- Fraction of On-Cycle Power Use
-          ,                               !- Heat Pump Fan Delay Time
           ,                               !- Ancilliary On-Cycle Electric Power
           ,                               !- Ancilliary Off-Cycle Electric Power
           ,                               !- Design Heat Recovery Water Flow Rate
@@ -1705,10 +1694,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
           80.0,                           !- Maximum Supply Air Temperature{ C }
           ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
           ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-          ,                               !- Maximum Cycling Rate
-          ,                               !- Heat Pump Time Constant
-          ,                               !- Fraction of On-Cycle Power Use
-          ,                               !- Heat Pump Fan Delay Time
           ,                               !- Ancilliary On-Cycle Electric Power
           ,                               !- Ancilliary Off-Cycle Electric Power
           ,                               !- Design Heat Recovery Water Flow Rate
@@ -1955,10 +1940,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
           80.0,                           !- Maximum Supply Air Temperature{ C }
           ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
           ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-          ,                               !- Maximum Cycling Rate
-          ,                               !- Heat Pump Time Constant
-          ,                               !- Fraction of On-Cycle Power Use
-          ,                               !- Heat Pump Fan Delay Time
           ,                               !- Ancilliary On-Cycle Electric Power
           ,                               !- Ancilliary Off-Cycle Electric Power
           ,                               !- Design Heat Recovery Water Flow Rate
@@ -2290,10 +2271,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -2581,10 +2558,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -2830,10 +2803,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -3105,10 +3074,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -3305,10 +3270,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -3550,10 +3511,6 @@ AirLoopHVAC:UnitarySystem,
   35.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -7559,10 +7516,6 @@ AirLoopHVAC:UnitarySystem,
   80,                     !- Maximum Supply Air Temperature{ C }
   21,                     !- Maximum Outdoor Dry - Bulb Temperature for Supplemental Heater Operation{ C }
   ,                       !- Outdoor Dry - Bulb Temperature Sensor Node Name
-  2.5,                    !- Maximum Cycling Rate{ cycles / hr }
-  60,                     !- Heat Pump Time Constant{ s }
-  0.01,                   !- Fraction of On - Cycle Power Use
-  60,                     !- Heat Pump Fan Delay Time{ s }
   ,                       !- Ancillary On - Cycle Electric Power{ W }
   ,                       !- Ancillary Off - Cycle Electric Power{ W }
   ,                       !- Design Heat Recovery Water Flow Rate{ m3 / s }
@@ -7745,10 +7698,6 @@ AirLoopHVAC:UnitarySystem,
   80,                     !- Maximum Supply Air Temperature{ C }
   21,                     !- Maximum Outdoor Dry - Bulb Temperature for Supplemental Heater Operation{ C }
   ,                       !- Outdoor Dry - Bulb Temperature Sensor Node Name
-  2.5,                    !- Maximum Cycling Rate{ cycles / hr }
-  60,                     !- Heat Pump Time Constant{ s }
-  0.01,                   !- Fraction of On - Cycle Power Use
-  60,                     !- Heat Pump Fan Delay Time{ s }
   ,                       !- Ancillary On - Cycle Electric Power{ W }
   ,                       !- Ancillary Off - Cycle Electric Power{ W }
   ,                       !- Design Heat Recovery Water Flow Rate{ m3 / s }
@@ -8052,10 +8001,6 @@ AirLoopHVAC:UnitarySystem,
   Autosize,                                                !- Maximum Supply Air Temperature {C}
   21,                                                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                                                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                                                        !- Maximum Cycling Rate
-  ,                                                        !- Heat Pump Time Constant
-  ,                                                        !- Fraction of On-Cycle Power Use
-  ,                                                        !- Heat Pump Fan Delay Time
   ,                                                        !- Ancilliary On-Cycle Electric Power
   ,                                                        !- Ancilliary Off-Cycle Electric Power
   ,                                                        !- Design Heat Recovery Water Flow Rate
@@ -8451,10 +8396,6 @@ AirLoopHVAC:UnitarySystem,
   80,                     !- Maximum Supply Air Temperature{ C }
   21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                        !- Maximum Cycling Rate {cycles/hr}
-  ,                        !- Heat Pump Time Constant {s}
-  ,                        !- Fraction of On-Cycle Power Use
-  ,                        !- Heat Pump Fan Delay Time {s}
   ,                        !- Ancillary On-Cycle Electric Power {W}
   ,                        !- Ancillary Off-Cycle Electric Power {W}
   ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -9695,7 +9636,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump_SetPointControl)
       1,                      !- Multiplier
       autocalculate,          !- Ceiling Height{ m }
       autocalculate;          !- Volume{ m3 }
-      
+
 
     ZoneHVAC:EquipmentConnections,
     EAST ZONE,                 !- Zone Name
@@ -9704,7 +9645,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump_SetPointControl)
       Zone Exhaust Node,       !- Zone Air Exhaust Node or NodeList Name
       Zone 2 Node,             !- Zone Air Node Name
       Zone 2 Outlet Node;      !- Zone Return Air Node Name
-      
+
 
     ZoneHVAC:EquipmentList,
       Zone2Equipment,          !- Name
@@ -9715,7 +9656,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump_SetPointControl)
       1,                       !- Zone Equipment 1 Heating or No - Load Sequence
       ,                        !- Zone Equipment 1 Sequential Cooling Fraction
       ;                        !- Zone Equipment 1 Sequential Heating Fraction
-      
+
 
     AirLoopHVAC:UnitarySystem,
       Unitary System Model,   !- Name
@@ -10943,10 +10884,6 @@ AirLoopHVAC:UnitarySystem,
   80,                     !- Maximum Supply Air Temperature{ C }
   21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                        !- Maximum Cycling Rate {cycles/hr}
-  ,                        !- Heat Pump Time Constant {s}
-  ,                        !- Fraction of On-Cycle Power Use
-  ,                        !- Heat Pump Fan Delay Time {s}
   ,                        !- Ancillary On-Cycle Electric Power {W}
   ,                        !- Ancillary Off-Cycle Electric Power {W}
   ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -11506,10 +11443,6 @@ AirLoopHVAC:UnitarySystem,
   50, !- Maximum Supply Air Temperature{ C }
   		21, !- Maximum Outdoor Dry - Bulb Temperature for Supplemental Heater Operation{ C }
   		, !- Outdoor Dry - Bulb Temperature Sensor Node Name
-  		, !- Maximum Cycling Rate
-  		, !- Heat Pump Time Constant
-  		, !- Fraction of On - Cycle Power Use
-  		, !- Heat Pump Fan Delay Time
   		, !- Ancillary On - Cycle Electric Power
   		, !- Ancillary Off - Cycle Electric Power
   		, !- Design Heat Recovery Water Flow Rate
@@ -12574,10 +12507,6 @@ AirLoopHVAC:UnitarySystem,
   80,                     !- Maximum Supply Air Temperature{ C }
   21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                        !- Maximum Cycling Rate {cycles/hr}
-  ,                        !- Heat Pump Time Constant {s}
-  ,                        !- Fraction of On-Cycle Power Use
-  ,                        !- Heat Pump Fan Delay Time {s}
   ,                        !- Ancillary On-Cycle Electric Power {W}
   ,                        !- Ancillary Off-Cycle Electric Power {W}
   0.002,                   !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -13659,10 +13588,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -13808,10 +13733,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -13934,10 +13855,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -14062,10 +13979,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -15778,7 +15691,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     NormalSHRTempCoolingFFF,  !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     NormalSHRFlowCoolingFFF;  !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
-  Curve:Biquadratic,  
+  Curve:Biquadratic,
   NormalTempCoolingCAPFTemp,  !- Name
   1.2047763641,  !- Coefficient1 Constant
   -0.0319503564,  !- Coefficient2 x
@@ -15796,7 +15709,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Biquadratic,  
+  Curve:Biquadratic,
   NormalTempCoolingEIRFTemp,  !- Name
   -0.0439174307,  !- Coefficient1 Constant
   0.0620812106,  !- Coefficient2 x
@@ -15814,7 +15727,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,  
+  Curve:Quadratic,
   NormalFlowCoolingCAPFFF,  !- Name
   0.7333333334,  !- Coefficient1 Constant
   0.3733333333,  !- Coefficient2 x
@@ -15826,7 +15739,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,  
+  Curve:Quadratic,
   NormalFlowCoolingEIRFFF,  !- Name
   1.1970044563,  !- Coefficient1 Constant
   -0.2513822149,  !- Coefficient2 x
@@ -15838,7 +15751,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-Curve:Biquadratic,	
+Curve:Biquadratic,
 NormalSHRTempCoolingFFF,	!- Name
 1.0,	!- Coefficient1 Constant
 0.0,	!- Coefficient2 x
@@ -15856,7 +15769,7 @@ Temperature,	!- Input Unit Type for X
 Temperature,	!- Input Unit Type for Y
 Dimensionless;	!- Output Unit Type
 
-Curve:Quadratic,	
+Curve:Quadratic,
 NormalSHRFlowCoolingFFF,	!- Name
 0.5620186265,	!- Coefficient1 Constant
 0.4708409870,	!- Coefficient2 x
@@ -15905,7 +15818,7 @@ Dimensionless;	!- Output Unit Type
     SubcoolSHRTempCoolingCAPFTemp,   !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     SubcoolSHRFlowCoolingCAPFFF;     !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
-  Curve:Biquadratic,  
+  Curve:Biquadratic,
   SubcoolTempCoolingCAPFTemp,  !- Name
   1.0162460317,  !- Coefficient1 Constant
   -0.0108091429,  !- Coefficient2 x
@@ -15923,7 +15836,7 @@ Dimensionless;	!- Output Unit Type
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Biquadratic,  
+  Curve:Biquadratic,
   SubcoolTempCoolingEIRFTemp,  !- Name
   0.2634289781,  !- Coefficient1 Constant
   0.0311157806,  !- Coefficient2 x
@@ -15941,7 +15854,7 @@ Dimensionless;	!- Output Unit Type
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,  
+  Curve:Quadratic,
   SubcoolFlowCoolingCAPFFF,  !- Name
   0.6,  !- Coefficient1 Constant
   0.6285714286,  !- Coefficient2 x
@@ -15953,7 +15866,7 @@ Dimensionless;	!- Output Unit Type
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,  
+  Curve:Quadratic,
   SubcoolFlowCoolingEIRFFF,  !- Name
   1.2856060606,  !- Coefficient1 Constant
   -0.4563131313,  !- Coefficient2 x
@@ -15965,7 +15878,7 @@ Dimensionless;	!- Output Unit Type
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-  Curve:Biquadratic,  
+  Curve:Biquadratic,
   SubcoolSHRTempCoolingCAPFTemp,  !- Name
   3.9903739056,  !- Coefficient1 Constant
   -0.2158168778,  !- Coefficient2 x
@@ -15983,7 +15896,7 @@ Dimensionless;	!- Output Unit Type
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,  
+  Curve:Quadratic,
   SubcoolSHRFlowCoolingCAPFFF,  !- Name
   0.4306934378,  !- Coefficient1 Constant
   0.606484437,  !- Coefficient2 x
@@ -16032,7 +15945,7 @@ Dimensionless;	!- Output Unit Type
     ReheatSHRTempCoolingCAPFTemp,  !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
     ReheatSHRFlowCoolingCAPFFF;    !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
-  Curve:Biquadratic,  
+  Curve:Biquadratic,
   ReheatTempCoolingCAPFTemp,  !- Name
   1.5813223182,  !- Coefficient1 Constant
   -0.0633198089,  !- Coefficient2 x
@@ -16050,7 +15963,7 @@ Dimensionless;	!- Output Unit Type
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Biquadratic,  
+  Curve:Biquadratic,
   ReheatTempCoolingEIRFTemp,  !- Name
   0.4050271551,  !- Coefficient1 Constant
   0.0140945368,  !- Coefficient2 x
@@ -16069,7 +15982,7 @@ Dimensionless;	!- Output Unit Type
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,  
+  Curve:Quadratic,
   ReheatFlowCoolingCAPFFF,  !- Name
   0.7454545455,  !- Coefficient1 Constant
   0.4,  !- Coefficient2 x
@@ -16081,7 +15994,7 @@ Dimensionless;	!- Output Unit Type
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,  
+  Curve:Quadratic,
   ReheatFlowCoolingEIRFFF,  !- Name
   1.3219073627,  !- Coefficient1 Constant
   -0.5498593181,  !- Coefficient2 x
@@ -16093,7 +16006,7 @@ Dimensionless;	!- Output Unit Type
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-  Curve:Biquadratic,  
+  Curve:Biquadratic,
   ReheatSHRTempCoolingCAPFTemp,  !- Name
   3.9903739056,  !- Coefficient1 Constant
   -0.2158168778,  !- Coefficient2 x
@@ -16111,7 +16024,7 @@ Dimensionless;	!- Output Unit Type
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  Curve:Quadratic,  
+  Curve:Quadratic,
   ReheatSHRFlowCoolingCAPFFF,  !- Name
   -1.4384495222,  !- Coefficient1 Constant
   0.9171312178,  !- Coefficient2 x
@@ -17301,10 +17214,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSiz
       Autosize,                !- Maximum Supply Air Temperature {C}
       21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
       ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-      ,                        !- Maximum Cycling Rate {cycles/hr}
-      ,                        !- Heat Pump Time Constant {s}
-      ,                        !- Fraction of On-Cycle Power Use
-      ,                        !- Heat Pump Fan Delay Time {s}
       ,                        !- Ancillary On-Cycle Electric Power {W}
       ,                        !- Ancillary Off-Cycle Electric Power {W}
       ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -17611,10 +17520,6 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
       Autosize,                !- Maximum Supply Air Temperature {C}
       21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
       ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-      ,                        !- Maximum Cycling Rate {cycles/hr}
-      ,                        !- Heat Pump Time Constant {s}
-      ,                        !- Fraction of On-Cycle Power Use
-      ,                        !- Heat Pump Fan Delay Time {s}
       ,                        !- Ancillary On-Cycle Electric Power {W}
       ,                        !- Ancillary Off-Cycle Electric Power {W}
       ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -18692,10 +18597,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -18900,10 +18801,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -19097,10 +18994,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate
@@ -20922,10 +20815,6 @@ AirLoopHVAC:UnitarySystem,
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                               !- Maximum Cycling Rate
-  ,                               !- Heat Pump Time Constant
-  ,                               !- Fraction of On-Cycle Power Use
-  ,                               !- Heat Pump Fan Delay Time
   ,                               !- Ancilliary On-Cycle Electric Power
   ,                               !- Ancilliary Off-Cycle Electric Power
   ,                               !- Design Heat Recovery Water Flow Rate

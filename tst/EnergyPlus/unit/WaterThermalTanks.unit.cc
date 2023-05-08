@@ -2561,6 +2561,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name",
         "    SensCoolCapCurve,        !- Sensible Cooling Name",
         "    CoolPowCurve,            !- Cooling Power Consumption Curve Name",
+        "    CoolPLFCurve,            !- Cooling Power Consumption Curve Name",
         "    1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
         "    1.5;                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 
@@ -2620,6 +2621,9 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "  100,                  ! Maximum Value of z",
         "  0.,                   ! Minimum Curve Output",
         "  38.;                  ! Maximum Curve Output",
+
+        "Curve:Quadratic, CoolPLFCurve, 0.85, 0.83, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless; ",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects));

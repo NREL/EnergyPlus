@@ -918,6 +918,11 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Twet_Rated = NumArray(5);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Gamma_Rated = NumArray(6);
 
+            // Previously set by parent objects, but not user-definable
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = 4;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant = 0.;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = 0.;
+
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum =
                 GetOnlySingleNode(state,
                                   AlphArray(2),
@@ -1445,6 +1450,11 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(4);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate = NumArray(5);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = DataHeatBalance::RefrigCondenserType::Water;
+
+            // Previously set by parent objects, but not user-definable
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = 4;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant = 0.;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = 0.;
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum =
                 GetOnlySingleNode(state,
@@ -1974,6 +1984,11 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel = int(NumArray(2));
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat = NumArray(3);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(4);
+            
+            // Previously set by parent objects, but not user-definable
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = 4;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant = 0.;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = 0.;
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum =
                 GetOnlySingleNode(state,
@@ -4091,6 +4106,7 @@ namespace VariableSpeedCoils {
                 }
 
                 // calculate coil model at rating point
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 1.0;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DesignAirMassFlowRate =
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds);
@@ -4226,6 +4242,7 @@ namespace VariableSpeedCoils {
                 }
 
                 // calculate coil model at rating point
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 1.0;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DesignAirMassFlowRate =
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds);
