@@ -5,8 +5,6 @@ namespace tk205  {
 
 	namespace rs0002_ns  {
 	
-		void from_json(const nlohmann::json& j, Schema& x) {
-		}
 		const std::string_view Schema::schema_title = "Unitary Cooling Air-Conditioning Equipment";
 
 		const std::string_view Schema::schema_version = "1.0.0";

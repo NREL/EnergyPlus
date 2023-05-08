@@ -5,8 +5,6 @@ namespace tk205  {
 
 	namespace rs0004_ns  {
 	
-		void from_json(const nlohmann::json& j, Schema& x) {
-		}
 		const std::string_view Schema::schema_title = "Air-to-Air Direct Expansion Refrigerant System";
 
 		const std::string_view Schema::schema_version = "1.0.0";
