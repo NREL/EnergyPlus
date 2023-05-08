@@ -701,11 +701,8 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
                 }
                 Real64 companionVolFlowRate = this->companionHeatPumpCoil->loadSideDesignVolFlowRate;
                 int compLoopNum = this->companionHeatPumpCoil->loadSidePlantLoc.loopNum;
-                if (this->companionHeatPumpCoil->loadSideIsPlantInlet &&
-                    (companionVolFlowRate > 0.0 || companionVolFlowRate == DataSizing::AutoSize)) {
-                    if (compLoopNum > 0) {
-                        companionVolFlowRate = state.dataSize->PlantSizData(compLoopNum).DesVolFlowRate * this->companionHeatPumpCoil->sizingFactor;
-                    }
+                if (compLoopNum > 0) {
+                    companionVolFlowRate = state.dataSize->PlantSizData(compLoopNum).DesVolFlowRate * this->companionHeatPumpCoil->sizingFactor;
                 }
                 Real64 compRefCapacity = this->companionHeatPumpCoil->referenceCapacity;
                 Real64 compRho = rho;
