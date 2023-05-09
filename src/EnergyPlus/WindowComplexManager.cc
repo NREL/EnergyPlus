@@ -2714,7 +2714,6 @@ namespace WindowComplexManager {
         Real64 edgeGlCorrFac;
 
         Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
-        Real64 SrdSurfViewFac; // View factor of a surrounding surface
         Real64 OutSrdIR;
 
         // fill local vars

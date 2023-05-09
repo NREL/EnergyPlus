@@ -976,8 +976,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     HPlenARR.deallocate();
     Real64 HExt = sum(HExtARR * Area) / A; // dummy for call to InitExteriorConvectionCoeff
     HExtARR.deallocate();
-    Real64 HrSrdSurfs = sum(HSrdSurfARR * Area) / A; // dummy for call to InitExteriorConvectionCoeff, unused for now
-    HSrdSurfARR.deallocate();
 
     if (state.dataEnvrn->IsRain) HExt = 1000.0;
 

@@ -703,7 +703,6 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     LayerType InSideLayerType;  // interior shade type
 
     Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
-    Real64 SrdSurfViewFac; // View factor of a surrounding surface
     Real64 OutSrdIR;
 
     if (CalcCondition != DataBSDFWindow::Condition::Invalid) return;
