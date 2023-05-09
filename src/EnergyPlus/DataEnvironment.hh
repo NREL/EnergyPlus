@@ -71,7 +71,7 @@ namespace DataEnvironment {
 
     Real64 OutWetBulbTempAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
-    Real64 WindSpeedAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
+    Real64 WindSpeedAt(const EnergyPlusData &state, Real64 Z); // Height above ground (m)
 
     Real64 OutBaroPressAt(EnergyPlusData &state, Real64 Z); // Height above ground (m)
 

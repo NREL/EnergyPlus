@@ -2,3 +2,9 @@ version: 2
 
 sphinx:
   configuration: doc/readthedocs/sphinx/conf.py
+
+# read the docs image build already includes sphinx-rtd-theme, so this isn't needed
+# however, keeping it here and running it on RTD is a near zero cost operation and makes sure the requirements are ok
+python:
+  install:
+    - requirements: doc/readthedocs/requirements.txt
