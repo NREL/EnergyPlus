@@ -3506,7 +3506,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
 
         "  ShadowCalculation,",
         "    PixelCounting, !-Shading Calculation Method",
-        "    Periodic, !-Shading Calculation Update Frequency Method",
+        "    Timestep, !-Shading Calculation Update Frequency Method",
         "    , !-Shading Calculation Update Frequency",
         "    , !-Maximum Figures in Shadow Overlap Calculations",
         "    , !-Polygon Clipping Algorithm",

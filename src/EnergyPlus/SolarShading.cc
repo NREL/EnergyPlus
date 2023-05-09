@@ -715,6 +715,14 @@ void GetShadowingInput(EnergyPlusData &state)
         }
     }
 
+    if (!state.dataSysVars->DetailedSolarTimestepIntegration && state.dataSurface->ShadingTransmittanceVaries &&
+        state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) {
+
+        ShowWarningError(state,
+                         format("GetShadowingInput: The shading transmittance for shading devices changes throughout the year. Choose "
+                                "Shading Calculation Update Frequency Method = Timestep in the {} object to remove this warning.",
+                                cCurrentModuleObject));
+    }
     if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm && state.dataSurface->ShadingTransmittanceVaries &&
         state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) {
 
@@ -725,7 +733,7 @@ void GetShadowingInput(EnergyPlusData &state)
         ShowContinueError(state, "Simulation has been reset to use DetailedSkyDiffuseModeling. Simulation continues.");
         state.dataSysVars->DetailedSkyDiffuseAlgorithm = true;
         state.dataIPShortCut->cAlphaArgs(2) = "DetailedSkyDiffuseModeling";
-        if (state.dataSolarShading->ShadowingCalcFrequency > 1) {
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration && state.dataSolarShading->ShadowingCalcFrequency > 1) {
             ShowContinueError(state,
                               format("Better accuracy may be gained by setting the {} to 1 in the {} object.",
                                      state.dataIPShortCut->cNumericFieldNames(1),
