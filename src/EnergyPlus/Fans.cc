@@ -99,9 +99,7 @@ void SimulateFanComponents(EnergyPlusData &state,
                            bool const FirstHVACIteration,
                            int &CompIndex,
                            ObjexxFCL::Optional<Real64 const> SpeedRatio,
-                           ObjexxFCL::Optional_bool_const ZoneCompTurnFansOn,  // Turn fans ON signal from ZoneHVAC component
-                           ObjexxFCL::Optional_bool_const ZoneCompTurnFansOff, // Turn Fans OFF signal from ZoneHVAC component
-                           ObjexxFCL::Optional<Real64 const> PressureRise      // Pressure difference to use for DeltaPress
+                           ObjexxFCL::Optional<Real64 const> PressureRise // Pressure difference to use for DeltaPress
 )
 {
 
@@ -148,22 +146,8 @@ void SimulateFanComponents(EnergyPlusData &state,
         }
     }
 
-    state.dataFans->LocalTurnFansOn = false;
-    state.dataFans->LocalTurnFansOff = false;
     // With the correct FanNum Initialize
     InitFan(state, FanNum, FirstHVACIteration); // Initialize all fan related parameters
-
-    if (present(ZoneCompTurnFansOn) && present(ZoneCompTurnFansOff)) {
-        // Set module-level logic flags equal to ZoneCompTurnFansOn and ZoneCompTurnFansOff values passed into this routine
-        // for ZoneHVAC components with system availability managers defined.
-        // The module-level flags get used in the other subroutines (e.g., SimSimpleFan,SimVariableVolumeFan and SimOnOffFan)
-        state.dataFans->LocalTurnFansOn = ZoneCompTurnFansOn;
-        state.dataFans->LocalTurnFansOff = ZoneCompTurnFansOff;
-    } else {
-        // Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
-        state.dataFans->LocalTurnFansOn = state.dataHVACGlobal->TurnFansOn;
-        state.dataFans->LocalTurnFansOff = state.dataHVACGlobal->TurnFansOff;
-    }
 
     // Calculate the Correct Fan Model with the current FanNum
     switch (state.dataFans->Fan(FanNum).FanType_Num) {
@@ -1491,7 +1475,6 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
     //       AUTHOR         Unknown
     //       DATE WRITTEN   Unknown
     //       MODIFIED       Brent Griffith, May 2009, added EMS override
-    //                      Chandan Sharma, March 2011, FSEC: Added LocalTurnFansOn and LocalTurnFansOff
     //                      Rongpeng Zhang, April 2015, added faulty fan operations due to fouling air filters
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -1570,8 +1553,8 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
     MassFlow = max(MassFlow, fan.MinAirMassFlowRate);
 
     // Determine the Fan Schedule for the Time step
-    if ((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) &&
-        !state.dataFans->LocalTurnFansOff && MassFlow > 0.0) {
+    if ((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataHVACGlobal->TurnFansOn) &&
+        !state.dataHVACGlobal->TurnFansOff && MassFlow > 0.0) {
         // Fan is operating
         fan.FanPower = max(0.0, MassFlow * DeltaPress / (FanEff * RhoAir)); // total fan power
         FanShaftPower = MotEff * fan.FanPower;                              // power delivered to shaft
@@ -1605,7 +1588,6 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
     //       DATE WRITTEN   Unknown
     //       MODIFIED       Phil Haves
     //                      Brent Griffith, May 2009 for EMS
-    //                      Chandan Sharma, March 2011, FSEC: Added LocalTurnFansOn and LocalTurnFansOff
     //                      Rongpeng Zhang, April 2015, added faulty fan operations due to fouling air filters
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -1700,8 +1682,8 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
     MassFlow = min(MassFlow, MaxAirMassFlowRate);
 
     // Determine the Fan Schedule for the Time step
-    if ((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) &&
-        !state.dataFans->LocalTurnFansOff && MassFlow > 0.0) {
+    if ((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataHVACGlobal->TurnFansOn) &&
+        !state.dataHVACGlobal->TurnFansOff && MassFlow > 0.0) {
         // Fan is operating - calculate power loss and enthalpy rise
         //  fan%FanPower = PartLoadFrac*FullMassFlow*DeltaPress/(FanEff*RhoAir) ! total fan power
         // Calculate and check limits on fraction of system flow
@@ -1789,7 +1771,6 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
     //       MODIFIED       Shirey, May 2001
     //                      R. Raustad - FSEC, Jan 2009 - added SpeedRatio for multi-speed fans
     //                      Brent Griffith, May 2009 for EMS
-    //                      Chandan Sharma, March 2011, FSEC: Added LocalTurnFansOn and LocalTurnFansOff
     //                      Rongpeng Zhang, April 2015, added faulty fan operations due to fouling air filters
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -1856,8 +1837,8 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
     fan.FanRuntimeFraction = 0.0;
 
     // Determine the Fan Schedule for the Time step
-    if ((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) &&
-        !state.dataFans->LocalTurnFansOff && MassFlow > 0.0 && fan.MaxAirMassFlowRate > 0.0) {
+    if ((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataHVACGlobal->TurnFansOn) &&
+        !state.dataHVACGlobal->TurnFansOff && MassFlow > 0.0 && fan.MaxAirMassFlowRate > 0.0) {
         // The actual flow fraction is calculated from MassFlow and the MaxVolumeFlow * AirDensity
         Real64 FlowFrac = MassFlow / MaxAirMassFlowRate;
 
@@ -1990,10 +1971,7 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
     //  When the AvailManagerMode == ExhaustFanCoupledToAvailManagers then the
     //  Exhaust Fan is  interlocked with air loop availability via global TurnFansOn and TurnFansOff variables.
     //  There is now the option to control if user wants to decouple air loop operation and exhaust fan operation
-    //  (zone air mass balance issues). If in the future want to allow for zone level local availability manager
-    //  then the optional arguments ZoneCompTurnFansOn and ZoneCompTurnFansOff will need
-    //  to be passed to SimulateFanComponents, and TurnFansOn must be changed to LocalTurnFansOn
-    //  and TurnFansOff to LocalTurnFansOff in the IF statement below.
+    //  (zone air mass balance issues).
 
     // apply controls to determine if operating
     if (fan.AvailManagerMode == AvailabilityManagerCoupling::Coupled) {
@@ -2059,7 +2037,6 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Craig Wray, LBNL
     //       DATE WRITTEN   Feb 2010
-    //       MODIFIED       Chandan Sharma, March 2011, FSEC: Added LocalTurnFansOn and LocalTurnFansOff
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine simulates the component model fan.
@@ -2119,8 +2096,8 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
     //  IF (fan%EMSMaxMassFlowOverrideOn) MassFlow   = fan%EMSAirMassFlowValue
 
     // Determine the Fan Schedule for the Time step
-    if ((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) &&
-        !state.dataFans->LocalTurnFansOff && MassFlow > 0.0) {
+    if ((ScheduleManager::GetCurrentScheduleValue(state, fan.AvailSchedPtrNum) > 0.0 || state.dataHVACGlobal->TurnFansOn) &&
+        !state.dataHVACGlobal->TurnFansOff && MassFlow > 0.0) {
         // Fan is operating - calculate fan pressure rise, component efficiencies and power, and also air enthalpy rise
 
         // Calculate fan static pressure rise using fan volumetric flow, std air density, air-handling system characteristics,

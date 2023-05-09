@@ -103,7 +103,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,23.1;
+  Version,23.2;
 
   Building,
     NONE,                    !- Name

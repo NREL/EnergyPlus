@@ -927,8 +927,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
 
     state->dataUnitarySystems->HeatingLoad = false;
     state->dataUnitarySystems->CoolingLoad = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     // supply fan is continuous flow
     thisSys.MaxHeatAirMassFlow = HVACInletMassFlowRate;
@@ -1229,8 +1229,8 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
 
     state->dataUnitarySystems->HeatingLoad = false;
     state->dataUnitarySystems->CoolingLoad = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataScheduleMgr->Schedule(thisSys.m_FanOpModeSchedPtr).CurrentValue = 1.0; // unit is always on
     state->dataScheduleMgr->Schedule(thisSys.m_SysAvailSchedPtr).CurrentValue = 1.0;  // unit is always available
@@ -4971,8 +4971,8 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     state->dataGlobal->SysSizingCalc = true;
     state->dataUnitarySystems->HeatingLoad = false;
     state->dataUnitarySystems->CoolingLoad = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
     // initialized to false
     ASSERT_FALSE(state->dataUnitarySystems->HeatingLoad);
     bool HeatActive = false;
@@ -5018,8 +5018,6 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     // test 1: availability manager status to off
     state->dataHVACGlobal->TurnFansOn = false;
     state->dataHVACGlobal->TurnFansOff = true;
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 21.10;
     state->dataHeatBalFanSys->TempTstatAir(1) = 21.1;
     sysAvailMgr.AvailStatus = 0;
@@ -5029,8 +5027,6 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     EXPECT_EQ(DataHVACGlobals::NoAction, sysAvailMgr.AvailStatus);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
     EXPECT_TRUE(state->dataHVACGlobal->TurnFansOff);
-    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOff);
-    EXPECT_TRUE(state->dataHVACGlobal->ZoneCompTurnFansOn);
     // run to set zone night cycle manager
     ZoneEquipmentManager::SimZoneEquipment(*state, true, SimAir);
     Real64 OnOffAirFlowRatio = 0.0;
@@ -5039,8 +5035,6 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     thisSys.setAverageAirFlow(*state, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
-    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOn);
-    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOff);
 
     // test 2: availability manager status to on
     state->dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(1).StartTime = 0.0;
@@ -5056,16 +5050,12 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     EXPECT_EQ(DataHVACGlobals::CycleOn, sysAvailMgr.AvailStatus);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
-    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOn);
-    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOff);
     state->dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(1).AvailStatus = DataHVACGlobals::CycleOn;
     // run to set zone night cycle manager
     ZoneEquipmentManager::SimZoneEquipment(*state, true, SimAir);
     // test global zone fan control variables are turned on
     EXPECT_TRUE(state->dataHVACGlobal->TurnFansOn);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
-    EXPECT_TRUE(state->dataHVACGlobal->ZoneCompTurnFansOn);
-    EXPECT_FALSE(state->dataHVACGlobal->ZoneCompTurnFansOff);
 }
 
 } // namespace EnergyPlus
