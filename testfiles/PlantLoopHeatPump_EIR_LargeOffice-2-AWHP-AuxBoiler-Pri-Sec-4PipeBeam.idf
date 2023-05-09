@@ -4789,9 +4789,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Core_bottom 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Core_bottom 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Core_bottom 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Core_bottom 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -4818,9 +4818,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Core_mid 4pipe Beam,     !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Core_mid 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Core_mid 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Core_mid 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -4847,9 +4847,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Core_top 4pipe Beam,     !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Core_top 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Core_top 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Core_top 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -4876,9 +4876,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Perimeter_bot_ZN_1 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Perimeter_bot_ZN_1 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Perimeter_bot_ZN_1 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Perimeter_bot_ZN_1 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -4905,9 +4905,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Perimeter_bot_ZN_2 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Perimeter_bot_ZN_2 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Perimeter_bot_ZN_2 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Perimeter_bot_ZN_2 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -4934,9 +4934,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Perimeter_bot_ZN_3 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Perimeter_bot_ZN_3 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Perimeter_bot_ZN_3 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Perimeter_bot_ZN_3 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -4963,9 +4963,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Perimeter_bot_ZN_4 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Perimeter_bot_ZN_4 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Perimeter_bot_ZN_4 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Perimeter_bot_ZN_4 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -4992,9 +4992,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Perimeter_mid_ZN_1 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Perimeter_mid_ZN_1 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Perimeter_mid_ZN_1 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Perimeter_mid_ZN_1 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -5021,9 +5021,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Perimeter_mid_ZN_2 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Perimeter_mid_ZN_2 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Perimeter_mid_ZN_2 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Perimeter_mid_ZN_2 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -5050,9 +5050,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Perimeter_mid_ZN_3 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Perimeter_mid_ZN_3 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Perimeter_mid_ZN_3 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Perimeter_mid_ZN_3 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -5079,9 +5079,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Perimeter_mid_ZN_4 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Perimeter_mid_ZN_4 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Perimeter_mid_ZN_4 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Perimeter_mid_ZN_4 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -5108,9 +5108,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Perimeter_top_ZN_1 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Perimeter_top_ZN_1 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Perimeter_top_ZN_1 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Perimeter_top_ZN_1 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -5137,9 +5137,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Perimeter_top_ZN_2 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Perimeter_top_ZN_2 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Perimeter_top_ZN_2 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Perimeter_top_ZN_2 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -5166,9 +5166,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Perimeter_top_ZN_3 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Perimeter_top_ZN_3 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Perimeter_top_ZN_3 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Perimeter_top_ZN_3 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -5195,9 +5195,9 @@
 
   AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam,
     Perimeter_top_ZN_4 4pipe Beam,  !- Name
-    HVACOperationSchd,       !- Primary Air Availability Schedule Name
-    HVACOperationSchd,       !- Cooling Availability Schedule Name
-    HVACOperationSchd,       !- Heating Availability Schedule Name
+    ALWAYS_ON,               !- Primary Air Availability Schedule Name
+    ALWAYS_ON,               !- Cooling Availability Schedule Name
+    ALWAYS_ON,               !- Heating Availability Schedule Name
     Perimeter_top_ZN_4 4pipe Beam Inlet Node Name,  !- Primary Air Inlet Node Name
     Perimeter_top_ZN_4 4pipe Beam Outlet Node Name,  !- Primary Air Outlet Node Name
     Perimeter_top_ZN_4 4pipe Beam CW Inlet Node,  !- Chilled Water Inlet Node Name
@@ -7860,6 +7860,7 @@
     HeatSys1 Supply Inlet Branch,  !- Branch 1 Name
     HeatSys1 Supply Equipment Branch 1,  !- Branch 2 Name
     HeatSys1 Supply Equipment Branch 2,  !- Branch 2 Name
+    HEATSYS1 SUPPLY EQUIPMENT BYPASS BRANCH,
     HeatSys1 Supply Outlet Branch;  !- Branch 4 Name
 
   Branch,
@@ -8435,7 +8436,7 @@
     1.0,                        !- Sizing Factor
     CoolCapCurveFuncTemp,    !- Capacity Modifier Function of Temperature Curve Name
     CoolEIRCurveFuncTemp,    !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    FakeEIRCurveFuncPLR,        !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
     Setpoint,                    !- Control Type
     VariableSpeedPumping,            !- Flow Mode
     0.2;                     !- Minimum Part Load Ratio
@@ -8459,7 +8460,7 @@
     1.0,                        !- Sizing Factor
     CoolCapCurveFuncTemp,    !- Capacity Modifier Function of Temperature Curve Name
     CoolEIRCurveFuncTemp,    !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    FakeEIRCurveFuncPLR,        !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
     Setpoint,                    !- Control Type
     VariableSpeedPumping,            !- Flow Mode
     0.2;                     !- Minimum Part Load Ratio
@@ -8520,7 +8521,7 @@ Curve:Biquadratic,
     1.0,                        !- Sizing Factor
     HeatCapCurveFuncTemp,    !- Capacity Modifier Function of Temperature Curve Name
     HeatEIRCurveFuncTemp,    !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    FakeEIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
     1.1,                     !- Heating To Cooling Capacity Sizing Ratio
     GreaterOfHeatingOrCooling,  !- Heat Pump Sizing Method
     Setpoint,                    !- Control Type
@@ -8582,7 +8583,7 @@ Curve:Biquadratic,
     1.0,                        !- Sizing Factor
     HeatCapCurveFuncTemp,    !- Capacity Modifier Function of Temperature Curve Name
     HeatEIRCurveFuncTemp,    !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    FakeEIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
     1.1,                     !- Heating To Cooling Capacity Sizing Ratio
     GreaterOfHeatingOrCooling,  !- Heat Pump Sizing Method
     Setpoint,                    !- Control Type
@@ -8642,52 +8643,13 @@ Curve:Biquadratic,
     AWHP_2 Heating Side Condenser Air Inlet Node,
     -1;
 
-!___  FAKE CURVES BELOW!!!
-
-  Curve:Biquadratic,
-    FakeCapCurveFuncTemp,        !- Name
-    1.0,                     !- Coefficient1 Constant
-    0.0,                     !- Coefficient2 x
-    0.0,                     !- Coefficient3 x**2
-    0.0,                     !- Coefficient4 y
-    0.0,                     !- Coefficient5 y**2
-    0.0,                     !- Coefficient6 x*y
-    5.0,                     !- Minimum Value of x
-    10.0,                    !- Maximum Value of x
-    24.0,                    !- Minimum Value of y
-    35.0,                    !- Maximum Value of y
-    ,                        !- Minimum Curve Output
-    ,                        !- Maximum Curve Output
-    Temperature,             !- Input Unit Type for X
-    Temperature,             !- Input Unit Type for Y
-    Dimensionless;           !- Output Unit Type
-
-  Curve:Biquadratic,
-    FakeEIRCurveFuncTemp,        !- Name
-    0.0,                     !- Coefficient1 Constant
-    1.0,                     !- Coefficient2 x
-    0.0,                     !- Coefficient3 x**2
-    0.0,                     !- Coefficient4 y
-    0.0,                     !- Coefficient5 y**2
-    0.0,                     !- Coefficient6 x*y
-    5.0,                     !- Minimum Value of x
-    10.0,                    !- Maximum Value of x
-    24.0,                    !- Minimum Value of y
-    35.0,                    !- Maximum Value of y
-    ,                        !- Minimum Curve Output
-    ,                        !- Maximum Curve Output
-    Temperature,             !- Input Unit Type for X
-    Temperature,             !- Input Unit Type for Y
-    Dimensionless;           !- Output Unit Type
-
   Curve:Quadratic,
-    FakeEIRCurveFuncPLR,         !- Name
+    EIRCurveFuncPLR,         !- Name
     0.0,                     !- Coefficient1 Constant
     1.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
- 
  
    Curve:Quadratic,
      TimedDefrostHeatEnergy,  !- Name
@@ -8731,13 +8693,18 @@ Curve:Biquadratic,
 
 
 
- ! Branch,
- !   HeatSys1 Supply Equipment Bypass Branch,  !- Name
- !   ,                        !- Pressure Drop Curve Name
- !   Pipe:Adiabatic,          !- Component 1 Object Type
- !   HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
- !   HeatSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
- !   HeatSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
+  Branch,
+    HeatSys1 Supply Equipment Bypass Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    HeatSys1 Supply Equipment Bypass Pipe,  !- Component 1 Name
+    HeatSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
+    HeatSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
+
+  Pipe:Adiabatic,
+    HeatSys1 Supply Equipment Bypass Pipe,  !- Name
+    HeatSys1 Supply Equip Bypass Inlet Node,  !- Inlet Node Name
+    HeatSys1 Supply Equip Bypass Outlet Node;  !- Outlet Node Name
 
   Branch,
     HeatSys1 Supply Inlet Branch,  !- Name
@@ -8832,8 +8799,8 @@ Curve:Biquadratic,
     HeatSys1 Supply Splitter,!- Name
     HeatSys1 Supply Inlet Branch,  !- Inlet Branch Name
     HeatSys1 Supply Equipment Branch 1,  !- Outlet Branch 1 Name
-    HeatSys1 Supply Equipment Branch 2;  !- Outlet Branch 1 Name    
-!    HeatSys1 Supply Equipment Bypass Branch;  !- Outlet Branch 2 Name
+    HeatSys1 Supply Equipment Branch 2,  !- Outlet Branch 1 Name    
+    HeatSys1 Supply Equipment Bypass Branch;  !- Outlet Branch 2 Name
 
   Connector:Mixer,
     CoolSys1 Demand Mixer,   !- Name
@@ -8866,8 +8833,8 @@ Curve:Biquadratic,
     HeatSys1 Supply Mixer,   !- Name
     HeatSys1 Supply Outlet Branch,  !- Outlet Branch Name
     HeatSys1 Supply Equipment Branch 1,  !- Inlet Branch 1 Name
-    HeatSys1 Supply Equipment Branch 2;  !- Outlet Branch 1 Name
-!    HeatSys1 Supply Equipment Bypass Branch;  !- Inlet Branch 2 Name
+    HeatSys1 Supply Equipment Branch 2,  !- Outlet Branch 1 Name
+    HeatSys1 Supply Equipment Bypass Branch;  !- Inlet Branch 2 Name
 
   Pipe:Adiabatic,
     CoolSys1 Demand Bypass Pipe,  !- Name
@@ -8903,11 +8870,6 @@ Curve:Biquadratic,
     HeatSys1 Demand Outlet Pipe,  !- Name
     HeatSys1 Demand Mixer-HeatSys1 Demand Outlet Pipe,  !- Inlet Node Name
     HeatSys1 Demand Outlet Node;  !- Outlet Node Name
-
-  Pipe:Adiabatic,
-    HeatSys1 Supply Outlet Pipe,  !- Name
-    HeatSys1 Supply Mixer-HeatSys1 Supply Outlet Pipe,  !- Inlet Node Name
-    HeatSys1 Supply Outlet Node;  !- Outlet Node Name
 
   Branch,
     Primary to Secondary HW HX Branch,  !- Name
@@ -10386,7 +10348,6 @@ Curve:Biquadratic,
   Output:Variable,*,Boiler Inlet Temperature,hourly; !- HVAC Average [C]
   Output:Variable,*,Boiler Outlet Temperature,hourly; !- HVAC Average [C]
   Output:Variable,*,Boiler Mass Flow Rate,hourly;
-
 
   Output:Variable,AWHP_2 Heating Side Outlet,System Node Setpoint Temperature,hourly; !- HVAC Average [C]
   Output:Variable,AWHP_1 Heating Side Outlet,System Node Setpoint Temperature,hourly; !- HVAC Average [C]

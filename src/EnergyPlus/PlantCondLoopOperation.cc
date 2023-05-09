@@ -1877,45 +1877,53 @@ void GetChillerHeaterChangeoverOpSchemeInput(EnergyPlusData &state,
                     scheme.TypeOf = "PlantEquipmentOperation:ChillerHeaterChangeover";
                     scheme.Type = OpScheme::ChillerHeaterSupervisory;
                     scheme.Setpoint.PrimCW = fields.at("primary_cooling_plant_setpoint_temperature").get<Real64>();
-                    if (fields.find("secondary_distribution_cooling_plant_setpoint_temperature") != fields.end()) { // not required field)
-                        scheme.Setpoint.SecCW = fields.at("secondary_distribution_cooling_plant_setpoint_temperature").get<Real64>();
+                    auto const secCWSP = fields.find("secondary_distribution_cooling_plant_setpoint_temperature");
+                    if (secCWSP != fields.end()) { // not required field
+                        scheme.Setpoint.SecCW = secCWSP.value().get<Real64>();
                     }
                     scheme.Setpoint.PrimHW_High = fields.at("primary_heating_plant_setpoint_at_outdoor_high_temperature").get<Real64>();
                     scheme.TempReset.HighOutdoorTemp = fields.at("outdoor_high_temperature").get<Real64>();
                     scheme.Setpoint.PrimHW_Low = fields.at("primary_heating_plant_setpoint_at_outdoor_low_temperature").get<Real64>();
                     scheme.TempReset.LowOutdoorTemp = fields.at("outdoor_low_temperature").get<Real64>();
-                    if (fields.find("secondary_distribution_heating_plant_setpoint_temperature") != fields.end()) { // not required field)
-                        scheme.Setpoint.SecHW = fields.at("secondary_distribution_heating_plant_setpoint_temperature").get<Real64>();
+                    auto const secHWSP = fields.find("secondary_distribution_heating_plant_setpoint_temperature");
+                    if (secHWSP != fields.end()) { // not required field
+                        scheme.Setpoint.SecHW = secHWSP.value().get<Real64>();
                     }
-                    scheme.ZoneListName = UtilityRoutines::MakeUPPERCase(fields.at("zone_load_polling_zonelist_name").get<std::string>());
-                    coolingOnlyLoadOpName =
-                        UtilityRoutines::MakeUPPERCase(fields.at("cooling_only_load_plant_equipment_operation_cooling_load_name").get<std::string>());
-                    heatingOnlyLoadOpName =
-                        UtilityRoutines::MakeUPPERCase(fields.at("heating_only_load_plant_equipment_operation_heating_load_name").get<std::string>());
-                    if (fields.find("simultaneous_cooling_and_heating_plant_equipment_operation_cooling_load_name") !=
-                        fields.end()) { // not required field)
-                        simulHeatCoolCoolingOpName = UtilityRoutines::MakeUPPERCase(
-                            fields.at("simultaneous_cooling_and_heating_plant_equipment_operation_cooling_load_name").get<std::string>());
+                    auto const zoneNameList = fields.find("zone_load_polling_zonelist_name");
+                    if (zoneNameList != fields.end()) {
+                        scheme.ZoneListName = UtilityRoutines::MakeUPPERCase(zoneNameList.value().get<std::string>());
+                    }
+                    auto const coolPlantEqOpCoolingLoad = fields.find("cooling_only_load_plant_equipment_operation_cooling_load_name");
+                    if (coolPlantEqOpCoolingLoad != fields.end()) {
+                        coolingOnlyLoadOpName = UtilityRoutines::MakeUPPERCase(coolPlantEqOpCoolingLoad.value().get<std::string>());
+                    }
+                    auto const heatPlantEqOpHeatingLoad = fields.find("heating_only_load_plant_equipment_operation_heating_load_name");
+                    if (heatPlantEqOpHeatingLoad != fields.end()) {
+                        heatingOnlyLoadOpName = UtilityRoutines::MakeUPPERCase(heatPlantEqOpHeatingLoad.value().get<std::string>());
+                    }
+                    auto const simulEqOpCoolingLoad = fields.find("simultaneous_cooling_and_heating_plant_equipment_operation_cooling_load_name");
+                    if (simulEqOpCoolingLoad != fields.end()) {
+                        simulHeatCoolCoolingOpName = UtilityRoutines::MakeUPPERCase(simulEqOpCoolingLoad.value().get<std::string>());
                         scheme.PlantOps.SimulHeatCoolCoolingOpInput = true;
                     }
-                    if (fields.find("simultaneous_cooling_and_heating_plant_equipment_operation_heating_load_name") != fields.end()) {
-                        simultHeatCoolHeatingOpName = UtilityRoutines::MakeUPPERCase(
-                            fields.at("simultaneous_cooling_and_heating_plant_equipment_operation_heating_load_name").get<std::string>());
+                    auto const simulEqOpHeatingLoad = fields.find("simultaneous_cooling_and_heating_plant_equipment_operation_heating_load_name");
+                    if (simulEqOpHeatingLoad != fields.end()) {
+                        simultHeatCoolHeatingOpName = UtilityRoutines::MakeUPPERCase(simulEqOpHeatingLoad.value().get<std::string>());
                         scheme.PlantOps.SimultHeatCoolHeatingOpInput = true;
                     }
-                    if (fields.find("dedicated_chilled_water_return_recovery_heat_pump_name") != fields.end()) {
-                        scheme.DedicatedHR_ChWRetControl_Name =
-                            UtilityRoutines::MakeUPPERCase(fields.at("dedicated_chilled_water_return_recovery_heat_pump_name").get<std::string>());
+                    auto const dedicatedCWHPName = fields.find("dedicated_chilled_water_return_recovery_heat_pump_name");
+                    if (dedicatedCWHPName != fields.end()) {
+                        scheme.DedicatedHR_ChWRetControl_Name = UtilityRoutines::MakeUPPERCase(dedicatedCWHPName.value().get<std::string>());
                         scheme.PlantOps.DedicatedHR_ChWRetControl_Input = true;
                     }
-                    if (fields.find("dedicated_hot_water_return_recovery_heat_pump_name") != fields.end()) {
-                        scheme.DedicatedHR_HWRetControl_Name =
-                            UtilityRoutines::MakeUPPERCase(fields.at("dedicated_hot_water_return_recovery_heat_pump_name").get<std::string>());
+                    auto const dedicatedHWHPName = fields.find("dedicated_hot_water_return_recovery_heat_pump_name");
+                    if (dedicatedHWHPName != fields.end()) {
+                        scheme.DedicatedHR_HWRetControl_Name = UtilityRoutines::MakeUPPERCase(dedicatedHWHPName.value().get<std::string>());
                         scheme.PlantOps.DedicatedHR_HWRetControl_Input = true;
                     }
-                    if (fields.find("dedicated_recovery_heat_pump_control_load_capacity_factor") != fields.end()) {
-                        scheme.PlantOps.DedicatedHR_CapacityControlFactor =
-                            fields.at("dedicated_recovery_heat_pump_control_load_capacity_factor").get<Real64>();
+                    auto const dedicatedCapacityFactor = fields.find("dedicated_recovery_heat_pump_control_load_capacity_factor");
+                    if (dedicatedCapacityFactor != fields.end()) {
+                        scheme.PlantOps.DedicatedHR_CapacityControlFactor = dedicatedCapacityFactor.value().get<Real64>();
                     }
                 }
             }

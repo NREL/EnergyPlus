@@ -1364,9 +1364,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.heatSizingMethod = static_cast<HeatSizingType>(
                     getEnumerationValue(PLHPHeatSizTypeNamesUC, UtilityRoutines::MakeUPPERCase(heatSizingType.value().get<std::string>())));
             } else {
-                // revert to legacy sizing method
-                if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
-                    // sizing will check companion coil heat sizing method, does not matter if no companion coil
+                // revert to legacy sizing method, if no companion coil and this coil type is heating, set to heating
+                if (compHPFound == fields.end() && thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
                     thisPLHP.heatSizingMethod = HeatSizingType::Heating;
                 } else {
                     thisPLHP.heatSizingMethod = HeatSizingType::Cooling;

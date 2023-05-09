@@ -638,7 +638,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     Real64 constexpr expectedSourceRho = 983.2;
     Real64 const expectedLoadFlow = plantSizingLoadVolFlow;
     Real64 expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
-    Real64 expectedSourceFlow = plantSizingLoadVolFlow * 2.0 * ((expectedSourceCp * expectedSourceRho) / (expectedLoadCp * expectedLoadRho));
+    Real64 expectedSourceFlow = plantSizingLoadVolFlow * 2.0;
     thisCoolingPLHP->sizeLoadSide(*state);
     thisCoolingPLHP->sizeSrcSideWSHP(*state);
     EXPECT_NEAR(expectedLoadFlow, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);

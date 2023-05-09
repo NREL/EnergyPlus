@@ -48,8 +48,6 @@
 #ifndef PlantOperationEquipAndOperations_hh_INCLUDED
 #define PlantOperationEquipAndOperations_hh_INCLUDED
 
-//#include <EnergyPlus/Plant/Component.hh>
-//#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
