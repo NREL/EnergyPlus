@@ -84,16 +84,22 @@ void BaseSizerWithFanHeatInputs::initializeWithinEP(EnergyPlusData &state,
                                      this->fanCompModel);
 }
 
-Real64 BaseSizerWithFanHeatInputs::calcFanDesHeatGain(Real64 &airVolFlow)
+Real64 BaseSizerWithFanHeatInputs::calcFanDesHeatGain(Real64 const &airVolFlow)
 {
     Real64 designHeatGain = 0.0;
-    if (this->dataFanEnumType < 0 || this->dataFanIndex < 0) return designHeatGain;
-    if (this->dataFanEnumType == DataAirSystems::Invalid) return designHeatGain;
-    if (this->dataFanEnumType == DataAirSystems::StructArrayLegacyFanModels && this->dataFanIndex == 0) return designHeatGain;
+    if (this->dataFanEnumType < 0 || this->dataFanIndex < 0) {
+        return designHeatGain;
+    }
+    if (this->dataFanEnumType == DataAirSystems::Invalid) {
+        return designHeatGain;
+    }
+    if (this->dataFanEnumType == DataAirSystems::StructArrayLegacyFanModels && this->dataFanIndex == 0) {
+        return designHeatGain;
+    }
     if (this->fanCompModel) {
         designHeatGain = this->fanShaftPow + (this->motInPower - this->fanShaftPow) * this->motInAirFrac;
     } else {
-        Real64 fanPowerTot = (airVolFlow * this->deltaP) / this->totEff;
+        Real64 const fanPowerTot = (airVolFlow * this->deltaP) / this->totEff;
         designHeatGain = this->motEff * fanPowerTot + (fanPowerTot - this->motEff * fanPowerTot) * this->motInAirFrac;
     }
     return designHeatGain;
@@ -111,7 +117,9 @@ void BaseSizerWithFanHeatInputs::getFanInputsForDesHeatGain(EnergyPlusData &stat
                                                             bool &fanCompModel)
 {
     // if fan unknown or air flow sizing (recursive call to size fan) then return
-    if (fanEnumType < 0 || fanIndex < 0 || this->isFanReportObject) return;
+    if (fanEnumType < 0 || fanIndex < 0 || this->isFanReportObject) {
+        return;
+    }
 
     switch (fanEnumType) {
     case DataAirSystems::StructArrayLegacyFanModels: {
@@ -127,7 +135,6 @@ void BaseSizerWithFanHeatInputs::getFanInputsForDesHeatGain(EnergyPlusData &stat
         break;
     }
     } // end switch
-    return;
 }
 
 void BaseSizerWithFanHeatInputs::setDataDesAccountForFanHeat(EnergyPlusData &state, bool flag)

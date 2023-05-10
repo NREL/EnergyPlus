@@ -242,7 +242,7 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state)
 void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 {
 
-    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
 
     // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
     // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
@@ -391,7 +391,7 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
 
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::InitConvTemp,
+                                                       Constant::InitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
                                                        routineName);
         this->loadSideDesignMassFlowRate = rho * this->loadSideDesignVolFlowRate;
@@ -400,7 +400,7 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
         if (this->waterSource) {
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum).FluidName,
-                                                    DataGlobalConstants::InitConvTemp,
+                                                    Constant::InitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum).FluidIndex,
                                                     routineName);
             this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
@@ -448,9 +448,9 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
     Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
 
     std::string_view const typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)];
-    Real64 loadSideInitTemp = DataGlobalConstants::CWInitConvTemp;
+    Real64 loadSideInitTemp = Constant::CWInitConvTemp;
     if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
-        loadSideInitTemp = DataGlobalConstants::HWInitConvTemp;
+        loadSideInitTemp = Constant::HWInitConvTemp;
     }
 
     Real64 const rho = FluidProperties::GetDensityGlycol(state,
@@ -630,9 +630,9 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
     Real64 tmpSourceVolFlow;
 
     std::string_view const typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)];
-    Real64 sourceSideInitTemp = DataGlobalConstants::HWInitConvTemp;
+    Real64 sourceSideInitTemp = Constant::HWInitConvTemp;
     if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
-        sourceSideInitTemp = DataGlobalConstants::CWInitConvTemp;
+        sourceSideInitTemp = Constant::CWInitConvTemp;
     }
 
     Real64 const rhoSrc = FluidProperties::GetDensityGlycol(state,
@@ -1159,10 +1159,10 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
-                            _,
-                            _,
+                            {},
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Rate",
@@ -1221,7 +1221,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
                                 "Heat Pump",
@@ -1234,7 +1234,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
                                 "Heat Pump",
@@ -1335,7 +1335,7 @@ static constexpr std::array<std::string_view, static_cast<int>(EIRFuelFiredHeatP
 
 void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 {
-    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
 
     // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
     // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
@@ -1676,7 +1676,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     if (this->cycRatioCurveIndex > 0) {
         CRF = Curve::CurveValue(state, this->cycRatioCurveIndex, CR);
     }
-    if (CRF <= DataGlobalConstants::rTinyValue) CRF = CRF_Intercept; // What could a proper default for too tiny CRF?
+    if (CRF <= Constant::rTinyValue) CRF = CRF_Intercept; // What could a proper default for too tiny CRF?
 
     // aux elec
     Real64 eirAuxElecFuncTemp = 0.0;
@@ -1973,18 +1973,15 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
             // A6 Fuel Type
             std::string tempRsrStr = UtilityRoutines::MakeUPPERCase(fields.at("fuel_type").get<std::string>());
-            thisPLHP.fuelType = DataGlobalConstants::AssignResourceTypeNum(tempRsrStr);
+            thisPLHP.fuelType = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, tempRsrStr));
             // Validate fuel type input
             static constexpr std::string_view RoutineName("processInputForEIRPLHP: ");
-            bool FuelTypeError = false;
-            UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(tempRsrStr, tempRsrStr, thisPLHP.fuelType, FuelTypeError);
-            if (FuelTypeError) {
+            if (thisPLHP.fuelType == Constant::eResource::Invalid) {
                 ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, cCurrentModuleObject, thisPLHP.name));
                 ShowContinueError(state, format("Invalid Fuel Type = {}", tempRsrStr));
                 ShowContinueError(state, "Reset the Fuel Type to \"NaturalGas\".");
-                thisPLHP.fuelType = DataGlobalConstants::ResourceType::Natural_Gas;
+                thisPLHP.fuelType = Constant::eResource::NaturalGas;
                 errorsFound = true;
-                FuelTypeError = false;
             }
 
             // A7 End use category
@@ -2362,19 +2359,19 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
-                            _,
-                            _,
+                            {},
+                            {},
                             "Plant");
-        // SetupOutputVariable(state,
+        // Setup Output Variable(state,
         //                    "Fuel-fired Absorption Heat Pump Source Side Heat Transfer Rate",
         //                    OutputProcessor::Unit::W,
         //                    this->sourceSideHeatTransfer,
         //                    OutputProcessor::SOVTimeStepType::System,
         //                    OutputProcessor::SOVStoreType::Average,
         //                    this->name);
-        // SetupOutputVariable(state,
+        // Setup Output Variable(state,
         //                    "Fuel-fired Absorption Heat Pump Source Side Heat Transfer Energy",
         //                    OutputProcessor::Unit::J,
         //                    this->sourceSideEnergy,
@@ -2395,14 +2392,14 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
-        // SetupOutputVariable(state,
+        // Setup Output Variable(state,
         //                    "Fuel-fired Absorption Heat Pump Source Side Inlet Temperature",
         //                    OutputProcessor::Unit::C,
         //                    this->sourceSideInletTemp,
         //                    OutputProcessor::SOVTimeStepType::System,
         //                    OutputProcessor::SOVStoreType::Average,
         //                    this->name);
-        // SetupOutputVariable(state,
+        // Setup Output Variable(state,
         //                    "Heat Pump Source Side Outlet Temperature",
         //                    OutputProcessor::Unit::C,
         //                    this->sourceSideOutletTemp,
@@ -2431,8 +2428,8 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
-                                _,
-                                DataGlobalConstants::GetResourceTypeChar(this->fuelType),
+                                {},
+                                Constant::eResourceNames[static_cast<int>(this->fuelType)],
                                 "Cooling",
                                 this->endUseSubcat, //"Heat Pump",
                                 "Plant");
@@ -2443,7 +2440,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
                                 this->endUseSubcat, // "Heat Pump",
@@ -2457,8 +2454,8 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
-                                _,
-                                DataGlobalConstants::GetResourceTypeChar(this->fuelType),
+                                {},
+                                Constant::eResourceNames[static_cast<int>(this->fuelType)],
                                 "Heating",
                                 this->endUseSubcat, // "Heat Pump",
                                 "Plant");
@@ -2469,7 +2466,7 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
                                 this->endUseSubcat, // "Heat Pump",

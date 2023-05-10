@@ -245,7 +245,6 @@ void GetCoolingPanelInput(EnergyPlusData &state)
     int SurfNum;           // Surface number Do loop counter
     int IOStat;
     bool ErrorsFound(false); // If errors detected in input
-    auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     int NumCoolingPanels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_CoolingPanel_Simple);
 
     // Count total number of baseboard units
@@ -267,7 +266,6 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).FieldNames.allocate(NumNumbers);
         state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).FieldNames = "";
@@ -291,7 +289,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         // Get schedule
         ThisCP.Schedule = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            ThisCP.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            ThisCP.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             ThisCP.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (ThisCP.SchedPtr == 0) {
@@ -723,10 +721,10 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGPANEL",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Panel Total System Cooling Energy",
@@ -735,10 +733,10 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGPANEL",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Panel Convective Cooling Energy",
@@ -839,7 +837,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
             if (ThisCP.WaterInletNode > 0) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidName,
-                                                        DataGlobalConstants::CWInitConvTemp,
+                                                        Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidIndex,
                                                         RoutineName);
                 ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
@@ -854,7 +852,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
 
         rho = FluidProperties::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidName,
-                                                DataGlobalConstants::InitConvTemp,
+                                                Constant::InitConvTemp,
                                                 state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidIndex,
                                                 RoutineName);
 
@@ -1642,7 +1640,7 @@ void CoolingPanelParams::ReportCoolingPanel(EnergyPlusData &state)
     // REFERENCES:
     // Existing code for hot water baseboard models (radiant-convective variety)
 
-    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // All of the power numbers are negative for cooling.  This is because they will have a negative
     // or cooling impact on the surfaces/zones.  However, the output variables are noted as cooling.

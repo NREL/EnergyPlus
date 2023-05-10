@@ -97,7 +97,6 @@ namespace EnergyPlus::ChillerElectricEIR {
 //       MODIFIED       Chandan Sharma, FSEC, February 2010, Added basin heater
 //                      Brent Griffith, NREL, Sept 2010, revised for plant changes
 //                      generalized fluid properties
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 //  This module simulates the performance of the electric vapor
@@ -112,7 +111,7 @@ namespace EnergyPlus::ChillerElectricEIR {
 // REFERENCES:
 // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-PlantComponent *ElectricEIRChillerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
+ElectricEIRChillerSpecs *ElectricEIRChillerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
     // Process the input data if it hasn't been done already
     if (state.dataChillerElectricEIR->getInputFlag) {
@@ -120,11 +119,10 @@ PlantComponent *ElectricEIRChillerSpecs::factory(EnergyPlusData &state, std::str
         state.dataChillerElectricEIR->getInputFlag = false;
     }
     // Now look for this particular object in the list
-    for (auto &obj : state.dataChillerElectricEIR->ElectricEIRChiller) {
-        if (obj.Name == objectName) {
-            return &obj;
-        }
-    }
+    auto thisObj = std::find_if(state.dataChillerElectricEIR->ElectricEIRChiller.begin(),
+                                state.dataChillerElectricEIR->ElectricEIRChiller.end(),
+                                [&objectName](const ElectricEIRChillerSpecs &myObj) { return myObj.Name == objectName; });
+    if (thisObj != state.dataChillerElectricEIR->ElectricEIRChiller.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("LocalElectEIRChillerFactory: Error getting inputs for object named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
@@ -137,8 +135,6 @@ void ElectricEIRChillerSpecs::simulate(
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   June 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  This is the electric EIR chiller model driver. It gets the input for the
@@ -256,7 +252,6 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
         // ErrorsFound will be set to True if problem was found, left untouched otherwise
         GlobalNames::VerifyUniqueChillerName(state,
@@ -336,16 +331,14 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
             // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
             // since it is not used elsewhere for connection
             if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                    DataGlobalConstants::MaxNameLength - 25) { // protect against long name leading to > 100 chars
+                if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 25) { // protect against long name leading to > 100 chars
                     state.dataIPShortCut->cAlphaArgs(7) = state.dataIPShortCut->cAlphaArgs(1) + " INLET NODE FOR CONDENSER";
                 } else {
                     state.dataIPShortCut->cAlphaArgs(7) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 75) + " INLET NODE FOR CONDENSER";
                 }
             }
             if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                    DataGlobalConstants::MaxNameLength - 26) { // protect against long name leading to > 100 chars
+                if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 26) { // protect against long name leading to > 100 chars
                     state.dataIPShortCut->cAlphaArgs(8) = state.dataIPShortCut->cAlphaArgs(1) + " OUTLET NODE FOR CONDENSER";
                 } else {
                     state.dataIPShortCut->cAlphaArgs(8) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 74) + " OUTLET NODE FOR CONDENSER";
@@ -802,7 +795,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Cooling",
                         this->EndUseSubcategory,
@@ -823,10 +816,10 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -884,10 +877,10 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -965,10 +958,10 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -1029,10 +1022,10 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "ELECTRICITY",
                                 "Cooling",
-                                _,
+                                {},
                                 "Plant");
         }
         if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
@@ -1043,10 +1036,10 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "Water",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -1056,10 +1049,10 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
 
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
@@ -1078,10 +1071,10 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
-                                    _,
+                                    {},
                                     "Electricity",
                                     "CHILLERS",
-                                    _,
+                                    {},
                                     "Plant");
             }
         }
@@ -1184,7 +1177,7 @@ void ElectricEIRChillerSpecs::initEachEnvironment(EnergyPlusData &state)
 
     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                   DataGlobalConstants::CWInitConvTemp,
+                                                   Constant::CWInitConvTemp,
                                                    state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                    RoutineName);
 
@@ -1222,7 +1215,7 @@ void ElectricEIRChillerSpecs::initEachEnvironment(EnergyPlusData &state)
     if (this->HeatRecActive) {
         rho = FluidProperties::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                DataGlobalConstants::CWInitConvTemp,
+                                                Constant::CWInitConvTemp,
                                                 state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                 RoutineName);
         this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -1285,8 +1278,6 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Raustad, FSEC
     //       DATE WRITTEN   June 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  This subroutine is for initializations of the Electric EIR Chiller variables
@@ -1349,7 +1340,6 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
     //       AUTHOR         Richard Raustad, FSEC
     //       DATE WRITTEN   June 2004
     //       MODIFIED       October 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  This subroutine is for sizing Electric EIR Chiller Components for which capacities and flow rates
@@ -1441,13 +1431,13 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
         if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               Constant::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * tmpEvapVolFlowRate;
@@ -1504,7 +1494,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                           DataGlobalConstants::CWInitConvTemp,
+                                                           Constant::CWInitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1693,7 +1683,6 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
     //       MODIFIED       Feb. 2010, Chandan Sharma, FSEC, Added basin heater
     //                      Jun. 2016, Rongpeng Zhang, Applied the chiller supply water temperature sensor fault model
     //                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //  Simulate a vapor compression chiller using the DOE-2 model
@@ -2284,7 +2273,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
         }
 
         if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
-            Real64 const RhoWater = Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
+            Real64 const RhoWater = Psychrometrics::RhoH2O(Constant::InitConvTemp);
             // CondMassFlowRate is already multiplied by PLR, convert to water use rate
             this->EvapWaterConsumpRate =
                 ((this->CondOutletHumRat - state.dataLoopNodes->Node(this->CondInletNodeNum).HumRat) * this->CondMassFlowRate) / RhoWater;
@@ -2395,7 +2384,7 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
     //  Reporting
 
     // Number of seconds per HVAC system time step, to convert from W (J/s) to J
-    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
     if (MyLoad >= 0 || !RunFlag) { // Chiller not running so pass inlet states to outlet states
         // Set node conditions
@@ -2467,15 +2456,15 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
 
         // Set node flow rates;  for these load based models
         // assume that sufficient evaporator flow rate is available
-        this->ChillerFalseLoad = this->ChillerFalseLoadRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ChillerFalseLoad = this->ChillerFalseLoadRate * state.dataHVACGlobal->TimeStepSysSec;
+        this->Energy = this->Power * state.dataHVACGlobal->TimeStepSysSec;
+        this->EvapEnergy = this->QEvaporator * state.dataHVACGlobal->TimeStepSysSec;
+        this->CondEnergy = this->QCondenser * state.dataHVACGlobal->TimeStepSysSec;
         this->EvapInletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         this->CondInletTemp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
         this->CondOutletTemp = state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp;
         this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp;
-        this->CondenserFanEnergyConsumption = this->CondenserFanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        this->CondenserFanEnergyConsumption = this->CondenserFanPower * state.dataHVACGlobal->TimeStepSysSec;
         if (this->Power != 0.0) {
             this->ActualCOP = (this->QEvaporator + this->ChillerFalseLoadRate) / this->Power;
         } else {
@@ -2489,7 +2478,7 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
         if (this->HeatRecActive) {
 
             PlantUtilities::SafeCopyPlantNode(state, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
-            this->EnergyHeatRecovery = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            this->EnergyHeatRecovery = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSysSec;
             state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
             this->HeatRecInletTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
             this->HeatRecMassFlow = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;

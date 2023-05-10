@@ -58,6 +58,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -82,8 +83,7 @@ namespace BoilerSteam {
     // MODULE INFORMATION:
     //    AUTHOR         Rahul Chillar
     //    DATE WRITTEN   Dec 2004
-    //    MODIFIED       na
-    //    RE-ENGINEERED  na
+
     // PURPOSE OF THIS MODULE:
     // Performs steam boiler simulation for plant simulation
 
@@ -98,11 +98,11 @@ namespace BoilerSteam {
         }
 
         // Now look for this particular pipe in the list
-        for (auto &boiler : state.dataBoilerSteam->Boiler) {
-            if (boiler.Name == objectName) {
-                return &boiler;
-            }
-        }
+        auto myBoiler = std::find_if(state.dataBoilerSteam->Boiler.begin(),
+                                     state.dataBoilerSteam->Boiler.end(),
+                                     [&objectName](const BoilerSpecs &boiler) { return boiler.Name == objectName; });
+        if (myBoiler != state.dataBoilerSteam->Boiler.end()) return myBoiler;
+
         // If we didn't find it, fatal
         ShowFatalError(state, format("LocalBoilerSteamFactory: Error getting inputs for steam boiler named: {}", objectName)); // LCOV_EXCL_LINE
         // Shut up the compiler
@@ -142,8 +142,6 @@ namespace BoilerSteam {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Get all boiler data from input file
@@ -188,7 +186,6 @@ namespace BoilerSteam {
                                                                      _,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBoilerName(state,
                                                 state.dataIPShortCut->cCurrentModuleObject,
@@ -199,17 +196,8 @@ namespace BoilerSteam {
             thisBoiler.Name = state.dataIPShortCut->cAlphaArgs(1);
 
             // Validate fuel type input
-            bool FuelTypeError(false);
-            UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(
-                state.dataIPShortCut->cAlphaArgs(2), thisBoiler.BoilerFuelTypeForOutputVariable, thisBoiler.FuelType, FuelTypeError);
-            if (FuelTypeError) {
-                ShowSevereError(state,
-                                format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
-                // Set to Electric to avoid errors when setting up output variables
-                thisBoiler.BoilerFuelTypeForOutputVariable = "Electricity";
-                ErrorsFound = true;
-            }
+            thisBoiler.FuelType =
+                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
 
             // INPUTS from the IDF file
             thisBoiler.BoilerMaxOperPress = state.dataIPShortCut->rNumericArgs(1);
@@ -374,7 +362,6 @@ namespace BoilerSteam {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
-        //       MODIFIED       na
         //       RE-ENGINEERED  D. Shirey, rework for plant upgrade
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -421,6 +408,7 @@ namespace BoilerSteam {
 
     void BoilerSpecs::setupOutputVars(EnergyPlusData &state)
     {
+        std::string_view sFuelType = Constant::eResourceNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Boiler Heating Rate",
                             OutputProcessor::Unit::W,
@@ -435,27 +423,27 @@ namespace BoilerSteam {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "BOILERS",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
-                            "Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
+                            format("Boiler {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
                             this->FuelUsed,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
-                            "Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
+                            format("Boiler {} Energy", sFuelType),
                             OutputProcessor::Unit::J,
                             this->FuelConsumed,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
-                            this->BoilerFuelTypeForOutputVariable,
+                            {},
+                            sFuelType,
                             "Heating",
                             this->EndUseSubcategory,
                             "Plant");
@@ -496,7 +484,6 @@ namespace BoilerSteam {
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
         //       MODIFIED       November 2013 Daeho Kang, add component sizing table entries
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for sizing Boiler Components for which capacities and flow rates
@@ -593,8 +580,6 @@ namespace BoilerSteam {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the boiler fuel consumption and the associated
@@ -823,13 +808,11 @@ namespace BoilerSteam {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
         //       DATE WRITTEN   Dec 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Boiler simulation reporting
 
-        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
         int BoilerInletNode = this->BoilerInletNodeNum;
         int BoilerOutletNode = this->BoilerOutletNodeNum;
 

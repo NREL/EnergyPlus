@@ -1362,7 +1362,7 @@ void RezeroZoneSizingArrays(EnergyPlusData &state)
     }
 }
 
-void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator)
+void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallIndicator)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1404,7 +1404,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
     Real64 DeltaTemp;      // supply air delta temperature [deltaC]
 
     switch (CallIndicator) {
-    case DataGlobalConstants::CallIndicator::BeginDay: {
+    case Constant::CallIndicator::BeginDay: {
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
 
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
@@ -1432,7 +1432,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             calcZoneSizing.HeatSizingType = "Heating"; // string reported to eio
         }
     } break;
-    case DataGlobalConstants::CallIndicator::DuringDay: {
+    case Constant::CallIndicator::DuringDay: {
         TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
 
         Real64 FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
@@ -1488,7 +1488,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             }
         }
     } break;
-    case DataGlobalConstants::CallIndicator::EndDay: {
+    case Constant::CallIndicator::EndDay: {
         // average some of the zone sequences to reduce peakiness
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
@@ -1935,7 +1935,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
             }
         }
     } break;
-    case DataGlobalConstants::CallIndicator::EndZoneSizingCalc: {
+    case Constant::CallIndicator::EndZoneSizingCalc: {
         // candidate EMS calling point to customize CalcFinalZoneSizing
         bool anyEMSRan;
         EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::ZoneSizing, anyEMSRan, ObjexxFCL::Optional_int_const());
@@ -3046,17 +3046,12 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
         InitSystemOutputRequired(state, ControlledZoneNum, FirstHVACIteration, true);
 
-        auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
-        auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
-        auto &TurnZoneFansOnlyOn = state.dataHVACGlobal->TurnZoneFansOnlyOn;
-
-        // Air loop system availability manager status only applies to PIU and exhaust fans
-        // Reset fan SAM operation flags for zone fans.
-        TurnFansOn = false;
-        TurnZoneFansOnlyOn = false;
-        TurnFansOff = false;
-
         for (int EquipTypeNum = 1; EquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ControlledZoneNum).NumOfEquipTypes; ++EquipTypeNum) {
+
+            // Air loop system availability manager status only applies to PIU and exhaust fans
+            // Reset fan SAM operation flags for zone fans.
+            state.dataHVACGlobal->TurnFansOn = false;
+            state.dataHVACGlobal->TurnFansOff = false;
 
             state.dataHVACGlobal->UnbalExhMassFlow = 0.0;
             state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
@@ -3107,18 +3102,12 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 SystemAvailabilityManager::GetZoneEqAvailabilityManager(state, ZoneEquipTypeNum, ZoneCompNum, ErrorFlag);
 
                 if (ZoneComp(ZoneEquipTypeNum).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == DataHVACGlobals::CycleOn) {
-                    state.dataHVACGlobal->ZoneCompTurnFansOn = true;
-                    state.dataHVACGlobal->ZoneCompTurnFansOff = false;
+                    state.dataHVACGlobal->TurnFansOn = true;
+                    state.dataHVACGlobal->TurnFansOff = false;
                 } else if (ZoneComp(ZoneEquipTypeNum).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == DataHVACGlobals::ForceOff) {
-                    state.dataHVACGlobal->ZoneCompTurnFansOn = false;
-                    state.dataHVACGlobal->ZoneCompTurnFansOff = true;
-                } else {
-                    state.dataHVACGlobal->ZoneCompTurnFansOn = TurnFansOn;
-                    state.dataHVACGlobal->ZoneCompTurnFansOff = TurnFansOff;
+                    state.dataHVACGlobal->TurnFansOn = false;
+                    state.dataHVACGlobal->TurnFansOff = true;
                 }
-            } else {
-                state.dataHVACGlobal->ZoneCompTurnFansOn = TurnFansOn;
-                state.dataHVACGlobal->ZoneCompTurnFansOff = TurnFansOff;
             }
 
             switch (ZoneEquipTypeNum) {
@@ -3128,14 +3117,10 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 // and set fan on/off flags accordingly.
                 if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOn ||
                     state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) {
-                    TurnFansOn = true;
-                }
-                if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) {
-                    // Currently used only by parallel powered induction unit
-                    TurnZoneFansOnlyOn = true;
+                    state.dataHVACGlobal->TurnFansOn = true;
                 }
                 if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::ForceOff) {
-                    TurnFansOff = true;
+                    state.dataHVACGlobal->TurnFansOff = true;
                 }
 
                 ZoneAirLoopEquipmentManager::ManageZoneAirLoopEquipment(state,
@@ -3146,11 +3131,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                                         LatOutputProvided,
                                                                         ControlledZoneNum,
                                                                         zoneEquipList.EquipIndex(EquipPtr));
-
-                //            reset status flags for other zone equipment
-                TurnFansOn = false;
-                TurnZoneFansOnlyOn = false;
-                TurnFansOff = false;
 
                 thisZoneHB.NonAirSystemResponse += NonAirSysOutput;
                 SysOutputProvided = NonAirSysOutput + AirSysOutput;
@@ -3336,10 +3316,10 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 // and set fan on/off flags accordingly.
                 if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOn ||
                     state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) {
-                    TurnFansOn = true;
+                    state.dataHVACGlobal->TurnFansOn = true;
                 }
                 if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::ForceOff) {
-                    TurnFansOff = true;
+                    state.dataHVACGlobal->TurnFansOff = true;
                 }
 
                 Fans::SimulateFanComponents(state,
@@ -3347,9 +3327,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                             FirstHVACIteration,
                                             zoneEquipList.EquipIndex(EquipPtr));
 
-                //            reset status flags for other zone equipment
-                TurnFansOn = false;
-                TurnFansOff = false;
             } break;
             case ZoneEquip::HeatXchngr: { // 'HeatExchanger:AirToAir:FlatPlate'
                 HeatRecovery::SimHeatRecovery(state,
@@ -5303,15 +5280,12 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                         if (!(state.dataZoneEquip->ZoneEquipAvail(zoneNum) == DataHVACGlobals::CycleOn ||
                               state.dataZoneEquip->ZoneEquipAvail(zoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) ||
                             !state.afn->AirflowNetworkZoneFlag(zoneNum))
-                            state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
-                                thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                            state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec += thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSysSec;
                     } else if (!state.afn->AirflowNetworkZoneFlag(zoneNum)) {
-                        state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
-                            thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                        state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec += thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSysSec;
                     }
                 } else {
-                    state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec +=
-                        thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+                    state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec += thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSysSec;
                 }
             }
             // Intake fans will add some heat to the air, raising the temperature for an intake fan...
@@ -5342,7 +5316,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             Real64 angle = 0.0; // Angle between wind direction and effective angle
             Real64 Qw = 0.0;    // Volumetric flow driven by wind
             Real64 Qst = 0.0;   // Volumetric flow driven by stack effect
-            if (thisVentilation.OpenEff != DataGlobalConstants::AutoCalculate) {
+            if (thisVentilation.OpenEff != Constant::AutoCalculate) {
                 Cw = thisVentilation.OpenEff;
             } else {
                 //   Wind Dir (β1)                                        90°, min effectiveness
@@ -5400,7 +5374,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                     Cw = intercept + angle * slope;
                 }
             }
-            if (thisVentilation.DiscCoef != DataGlobalConstants::AutoCalculate) {
+            if (thisVentilation.DiscCoef != Constant::AutoCalculate) {
                 Cd = thisVentilation.DiscCoef;
             } else {
                 Cd = 0.40 + 0.0045 * std::abs(TempExt - thisMixingMAT);

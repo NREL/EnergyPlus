@@ -624,10 +624,12 @@ void BaseSizer::overrideSizingString(std::string_view const string)
     this->overrideSizeString = false;
 }
 
-Real64 BaseSizer::setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
+Real64 BaseSizer::setOAFracForZoneEqSizing(const EnergyPlusData &state, Real64 const desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
 {
     Real64 outAirFrac = 0.0;
-    if (desMassFlow <= 0.0) return outAirFrac;
+    if (desMassFlow <= 0.0) {
+        return outAirFrac;
+    }
 
     if (zoneEqSizing.ATMixerVolFlow > 0.0) {
         // set central DOAS AT mixer OA fraction

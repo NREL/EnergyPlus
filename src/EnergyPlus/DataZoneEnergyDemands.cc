@@ -111,10 +111,10 @@ void ZoneSystemSensibleDemand::setUpOutputVars(EnergyPlusData &state,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "Heating",
-                            _,
+                            {},
                             "Building",
                             name,
                             zoneMult,
@@ -126,10 +126,10 @@ void ZoneSystemSensibleDemand::setUpOutputVars(EnergyPlusData &state,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "Cooling",
-                            _,
+                            {},
                             "Building",
                             name,
                             zoneMult,
@@ -326,8 +326,8 @@ void ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads(EnergyPlusData &
 {
     this->ZoneSNLoadHeatRate = max(SNLoad, 0.0);
     this->ZoneSNLoadCoolRate = std::abs(min(SNLoad, 0.0));
-    this->ZoneSNLoadHeatEnergy = this->ZoneSNLoadHeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->ZoneSNLoadCoolEnergy = this->ZoneSNLoadCoolRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->ZoneSNLoadHeatEnergy = this->ZoneSNLoadHeatRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->ZoneSNLoadCoolEnergy = this->ZoneSNLoadCoolRate * state.dataHVACGlobal->TimeStepSysSec;
 }
 void ZoneSystemSensibleDemand::reportSensibleLoadsZoneMultiplier(
     EnergyPlusData &state, int const zoneNum, Real64 const totalLoad, Real64 const loadToHeatingSetPoint, Real64 const loadToCoolingSetPoint)
@@ -360,8 +360,8 @@ void ZoneSystemMoistureDemand::reportZoneAirSystemMoistureLoads(EnergyPlusData &
 {
     this->ZoneLTLoadHeatRate = std::abs(min(latentGain, 0.0));
     this->ZoneLTLoadCoolRate = max(latentGain, 0.0);
-    this->ZoneLTLoadHeatEnergy = this->ZoneLTLoadHeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->ZoneLTLoadCoolEnergy = this->ZoneLTLoadCoolRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->ZoneLTLoadHeatEnergy = this->ZoneLTLoadHeatRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->ZoneLTLoadCoolEnergy = this->ZoneLTLoadCoolRate * state.dataHVACGlobal->TimeStepSysSec;
     if ((sensibleLoad + latentGain) != 0.0) {
         this->ZoneSensibleHeatRatio = sensibleLoad / (sensibleLoad + latentGain);
     } else if (sensibleLoad != 0.0) {

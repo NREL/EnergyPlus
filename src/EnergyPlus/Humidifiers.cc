@@ -290,7 +290,7 @@ namespace Humidifiers {
             Humidifier(HumNum).HumType = HumidType::Electric;
             Humidifier(HumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                Humidifier(HumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                Humidifier(HumNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
@@ -365,7 +365,7 @@ namespace Humidifiers {
             Humidifier(HumNum).HumType = HumidType::Gas;
             Humidifier(HumNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                Humidifier(HumNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                Humidifier(HumNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
@@ -482,10 +482,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "Water",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "SYSTEM");
                 SetupOutputVariable(state,
                                     "Humidifier Starved Storage Tank Water Volume Flow Rate",
@@ -501,10 +501,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "Water",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "SYSTEM");
                 SetupOutputVariable(state,
                                     "Humidifier Mains Water Volume",
@@ -513,10 +513,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "MainsWater",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "SYSTEM");
 
             } else {
@@ -534,10 +534,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "WATER",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Humidifier Mains Water Volume",
@@ -546,10 +546,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "MAINSWATER",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
             }
             if (Humidifier(HumNum).HumType == HumidType::Electric) {
@@ -567,10 +567,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "ELECTRICITY",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
             } else if (Humidifier(HumNum).HumType == HumidType::Gas) {
                 SetupOutputVariable(state,
@@ -594,10 +594,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "NATURALGAS",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
                 SetupOutputVariable(state,
                                     "Humidifier Auxiliary Electricity Rate",
@@ -613,10 +613,10 @@ namespace Humidifiers {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
-                                    _,
+                                    {},
                                     "ELECTRICITY",
                                     "HUMIDIFIER",
-                                    _,
+                                    {},
                                     "System");
             }
         }
@@ -869,7 +869,7 @@ namespace Humidifiers {
             }
 
             if (!HardSizeNoDesRun) {
-                NomCapVolDes = MassFlowDes * (OutletHumRatDes - InletHumRatDes) / RhoH2O(DataGlobalConstants::InitConvTemp);
+                NomCapVolDes = MassFlowDes * (OutletHumRatDes - InletHumRatDes) / RhoH2O(Constant::InitConvTemp);
                 if (NomCapVolDes < 0.0) NomCapVolDes = 0.0; // No humidity demand
 
                 if (IsAutoSize) {
@@ -902,7 +902,7 @@ namespace Humidifiers {
                 }
             }
 
-            NomCap = RhoH2O(DataGlobalConstants::InitConvTemp) * NomCapVol;
+            NomCap = RhoH2O(Constant::InitConvTemp) * NomCapVol;
             RefrigerantIndex = FindRefrigerant(state, format(fluidNameSteam));
             WaterIndex = FindGlycol(state, format(fluidNameWater));
             SteamSatEnthalpy = GetSatEnthalpyRefrig(state, format(fluidNameSteam), TSteam, 1.0, RefrigerantIndex, CalledFrom);
@@ -1110,7 +1110,7 @@ namespace Humidifiers {
         HumRatSatOut = 0.0;
         HumRatSatApp = 0.0;
         WaterInEnthalpy = 2676125.0; // At 100 C
-        WaterDens = RhoH2O(DataGlobalConstants::InitConvTemp);
+        WaterDens = RhoH2O(Constant::InitConvTemp);
         WaterAddNeededMax = min(WaterAddNeeded, NomCap);
         if (WaterAddNeededMax > 0.0) {
             //   ma*W1 + mw = ma*W2
@@ -1223,7 +1223,7 @@ namespace Humidifiers {
         HumRatSatOut = 0.0;
         HumRatSatApp = 0.0;
         WaterInEnthalpy = 2676125.0; // At 100 C
-        WaterDens = RhoH2O(DataGlobalConstants::InitConvTemp);
+        WaterDens = RhoH2O(Constant::InitConvTemp);
         WaterAddNeededMax = min(WaterAddNeeded, NomCap);
         if (WaterAddNeededMax > 0.0) {
             //   ma*W1 + mw = ma*W2

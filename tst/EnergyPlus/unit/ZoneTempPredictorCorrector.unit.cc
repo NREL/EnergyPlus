@@ -102,7 +102,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
 {
 
     state->dataHVACGlobal->TimeStepSys = 15.0 / 60.0; // System timestep in hours
-    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
@@ -810,7 +810,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     state->dataWeatherManager->Envrn = 1;
     state->dataWeatherManager->Environment.allocate(1);
     state->dataWeatherManager->DesDayInput.allocate(1);
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
+    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).KindOfEnvrn = Constant::KindOfSim::RunPeriodWeather;
     state->dataWeatherManager->DesDayInput(state->dataWeatherManager->Envrn).DayType = summerDesignDayTypeIndex;
     state->dataWeatherManager->DesDayInput(state->dataWeatherManager->Envrn).MaxDryBulb = 30.0;
     state->dataWeatherManager->DesDayInput(state->dataWeatherManager->Envrn).DailyDBRange = 10.0;
@@ -1658,7 +1658,7 @@ TEST_F(EnergyPlusFixture, DownInterpolate4HistoryValues_Test)
 {
     Real64 PriorTimeStep = 0.25;
     state->dataHVACGlobal->TimeStepSys = 0.125;
-    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     Real64 myVarValue = 5.0;
     Real64 HistoryValue1 = 1.0;
     Real64 HistoryValue2 = 2.0;

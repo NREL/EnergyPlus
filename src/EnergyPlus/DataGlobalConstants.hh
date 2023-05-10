@@ -48,16 +48,13 @@
 #ifndef DataGlobalConstants_hh_INCLUDED
 #define DataGlobalConstants_hh_INCLUDED
 
-// C++ Headers
-#include <map>
-
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-namespace DataGlobalConstants {
+namespace Constant {
 
     enum class EndUse
     {
@@ -79,29 +76,41 @@ namespace DataGlobalConstants {
         Num
     };
 
-    enum class ResourceType
+    enum class eResource
     {
         Invalid = -1,
-        None,
         Electricity,
-        Natural_Gas,
+        NaturalGas,
         Gasoline,
         Diesel,
         Coal,
-        FuelOil_1,
-        FuelOil_2,
         Propane,
+        FuelOilNo1,
+        FuelOilNo2,
+        OtherFuel1,
+        OtherFuel2,
+        DistrictCooling,
+        DistrictHeating,
         Water,
         EnergyTransfer,
         Steam,
-        DistrictCooling,
-        DistrictHeating,
         ElectricityProduced,
         ElectricityPurchased,
         ElectricitySurplusSold,
         ElectricityNet,
         SolarWater,
         SolarAir,
+        CarbonEquivalent,
+        PlantLoopHeatingDemand,
+        PlantLoopCoolingDemand,
+        OnSiteWater,
+        MainsWater,
+        RainWater,
+        WellWater,
+        Condensate,
+        WaterEnvironmentalFactors,
+        Source,
+        Generic, // only used by custom meters
         SO2,
         NOx,
         N2O,
@@ -117,20 +126,256 @@ namespace DataGlobalConstants {
         Pb,
         NuclearHigh,
         NuclearLow,
-        WaterEnvironmentalFactors,
-        CarbonEquivalent,
-        Source,
-        PlantLoopHeatingDemand,
-        PlantLoopCoolingDemand,
-        OnSiteWater,
-        MainsWater,
-        RainWater,
-        WellWater,
-        Condensate,
-        OtherFuel1,
-        OtherFuel2,
         Num
     };
+
+    enum class eFuel
+    {
+        Invalid = -1,
+        Electricity,
+        NaturalGas,
+        Gasoline,
+        Diesel,
+        Coal,
+        Propane,
+        FuelOilNo1,
+        FuelOilNo2,
+        OtherFuel1,
+        OtherFuel2,
+        DistrictCooling,
+        DistrictHeating,
+        Num
+    };
+
+    enum class ePollutant
+    {
+        Invalid = -1,
+        SO2,
+        NOx,
+        N2O,
+        PM,
+        PM2_5,
+        PM10,
+        CO,
+        CO2,
+        CH4,
+        NH3,
+        NMVOC,
+        Hg,
+        Pb,
+        NuclearHigh,
+        NuclearLow,
+        Num
+    };
+
+    constexpr std::array<eFuel, static_cast<int>(eResource::Num)> eResource2eFuel = {
+        eFuel::Electricity,     eFuel::NaturalGas,      eFuel::Gasoline,   eFuel::Diesel,     eFuel::Coal,
+        eFuel::Propane,         eFuel::FuelOilNo1,      eFuel::FuelOilNo2, eFuel::OtherFuel1, eFuel::OtherFuel2,
+        eFuel::DistrictCooling, eFuel::DistrictHeating, eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
+        eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
+        eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
+        eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
+        eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
+        eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
+        eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
+        eFuel::Invalid,         eFuel::Invalid};
+
+    constexpr std::array<eResource, static_cast<int>(eFuel::Num)> eFuel2eResource = {eResource::Electricity,
+                                                                                     eResource::NaturalGas,
+                                                                                     eResource::Gasoline,
+                                                                                     eResource::Diesel,
+                                                                                     eResource::Coal,
+                                                                                     eResource::Propane,
+                                                                                     eResource::FuelOilNo1,
+                                                                                     eResource::FuelOilNo2,
+                                                                                     eResource::OtherFuel1,
+                                                                                     eResource::OtherFuel2,
+                                                                                     eResource::DistrictCooling,
+                                                                                     eResource::DistrictHeating};
+
+    constexpr std::array<ePollutant, static_cast<int>(eResource::Num)> eResource2ePollutant = {
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::SO2,     ePollutant::NOx,         ePollutant::N2O,       ePollutant::PM,
+        ePollutant::PM2_5,   ePollutant::PM10,    ePollutant::CO,      ePollutant::CO2,         ePollutant::CH4,       ePollutant::NH3,
+        ePollutant::NMVOC,   ePollutant::Hg,      ePollutant::Pb,      ePollutant::NuclearHigh, ePollutant::NuclearLow};
+
+    constexpr std::array<eResource, static_cast<int>(ePollutant::Num)> ePollutant2eResource = {eResource::SO2,
+                                                                                               eResource::NOx,
+                                                                                               eResource::N2O,
+                                                                                               eResource::PM,
+                                                                                               eResource::PM2_5,
+                                                                                               eResource::PM10,
+                                                                                               eResource::CO,
+                                                                                               eResource::CO2,
+                                                                                               eResource::CH4,
+                                                                                               eResource::NH3,
+                                                                                               eResource::NMVOC,
+                                                                                               eResource::Hg,
+                                                                                               eResource::Pb,
+                                                                                               eResource::NuclearHigh,
+                                                                                               eResource::NuclearLow};
+
+    static constexpr std::array<std::string_view, static_cast<int>(eResource::Num)> eResourceNamesUC = {"ELECTRICITY",
+                                                                                                        "NATURALGAS",
+                                                                                                        "GASOLINE",
+                                                                                                        "DIESEL",
+                                                                                                        "COAL",
+                                                                                                        "PROPANE",
+                                                                                                        "FUELOILNO1",
+                                                                                                        "FUELOILNO2",
+                                                                                                        "OTHERFUEL1",
+                                                                                                        "OTHERFUEL2",
+                                                                                                        "DISTRICTCOOLING",
+                                                                                                        "DISTRICTHEATING",
+                                                                                                        "WATER",
+                                                                                                        "ENERGYTRANSFER",
+                                                                                                        "STEAM",
+                                                                                                        "ELECTRICITYPRODUCED",
+                                                                                                        "ELECTRICITYPURCHASED",
+                                                                                                        "ELECTRICITYSURPLUSSOLD",
+                                                                                                        "ELECTRICITYNET",
+                                                                                                        "SOLARWATER",
+                                                                                                        "SOLARAIR",
+                                                                                                        "CARBON EQUIVALENT",
+                                                                                                        "PLANTLOOPHEATINGDEMAND",
+                                                                                                        "PLANTLOOPCOOLINGDEMAND",
+                                                                                                        "ONSITEWATER",
+                                                                                                        "MAINSWATER",
+                                                                                                        "RAINWATER",
+                                                                                                        "WELLWATER",
+                                                                                                        "CONDENSATE",
+                                                                                                        "WATERENVIRONMENTALFACTORS",
+                                                                                                        "SOURCE",
+                                                                                                        "GENERIC",
+                                                                                                        "SO2",
+                                                                                                        "NOX",
+                                                                                                        "N2O",
+                                                                                                        "PM",
+                                                                                                        "PM2.5",
+                                                                                                        "PM10",
+                                                                                                        "CO",
+                                                                                                        "CO2",
+                                                                                                        "CH4",
+                                                                                                        "NH3",
+                                                                                                        "NMVOC",
+                                                                                                        "HG",
+                                                                                                        "PB",
+                                                                                                        "NUCLEAR HIGH",
+                                                                                                        "NUCLEAR LOW"};
+
+    static constexpr std::array<std::string_view, static_cast<int>(eResource::Num)> eResourceNames = {"Electricity",
+                                                                                                      "NaturalGas",
+                                                                                                      "Gasoline",
+                                                                                                      "Diesel",
+                                                                                                      "Coal",
+                                                                                                      "Propane",
+                                                                                                      "FuelOilNo1",
+                                                                                                      "FuelOilNo2",
+                                                                                                      "OtherFuel1",
+                                                                                                      "OtherFuel2",
+                                                                                                      "DistrictCooling",
+                                                                                                      "DistrictHeating",
+                                                                                                      "Water",
+                                                                                                      "EnergyTransfer",
+                                                                                                      "Steam",
+                                                                                                      "ElectricityProduced",
+                                                                                                      "ElectricityPurchased",
+                                                                                                      "ElectricitySurplusSold",
+                                                                                                      "ElectricityNet",
+                                                                                                      "SolarWater",
+                                                                                                      "SolarAir",
+                                                                                                      "Carbon Equivalent",
+                                                                                                      "PlantLoopHeatingDemand",
+                                                                                                      "PlantLoopCoolingDemand",
+                                                                                                      "OnSiteWater",
+                                                                                                      "MainsWater",
+                                                                                                      "RainWater",
+                                                                                                      "WellWater",
+                                                                                                      "Condensate",
+                                                                                                      "WaterEnvironmentalFactors",
+                                                                                                      "Source",
+                                                                                                      "Generic",
+                                                                                                      "SO2",
+                                                                                                      "NOx",
+                                                                                                      "N2O",
+                                                                                                      "PM",
+                                                                                                      "PM2.5",
+                                                                                                      "PM10",
+                                                                                                      "CO",
+                                                                                                      "CO2",
+                                                                                                      "CH4",
+                                                                                                      "NH3",
+                                                                                                      "NMVOC",
+                                                                                                      "Hg",
+                                                                                                      "Pb",
+                                                                                                      "Nuclear High",
+                                                                                                      "Nuclear Low"};
+
+    static constexpr std::array<std::string_view, static_cast<int>(eFuel::Num)> eFuelNamesUC = {
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Electricity)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::NaturalGas)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Gasoline)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Diesel)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Coal)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Propane)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::FuelOilNo1)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::FuelOilNo2)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::OtherFuel1)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::OtherFuel2)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictCooling)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictHeating)])]};
+
+    static constexpr std::array<std::string_view, static_cast<int>(eFuel::Num)> eFuelNames = {
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Electricity)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::NaturalGas)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Gasoline)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Diesel)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Coal)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Propane)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::FuelOilNo1)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::FuelOilNo2)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::OtherFuel1)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::OtherFuel2)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictCooling)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictHeating)])]};
+
+    static constexpr std::array<std::string_view, static_cast<int>(ePollutant::Num)> ePollutantNamesUC = {
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::SO2)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NOx)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::N2O)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::PM)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::PM2_5)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::PM10)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::CO)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::CO2)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::CH4)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NH3)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NMVOC)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::Hg)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::Pb)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NuclearHigh)])],
+        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NuclearLow)])]};
+
+    static constexpr std::array<std::string_view, static_cast<int>(ePollutant::Num)> ePollutantNames = {
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::SO2)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NOx)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::N2O)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::PM)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::PM2_5)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::PM10)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::CO)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::CO2)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::CH4)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NH3)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NMVOC)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::Hg)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::Pb)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NuclearHigh)])],
+        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NuclearLow)])]};
 
     enum class CallIndicator
     {
@@ -181,88 +426,8 @@ namespace DataGlobalConstants {
     Real64 constexpr StefanBoltzmann = 5.6697E-8;           // Stefan-Boltzmann constant in W/(m2*K4)
     Real64 constexpr UniversalGasConst = 8314.462175;       // Universal Gas Constant (J/mol*K)
     Real64 constexpr convertJtoGJ = 1.0E-9;                 // Conversion factor for J to GJ
-    int constexpr MaxSpeedLevels = 10;                      // Maximum number of speed that supports
-    int constexpr ScheduleAlwaysOn = -1;                    // Value when passed to schedule routines gives back 1.0 (on)
-    int constexpr MaxCTFTerms = 19; // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
 
-    ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar);
-    std::string GetResourceTypeChar(ResourceType ResourceTypeNum);
-
-} // namespace DataGlobalConstants
-
-struct DataGlobalConstantsData : BaseGlobalStruct
-{
-    std::map<DataGlobalConstants::EndUse, int> iEndUse = {
-        {DataGlobalConstants::EndUse::Heating, 1},
-        {DataGlobalConstants::EndUse::Cooling, 2},
-        {DataGlobalConstants::EndUse::InteriorLights, 3},
-        {DataGlobalConstants::EndUse::ExteriorLights, 4},
-        {DataGlobalConstants::EndUse::InteriorEquipment, 5},
-        {DataGlobalConstants::EndUse::ExteriorEquipment, 6},
-        {DataGlobalConstants::EndUse::Fans, 7},
-        {DataGlobalConstants::EndUse::Pumps, 8},
-        {DataGlobalConstants::EndUse::HeatRejection, 9},
-        {DataGlobalConstants::EndUse::Humidification, 10},
-        {DataGlobalConstants::EndUse::HeatRecovery, 11},
-        {DataGlobalConstants::EndUse::WaterSystem, 12},
-        {DataGlobalConstants::EndUse::Refrigeration, 13},
-        {DataGlobalConstants::EndUse::Cogeneration, 14},
-    };
-    static int constexpr iEndUseSize = 14;
-
-    std::vector<DataGlobalConstants::ResourceType> AllResourceTypes = {DataGlobalConstants::ResourceType::None,
-                                                                       DataGlobalConstants::ResourceType::Electricity,
-                                                                       DataGlobalConstants::ResourceType::Natural_Gas,
-                                                                       DataGlobalConstants::ResourceType::Gasoline,
-                                                                       DataGlobalConstants::ResourceType::Diesel,
-                                                                       DataGlobalConstants::ResourceType::Coal,
-                                                                       DataGlobalConstants::ResourceType::FuelOil_1,
-                                                                       DataGlobalConstants::ResourceType::FuelOil_2,
-                                                                       DataGlobalConstants::ResourceType::Propane,
-                                                                       DataGlobalConstants::ResourceType::Water,
-                                                                       DataGlobalConstants::ResourceType::EnergyTransfer,
-                                                                       DataGlobalConstants::ResourceType::Steam,
-                                                                       DataGlobalConstants::ResourceType::DistrictCooling,
-                                                                       DataGlobalConstants::ResourceType::DistrictHeating,
-                                                                       DataGlobalConstants::ResourceType::ElectricityProduced,
-                                                                       DataGlobalConstants::ResourceType::ElectricityPurchased,
-                                                                       DataGlobalConstants::ResourceType::ElectricitySurplusSold,
-                                                                       DataGlobalConstants::ResourceType::ElectricityNet,
-                                                                       DataGlobalConstants::ResourceType::SolarWater,
-                                                                       DataGlobalConstants::ResourceType::SolarAir,
-                                                                       DataGlobalConstants::ResourceType::SO2,
-                                                                       DataGlobalConstants::ResourceType::NOx,
-                                                                       DataGlobalConstants::ResourceType::N2O,
-                                                                       DataGlobalConstants::ResourceType::PM,
-                                                                       DataGlobalConstants::ResourceType::PM2_5,
-                                                                       DataGlobalConstants::ResourceType::PM10,
-                                                                       DataGlobalConstants::ResourceType::CO,
-                                                                       DataGlobalConstants::ResourceType::CO2,
-                                                                       DataGlobalConstants::ResourceType::CH4,
-                                                                       DataGlobalConstants::ResourceType::NH3,
-                                                                       DataGlobalConstants::ResourceType::NMVOC,
-                                                                       DataGlobalConstants::ResourceType::Hg,
-                                                                       DataGlobalConstants::ResourceType::Pb,
-                                                                       DataGlobalConstants::ResourceType::NuclearHigh,
-                                                                       DataGlobalConstants::ResourceType::NuclearLow,
-                                                                       DataGlobalConstants::ResourceType::WaterEnvironmentalFactors,
-                                                                       DataGlobalConstants::ResourceType::CarbonEquivalent,
-                                                                       DataGlobalConstants::ResourceType::Source,
-                                                                       DataGlobalConstants::ResourceType::PlantLoopHeatingDemand,
-                                                                       DataGlobalConstants::ResourceType::PlantLoopCoolingDemand,
-                                                                       DataGlobalConstants::ResourceType::OnSiteWater,
-                                                                       DataGlobalConstants::ResourceType::MainsWater,
-                                                                       DataGlobalConstants::ResourceType::RainWater,
-                                                                       DataGlobalConstants::ResourceType::WellWater,
-                                                                       DataGlobalConstants::ResourceType::Condensate,
-                                                                       DataGlobalConstants::ResourceType::OtherFuel1,
-                                                                       DataGlobalConstants::ResourceType::OtherFuel2};
-
-    void clear_state() override
-    {
-        // nothing to clear
-    }
-};
+} // namespace Constant
 
 } // namespace EnergyPlus
 

@@ -141,18 +141,16 @@ namespace Curve {
         }
     }
 
-    void ResetPerformanceCurveOutput(EnergyPlusData &state)
+    void ResetPerformanceCurveOutput(const EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   August 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
         // PURPOSE OF THIS SUBROUTINE:
         // Reset curve outputs prior to simulating air loops, plant loops, etc.
         // This allows the report variable for curve/table objects to show an inactive state.
 
-        for (auto &c : state.dataCurveManager->PerfCurve) {
+        for (auto const &c : state.dataCurveManager->PerfCurve) {
             c->output = DataLoopNode::SensedNodeFlagValue;
             for (auto &i : c->inputs) {
                 i = DataLoopNode::SensedNodeFlagValue;
@@ -628,8 +626,6 @@ namespace Curve {
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call
         int IOStatus;                    // Used in GetObjectItem
         std::string CurrentModuleObject; // for ease in renaming.
-        int MaxTableNums(0);             // Maximum number of numeric input fields in Tables
-        //   certain object in the input file
 
         // Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
@@ -2127,7 +2123,7 @@ namespace Curve {
                     format("GetCurveInput: Currently exactly one (\"1\") {} object per simulation is required when using the AirflowNetwork model.",
                            CurrentModuleObject));
                 ErrorsFound = true;
-            } else if (numOfCPArray == 1) {
+            } else {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          CurrentModuleObject,
                                                                          1,
@@ -2231,7 +2227,7 @@ namespace Curve {
                     thisCurve->outputLimits.max = 1.0;
                     thisCurve->outputLimits.maxPresent = true;
 
-                    MaxTableNums = NumNumbers;
+                    int MaxTableNums = NumNumbers;
                     if (NumNumbers != numWindDir) {
                         ShowSevereError(state, format("GetCurveInput: For {}: ", CurrentModuleObject));
                         ShowContinueError(state,
@@ -3522,7 +3518,7 @@ namespace Curve {
         auto &curve = state.dataBranchAirLoopPlant->PressureCurve(PressureCurveIndex);
 
         // Intermediate calculations
-        Real64 const CrossSectArea = (DataGlobalConstants::Pi / 4.0) * pow_2(curve.EquivDiameter);
+        Real64 const CrossSectArea = (Constant::Pi / 4.0) * pow_2(curve.EquivDiameter);
         Real64 const Velocity = MassFlow / (Density * CrossSectArea);
         Real64 const ReynoldsNumber = Density * curve.EquivDiameter * Velocity / Viscosity; // assuming mu here
         Real64 const RoughnessRatio = curve.EquivRoughness / curve.EquivDiameter;

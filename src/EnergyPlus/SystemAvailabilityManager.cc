@@ -588,7 +588,7 @@ namespace SystemAvailabilityManager {
                 nightCycleMgr.Name = cAlphaArgs(1);
                 nightCycleMgr.MgrType = DataPlant::SystemAvailabilityType::NightCycle;
                 nightCycleMgr.TempTolRange = rNumericArgs(1);
-                CyclingTimeSteps = nint((rNumericArgs(2) / DataGlobalConstants::SecInHour) * double(state.dataGlobal->NumOfTimeStepInHour));
+                CyclingTimeSteps = nint((rNumericArgs(2) / Constant::SecInHour) * double(state.dataGlobal->NumOfTimeStepInHour));
                 CyclingTimeSteps = max(1, CyclingTimeSteps);
                 nightCycleMgr.CyclingTimeSteps = CyclingTimeSteps;
                 nightCycleMgr.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
@@ -1303,7 +1303,7 @@ namespace SystemAvailabilityManager {
         }
 
         bool ErrorsFound = false;
-        std::string const &cCurrentModuleObject = "AvailabilityManagerAssignmentList";
+        std::string const cCurrentModuleObject = "AvailabilityManagerAssignmentList";
         auto &ip = state.dataInputProcessing->inputProcessor;
 
         state.dataSystemAvailabilityManager->NumAvailManagerLists = ip->getNumObjectsFound(state, cCurrentModuleObject);
@@ -1811,7 +1811,7 @@ namespace SystemAvailabilityManager {
                 SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NightVentData);
             }
             if (SysAvailNum > 0) {
-                CalcNVentSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType);
+                CalcNVentSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, present(ZoneEquipType));
             } else {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:NightVentilation not found: {}", SysAvailName));
             }
@@ -3474,10 +3474,10 @@ namespace SystemAvailabilityManager {
         }
     }
     void CalcNVentSysAvailMgr(EnergyPlusData &state,
-                              int const SysAvailNum,                      // number of the current scheduled system availability manager
-                              int const PriAirSysNum,                     // number of the primary air system affected by this Avail. Manager
-                              int &AvailStatus,                           // System status indicator
-                              ObjexxFCL::Optional_int_const ZoneEquipType // Type of zone equipment component
+                              int const SysAvailNum,     // number of the current scheduled system availability manager
+                              int const PriAirSysNum,    // number of the primary air system affected by this Avail. Manager
+                              int &AvailStatus,          // System status indicator
+                              bool const isZoneEquipType // Type of zone equipment component
     )
     {
 
@@ -3519,7 +3519,7 @@ namespace SystemAvailabilityManager {
             VentTemp = GetCurrentScheduleValue(state, nightVentMgr.VentTempSchedPtr);
             int ControlZoneNum = nightVentMgr.ZoneNum;
 
-            if (present(ZoneEquipType)) {
+            if (isZoneEquipType) {
                 // if the room temperature is greater than the vent temp sched value, set the vent temp check to TRUE
                 if (state.dataHeatBalFanSys->TempTstatAir(ControlZoneNum) > VentTemp) {
                     TempCheck = true;
@@ -3556,7 +3556,7 @@ namespace SystemAvailabilityManager {
             }
         }
 
-        if (!present(ZoneEquipType)) {
+        if (!isZoneEquipType) {
             if (AvailStatus == CycleOn) {
                 state.dataAirLoop->AirLoopControlInfo(PriAirSysNum).LoopFlowRateSet = true;
                 state.dataAirLoop->AirLoopControlInfo(PriAirSysNum).NightVent = true;

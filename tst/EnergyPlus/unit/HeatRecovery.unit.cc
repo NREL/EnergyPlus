@@ -4249,7 +4249,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     state->dataMixedAir->OAController.allocate(OAContrllerNum);
     auto &thisOAController(state->dataMixedAir->OAController(OAContrllerNum));
     // initialize OA controller
-    thisOAController.ControllerType_Num = MixedAir::MixedAirControllerType::ControllerOutsideAir;
+    thisOAController.ControllerType = MixedAir::MixedAirControllerType::ControllerOutsideAir;
 
     int OASysNum = 1;
     state->dataAirLoop->OutsideAirSys.allocate(OASysNum);

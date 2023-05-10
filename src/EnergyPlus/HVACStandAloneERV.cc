@@ -305,7 +305,7 @@ void GetStandAloneERV(EnergyPlusData &state)
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).UnitType = CurrentModuleObject;
 
         if (lAlphaBlanks(2)) {
-            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr =
                 GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
@@ -874,8 +874,7 @@ void GetStandAloneERV(EnergyPlusData &state)
         auto &thisOAController = state.dataMixedAir->OAController(OutAirNum);
 
         thisOAController.Name = Alphas(1);
-        thisOAController.ControllerType = CurrentModuleObject;
-        thisOAController.ControllerType_Num = MixedAir::MixedAirControllerType::ControllerStandAloneERV;
+        thisOAController.ControllerType = MixedAir::MixedAirControllerType::ControllerStandAloneERV;
         WhichERV = UtilityRoutines::FindItemInList(Alphas(1), state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
         if (WhichERV != 0) {
             AirFlowRate = state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow;
@@ -1389,7 +1388,7 @@ void InitStandAloneERV(EnergyPlusData &state,
         }
 
         if (GetCurrentScheduleValue(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanSchPtr) > 0 ||
-            (state.dataHVACGlobal->ZoneCompTurnFansOn && !state.dataHVACGlobal->ZoneCompTurnFansOff)) {
+            (state.dataHVACGlobal->TurnFansOn && !state.dataHVACGlobal->TurnFansOff)) {
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
                 if (state.dataMixedAir->OAController(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex)
                         .HighHumCtrlActive) {
@@ -1631,8 +1630,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
                               true,
                               state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex);
     } else {
-        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->simulate(
-            state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->simulate(state, _, _);
     }
     if (!(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanType_Num == DataHVACGlobals::FanType_SystemModelObject)) {
         SimulateFanComponents(state,
@@ -1640,8 +1638,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
                               true,
                               state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex);
     } else {
-        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->simulate(
-            state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->simulate(state, _, _);
     }
 
     // now reset the ZoneEqSizing variable to NOT use the multiplier for HighRHOAFlowRatio for sizing HXs
@@ -1722,14 +1719,11 @@ void CalcStandAloneERV(EnergyPlusData &state,
                               state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName,
                               FirstHVACIteration,
                               state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex,
-                              _,
-                              state.dataHVACGlobal->ZoneCompTurnFansOn,
-                              state.dataHVACGlobal->ZoneCompTurnFansOff);
+                              _);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate +=
             Fans::GetFanPower(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex);
     } else {
-        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->simulate(
-            state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->simulate(state, _, _);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate +=
             state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->fanPower();
     }
@@ -1738,12 +1732,11 @@ void CalcStandAloneERV(EnergyPlusData &state,
         SimulateFanComponents(state,
                               state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
                               FirstHVACIteration,
-                              state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex); // why no Turn on off flags here?
+                              state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate +=
             Fans::GetFanPower(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex);
     } else {
-        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->simulate(
-            state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->simulate(state, _, _);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate +=
             state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->fanPower();
     }
@@ -1837,7 +1830,7 @@ void ReportStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum) // n
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ReportingConstant;
 
-    ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseEnergy =
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate * ReportingConstant;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SensCoolingEnergy =
