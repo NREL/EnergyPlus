@@ -3080,18 +3080,18 @@ namespace UnitarySystems {
                 if (this->m_NumOfSpeedCooling > 1) {
                     int FanIndex = this->m_FanIndex;
                     for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
-                            if (this->m_DesignSpecMSHPIndex > -1) {
-                                if (state.dataUnitarySystems->designSpecMSHP[this->m_DesignSpecMSHPIndex].coolingVolFlowRatio[i] ==
-                                    DataSizing::AutoSize) {
-                                    this->m_CoolVolumeFlowRate[i] = double(i) / double(this->m_NumOfSpeedCooling) * AirFlowRate;
-                                } else {
-                                    this->m_CoolVolumeFlowRate[i] =
-                                        state.dataUnitarySystems->designSpecMSHP[this->m_DesignSpecMSHPIndex].coolingVolFlowRatio[i] * AirFlowRate;
-                                }
+                        if (this->m_DesignSpecMSHPIndex > -1) {
+                            if (state.dataUnitarySystems->designSpecMSHP[this->m_DesignSpecMSHPIndex].coolingVolFlowRatio[i] ==
+                                DataSizing::AutoSize) {
+                                this->m_CoolVolumeFlowRate[i] = double(i) / double(this->m_NumOfSpeedCooling) * AirFlowRate;
                             } else {
                                 this->m_CoolVolumeFlowRate[i] =
-                                    state.dataHVACFan->fanObjs[FanIndex]->AirMassFlowRateAtSpeed(i - 1) / state.dataEnvrn->StdRhoAir;                                
+                                    state.dataUnitarySystems->designSpecMSHP[this->m_DesignSpecMSHPIndex].coolingVolFlowRatio[i] * AirFlowRate;
                             }
+                        } else {
+                            this->m_CoolVolumeFlowRate[i] =
+                                state.dataHVACFan->fanObjs[FanIndex]->AirMassFlowRateAtSpeed(i - 1) / state.dataEnvrn->StdRhoAir;
+                        }
                         this->m_CoolMassFlowRate[i] = this->m_CoolVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
                     }
                 }
@@ -11846,26 +11846,26 @@ namespace UnitarySystems {
         } break;
         case DataHVACGlobals::Coil_CoolingWaterToAirHPSimple: {
             // WSHP coils do not have a PLF curve and do not adjust fan performance
+            bool errFlag = false;
             this->heatPumpRunFrac(PartLoadRatio, errFlag, this->m_WSHPRuntimeFrac);
             if (PartLoadRatio > 0.0 && this->m_WSHPRuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil &&
                 this->m_sysType != SysType::PackagedWSHP) {
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / this->m_WSHPRuntimeFrac;
             }
 
-
-                WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
-                                                                blankString,
-                                                                this->m_CoolingCoilIndex,
-                                                                this->m_CoolingCoilSensDemand,
-                                                                this->m_CoolingCoilLatentDemand,
-                                                                this->m_FanOpMode,
-                                                                this->m_WSHPRuntimeFrac,
-                                                                this->m_MaxONOFFCyclesperHour,
-                                                                this->m_HPTimeConstant,
-                                                                this->m_FanDelayTime,
-                                                                CompressorOn,
-                                                                PartLoadRatio,
-                                                                FirstHVACIteration);
+            WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
+                                                            blankString,
+                                                            this->m_CoolingCoilIndex,
+                                                            this->m_CoolingCoilSensDemand,
+                                                            this->m_CoolingCoilLatentDemand,
+                                                            this->m_FanOpMode,
+                                                            this->m_WSHPRuntimeFrac,
+                                                            this->m_MaxONOFFCyclesperHour,
+                                                            this->m_HPTimeConstant,
+                                                            this->m_FanDelayTime,
+                                                            CompressorOn,
+                                                            PartLoadRatio,
+                                                            FirstHVACIteration);
         } break;
         case DataHVACGlobals::Coil_CoolingWaterToAirHP: {
             bool errFlag = false;
@@ -12059,6 +12059,7 @@ namespace UnitarySystems {
         } break;
         case DataHVACGlobals::Coil_HeatingWaterToAirHPSimple: {
             // WSHP coils do not have a PLF curve and do not adjust fan performance
+            bool errFlag = false;
             this->heatPumpRunFrac(PartLoadRatio, errFlag, this->m_WSHPRuntimeFrac);
             if (PartLoadRatio > 0.0 && this->m_WSHPRuntimeFrac > 0.0 && this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil &&
                 this->m_sysType != SysType::PackagedWSHP) { // used to match up to PTUnit results
@@ -15913,7 +15914,7 @@ namespace UnitarySystems {
             this->m_ElecPower = locFanElecPower;
             this->m_ElecPowerConsumption = this->m_ElecPower * ReportingConstant;
         } break;
-            // May not need 
+            // May not need
         case DataHVACGlobals::Coil_CoolingWaterToAirHPSimple: {
             if (this->m_NumOfSpeedCooling > 1) {
                 this->m_CycRatio = max(this->m_CoolingCycRatio, this->m_HeatingCycRatio);

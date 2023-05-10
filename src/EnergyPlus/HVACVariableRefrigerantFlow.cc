@@ -4537,7 +4537,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
                                 for (int i = 1; i <= state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NumOfSpeedCooling; ++i) {
                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] =
-                                        state.dataHVACFan->fanObjs[FanIndex]->AirMassFlowRateAtSpeed(i-1);
+                                        state.dataHVACFan->fanObjs[FanIndex]->AirMassFlowRateAtSpeed(i - 1);
                                 }
                             }
                         }
@@ -4552,7 +4552,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 }
                             }
                         }
-                        ShowWarningError(state, cCurrentModuleObject + " = " + thisVrfTU.Name + " with Fan:SystemModel is used in  " + cAlphaArgs(8) + "\"");
+                        ShowWarningError(state,
+                                         cCurrentModuleObject + " = " + thisVrfTU.Name + " with Fan:SystemModel is used in  " + cAlphaArgs(8) + "\"");
                         ShowContinueError(state, format("...The number of speed = {:.0R}.", double(NumSpeeds)));
                         ShowContinueError(state, "...Multiple speed fan will be appiled to this unit. The speed number is determined by load.");
                     }
@@ -9488,7 +9489,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
 
             if (SpeedNum == 1) {
                 this->SpeedRatio = 0.0;
-            } 
+            }
             auto f = [&state, VRFTUNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio](Real64 const PartLoadRatio) {
                 Real64 QZnReqTemp = QZnReq; // denominator representing zone load (W)
                 Real64 ActualOutput;        // delivered capacity of VRF terminal unit
@@ -9523,7 +9524,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                 this->SpeedRatio = 0.0;
                 if (SolFla > 0 && PartLoadRatio <= 1.0) break;
             } else {
-                this->CycRatio = 1.0; 
+                this->CycRatio = 1.0;
                 this->SpeedRatio = PartLoadRatio;
                 if (SolFla > 0 && PartLoadRatio <= 1.0) break;
             } 
@@ -9636,7 +9637,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                     }
                 }
                 if (FullOutput - NoCompOutput == 0.0) {
-                   PartLoadRatio = 0.0;
+                    PartLoadRatio = 0.0;
                 } else {
                     PartLoadRatio = min(1.0, max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput)));
                 }
@@ -10191,7 +10192,7 @@ void SetAverageAirFlow(EnergyPlusData &state,
         } else {
             state.dataHVACVarRefFlow->FanSpeedRatio = state.dataHVACVarRefFlow->CompOnFlowRatio;
         }
-    } 
+    }
 
     // if the terminal unit and fan are scheduled on then set flow rate
     if (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr) > 0.0 &&
