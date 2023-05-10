@@ -540,7 +540,6 @@ namespace HVACMultiSpeedHeatPump {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), state.dataHVACMultiSpdHP->CurrentModuleObject, ErrorsFound);
 
             thisMSHP.Name = Alphas(1);
             if (lAlphaBlanks(2)) {

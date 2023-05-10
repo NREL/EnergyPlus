@@ -678,8 +678,6 @@ namespace HeatRecovery {
             thisPerfData.NumericFieldNames = "";
             thisPerfData.NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
             thisPerfData.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisPerfData.PerfType = cCurrentModuleObject;
             thisPerfData.NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
@@ -2150,7 +2148,7 @@ namespace HeatRecovery {
             //   (supply air stream bypass mass flow rate proportional to ControlFraction except when frost control is active)
             if (this->ControlToTemperatureSetPoint) {
                 if ((this->SupInTemp - this->SupOutTemp) != 0.0) {
-                    if ((this->SupInTemp < HXTempSetPoint && this->SupOutTemp > HXTempSetPoint) ||
+                    if ((this->SupInTemp<HXTempSetPoint &&this->SupOutTemp> HXTempSetPoint) ||
                         (this->SupInTemp > HXTempSetPoint && this->SupOutTemp < HXTempSetPoint)) {
                         ControlFraction = max(0.0, min(1.0, std::abs((this->SupInTemp - HXTempSetPoint) / (this->SupInTemp - this->SupOutTemp))));
                     } else if ((this->SupInTemp < this->SupOutTemp && this->SupOutTemp < HXTempSetPoint) ||
