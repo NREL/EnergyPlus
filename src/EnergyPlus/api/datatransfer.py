@@ -315,8 +315,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.
         """
-        success = self.api.apiDataFullyReady(state)
-        if success == 0:
+        if self.api.apiDataFullyReady(state) == 1:
             return True
         return False
 
@@ -643,7 +642,7 @@ class DataExchange:
 
     def get_construction_handle(self, state: c_void_p, var_name: Union[str, bytes]) -> int:
         """
-        Get a handle to a constructions in a running simulation.  This is only used for Python Plugin applications!
+        Get a handle to a constructions in a running simulation.
 
         Some actuators allow specifying different constructions to allow switchable construction control.
         This function returns an index that can be used in those functions.  The construction is specified by name.
@@ -658,8 +657,6 @@ class DataExchange:
         :param var_name: Name of the construction to look up
         :return: An integer ID for this construction, or -1 if one could not be found.
         """
-        if not self.running_as_python_plugin:
-            raise EnergyPlusException("get_construction_handle is only available as part of a Python Plugin workflow")
         if isinstance(var_name, str):
             var_name = var_name.encode('utf-8')
         elif not isinstance(var_name, bytes):

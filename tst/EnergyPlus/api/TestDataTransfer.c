@@ -55,18 +55,35 @@
 int outdoorDewPointActuator = -1;
 int outdoorTempSensor = -1;
 int outdoorDewPointSensor = -1;
+int zone1_wall1Actuator = -1;
+int wallConstruction = -1;
+int floorConstruction = -1;
 int handlesRetrieved = 0;
 
 void afterZoneTimeStepHandler(EnergyPlusState state)
 {
     printf("STARTING A NEW TIME STEP\n");
     if (handlesRetrieved == 0) {
-        if (apiDataFullyReady(state) == 1) return;
+        if (!apiDataFullyReady(state)) {
+            return;
+        }
         outdoorDewPointActuator = getActuatorHandle(state, "Weather Data", "Outdoor Dew Point", "Environment");
         outdoorTempSensor = getVariableHandle(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
         outdoorDewPointSensor = getVariableHandle(state, "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
-        printf("Got handles %d, %d, %d", outdoorDewPointActuator, outdoorTempSensor, outdoorDewPointSensor);
-        if (outdoorDewPointActuator == -1 || outdoorTempSensor == -1 || outdoorDewPointSensor == -1) {
+
+        zone1_wall1Actuator = getActuatorHandle(state, "Surface", "Construction State", "Zn001:Wall001");
+        wallConstruction = getConstructionHandle(state, "R13WALL");
+        floorConstruction = getConstructionHandle(state, "FLOOR");
+
+        printf("Got handles %d, %d, %d, %d, %d, %d",
+               outdoorDewPointActuator,
+               outdoorTempSensor,
+               outdoorDewPointSensor,
+               zone1_wall1Actuator,
+               wallConstruction,
+               floorConstruction);
+        if (outdoorDewPointActuator == -1 || outdoorTempSensor == -1 || outdoorDewPointSensor == -1 || zone1_wall1Actuator == -1 ||
+            wallConstruction == -1 || floorConstruction == -1) {
             exit(1);
         }
         handlesRetrieved = 1;
@@ -81,6 +98,14 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
     printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
     Real64 simTime = currentSimTime(state);
     printf("Current Sim Time: %0.2f \n", simTime);
+
+    if (oa_temp > 10) {
+        printf("Setting Zn001:Wall001 construction (%d) to R13WALL (%d)", zone1_wall1Actuator, wallConstruction);
+        setActuatorValue(state, zone1_wall1Actuator, wallConstruction);
+    } else {
+        printf("Setting Zn001:Wall001 construction (%d) to FLOOR (%d)", zone1_wall1Actuator, floorConstruction);
+        setActuatorValue(state, zone1_wall1Actuator, floorConstruction);
+    }
 }
 
 int main(int argc, const char *argv[])
@@ -90,5 +115,9 @@ int main(int argc, const char *argv[])
     requestVariable(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
     requestVariable(state, "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
     energyplus(state, argc, argv);
+    if (handlesRetrieved == 0) {
+        fprintf(stderr, "We never got ANY handles\n");
+        return 1;
+    }
     return 0;
 }

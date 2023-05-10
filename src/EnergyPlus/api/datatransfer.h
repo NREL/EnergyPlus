@@ -119,7 +119,7 @@ ENERGYPLUSLIB_API char *listAllAPIDataCSV(EnergyPlusState state);
 ///          This function allows a user to call the simulation to check whether data is ready for access.
 ///          Do not call for variable, meter, actuator, or any other internal exchange data prior to this returning true.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
-/// \return Returns 0 (success) once the data is ready, otherwise returns 1.
+/// \return Returns 1 (true) once the data is ready, otherwise returns 0 (false).
 ENERGYPLUSLIB_API int apiDataFullyReady(EnergyPlusState state);
 /// \brief Provides a user-facing check on the API error flag
 /// \details Some API functions return a value of 0, which could potentially indicate an error, or an actual 0 value.
