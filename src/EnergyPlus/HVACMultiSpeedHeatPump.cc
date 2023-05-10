@@ -466,7 +466,6 @@ namespace HVACMultiSpeedHeatPump {
         bool IsNotOK;                  // Flag to verify name
         bool AirNodeFound;             // True when an air node is found
         bool AirLoopFound;             // True when an air loop is found
-        int FanType;                   // Fan type
         int i;                         // Index to speeds
         int j;                         // Index to speeds
         bool Found;                    // Flag to find autosize
@@ -667,15 +666,12 @@ namespace HVACMultiSpeedHeatPump {
                                                      thisMSHP.FanName,
                                                      "UNDEFINED",
                                                      "UNDEFINED");
-            }
-            if (thisMSHP.FanType != DataHVACGlobals::FanType_SimpleOnOff && thisMSHP.FanType != DataHVACGlobals::FanType_SimpleConstVolume) {
-                ShowSevereError(state,
-                                format("{}, \"{}\", {} is not allowed = {}",
-                                       state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                       thisMSHP.Name,
-                                       cAlphaFields(6),
-                                       Alphas(6)));
-                ShowContinueError(state, "Valid choices are Fan:OnOff or Fan:ConstantVolume");
+            } else {
+                ShowSevereError(
+                    state,
+                    format(
+                        "{}, \"{}\", fan {} \"{}\" not found", state.dataHVACMultiSpdHP->CurrentModuleObject, thisMSHP.Name, Alphas(6), Alphas(7)));
+                ShowContinueError(state, "Correct this fan name using valid Fan:OnOff or Fan:ConstantVolume fan object names.");
                 ErrorsFound = true;
             }
 

@@ -321,7 +321,7 @@ namespace HeatBalanceManager {
 
         Material::GetMaterialData(state, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
-        GetFrameAndDividerData(state, ErrorsFound);
+        GetFrameAndDividerData(state);
 
         GetConstructData(state, ErrorsFound); // Read constructs from input file/transfer from legacy data structure
 
@@ -3864,7 +3864,7 @@ namespace HeatBalanceManager {
         }
         print(state.files.shade, "\n");
     }
-    void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
+    void GetFrameAndDividerData(EnergyPlusData &state) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
