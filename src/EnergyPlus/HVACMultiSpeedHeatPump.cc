@@ -1606,22 +1606,22 @@ namespace HVACMultiSpeedHeatPump {
         }
         // End of multispeed heat pump
 
-        for (MSHPNum = 1; MSHPNum <= state.dataHVACMultiSpdHP->NumMSHeatPumps; ++MSHPNum) {
+        for (auto &thisMSHeatPump : state.dataHVACMultiSpdHP->MSHeatPump) {
             // Setup Report Variables for MSHP Equipment
             SetupOutputVariable(state,
                                 "Unitary System Ancillary Electricity Rate",
                                 OutputProcessor::Unit::W,
-                                MSHeatPump(MSHPNum).AuxElecPower,
+                                thisMSHeatPump.AuxElecPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System Cooling Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).AuxElecCoolConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                MSHeatPump(MSHPNum).Name,
+                                thisMSHeatPump.Name,
                                 {},
                                 "Electricity",
                                 "Cooling",
@@ -1633,7 +1633,7 @@ namespace HVACMultiSpeedHeatPump {
                                 state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).AuxElecHeatConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                MSHeatPump(MSHPNum).Name,
+                                thisMSHeatPump.Name,
                                 {},
                                 "Electricity",
                                 "Heating",
@@ -1642,141 +1642,141 @@ namespace HVACMultiSpeedHeatPump {
             SetupOutputVariable(state,
                                 "Unitary System Fan Part Load Ratio",
                                 OutputProcessor::Unit::None,
-                                MSHeatPump(MSHPNum).FanPartLoadRatio,
+                                thisMSHeatPump.FanPartLoadRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System Compressor Part Load Ratio",
                                 OutputProcessor::Unit::None,
-                                MSHeatPump(MSHPNum).CompPartLoadRatio,
+                                thisMSHeatPump.CompPartLoadRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System Electricity Rate",
                                 OutputProcessor::Unit::W,
-                                MSHeatPump(MSHPNum).ElecPower,
+                                thisMSHeatPump.ElecPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).ElecPowerConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System DX Coil Cycling Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).CycRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System DX Coil Speed Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).SpeedRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System DX Coil Speed Level",
                                 OutputProcessor::Unit::None,
                                 state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).SpeedNum,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System Total Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                MSHeatPump(MSHPNum).TotCoolEnergyRate,
+                                thisMSHeatPump.TotCoolEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System Total Heating Rate",
                                 OutputProcessor::Unit::W,
-                                MSHeatPump(MSHPNum).TotHeatEnergyRate,
+                                thisMSHeatPump.TotHeatEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                MSHeatPump(MSHPNum).SensCoolEnergyRate,
+                                thisMSHeatPump.SensCoolEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
-                                MSHeatPump(MSHPNum).SensHeatEnergyRate,
+                                thisMSHeatPump.SensHeatEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                MSHeatPump(MSHPNum).LatCoolEnergyRate,
+                                thisMSHeatPump.LatCoolEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
+                                thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System Latent Heating Rate",
                                 OutputProcessor::Unit::W,
-                                MSHeatPump(MSHPNum).LatHeatEnergyRate,
+                                thisMSHeatPump.LatHeatEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                MSHeatPump(MSHPNum).Name);
-            if (MSHeatPump(MSHPNum).HeatRecActive) {
+                                thisMSHeatPump.Name);
+            if (thisMSHeatPump.HeatRecActive) {
                 SetupOutputVariable(state,
                                     "Unitary System Heat Recovery Rate",
                                     OutputProcessor::Unit::W,
-                                    MSHeatPump(MSHPNum).HeatRecoveryRate,
+                                    thisMSHeatPump.HeatRecoveryRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    MSHeatPump(MSHPNum).Name);
+                                    thisMSHeatPump.Name);
                 SetupOutputVariable(state,
                                     "Unitary System Heat Recovery Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    MSHeatPump(MSHPNum).HeatRecoveryInletTemp,
+                                    thisMSHeatPump.HeatRecoveryInletTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    MSHeatPump(MSHPNum).Name);
+                                    thisMSHeatPump.Name);
                 SetupOutputVariable(state,
                                     "Unitary System Heat Recovery Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    MSHeatPump(MSHPNum).HeatRecoveryOutletTemp,
+                                    thisMSHeatPump.HeatRecoveryOutletTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    MSHeatPump(MSHPNum).Name);
+                                    thisMSHeatPump.Name);
                 SetupOutputVariable(state,
                                     "Unitary System Heat Recovery Fluid Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    MSHeatPump(MSHPNum).HeatRecoveryMassFlowRate,
+                                    thisMSHeatPump.HeatRecoveryMassFlowRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    MSHeatPump(MSHPNum).Name);
+                                    thisMSHeatPump.Name);
                 SetupOutputVariable(state,
                                     "Unitary System Heat Recovery Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).HeatRecoveryEnergy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
-                                    MSHeatPump(MSHPNum).Name);
+                                    thisMSHeatPump.Name);
             }
         }
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            for (int coilNUM = 1; coilNUM <= int(state.dataHVACMultiSpdHP->MSHeatPump.size()); ++coilNUM) {
+            for (auto &thisCoil : state.dataHVACMultiSpdHP->MSHeatPump) {
                 SetupEMSActuator(state,
                                  "Coil Speed Control",
-                                 state.dataHVACMultiSpdHP->MSHeatPump(coilNUM).Name,
+                                 thisCoil.Name,
                                  "Unitary System DX Coil Speed Value",
                                  "[]",
-                                 state.dataHVACMultiSpdHP->MSHeatPump(coilNUM).EMSOverrideCoilSpeedNumOn,
-                                 state.dataHVACMultiSpdHP->MSHeatPump(coilNUM).EMSOverrideCoilSpeedNumValue);
+                                 thisCoil.EMSOverrideCoilSpeedNumOn,
+                                 thisCoil.EMSOverrideCoilSpeedNumValue);
             }
         }
     }
