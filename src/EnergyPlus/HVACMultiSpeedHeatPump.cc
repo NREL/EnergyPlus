@@ -459,7 +459,6 @@ namespace HVACMultiSpeedHeatPump {
         static constexpr std::string_view RoutineNameNoColon("GetMSHeatPumpInput");
 
         // LOCAL VARIABLES
-        int MSHPNum;                   // Engine driven heat pump count
         int NumAlphas;                 // Number of elements in the alpha array
         int NumNumbers;                // Number of Numbers for each GetObjectItem call
         int IOStatus;                  // Used in GetObjectItem
@@ -519,7 +518,7 @@ namespace HVACMultiSpeedHeatPump {
         state.dataHVACMultiSpdHP->CheckEquipName.dimension(state.dataHVACMultiSpdHP->NumMSHeatPumps, true);
 
         // Load arrays with reformulated electric EIR chiller data
-        for (MSHPNum = 1; MSHPNum <= state.dataHVACMultiSpdHP->NumMSHeatPumps; ++MSHPNum) {
+        for (int MSHPNum = 1; MSHPNum <= state.dataHVACMultiSpdHP->NumMSHeatPumps; ++MSHPNum) {
             auto &thisMSHP = MSHeatPump(MSHPNum);
             int HeatingCoilInletNode = 0;
             int HeatingCoilOutletNode = 0;
@@ -1588,7 +1587,9 @@ namespace HVACMultiSpeedHeatPump {
         }
         // End of multispeed heat pump
 
+        int MSHPNum = 0;
         for (auto &thisMSHeatPump : state.dataHVACMultiSpdHP->MSHeatPump) {
+            auto &thisMSHPReport = state.dataHVACMultiSpdHP->MSHeatPumpReport(++MSHPNum);
             // Setup Report Variables for MSHP Equipment
             SetupOutputVariable(state,
                                 "Unitary System Ancillary Electricity Rate",
@@ -1600,7 +1601,7 @@ namespace HVACMultiSpeedHeatPump {
             SetupOutputVariable(state,
                                 "Unitary System Cooling Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).AuxElecCoolConsumption,
+                                thisMSHPReport.AuxElecCoolConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisMSHeatPump.Name,
@@ -1612,7 +1613,7 @@ namespace HVACMultiSpeedHeatPump {
             SetupOutputVariable(state,
                                 "Unitary System Heating Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).AuxElecHeatConsumption,
+                                thisMSHPReport.AuxElecHeatConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisMSHeatPump.Name,
@@ -1645,28 +1646,28 @@ namespace HVACMultiSpeedHeatPump {
             SetupOutputVariable(state,
                                 "Unitary System Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).ElecPowerConsumption,
+                                thisMSHPReport.ElecPowerConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System DX Coil Cycling Ratio",
                                 OutputProcessor::Unit::None,
-                                state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).CycRatio,
+                                thisMSHPReport.CycRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System DX Coil Speed Ratio",
                                 OutputProcessor::Unit::None,
-                                state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).SpeedRatio,
+                                thisMSHPReport.SpeedRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisMSHeatPump.Name);
             SetupOutputVariable(state,
                                 "Unitary System DX Coil Speed Level",
                                 OutputProcessor::Unit::None,
-                                state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).SpeedNum,
+                                thisMSHPReport.SpeedNum,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisMSHeatPump.Name);
@@ -1744,7 +1745,7 @@ namespace HVACMultiSpeedHeatPump {
                 SetupOutputVariable(state,
                                     "Unitary System Heat Recovery Energy",
                                     OutputProcessor::Unit::J,
-                                    state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).HeatRecoveryEnergy,
+                                    thisMSHPReport.HeatRecoveryEnergy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     thisMSHeatPump.Name);
