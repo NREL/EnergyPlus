@@ -1186,6 +1186,16 @@ namespace HVACFan {
         }
     }
 
+    int FanSystem::fanNumOfSpeed() const
+    {
+        return m_numSpeeds;
+    }
+
+    Real64 FanSystem::AirMassFlowRateAtSpeed(int const SpeedNum)
+    {
+        return m_massFlowAtSpeed[SpeedNum];
+    }
+
     // void
     // FanSystem::fanIsSecondaryDriver()
     //{

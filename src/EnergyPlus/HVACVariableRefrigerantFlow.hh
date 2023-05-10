@@ -61,6 +61,7 @@
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/StandardRatings.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -754,6 +755,20 @@ namespace HVACVariableRefrigerantFlow {
         int coolCoilAirOutNode = 0;            // cooling coil air outlet node number
         int heatCoilAirInNode = 0;             // heating coil air inlet node number
         int heatCoilAirOutNode = 0;            // heating coil air outlet node number
+        std::string DesignSpecMultispeedHPType; // Multiuple performance object type
+        std::string DesignSpecMultispeedHPName; // Multiuple performance object name
+        int DesignSpecMSHPIndex = -1;           //  Multiuple performance index
+        int NumOfSpeedHeating = 0;              // Number of heating speed
+        int NumOfSpeedCooling = 0;              // Number of cooling speed
+        int HeatSpeedNum = 0;                   // Heating speed number
+        int CoolSpeedNum = 0;                   // Cooling speed number
+        std::vector<Real64> CoolVolumeFlowRate;
+        std::vector<Real64> CoolMassFlowRate;
+        std::vector<Real64> HeatVolumeFlowRate;
+        std::vector<Real64> HeatMassFlowRate;
+        int SpeedNum = 0;
+        Real64 SpeedRatio = 0.0;
+        Real64 CycRatio = 0.0;
 
         // Methods for New VRF Model: Fluid Temperature Control
         //******************************************************************************

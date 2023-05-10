@@ -112,6 +112,10 @@ namespace HVACFan {
 
         void FanInputsForDesignHeatGain(EnergyPlusData &state, Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac);
 
+        int fanNumOfSpeed() const;
+
+        Real64 AirMassFlowRateAtSpeed(int const SpeedNum);
+
         // void
         // fanIsSecondaryDriver();
 
