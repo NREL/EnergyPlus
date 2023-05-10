@@ -654,39 +654,22 @@ namespace HVACMultiSpeedHeatPump {
             }
 
             // Get supply fan data
-            thisMSHP.FanName = Alphas(7);
-            if (UtilityRoutines::SameString(Alphas(6), "Fan:OnOff") || UtilityRoutines::SameString(Alphas(6), "Fan:ConstantVolume")) {
-                if (UtilityRoutines::SameString(Alphas(6), "Fan:OnOff")) {
-                    thisMSHP.FanType = DataHVACGlobals::FanType_SimpleOnOff;
-                    BranchNodeConnections::SetUpCompSets(
-                        state, state.dataHVACMultiSpdHP->CurrentModuleObject, thisMSHP.Name, "Fan:OnOff", thisMSHP.FanName, "UNDEFINED", "UNDEFINED");
-                    thisMSHP.FanInletNode = Fans::GetFanInletNode(state, "Fan:OnOff", thisMSHP.FanName, ErrorsFound);
-                    thisMSHP.FanOutletNode = Fans::GetFanOutletNode(state, "Fan:OnOff", thisMSHP.FanName, ErrorsFound);
-                } else {
-                    thisMSHP.FanType = DataHVACGlobals::FanType_SimpleConstVolume;
-                    BranchNodeConnections::SetUpCompSets(state,
-                                                         state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                                         thisMSHP.Name,
-                                                         "Fan:ConstantVolume",
-                                                         thisMSHP.FanName,
-                                                         "UNDEFINED",
-                                                         "UNDEFINED");
-                    thisMSHP.FanInletNode = Fans::GetFanInletNode(state, "Fan:ConstantVolume", thisMSHP.FanName, ErrorsFound);
-                    thisMSHP.FanOutletNode = Fans::GetFanOutletNode(state, "Fan:ConstantVolume", thisMSHP.FanName, ErrorsFound);
-                }
-                Fans::GetFanIndex(state, Alphas(7), thisMSHP.FanNum, ErrorsFound, state.dataHVACMultiSpdHP->CurrentModuleObject);
-                Fans::GetFanType(state, Alphas(7), FanType, ErrorsFound);
-                if (FanType != thisMSHP.FanType) {
-                    ShowSevereError(state,
-                                    format("{}, \"{}\", {} and {} do not match in Fan objects.",
-                                           state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                           thisMSHP.Name,
-                                           cAlphaFields(6),
-                                           cAlphaFields(7)));
-                    ShowContinueError(state, format("The entered {} = {} and {} = {}", cAlphaFields(7), Alphas(7), cAlphaFields(6), Alphas(6)));
-                    ErrorsFound = true;
-                }
-            } else {
+            bool errFound = false;
+            Fans::GetFanIndex(state, Alphas(7), thisMSHP.FanNum, errFound, state.dataHVACMultiSpdHP->CurrentModuleObject);
+            if (!errFound && thisMSHP.FanNum > 0) {
+                thisMSHP.FanName = state.dataFans->Fan(thisMSHP.FanNum).FanName;
+                thisMSHP.FanType = state.dataFans->Fan(thisMSHP.FanNum).FanType_Num;
+                thisMSHP.FanInletNode = state.dataFans->Fan(thisMSHP.FanNum).InletNodeNum;
+                thisMSHP.FanOutletNode = state.dataFans->Fan(thisMSHP.FanNum).OutletNodeNum;
+                BranchNodeConnections::SetUpCompSets(state,
+                                                     state.dataHVACMultiSpdHP->CurrentModuleObject,
+                                                     thisMSHP.Name,
+                                                     DataHVACGlobals::cFanTypes(thisMSHP.FanType),
+                                                     thisMSHP.FanName,
+                                                     "UNDEFINED",
+                                                     "UNDEFINED");
+            }
+            if (thisMSHP.FanType != DataHVACGlobals::FanType_SimpleOnOff && thisMSHP.FanType != DataHVACGlobals::FanType_SimpleConstVolume) {
                 ShowSevereError(state,
                                 format("{}, \"{}\", {} is not allowed = {}",
                                        state.dataHVACMultiSpdHP->CurrentModuleObject,
