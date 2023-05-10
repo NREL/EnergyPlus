@@ -63,8 +63,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EconomicLifeCycleCost;
-
-using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::EconomicTariff;
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
@@ -425,7 +423,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     state->dataEconLifeCycleCost->numCashFlow = 1;
     state->dataEconLifeCycleCost->CashFlow.resize(state->dataEconLifeCycleCost->numCashFlow);
     state->dataEconLifeCycleCost->CashFlow[0].pvKind = PrValKind::Energy;
-    state->dataEconLifeCycleCost->CashFlow[0].Resource = DataGlobalConstants::ResourceType::Electricity;
+    state->dataEconLifeCycleCost->CashFlow[0].Resource = Constant::eResource::Electricity;
     state->dataEconLifeCycleCost->CashFlow[0].yrAmount.allocate(state->dataEconLifeCycleCost->lengthStudyYears);
     state->dataEconLifeCycleCost->CashFlow[0].yrAmount(1) = 100;
     state->dataEconLifeCycleCost->CashFlow[0].yrAmount(2) = 110;
@@ -436,22 +434,20 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     state->dataEconLifeCycleCost->numResourcesUsed = 1;
 
     for (int year = 1; year <= state->dataEconLifeCycleCost->lengthStudyYears; ++year) {
-        std::map<DataGlobalConstants::ResourceType, Real64> yearMap;
-        for (auto iResource : state->dataGlobalConst->AllResourceTypes) {
-            yearMap.insert(std::pair<DataGlobalConstants::ResourceType, Real64>(iResource, 0.0));
-        }
-        state->dataEconLifeCycleCost->EscalatedEnergy.insert(std::pair<int, std::map<DataGlobalConstants::ResourceType, Real64>>(year, yearMap));
+        std::array<Real64, static_cast<int>(Constant::eResource::Num)> yearMap;
+        std::fill(yearMap.begin(), yearMap.end(), 0.0);
+        state->dataEconLifeCycleCost->EscalatedEnergy[year] = yearMap;
     }
 
     state->dataEconLifeCycleCost->EscalatedTotEnergy.allocate(state->dataEconLifeCycleCost->lengthStudyYears);
     state->dataEconLifeCycleCost->EscalatedTotEnergy = 0.0;
 
     ComputeEscalatedEnergyCosts(*state);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1).at(DataGlobalConstants::ResourceType::Electricity), 100., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2).at(DataGlobalConstants::ResourceType::Electricity), 110., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3).at(DataGlobalConstants::ResourceType::Electricity), 120., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4).at(DataGlobalConstants::ResourceType::Electricity), 130., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5).at(DataGlobalConstants::ResourceType::Electricity), 140., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1)[static_cast<int>(Constant::eResource::Electricity)], 100., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2)[static_cast<int>(Constant::eResource::Electricity)], 110., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3)[static_cast<int>(Constant::eResource::Electricity)], 120., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4)[static_cast<int>(Constant::eResource::Electricity)], 130., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5)[static_cast<int>(Constant::eResource::Electricity)], 140., 0.001);
 
     EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(1), 100., 0.001);
     EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(2), 110., 0.001);
@@ -461,7 +457,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
     state->dataEconLifeCycleCost->numUsePriceEscalation = 1;
     state->dataEconLifeCycleCost->UsePriceEscalation.allocate(state->dataEconLifeCycleCost->numUsePriceEscalation);
-    state->dataEconLifeCycleCost->UsePriceEscalation(1).resource = DataGlobalConstants::ResourceType::Electricity;
+    state->dataEconLifeCycleCost->UsePriceEscalation(1).resource = Constant::eResource::Electricity;
     state->dataEconLifeCycleCost->UsePriceEscalation(1).Escalation.allocate(state->dataEconLifeCycleCost->lengthStudyYears);
     state->dataEconLifeCycleCost->UsePriceEscalation(1).Escalation(1) = 1.03;
     state->dataEconLifeCycleCost->UsePriceEscalation(1).Escalation(2) = 1.05;
@@ -473,11 +469,11 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     state->dataEconLifeCycleCost->EscalatedTotEnergy = 0.0;
 
     ComputeEscalatedEnergyCosts(*state);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1).at(DataGlobalConstants::ResourceType::Electricity), 103.0, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2).at(DataGlobalConstants::ResourceType::Electricity), 115.5, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3).at(DataGlobalConstants::ResourceType::Electricity), 128.4, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4).at(DataGlobalConstants::ResourceType::Electricity), 144.3, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5).at(DataGlobalConstants::ResourceType::Electricity), 161.0, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1)[static_cast<int>(Constant::eResource::Electricity)], 103.0, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2)[static_cast<int>(Constant::eResource::Electricity)], 115.5, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3)[static_cast<int>(Constant::eResource::Electricity)], 128.4, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4)[static_cast<int>(Constant::eResource::Electricity)], 144.3, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5)[static_cast<int>(Constant::eResource::Electricity)], 161.0, 0.001);
 
     EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(1), 103., 0.001);
     EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(2), 115.5, 0.001);
@@ -517,7 +513,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     state->dataEconTariff->numTariff = 1;
     state->dataEconTariff->tariff.allocate(1);
     state->dataEconTariff->tariff(1).isSelected = true;
-    state->dataEconTariff->tariff(1).resourceNum = DataGlobalConstants::ResourceType::Electricity;
+    state->dataEconTariff->tariff(1).resourceNum = Constant::eResource::Electricity;
     state->dataEconTariff->tariff(1).ptTotal = 1;
     state->dataEconTariff->econVar.allocate(1);
     state->dataEconTariff->econVar(1).values.allocate(12);

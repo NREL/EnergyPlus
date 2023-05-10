@@ -267,7 +267,7 @@ namespace WindTurbine {
 
             windTurbine.Schedule = state.dataIPShortCut->cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
-                windTurbine.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                windTurbine.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 windTurbine.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (windTurbine.SchedPtr == 0) {
@@ -689,10 +689,10 @@ namespace WindTurbine {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 windTurbine.Name,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "WINDTURBINE",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(state,
                                 "Generator Turbine Local Wind Speed",
@@ -796,7 +796,7 @@ namespace WindTurbine {
                 while (statFile.good()) { // end of file
                     auto lineIn = statFile.readLine();
                     // reconcile line with different versions of stat file
-                    auto lnPtr = index(lineIn.data, "Wind Speed");
+                    size_t lnPtr = index(lineIn.data, "Wind Speed");
                     if (lnPtr == std::string::npos) continue;
                     // have hit correct section.
                     while (statFile.good()) { // find daily avg line
@@ -977,9 +977,9 @@ namespace WindTurbine {
             LocalWindSpeed < windTurbine.CutOutSpeed) {
 
             // System is on
-            Period = 2.0 * DataGlobalConstants::Pi;
+            Period = 2.0 * Constant::Pi;
             Omega = (RotorSpeed * Period) / SecInMin;
-            SweptArea = (DataGlobalConstants::Pi * pow_2(RotorD)) / 4;
+            SweptArea = (Constant::Pi * pow_2(RotorD)) / 4;
             TipSpeedRatio = (Omega * (RotorD / 2.0)) / LocalWindSpeed;
 
             // Limit maximum tip speed ratio
@@ -1045,8 +1045,8 @@ namespace WindTurbine {
 
                 InducedVel = LocalWindSpeed * 2.0 / 3.0;
                 // Velocity components
-                Real64 const sin_AzimuthAng(std::sin(AzimuthAng * DataGlobalConstants::DegToRadians));
-                Real64 const cos_AzimuthAng(std::cos(AzimuthAng * DataGlobalConstants::DegToRadians));
+                Real64 const sin_AzimuthAng(std::sin(AzimuthAng * Constant::DegToRadians));
+                Real64 const cos_AzimuthAng(std::cos(AzimuthAng * Constant::DegToRadians));
                 ChordalVel = RotorVel + InducedVel * cos_AzimuthAng;
                 NormalVel = InducedVel * sin_AzimuthAng;
                 RelFlowVel = std::sqrt(pow_2(ChordalVel) + pow_2(NormalVel));
@@ -1055,8 +1055,8 @@ namespace WindTurbine {
                 AngOfAttack = std::atan((sin_AzimuthAng / ((RotorVel / LocalWindSpeed) / (InducedVel / LocalWindSpeed) + cos_AzimuthAng)));
 
                 // Force coefficients
-                Real64 const sin_AngOfAttack(std::sin(AngOfAttack * DataGlobalConstants::DegToRadians));
-                Real64 const cos_AngOfAttack(std::cos(AngOfAttack * DataGlobalConstants::DegToRadians));
+                Real64 const sin_AngOfAttack(std::sin(AngOfAttack * Constant::DegToRadians));
+                Real64 const cos_AngOfAttack(std::cos(AngOfAttack * Constant::DegToRadians));
                 TanForceCoeff = std::abs(windTurbine.LiftCoeff * sin_AngOfAttack - windTurbine.DragCoeff * cos_AngOfAttack);
                 NorForceCoeff = windTurbine.LiftCoeff * cos_AngOfAttack + windTurbine.DragCoeff * sin_AngOfAttack;
 
@@ -1135,10 +1135,10 @@ namespace WindTurbine {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine fills remaining report variables.
 
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &windTurbine = state.dataWindTurbine->WindTurbineSys(WindTurbineNum);
 
-        windTurbine.Energy = windTurbine.Power * TimeStepSys * DataGlobalConstants::SecInHour;
+        windTurbine.Energy = windTurbine.Power * TimeStepSysSec;
     }
 
     //*****************************************************************************************

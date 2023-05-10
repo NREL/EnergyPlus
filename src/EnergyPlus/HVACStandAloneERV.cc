@@ -207,12 +207,9 @@ void GetStandAloneERV(EnergyPlusData &state)
     using Fans::GetFanOutletNode;
     using Fans::GetFanType;
 
-    using NodeInputManager::GetOnlySingleNode;
-    auto &GetGenericSupplyAirFlowRate(HeatRecovery::GetSupplyAirFlowRate);
-    using HeatRecovery::GetHeatExchangerObjectTypeNum;
-    auto &GetHXSupplyInletNode(HeatRecovery::GetSupplyInletNode);
-    auto &GetHXSecondaryInletNode(HeatRecovery::GetSecondaryInletNode);
     using Curve::GetCurveIndex;
+    using HeatRecovery::GetHeatExchangerObjectTypeNum;
+    using NodeInputManager::GetOnlySingleNode;
     using OutAirNodeManager::CheckOutAirNodeNumber;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -308,7 +305,7 @@ void GetStandAloneERV(EnergyPlusData &state)
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).UnitType = CurrentModuleObject;
 
         if (lAlphaBlanks(2)) {
-            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr =
                 GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
@@ -337,7 +334,7 @@ void GetStandAloneERV(EnergyPlusData &state)
 
         errFlag = false;
         HXSupAirFlowRate =
-            GetGenericSupplyAirFlowRate(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName, errFlag);
+            HeatRecovery::GetSupplyAirFlowRate(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName, errFlag);
         if (errFlag) {
             ShowContinueError(
                 state, format("... occurs in {} \"{}\"", CurrentModuleObject, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name));
@@ -471,9 +468,9 @@ void GetStandAloneERV(EnergyPlusData &state)
 
         errFlag = false;
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode =
-            GetHXSupplyInletNode(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName, errFlag);
+            HeatRecovery::GetSupplyInletNode(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName, errFlag);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode =
-            GetHXSecondaryInletNode(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName, errFlag);
+            HeatRecovery::GetSecondaryInletNode(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName, errFlag);
         if (errFlag) {
             ShowContinueError(state,
                               format("... occurs in {} ={}", CurrentModuleObject, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name));
@@ -874,11 +871,10 @@ void GetStandAloneERV(EnergyPlusData &state)
                                                                  cNumericFields);
         MixedAir::CheckOAControllerName(state, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         ++OutAirNum;
-        auto &thisOAController(state.dataMixedAir->OAController(OutAirNum));
+        auto &thisOAController = state.dataMixedAir->OAController(OutAirNum);
 
         thisOAController.Name = Alphas(1);
-        thisOAController.ControllerType = CurrentModuleObject;
-        thisOAController.ControllerType_Num = MixedAir::MixedAirControllerType::ControllerStandAloneERV;
+        thisOAController.ControllerType = MixedAir::MixedAirControllerType::ControllerStandAloneERV;
         WhichERV = UtilityRoutines::FindItemInList(Alphas(1), state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
         if (WhichERV != 0) {
             AirFlowRate = state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow;
@@ -1289,7 +1285,7 @@ void InitStandAloneERV(EnergyPlusData &state,
     int SupInletNode; // supply air inlet node number for Stand Alone ERV 'StandAloneERVNum'
     int Loop;         // loop counter
 
-    auto &Node(state.dataLoopNodes->Node);
+    auto &Node = state.dataLoopNodes->Node;
 
     // Do the one time initializations
     if (state.dataHVACStandAloneERV->MyOneTimeFlag) {
@@ -1392,7 +1388,7 @@ void InitStandAloneERV(EnergyPlusData &state,
         }
 
         if (GetCurrentScheduleValue(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanSchPtr) > 0 ||
-            (state.dataHVACGlobal->ZoneCompTurnFansOn && !state.dataHVACGlobal->ZoneCompTurnFansOff)) {
+            (state.dataHVACGlobal->TurnFansOn && !state.dataHVACGlobal->TurnFansOff)) {
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
                 if (state.dataMixedAir->OAController(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex)
                         .HighHumCtrlActive) {
@@ -1462,7 +1458,6 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     // Using/Aliasing
     using Fans::SetFanData;
     using Fans::SimulateFanComponents;
-    using HeatRecovery::SetHeatExchangerData;
     using ScheduleManager::GetScheduleMaxValue;
 
     static constexpr std::string_view RoutineName("SizeStandAloneERV: ");
@@ -1490,12 +1485,12 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     DesignSAFanVolFlowRateUser = 0.0;
     ExhaustAirVolFlowDes = 0.0;
     ExhaustAirVolFlowUser = 0.0;
-    std::string CompType("ZoneHVAC:EnergyRecoveryVentilator");
-    std::string CompName(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name);
+    std::string CompType = "ZoneHVAC:EnergyRecoveryVentilator";
+    std::string CompName = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name;
     bool PrintFlag = true;
     bool ErrorsFound = false;
 
-    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+    auto &ZoneEqSizing = state.dataSize->ZoneEqSizing;
 
     if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow == DataSizing::AutoSize) {
         IsAutoSize = true;
@@ -1635,8 +1630,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
                               true,
                               state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex);
     } else {
-        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->simulate(
-            state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->simulate(state, _, _);
     }
     if (!(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanType_Num == DataHVACGlobals::FanType_SystemModelObject)) {
         SimulateFanComponents(state,
@@ -1644,8 +1638,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
                               true,
                               state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex);
     } else {
-        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->simulate(
-            state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->simulate(state, _, _);
     }
 
     // now reset the ZoneEqSizing variable to NOT use the multiplier for HighRHOAFlowRatio for sizing HXs
@@ -1726,14 +1719,11 @@ void CalcStandAloneERV(EnergyPlusData &state,
                               state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName,
                               FirstHVACIteration,
                               state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex,
-                              _,
-                              state.dataHVACGlobal->ZoneCompTurnFansOn,
-                              state.dataHVACGlobal->ZoneCompTurnFansOff);
+                              _);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate +=
             Fans::GetFanPower(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex);
     } else {
-        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->simulate(
-            state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->simulate(state, _, _);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate +=
             state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->fanPower();
     }
@@ -1742,12 +1732,11 @@ void CalcStandAloneERV(EnergyPlusData &state,
         SimulateFanComponents(state,
                               state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
                               FirstHVACIteration,
-                              state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex); // why no Turn on off flags here?
+                              state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate +=
             Fans::GetFanPower(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex);
     } else {
-        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->simulate(
-            state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+        state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->simulate(state, _, _);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate +=
             state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->fanPower();
     }
@@ -1841,7 +1830,7 @@ void ReportStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum) // n
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ReportingConstant;
 
-    ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseEnergy =
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate * ReportingConstant;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SensCoolingEnergy =
@@ -1914,100 +1903,6 @@ Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
     }
 
     return AirFlowRate;
-}
-
-int GetSupplyAirInletNode(EnergyPlusData &state,
-                          std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
-                          std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
-                          bool &ErrorsFound               // set to true if problem
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   October 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function looks up the ERVCtrlName in the ERV Stand Alone list and returns the
-    // Supply Air Inlet Node Number, if found.  If incorrect name is given, ErrorsFound is returned as true
-    // and Supply Air Inlet Node Number as zero.
-
-    // Return value
-    int AirInletNode(0); // returned air inlet node number of the ERV unit
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichERV;
-
-    if (state.dataHVACStandAloneERV->GetERVInputFlag) {
-        GetStandAloneERV(state);
-        state.dataHVACStandAloneERV->GetERVInputFlag = false;
-    }
-
-    if (UtilityRoutines::SameString(ERVType, "ZoneHVAC:EnergyRecoveryVentilator")) {
-        WhichERV = UtilityRoutines::FindItem(ERVCtrlName, state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
-        if (WhichERV != 0) {
-            AirInletNode = state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirInletNode;
-        }
-    } else {
-        WhichERV = 0;
-    }
-
-    if (WhichERV == 0) {
-        ShowSevereError(state, format("Could not find ZoneHVAC:EnergyRecoveryVentilator with Controller Name=\"{}\"", ERVCtrlName));
-        ErrorsFound = true;
-        AirInletNode = 0;
-    }
-
-    return AirInletNode;
-}
-
-int GetExhaustAirInletNode(EnergyPlusData &state,
-                           std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
-                           std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
-                           bool &ErrorsFound               // set to true if problem
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   October 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function looks up the ERVCtrlName in the ERV Stand Alone list and returns the
-    // Exhaust Air Inlet Node Number, if found.  If incorrect name is given, ErrorsFound is returned as true
-    // and Exhaust Air Inlet Node Number as zero.
-
-    // Return value
-    int AirInletNode(0); // returned air inlet node number of the ERV unit
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichERV;
-
-    if (state.dataHVACStandAloneERV->GetERVInputFlag) {
-        GetStandAloneERV(state);
-        state.dataHVACStandAloneERV->GetERVInputFlag = false;
-    }
-
-    if (UtilityRoutines::SameString(ERVType, "ZoneHVAC:EnergyRecoveryVentilator")) {
-        WhichERV = UtilityRoutines::FindItem(ERVCtrlName, state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
-        if (WhichERV != 0) {
-            AirInletNode = state.dataHVACStandAloneERV->StandAloneERV(WhichERV).ExhaustAirInletNode;
-        }
-    } else {
-        WhichERV = 0;
-    }
-
-    if (WhichERV == 0) {
-        ShowSevereError(state, format("Could not find ZoneHVAC:EnergyRecoveryVentilator with Controller Name=\"{}\"", ERVCtrlName));
-        ErrorsFound = true;
-        AirInletNode = 0;
-    }
-
-    return AirInletNode;
 }
 
 int GetStandAloneERVOutAirNode(EnergyPlusData &state, int const StandAloneERVNum)
@@ -2180,12 +2075,12 @@ bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
 
     for (StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
 
-        auto StandAloneERV = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex);
-        bool ErrorsFound{false};
-        int SupplyFanInletNodeIndex(0);
-        int SupplyFanOutletNodeIndex(0);
-        int ExhaustFanInletNodeIndex(0);
-        int ExhaustFanOutletNodeIndex(0);
+        auto &StandAloneERV = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex);
+        bool ErrorsFound = false;
+        int SupplyFanInletNodeIndex = 0;
+        int SupplyFanOutletNodeIndex = 0;
+        int ExhaustFanInletNodeIndex = 0;
+        int ExhaustFanOutletNodeIndex = 0;
         Real64 SupplyFanAirFlow;
         Real64 ExhaustFanAirFlow;
 

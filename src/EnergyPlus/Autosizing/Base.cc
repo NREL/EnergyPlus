@@ -230,12 +230,9 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
 
     if (this->curSysNum > 0 && this->curSysNum <= this->numPrimaryAirSys) {
         if (this->sysSizingRunDone) {
-            for (auto const &sizingInput : this->sysSizingInputData) {
-                if (sizingInput.AirLoopNum == this->curSysNum) {
-                    this->sizingDesRunThisAirSys = true;
-                    break;
-                }
-            }
+            int sysNum = this->curSysNum;
+            this->sizingDesRunThisAirSys = std::any_of(
+                this->sysSizingInputData.begin(), this->sysSizingInputData.end(), [sysNum](auto const &ssid) { return ssid.AirLoopNum == sysNum; });
         }
         if (allocated(this->unitarySysEqSizing))
             this->airLoopSysFlag =
@@ -250,12 +247,9 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
             this->sizingDesValueFromParent = this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent;
         }
         if (this->zoneSizingRunDone) {
-            for (auto const &sizingInput : this->zoneSizingInput) {
-                if (sizingInput.ZoneNum == this->curZoneEqNum) {
-                    this->sizingDesRunThisZone = true;
-                    break;
-                }
-            }
+            int zoneNum = this->curZoneEqNum;
+            this->sizingDesRunThisZone = std::any_of(
+                this->zoneSizingInput.begin(), this->zoneSizingInput.end(), [zoneNum](auto const &zsi) { return zsi.ZoneNum == zoneNum; });
         }
         this->hardSizeNoDesignRun = false;
     }
@@ -630,10 +624,12 @@ void BaseSizer::overrideSizingString(std::string_view const string)
     this->overrideSizeString = false;
 }
 
-Real64 BaseSizer::setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
+Real64 BaseSizer::setOAFracForZoneEqSizing(const EnergyPlusData &state, Real64 const desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
 {
     Real64 outAirFrac = 0.0;
-    if (desMassFlow <= 0.0) return outAirFrac;
+    if (desMassFlow <= 0.0) {
+        return outAirFrac;
+    }
 
     if (zoneEqSizing.ATMixerVolFlow > 0.0) {
         // set central DOAS AT mixer OA fraction

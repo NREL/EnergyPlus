@@ -68,7 +68,8 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
                                                           const CoilCoolingDXCurveFitSpeedInputSpecification &input_data)
 {
     bool errorsFound(false);
-    static constexpr std::string_view routineName("CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ");
+    static constexpr std::string_view routineName = "CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ";
+    static constexpr std::string_view fieldName = "Part Load Fraction Correlation Curve Name";
     this->original_input_specs = input_data;
     this->name = input_data.name;
     this->active_fraction_of_face_coil_area = input_data.active_fraction_of_coil_face_area;
@@ -151,8 +152,6 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
         }
     }
 
-    std::string fieldName("Part Load Fraction Correlation Curve Name");
-    std::string curveName(input_data.part_load_fraction_correlation_curve_name);
     errorsFound |= this->processCurve(state,
                                       input_data.part_load_fraction_correlation_curve_name,
                                       this->indexPLRFPLF,
@@ -180,16 +179,16 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
             CurveInput += 0.01;
         }
         if (MinCurveVal < 0.7) {
-            ShowWarningError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
-            ShowContinueError(state, "..." + fieldName + "=\"" + curveName + "\" has out of range values.");
+            ShowWarningError(state, format("{}{}=\"{}\", invalid", routineName, this->object_name, this->name));
+            ShowContinueError(state, format("...{}=\"{}\" has out of range value.", fieldName, input_data.part_load_fraction_correlation_curve_name));
             ShowContinueError(state, format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
             ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
             Curve::SetCurveOutputMinValue(state, this->indexPLRFPLF, errorsFound, 0.7);
         }
 
         if (MaxCurveVal > 1.0) {
-            ShowWarningError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
-            ShowContinueError(state, "..." + fieldName + " = " + curveName + " has out of range value.");
+            ShowWarningError(state, format("{}{}=\"{}\", invalid", routineName, this->object_name, this->name));
+            ShowContinueError(state, format("...{}=\"{}\" has out of range value.", fieldName, input_data.part_load_fraction_correlation_curve_name));
             ShowContinueError(state, format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
             ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
             Curve::SetCurveOutputMaxValue(state, this->indexPLRFPLF, errorsFound, 1.0);
@@ -493,15 +492,9 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
         hDelta = TotCap / AirMassFlow;
 
         if (indexSHRFT > 0 && indexSHRFFF > 0) {
-            Real64 SHRTempModFrac = 1.0;
-            if (indexSHRFT > 0) {
-                SHRTempModFrac = max(Curve::CurveValue(state, indexSHRFT, inletWetBulb, inletNode.Temp), 0.0);
-            }
+            Real64 SHRTempModFrac = max(Curve::CurveValue(state, indexSHRFT, inletWetBulb, inletNode.Temp), 0.0);
 
-            Real64 SHRFlowModFrac = 1.0;
-            if (indexSHRFFF > 0) {
-                SHRFlowModFrac = max(Curve::CurveValue(state, indexSHRFFF, AirFF), 0.0);
-            }
+            Real64 SHRFlowModFrac = max(Curve::CurveValue(state, indexSHRFFF, AirFF), 0.0);
 
             SHR = this->grossRatedSHR * SHRTempModFrac * SHRFlowModFrac;
             SHR = max(min(SHR, 1.0), 0.0);

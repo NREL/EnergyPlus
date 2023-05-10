@@ -342,7 +342,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
 
     state->dataMaterial->TotMaterials = 3;
     for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
-        Material::MaterialProperties *p = new Material::MaterialProperties;
+        Material::MaterialChild *p = new Material::MaterialChild;
         state->dataMaterial->Material.push_back(p);
     }
     state->dataMaterial->Material(1)->Name = "GLASS";
@@ -350,9 +350,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     state->dataMaterial->Material(3)->Name = "GLASS";
 
     // Material layer group index
-    state->dataMaterial->Material(1)->Group = Material::MaterialGroup::WindowGlass;
-    state->dataMaterial->Material(2)->Group = Material::MaterialGroup::WindowGas;
-    state->dataMaterial->Material(3)->Group = Material::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(1)->group = Material::Group::WindowGlass;
+    state->dataMaterial->Material(2)->group = Material::Group::WindowGas;
+    state->dataMaterial->Material(3)->group = Material::Group::WindowGlass;
 
     state->dataHeatBal->NominalRforNominalUCalculation.allocate(1);
     state->dataHeatBal->NominalRforNominalUCalculation(1) = 0.0;
@@ -500,7 +500,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeADUNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
@@ -526,7 +526,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1) = 8;
     state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnFlowSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
     state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).InletNodeADUNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitCool.allocate(1);
@@ -720,11 +720,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     EXPECT_FALSE(ErrorsFound);
 
     // check the "Material:RoofVegetation" names
-    EXPECT_EQ(state->dataMaterial->Material(1)->Name, "THICKSOIL");
+    auto const *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
+    EXPECT_EQ(thisMaterial_1->Name, "THICKSOIL");
     // check maximum (saturated) moisture content
-    EXPECT_EQ(0.4, state->dataMaterial->Material(1)->Porosity);
+    EXPECT_EQ(0.4, thisMaterial_1->Porosity);
     // check initial moisture Content was reset
-    EXPECT_EQ(0.4, state->dataMaterial->Material(1)->InitMoisture); // reset from 0.45 to 0.4 during get input
+    EXPECT_EQ(0.4, thisMaterial_1->InitMoisture); // reset from 0.45 to 0.4 during get input
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
@@ -1779,7 +1780,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
     Material::GetMaterialData(*state, errorsfound);
 
     EXPECT_FALSE(errorsfound);
-    EXPECT_NEAR(state->dataMaterial->Material(1)->Resistance, 0.158, 0.0001);
+    EXPECT_NEAR(dynamic_cast<const Material::MaterialChild *>(state->dataMaterial->Material(1))->Resistance, 0.158, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
@@ -2582,7 +2583,7 @@ TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput)
     state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * Constant::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
@@ -2635,7 +2636,7 @@ TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     state->dataSurface->Surface(2).HasShadeControl = false;
-    state->dataMaterial->Material(3)->Group = Material::MaterialGroup::Screen;
+    state->dataMaterial->Material(3)->group = Material::Group::Screen;
     GetIncidentSolarMultiplier(*state, ErrorsFound);
     error_string =
         delimited_string({"   ** Severe  ** Non-compatible shades defined alongside SurfaceProperty:IncidentSolarMultiplier for the same window"});

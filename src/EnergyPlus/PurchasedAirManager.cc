@@ -263,7 +263,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             // get optional  availability schedule
             PurchAir(PurchAirNum).AvailSched = state.dataIPShortCut->cAlphaArgs(2);
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                PurchAir(PurchAirNum).AvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                PurchAir(PurchAirNum).AvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 PurchAir(PurchAirNum).AvailSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (PurchAir(PurchAirNum).AvailSchedPtr == 0) {
@@ -409,7 +409,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             // get optional heating availability schedule
             PurchAir(PurchAirNum).HeatSched = state.dataIPShortCut->cAlphaArgs(8);
             if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                PurchAir(PurchAirNum).HeatSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                PurchAir(PurchAirNum).HeatSchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 PurchAir(PurchAirNum).HeatSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
                 if (PurchAir(PurchAirNum).HeatSchedPtr == 0) {
@@ -423,7 +423,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             // get optional cooling availability schedule
             PurchAir(PurchAirNum).CoolSched = state.dataIPShortCut->cAlphaArgs(9);
             if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                PurchAir(PurchAirNum).CoolSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                PurchAir(PurchAirNum).CoolSchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 PurchAir(PurchAirNum).CoolSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
                 if (PurchAir(PurchAirNum).CoolSchedPtr == 0) {
@@ -486,8 +486,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             if (PurchAir(PurchAirNum).OutdoorAir) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                     // If there is outdoor air and outdoor air inlet node is blank, then create one
-                    if (len(state.dataIPShortCut->cAlphaArgs(1)) <
-                        DataGlobalConstants::MaxNameLength - 23) { // protect against long name leading to > 100 chars
+                    if (len(state.dataIPShortCut->cAlphaArgs(1)) < Constant::MaxNameLength - 23) { // protect against long name leading to > 100 chars
                         state.dataIPShortCut->cAlphaArgs(13) = state.dataIPShortCut->cAlphaArgs(1) + " OUTDOOR AIR INLET NODE";
                     } else {
                         state.dataIPShortCut->cAlphaArgs(13) = state.dataIPShortCut->cAlphaArgs(1).substr(0, 75) + " OUTDOOR AIR INLET NODE";
@@ -699,10 +698,10 @@ void GetPurchasedAir(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             PurchAir(PurchAirNum).Name,
-                            _,
+                            {},
                             "DISTRICTHEATING",
                             "Heating",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Sensible Cooling Energy",
@@ -725,10 +724,10 @@ void GetPurchasedAir(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             PurchAir(PurchAirNum).Name,
-                            _,
+                            {},
                             "DISTRICTCOOLING",
                             "Cooling",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Sensible Heating Energy",
@@ -3176,12 +3175,9 @@ void ReportPurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     // Calculate values of report variables, if necessary.
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 ReportingConstant;
 
     // Sort out heating and cooling rates
     PurchAir(PurchAirNum).SenHeatRate = max(PurchAir(PurchAirNum).SenCoilLoad, 0.0);
@@ -3232,35 +3228,33 @@ void ReportPurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     PurchAir(PurchAirNum).HtRecTotHeatRate = PurchAir(PurchAirNum).HtRecSenHeatRate + PurchAir(PurchAirNum).HtRecLatHeatRate;
     PurchAir(PurchAirNum).HtRecTotCoolRate = PurchAir(PurchAirNum).HtRecSenCoolRate + PurchAir(PurchAirNum).HtRecLatCoolRate;
 
-    ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
+    PurchAir(PurchAirNum).SenHeatEnergy = PurchAir(PurchAirNum).SenHeatRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).SenCoolEnergy = PurchAir(PurchAirNum).SenCoolRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).LatHeatEnergy = PurchAir(PurchAirNum).LatHeatRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).LatCoolEnergy = PurchAir(PurchAirNum).LatCoolRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).TotHeatEnergy = PurchAir(PurchAirNum).TotHeatRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).TotCoolEnergy = PurchAir(PurchAirNum).TotCoolRate * TimeStepSysSec;
 
-    PurchAir(PurchAirNum).SenHeatEnergy = PurchAir(PurchAirNum).SenHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).SenCoolEnergy = PurchAir(PurchAirNum).SenCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).LatHeatEnergy = PurchAir(PurchAirNum).LatHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).LatCoolEnergy = PurchAir(PurchAirNum).LatCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).TotHeatEnergy = PurchAir(PurchAirNum).TotHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).TotCoolEnergy = PurchAir(PurchAirNum).TotCoolRate * ReportingConstant;
+    PurchAir(PurchAirNum).ZoneSenHeatEnergy = PurchAir(PurchAirNum).ZoneSenHeatRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).ZoneSenCoolEnergy = PurchAir(PurchAirNum).ZoneSenCoolRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).ZoneLatHeatEnergy = PurchAir(PurchAirNum).ZoneLatHeatRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).ZoneLatCoolEnergy = PurchAir(PurchAirNum).ZoneLatCoolRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).ZoneTotHeatEnergy = PurchAir(PurchAirNum).ZoneTotHeatRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).ZoneTotCoolEnergy = PurchAir(PurchAirNum).ZoneTotCoolRate * TimeStepSysSec;
 
-    PurchAir(PurchAirNum).ZoneSenHeatEnergy = PurchAir(PurchAirNum).ZoneSenHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).ZoneSenCoolEnergy = PurchAir(PurchAirNum).ZoneSenCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).ZoneLatHeatEnergy = PurchAir(PurchAirNum).ZoneLatHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).ZoneLatCoolEnergy = PurchAir(PurchAirNum).ZoneLatCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).ZoneTotHeatEnergy = PurchAir(PurchAirNum).ZoneTotHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).ZoneTotCoolEnergy = PurchAir(PurchAirNum).ZoneTotCoolRate * ReportingConstant;
+    PurchAir(PurchAirNum).OASenHeatEnergy = PurchAir(PurchAirNum).OASenHeatRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).OASenCoolEnergy = PurchAir(PurchAirNum).OASenCoolRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).OALatHeatEnergy = PurchAir(PurchAirNum).OALatHeatRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).OALatCoolEnergy = PurchAir(PurchAirNum).OALatCoolRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).OATotHeatEnergy = PurchAir(PurchAirNum).OATotHeatRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).OATotCoolEnergy = PurchAir(PurchAirNum).OATotCoolRate * TimeStepSysSec;
 
-    PurchAir(PurchAirNum).OASenHeatEnergy = PurchAir(PurchAirNum).OASenHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).OASenCoolEnergy = PurchAir(PurchAirNum).OASenCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).OALatHeatEnergy = PurchAir(PurchAirNum).OALatHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).OALatCoolEnergy = PurchAir(PurchAirNum).OALatCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).OATotHeatEnergy = PurchAir(PurchAirNum).OATotHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).OATotCoolEnergy = PurchAir(PurchAirNum).OATotCoolRate * ReportingConstant;
-
-    PurchAir(PurchAirNum).HtRecSenHeatEnergy = PurchAir(PurchAirNum).HtRecSenHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).HtRecSenCoolEnergy = PurchAir(PurchAirNum).HtRecSenCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).HtRecLatHeatEnergy = PurchAir(PurchAirNum).HtRecLatHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).HtRecLatCoolEnergy = PurchAir(PurchAirNum).HtRecLatCoolRate * ReportingConstant;
-    PurchAir(PurchAirNum).HtRecTotHeatEnergy = PurchAir(PurchAirNum).HtRecTotHeatRate * ReportingConstant;
-    PurchAir(PurchAirNum).HtRecTotCoolEnergy = PurchAir(PurchAirNum).HtRecTotCoolRate * ReportingConstant;
+    PurchAir(PurchAirNum).HtRecSenHeatEnergy = PurchAir(PurchAirNum).HtRecSenHeatRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).HtRecSenCoolEnergy = PurchAir(PurchAirNum).HtRecSenCoolRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).HtRecLatHeatEnergy = PurchAir(PurchAirNum).HtRecLatHeatRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).HtRecLatCoolEnergy = PurchAir(PurchAirNum).HtRecLatCoolRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).HtRecTotHeatEnergy = PurchAir(PurchAirNum).HtRecTotHeatRate * TimeStepSysSec;
+    PurchAir(PurchAirNum).HtRecTotCoolEnergy = PurchAir(PurchAirNum).HtRecTotCoolRate * TimeStepSysSec;
 }
 
 Real64 GetPurchasedAirOutAirMassFlow(EnergyPlusData &state, int const PurchAirNum)

@@ -163,18 +163,18 @@ void CheckThisZoneForSizing(EnergyPlusData &state,
                             bool &ZoneWasSized);
 
 void ValidateComponent(EnergyPlusData &state,
-                       std::string_view CompType,    // Component Type (e.g. Chiller:Electric)
-                       std::string const &CompName,  // Component Name (e.g. Big Chiller)
-                       bool &IsNotOK,                // .TRUE. if this component pair is invalid
-                       std::string const &CallString // Context of this pair -- for error message
+                       std::string_view CompType,   // Component Type (e.g. Chiller:Electric)
+                       std::string const &CompName, // Component Name (e.g. Big Chiller)
+                       bool &IsNotOK,               // .TRUE. if this component pair is invalid
+                       std::string_view CallString  // Context of this pair -- for error message
 );
 
 void ValidateComponent(EnergyPlusData &state,
-                       std::string const &CompType,    // Component Type (e.g. Chiller:Electric)
+                       std::string_view CompType,      // Component Type (e.g. Chiller:Electric)
                        std::string const &CompValType, // Component "name" field type
                        std::string const &CompName,    // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                  // .TRUE. if this component pair is invalid
-                       std::string const &CallString   // Context of this pair -- for error message
+                       std::string_view CallString     // Context of this pair -- for error message
 );
 
 void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
@@ -188,10 +188,10 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Real64 const Tilt,             // Tilt of gap [Degrees]
                                   Real64 const AspRat,           // aspect ratio of gap  Height/gap [--]
                                   Real64 const GapThick,         // Thickness of air space between baffle and underlying heat transfer surface
-                                  DataSurfaces::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
-                                  Real64 const QdotSource,                        // Source/sink term, e.g. electricity exported from solar cell [W]
-                                  Real64 &TsBaffle,                               // Temperature of baffle (both sides) use lagged value on input [C]
-                                  Real64 &TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
+                                  Material::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                                  Real64 const QdotSource,                    // Source/sink term, e.g. electricity exported from solar cell [W]
+                                  Real64 &TsBaffle,                           // Temperature of baffle (both sides) use lagged value on input [C]
+                                  Real64 &TaGap,                              // Temperature of air gap (assumed mixed) use lagged value on input [C]
                                   ObjexxFCL::Optional<Real64> HcGapRpt = _,
                                   ObjexxFCL::Optional<Real64> HrGapRpt = _,
                                   ObjexxFCL::Optional<Real64> IscRpt = _,

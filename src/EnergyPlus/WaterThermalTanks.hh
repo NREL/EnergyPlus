@@ -203,50 +203,6 @@ namespace WaterThermalTanks {
         Num
     };
 
-    enum class Fuel
-    {
-        Invalid = -1,
-        Electricity,
-        NaturalGas,
-        Diesel,
-        Gasoline,
-        Coal,
-        FuelOilNo1,
-        FuelOilNo2,
-        Propane,
-        Steam,
-        OtherFuel1,
-        OtherFuel2,
-        DistrictHeating,
-        Num
-    };
-
-    constexpr std::array<std::string_view, static_cast<int>(Fuel::Num)> FuelTypeNames{"Electricity",
-                                                                                      "NaturalGas",
-                                                                                      "Diesel",
-                                                                                      "Gasoline",
-                                                                                      "Coal",
-                                                                                      "FuelOilNo1",
-                                                                                      "FuelOilNo2",
-                                                                                      "Propane",
-                                                                                      "Steam",
-                                                                                      "OtherFuel1",
-                                                                                      "OtherFuel2",
-                                                                                      "DistrictHeating"};
-
-    constexpr std::array<std::string_view, static_cast<int>(Fuel::Num)> FuelTypeNamesUC{"ELECTRICITY",
-                                                                                        "NATURALGAS",
-                                                                                        "DIESEL",
-                                                                                        "GASOLINE",
-                                                                                        "COAL",
-                                                                                        "FUELOILNO1",
-                                                                                        "FUELOILNO2",
-                                                                                        "PROPANE",
-                                                                                        "STEAM",
-                                                                                        "OTHERFUEL1",
-                                                                                        "OTHERFUEL2",
-                                                                                        "DISTRICTHEATING"};
-
     enum class TankOperatingMode
     {
         Invalid = -1,
@@ -487,10 +443,10 @@ namespace WaterThermalTanks {
               HPWaterHeaterSensibleCapacity(0.0), HPWaterHeaterLatentCapacity(0.0), WrappedCondenserBottomLocation(0.0),
               WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), ControlSensor1Node(1), ControlSensor1Weight(1.0),
               ControlSensor2Height(-1.0), ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0), ControlTempFinal(0.0),
-              AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              HPWHAirMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), HPWHWaterVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              HPWHWaterMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSAirSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSWaterSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0), bIsIHP(false), MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true),
+              AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              HPWHAirMassFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0), HPWHWaterVolFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              HPWHWaterMassFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0), MSAirSpeedRatio(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSWaterSpeedRatio(DataHVACGlobals::MaxSpeedLevels, 0.0), bIsIHP(false), MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true),
               CheckHPWHEquipName(true), myOneTimeInitFlag(true)
         {
         }
@@ -541,7 +497,7 @@ namespace WaterThermalTanks {
         TankOperatingMode SavedMode = TankOperatingMode::Floating; // Mode indicator saved from previous time step
         HeaterControlMode ControlType;                             // Indicator for Heater Control type
         PriorityControlMode StratifiedControlMode;                 // Indicator for Stratified Water Heaters Priority Control Type
-        Fuel FuelType;                                             // Fuel type
+        Constant::eResource FuelType;                              // Fuel type
         Real64 MaxCapacity;                                        // Maximum capacity of auxiliary heater 1 (W)
         bool MaxCapacityWasAutoSized;                              // true if heater 1 capacity was autosized on input
         Real64 MinCapacity;                                        // Minimum capacity of auxiliary heater 1 (W)
@@ -553,10 +509,10 @@ namespace WaterThermalTanks {
         Real64 TankTempLimit;                                      // Maximum tank temperature limit before venting (C)
         Real64 IgnitionDelay;                                      // Time delay before heater is allowed to turn on (s)
         Real64 OffCycParaLoad;                                     // Rate for off-cycle parasitic load (W)
-        Fuel OffCycParaFuelType;                                   // Fuel type for off-cycle parasitic load
+        Constant::eResource OffCycParaFuelType;                    // Fuel type for off-cycle parasitic load
         Real64 OffCycParaFracToTank;                               // Fraction of off-cycle parasitic energy ending up in tank (W)
         Real64 OnCycParaLoad;                                      // Rate for on-cycle parasitic load (W)
-        Fuel OnCycParaFuelType;                                    // Fuel type for on-cycle parasitic load
+        Constant::eResource OnCycParaFuelType;                     // Fuel type for on-cycle parasitic load
         Real64 OnCycParaFracToTank;                                // Fraction of on-cycle parasitic energy ending up in tank (W)
         DataPlant::FlowLock UseCurrentFlowLock;                    // current flow lock setting on use side
         int UseInletNode;                                          // Inlet node on the use side; colder water returning to a hottank

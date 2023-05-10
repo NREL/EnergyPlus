@@ -202,7 +202,7 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
 
         FluidDensityInit = GetDensityGlycol(state,
                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                            DataGlobalConstants::InitConvTemp,
+                                            Constant::InitConvTemp,
                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                             RoutineName);
 
@@ -273,9 +273,9 @@ void PlantProfileData::ReportPlantProfile(EnergyPlusData &state)
     // Calculates report variables.
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
-    this->Energy = this->Power * TimeStepSys * DataGlobalConstants::SecInHour;
+    this->Energy = this->Power * TimeStepSysSec;
 
     if (this->Energy >= 0.0) {
         this->HeatingEnergy = this->Energy;
@@ -431,10 +431,10 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "Heating",
-                                _,
+                                {},
                                 "Plant"); // is EndUseKey right?
 
             SetupOutputVariable(state,
@@ -444,10 +444,10 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "Heating",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -457,10 +457,10 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "Cooling",
-                                _,
+                                {},
                                 "Plant");
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {

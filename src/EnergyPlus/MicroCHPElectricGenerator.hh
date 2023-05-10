@@ -218,8 +218,7 @@ namespace MicroCHPElectricGenerator {
                                                    bool RunFlagElectCenter, // TRUE when Generator operating
                                                    bool RunFlagPlant,
                                                    Real64 MyElectricLoad, // Generator demand
-                                                   Real64 MyThermalLoad,
-                                                   bool FirstHVACIteration);
+                                                   Real64 MyThermalLoad);
 
         void UpdateMicroCHPGeneratorRecords(EnergyPlusData &state);
 

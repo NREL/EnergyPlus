@@ -537,7 +537,7 @@ namespace Psychrometrics {
         // Wylan & Sontag, Fundamentals of Classical Thermodynamics.
         // ASHRAE handbook 1985 Fundamentals, Ch. 6, eqn. (6),(26)
 
-        Real64 const rhoair(pb / (287.0 * (tdb + DataGlobalConstants::KelvinConv) * (1.0 + 1.6077687 * max(dw, 1.0e-5))));
+        Real64 const rhoair(pb / (287.0 * (tdb + Constant::KelvinConv) * (1.0 + 1.6077687 * max(dw, 1.0e-5))));
 #ifdef EP_psych_errors
         if (rhoair < 0.0) PsyRhoAirFnPbTdbW_error(state, pb, tdb, dw, rhoair, CalledFrom);
 #endif
@@ -568,7 +568,7 @@ namespace Psychrometrics {
         // Wylan & Sontag, Fundamentals of Classical Thermodynamics.
         // ASHRAE handbook 1985 Fundamentals, Ch. 6, eqn. (6),(26)
 
-        return (pb / (287.0 * (tdb + DataGlobalConstants::KelvinConv) * (1.0 + 1.6077687 * std::max(dw, 1.0e-5))));
+        return (pb / (287.0 * (tdb + Constant::KelvinConv) * (1.0 + 1.6077687 * std::max(dw, 1.0e-5))));
     }
 
     inline Real64 PsyRhoAirFnPbTdbW_fast([[maybe_unused]] EnergyPlusData &state,
@@ -579,7 +579,7 @@ namespace Psychrometrics {
     {
         // Faster version with humidity ratio already adjusted
         assert(dw >= 1.0e-5);
-        Real64 const rhoair(pb / (287.0 * (tdb + DataGlobalConstants::KelvinConv) * (1.0 + 1.6077687 * dw)));
+        Real64 const rhoair(pb / (287.0 * (tdb + Constant::KelvinConv) * (1.0 + 1.6077687 * dw)));
 #ifdef EP_psych_errors
         if (rhoair < 0.0) PsyRhoAirFnPbTdbW_error(state, pb, tdb, dw, rhoair);
 #endif
@@ -775,8 +775,8 @@ namespace Psychrometrics {
         // REFERENCES:
         // ASHRAE handbook 1993 Fundamentals,
 
-        return RH / (461.52 * (Tdb + DataGlobalConstants::KelvinConv)) *
-               std::exp(23.7093 - 4111.0 / ((Tdb + DataGlobalConstants::KelvinConv) - 35.45)); // Vapor density in air
+        return RH / (461.52 * (Tdb + Constant::KelvinConv)) *
+               std::exp(23.7093 - 4111.0 / ((Tdb + Constant::KelvinConv) - 35.45)); // Vapor density in air
     }
 
     inline Real64 PsyRhovFnTdbWPb(Real64 const Tdb, // dry-bulb temperature {C}
@@ -802,7 +802,7 @@ namespace Psychrometrics {
         // ASHRAE handbook 1993 Fundamentals,
 
         Real64 const W(max(dW, 1.0e-5)); // humidity ratio
-        return W * PB / (461.52 * (Tdb + DataGlobalConstants::KelvinConv) * (W + 0.62198));
+        return W * PB / (461.52 * (Tdb + Constant::KelvinConv) * (W + 0.62198));
     }
 
     inline Real64 PsyRhovFnTdbWPb_fast(Real64 const Tdb, // dry-bulb temperature {C}
@@ -812,7 +812,7 @@ namespace Psychrometrics {
     {
         // Faster version with humidity ratio already adjusted
         assert(dW >= 1.0e-5);
-        return dW * PB / (461.52 * (Tdb + DataGlobalConstants::KelvinConv) * (dW + 0.62198));
+        return dW * PB / (461.52 * (Tdb + Constant::KelvinConv) * (dW + 0.62198));
     }
 
 #ifdef EP_psych_errors
@@ -853,8 +853,8 @@ namespace Psychrometrics {
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::RhFnTdbRhovLBnd0C)];
 #endif
 
-        Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + DataGlobalConstants::KelvinConv) *
-                                                  std::exp(-23.7093 + 4111.0 / ((Tdb + DataGlobalConstants::KelvinConv) - 35.45))
+        Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + Constant::KelvinConv) *
+                                                  std::exp(-23.7093 + 4111.0 / ((Tdb + Constant::KelvinConv) - 35.45))
                                             : 0.0);
 
         if ((RHValue < 0.0) || (RHValue > 1.0)) {
@@ -1034,6 +1034,7 @@ namespace Psychrometrics {
 
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
+        // cppcheck-suppress invalidPointerCast
         Int64 Tdb_tag(*reinterpret_cast<Int64 const *>(&T) >> Grid_Shift);
         DISABLE_WARNING_POP
         Int64 const hash(Tdb_tag & psatcache_mask);
@@ -1044,6 +1045,7 @@ namespace Psychrometrics {
             Tdb_tag <<= Grid_Shift;
             DISABLE_WARNING_PUSH
             DISABLE_WARNING_STRICT_ALIASING
+            // cppcheck-suppress invalidPointerCast
             Real64 Tdb_tag_r = *reinterpret_cast<Real64 const *>(&Tdb_tag);
             DISABLE_WARNING_POP
             cPsat.Psat = PsyPsatFnTemp_raw(state, Tdb_tag_r, CalledFrom);
@@ -1091,7 +1093,9 @@ namespace Psychrometrics {
 #endif
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
+        // cppcheck-suppress invalidPointerCast
         Int64 H_tag = *reinterpret_cast<Int64 const *>(&H) >> Grid_Shift;
+        // cppcheck-suppress invalidPointerCast
         Int64 Pb_tag = *reinterpret_cast<Int64 const *>(&Pb) >> Grid_Shift;
         DISABLE_WARNING_POP
         Int64 hash = (H_tag ^ Pb_tag) & Int64(tsat_hbp_cache_size - 1);
@@ -1143,7 +1147,7 @@ namespace Psychrometrics {
         // Used values from Table 2, HOF 2005, Chapter 6, to verify that these values match (at saturation)
         // values from PsyRhFnTdbWPb
 
-        return (PsyPsatFnTemp(state, Tdb, CalledFrom) * RH) / (461.52 * (Tdb + DataGlobalConstants::KelvinConv)); // Vapor density in air
+        return (PsyPsatFnTemp(state, Tdb, CalledFrom) * RH) / (461.52 * (Tdb + Constant::KelvinConv)); // Vapor density in air
     }
 
 #ifdef EP_psych_errors
@@ -1185,7 +1189,7 @@ namespace Psychrometrics {
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::RhFnTdbRhov)];
 #endif
 
-        Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + DataGlobalConstants::KelvinConv) /
+        Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + Constant::KelvinConv) /
                                                   PsyPsatFnTemp(state, Tdb, PsyRoutineNames[static_cast<int>(PsychrometricFunction::RhFnTdbRhov)])
                                             : 0.0);
 
@@ -1491,6 +1495,7 @@ namespace Psychrometrics {
         std::uint64_t Grid_Shift = 64 - 12 - state.dataPsychCache->tsatprecision_bits;
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
+        // cppcheck-suppress invalidPointerCast
         Int64 const Pb_tag(*reinterpret_cast<Int64 const *>(&Press) >> Grid_Shift);
         DISABLE_WARNING_POP
 

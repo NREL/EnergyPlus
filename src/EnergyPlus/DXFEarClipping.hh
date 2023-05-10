@@ -133,7 +133,7 @@ namespace DXFEarClipping {
                                            Array1D<Real64> &yvt,
                                            Array1D<Real64> &zvt);
 
-    void reorder(int &nvert); // unused1208
+    // void reorder(int &nvert); // unused1208
 
 } // namespace DXFEarClipping
 

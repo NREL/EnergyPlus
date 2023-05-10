@@ -79,7 +79,6 @@ set(test_src
     DOASEffectOnZoneSizing.unit.cc
     DXCoils.unit.cc
     DataEnvironment.unit.cc
-    DataGlobalConstants.unit.cc
     DataHeatBalance.unit.cc
     DataPlant.unit.cc
     DataRuntimeLanguage.unit.cc
@@ -175,6 +174,7 @@ set(test_src
     PVWatts.unit.cc
     PackagedTerminalHeatPump.unit.cc
     Photovoltaics.unit.cc
+    PhotovoltaicThermalCollectors.unit.cc
     PierceSurface.unit.cc
     Pipes.unit.cc
     Plant/Branch.unit.cc
@@ -223,6 +223,7 @@ set(test_src
     StringUtilities.unit.cc
     SurfaceGeometry.unit.cc
     SurfaceOctree.unit.cc
+    SurfaceGroundHeatExchanger.unit.cc
     SwimmingPool.unit.cc
     SystemAvailabilityManager.unit.cc
     SystemReports.unit.cc

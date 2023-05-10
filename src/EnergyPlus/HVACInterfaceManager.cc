@@ -545,8 +545,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     // tank. Note that this routine is called repeatedly to re calculate
     // loop capacitance based on current plant conditions
 
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
@@ -580,7 +579,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     // tank conditions each call.
     // Analytical solution for ODE, formulated for both final tank temp and average tank temp.
 
-    Real64 TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSeconds = state.dataHVACGlobal->TimeStepSysSec;
     Real64 MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
     Real64 PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TotalPumpHeat;
     Real64 ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
@@ -666,8 +665,7 @@ void UpdateCommonPipe(EnergyPlusData &state,
     // loop capacitance based on current plant conditions
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("UpdateCommonPipe");
@@ -715,7 +713,7 @@ void UpdateCommonPipe(EnergyPlusData &state,
     // no common pipe case.
     // calculation is separated because for common pipe, a different split for mass fraction is applied
     // The pump heat source is swapped around here compared to no common pipe (so pump heat sort stays on its own side).
-    Real64 TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSeconds = state.dataHVACGlobal->TimeStepSysSec;
     Real64 MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
     Real64 PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).TotalPumpHeat;
     Real64 ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
@@ -787,7 +785,7 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     // called from "Demand to Supply" interface or "Supply to Demand" interface. Update the node temperatures
     // accordingly.
 
-    auto &PlantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe);
+    auto &PlantCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe;
 
     // One time call to set up report variables and set common pipe 'type' flag
     if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
@@ -798,15 +796,14 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     int NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
     int NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
 
-    auto &MyEnvrnFlag(PlantCommonPipe(LoopNum).MyEnvrnFlag);
-    if (MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
+    if (PlantCommonPipe(LoopNum).MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         PlantCommonPipe(LoopNum).Flow = 0.0;
         PlantCommonPipe(LoopNum).Temp = 0.0;
         PlantCommonPipe(LoopNum).FlowDir = NoRecircFlow;
-        MyEnvrnFlag = false;
+        PlantCommonPipe(LoopNum).MyEnvrnFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        MyEnvrnFlag = true;
+        PlantCommonPipe(LoopNum).MyEnvrnFlag = true;
     }
 
     // every time inits
@@ -927,17 +924,16 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
     int const NodeNumSecOut = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
 
     // begin environment inits
-    auto &MyEnvrnFlag(plantCommonPipe.MyEnvrnFlag);
-    if (MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
+    if (plantCommonPipe.MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         plantCommonPipe.PriToSecFlow = 0.0;
         plantCommonPipe.SecToPriFlow = 0.0;
         plantCommonPipe.PriCPLegFlow = 0.0;
         plantCommonPipe.SecCPLegFlow = 0.0;
-        MyEnvrnFlag = false;
+        plantCommonPipe.MyEnvrnFlag = false;
     }
 
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        MyEnvrnFlag = true;
+        plantCommonPipe.MyEnvrnFlag = true;
     }
 
     // every time inits
@@ -1120,8 +1116,8 @@ void SetupCommonPipes(EnergyPlusData &state)
         // reference to easily lookup the first item once
         auto &thisPlantLoop = state.dataPlnt->PlantLoop(CurLoopNum);
         auto &thisCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe(CurLoopNum);
-        auto &first_demand_component_type(thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type);
-        auto &first_supply_component_type(thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type);
+        auto const &first_demand_component_type = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type;
+        auto const &first_supply_component_type = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type;
 
         switch (thisPlantLoop.CommonPipeType) {
         case DataPlant::CommonPipeType::No:

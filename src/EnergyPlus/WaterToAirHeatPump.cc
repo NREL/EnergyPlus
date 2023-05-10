@@ -351,8 +351,7 @@ namespace WaterToAirHeatPump {
             heatPump.LoadSideTotalUACoeff = NumArray(7);
             heatPump.LoadSideOutsideUACoeff = NumArray(8);
 
-            if ((heatPump.LoadSideOutsideUACoeff < DataGlobalConstants::rTinyValue) ||
-                (heatPump.LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue)) {
+            if ((heatPump.LoadSideOutsideUACoeff < Constant::rTinyValue) || (heatPump.LoadSideTotalUACoeff < Constant::rTinyValue)) {
                 ShowSevereError(state, format("Input problem for {}={}", CurrentModuleObject, heatPump.Name));
                 ShowContinueError(state, " One or both load side UA values entered are below tolerance, likely zero or blank.");
                 ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
@@ -410,10 +409,10 @@ namespace WaterToAirHeatPump {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatPump.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
@@ -422,10 +421,10 @@ namespace WaterToAirHeatPump {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatPump.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
@@ -448,10 +447,10 @@ namespace WaterToAirHeatPump {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatPump.Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // save the design source side flow rate for use by plant loop sizing algorithms
@@ -536,7 +535,7 @@ namespace WaterToAirHeatPump {
                                                           ObjectIsNotParent);
 
             heatPump.LoadSideTotalUACoeff = NumArray(5);
-            if (heatPump.LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue) {
+            if (heatPump.LoadSideTotalUACoeff < Constant::rTinyValue) {
                 ShowSevereError(state, format("Input problem for {}={}", CurrentModuleObject, heatPump.Name));
                 ShowContinueError(state, " Load side UA value is less than tolerance, likely zero or blank.");
                 ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
@@ -592,10 +591,10 @@ namespace WaterToAirHeatPump {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatPump.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
@@ -604,10 +603,10 @@ namespace WaterToAirHeatPump {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatPump.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
@@ -616,10 +615,10 @@ namespace WaterToAirHeatPump {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatPump.Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // save the design source side flow rate for use by plant loop sizing algorithms
@@ -938,7 +937,7 @@ namespace WaterToAirHeatPump {
             ScanPlantLoopsForObject(state, heatPump.Name, heatPump.WAHPType, heatPump.plantLoc, errFlag, _, _, _, _, _);
 
             if (state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidName == "WATER") {
-                if (heatPump.SourceSideUACoeff < DataGlobalConstants::rTinyValue) {
+                if (heatPump.SourceSideUACoeff < Constant::rTinyValue) {
                     ShowSevereError(state, format("Input problem for water to air heat pump, \"{}\".", heatPump.Name));
                     ShowContinueError(state, " Source side UA value is less than tolerance, likely zero or blank.");
                     ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
@@ -946,7 +945,7 @@ namespace WaterToAirHeatPump {
                     errFlag = true;
                 }
             } else {
-                if ((heatPump.SourceSideHTR1 < DataGlobalConstants::rTinyValue) || (heatPump.SourceSideHTR2 < DataGlobalConstants::rTinyValue)) {
+                if ((heatPump.SourceSideHTR1 < Constant::rTinyValue) || (heatPump.SourceSideHTR2 < Constant::rTinyValue)) {
                     ShowSevereError(state, format("Input problem for water to air heat pump, \"{}\".", heatPump.Name));
                     ShowContinueError(state, " A source side heat transfer resistance value is less than tolerance, likely zero or blank.");
                     ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
@@ -997,12 +996,12 @@ namespace WaterToAirHeatPump {
             // The rest of the one time initializations
             rho = GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidName,
-                                   DataGlobalConstants::InitConvTemp,
+                                   Constant::InitConvTemp,
                                    state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidIndex,
                                    RoutineName);
             Cp = GetSpecificHeatGlycol(state,
                                        state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidName,
-                                       DataGlobalConstants::InitConvTemp,
+                                       Constant::InitConvTemp,
                                        state.dataPlnt->PlantLoop(heatPump.plantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
@@ -2098,14 +2097,10 @@ namespace WaterToAirHeatPump {
         // Data is moved from the HP data structure to the HP outlet nodes.
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         auto &heatPump = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum);
         using PlantUtilities::SafeCopyPlantNode;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 ReportingConstant;
-
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // WatertoAirHP(HPNum)%SimFlag=.FALSE.
         if (!heatPump.SimFlag) {
             // Heatpump is off; just pass through conditions
@@ -2157,11 +2152,11 @@ namespace WaterToAirHeatPump {
         heatPump.InletAirMassFlowRate = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).MassFlowRate;
         heatPump.OutletAirMassFlowRate = heatPump.InletAirMassFlowRate;
 
-        heatPump.Energy = heatPump.Power * ReportingConstant;
-        heatPump.EnergyLoadTotal = heatPump.QLoadTotal * ReportingConstant;
-        heatPump.EnergySensible = heatPump.QSensible * ReportingConstant;
-        heatPump.EnergyLatent = heatPump.QLatent * ReportingConstant;
-        heatPump.EnergySource = heatPump.QSource * ReportingConstant;
+        heatPump.Energy = heatPump.Power * TimeStepSysSec;
+        heatPump.EnergyLoadTotal = heatPump.QLoadTotal * TimeStepSysSec;
+        heatPump.EnergySensible = heatPump.QSensible * TimeStepSysSec;
+        heatPump.EnergyLatent = heatPump.QLatent * TimeStepSysSec;
+        heatPump.EnergySource = heatPump.QSource * TimeStepSysSec;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             state.dataLoopNodes->Node(heatPump.AirOutletNodeNum).CO2 = state.dataLoopNodes->Node(heatPump.AirInletNodeNum).CO2;

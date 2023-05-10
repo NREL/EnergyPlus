@@ -52,6 +52,7 @@
 #include "FileSystem.hh"
 #include "InputProcessing/EmbeddedEpJSONSchema.hh"
 #include "InputProcessing/InputProcessor.hh"
+#include "ResultsFramework.hh"
 #include "UtilityRoutines.hh"
 
 #include <algorithm>
@@ -109,7 +110,7 @@ std::string InputFile::readFile()
 
 nlohmann::json InputFile::readJSON()
 {
-    auto const ext = FileSystem::getFileType(filePath);
+    FileSystem::FileTypes const ext = FileSystem::getFileType(filePath);
     switch (ext) {
     case FileSystem::FileTypes::EpJSON:
     case FileSystem::FileTypes::JSON:
@@ -147,7 +148,7 @@ void InputFile::open(bool, bool)
 
 std::string InputFile::error_state_to_string() const
 {
-    const auto state = rdstate();
+    const std::istream::iostate state = rdstate();
 
     if (!is_open()) {
         return "file not opened'";
@@ -297,7 +298,7 @@ std::vector<std::string> InputOutputFile::getLines()
     if (os) {
         // avoid saving and reloading the file by simply reading the current input stream
         os->flush();
-        const auto last_pos = os->tellg();
+        const size_t last_pos = os->tellg();
         std::string line;
         std::vector<std::string> lines;
         os->seekg(0);
@@ -316,8 +317,9 @@ std::vector<std::string> InputOutputFile::getLines()
 
 void IOFiles::OutputControl::getInput(EnergyPlusData &state)
 {
-    auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find("OutputControl:Files");
-    if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+    auto &ip = state.dataInputProcessing->inputProcessor;
+    auto const instances = ip->epJSON.find("OutputControl:Files");
+    if (instances != ip->epJSON.end()) {
 
         auto find_input = [=, &state](nlohmann::json const &fields, std::string const &field_name) -> std::string {
             std::string input;
@@ -345,7 +347,7 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
 
-            state.dataInputProcessing->inputProcessor->markObjectAsUsed("OutputControl:Files", instance.key());
+            ip->markObjectAsUsed("OutputControl:Files", instance.key());
 
             { // "output_csv"
                 csv = boolean_choice(find_input(fields, "output_csv"));
@@ -439,6 +441,25 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
             }
             { // "sqlite"
                 sqlite = boolean_choice(find_input(fields, "output_sqlite"));
+            }
+        }
+    }
+
+    auto const timestamp_instances = ip->epJSON.find("OutputControl:Timestamp");
+    if (timestamp_instances != ip->epJSON.end()) {
+        auto const &instancesValue = timestamp_instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &fields = instance.value();
+            ip->markObjectAsUsed("OutputControl:Timestamp", instance.key());
+
+            auto item = fields.find("iso_8601_format");
+            if (item != fields.end()) {
+                state.dataResultsFramework->resultsFramework->setISO8601(item->get<std::string>() == "Yes");
+            }
+
+            item = fields.find("timestamp_at_beginning_of_interval");
+            if (item != fields.end()) {
+                state.dataResultsFramework->resultsFramework->setBeginningOfInterval(item->get<std::string>() == "Yes");
             }
         }
     }

@@ -88,8 +88,9 @@ namespace PVWatts {
                                        size_t surfaceNum,
                                        Real64 groundCoverageRatio)
         : moduleType_(moduleType), arrayType_(arrayType), geometryType_(geometryType), DCtoACRatio_(1.1), inverterEfficiency_(0.96),
-          outputDCPower_(1000.0), cellTemperature_(-9999), planeOfArrayIrradiance_(-9999), shadedPercent_(0.0),
-          pvwattsModule_(ssc_module_create("pvwattsv5_1ts")), pvwattsData_(ssc_data_create()), NumTimeStepsToday_(0.0)
+          outputDCPower_(1000.0), outputDCEnergy_(0.0), outputACPower_(0.0), outputACEnergy_(0.0), cellTemperature_(-9999),
+          planeOfArrayIrradiance_(-9999), shadedPercent_(0.0), pvwattsModule_(ssc_module_create("pvwattsv5_1ts")), pvwattsData_(ssc_data_create()),
+          NumTimeStepsToday_(0.0)
 
     {
 
@@ -186,10 +187,10 @@ namespace PVWatts {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "Photovoltaics",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Generator PV Cell Temperature",
@@ -386,15 +387,15 @@ namespace PVWatts {
 
     void PVWattsGenerator::calc(EnergyPlusData &state)
     {
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         // We only run this once for each zone time step.
         const int NumTimeStepsToday_loc = state.dataGlobal->HourOfDay * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
         if (NumTimeStepsToday_ != NumTimeStepsToday_loc) {
             NumTimeStepsToday_ = NumTimeStepsToday_loc;
         } else {
-            outputDCEnergy_ = outputDCPower_ * TimeStepSys * DataGlobalConstants::SecInHour;
-            outputACEnergy_ = outputACPower_ * TimeStepSys * DataGlobalConstants::SecInHour;
+            outputDCEnergy_ = outputDCPower_ * TimeStepSysSec;
+            outputACEnergy_ = outputACPower_ * TimeStepSysSec;
             return;
         }
         // SSC Inputs
@@ -450,9 +451,9 @@ namespace PVWatts {
         } else {
             // Report Out
             ssc_data_get_number(pvwattsData_, "dc", &outputDCPower_);
-            outputDCEnergy_ = outputDCPower_ * TimeStepSys * DataGlobalConstants::SecInHour;
+            outputDCEnergy_ = outputDCPower_ * TimeStepSysSec;
             ssc_data_get_number(pvwattsData_, "ac", &outputACPower_);
-            outputACEnergy_ = outputACPower_ * TimeStepSys * DataGlobalConstants::SecInHour;
+            outputACEnergy_ = outputACPower_ * TimeStepSysSec;
             ssc_data_get_number(pvwattsData_, "tcell", &cellTemperature_);
             ssc_data_get_number(pvwattsData_, "poa", &planeOfArrayIrradiance_);
         }

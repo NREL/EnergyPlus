@@ -390,10 +390,10 @@ void GetGshpInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name,
-                            _,
+                            {},
                             "Electricity",
                             "Heating",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -505,7 +505,7 @@ void GshpPeHeatingSpecs::initialize(EnergyPlusData &state)
         this->beginEnvironFlag = false;
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::CWInitConvTemp,
+                                                       Constant::CWInitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
         this->LoadSideDesignMassFlow = this->LoadSideVolFlowRate * rho;
@@ -514,7 +514,7 @@ void GshpPeHeatingSpecs::initialize(EnergyPlusData &state)
 
         rho = FluidProperties::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                                DataGlobalConstants::CWInitConvTemp,
+                                                Constant::CWInitConvTemp,
                                                 state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                                 RoutineName);
         this->SourceSideDesignMassFlow = this->SourceSideVolFlowRate * rho;
@@ -547,7 +547,7 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     //       RE-ENGINEERED  Mar2000
 
     // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     using namespace FluidProperties;
 
     using PlantUtilities::SetComponentFlowRate;
@@ -573,18 +573,15 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     std::string ErrString;
     Real64 DutyFactor;
 
-    auto &CurrentSimTime = state.dataHPWaterToWaterHtg->CurrentSimTime;
-    auto &PrevSimTime = state.dataHPWaterToWaterHtg->PrevSimTime;
-
     // Init Module level Variables
-    if (PrevSimTime != CurrentSimTime) {
-        PrevSimTime = CurrentSimTime;
+    if (state.dataHPWaterToWaterHtg->PrevSimTime != state.dataHPWaterToWaterHtg->CurrentSimTime) {
+        state.dataHPWaterToWaterHtg->PrevSimTime = state.dataHPWaterToWaterHtg->CurrentSimTime;
     }
 
     // CALCULATE THE SIMULATION TIME
     Real64 constexpr hoursInDay = 24.0;
-    CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * hoursInDay + state.dataGlobal->HourOfDay - 1 +
-                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
+    state.dataHPWaterToWaterHtg->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * hoursInDay + state.dataGlobal->HourOfDay - 1 +
+                                                  (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
     if (MyLoad > 0.0) {
         this->MustRun = true;
@@ -861,7 +858,7 @@ void GshpPeHeatingSpecs::update(EnergyPlusData &state)
         // set node flow rates;  for these load based models
         // assume that the sufficient Source Side flow rate available
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         this->Energy = this->Power * ReportingConstant;
         this->QSourceEnergy = QSource * ReportingConstant;

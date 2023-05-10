@@ -163,7 +163,7 @@ void DeflectionTemperatures(int const nlayer,
     EP_SIZE_CHECK(LayerDeflection, maxlay);
 
     // Static constants
-    static Real64 const Pi_6(pow_6(DataGlobalConstants::Pi));
+    static Real64 const Pi_6(pow_6(Constant::Pi));
 
     // localy used
     Array1D<Real64> DPressure(maxlay); // delta pressure at each glazing layer

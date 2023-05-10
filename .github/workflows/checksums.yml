@@ -13,6 +13,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      # Needed permission to upload the release asset
+      contents: write
 
     steps:
 

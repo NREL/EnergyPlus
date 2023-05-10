@@ -244,7 +244,7 @@ namespace HVACSingleDuctInduc {
         int ADUNum;
         bool errFlag;
 
-        auto &ZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig);
+        auto &ZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig;
 
         // find the number of each type of induction unit
         CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
@@ -287,7 +287,7 @@ namespace HVACSingleDuctInduc {
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType_Num = SingleDuct_CV::FourPipeInduc;
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr == 0) {
@@ -674,7 +674,7 @@ namespace HVACSingleDuctInduc {
 
                 rho = GetDensityGlycol(state,
                                        state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidName,
-                                       DataGlobalConstants::HWInitConvTemp,
+                                       Constant::HWInitConvTemp,
                                        state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidIndex,
                                        RoutineName);
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxHotWaterFlow =
@@ -694,7 +694,7 @@ namespace HVACSingleDuctInduc {
             if (ColdConNode > 0) {
                 rho = GetDensityGlycol(state,
                                        state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopNum).FluidName,
-                                       DataGlobalConstants::CWInitConvTemp,
+                                       Constant::CWInitConvTemp,
                                        state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopNum).FluidIndex,
                                        RoutineName);
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxColdWaterFlow =
@@ -817,7 +817,7 @@ namespace HVACSingleDuctInduc {
         MaxVolColdWaterFlowDes = 0.0;
         MaxVolColdWaterFlowUser = 0.0;
 
-        auto &TermUnitSizing(state.dataSize->TermUnitSizing);
+        auto &TermUnitSizing = state.dataSize->TermUnitSizing;
 
         if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow == AutoSize) {
             IsAutoSize = true;
@@ -931,14 +931,14 @@ namespace HVACSingleDuctInduc {
                                 Cp = GetSpecificHeatGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidName,
-                                    DataGlobalConstants::HWInitConvTemp,
+                                    Constant::HWInitConvTemp,
                                     state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidIndex,
                                     RoutineName);
 
                                 rho = GetDensityGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidName,
-                                    DataGlobalConstants::HWInitConvTemp,
+                                    Constant::HWInitConvTemp,
                                     state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidIndex,
                                     RoutineName);
 
@@ -1271,7 +1271,7 @@ namespace HVACSingleDuctInduc {
                 CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MaxHotWaterFlow, MinColdWaterFlow, PowerMet);
                 if (PowerMet > QToHeatSetPt + SmallLoad) {
                     ErrTolerance = state.dataHVACSingleDuctInduc->IndUnit(IUNum).HotControlOffset;
-                    auto f =
+                    auto f = // (AUTO_OK_LAMBDA)
                         [&state, IUNum, FirstHVACIteration, ZoneNodeNum, MinColdWaterFlow, QToHeatSetPt, QPriOnly, PowerMet](Real64 const HWFlow) {
                             Real64 UnitOutput;
                             CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, HWFlow, MinColdWaterFlow, UnitOutput);
@@ -1323,7 +1323,7 @@ namespace HVACSingleDuctInduc {
                 CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MaxColdWaterFlow, PowerMet);
                 if (PowerMet < QToCoolSetPt - SmallLoad) {
                     ErrTolerance = state.dataHVACSingleDuctInduc->IndUnit(IUNum).ColdControlOffset;
-                    auto f =
+                    auto f = // (AUTO_OK_LAMBDA)
                         [&state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, QToCoolSetPt, QPriOnly, PowerMet](Real64 const CWFlow) {
                             Real64 UnitOutput;
                             CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, CWFlow, UnitOutput);
@@ -1491,11 +1491,9 @@ namespace HVACSingleDuctInduc {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int ItemNum;
 
-        auto &GetIUInputFlag = state.dataHVACSingleDuctInduc->GetIUInputFlag;
-
-        if (GetIUInputFlag) {
+        if (state.dataHVACSingleDuctInduc->GetIUInputFlag) {
             GetIndUnits(state);
-            GetIUInputFlag = false;
+            state.dataHVACSingleDuctInduc->GetIUInputFlag = false;
         }
 
         YesNo = false;

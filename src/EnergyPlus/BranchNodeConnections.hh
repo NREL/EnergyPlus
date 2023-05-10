@@ -126,9 +126,7 @@ namespace BranchNodeConnections {
                           int &NumOutlets,
                           Array1D_string &OutletNodeNames,
                           Array1D_int &OutletNodeNums,
-                          Array1D<NodeInputManager::CompFluidStream> &OutletFluidStreams,
-                          bool &ErrorsFound // set to true if errors found, unchanged otherwise
-    );
+                          Array1D<NodeInputManager::CompFluidStream> &OutletFluidStreams);
 
     void GetChildrenData(EnergyPlusData &state,
                          DataLoopNode::ConnectionObjectType const ComponentType,

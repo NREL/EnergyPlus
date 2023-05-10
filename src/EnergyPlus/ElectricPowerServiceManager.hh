@@ -109,7 +109,7 @@ enum class ThermalLossDestination
     Num
 };
 
-void initializeElectricPowerServiceZoneGains(EnergyPlusData &state);
+void initializeElectricPowerServiceZoneGains(const EnergyPlusData &state);
 
 class DCtoACInverter
 // This class is for modelling a power conversion device that takes DC power in and produces AC power out.
@@ -829,7 +829,7 @@ private:                      // data
 
 }; // class ElectricPowerServiceManager
 
-void createFacilityElectricPowerServiceObject(EnergyPlusData &state);
+void createFacilityElectricPowerServiceObject(const EnergyPlusData &state);
 
 Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName, bool &errorsFound);
 

@@ -400,10 +400,10 @@ void GetGshpInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name,
-                            _,
+                            {},
                             "Electricity",
                             "Cooling",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -514,7 +514,7 @@ void GshpPeCoolingSpecs::initialize(EnergyPlusData &state)
         this->beginEnvironFlag = false;
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::CWInitConvTemp,
+                                                       Constant::CWInitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
         this->LoadSideDesignMassFlow = this->LoadSideVolFlowRate * rho;
@@ -523,7 +523,7 @@ void GshpPeCoolingSpecs::initialize(EnergyPlusData &state)
 
         rho = FluidProperties::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                                DataGlobalConstants::CWInitConvTemp,
+                                                Constant::CWInitConvTemp,
                                                 state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                                 RoutineName);
         this->SourceSideDesignMassFlow = this->SourceSideVolFlowRate * rho;
@@ -598,19 +598,17 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     Real64 DutyFactor;
     int IterationCount;
 
-    auto &CurrentSimTime = state.dataHPWaterToWaterClg->CurrentSimTime;
-    auto &PrevSimTime = state.dataHPWaterToWaterClg->PrevSimTime;
-
     Real64 CpSourceSide; // local temporary for fluid specific heat
     Real64 CpLoadSide;   // local temporary for fluid specific heat
 
-    if (PrevSimTime != CurrentSimTime) {
-        PrevSimTime = CurrentSimTime;
+    if (state.dataHPWaterToWaterClg->PrevSimTime != state.dataHPWaterToWaterClg->CurrentSimTime) {
+        state.dataHPWaterToWaterClg->PrevSimTime = state.dataHPWaterToWaterClg->CurrentSimTime;
     }
 
     // CALCULATE THE SIMULATION TIME
-    CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 +
-                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
+    state.dataHPWaterToWaterClg->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 +
+                                                  (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
+                                                  state.dataHVACGlobal->SysTimeElapsed;
 
     if (MyLoad < 0.0) {
         this->MustRun = true;
@@ -908,7 +906,7 @@ void GshpPeCoolingSpecs::update(EnergyPlusData &state)
         // set node flow rates;  for these load based models
         // assume that the sufficient Source Side flow rate available
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         this->Energy = this->Power * ReportingConstant;
         this->QSourceEnergy = QSource * ReportingConstant;

@@ -216,7 +216,7 @@ namespace ThermalChimney {
 
             state.dataThermalChimneys->ThermalChimneySys(Loop).SchedName = state.dataIPShortCut->cAlphaArgs(3);
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr == 0) {
@@ -744,7 +744,7 @@ namespace ThermalChimney {
                         if (state.dataHeatBalSurf->SurfTempIn(SurfNum) > TemporaryWallSurfTemp) {
                             TemporaryWallSurfTemp = state.dataHeatBalSurf->SurfTempIn(SurfNum);
                             ConvTransCoeffWallFluid = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
-                            SurfTempAbsorberWall = state.dataHeatBalSurf->SurfTempIn(SurfNum) + DataGlobalConstants::KelvinConv;
+                            SurfTempAbsorberWall = state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::KelvinConv;
                         }
                     }
                 }
@@ -754,7 +754,7 @@ namespace ThermalChimney {
                         if (state.dataSurface->Surface(SurfNum).Width > TempmajorW) {
                             TempmajorW = state.dataSurface->Surface(SurfNum).Width;
                             ConvTransCoeffGlassFluid = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
-                            SurfTempGlassCover = state.dataHeatBalSurf->SurfTempIn(SurfNum) + DataGlobalConstants::KelvinConv;
+                            SurfTempGlassCover = state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::KelvinConv;
                         }
                     }
                 }
@@ -781,7 +781,7 @@ namespace ThermalChimney {
                 RoomAirTemp += state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) *
                                state.dataZoneTempPredictorCorrector->zoneHeatBalance(TCZoneNumCounter).MAT;
             }
-            RoomAirTemp += DataGlobalConstants::KelvinConv;
+            RoomAirTemp += Constant::KelvinConv;
 
             Process1 = 0.0;
             Process2 = 0.0;
@@ -919,7 +919,7 @@ namespace ThermalChimney {
                 state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCMassFlow =
                     state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlow * AirDensityThermalChim;
             }
-            state.dataThermalChimneys->ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - DataGlobalConstants::KelvinConv;
+            state.dataThermalChimneys->ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - Constant::KelvinConv;
 
             if (GetCurrentScheduleValue(state, state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr) <= 0.0) {
                 for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
@@ -954,14 +954,11 @@ namespace ThermalChimney {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine fills remaining report variables.
 
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         int ZoneLoop; // Counter for the # of zones (nz)
         Real64 AirDensity;
         Real64 CpAir;
-        Real64 TSMult;
-
-        TSMult = TimeStepSys * DataGlobalConstants::SecInHour;
 
         for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
@@ -970,8 +967,9 @@ namespace ThermalChimney {
             AirDensity = PsyRhoAirFnPbTdbW(
                 state, state.dataEnvrn->OutBaroPress, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).MAT, thisZoneHB.ZoneAirHumRat);
             CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
-            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyVolume = (thisZoneHB.MCPThermChim / CpAir / AirDensity) * TSMult;
-            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyMass = (thisZoneHB.MCPThermChim / CpAir) * TSMult;
+            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyVolume =
+                (thisZoneHB.MCPThermChim / CpAir / AirDensity) * TimeStepSysSec;
+            state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyMass = (thisZoneHB.MCPThermChim / CpAir) * TimeStepSysSec;
 
             state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatLoss = 0.0;
             state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatGain = 0.0;
@@ -980,14 +978,16 @@ namespace ThermalChimney {
 
                 state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatLoss =
                     thisZoneHB.MCPThermChim *
-                    (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).ZT - state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) * TSMult;
+                    (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).ZT - state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) *
+                    TimeStepSysSec;
                 state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatGain = 0.0;
 
             } else if (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).ZT <= state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) {
 
                 state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatGain =
                     thisZoneHB.MCPThermChim *
-                    (state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp - state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).ZT) * TSMult;
+                    (state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp - state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).ZT) *
+                    TimeStepSysSec;
                 state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyHeatLoss = 0.0;
             }
 

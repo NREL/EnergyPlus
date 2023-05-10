@@ -89,10 +89,10 @@ protected:
         // setup weather manager state needed
         state->dataWeatherManager->NumOfEnvrn = 2;
         state->dataWeatherManager->Environment.allocate(state->dataWeatherManager->NumOfEnvrn);
-        state->dataWeatherManager->Environment(1).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
+        state->dataWeatherManager->Environment(1).KindOfEnvrn = Constant::KindOfSim::DesignDay;
         state->dataWeatherManager->Environment(1).DesignDayNum = 1;
 
-        state->dataWeatherManager->Environment(2).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
+        state->dataWeatherManager->Environment(2).KindOfEnvrn = Constant::KindOfSim::DesignDay;
         state->dataWeatherManager->Environment(2).DesignDayNum = 2;
 
         averagingWindow = 1;
@@ -101,11 +101,11 @@ protected:
         state->dataWeatherManager->NumOfEnvrn = 4;
         state->dataWeatherManager->Environment.redimension(state->dataWeatherManager->NumOfEnvrn);
 
-        state->dataWeatherManager->Environment(3).KindOfEnvrn = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
+        state->dataWeatherManager->Environment(3).KindOfEnvrn = Constant::KindOfSim::HVACSizeDesignDay;
         state->dataWeatherManager->Environment(3).DesignDayNum = 1;
         state->dataWeatherManager->Environment(3).SeedEnvrnNum = 1;
 
-        state->dataWeatherManager->Environment(4).KindOfEnvrn = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
+        state->dataWeatherManager->Environment(4).KindOfEnvrn = Constant::KindOfSim::HVACSizeDesignDay;
         state->dataWeatherManager->Environment(4).DesignDayNum = 2;
         state->dataWeatherManager->Environment(4).SeedEnvrnNum = 2;
 
@@ -149,7 +149,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     ShowMessage(*state, "Begin Test: SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework");
 
     // first step
-    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     state->dataGlobal->DayOfSim = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataWeatherManager->Envrn = 3;
@@ -209,7 +209,7 @@ TEST_F(SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
     TestLogObj.ztStepObj.resize(TestLogObj.NumOfStepsInLogSet);
 
     // fill first step in log with zone step data
-    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     int Envrn(3);
     state->dataGlobal->DayOfSim = 1;
     int HourofDay(1);
@@ -301,7 +301,7 @@ TEST_F(SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour)
     TestLogObj.ztStepObj.resize(TestLogObj.NumOfStepsInLogSet);
 
     // fill first step in log with zone step data
-    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     int Envrn(3);
     state->dataGlobal->DayOfSim = 1;
     int HourofDay(1);
@@ -369,7 +369,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
     PlantCoinicidentAnalysis TestAnalysisObj(loopName, loopNum, nodeNum, density, cp, timestepsInAvg, plantSizingIndex);
 
     // fill first step in log with zone step data
-    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     int Envrn(4);
     state->dataGlobal->DayOfSim = 1;
     int HourofDay(1);
@@ -430,11 +430,12 @@ TEST_F(SizingAnalysisObjectsTest, DISABLED_LoggingSubStep4stepPerHour)
 
     TestLogObj.ztStepObj.resize(TestLogObj.NumOfStepsInLogSet);
 
-    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     int Envrn(3);
     state->dataGlobal->DayOfSim = 1;
     int HourofDay(0);
     state->dataHVACGlobal->TimeStepSys = 1.0 / (4.0 * 5.0); // fractional hours, duration
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     Real64 zoneTimeStepDuration(0.25);
     int numTimeStepsInHour(4);
 
@@ -555,7 +556,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTestNullMassFlowRateTim
     PlantCoinicidentAnalysis TestAnalysisObj(loopName, loopNum, nodeNum, density, cp, timestepsInAvg, plantSizingIndex);
 
     // fill first step in log with zone step data
-    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::HVACSizeDesignDay;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     int Envrn(4);
     state->dataGlobal->DayOfSim = 1;
     int HourofDay(1);

@@ -177,7 +177,6 @@ namespace DaylightingDevices {
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   May 2003
         //       MODIFIED       PGE, Aug 2003:  Added daylighting shelves.
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes all daylighting device:  TDD pipes and daylighting shelves.
@@ -185,23 +184,6 @@ namespace DaylightingDevices {
 
         // METHODOLOGY EMPLOYED:
         // Daylighting and thermal variables are calculated.  BeamTrans/COSAngle table is calculated.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int PipeNum;   // TDD pipe object number
-        int StoredNum; // Stored TDD pipe object number
-        int AngleNum;
-        int TZoneNum;
-        int Loop;
-        Real64 Theta;       // Angle of entry in degrees, 0 is parallel to pipe axis
-        Real64 dTheta;      // Angle increment
-        Real64 Reflectance; // Visible or solar reflectance of surface
-        Real64 SumTZoneLengths;
-        bool Found;
-        int ShelfNum;  // Daylighting shelf object number
-        int ShelfSurf; // Daylighting shelf surface number
-        int WinSurf;   // Window surface number
-
-        int NumStored(0); // Counter for number of pipes stored as they are calculated
 
         struct TDDPipeStoredData
         {
@@ -228,16 +210,16 @@ namespace DaylightingDevices {
             state.dataDaylightingDevices->COSAngle(1) = 0.0;
             state.dataDaylightingDevices->COSAngle(DataDaylightingDevices::NumOfAngles) = 1.0;
 
-            dTheta = 90.0 * DataGlobalConstants::DegToRadians / (DataDaylightingDevices::NumOfAngles - 1.0);
-            Theta = 90.0 * DataGlobalConstants::DegToRadians;
-            for (AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
+            Real64 dTheta = 90.0 * Constant::DegToRadians / (DataDaylightingDevices::NumOfAngles - 1.0);
+            Real64 Theta = 90.0 * Constant::DegToRadians;
+            for (int AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
                 Theta -= dTheta;
                 state.dataDaylightingDevices->COSAngle(AngleNum) = std::cos(Theta);
             } // AngleNum
 
             TDDPipeStored.allocate((int)state.dataDaylightingDevicesData->TDDPipe.size() * 2);
 
-            for (PipeNum = 1; PipeNum <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++PipeNum) {
+            for (int PipeNum = 1; PipeNum <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++PipeNum) {
                 // Initialize optical properties
                 state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio =
                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TotLength / state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diameter;
@@ -248,10 +230,12 @@ namespace DaylightingDevices {
 
                 // Calculate the beam transmittance table for visible and solar spectrum
                 // First time thru use the visible reflectance
-                Reflectance = state.dataDaylightingDevicesData->TDDPipe(PipeNum).ReflectVis;
-                for (Loop = 1; Loop <= 2; ++Loop) {
+                Real64 Reflectance = state.dataDaylightingDevicesData->TDDPipe(PipeNum).ReflectVis;
+                int NumStored = 0; // Counter for number of pipes stored as they are calculated
+                int StoredNum;     // Stored TDD pipe object number
+                for (int Loop = 1; Loop <= 2; ++Loop) {
                     // For computational efficiency, search stored pipes to see if an identical pipe has already been calculated
-                    Found = false;
+                    bool Found = false;
                     for (StoredNum = 1; StoredNum <= NumStored; ++StoredNum) {
                         if (TDDPipeStored(StoredNum).AspectRatio != state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio) continue;
                         if (TDDPipeStored(StoredNum).Reflectance == Reflectance) {
@@ -272,8 +256,8 @@ namespace DaylightingDevices {
                         TDDPipeStored(NumStored).TransBeam(DataDaylightingDevices::NumOfAngles) = 1.0;
 
                         // Calculate intermediate beam transmittances between 0 and 90 degrees
-                        Theta = 90.0 * DataGlobalConstants::DegToRadians;
-                        for (AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
+                        Theta = 90.0 * Constant::DegToRadians;
+                        for (int AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
                             Theta -= dTheta;
                             TDDPipeStored(NumStored).TransBeam(AngleNum) =
                                 CalcPipeTransBeam(Reflectance, state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio, Theta);
@@ -298,8 +282,8 @@ namespace DaylightingDevices {
                 state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolHorizon = CalcTDDTransSolHorizon(state, PipeNum);
 
                 // Initialize thermal properties
-                SumTZoneLengths = 0.0;
-                for (TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
+                Real64 SumTZoneLengths = 0.0;
+                for (int TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
                     SumTZoneLengths += state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneLength(TZoneNum);
 
                     SetupZoneInternalGain(state,
@@ -382,10 +366,10 @@ namespace DaylightingDevices {
 
         if ((int)state.dataDaylightingDevicesData->Shelf.size() > 0) DisplayString(state, "Initializing Light Shelf Daylighting Devices");
 
-        for (ShelfNum = 1; ShelfNum <= (int)state.dataDaylightingDevicesData->Shelf.size(); ++ShelfNum) {
-            WinSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).Window;
+        for (int ShelfNum = 1; ShelfNum <= (int)state.dataDaylightingDevicesData->Shelf.size(); ++ShelfNum) {
+            int WinSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).Window;
 
-            ShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf;
+            int ShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf;
             if (ShelfSurf > 0) {
                 // Double surface area so that both sides of the shelf are treated as internal mass
                 state.dataSurface->Surface(ShelfSurf).Area *= 2.0;
@@ -443,28 +427,12 @@ namespace DaylightingDevices {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   May 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the input for TDD pipes and does some error checking.
 
         // METHODOLOGY EMPLOYED:
         // Standard EnergyPlus methodology.
-
-        // Using/Aliasing
-
-        using General::SafeDivide;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int IOStatus;          // Used in GetObjectItem
-        int NumAlphas;         // Number of Alphas for each GetObjectItem call
-        int NumNumbers;        // Number of Numbers for each GetObjectItem call
-        int PipeNum;           // TDD pipe object number
-        int SurfNum;           // Dome or diffuser surface
-        int TZoneNum;          // Transition zone loop
-        std::string TZoneName; // Transition zone name
-        Real64 PipeArea;
 
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
@@ -473,8 +441,11 @@ namespace DaylightingDevices {
 
         if (NumOfTDDPipes > 0) {
             state.dataDaylightingDevicesData->TDDPipe.allocate(NumOfTDDPipes);
+            int IOStatus;   // Used in GetObjectItem
+            int NumAlphas;  // Number of Alphas for each GetObjectItem call
+            int NumNumbers; // Number of Numbers for each GetObjectItem call
 
-            for (PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
+            for (int PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          PipeNum,
@@ -487,13 +458,11 @@ namespace DaylightingDevices {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(
-                    state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataDaylightingDevices->GetTDDInputErrorsFound);
                 // Pipe name
                 state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // Get TDD:DOME object
-                SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
                     ShowSevereError(state,
@@ -626,9 +595,9 @@ namespace DaylightingDevices {
                     if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome > 0 &&
                         std::abs(state.dataSurface->Surface(SurfNum).Area -
                                  state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area) > 0.1) {
-                        if (SafeDivide(std::abs(state.dataSurface->Surface(SurfNum).Area -
-                                                state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area),
-                                       state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area) >
+                        if (General::SafeDivide(std::abs(state.dataSurface->Surface(SurfNum).Area -
+                                                         state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area),
+                                                state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area) >
                             0.1) { // greater than 10%
                             ShowSevereError(state,
                                             format("{} = {}:  Dome and diffuser areas are significantly different (>10%).",
@@ -708,12 +677,12 @@ namespace DaylightingDevices {
                     state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                 }
 
-                PipeArea = 0.25 * DataGlobalConstants::Pi * pow_2(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diameter);
+                Real64 PipeArea = 0.25 * Constant::Pi * pow_2(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diameter);
                 if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome > 0 &&
                     std::abs(PipeArea - state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area) > 0.1) {
-                    if (SafeDivide(std::abs(PipeArea - state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area),
-                                   state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area) >
-                        0.1) { // greater than 10%
+                    if (General::SafeDivide(
+                            std::abs(PipeArea - state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area),
+                            state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area) > 0.1) { // greater than 10%
                         ShowSevereError(state,
                                         format("{} = {}:  Pipe and dome/diffuser areas are significantly different (>10%).",
                                                cCurrentModuleObject,
@@ -777,8 +746,8 @@ namespace DaylightingDevices {
                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneLength = 0.0;
                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneHeatGain = 0.0;
 
-                    for (TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
-                        TZoneName = state.dataIPShortCut->cAlphaArgs(TZoneNum + 4);
+                    for (int TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
+                        std::string const TZoneName = state.dataIPShortCut->cAlphaArgs(TZoneNum + 4);
                         state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) =
                             UtilityRoutines::FindItemInList(TZoneName, state.dataHeatBal->Zone);
                         if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) == 0) {
@@ -825,24 +794,12 @@ namespace DaylightingDevices {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the input for light shelves and does some error checking.
 
         // METHODOLOGY EMPLOYED:
         // Standard EnergyPlus methodology.
-
-        // Using/Aliasing
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int IOStatus;   // Used in GetObjectItem
-        int NumAlphas;  // Number of Alphas for each GetObjectItem call
-        int NumNumbers; // Number of Numbers for each GetObjectItem call
-        int ShelfNum;   // Daylighting shelf object number
-        int SurfNum;    // Window, inside, or outside shelf surfaces
-        int ConstrNum;  // Outside shelf construction object number
 
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
@@ -851,8 +808,11 @@ namespace DaylightingDevices {
 
         if (NumOfShelf > 0) {
             state.dataDaylightingDevicesData->Shelf.allocate(NumOfShelf);
+            int NumAlphas;  // Number of Alphas for each GetObjectItem call
+            int NumNumbers; // Number of Numbers for each GetObjectItem call
+            int IOStatus;   // Used in GetObjectItem
 
-            for (ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum) {
+            for (int ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          ShelfNum,
@@ -865,13 +825,11 @@ namespace DaylightingDevices {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(
-                    state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, state.dataDaylightingDevices->GetShelfInputErrorsFound);
                 // Shelf name
                 state.dataDaylightingDevicesData->Shelf(ShelfNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // Get window object
-                SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
                     ShowSevereError(state,
@@ -1015,6 +973,7 @@ namespace DaylightingDevices {
                             state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                         }
 
+                        int ConstrNum = 0;
                         // Get outside shelf construction (required if outside shelf is specified)
                         if (state.dataIPShortCut->cAlphaArgs(5) != "") {
                             ConstrNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataConstruction->Construct);
@@ -1147,7 +1106,7 @@ namespace DaylightingDevices {
         xLimit = (std::log(pow_2(N) * myLocalTiny) / std::log(R)) / xTol;
 
         c1 = A * std::tan(Theta);
-        c2 = 4.0 / DataGlobalConstants::Pi;
+        c2 = 4.0 / Constant::Pi;
 
         s = i;
         while (s < (1.0 - i)) {
@@ -1209,13 +1168,13 @@ namespace DaylightingDevices {
         Real64 COSI;            // Cosine of incident angle
         Real64 SINI;            // Sine of incident angle
 
-        Real64 const dPH = 90.0 * DataGlobalConstants::DegToRadians / NPH; // Altitude angle of sky element
-        Real64 PH = 0.5 * dPH;                                             // Altitude angle increment
+        Real64 const dPH = 90.0 * Constant::DegToRadians / NPH; // Altitude angle of sky element
+        Real64 PH = 0.5 * dPH;                                  // Altitude angle increment
 
         // Integrate from 0 to Pi/2 altitude
         for (int N = 1; N <= NPH; ++N) {
-            COSI = std::cos(DataGlobalConstants::PiOvr2 - PH);
-            SINI = std::sin(DataGlobalConstants::PiOvr2 - PH);
+            COSI = std::cos(Constant::PiOvr2 - PH);
+            SINI = std::sin(Constant::PiOvr2 - PH);
 
             Real64 P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
 
@@ -1273,16 +1232,16 @@ namespace DaylightingDevices {
         Real64 CosPhi;          // Cosine of TDD:DOME altitude angle
         Real64 Theta;           // TDD:DOME azimuth angle
 
-        CosPhi = std::cos(DataGlobalConstants::PiOvr2 - state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Tilt *
-                                                            DataGlobalConstants::DegToRadians);
-        Theta = state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Azimuth * DataGlobalConstants::DegToRadians;
+        CosPhi = std::cos(Constant::PiOvr2 -
+                          state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Tilt * Constant::DegToRadians);
+        Theta = state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Azimuth * Constant::DegToRadians;
 
         if (CosPhi > 0.01) { // Dome has a view of the horizon
             // Integrate over the semicircle
-            Real64 const THMIN = Theta - DataGlobalConstants::PiOvr2; // Minimum azimuth integration limit
+            Real64 const THMIN = Theta - Constant::PiOvr2; // Minimum azimuth integration limit
             // Real64 const THMAX = Theta + PiOvr2; // Maximum azimuth integration limit
-            Real64 const dTH = 180.0 * DataGlobalConstants::DegToRadians / NTH; // Azimuth angle increment
-            Real64 TH = THMIN + 0.5 * dTH;                                      // Azimuth angle of sky horizon element
+            Real64 const dTH = 180.0 * Constant::DegToRadians / NTH; // Azimuth angle increment
+            Real64 TH = THMIN + 0.5 * dTH;                           // Azimuth angle of sky horizon element
 
             for (int N = 1; N <= NTH; ++N) {
                 // Calculate incident angle between dome outward normal and horizon element
@@ -1574,40 +1533,32 @@ namespace DaylightingDevices {
         //   3. Inward absorbed solar in dome and diffuser glass
         // This subroutine is called by InitIntSolarDistribution in HeatBalanceSurfaceManager.cc.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int PipeNum;           // TDD pipe object number
-        int DiffSurf;          // Surface number of TDD:DIFFUSER
-        int TZoneNum;          // Transition zone index
-        Real64 transDiff;      // Diffuse transmittance of TDD:DIFFUSER
-        Real64 QRefl;          // Diffuse radiation reflected back up the pipe
-        Real64 TotTDDPipeGain; // Total absorbed solar gain in the tubular daylighting device pipe
-
-        for (PipeNum = 1; PipeNum <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++PipeNum) {
-            DiffSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
-            transDiff = state.dataConstruction->Construct(state.dataSurface->Surface(DiffSurf).Construction).TransDiff;
+        for (int PipeNum = 1; PipeNum <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++PipeNum) {
+            int DiffSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
+            Real64 transDiff = state.dataConstruction->Construct(state.dataSurface->Surface(DiffSurf).Construction).TransDiff;
 
             // Calculate diffuse solar reflected back up the pipe by the inside surface of the TDD:DIFFUSER
             // All solar arriving at the diffuser is assumed to be isotropically diffuse by this point
-            QRefl = (state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) - state.dataHeatBal->SurfWinQRadSWwinAbsTot(DiffSurf)) *
-                        state.dataSurface->Surface(DiffSurf).Area -
-                    state.dataSurface->SurfWinTransSolar(DiffSurf);
+            Real64 QRefl = (state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) - state.dataHeatBal->SurfWinQRadSWwinAbsTot(DiffSurf)) *
+                               state.dataSurface->Surface(DiffSurf).Area -
+                           state.dataSurface->SurfWinTransSolar(DiffSurf);
 
             // Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
             QRefl += state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(DiffSurf).SolarEnclIndex) *
                      state.dataSurface->Surface(DiffSurf).Area * transDiff;
 
-            TotTDDPipeGain = state.dataSurface->SurfWinTransSolar(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) -
-                             state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) * state.dataSurface->Surface(DiffSurf).Area +
-                             QRefl * (1.0 - state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso / transDiff) +
-                             state.dataHeatBal->SurfWinQRadSWwinAbs(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome, 1) *
-                                 state.dataSurface->Surface(DiffSurf).Area / 2.0 +
-                             state.dataHeatBal->SurfWinQRadSWwinAbs(DiffSurf, 1) * state.dataSurface->Surface(DiffSurf).Area /
-                                 2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to
-                                      // reflections on the way out | Inward absorbed solar from dome
-                                      // glass | Inward absorbed solar from diffuser glass
+            Real64 TotTDDPipeGain = state.dataSurface->SurfWinTransSolar(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) -
+                                    state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) * state.dataSurface->Surface(DiffSurf).Area +
+                                    QRefl * (1.0 - state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso / transDiff) +
+                                    state.dataHeatBal->SurfWinQRadSWwinAbs(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome, 1) *
+                                        state.dataSurface->Surface(DiffSurf).Area / 2.0 +
+                                    state.dataHeatBal->SurfWinQRadSWwinAbs(DiffSurf, 1) * state.dataSurface->Surface(DiffSurf).Area /
+                                        2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to
+                                             // reflections on the way out | Inward absorbed solar from dome
+                                             // glass | Inward absorbed solar from diffuser glass
             state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeAbsorbedSolar = max(0.0, TotTDDPipeGain); // Report variable [W]
 
-            for (TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
+            for (int TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
                 // Distribute absorbed solar gain in proportion to transition zone length
                 state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneHeatGain(TZoneNum) =
                     TotTDDPipeGain * (state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneLength(TZoneNum) /
@@ -1700,7 +1651,7 @@ namespace DaylightingDevices {
         E3 = std::pow(pow_2(M) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(M)) * (pow_2(M) + pow_2(N))), pow_2(M));
         E4 = std::pow(pow_2(N) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(N)) * (pow_2(M) + pow_2(N))), pow_2(N));
 
-        state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = (1.0 / (DataGlobalConstants::Pi * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
+        state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = (1.0 / (Constant::Pi * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
     }
 
     void adjustViewFactorsWithShelf(
@@ -1875,25 +1826,21 @@ namespace DaylightingDevices {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // intialize zone gains at begin new environment
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &MyEnvrnFlag = state.dataDaylightingDevices->MyEnvrnFlag;
-        int Loop;
 
         if ((int)state.dataDaylightingDevicesData->TDDPipe.size() == 0) return;
 
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
-            for (Loop = 1; Loop <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++Loop) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataDaylightingDevices->MyEnvrnFlag) {
+            for (int Loop = 1; Loop <= (int)state.dataDaylightingDevicesData->TDDPipe.size(); ++Loop) {
                 state.dataDaylightingDevicesData->TDDPipe(Loop).TZoneHeatGain = 0.0;
             }
-            MyEnvrnFlag = false;
+            state.dataDaylightingDevices->MyEnvrnFlag = false;
         }
-        if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) state.dataDaylightingDevices->MyEnvrnFlag = true;
     }
 
 } // namespace DaylightingDevices

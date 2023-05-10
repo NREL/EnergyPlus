@@ -160,15 +160,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     int NumAlphas;
     int NumNums;
     int NodeNum;
-    int PathNum;
-    int CompNum;
-    int ControlledZoneLoop;
-    int ZoneEquipListNum;
     int IOStat;
-    std::string InletNodeListName;
-    std::string ExhaustNodeListName;
-    std::string ReturnNodeListName;
-    std::string ReturnFlowBasisNodeListName;
     Array1D_string AlphArray;
     Array1D<Real64> NumArray;
     int MaxAlphas;
@@ -176,7 +168,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     int NumParams;
     int NumNodes;
     Array1D_int NodeNums;
-    int Counter;
     bool IsNotOK; // Flag to verify nam
     bool NodeListError;
     bool UniqueNodeError;
@@ -186,10 +177,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
     int overallEquipCount;
-    int Loop1;
-    int Loop2;
-
-    auto &TermUnitSizing(state.dataSize->TermUnitSizing);
 
     struct EquipListAudit
     {
@@ -203,14 +190,13 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         {
         }
     };
-
     // Object Data
     Array1D<EquipListAudit> ZoneEquipListAcct;
 
-    ExhaustNodeListName = "";
-    InletNodeListName = "";
-    ReturnNodeListName = "";
-    ReturnFlowBasisNodeListName = "";
+    std::string ExhaustNodeListName = "";
+    std::string InletNodeListName = "";
+    std::string ReturnNodeListName = "";
+    std::string ReturnFlowBasisNodeListName = "";
 
     // Look in the input file for zones with air loop and zone equipment attached
 
@@ -287,7 +273,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
     auto &Zone(state.dataHeatBal->Zone);
 
-    for (ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfControlledZones; ++ControlledZoneLoop) {
+    for (int ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfControlledZones; ++ControlledZoneLoop) {
 
         CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
 
@@ -367,7 +353,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
         ReturnNodeListName = AlphArray(6);
         if (lAlphaBlanks(7)) {
-            thisZoneEquipConfig.ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+            thisZoneEquipConfig.ReturnFlowSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisZoneEquipConfig.ReturnFlowSchedPtrNum = GetScheduleIndex(state, AlphArray(7));
             if (thisZoneEquipConfig.ReturnFlowSchedPtrNum == 0) {
@@ -390,7 +376,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         CurrentModuleObject = "ZoneHVAC:EquipmentList";
         auto &ip = state.dataInputProcessing->inputProcessor;
 
-        ZoneEquipListNum = ip->getObjectItemNum(state, CurrentModuleObject, thisZoneEquipConfig.EquipListName);
+        int ZoneEquipListNum = ip->getObjectItemNum(state, CurrentModuleObject, thisZoneEquipConfig.EquipListName);
 
         if (ZoneEquipListNum <= 0) {
             ShowSevereError(state, format("{}{} not found = {}", RoutineName, CurrentModuleObject, thisZoneEquipConfig.EquipListName));
@@ -499,7 +485,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     std::string coolingSchName =
                         ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_cooling_fraction_schedule_name");
                     if (coolingSchName.empty()) {
-                        thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = DataGlobalConstants::ScheduleAlwaysOn;
+                        thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleManager::ScheduleAlwaysOn;
                     } else {
                         thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = GetScheduleIndex(state, coolingSchName);
                         if (thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
@@ -514,7 +500,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     std::string heatingSchName =
                         ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_heating_fraction_schedule_name");
                     if (heatingSchName.empty()) {
-                        thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = DataGlobalConstants::ScheduleAlwaysOn;
+                        thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleManager::ScheduleAlwaysOn;
                     } else {
                         thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = GetScheduleIndex(state, heatingSchName);
                         if (thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
@@ -757,12 +743,12 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     // Allocate TermUnitSizing array and set zone number
     if (locTermUnitSizingCounter > 0) {
         state.dataSize->NumAirTerminalUnits = locTermUnitSizingCounter;
-        TermUnitSizing.allocate(state.dataSize->NumAirTerminalUnits);
+        state.dataSize->TermUnitSizing.allocate(state.dataSize->NumAirTerminalUnits);
         for (int loopZoneNum = 1; loopZoneNum <= state.dataGlobal->NumOfZones; ++loopZoneNum) {
             {
-                auto &thisZoneEqConfig(state.dataZoneEquip->ZoneEquipConfig(loopZoneNum));
+                auto &thisZoneEqConfig = state.dataZoneEquip->ZoneEquipConfig(loopZoneNum);
                 for (int loopNodeNum = 1; loopNodeNum <= thisZoneEqConfig.NumInletNodes; ++loopNodeNum) {
-                    TermUnitSizing(thisZoneEqConfig.AirDistUnitCool(loopNodeNum).TermUnitSizingIndex).CtrlZoneNum = loopZoneNum;
+                    state.dataSize->TermUnitSizing(thisZoneEqConfig.AirDistUnitCool(loopNodeNum).TermUnitSizingIndex).CtrlZoneNum = loopZoneNum;
                 }
             }
         }
@@ -774,8 +760,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     if (overallEquipCount > 0) {
         ZoneEquipListAcct.allocate(overallEquipCount);
         overallEquipCount = 0;
-        for (Loop1 = 1; Loop1 <= NumOfControlledZones; ++Loop1) {
-            for (Loop2 = 1; Loop2 <= state.dataZoneEquip->ZoneEquipList(Loop1).NumOfEquipTypes; ++Loop2) {
+        for (int Loop1 = 1; Loop1 <= NumOfControlledZones; ++Loop1) {
+            for (int Loop2 = 1; Loop2 <= state.dataZoneEquip->ZoneEquipList(Loop1).NumOfEquipTypes; ++Loop2) {
                 ++overallEquipCount;
                 ZoneEquipListAcct(overallEquipCount).ObjectType = state.dataZoneEquip->ZoneEquipList(Loop1).EquipType(Loop2);
                 ZoneEquipListAcct(overallEquipCount).ObjectName = state.dataZoneEquip->ZoneEquipList(Loop1).EquipName(Loop2);
@@ -783,8 +769,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             }
         }
         // Now check for uniqueness
-        for (Loop1 = 1; Loop1 <= overallEquipCount; ++Loop1) {
-            for (Loop2 = Loop1 + 1; Loop2 <= overallEquipCount; ++Loop2) {
+        for (int Loop1 = 1; Loop1 <= overallEquipCount; ++Loop1) {
+            for (int Loop2 = Loop1 + 1; Loop2 <= overallEquipCount; ++Loop2) {
                 if (ZoneEquipListAcct(Loop1).ObjectType != ZoneEquipListAcct(Loop2).ObjectType ||
                     ZoneEquipListAcct(Loop1).ObjectName != ZoneEquipListAcct(Loop2).ObjectName)
                     continue;
@@ -805,7 +791,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
     // map ZoneEquipConfig%EquipListIndex to ZoneEquipList%Name
 
-    for (ControlledZoneLoop = 1; ControlledZoneLoop <= state.dataGlobal->NumOfZones; ++ControlledZoneLoop) {
+    for (int ControlledZoneLoop = 1; ControlledZoneLoop <= state.dataGlobal->NumOfZones; ++ControlledZoneLoop) {
         state.dataZoneEquip->GetZoneEquipmentDataFound = UtilityRoutines::FindItemInList(
             state.dataZoneEquip->ZoneEquipList(ControlledZoneLoop).Name, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::EquipListName);
         if (state.dataZoneEquip->GetZoneEquipmentDataFound > 0)
@@ -815,7 +801,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     EndUniqueNodeCheck(state, "ZoneHVAC:EquipmentConnections");
 
     CurrentModuleObject = "AirLoopHVAC:SupplyPath";
-    for (PathNum = 1; PathNum <= state.dataZoneEquip->NumSupplyAirPaths; ++PathNum) {
+    for (int PathNum = 1; PathNum <= state.dataZoneEquip->NumSupplyAirPaths; ++PathNum) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
@@ -829,7 +815,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields); //  data for one zone
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, state.dataZoneEquip->GetZoneEquipmentDataErrorsFound);
         state.dataZoneEquip->SupplyAirPath(PathNum).Name = AlphArray(1);
         state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
@@ -851,9 +836,9 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         state.dataZoneEquip->SupplyAirPath(PathNum).SplitterIndex.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->SupplyAirPath(PathNum).PlenumIndex.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
 
-        Counter = 3;
+        int Counter = 3;
 
-        for (CompNum = 1; CompNum <= state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents; ++CompNum) {
+        for (int CompNum = 1; CompNum <= state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents; ++CompNum) {
 
             if ((AlphArray(Counter) == "AIRLOOPHVAC:ZONESPLITTER") || (AlphArray(Counter) == "AIRLOOPHVAC:SUPPLYPLENUM")) {
 
@@ -885,7 +870,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     } // end loop over supply air paths
 
     CurrentModuleObject = "AirLoopHVAC:ReturnPath";
-    for (PathNum = 1; PathNum <= state.dataZoneEquip->NumReturnAirPaths; ++PathNum) {
+    for (int PathNum = 1; PathNum <= state.dataZoneEquip->NumReturnAirPaths; ++PathNum) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
@@ -899,7 +884,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields); //  data for one zone
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, state.dataZoneEquip->GetZoneEquipmentDataErrorsFound);
         state.dataZoneEquip->ReturnAirPath(PathNum).Name = AlphArray(1);
         state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
@@ -919,9 +903,9 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentIndex.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
 
-        Counter = 3;
+        int Counter = 3;
 
-        for (CompNum = 1; CompNum <= state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents; ++CompNum) {
+        for (int CompNum = 1; CompNum <= state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents; ++CompNum) {
 
             if ((AlphArray(Counter) == "AIRLOOPHVAC:ZONEMIXER") || (AlphArray(Counter) == "AIRLOOPHVAC:RETURNPLENUM")) {
 
@@ -958,31 +942,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     lAlphaBlanks.deallocate();
     lNumericBlanks.deallocate();
 
-    // setup zone equipment info for convection correlations
-    SetupZoneEquipmentForConvectionFlowRegime(state);
-
     if (state.dataZoneEquip->GetZoneEquipmentDataErrorsFound) {
         ShowFatalError(state, format("{}Errors found in getting Zone Equipment input.", RoutineName));
-    }
-}
-
-void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   Aug 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Decide a few one-time things for later
-    // determination of flow regime for convection
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneLoop;
-
-    for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
     }
 }
 
@@ -1066,8 +1027,6 @@ int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
 
     int ControlledZoneIndex = 0; // Index into Controlled Zone structure
 
-    bool FoundIt = false;
-
     if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
         GetZoneEquipmentData(state);
         state.dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -1077,7 +1036,6 @@ int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) {
             if (TrialZoneNodeNum == state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode) {
                 // found it.
-                FoundIt = true;
                 ControlledZoneIndex = ZoneNum;
                 break;
             }

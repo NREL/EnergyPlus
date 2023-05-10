@@ -50,6 +50,10 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#ifdef DEBUG_ARITHM_GCC_OR_CLANG
+#include <EnergyPlus/fenv_missing.h>
+#endif
+
 // Google Test main
 int main(int argc, char **argv)
 {
@@ -61,5 +65,8 @@ int main(int argc, char **argv)
     ::testing::GTEST_FLAG(shuffle) = true;
 #endif
     ::testing::InitGoogleTest(&argc, argv);
+#ifdef DEBUG_ARITHM_GCC_OR_CLANG
+    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
     return RUN_ALL_TESTS();
 }

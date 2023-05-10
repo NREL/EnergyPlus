@@ -177,7 +177,7 @@ namespace Psychrometrics {
                 print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
                 for (Loop = 0; Loop < static_cast<int>(PsychrometricFunction::Num); ++Loop) {
                     if (!PsyReportIt[Loop]) continue;
-                    const auto istring = fmt::to_string(state.dataPsychCache->NumTimesCalled[Loop]);
+                    const std::string istring = fmt::to_string(state.dataPsychCache->NumTimesCalled[Loop]);
                     if (state.dataPsychCache->NumIterations[Loop] > 0) {
                         AverageIterations = double(state.dataPsychCache->NumIterations[Loop]) / double(state.dataPsychCache->NumTimesCalled[Loop]);
                         print(auditFile, "{},{},{:.2R}\n", PsyRoutineNames[Loop], istring, AverageIterations);
@@ -324,8 +324,11 @@ namespace Psychrometrics {
 
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
+        // cppcheck-suppress invalidPointerCast
         std::uint64_t Tdb_tag = *reinterpret_cast<std::uint64_t const *>(&Tdb) >> Grid_Shift;
+        // cppcheck-suppress invalidPointerCast
         std::uint64_t W_tag = *reinterpret_cast<std::uint64_t const *>(&W) >> Grid_Shift;
+        // cppcheck-suppress invalidPointerCast
         std::uint64_t Pb_tag = *reinterpret_cast<std::uint64_t const *>(&Pb) >> Grid_Shift;
         DISABLE_WARNING_POP
 
@@ -341,12 +344,15 @@ namespace Psychrometrics {
             DISABLE_WARNING_PUSH
             DISABLE_WARNING_STRICT_ALIASING
             Tdb_tag <<= Grid_Shift;
+            // cppcheck-suppress invalidPointerCast
             Real64 Tdb_tag_r = *reinterpret_cast<Real64 const *>(&Tdb_tag);
 
             W_tag <<= Grid_Shift;
+            // cppcheck-suppress invalidPointerCast
             Real64 W_tag_r = *reinterpret_cast<Real64 const *>(&W_tag);
 
             Pb_tag <<= Grid_Shift;
+            // cppcheck-suppress invalidPointerCast
             Real64 Pb_tag_r = *reinterpret_cast<Real64 const *>(&Pb_tag);
             DISABLE_WARNING_POP
 
@@ -736,14 +742,14 @@ namespace Psychrometrics {
 #endif
 
         // Convert temperature from Centigrade to Kelvin.
-        Real64 const Tkel(T + DataGlobalConstants::KelvinConv); // Dry-bulb in REAL(r64) for function passing
+        Real64 const Tkel(T + Constant::KelvinConv); // Dry-bulb in REAL(r64) for function passing
 
         // If below -100C,set value of Pressure corresponding to Saturation Temperature of -100C.
         if (Tkel < 173.15) {
             Pascal = 0.001405102123874164;
 
             // If below freezing, calculate saturation pressure over ice.
-        } else if (Tkel < DataGlobalConstants::TriplePointOfWaterTempKelvin) { // Tkel >= 173.15, Tkel < 273.16 (0.01°C)
+        } else if (Tkel < Constant::TriplePointOfWaterTempKelvin) { // Tkel >= 173.15, Tkel < 273.16 (0.01°C)
             Real64 constexpr C1(-5674.5359);
             Real64 constexpr C2(6.3925247);
             Real64 constexpr C3(-0.9677843e-2);
