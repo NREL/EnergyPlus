@@ -2774,37 +2774,12 @@ namespace ScheduleManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   January 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS FUNCTION:
         // This function provides a method to look up schedule values for any hour, timestep, day
         // of the year (rather than just the "current time").
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
         // Return value
         Real64 scheduleValue(0.0);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         if (ThisHour > 24) {
             ShowFatalError(state, format("LookUpScheduleValue called with thisHour={}", ThisHour));
@@ -2814,6 +2789,8 @@ namespace ScheduleManager {
             return 1.0;
         } else if (ScheduleIndex == 0) {
             return 0.0;
+        } else if (state.dataScheduleMgr->Schedule(ScheduleIndex).EMSActuatedOn) {
+            return state.dataScheduleMgr->Schedule(ScheduleIndex).EMSValue;
         }
 
         if (!state.dataScheduleMgr->ScheduleInputProcessed) {
