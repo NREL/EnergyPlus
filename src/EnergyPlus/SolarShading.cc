@@ -193,12 +193,12 @@ void InitSolarCalculations(EnergyPlusData &state)
         }
 
         if (state.dataSolarShading->GetInputFlag) {
+            checkShadingSurfaceSchedules(state);
             GetShadowingInput(state);
             state.dataSolarShading->GetInputFlag = false;
             state.dataSolarShading->MaxHCV =
                 (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
             assert((state.dataSolarShading->MaxHCV + 1) % 16 == 0);
-            checkShadingSurfaceTransparency(state);
         }
 
         if (state.dataSolarShading->firstTime) DisplayString(state, "Allocate Solar Module Arrays");
@@ -365,7 +365,7 @@ void InitSolarCalculations(EnergyPlusData &state)
     state.dataSolarShading->firstTime = false;
 }
 
-void checkShadingSurfaceTransparency(EnergyPlusData &state)
+void checkShadingSurfaceSchedules(EnergyPlusData &state)
 {
     // Shading surfaces with a transmittance schedule that is always 1.0 are marked IsTransparent during shading surface input processing
     // Now that EMS (and other types) actuators are set up, check to see if the schedule has an actuator and reset if needed
@@ -375,6 +375,9 @@ void checkShadingSurfaceTransparency(EnergyPlusData &state)
         if (EMSManager::isScheduleManaged(state, thisSurface.SchedShadowSurfIndex)) {
             // Transmittance schedule has an actuator, set not transparent so it won't be skipped during shading calcs
             thisSurface.IsTransparent = false;
+            // Also set global flags
+            state.dataSolarShading->anyScheduledShadingSurface = true;
+            state.dataSurface->ShadingTransmittanceVaries = true;
         } else if (!thisSurface.MirroredSurf) {
             // Warning moved here from shading surface input processing (skip warning for mirrored surfaces)
             ShowWarningError(state,
@@ -740,10 +743,10 @@ void GetShadowingInput(EnergyPlusData &state)
     if (!state.dataSysVars->DetailedSolarTimestepIntegration && state.dataSurface->ShadingTransmittanceVaries &&
         state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) {
 
-        ShowWarningError(state,
-                         format("GetShadowingInput: The shading transmittance for shading devices changes throughout the year. Choose "
-                                "Shading Calculation Update Frequency Method = Timestep in the {} object to remove this warning.",
-                                cCurrentModuleObject));
+        ShowWarningError(state, "GetShadowingInput: The shading transmittance for shading devices changes throughout the year.");
+        ShowContinueError(state,
+                          format("Choose Shading Calculation Update Frequency Method = Timestep in the {} object to capture all shading impacts.",
+                                 cCurrentModuleObject));
     }
     if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm && state.dataSurface->ShadingTransmittanceVaries &&
         state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) {

@@ -95,7 +95,7 @@ namespace SolarShading {
 
     void InitSolarCalculations(EnergyPlusData &state);
 
-    void checkShadingSurfaceTransparency(EnergyPlusData &state);
+    void checkShadingSurfaceSchedules(EnergyPlusData &state);
 
     void GetShadowingInput(EnergyPlusData &state);
 
