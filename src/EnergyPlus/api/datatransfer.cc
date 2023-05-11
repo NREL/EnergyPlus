@@ -127,12 +127,12 @@ APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize)
 void freeAPIData(struct APIDataEntry *data, unsigned int arraySize)
 {
     for (unsigned int i = 0; i < arraySize; i++) {
-        free(data[i].what);
-        free(data[i].name);
-        free(data[i].key);
-        free(data[i].type);
+        delete[] data[i].what;
+        delete[] data[i].name;
+        delete[] data[i].key;
+        delete[] data[i].type;
     }
-    free(data);
+    delete[] data;
 }
 
 char *listAllAPIDataCSV(EnergyPlusState state)
