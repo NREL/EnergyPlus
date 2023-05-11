@@ -120,6 +120,7 @@ namespace OutputReportTabular {
         JtoMJ,
         JtoGJ,
         InchPound,
+        InchPoundExceptElectricity,
         NotFound,
         Num
     };

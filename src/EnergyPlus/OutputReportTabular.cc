@@ -1429,6 +1429,8 @@ UnitsStyle SetUnitsStyleFromString(std::string const &unitStringIn)
         unitsStyleReturn = UnitsStyle::JtoGJ;
     } else if (UtilityRoutines::SameString(unitStringIn, "INCHPOUND")) {
         unitsStyleReturn = UnitsStyle::InchPound;
+    } else if (UtilityRoutines::SameString(unitStringIn, "INCHPOUNDEXCEPTELECTRICITY")) {
+        unitsStyleReturn = UnitsStyle::InchPoundExceptElectricity;
     } else {
         unitsStyleReturn = UnitsStyle::NotFound;
     }
