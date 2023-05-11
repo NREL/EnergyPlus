@@ -23578,7 +23578,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
     EXPECT_EQ(thisSys.m_SpeedNum, 2);
     EXPECT_NEAR(sensOut, -1500.0, 2);
 
-     // Variable speed water coil
+    // Variable speed water coil
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand[1].RemainingOutputRequired = -100.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand[1].RemainingOutputReqToCoolSP = -100.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand[1].RemainingOutputReqToHeatSP = -100.0;
@@ -23669,5 +23669,4 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
     EXPECT_NEAR(thisSys1.m_CycRatio, 1.0, 0.0001);
     EXPECT_EQ(thisSys1.m_SpeedNum, 2);
     EXPECT_NEAR(sensOut, 500.0, 2);
-
 }
