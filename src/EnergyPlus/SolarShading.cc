@@ -7301,7 +7301,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                     } else {
                         TBmAll = TBmBm + TBmDif;
                     }
-                    BTOTZone += TBmAll * SunLitFract * CosInc * state.dataSurface->Surface(SurfNum).Area * InOutProjSLFracMult; // [m2]
+                    BTOTZone += state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBmAll * SunLitFract * CosInc * state.dataSurface->Surface(SurfNum).Area * InOutProjSLFracMult; // [m2]
                 }
             }
 
@@ -8236,7 +8236,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         if (state.dataSolarShading->SurfIntAbsFac(FloorNum) <= 0.0 || FloorNum == SurfNum) continue; // Keep only floor surfaces
                         int const FlConstrNum = state.dataSurface->SurfActiveConstruction(FloorNum);
 
-                        Real64 BTOTWinZone = TBm * SunLitFract * state.dataSurface->Surface(SurfNum).Area * CosInc * InOutProjSLFracMult; //[m2]
+                        Real64 BTOTWinZone = state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBm * SunLitFract * state.dataSurface->Surface(SurfNum).Area * CosInc * InOutProjSLFracMult; //[m2]
                         Real64 AbsBeamTotWin = 0.0;
 
                         if (state.dataConstruction->Construct(FlConstrNum).TransDiff <= 0.0) {
