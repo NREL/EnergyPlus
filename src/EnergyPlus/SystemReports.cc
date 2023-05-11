@@ -4611,7 +4611,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
         if (mechVentFlow > SmallAirVolFlow) {
             int thisOAControlNum = state.dataAirLoop->AirLoopControlInfo(sysNum).OACtrlNum;
             if (thisOAControlNum > 0) {
-                int limitFactorIndex = state.dataMixedAir->OAController(thisOAControlNum).OALimitingFactor;
+                int limitFactorIndex = static_cast<int>(state.dataMixedAir->OAController(thisOAControlNum).OALimitingFactor);
                 thisSysPreDefRep.TimeAtOALimit[limitFactorIndex] += TimeStepSys;
                 if (thisSysVentRepVars.AnyZoneOccupied) {
                     thisSysPreDefRep.TimeAtOALimitOcc[limitFactorIndex] += TimeStepSys;

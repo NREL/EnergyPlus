@@ -9399,20 +9399,12 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     if (this->FanPlace == DataHVACGlobals::BlowThru) {
         if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (OnOffAirFlowRatio > 0.0) {
-                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(state, _, _);
             } else {
-                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(state, PartLoadRatio, _);
             }
         } else {
-            Fans::SimulateFanComponents(state,
-                                        "",
-                                        FirstHVACIteration,
-                                        this->FanIndex,
-                                        state.dataHVACVarRefFlow->FanSpeedRatio,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOff);
+            Fans::SimulateFanComponents(state, "", FirstHVACIteration, this->FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
         }
     }
 
@@ -9468,21 +9460,13 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     if (this->FanPlace == DataHVACGlobals::DrawThru) {
         if (this->fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (OnOffAirFlowRatio > 0.0) {
-                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(state, _, _);
             } else {
-                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[this->FanIndex]->simulate(state, PartLoadRatio, _);
             }
 
         } else {
-            Fans::SimulateFanComponents(state,
-                                        "",
-                                        FirstHVACIteration,
-                                        this->FanIndex,
-                                        state.dataHVACVarRefFlow->FanSpeedRatio,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOff);
+            Fans::SimulateFanComponents(state, "", FirstHVACIteration, this->FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
         }
     }
 
@@ -9861,9 +9845,8 @@ void SetAverageAirFlow(EnergyPlusData &state,
 
     // if the terminal unit and fan are scheduled on then set flow rate
     if (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr) > 0.0 &&
-        (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr) > 0.0 ||
-         state.dataHVACGlobal->ZoneCompTurnFansOn) &&
-        !state.dataHVACGlobal->ZoneCompTurnFansOff) {
+        (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr) > 0.0 || state.dataHVACGlobal->TurnFansOn) &&
+        !state.dataHVACGlobal->TurnFansOff) {
 
         // so for sure OA system TUs should use inlet node flow rate, don't overwrite inlet node flow rate
         // could there be a reason for air loops to use inlet node flow? Possibly when VAV TUs used?
@@ -9883,12 +9866,14 @@ void SetAverageAirFlow(EnergyPlusData &state,
 
     } else { // terminal unit and/or fan is off
 
-        if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+        if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInOASys) {
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = 0.0;
+            OnOffAirFlowRatio = 0.0;
+        }
         if (OutsideAirNode > 0) {
             state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(AirRelNode).MassFlowRate = 0.0;
         }
-        OnOffAirFlowRatio = 0.0;
     }
 }
 
@@ -12652,20 +12637,12 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     if (this->FanPlace == DataHVACGlobals::BlowThru) {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (OnOffAirFlowRatio > 0.0) {
-                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, _, _);
             } else {
-                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, PartLoadRatio, _);
             }
         } else {
-            Fans::SimulateFanComponents(state,
-                                        "",
-                                        FirstHVACIteration,
-                                        this->FanIndex,
-                                        state.dataHVACVarRefFlow->FanSpeedRatio,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOff);
+            Fans::SimulateFanComponents(state, "", FirstHVACIteration, this->FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
         }
     }
     if (this->CoolingCoilPresent) {
@@ -12719,21 +12696,13 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     if (this->FanPlace == DataHVACGlobals::DrawThru) {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (OnOffAirFlowRatio > 0.0) {
-                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, _, _);
             } else {
-                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                    state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, PartLoadRatio, _);
             }
 
         } else {
-            Fans::SimulateFanComponents(state,
-                                        "",
-                                        FirstHVACIteration,
-                                        this->FanIndex,
-                                        state.dataHVACVarRefFlow->FanSpeedRatio,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOff);
+            Fans::SimulateFanComponents(state, "", FirstHVACIteration, this->FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
         }
     }
 
@@ -12924,20 +12893,13 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 if (temp > 0) {
-                    state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                        state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, _, _);
                 } else {
-                    state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(
-                        state, PartLoadRatio, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, PartLoadRatio, _);
                 }
             } else {
-                Fans::SimulateFanComponents(state,
-                                            "",
-                                            false,
-                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex,
-                                            state.dataHVACVarRefFlow->FanSpeedRatio,
-                                            state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                            state.dataHVACGlobal->ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(
+                    state, "", false, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
             }
             Tin = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).Temp;
             Win = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).HumRat;
