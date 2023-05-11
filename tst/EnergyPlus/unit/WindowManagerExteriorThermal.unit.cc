@@ -690,8 +690,7 @@ TEST_F(EnergyPlusFixture, test_GetWindowAssemblyNfrcForReport_withIDF)
     Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
-    EXPECT_FALSE(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
 
     HeatBalanceManager::GetConstructData(*state, FoundError);
     EXPECT_FALSE(FoundError);
