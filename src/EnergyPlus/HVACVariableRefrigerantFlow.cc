@@ -9527,7 +9527,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                 this->CycRatio = 1.0;
                 this->SpeedRatio = PartLoadRatio;
                 if (SolFla > 0 && PartLoadRatio <= 1.0) break;
-            } 
+            }
 
             if (SolFla == -1) {
                 //     Very low loads may not converge quickly. Tighten PLR boundary and try again.

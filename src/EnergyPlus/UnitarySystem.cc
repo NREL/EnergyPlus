@@ -6697,7 +6697,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         }
-        
+
         if (!this->m_DesignSpecMultispeedHPType.empty() && !this->m_DesignSpecMultispeedHPName.empty()) {
 
             if (this->m_DesignSpecMSHPIndex > -1) {
