@@ -16043,6 +16043,7 @@ namespace UnitarySystems {
             }
 
             elecHeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
+            defrostElecPower = state.dataHVACGlobal->DefrostElecPower;
         } break;
         case DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit: {
             if (this->m_NumOfSpeedHeating > 1) {
@@ -16059,6 +16060,7 @@ namespace UnitarySystems {
                 this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
             }
             elecHeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
+            defrostElecPower = state.dataHVACGlobal->DefrostElecPower;
         } break;
         case DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed: {
             if (state.dataUnitarySystems->HeatingLoad) {
