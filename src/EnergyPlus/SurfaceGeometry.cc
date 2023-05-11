@@ -341,7 +341,7 @@ namespace SurfaceGeometry {
         state.dataSurface->BuildingShadingCount = 0;
         state.dataSurface->FixedShadingCount = 0;
         state.dataSurface->AttachedShadingCount = 0;
-        state.dataSurface->ShadingSurfaceFirst = -1;
+        state.dataSurface->ShadingSurfaceFirst = 0;
         state.dataSurface->ShadingSurfaceLast = -1;
 
         // Reserve space to avoid excess allocations
@@ -357,7 +357,7 @@ namespace SurfaceGeometry {
             if (thisSurface.Class == SurfaceClass::Shading || thisSurface.Class == SurfaceClass::Detached_F ||
                 thisSurface.Class == SurfaceClass::Detached_B) {
                 thisSurface.IsShadowing = true;
-                if (state.dataSurface->ShadingSurfaceFirst == -1) state.dataSurface->ShadingSurfaceFirst = SurfNum;
+                if (state.dataSurface->ShadingSurfaceFirst == 0) state.dataSurface->ShadingSurfaceFirst = SurfNum;
                 state.dataSurface->ShadingSurfaceLast = SurfNum;
             }
             if ((thisSurface.HeatTransSurf && thisSurface.ExtSolar) || thisSurface.IsShadowing) {
