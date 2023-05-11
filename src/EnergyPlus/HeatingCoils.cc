@@ -370,8 +370,6 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, state.dataHeatingCoils->InputErrorsFound);
-
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
 
@@ -506,7 +504,6 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, state.dataHeatingCoils->InputErrorsFound);
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
             heatingCoil.Name = Alphas(1);
@@ -648,7 +645,6 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, state.dataHeatingCoils->InputErrorsFound);
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
             heatingCoil.Name = Alphas(1);
@@ -855,7 +851,6 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, state.dataHeatingCoils->InputErrorsFound);
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
             heatingCoil.Name = Alphas(1);
@@ -1054,7 +1049,6 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, state.dataHeatingCoils->InputErrorsFound);
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
             heatingCoil.Name = Alphas(1);
