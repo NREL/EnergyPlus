@@ -23887,8 +23887,6 @@ TEST_F(EnergyPlusFixture, VRF_MultispeedFan_Test)
         "  TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node",
         "  TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node",
         "  ;                        !- Name of Water Storage Tank for Condensate Collection",
-
-
         " !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW ===========",
 
         "COIL:Heating:DX:VariableRefrigerantFlow,",
@@ -24168,7 +24166,7 @@ TEST_F(EnergyPlusFixture, VRF_MultispeedFan_Test)
     EXPECT_EQ(QZnReq, -3000.0);
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     EXPECT_NEAR(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU[0].VRFTUOutletNodeNum).MassFlowRate, 0.29937661, 0.0001);
-    EXPECT_LT(abs(QZnReq-SysOutputProvided), 1.0);
+    EXPECT_LT(abs(QZnReq - SysOutputProvided), 1.0);
     EXPECT_EQ(state->dataHVACVarRefFlow->VRFTU[0].SpeedNum, 2);
     EXPECT_NEAR(state->dataHVACVarRefFlow->VRFTU[0].SpeedRatio, 0.7252535, 0.00001);
     EXPECT_NEAR(state->dataHVACVarRefFlow->VRFTU[0].CycRatio, 1.0, 0.00001);

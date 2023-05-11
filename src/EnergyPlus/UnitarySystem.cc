@@ -11866,6 +11866,7 @@ namespace UnitarySystems {
                                                             CompressorOn,
                                                             PartLoadRatio,
                                                             FirstHVACIteration);
+            this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
         } break;
         case DataHVACGlobals::Coil_CoolingWaterToAirHP: {
             bool errFlag = false;

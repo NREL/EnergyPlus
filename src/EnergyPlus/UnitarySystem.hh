@@ -486,7 +486,6 @@ namespace UnitarySystems {
         bool m_ZoneCompFlag = true;
         std::string m_AvailManagerListName;
         int m_EquipCompNum = 0; // 1-based index of this parent type for specific equipment type processing
-        bool reportVariablesAreSetup = false;
 
     public:
         // SZVAV variables
