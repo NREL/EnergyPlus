@@ -77,6 +77,7 @@
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -197,6 +198,7 @@ void InitSolarCalculations(EnergyPlusData &state)
             state.dataSolarShading->MaxHCV =
                 (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
             assert((state.dataSolarShading->MaxHCV + 1) % 16 == 0);
+            checkShadingSurfaceTransparency(state);
         }
 
         if (state.dataSolarShading->firstTime) DisplayString(state, "Allocate Solar Module Arrays");
@@ -361,6 +363,26 @@ void InitSolarCalculations(EnergyPlusData &state)
     }
 
     state.dataSolarShading->firstTime = false;
+}
+
+void checkShadingSurfaceTransparency(EnergyPlusData &state)
+{
+    // Shading surfaces with a transmittance schedule that is always 1.0 are marked IsTransparent during shading surface input processing
+    // Now that EMS (and other types) actuators are set up, check to see if the schedule has an actuator and reset if needed
+    for (int surfNum = state.dataSurface->ShadingSurfaceFirst; surfNum <= state.dataSurface->ShadingSurfaceLast; ++surfNum) {
+        auto &thisSurface = state.dataSurface->Surface(surfNum);
+        if (!thisSurface.IsTransparent) continue;
+        if (EMSManager::isScheduleManaged(state, thisSurface.SchedShadowSurfIndex)) {
+            // Transmittance schedule has an actuator, set not transparent so it won't be skipped during shading calcs
+            thisSurface.IsTransparent = false;
+        } else if (!thisSurface.MirroredSurf) {
+            // Warning moved here from shading surface input processing (skip warning for mirrored surfaces)
+            ShowWarningError(state,
+                             format("Shading Surface=\"{}\", Transmittance Schedule Name=\"{}\", is always transparent.",
+                                    thisSurface.Name,
+                                    state.dataScheduleMgr->Schedule(thisSurface.SchedShadowSurfIndex).Name));
+        }
+    }
 }
 
 void GetShadowingInput(EnergyPlusData &state)

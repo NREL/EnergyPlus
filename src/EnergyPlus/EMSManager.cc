@@ -1619,6 +1619,24 @@ namespace EMSManager {
         return FoundControl;
     }
 
+    bool isScheduleManaged(EnergyPlusData &state, int const scheduleNum)
+    {
+        // Check if a specific schedule has an EMS actuator assigned to it
+        bool foundControl = false;
+        static constexpr std::string_view cControlTypeName = "SCHEDULE VALUE";
+        std::string_view cSchedName = state.dataScheduleMgr->Schedule(scheduleNum).Name;
+
+        for (int Loop = 1; Loop <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed; ++Loop) {
+            if ((UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorUsed(Loop).UniqueIDName, cSchedName)) &&
+                (UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorUsed(Loop).ControlTypeName, cControlTypeName))) {
+                foundControl = true;
+                break;
+            }
+        }
+
+        return foundControl;
+    }
+
     void checkSetpointNodesAtEnd(EnergyPlusData &state)
     {
 
