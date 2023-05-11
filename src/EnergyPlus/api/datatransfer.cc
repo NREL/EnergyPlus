@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
@@ -216,6 +217,33 @@ void resetErrorFlag(EnergyPlusState state)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     thisState->dataPluginManager->apiErrorFlag = false;
+}
+
+const char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto &epjson = thisState->dataInputProcessing->inputProcessor->epJSON;
+    auto instances = epjson.find(objectType);
+    if (instances == epjson.end()) {
+        *resultingSize = 0;
+        return nullptr;
+    }
+    auto &instancesValue = instances.value();
+    *resultingSize = instancesValue.size();
+    auto *data = new const char *[*resultingSize];
+    unsigned int i = -1;
+    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+        i++;
+        data[i] = instance.key().data();
+    }
+    return data;
+}
+
+void freeObjectNames(const char **objectNames, unsigned int arraySize)
+{
+    // as of right now we don't actually need to free the underlying strings, they exist in the epJSON instance, so just delete our array of pointers
+    (void)arraySize; // no op to avoid compiler warning that this variable is unused, in the future, this may be needed so keeping it in the API now
+    delete[] objectNames;
 }
 
 int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char *surfName, const char *matName)

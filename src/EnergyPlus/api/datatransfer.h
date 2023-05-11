@@ -92,20 +92,6 @@ struct APIDataEntry
 };
 
 /// \brief Gets available API data for the current simulation
-/// \details This function returns a APIDataEntry * (array) which points to an API data array.
-/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
-/// \param[out] size An integer which will be set to the size of the array upon return
-/// \return An APIDataEntry * pointing to a CSV formatted string.  This allocates a new APIDataEntry *, and should be freed by passing to clearAPIData
-ENERGYPLUSLIB_API struct APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize);
-
-/// \brief Clears an APIData memory allocation
-/// \details This function frees an instance of the API data
-/// \param[in] data An array (pointer) of API data exchange points as returned from the getAPIData function
-/// \param[in] arraySize The size of the API data exchange array, which is known after the call to getAPIData.
-/// \return Nothing, this simply frees the memory
-ENERGYPLUSLIB_API void freeAPIData(struct APIDataEntry *data, unsigned int arraySize);
-
-/// \brief Gets available API data for the current simulation
 /// \details This function returns a char * which points to API data in CSV form for the current simulation
 ///          The data can be easily parsed and then used in subsequent API code.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
@@ -132,6 +118,38 @@ ENERGYPLUSLIB_API int apiErrorFlag(EnergyPlusState state);
 ///          a calculation to continue, this function can reset the flag.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 ENERGYPLUSLIB_API void resetErrorFlag(EnergyPlusState state);
+
+// ----- DATA TRANSFER HELPER FUNCTIONS
+
+/// \brief Gets available API data for the current simulation
+/// \details This function returns a APIDataEntry * (array) which points to an API data array.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[out] resultingSize An integer which will be set to the size of the array upon return
+/// \return An APIDataEntry * pointing to an array with the size passed in the by-ref argument.  When done, pass to freeAPIData to clear the memory.
+ENERGYPLUSLIB_API struct APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize);
+/// \brief Clears an APIData memory allocation
+/// \details This function frees an instance of the API data
+/// \param[in] data An array (pointer) of API data exchange that points as returned from the getAPIData function
+/// \param[in] arraySize The size of the API data exchange array, which is known after the call to getAPIData.
+/// \return Nothing, this simply frees the memory
+ENERGYPLUSLIB_API void freeAPIData(struct APIDataEntry *data, unsigned int arraySize);
+/// \brief Gets the names of the object instances in the current input file
+/// \details Although many workflows should be aware of the input file already, there are certain cases where asking EnergyPlus
+///          to report back the current input file objects has value.  The primary application is when a user is still utilizing an IDF based
+///          workflow, and wants to be able to write general purpose API callbacks or Python Plugins.  In this case, they may want to loop over all
+///          zones or chillers, and get handles to actuators or sensors accordingly.  Normally, the user would have to hardcode the object names, but
+///          with this API function, they can simply loop over all the objects of that type.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] objectType The object type from the input schema, such as "Chiller:Electric", or "Zone" -- casing should match input schema!
+/// \param[out] resultingSize An integer which will be set to the size of the array upon return
+/// \return Const char * pointing to an array of const char * with the size set in the by-ref argument.  When done, pass to freeObjectNames to clear.
+ENERGYPLUSLIB_API const char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize);
+/// \brief Clears an object names array allocation
+/// \details This function frees an instance of the object names array, which is returned from getObjectNames
+/// \param[in] data An array (pointer) of const char * as returned from the getObjectNames function
+/// \param[in] arraySize The size of the object name array, which is known after the call to getObjectNames.
+/// \return Nothing, this simply frees the memory
+ENERGYPLUSLIB_API void freeObjectNames(const char **objectNames, unsigned int arraySize);
 
 // ----- FUNCTIONS RELATED TO VARIABLES
 

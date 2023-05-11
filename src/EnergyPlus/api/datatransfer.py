@@ -126,6 +126,10 @@ class DataExchange:
         self.api.listAllAPIDataCSV.restype = c_char_p
         self.api.freeAPIData.argtypes = [POINTER(DataExchange._APIDataEntry), c_int]
         self.api.freeAPIData.restype = c_void_p
+        self.api.getObjectNames.argtypes = [c_void_p, c_char_p, POINTER(c_int)]
+        self.api.getObjectNames.restype = POINTER(c_char_p)
+        self.api.freeObjectNames.argtypes = [POINTER(c_char_p), c_int]
+        self.api.freeObjectNames.restype = c_void_p
         self.api.apiDataFullyReady.argtypes = [c_void_p]
         self.api.apiDataFullyReady.restype = c_int
         self.api.apiErrorFlag.argtypes = [c_void_p]
@@ -342,6 +346,28 @@ class DataExchange:
         """
         self.api.resetErrorFlag(state)
 
+    def get_object_names(self, state: c_void_p, object_type_name: Union[str, bytes]) -> List[str]:
+        """
+        Gets the instance names for a given object type in the current input file
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param object_type_name: The object type name as defined in the schema, such as "Zone" or "Chiller:Electric"
+        :return: A list of strings represented the names of the objects in the input file
+        """
+
+        if isinstance(object_type_name, str):
+            object_type_name = object_type_name.encode('utf-8')
+        elif not isinstance(object_type_name, bytes):
+            raise EnergyPlusException(
+                "`get_object_names` expects `object_type_name` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(object_type_name))
+        count = c_int()
+        r = self.api.getObjectNames(state, object_type_name, byref(count))
+        if not r:
+            return []
+        list_response = [r[i].decode('utf-8', errors='ignore') for i in range(count.value)]
+        self.api.freeObjectNames(r, count)  # free the underlying C memory now that we have a Python copy
+        return list_response
+
     def get_num_nodes_in_cond_fd_surf_layer(self, state: c_void_p, surface_name: Union[str, bytes],
                                             material_name: Union[str, bytes]) -> None:
         """
@@ -358,14 +384,14 @@ class DataExchange:
             surface_name = surface_name.encode('utf-8')
         elif not isinstance(surface_name, bytes):
             raise EnergyPlusException(
-                "`request_variable` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
-                "'{}'".format(surface_name))
+                "`get_num_nodes_in_cond_fd_surf_layer` expects `surface_name` as a `str` or UTF-8 encoded `bytes`, not"
+                " '{}'".format(surface_name))
         if isinstance(material_name, str):
             material_name = material_name.encode('utf-8')
         elif not isinstance(material_name, bytes):
             raise EnergyPlusException(
-                "`request_variable` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
-                "'{}'".format(material_name))
+                "`get_num_nodes_in_cond_fd_surf_layer` expects `material_name` as a `str` or UTF-8 encoded `bytes`, not"
+                " '{}'".format(material_name))
         return self.api.getNumNodesInCondFDSurfaceLayer(state, surface_name, material_name)
 
     def request_variable(self, state: c_void_p, variable_name: Union[str, bytes],

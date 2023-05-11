@@ -67,13 +67,27 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
         if (!apiDataFullyReady(state)) {
             return;
         }
+
+        unsigned int arraySize;
+        struct APIDataEntry *data = getAPIData(state, &arraySize); // inspect this to see what's available to exchange
+        const char **surfaceNames = getObjectNames(state, "BuildingSurface:Detailed", &arraySize);
+
+        if (arraySize == 0) {
+            printf("Encountered a file with no BuildingSurface:Detailed, can't run this script on that file! Aborting!");
+            exit(1);
+        }
+
         outdoorDewPointActuator = getActuatorHandle(state, "Weather Data", "Outdoor Dew Point", "Environment");
         outdoorTempSensor = getVariableHandle(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
         outdoorDewPointSensor = getVariableHandle(state, "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
 
-        zone1_wall1Actuator = getActuatorHandle(state, "Surface", "Construction State", "Zn001:Wall001");
+        zone1_wall1Actuator = getActuatorHandle(state, "Surface", "Construction State", surfaceNames[0]);
         wallConstruction = getConstructionHandle(state, "R13WALL");
         floorConstruction = getConstructionHandle(state, "FLOOR");
+
+        // don't forget to free memory from the API!
+        freeAPIData(data, arraySize);
+        freeObjectNames(surfaceNames, arraySize);
 
         printf("Got handles %d, %d, %d, %d, %d, %d",
                outdoorDewPointActuator,
@@ -87,9 +101,6 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
             exit(1);
         }
         handlesRetrieved = 1;
-        unsigned int arraySize;
-        struct APIDataEntry *data = getAPIData(state, &arraySize); // inspect this to see what's available to exchange
-        freeAPIData(data, arraySize);                              // don't forget to free it!
     }
     setActuatorValue(state, outdoorDewPointActuator, -25.0);
     Real64 oa_temp = getVariableValue(state, outdoorTempSensor);
