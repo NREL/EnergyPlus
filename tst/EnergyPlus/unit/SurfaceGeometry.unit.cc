@@ -11069,7 +11069,6 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_ShadingSurfaceScheduleChecks)
                                                                   "BuildingShade:TiltedShadeSurface2",
                                                                   "SiteShade:FlatShadeSurface2"};
     static constexpr std::array<bool, 8> isTransparent{false, true, false, false, false, true, false, false};
-    static constexpr std::array<bool, 8> transmittanceVaries{false, true, false, false, false, true, false, false};
 
     for (int surf = 0; surf < 8; ++surf) {
         int surfNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(surfacenames[surf]), state->dataSurface->Surface);
