@@ -1490,7 +1490,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     bool PrintFlag = true;
     bool ErrorsFound = false;
 
-    auto &ZoneEqSizing = state.dataSize->ZoneEqSizing;
+    auto &zoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
 
     if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow == DataSizing::AutoSize) {
         IsAutoSize = true;
@@ -1523,7 +1523,6 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
 
         // Size ERV supply flow rate
         Real64 TempSize = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
-        std::string SizingString = "Supply Air Flow Rate [m3/s]";
         if (IsAutoSize) {
             state.dataSize->DataConstantUsedForSizing = SupplyAirVolFlowDes;
             state.dataSize->DataFractionUsedForSizing = 1.0;
@@ -1539,6 +1538,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
             state.dataSize->DataFractionUsedForSizing = 1.0;
         }
         if (TempSize > 0.0) {
+            std::string SizingString = "Supply Air Flow Rate [m3/s]";
             SystemAirFlowSizer sizerSystemAirFlow;
             sizerSystemAirFlow.overrideSizingString(SizingString);
             sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -1566,7 +1566,6 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
             ExhaustAirVolFlowDes = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
         }
 
-        std::string SizingString = "Exhaust Air Flow Rate [m3/s]";
         Real64 TempSize = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow;
         if (IsAutoSize) {
             TempSize = ExhaustAirVolFlowDes;
@@ -1576,6 +1575,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
         }
         state.dataSize->DataFractionUsedForSizing = 1.0;
         if (TempSize > 0.0) {
+            std::string SizingString = "Exhaust Air Flow Rate [m3/s]";
             SystemAirFlowSizer sizerSystemAirFlow;
             sizerSystemAirFlow.overrideSizingString(SizingString);
             sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -1587,11 +1587,11 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     }
 
     // Set Zone equipment sizing data for autosizing the fans and heat exchanger
-    ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow *
-                                                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio;
-    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
-    ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
-    ZoneEqSizing(state.dataSize->CurZoneEqNum).DesignSizeFromParent = true;
+    zoneEqSizing.AirVolFlow = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow *
+                              state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio;
+    zoneEqSizing.OAVolFlow = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
+    zoneEqSizing.SystemAirFlow = true;
+    zoneEqSizing.DesignSizeFromParent = true;
 
     // Check supply fan flow rate or set flow rate if autosized in fan object
     IsAutoSize = false;
@@ -1642,7 +1642,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     }
 
     // now reset the ZoneEqSizing variable to NOT use the multiplier for HighRHOAFlowRatio for sizing HXs
-    ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
+    zoneEqSizing.AirVolFlow = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
 }
 
 void CalcStandAloneERV(EnergyPlusData &state,
@@ -2114,7 +2114,6 @@ bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
             GetFanVolFlow(state, StandAloneERV.ExhaustAirFanIndex, ExhaustFanAirFlow);
             if (ErrorsFound) {
                 ShowWarningError(state, format("Could not retrieve fan outlet node for this unit=\"{}\".", StandAloneERV.Name));
-                ErrorsFound = true;
             }
         }
 
