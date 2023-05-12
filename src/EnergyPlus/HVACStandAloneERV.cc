@@ -1463,11 +1463,8 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     static constexpr std::string_view RoutineName("SizeStandAloneERV: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string ZoneName;              // Name of zone
     Real64 ZoneMult;                   // Zone multiplier
-    int PeopleNum;                     // Index to people object
     Real64 NumberOfPeople;             // Maximum number of people in zone
-    int PeopleSchPtr;                  // Pointer to people schedule
     Real64 MaxPeopleSch;               // maximum people schedule value
     Real64 FloorArea;                  // Floor area of zone (m2)
     bool IsAutoSize;                   // Indicator to autosize
@@ -1500,16 +1497,15 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
 
         //      Sizing objects are not required for stand alone ERV
         //      CALL CheckZoneSizing('ZoneHVAC:EnergyRecoveryVentilator',StandAloneERV(StandAloneERVNum)%Name)
-        ZoneName = state.dataZoneEquip->ZoneEquipConfig(state.dataSize->CurZoneEqNum).ZoneName;
         int ZoneNum = state.dataSize->CurZoneEqNum;
         ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
         FloorArea = 0.0;
         FloorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
         NumberOfPeople = 0.0;
         MaxPeopleSch = 0.0;
-        for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+        for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
             if (ZoneNum != state.dataHeatBal->People(PeopleNum).ZonePtr) continue;
-            PeopleSchPtr = state.dataHeatBal->People(PeopleNum).NumberOfPeoplePtr;
+            int PeopleSchPtr = state.dataHeatBal->People(PeopleNum).NumberOfPeoplePtr;
             MaxPeopleSch = GetScheduleMaxValue(state, PeopleSchPtr);
             NumberOfPeople = NumberOfPeople + (state.dataHeatBal->People(PeopleNum).NumberOfPeople * MaxPeopleSch);
         }
