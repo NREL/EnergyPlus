@@ -1261,9 +1261,6 @@ void InitStandAloneERV(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger initializations.
 
-    using DataZoneEquipment::CheckZoneEquipmentList;
-    using MixedAir::SimOAController;
-
     // Do the one time initializations
     if (state.dataHVACStandAloneERV->MyOneTimeFlag) {
 
@@ -1291,7 +1288,7 @@ void InitStandAloneERV(EnergyPlusData &state,
     if (!state.dataHVACStandAloneERV->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataHVACStandAloneERV->ZoneEquipmentListChecked = true;
         for (int Loop = 1; Loop <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++Loop) {
-            if (CheckZoneEquipmentList(
+            if (DataZoneEquipment::CheckZoneEquipmentList(
                     state, state.dataHVACStandAloneERV->StandAloneERV(Loop).UnitType, state.dataHVACStandAloneERV->StandAloneERV(Loop).Name))
                 continue;
             ShowSevereError(state,
@@ -1330,11 +1327,11 @@ void InitStandAloneERV(EnergyPlusData &state,
         state.dataHVACStandAloneERV->MyEnvrnFlag(StandAloneERVNum) = false;
         //   Initialize OA Controller on BeginEnvrnFlag
         if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
-            SimOAController(state,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerName,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex,
-                            FirstHVACIteration,
-                            0);
+            MixedAir::SimOAController(state,
+                                      state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerName,
+                                      state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex,
+                                      FirstHVACIteration,
+                                      0);
         }
     } // end one time inits
 
@@ -1362,11 +1359,11 @@ void InitStandAloneERV(EnergyPlusData &state,
         if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
             //     Initialize a flow rate for controller
             supInNode.MassFlowRate = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow;
-            SimOAController(state,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerName,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex,
-                            FirstHVACIteration,
-                            0);
+            MixedAir::SimOAController(state,
+                                      state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerName,
+                                      state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex,
+                                      FirstHVACIteration,
+                                      0);
         }
 
         if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanSchPtr) > 0 ||
