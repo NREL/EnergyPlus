@@ -7897,7 +7897,7 @@ namespace SurfaceGeometry {
                       surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
             for (ThisSurf = 1; ThisSurf <= state.dataHeatBal->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
                 SurfID = state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs(ThisSurf);
-                if (std::abs(state.dataSurface->Surface(SurfID).Azimuth - AvgAzimuth) > 15.0) {
+                if (rotAzmDiffDeg(state.dataSurface->Surface(SurfID).Azimuth, AvgAzimuth) > 15.0) {
                     ShowWarningError(state,
                                      format("{}=\"{}, Surface {} has Azimuth different from others in the associated group.",
                                             cCurrentModuleObject,
@@ -13053,7 +13053,7 @@ namespace SurfaceGeometry {
 
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
             int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if (std::abs(state.dataSurface->Surface(curSurfNum).Azimuth - azimuth) < 1.) {
+            if (rotAzmDiffDeg(state.dataSurface->Surface(curSurfNum).Azimuth, azimuth) < 1.) {
                 facingAzimuth.emplace_back(iFace);
             }
         }
