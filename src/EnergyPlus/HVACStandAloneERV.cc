@@ -1806,49 +1806,20 @@ int GetStandAloneERVOutAirNode(EnergyPlusData &state, int const StandAloneERVNum
     // FUNCTION INFORMATION:
     //       AUTHOR         B Griffith
     //       DATE WRITTEN   Dec  2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // lookup function for OA inlet node for ventilation rate reporting
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-    int GetStandAloneERVOutAirNode;
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    // na
     if (state.dataHVACStandAloneERV->GetERVInputFlag) {
         GetStandAloneERV(state);
         state.dataHVACStandAloneERV->GetERVInputFlag = false;
     }
 
-    GetStandAloneERVOutAirNode = 0;
     if (StandAloneERVNum > 0 && StandAloneERVNum <= state.dataHVACStandAloneERV->NumStandAloneERVs) {
-        GetStandAloneERVOutAirNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
+        return state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
     }
 
-    return GetStandAloneERVOutAirNode;
+    return 0;
 }
 
 int GetStandAloneERVZoneInletAirNode(EnergyPlusData &state, int const StandAloneERVNum)
@@ -1856,49 +1827,20 @@ int GetStandAloneERVZoneInletAirNode(EnergyPlusData &state, int const StandAlone
     // FUNCTION INFORMATION:
     //       AUTHOR         B Griffith
     //       DATE WRITTEN   Dec  2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // lookup function for OA inlet node for ventilation rate reporting
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-    int GetStandAloneERVZoneInletAirNode;
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    // na
     if (state.dataHVACStandAloneERV->GetERVInputFlag) {
         GetStandAloneERV(state);
         state.dataHVACStandAloneERV->GetERVInputFlag = false;
     }
 
-    GetStandAloneERVZoneInletAirNode = 0;
     if (StandAloneERVNum > 0 && StandAloneERVNum <= state.dataHVACStandAloneERV->NumStandAloneERVs) {
-        GetStandAloneERVZoneInletAirNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode;
+        return state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode;
     }
 
-    return GetStandAloneERVZoneInletAirNode;
+    return 0;
 }
 
 int GetStandAloneERVReturnAirNode(EnergyPlusData &state, int const StandAloneERVNum)
@@ -1906,49 +1848,20 @@ int GetStandAloneERVReturnAirNode(EnergyPlusData &state, int const StandAloneERV
     // FUNCTION INFORMATION:
     //       AUTHOR         B Griffith
     //       DATE WRITTEN   Dec  2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // lookup function for OA inlet node for ventilation rate reporting
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Return value
-    int GetStandAloneERVReturnAirNode;
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    // na
     if (state.dataHVACStandAloneERV->GetERVInputFlag) {
         GetStandAloneERV(state);
         state.dataHVACStandAloneERV->GetERVInputFlag = false;
     }
 
-    GetStandAloneERVReturnAirNode = 0;
     if (StandAloneERVNum > 0 && StandAloneERVNum <= state.dataHVACStandAloneERV->NumStandAloneERVs) {
-        GetStandAloneERVReturnAirNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode;
+        return state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode;
     }
 
-    return GetStandAloneERVReturnAirNode;
+    return 0;
 }
 
 bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
@@ -1957,19 +1870,12 @@ bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
     // Check if a node is used by a stand alone ERV
     // and can be excluded from an airflow network.
 
-    // Return value
-    bool StandSloneERVAFNException;
-
-    int StandAloneERVIndex;
-
     if (state.dataHVACStandAloneERV->GetERVInputFlag) {
         GetStandAloneERV(state);
         state.dataHVACStandAloneERV->GetERVInputFlag = false;
     }
 
-    StandSloneERVAFNException = false;
-
-    for (StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
+    for (int StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
 
         auto &StandAloneERV = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex);
         bool ErrorsFound = false;
@@ -2022,18 +1928,16 @@ bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
         // Supply air fan nodes
         if (NodeNumber == SupplyFanInletNodeIndex || NodeNumber == SupplyFanOutletNodeIndex || NodeNumber == ExhaustFanInletNodeIndex ||
             NodeNumber == ExhaustFanOutletNodeIndex) {
-            StandSloneERVAFNException = true;
-            break;
+            return true;
         }
 
         // Supply air inlet node
         if (NodeNumber == StandAloneERV.SupplyAirInletNode) {
-            StandSloneERVAFNException = true;
-            break;
+            return true;
         }
     }
 
-    return StandSloneERVAFNException;
+    return false;
 }
 
 } // namespace EnergyPlus::HVACStandAloneERV
