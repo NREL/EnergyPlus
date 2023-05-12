@@ -990,113 +990,114 @@ void GetStandAloneERV(EnergyPlusData &state)
 
     // Setup report variables for the stand alone ERVs
     for (int StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
+        auto &standAloneERV = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex);
         SetupOutputVariable(state,
                             "Zone Ventilator Sensible Cooling Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).SensCoolingRate,
+                            standAloneERV.SensCoolingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Sensible Cooling Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).SensCoolingEnergy,
+                            standAloneERV.SensCoolingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Latent Cooling Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).LatCoolingRate,
+                            standAloneERV.LatCoolingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Latent Cooling Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).LatCoolingEnergy,
+                            standAloneERV.LatCoolingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Total Cooling Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).TotCoolingRate,
+                            standAloneERV.TotCoolingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Total Cooling Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).TotCoolingEnergy,
+                            standAloneERV.TotCoolingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
 
         SetupOutputVariable(state,
                             "Zone Ventilator Sensible Heating Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).SensHeatingRate,
+                            standAloneERV.SensHeatingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Sensible Heating Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).SensHeatingEnergy,
+                            standAloneERV.SensHeatingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Latent Heating Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).LatHeatingRate,
+                            standAloneERV.LatHeatingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Latent Heating Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).LatHeatingEnergy,
+                            standAloneERV.LatHeatingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Total Heating Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).TotHeatingRate,
+                            standAloneERV.TotHeatingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Total Heating Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).TotHeatingEnergy,
+                            standAloneERV.TotHeatingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
 
         SetupOutputVariable(state,
                             "Zone Ventilator Electricity Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).ElecUseRate,
+                            standAloneERV.ElecUseRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Electricity Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).ElecUseEnergy,
+                            standAloneERV.ElecUseEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Supply Fan Availability Status",
                             OutputProcessor::Unit::None,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).AvailStatus,
+                            standAloneERV.AvailStatus,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex).Name);
+                            standAloneERV.Name);
     }
 
     Alphas.deallocate();
