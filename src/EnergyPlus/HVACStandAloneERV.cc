@@ -86,8 +86,6 @@ namespace EnergyPlus::HVACStandAloneERV {
 // MODULE INFORMATION:
 //       AUTHOR         Richard Raustad, FSEC
 //       DATE WRITTEN   June 2003
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // To encapsulate the data and algorithms needed to simulate stand alone
@@ -98,10 +96,6 @@ namespace EnergyPlus::HVACStandAloneERV {
 // These units are modeled as a collection of components: air-to-air generic heat exchanger,
 // supply air fan, exhaust air fan and an optional controller to avoid overheating
 // of the supply air (economizer or free cooling operation).
-
-// REFERENCES: none
-
-// OTHER NOTES: none
 
 void SimStandAloneERV(EnergyPlusData &state,
                       std::string_view CompName,     // name of the Stand Alone ERV unit
@@ -117,17 +111,9 @@ void SimStandAloneERV(EnergyPlusData &state,
     //       AUTHOR         Richard Raustad, FSEC
     //       DATE WRITTEN   June 2003
     //       MODIFIED       Don Shirey, Aug 2009 (LatLoadMet)
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Manages the simulation of a Stand Alone ERV unit. Called from SimZoneEquipment
-
-    // Using/Aliasing
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // ZoneNum not used at this time, future modifications may require zone information
-    // dehumid = negative
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int StandAloneERVNum; // index of Stand Alone ERV unit being simulated
@@ -181,7 +167,6 @@ void GetStandAloneERV(EnergyPlusData &state)
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   June 2003
     //       MODIFIED       July 2012, Chandan Sharma - FSEC: Added zone sys avail managers
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for Stand Alone ERV units and stores it in the Stand Alone ERV data structure
@@ -196,14 +181,11 @@ void GetStandAloneERV(EnergyPlusData &state)
     Array1D_string cNumericFields;
     Array1D_bool lAlphaBlanks;
     Array1D_bool lNumericBlanks;
-    std::string CurrentModuleObject; // Object type for getting and error messages
-    int SAFanTypeNum;                // Integer equivalent to fan type
-    int EAFanTypeNum;                // Integer equivalent to fan type
+    int SAFanTypeNum; // Integer equivalent to fan type
+    int EAFanTypeNum; // Integer equivalent to fan type
     int NumArg;
     int NumAlphas;           // Number of Alphas for each GetObjectItem call
     int NumNumbers;          // Number of Numbers for each GetObjectItem call
-    int MaxAlphas;           // Max between the two objects gotten here
-    int MaxNumbers;          // Max between the two objects gotten here
     int IOStatus;            // Used in GetObjectItem
     bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
     int NumERVCtrlrs;        // total number of CONTROLLER:STAND ALONE ERV objects
@@ -220,8 +202,8 @@ void GetStandAloneERV(EnergyPlusData &state)
     int ZoneExhaustCZN;      // used for warning when zone node not listed in equipment connections
 
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EnergyRecoveryVentilator", NumArg, NumAlphas, NumNumbers);
-    MaxAlphas = NumAlphas;
-    MaxNumbers = NumNumbers;
+    int MaxAlphas = NumAlphas;
+    int MaxNumbers = NumNumbers;
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
         state, "ZoneHVAC:EnergyRecoveryVentilator:Controller", NumArg, NumAlphas, NumNumbers);
     MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -237,7 +219,7 @@ void GetStandAloneERV(EnergyPlusData &state)
     state.dataHVACStandAloneERV->GetERVInputFlag = false;
 
     // find the number of each type of Stand Alone ERV unit
-    CurrentModuleObject = "ZoneHVAC:EnergyRecoveryVentilator";
+    std::string CurrentModuleObject = "ZoneHVAC:EnergyRecoveryVentilator";
 
     state.dataHVACStandAloneERV->NumStandAloneERVs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
@@ -1253,7 +1235,6 @@ void InitStandAloneERV(EnergyPlusData &state,
     //       AUTHOR         Richard Raustad, FSEC
     //       DATE WRITTEN   June 2003
     //       MODIFIED       July 2012, Chandan Sharma - FSEC: Added zone sys avail managers
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for initializations of the Stand Alone ERV unit information.
@@ -1425,7 +1406,6 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     //       AUTHOR         Richard Raustad
     //       DATE WRITTEN   October 2007
     //       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for sizing Stand Alone ERV Components for which flow rates have not been
@@ -1437,25 +1417,18 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     static constexpr std::string_view RoutineName("SizeStandAloneERV: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 ZoneMult;                   // Zone multiplier
-    Real64 NumberOfPeople;             // Maximum number of people in zone
-    Real64 MaxPeopleSch;               // maximum people schedule value
-    Real64 FloorArea;                  // Floor area of zone (m2)
-    bool IsAutoSize;                   // Indicator to autosize
-    Real64 SupplyAirVolFlowDes;        // Autosized supply air flow for reporting
-    Real64 SupplyAirVolFlowUser;       // Hardsized supply air flow for reporting
-    Real64 DesignSAFanVolFlowRateDes;  // Autosized supply air fan flow for reporting
-    Real64 DesignSAFanVolFlowRateUser; // Hardsized supply air fan flow for reporting
-    Real64 ExhaustAirVolFlowDes;       // Autosized exhaust air flow for reporting
-    Real64 ExhaustAirVolFlowUser;      // Hardsized exhaust air flow for reporting
+    Real64 ZoneMult;       // Zone multiplier
+    Real64 NumberOfPeople; // Maximum number of people in zone
+    Real64 MaxPeopleSch;   // maximum people schedule value
+    Real64 FloorArea;      // Floor area of zone (m2)
 
-    IsAutoSize = false;
-    SupplyAirVolFlowDes = 0.0;
-    SupplyAirVolFlowUser = 0.0;
-    DesignSAFanVolFlowRateDes = 0.0;
-    DesignSAFanVolFlowRateUser = 0.0;
-    ExhaustAirVolFlowDes = 0.0;
-    ExhaustAirVolFlowUser = 0.0;
+    bool IsAutoSize = false;
+    Real64 SupplyAirVolFlowDes = 0.0;
+    Real64 SupplyAirVolFlowUser = 0.0;
+    Real64 DesignSAFanVolFlowRateDes = 0.0;
+    Real64 DesignSAFanVolFlowRateUser = 0.0;
+    Real64 ExhaustAirVolFlowDes = 0.0;
+    Real64 ExhaustAirVolFlowUser = 0.0;
     std::string CompType = "ZoneHVAC:EnergyRecoveryVentilator";
     std::string CompName = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name;
     bool PrintFlag = true;
@@ -1628,7 +1601,6 @@ void CalcStandAloneERV(EnergyPlusData &state,
     //       DATE WRITTEN   June 2003
     //       MODIFIED       Don Shirey, Aug 2009 (LatentMassLoadMet)
     //                      July 2012, Chandan Sharma - FSEC: Added zone sys avail managers
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Simulate the components making up the Stand Alone ERV unit.
@@ -1637,25 +1609,21 @@ void CalcStandAloneERV(EnergyPlusData &state,
     // Simulates the unit components sequentially in the air flow direction.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int SupOutletNode;    // unit supply air outlet node
-    int ExhaustInletNode; // unit exhaust air inlet node
-    int SupInletNode;     // unit supply air inlet node
-    Real64 AirMassFlow;   // total mass flow through supply side of the ERV (supply air outlet node)
+    Real64 AirMassFlow; // total mass flow through supply side of the ERV (supply air outlet node)
     // (so enthalpy routines work without error)
     Real64 TotLoadMet;           // total zone load met by unit (W)
     Real64 LatLoadMet;           // latent zone load met by unit (W)
-    bool HXUnitOn;               // flag to operate heat exchanger heat recovery
     bool EconomizerFlag;         // economizer signal from OA controller
     bool HighHumCtrlFlag;        // high humditiy control signal from OA controller
     Real64 TotalExhaustMassFlow; // total exhaust air mass flow rate in controlled zone
     Real64 TotalSupplyMassFlow;  // total supply air mass flow rate in controlled zone
 
-    SupInletNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
-    SupOutletNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode;
-    ExhaustInletNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode;
+    int SupInletNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
+    int SupOutletNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode;
+    int ExhaustInletNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode;
 
     // Stand alone ERV's HX is ON by default
-    HXUnitOn = true;
+    bool HXUnitOn = true;
 
     // Get stand alone ERV's controller economizer and high humidity control status
     if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
@@ -1766,37 +1734,8 @@ void ReportStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum) // n
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Raustad, FSEC
     //       DATE WRITTEN   June 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // Fill remaining report variables
-
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 ReportingConstant;
-
-    ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
+    Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseEnergy =
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate * ReportingConstant;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SensCoolingEnergy =
@@ -1820,8 +1759,6 @@ void ReportStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum) // n
     }
 }
 
-//        End of Reporting subroutines for the Module
-
 //        Utility subroutines/functions for the HeatingCoil Module
 
 Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
@@ -1834,16 +1771,11 @@ Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   October 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the ERVCtrlName in the ERV Stand Alone list and returns the
     // Supply Air Flow rate, if found.  If incorrect name is given, ErrorsFound is returned as true
     // and supply air flow rate as negative.
-
-    // Return value
-    Real64 AirFlowRate; // returned supply air flow rate of the ERV unit
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int WhichERV;
@@ -1856,7 +1788,7 @@ Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
     if (UtilityRoutines::SameString(ERVType, "ZoneHVAC:EnergyRecoveryVentilator")) {
         WhichERV = UtilityRoutines::FindItem(ERVCtrlName, state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
         if (WhichERV != 0) {
-            AirFlowRate = state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow;
+            return state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow;
         }
     } else {
         WhichERV = 0;
@@ -1865,10 +1797,8 @@ Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
     if (WhichERV == 0) {
         ShowSevereError(state, format("Could not find ZoneHVAC:EnergyRecoveryVentilator with Controller Name=\"{}\"", ERVCtrlName));
         ErrorsFound = true;
-        AirFlowRate = -1000.0;
+        return -1000.0;
     }
-
-    return AirFlowRate;
 }
 
 int GetStandAloneERVOutAirNode(EnergyPlusData &state, int const StandAloneERVNum)
