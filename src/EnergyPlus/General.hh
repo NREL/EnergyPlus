@@ -248,6 +248,8 @@ namespace General {
                              int nReportPeriods,
                              Array1D_bool &inReportPeriodFlags);
 
+    Real64 rotAzmDiffDeg(Real64 const &AzmA, Real64 const &AzmB);
+
     inline Real64 epexp(const Real64 numerator, const Real64 denominator)
     {
         if (denominator == 0.0) {
@@ -256,7 +258,6 @@ namespace General {
             return std::exp(numerator / denominator);
         }
     }
-
 } // namespace General
 
 struct GeneralData : BaseGlobalStruct

@@ -1409,4 +1409,18 @@ void findReportPeriodIdx(EnergyPlusData &state,
     }
 }
 
+Real64 rotAzmDiffDeg(Real64 const &AzmA, Real64 const &AzmB)
+{
+    // This function takes two (azimuth) angles in Degree(s),
+    // and returns the rotational angle difference in Degree(s).
+
+    Real64 diff = AzmB - AzmA;
+    if (diff > 180.0) {
+        diff = 360.0 - diff;
+    } else if (diff < -180.0) {
+        diff = 360.0 + diff;
+    }
+    return std::abs(diff);
+}
+
 } // namespace EnergyPlus::General
