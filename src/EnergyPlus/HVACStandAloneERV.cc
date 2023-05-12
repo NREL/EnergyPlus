@@ -1636,10 +1636,6 @@ void CalcStandAloneERV(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Simulates the unit components sequentially in the air flow direction.
 
-    // Using/Aliasing
-    using Fans::SimulateFanComponents;
-    using HeatRecovery::SimHeatRecovery;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SupOutletNode;    // unit supply air outlet node
     int ExhaustInletNode; // unit exhaust air inlet node
@@ -1671,25 +1667,25 @@ void CalcStandAloneERV(EnergyPlusData &state,
         HighHumCtrlFlag = false;
     }
 
-    SimHeatRecovery(state,
-                    state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName,
-                    FirstHVACIteration,
-                    state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerIndex,
-                    DataHVACGlobals::ContFanCycCoil,
-                    _,
-                    HXUnitOn,
-                    _,
-                    _,
-                    EconomizerFlag,
-                    HighHumCtrlFlag);
+    HeatRecovery::SimHeatRecovery(state,
+                                  state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName,
+                                  FirstHVACIteration,
+                                  state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerIndex,
+                                  DataHVACGlobals::ContFanCycCoil,
+                                  _,
+                                  HXUnitOn,
+                                  _,
+                                  _,
+                                  EconomizerFlag,
+                                  HighHumCtrlFlag);
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate = state.dataHVACGlobal->AirToAirHXElecPower;
 
     if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-        SimulateFanComponents(state,
-                              state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName,
-                              FirstHVACIteration,
-                              state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex,
-                              _);
+        Fans::SimulateFanComponents(state,
+                                    state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName,
+                                    FirstHVACIteration,
+                                    state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex,
+                                    _);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate +=
             Fans::GetFanPower(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex);
     } else {
@@ -1699,10 +1695,10 @@ void CalcStandAloneERV(EnergyPlusData &state,
     }
 
     if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-        SimulateFanComponents(state,
-                              state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
-                              FirstHVACIteration,
-                              state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex);
+        Fans::SimulateFanComponents(state,
+                                    state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
+                                    FirstHVACIteration,
+                                    state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate +=
             Fans::GetFanPower(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex);
     } else {
