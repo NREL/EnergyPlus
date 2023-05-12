@@ -213,18 +213,12 @@ void GetStandAloneERV(EnergyPlusData &state)
     using OutAirNodeManager::CheckOutAirNodeNumber;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int StandAloneERVIndex;  // loop index
-    int StandAloneERVNum;    // current Stand Alone ERV number
     Array1D_string Alphas;   // Alpha items for object
     Array1D<Real64> Numbers; // Numeric items for object
     Array1D_string cAlphaFields;
     Array1D_string cNumericFields;
     Array1D_bool lAlphaBlanks;
     Array1D_bool lNumericBlanks;
-    std::string CompSetSupplyFanInlet;
-    std::string CompSetSupplyFanOutlet;
-    std::string CompSetExhaustFanInlet;
-    std::string CompSetExhaustFanOutlet;
     std::string CurrentModuleObject; // Object type for getting and error messages
     int SAFanTypeNum;                // Integer equivalent to fan type
     int EAFanTypeNum;                // Integer equivalent to fan type
@@ -279,7 +273,7 @@ void GetStandAloneERV(EnergyPlusData &state)
     state.dataHVACStandAloneERV->CheckEquipName.dimension(state.dataHVACStandAloneERV->NumStandAloneERVs, true);
 
     // loop over Stand Alone ERV units; get and load the input data
-    for (StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
+    for (int StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  CurrentModuleObject,
@@ -293,7 +287,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
-        StandAloneERVNum = StandAloneERVIndex; // separate variables in case other objects read by this module at some point later
+        int StandAloneERVNum = StandAloneERVIndex; // separate variables in case other objects read by this module at some point later
         UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name = Alphas(1);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).UnitType = CurrentModuleObject;
@@ -759,12 +753,14 @@ void GetStandAloneERV(EnergyPlusData &state)
         }
 
         // Add supply fan to component sets array
-        CompSetSupplyFanInlet = "UNDEFINED";
-        CompSetSupplyFanOutlet = state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode);
+        std::string CompSetSupplyFanInlet = "UNDEFINED";
+        std::string CompSetSupplyFanOutlet =
+            state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode);
 
         // Add exhaust fan to component sets array
-        CompSetExhaustFanInlet = "UNDEFINED";
-        CompSetExhaustFanOutlet = state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirOutletNode);
+        std::string CompSetExhaustFanInlet = "UNDEFINED";
+        std::string CompSetExhaustFanOutlet =
+            state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirOutletNode);
 
         // Add HX to component sets array
         SetUpCompSets(state,
@@ -1006,7 +1002,6 @@ void GetStandAloneERV(EnergyPlusData &state)
             // Get the node number for the zone with the humidistat
             if (HStatZoneNum > 0) {
                 bool ZoneNodeFound = false;
-                bool HStatFound = false;
                 if (state.dataZoneEquip->ZoneEquipConfig(HStatZoneNum).IsControlled) {
                     //         Find the controlled zone number for the specified humidistat location
                     thisOAController.NodeNumofHumidistatZone = state.dataZoneEquip->ZoneEquipConfig(HStatZoneNum).ZoneNode;
@@ -1019,6 +1014,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                     ShowContinueError(state, "... A ZoneHVAC:EquipmentConnections object must be specified for this zone.");
                     ErrorsFound = true;
                 } else {
+                    bool HStatFound = false;
                     for (NumHstatZone = 1; NumHstatZone <= state.dataZoneCtrls->NumHumidityControlZones; ++NumHstatZone) {
                         if (state.dataZoneCtrls->HumidityControlZone(NumHstatZone).ActualZoneNum != HStatZoneNum) continue;
                         HStatFound = true;
@@ -1133,7 +1129,7 @@ void GetStandAloneERV(EnergyPlusData &state)
     }
 
     // Setup report variables for the stand alone ERVs
-    for (StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
+    for (int StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
         SetupOutputVariable(state,
                             "Zone Ventilator Sensible Cooling Rate",
                             OutputProcessor::Unit::W,
@@ -1273,8 +1269,6 @@ void InitStandAloneERV(EnergyPlusData &state,
     using DataZoneEquipment::CheckZoneEquipmentList;
     using MixedAir::SimOAController;
 
-    auto &Node = state.dataLoopNodes->Node;
-
     // Do the one time initializations
     if (state.dataHVACStandAloneERV->MyOneTimeFlag) {
 
@@ -1331,10 +1325,13 @@ void InitStandAloneERV(EnergyPlusData &state,
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignEAFanMassFlowRate =
             state.dataEnvrn->StdRhoAir * state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate;
         // set the node max and min mass flow rates
-        Node(SupInNode).MassFlowRateMax = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow;
-        Node(SupInNode).MassFlowRateMin = 0.0;
-        Node(ExhInNode).MassFlowRateMax = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow;
-        Node(ExhInNode).MassFlowRateMin = 0.0;
+        auto &supInNode = state.dataLoopNodes->Node(SupInNode);
+        auto &exhInNode = state.dataLoopNodes->Node(ExhInNode);
+
+        supInNode.MassFlowRateMax = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow;
+        supInNode.MassFlowRateMin = 0.0;
+        exhInNode.MassFlowRateMax = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow;
+        exhInNode.MassFlowRateMin = 0.0;
         state.dataHVACStandAloneERV->MyEnvrnFlag(StandAloneERVNum) = false;
         //   Initialize OA Controller on BeginEnvrnFlag
         if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
@@ -1358,8 +1355,10 @@ void InitStandAloneERV(EnergyPlusData &state,
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SensHeatingRate = 0.0;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).LatHeatingRate = 0.0;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).TotHeatingRate = 0.0;
-    int SupInletNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
+    int SupInNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
     int ExhInNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode;
+    auto &supInNode = state.dataLoopNodes->Node(SupInNode);
+    auto &exhInNode = state.dataLoopNodes->Node(ExhInNode);
 
     // Set the inlet node mass flow rate
     if (GetCurrentScheduleValue(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr) > 0.0) {
@@ -1367,7 +1366,7 @@ void InitStandAloneERV(EnergyPlusData &state,
         //   IF optional ControllerName is defined SimOAController ONLY to set economizer and Modifyairflow flags
         if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
             //     Initialize a flow rate for controller
-            Node(SupInletNode).MassFlowRate = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow;
+            supInNode.MassFlowRate = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow;
             SimOAController(state,
                             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerName,
                             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex,
@@ -1380,50 +1379,50 @@ void InitStandAloneERV(EnergyPlusData &state,
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
                 if (state.dataMixedAir->OAController(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex)
                         .HighHumCtrlActive) {
-                    Node(SupInletNode).MassFlowRate = min(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanMassFlowRate,
-                                                          state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow *
-                                                              state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio);
+                    supInNode.MassFlowRate = min(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanMassFlowRate,
+                                                 state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow *
+                                                     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio);
                 } else {
-                    Node(SupInletNode).MassFlowRate = min(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanMassFlowRate,
-                                                          state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow);
+                    supInNode.MassFlowRate = min(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanMassFlowRate,
+                                                 state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow);
                 }
             } else {
-                Node(SupInletNode).MassFlowRate = min(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanMassFlowRate,
-                                                      state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow);
+                supInNode.MassFlowRate = min(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanMassFlowRate,
+                                             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow);
             }
         } else {
-            Node(SupInletNode).MassFlowRate = 0.0;
+            supInNode.MassFlowRate = 0.0;
         }
-        Node(SupInletNode).MassFlowRateMaxAvail = Node(SupInletNode).MassFlowRate;
-        Node(SupInletNode).MassFlowRateMinAvail = Node(SupInletNode).MassFlowRate;
+        supInNode.MassFlowRateMaxAvail = supInNode.MassFlowRate;
+        supInNode.MassFlowRateMinAvail = supInNode.MassFlowRate;
 
         if (GetCurrentScheduleValue(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanSchPtr) > 0) {
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
                 if (state.dataMixedAir->OAController(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex)
                         .HighHumCtrlActive) {
-                    Node(ExhInNode).MassFlowRate = min(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignEAFanMassFlowRate,
-                                                       state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow *
-                                                           state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio);
+                    exhInNode.MassFlowRate = min(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignEAFanMassFlowRate,
+                                                 state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow *
+                                                     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio);
                 } else {
-                    Node(ExhInNode).MassFlowRate = min(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignEAFanMassFlowRate,
-                                                       state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow);
+                    exhInNode.MassFlowRate = min(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignEAFanMassFlowRate,
+                                                 state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow);
                 }
             } else {
-                Node(ExhInNode).MassFlowRate = min(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignEAFanMassFlowRate,
-                                                   state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow);
+                exhInNode.MassFlowRate = min(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignEAFanMassFlowRate,
+                                             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow);
             }
         } else {
-            Node(ExhInNode).MassFlowRate = 0.0;
+            exhInNode.MassFlowRate = 0.0;
         }
-        Node(ExhInNode).MassFlowRateMaxAvail = Node(ExhInNode).MassFlowRate;
-        Node(ExhInNode).MassFlowRateMinAvail = Node(ExhInNode).MassFlowRate;
+        exhInNode.MassFlowRateMaxAvail = exhInNode.MassFlowRate;
+        exhInNode.MassFlowRateMinAvail = exhInNode.MassFlowRate;
     } else {
-        Node(SupInletNode).MassFlowRate = 0.0;
-        Node(SupInletNode).MassFlowRateMaxAvail = 0.0;
-        Node(SupInletNode).MassFlowRateMinAvail = 0.0;
-        Node(ExhInNode).MassFlowRate = 0.0;
-        Node(ExhInNode).MassFlowRateMaxAvail = 0.0;
-        Node(ExhInNode).MassFlowRateMinAvail = 0.0;
+        supInNode.MassFlowRate = 0.0;
+        supInNode.MassFlowRateMaxAvail = 0.0;
+        supInNode.MassFlowRateMinAvail = 0.0;
+        exhInNode.MassFlowRate = 0.0;
+        exhInNode.MassFlowRateMaxAvail = 0.0;
+        exhInNode.MassFlowRateMinAvail = 0.0;
     }
 }
 
