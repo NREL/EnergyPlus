@@ -108,9 +108,6 @@ namespace EnergyPlus::HVACStandAloneERV {
 // Using/Aliasing
 using namespace DataLoopNode;
 using namespace DataHVACGlobals;
-using Fans::GetFanVolFlow;
-using ScheduleManager::GetCurrentScheduleValue;
-using ScheduleManager::GetScheduleIndex;
 
 void SimStandAloneERV(EnergyPlusData &state,
                       std::string_view CompName,     // name of the Stand Alone ERV unit
@@ -296,7 +293,7 @@ void GetStandAloneERV(EnergyPlusData &state)
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr =
-                GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
+                ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr == 0) {
                 ShowSevereError(state,
                                 format("{}, \"{}\" {} not found = {}",
@@ -1069,10 +1066,10 @@ void GetStandAloneERV(EnergyPlusData &state)
         }
 
         //   Check for a time of day outside air schedule
-        thisOAController.EconomizerOASchedPtr = GetScheduleIndex(state, Alphas(5));
+        thisOAController.EconomizerOASchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(5));
 
         if (WhichERV != 0) {
-            state.dataHVACStandAloneERV->StandAloneERV(WhichERV).EconomizerOASchedPtr = GetScheduleIndex(state, Alphas(5));
+            state.dataHVACStandAloneERV->StandAloneERV(WhichERV).EconomizerOASchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(5));
 
             // Compare the ERV SA fan flow rates to modified air flow rate.
             if (HighRHOARatio > 1.0 && state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow != AutoSize &&
@@ -1361,7 +1358,7 @@ void InitStandAloneERV(EnergyPlusData &state,
     auto &exhInNode = state.dataLoopNodes->Node(ExhInNode);
 
     // Set the inlet node mass flow rate
-    if (GetCurrentScheduleValue(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr) > 0.0) {
+    if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr) > 0.0) {
 
         //   IF optional ControllerName is defined SimOAController ONLY to set economizer and Modifyairflow flags
         if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
@@ -1374,7 +1371,7 @@ void InitStandAloneERV(EnergyPlusData &state,
                             0);
         }
 
-        if (GetCurrentScheduleValue(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanSchPtr) > 0 ||
+        if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanSchPtr) > 0 ||
             (state.dataHVACGlobal->TurnFansOn && !state.dataHVACGlobal->TurnFansOff)) {
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
                 if (state.dataMixedAir->OAController(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex)
@@ -1396,7 +1393,7 @@ void InitStandAloneERV(EnergyPlusData &state,
         supInNode.MassFlowRateMaxAvail = supInNode.MassFlowRate;
         supInNode.MassFlowRateMinAvail = supInNode.MassFlowRate;
 
-        if (GetCurrentScheduleValue(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanSchPtr) > 0) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanSchPtr) > 0) {
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
                 if (state.dataMixedAir->OAController(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex)
                         .HighHumCtrlActive) {
@@ -2078,7 +2075,7 @@ bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
             // Fan:OnOff
             SupplyFanInletNodeIndex = Fans::GetFanInletNode(state, "Fan:OnOff", StandAloneERV.SupplyAirFanName, ErrorsFound);
             SupplyFanOutletNodeIndex = Fans::GetFanOutletNode(state, "Fan:OnOff", StandAloneERV.SupplyAirFanName, ErrorsFound);
-            GetFanVolFlow(state, StandAloneERV.SupplyAirFanIndex, SupplyFanAirFlow);
+            Fans::GetFanVolFlow(state, StandAloneERV.SupplyAirFanIndex, SupplyFanAirFlow);
             if (ErrorsFound) {
                 ShowWarningError(state, format("Could not retrieve fan outlet node for this unit=\"{}\".", StandAloneERV.Name));
                 ErrorsFound = true;
@@ -2094,7 +2091,7 @@ bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
             // Fan:OnOff
             ExhaustFanInletNodeIndex = Fans::GetFanInletNode(state, "Fan:OnOff", StandAloneERV.ExhaustAirFanName, ErrorsFound);
             ExhaustFanOutletNodeIndex = Fans::GetFanOutletNode(state, "Fan:OnOff", StandAloneERV.ExhaustAirFanName, ErrorsFound);
-            GetFanVolFlow(state, StandAloneERV.ExhaustAirFanIndex, ExhaustFanAirFlow);
+            Fans::GetFanVolFlow(state, StandAloneERV.ExhaustAirFanIndex, ExhaustFanAirFlow);
             if (ErrorsFound) {
                 ShowWarningError(state, format("Could not retrieve fan outlet node for this unit=\"{}\".", StandAloneERV.Name));
             }
