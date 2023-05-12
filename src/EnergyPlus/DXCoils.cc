@@ -6202,8 +6202,7 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System");
             }
 
-            if (thisDXCoil.FuelType != Constant::eFuel::Electricity &&
-                thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
+            if (thisDXCoil.FuelType != Constant::eFuel::Electricity && thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
                 std::string_view sFuelType = Constant::eFuelNames[static_cast<int>(thisDXCoil.FuelType)];
                 SetupOutputVariable(state,
                                     format("Heating Coil Defrost {} Rate", sFuelType),
