@@ -229,30 +229,24 @@ void GetStandAloneERV(EnergyPlusData &state)
     int SAFanTypeNum;                // Integer equivalent to fan type
     int EAFanTypeNum;                // Integer equivalent to fan type
     int NumArg;
-    int NumAlphas;             // Number of Alphas for each GetObjectItem call
-    int NumNumbers;            // Number of Numbers for each GetObjectItem call
-    int MaxAlphas;             // Max between the two objects gotten here
-    int MaxNumbers;            // Max between the two objects gotten here
-    int IOStatus;              // Used in GetObjectItem
-    bool ErrorsFound(false);   // Set to true if errors in input, fatal at end of routine
-    int NumERVCtrlrs;          // total number of CONTROLLER:STAND ALONE ERV objects
-    int ERVControllerNum;      // index to ERV controller
-    int WhichERV;              // used in controller GetInput
-    Real64 AirFlowRate;        // used to find zone with humidistat
-    int NodeNumber;            // used to find zone with humidistat
-    int HStatZoneNum;          // used to find zone with humidistat
-    int NumHstatZone;          // index to humidity controlled zones
-    bool ZoneNodeFound(false); // used to find zone with humidistat
-    bool HStatFound(false);    // used to find zone with humidistat
-    bool errFlag;              // Error flag used in mining calls
-    Real64 SAFanVolFlowRate;   // supply air fan volumetric flow rate [m3/s]
-    Real64 EAFanVolFlowRate;   // exhaust air fan volumetric flow rate [m3/s]
-    Real64 HXSupAirFlowRate;   // HX supply air flow rate [m3/s]
-    Real64 HighRHOARatio;      // local variable for HighRHOAFlowRatio
-    bool ZoneInletNodeFound;   // used for warning when zone node not listed in equipment connections
-    bool ZoneExhaustNodeFound; // used for warning when zone node not listed in equipment connections
-    int ZoneInletCZN;          // used for warning when zone node not listed in equipment connections
-    int ZoneExhaustCZN;        // used for warning when zone node not listed in equipment connections
+    int NumAlphas;           // Number of Alphas for each GetObjectItem call
+    int NumNumbers;          // Number of Numbers for each GetObjectItem call
+    int MaxAlphas;           // Max between the two objects gotten here
+    int MaxNumbers;          // Max between the two objects gotten here
+    int IOStatus;            // Used in GetObjectItem
+    bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+    int NumERVCtrlrs;        // total number of CONTROLLER:STAND ALONE ERV objects
+    int ERVControllerNum;    // index to ERV controller
+    Real64 AirFlowRate;      // used to find zone with humidistat
+    int NodeNumber;          // used to find zone with humidistat
+    int HStatZoneNum;        // used to find zone with humidistat
+    int NumHstatZone;        // index to humidity controlled zones
+    Real64 SAFanVolFlowRate; // supply air fan volumetric flow rate [m3/s]
+    Real64 EAFanVolFlowRate; // exhaust air fan volumetric flow rate [m3/s]
+    Real64 HXSupAirFlowRate; // HX supply air flow rate [m3/s]
+    Real64 HighRHOARatio;    // local variable for HighRHOAFlowRatio
+    int ZoneInletCZN;        // used for warning when zone node not listed in equipment connections
+    int ZoneExhaustCZN;      // used for warning when zone node not listed in equipment connections
 
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EnergyRecoveryVentilator", NumArg, NumAlphas, NumNumbers);
     MaxAlphas = NumAlphas;
@@ -323,7 +317,7 @@ void GetStandAloneERV(EnergyPlusData &state)
         GlobalNames::IntraObjUniquenessCheck(
             state, Alphas(3), CurrentModuleObject, cAlphaFields(3), state.dataHVACStandAloneERV->HeatExchangerUniqueNames, ErrorsFound);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName = Alphas(3);
-        errFlag = false;
+        bool errFlag = false;
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerTypeNum =
             GetHeatExchangerObjectTypeNum(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName, errFlag);
         if (errFlag) {
@@ -528,8 +522,8 @@ void GetStandAloneERV(EnergyPlusData &state)
         }
 
         //   Check to make sure inlet and exhaust nodes are listed in a ZoneHVAC:EquipmentConnections object
-        ZoneInletNodeFound = false;
-        ZoneExhaustNodeFound = false;
+        bool ZoneInletNodeFound = false;
+        bool ZoneExhaustNodeFound = false;
         for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
             if (!ZoneInletNodeFound) {
                 for (NodeNumber = 1; NodeNumber <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++NodeNumber) {
@@ -875,7 +869,7 @@ void GetStandAloneERV(EnergyPlusData &state)
 
         thisOAController.Name = Alphas(1);
         thisOAController.ControllerType = MixedAir::MixedAirControllerType::ControllerStandAloneERV;
-        WhichERV = UtilityRoutines::FindItemInList(Alphas(1), state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
+        int WhichERV = UtilityRoutines::FindItemInList(Alphas(1), state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
         if (WhichERV != 0) {
             AirFlowRate = state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow;
             state.dataHVACStandAloneERV->StandAloneERV(WhichERV).ControllerIndex = OutAirNum;
@@ -1011,8 +1005,8 @@ void GetStandAloneERV(EnergyPlusData &state)
 
             // Get the node number for the zone with the humidistat
             if (HStatZoneNum > 0) {
-                ZoneNodeFound = false;
-                HStatFound = false;
+                bool ZoneNodeFound = false;
+                bool HStatFound = false;
                 if (state.dataZoneEquip->ZoneEquipConfig(HStatZoneNum).IsControlled) {
                     //         Find the controlled zone number for the specified humidistat location
                     thisOAController.NodeNumofHumidistatZone = state.dataZoneEquip->ZoneEquipConfig(HStatZoneNum).ZoneNode;
@@ -1279,12 +1273,6 @@ void InitStandAloneERV(EnergyPlusData &state,
     using DataZoneEquipment::CheckZoneEquipmentList;
     using MixedAir::SimOAController;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int SupInNode;    // supply air inlet node number
-    int ExhInNode;    // exhaust air inlet node number
-    int SupInletNode; // supply air inlet node number for Stand Alone ERV 'StandAloneERVNum'
-    int Loop;         // loop counter
-
     auto &Node = state.dataLoopNodes->Node;
 
     // Do the one time initializations
@@ -1313,7 +1301,7 @@ void InitStandAloneERV(EnergyPlusData &state,
     // need to check all units to see if they are on Zone Equipment List or issue warning
     if (!state.dataHVACStandAloneERV->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataHVACStandAloneERV->ZoneEquipmentListChecked = true;
-        for (Loop = 1; Loop <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++Loop) {
             if (CheckZoneEquipmentList(
                     state, state.dataHVACStandAloneERV->StandAloneERV(Loop).UnitType, state.dataHVACStandAloneERV->StandAloneERV(Loop).Name))
                 continue;
@@ -1331,8 +1319,8 @@ void InitStandAloneERV(EnergyPlusData &state,
 
     // Do the Begin Environment initializations
     if (state.dataGlobal->BeginEnvrnFlag && state.dataHVACStandAloneERV->MyEnvrnFlag(StandAloneERVNum)) {
-        SupInNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
-        ExhInNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode;
+        int SupInNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
+        int ExhInNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode;
         // set the mass flow rates from the input volume flow rates
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow =
             state.dataEnvrn->StdRhoAir * state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
@@ -1370,8 +1358,8 @@ void InitStandAloneERV(EnergyPlusData &state,
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SensHeatingRate = 0.0;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).LatHeatingRate = 0.0;
     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).TotHeatingRate = 0.0;
-    SupInletNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
-    ExhInNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode;
+    int SupInletNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
+    int ExhInNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode;
 
     // Set the inlet node mass flow rate
     if (GetCurrentScheduleValue(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SchedPtr) > 0.0) {
