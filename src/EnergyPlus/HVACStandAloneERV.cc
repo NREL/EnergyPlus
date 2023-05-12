@@ -197,7 +197,6 @@ void GetStandAloneERV(EnergyPlusData &state)
     Real64 SAFanVolFlowRate; // supply air fan volumetric flow rate [m3/s]
     Real64 EAFanVolFlowRate; // exhaust air fan volumetric flow rate [m3/s]
     Real64 HXSupAirFlowRate; // HX supply air flow rate [m3/s]
-    Real64 HighRHOARatio;    // local variable for HighRHOAFlowRatio
     int ZoneInletCZN;        // used for warning when zone node not listed in equipment connections
     int ZoneExhaustCZN;      // used for warning when zone node not listed in equipment connections
 
@@ -968,7 +967,7 @@ void GetStandAloneERV(EnergyPlusData &state)
         thisOAController.EconBypass = true;
 
         //   Initialize to one in case high humidity control is NOT used
-        HighRHOARatio = 1.0;
+        Real64 HighRHOARatio = 1.0;
         //   READ Modify Air Flow Data
         //   High humidity control option is YES, read in additional data
         if (UtilityRoutines::SameString(Alphas(6), "Yes")) {
@@ -1416,19 +1415,11 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
 
     static constexpr std::string_view RoutineName("SizeStandAloneERV: ");
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 ZoneMult;       // Zone multiplier
-    Real64 NumberOfPeople; // Maximum number of people in zone
-    Real64 MaxPeopleSch;   // maximum people schedule value
-    Real64 FloorArea;      // Floor area of zone (m2)
-
     bool IsAutoSize = false;
     Real64 SupplyAirVolFlowDes = 0.0;
-    Real64 SupplyAirVolFlowUser = 0.0;
     Real64 DesignSAFanVolFlowRateDes = 0.0;
     Real64 DesignSAFanVolFlowRateUser = 0.0;
     Real64 ExhaustAirVolFlowDes = 0.0;
-    Real64 ExhaustAirVolFlowUser = 0.0;
     std::string CompType = "ZoneHVAC:EnergyRecoveryVentilator";
     std::string CompName = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name;
     bool PrintFlag = true;
@@ -1445,11 +1436,10 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
         //      Sizing objects are not required for stand alone ERV
         //      CALL CheckZoneSizing('ZoneHVAC:EnergyRecoveryVentilator',StandAloneERV(StandAloneERVNum)%Name)
         int ZoneNum = state.dataSize->CurZoneEqNum;
-        ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
-        FloorArea = 0.0;
-        FloorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
-        NumberOfPeople = 0.0;
-        MaxPeopleSch = 0.0;
+        Real64 ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
+        Real64 FloorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
+        Real64 NumberOfPeople = 0.0;
+        Real64 MaxPeopleSch = 0.0;
         for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
             if (ZoneNum != state.dataHeatBal->People(PeopleNum).ZonePtr) continue;
             int PeopleSchPtr = state.dataHeatBal->People(PeopleNum).NumberOfPeoplePtr;
@@ -1609,14 +1599,10 @@ void CalcStandAloneERV(EnergyPlusData &state,
     // Simulates the unit components sequentially in the air flow direction.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 AirMassFlow; // total mass flow through supply side of the ERV (supply air outlet node)
-    // (so enthalpy routines work without error)
-    Real64 TotLoadMet;           // total zone load met by unit (W)
-    Real64 LatLoadMet;           // latent zone load met by unit (W)
-    bool EconomizerFlag;         // economizer signal from OA controller
-    bool HighHumCtrlFlag;        // high humditiy control signal from OA controller
-    Real64 TotalExhaustMassFlow; // total exhaust air mass flow rate in controlled zone
-    Real64 TotalSupplyMassFlow;  // total supply air mass flow rate in controlled zone
+    Real64 TotLoadMet;    // total zone load met by unit (W)
+    Real64 LatLoadMet;    // latent zone load met by unit (W)
+    bool EconomizerFlag;  // economizer signal from OA controller
+    bool HighHumCtrlFlag; // high humditiy control signal from OA controller
 
     int SupInletNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
     int SupOutletNode = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode;
@@ -1675,7 +1661,8 @@ void CalcStandAloneERV(EnergyPlusData &state,
             state.dataHVACFan->fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->fanPower();
     }
 
-    AirMassFlow = state.dataLoopNodes->Node(SupOutletNode).MassFlowRate;
+    // total mass flow through supply side of the ERV (supply air outlet node)
+    Real64 AirMassFlow = state.dataLoopNodes->Node(SupOutletNode).MassFlowRate;
     CalcZoneSensibleLatentOutput(AirMassFlow,
                                  state.dataLoopNodes->Node(SupOutletNode).Temp,
                                  state.dataLoopNodes->Node(SupOutletNode).HumRat,
@@ -1711,8 +1698,8 @@ void CalcStandAloneERV(EnergyPlusData &state,
 
     // Provide a one time message when exhaust flow rate is greater than supply flow rate
     if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).FlowError && !state.dataGlobal->WarmupFlag) {
-        TotalExhaustMassFlow = state.dataLoopNodes->Node(ExhaustInletNode).MassFlowRate;
-        TotalSupplyMassFlow = state.dataLoopNodes->Node(SupInletNode).MassFlowRate;
+        Real64 TotalExhaustMassFlow = state.dataLoopNodes->Node(ExhaustInletNode).MassFlowRate;
+        Real64 TotalSupplyMassFlow = state.dataLoopNodes->Node(SupInletNode).MassFlowRate;
         if (TotalExhaustMassFlow > TotalSupplyMassFlow && !state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
             ShowWarningError(state,
                              format("For {} \"{}\" there is unbalanced exhaust air flow.",
@@ -1777,28 +1764,21 @@ Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
     // Supply Air Flow rate, if found.  If incorrect name is given, ErrorsFound is returned as true
     // and supply air flow rate as negative.
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichERV;
-
     if (state.dataHVACStandAloneERV->GetERVInputFlag) {
         GetStandAloneERV(state);
         state.dataHVACStandAloneERV->GetERVInputFlag = false;
     }
 
     if (UtilityRoutines::SameString(ERVType, "ZoneHVAC:EnergyRecoveryVentilator")) {
-        WhichERV = UtilityRoutines::FindItem(ERVCtrlName, state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
+        int WhichERV = UtilityRoutines::FindItem(ERVCtrlName, state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
         if (WhichERV != 0) {
             return state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow;
         }
-    } else {
-        WhichERV = 0;
     }
 
-    if (WhichERV == 0) {
-        ShowSevereError(state, format("Could not find ZoneHVAC:EnergyRecoveryVentilator with Controller Name=\"{}\"", ERVCtrlName));
-        ErrorsFound = true;
-        return -1000.0;
-    }
+    ShowSevereError(state, format("Could not find ZoneHVAC:EnergyRecoveryVentilator with Controller Name=\"{}\"", ERVCtrlName));
+    ErrorsFound = true;
+    return -1000.0;
 }
 
 int GetStandAloneERVOutAirNode(EnergyPlusData &state, int const StandAloneERVNum)
