@@ -1668,9 +1668,9 @@ namespace HVACUnitaryBypassVAV {
 
         // IF CBVAV system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than CBVAV flow rates
         if (CBVAV(CBVAVNum).CheckFanFlow) {
-            std::string CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
 
             if (!state.dataGlobal->DoingSizing && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
+                std::string CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
                 //     Check fan versus system supply air flow rates
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).MaxCoolAirVolFlow) {
                     ShowWarningError(state,
@@ -2269,7 +2269,6 @@ namespace HVACUnitaryBypassVAV {
         Real64 QHeater;       // Load to be met by heater [W]
         Real64 QHeaterActual; // actual heating load met [W]
         Real64 CpAir;         // Specific heat of air [J/kg-K]
-        int DehumidMode;      // Dehumidification mode (0=normal, 1=enhanced)
         Real64 ApproachTemp;
         Real64 DesiredDewPoint;
         Real64 OutdoorDryBulbTemp; // Dry-bulb temperature at outdoor condenser
@@ -2845,7 +2844,7 @@ namespace HVACUnitaryBypassVAV {
                     // Determine required part load for normal mode
 
                     // Get full load result
-                    DehumidMode = 0;
+                    int DehumidMode = 0; // Dehumidification mode (0=normal, 1=enhanced)
                     CBVAV(CBVAVNum).DehumidificationMode = DehumidMode;
                     DXCoils::SimDXCoilMultiMode(state,
                                                 CBVAV(CBVAVNum).DXCoolCoilName,
@@ -3864,28 +3863,28 @@ namespace HVACUnitaryBypassVAV {
         Real64 SupplyAirTempToHeatSetPt; // Supply air temperature required to reach the heating setpoint [C]
         Real64 SupplyAirTempToCoolSetPt; // Supply air temperature required to reach the cooling setpoint [C]
 
-        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
+        auto &cBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNumber);
 
-        Real64 DXCoolCoilInletTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNumber).DXCoilInletNode).Temp;
-        Real64 OutAirTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNumber).AirOutNode).Temp;
-        Real64 OutAirHumRat = state.dataLoopNodes->Node(CBVAV(CBVAVNumber).AirOutNode).HumRat;
+        Real64 DXCoolCoilInletTemp = state.dataLoopNodes->Node(cBVAV.DXCoilInletNode).Temp;
+        Real64 OutAirTemp = state.dataLoopNodes->Node(cBVAV.AirOutNode).Temp;
+        Real64 OutAirHumRat = state.dataLoopNodes->Node(cBVAV.AirOutNode).HumRat;
 
-        if (CBVAV(CBVAVNumber).HeatCoolMode == CoolingMode) { // Cooling required
+        if (cBVAV.HeatCoolMode == CoolingMode) { // Cooling required
             CalcSetPointTempTarget = 99999.0;
-        } else if (CBVAV(CBVAVNumber).HeatCoolMode == HeatingMode) { // Heating required
+        } else if (cBVAV.HeatCoolMode == HeatingMode) { // Heating required
             CalcSetPointTempTarget = -99999.0;
         }
         Real64 TSupplyToHeatSetPtMax = -99999.0; // Maximum of the supply air temperatures required to reach the heating setpoint [C]
         Real64 TSupplyToCoolSetPtMin = 99999.0;  // Minimum of the supply air temperatures required to reach the cooling setpoint [C]
 
-        for (int ZoneNum = 1; ZoneNum <= CBVAV(CBVAVNumber).NumControlledZones; ++ZoneNum) {
-            int ZoneNodeNum = CBVAV(CBVAVNumber).ControlledZoneNodeNum(ZoneNum);
-            int BoxOutletNodeNum = CBVAV(CBVAVNumber).CBVAVBoxOutletNode(ZoneNum);
-            if ((CBVAV(CBVAVNumber).ZoneSequenceCoolingNum(ZoneNum) > 0) && (CBVAV(CBVAVNumber).ZoneSequenceHeatingNum(ZoneNum) > 0)) {
-                QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum))
-                                   .SequencedOutputRequiredToCoolingSP(CBVAV(CBVAVNumber).ZoneSequenceCoolingNum(ZoneNum));
-                QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum))
-                                   .SequencedOutputRequiredToHeatingSP(CBVAV(CBVAVNumber).ZoneSequenceHeatingNum(ZoneNum));
+        for (int ZoneNum = 1; ZoneNum <= cBVAV.NumControlledZones; ++ZoneNum) {
+            int ZoneNodeNum = cBVAV.ControlledZoneNodeNum(ZoneNum);
+            int BoxOutletNodeNum = cBVAV.CBVAVBoxOutletNode(ZoneNum);
+            if ((cBVAV.ZoneSequenceCoolingNum(ZoneNum) > 0) && (cBVAV.ZoneSequenceHeatingNum(ZoneNum) > 0)) {
+                QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(cBVAV.ControlledZoneNum(ZoneNum))
+                                   .SequencedOutputRequiredToCoolingSP(cBVAV.ZoneSequenceCoolingNum(ZoneNum));
+                QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(cBVAV.ControlledZoneNum(ZoneNum))
+                                   .SequencedOutputRequiredToHeatingSP(cBVAV.ZoneSequenceHeatingNum(ZoneNum));
                 if (QToHeatSetPt > 0.0 && QToCoolSetPt > 0.0) {
                     ZoneLoad = QToHeatSetPt;
                 } else if (QToHeatSetPt < 0.0 && QToCoolSetPt < 0.0) {
@@ -3894,11 +3893,9 @@ namespace HVACUnitaryBypassVAV {
                     ZoneLoad = 0.0;
                 }
             } else {
-                ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum)).RemainingOutputRequired;
-                QToCoolSetPt =
-                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum)).OutputRequiredToCoolingSP;
-                QToHeatSetPt =
-                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum)).OutputRequiredToHeatingSP;
+                ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(cBVAV.ControlledZoneNum(ZoneNum)).RemainingOutputRequired;
+                QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(cBVAV.ControlledZoneNum(ZoneNum)).OutputRequiredToCoolingSP;
+                QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(cBVAV.ControlledZoneNum(ZoneNum)).OutputRequiredToHeatingSP;
             }
 
             Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnW(OutAirHumRat);
@@ -3918,9 +3915,9 @@ namespace HVACUnitaryBypassVAV {
 
             //     Save the MIN (cooling) or MAX (heating) temperature for coil control
             //     One box will always operate at maximum damper position minimizing overall system energy use
-            if (CBVAV(CBVAVNumber).HeatCoolMode == CoolingMode) {
+            if (cBVAV.HeatCoolMode == CoolingMode) {
                 CalcSetPointTempTarget = min(SupplyAirTemp, CalcSetPointTempTarget);
-            } else if (CBVAV(CBVAVNumber).HeatCoolMode == HeatingMode) {
+            } else if (cBVAV.HeatCoolMode == HeatingMode) {
                 CalcSetPointTempTarget = max(SupplyAirTemp, CalcSetPointTempTarget);
             } else {
                 //       Should use CpAirAtCoolSetPoint or CpAirAtHeatSetPoint here?
@@ -3941,8 +3938,8 @@ namespace HVACUnitaryBypassVAV {
         }
 
         //   Account for floating condition where cooling/heating is required to avoid overshooting setpoint
-        if (CBVAV(CBVAVNumber).HeatCoolMode == 0) {
-            if (CBVAV(CBVAVNumber).OpMode == DataHVACGlobals::ContFanCycCoil) {
+        if (cBVAV.HeatCoolMode == 0) {
+            if (cBVAV.OpMode == DataHVACGlobals::ContFanCycCoil) {
                 if (OutAirTemp > TSupplyToCoolSetPtMin) {
                     CalcSetPointTempTarget = TSupplyToCoolSetPtMin;
                 } else if (OutAirTemp < TSupplyToHeatSetPtMax) {
@@ -3951,19 +3948,19 @@ namespace HVACUnitaryBypassVAV {
                     CalcSetPointTempTarget = OutAirTemp;
                 }
             } else { // Reset setpoint to inlet air temp if unit is OFF and in cycling fan mode
-                CalcSetPointTempTarget = state.dataLoopNodes->Node(CBVAV(CBVAVNumber).AirInNode).Temp;
+                CalcSetPointTempTarget = state.dataLoopNodes->Node(cBVAV.AirInNode).Temp;
             }
             //   Reset cooling/heating mode to OFF if mixed air inlet temperature is below/above setpoint temperature.
             //   HeatCoolMode = 0 for OFF, 1 for cooling, 2 for heating
-        } else if (CBVAV(CBVAVNumber).HeatCoolMode == CoolingMode) {
+        } else if (cBVAV.HeatCoolMode == CoolingMode) {
             if (DXCoolCoilInletTemp < CalcSetPointTempTarget) CalcSetPointTempTarget = DXCoolCoilInletTemp;
-        } else if (CBVAV(CBVAVNumber).HeatCoolMode == HeatingMode) {
+        } else if (cBVAV.HeatCoolMode == HeatingMode) {
             if (DXCoolCoilInletTemp > CalcSetPointTempTarget) CalcSetPointTempTarget = DXCoolCoilInletTemp;
         }
 
         //   Limit outlet node temperature to MAX/MIN specified in input
-        if (CalcSetPointTempTarget < CBVAV(CBVAVNumber).MinLATCooling) CalcSetPointTempTarget = CBVAV(CBVAVNumber).MinLATCooling;
-        if (CalcSetPointTempTarget > CBVAV(CBVAVNumber).MaxLATHeating) CalcSetPointTempTarget = CBVAV(CBVAVNumber).MaxLATHeating;
+        if (CalcSetPointTempTarget < cBVAV.MinLATCooling) CalcSetPointTempTarget = cBVAV.MinLATCooling;
+        if (CalcSetPointTempTarget > cBVAV.MaxLATHeating) CalcSetPointTempTarget = cBVAV.MaxLATHeating;
 
         return CalcSetPointTempTarget;
     }
