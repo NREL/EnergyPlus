@@ -1841,7 +1841,7 @@ namespace HVACUnitaryBypassVAV {
                         bool EMSSetPointCheck = false;
                         EMSManager::CheckIfNodeSetPointManagedByEMS(
                             state, OutNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, EMSSetPointCheck);
-                        bool foundControl = state.dataLoopNodes->NodeSetpointCheck(OutNode).needsSetpointChecking = false;
+                        state.dataLoopNodes->NodeSetpointCheck(OutNode).needsSetpointChecking = false;
                         if (EMSSetPointCheck) {
                             // There is no plugin anyways, so we now we have a bad condition.
                             ShowWarningError(state, format("Unitary System:VAV:ChangeOverBypass = {}", cBVAV.Name));
@@ -1852,22 +1852,6 @@ namespace HVACUnitaryBypassVAV {
                                 state, "Or use an EMS Actuator to place a maximum humidity setpoint at the air outlet node of the unitary system.");
                             ShowContinueError(state, "Setting Dehumidification Control Type to None and simulation continues.");
                             cBVAV.DehumidControlType = DehumidControl::None;
-                        } else if (!foundControl) {
-                            // Couldn't find a control, but no error? There are some plugins, so adjust warning message accordingly
-                            ShowWarningError(state, format("Unitary System:VAV:ChangeOverBypass = {}", cBVAV.Name));
-                            ShowContinueError(state,
-                                              "Use SetpointManager:SingleZone:Humidity:Maximum to place a humidity setpoint at the air outlet node "
-                                              "of the unitary system.");
-                            ShowContinueError(
-                                state,
-                                "Or make sure you do actuate the value via an EMS Actuator or Python Actuator to place a maximum humidity setpoint");
-                            ShowContinueError(
-                                state, "at the air outlet node of the unitary system, or it will behave as if Dehumidification Control Type = None.");
-                            // We do not change the DehumidControlType. There might be a PythonPlugin that will later actuate the HumRatMax
-                            // All checks later are in the following form, and HumRatMax will be > 0 only if actually actuated (otherwise it's
-                            // SensedNodeFlagValue = -999), so it's fine:
-                            // `cBVAV.DehumidControlType == DehumidControl_Multimode) && state.dataLoopNodes->Node(OutletNode).HumRatMax >
-                            // 0.0)`
                         }
                     }
                 }
