@@ -999,25 +999,12 @@ namespace HWBaseboardRadiator {
         //       MODIFIED       August 2009 Daeho Kang (Add UA autosizing by LMTD)
         //                      Aug 2013 Daeho Kang, add component sizing table entries
         //                      July 2014, B.Nigusse, added scalable sizing
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for sizing hot water baseboard components
 
         // METHODOLOGY EMPLOYED:
         // Obtains flow rates from the zone sizing arrays and plant sizing data.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace DataSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
-
-        using PlantUtilities::RegisterPlantCompDesignFlow;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr AirInletTempStd(18.0); // I=B=R rating document
@@ -1057,33 +1044,33 @@ namespace HWBaseboardRadiator {
             state.dataSize->DataHeatSizeRatio = 1.0;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = hWBaseboard.ZonePtr;
-            int SizingMethod = HeatingCapacitySizing;
+            int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
             int FieldNum = 3; // IDD numeric field number where input field description is found
             std::string SizingString = state.dataHWBaseboardRad->HWBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
             int CapSizingMethod = hWBaseboard.HeatingCapMethod;
             zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
-            if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
-                CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                if (CapSizingMethod == HeatingDesignCapacity) {
-                    if (hWBaseboard.ScaledHeatingCapacity == AutoSize) {
+            if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
+                CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
+                if (CapSizingMethod == DataSizing::HeatingDesignCapacity) {
+                    if (hWBaseboard.ScaledHeatingCapacity == DataSizing::AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
                         zoneEqSizing.HeatingCapacity = true;
                         zoneEqSizing.DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
                     TempSize = hWBaseboard.ScaledHeatingCapacity;
 
-                } else if (CapSizingMethod == CapacityPerFloorArea) {
+                } else if (CapSizingMethod == DataSizing::CapacityPerFloorArea) {
                     zoneEqSizing.HeatingCapacity = true;
                     zoneEqSizing.DesHeatingLoad =
                         hWBaseboard.ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
                     TempSize = zoneEqSizing.DesHeatingLoad;
                     state.dataSize->DataScalableCapSizingON = true;
-                } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                } else if (CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
                     CheckZoneSizing(state, CompType, CompName);
                     zoneEqSizing.HeatingCapacity = true;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = hWBaseboard.ScaledHeatingCapacity;
                     zoneEqSizing.DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
-                    TempSize = AutoSize;
+                    TempSize = DataSizing::AutoSize;
                     state.dataSize->DataScalableCapSizingON = true;
                 } else {
                     TempSize = hWBaseboard.ScaledHeatingCapacity;
@@ -1094,8 +1081,8 @@ namespace HWBaseboardRadiator {
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 TempSize = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                if (hWBaseboard.ScaledHeatingCapacity == AutoSize) {
-                    hWBaseboard.RatedCapacity = AutoSize;
+                if (hWBaseboard.ScaledHeatingCapacity == DataSizing::AutoSize) {
+                    hWBaseboard.RatedCapacity = DataSizing::AutoSize;
                 } else {
                     hWBaseboard.RatedCapacity = TempSize;
                 }
@@ -1111,7 +1098,7 @@ namespace HWBaseboardRadiator {
             if (state.dataSize->CurZoneEqNum > 0) {
                 bool FlowAutoSize = false;
 
-                if (hWBaseboard.WaterVolFlowRateMax == AutoSize) {
+                if (hWBaseboard.WaterVolFlowRateMax == DataSizing::AutoSize) {
                     FlowAutoSize = true;
                 }
                 if (!FlowAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
@@ -1176,7 +1163,7 @@ namespace HWBaseboardRadiator {
                 if (hWBaseboard.WaterTempAvg > 0.0 && hWBaseboard.WaterMassFlowRateStd > 0.0 && hWBaseboard.RatedCapacity > 0.0) {
                     DesCoilLoad = hWBaseboard.RatedCapacity;
                     WaterMassFlowRateStd = hWBaseboard.WaterMassFlowRateStd;
-                } else if (hWBaseboard.RatedCapacity == AutoSize || hWBaseboard.RatedCapacity == 0.0) {
+                } else if (hWBaseboard.RatedCapacity == DataSizing::AutoSize || hWBaseboard.RatedCapacity == 0.0) {
                     DesCoilLoad = RatedCapacityDes;
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(hWBaseboard.plantLoc.loopNum).FluidName,
@@ -1232,7 +1219,8 @@ namespace HWBaseboardRadiator {
             }
         } else {
             // if there is no heating Sizing:Plant object and autosizng was requested, issue an error message
-            if (hWBaseboard.WaterVolFlowRateMax == AutoSize || hWBaseboard.RatedCapacity == AutoSize || hWBaseboard.RatedCapacity == 0.0) {
+            if (hWBaseboard.WaterVolFlowRateMax == DataSizing::AutoSize || hWBaseboard.RatedCapacity == DataSizing::AutoSize ||
+                hWBaseboard.RatedCapacity == 0.0) {
                 ShowSevereError(state, "Autosizing of hot water baseboard requires a heating loop Sizing:Plant object");
                 ShowContinueError(state, format("Occurs in Hot Water Baseboard Heater={}", hWBaseboard.EquipID));
                 ErrorsFound = true;
@@ -1285,7 +1273,7 @@ namespace HWBaseboardRadiator {
             BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water, hWBaseboard.EquipID, "U-Factor times Area [W/C]", hWBaseboard.UA);
         }
         // save the design water flow rate for use by the water loop sizing algorithms
-        RegisterPlantCompDesignFlow(state, hWBaseboard.WaterInletNode, hWBaseboard.WaterVolFlowRateMax);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, hWBaseboard.WaterInletNode, hWBaseboard.WaterVolFlowRateMax);
 
         if (ErrorsFound) {
             ShowFatalError(state, "Preceding sizing errors cause program termination");
@@ -1300,7 +1288,6 @@ namespace HWBaseboardRadiator {
         //       MODIFIED       May 2000 Fred Buhl
         //                      Aug 2007 Daeho Kang (Add the calculation of radiant heat source)
         //                      Sep 2011 LKL/BG - resimulate only zones needing it for Radiant systems
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates both the convective and radiant heat transfer rate
@@ -1308,30 +1295,13 @@ namespace HWBaseboardRadiator {
         // both fluids unmixed.  The air flow is buoyancy driven and a constant airflow
         // and a constant airflow velocity of 0.5m/s is assumed.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // REFERENCES:
         // Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
         // Chapter 11.4, p. 523, eq. 11.33
 
-        // Using/Aliasing
-        using namespace DataSizing;
-        using PlantUtilities::SetActuatedBranchFlowRate;
-        using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr MinFrac(0.0005); // Minimum fraction that delivers radiant heats to surfaces
         static constexpr std::string_view RoutineName("CalcHWBaseboard");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RadHeat;
@@ -1362,7 +1332,7 @@ namespace HWBaseboardRadiator {
             state.dataHWBaseboardRad->HWBaseboardDesignObject(hWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
 
         if (QZnReq > DataHVACGlobals::SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) &&
-            (GetCurrentScheduleValue(state, hWBaseboard.SchedPtr) > 0) && (WaterMassFlowRate > 0.0)) {
+            (ScheduleManager::GetCurrentScheduleValue(state, hWBaseboard.SchedPtr) > 0) && (WaterMassFlowRate > 0.0)) {
             // Calculate air mass flow rate
             AirMassFlowRate = hWBaseboard.AirMassFlowRateStd * (WaterMassFlowRate / hWBaseboard.WaterMassFlowRateMax);
             CapacitanceAir = Psychrometrics::PsyCpAirFnW(hWBaseboard.AirInletHumRat) * AirMassFlowRate;
@@ -1439,7 +1409,7 @@ namespace HWBaseboardRadiator {
             AirMassFlowRate = 0.0;
             state.dataHWBaseboardRad->QBBRadSource(BaseboardNum) = 0.0;
             hWBaseboard.WaterOutletEnthalpy = hWBaseboard.WaterInletEnthalpy;
-            SetActuatedBranchFlowRate(state, WaterMassFlowRate, hWBaseboard.WaterInletNode, hWBaseboard.plantLoc, false);
+            PlantUtilities::SetActuatedBranchFlowRate(state, WaterMassFlowRate, hWBaseboard.WaterInletNode, hWBaseboard.plantLoc, false);
         }
 
         hWBaseboard.WaterOutletTemp = WaterOutletTemp;
