@@ -859,10 +859,6 @@ namespace HWBaseboardRadiator {
         // 2. I=B=R Ratings for Baseboards, Baseboard Radiation, Finned Tube (Commercial) Radiation,
         // and Indirect Fired Water Heaters, January 2007 Edition
 
-        // Using/Aliasing
-        using PlantUtilities::InitComponentNodes;
-        using PlantUtilities::ScanPlantLoopsForObject;
-
         Real64 constexpr Constant(0.0062); // Constant of linear equation for air mass flow rate
         Real64 constexpr Coeff(0.0000275); // Correlation coefficient to capacity
         static constexpr std::string_view RoutineName("BaseboardRadiatorWater:InitHWBaseboard");
@@ -907,7 +903,8 @@ namespace HWBaseboardRadiator {
         if (state.dataHWBaseboardRad->SetLoopIndexFlag(BaseboardNum)) {
             if (allocated(state.dataPlnt->PlantLoop)) {
                 bool errFlag = false;
-                ScanPlantLoopsForObject(state, HWBaseboard.EquipID, HWBaseboard.EquipType, HWBaseboard.plantLoc, errFlag, _, _, _, _, _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, HWBaseboard.EquipID, HWBaseboard.EquipType, HWBaseboard.plantLoc, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError(state, "InitHWBaseboard: Program terminated for previous conditions.");
                 }
@@ -936,7 +933,7 @@ namespace HWBaseboardRadiator {
 
             HWBaseboard.WaterMassFlowRateMax = rho * HWBaseboard.WaterVolFlowRateMax;
 
-            InitComponentNodes(state, 0.0, HWBaseboard.WaterMassFlowRateMax, HWBaseboard.WaterInletNode, HWBaseboard.WaterOutletNode);
+            PlantUtilities::InitComponentNodes(state, 0.0, HWBaseboard.WaterMassFlowRateMax, HWBaseboard.WaterInletNode, HWBaseboard.WaterOutletNode);
 
             state.dataLoopNodes->Node(WaterInletNode).Temp = 60.0;
 
