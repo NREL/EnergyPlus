@@ -338,7 +338,6 @@ namespace HVACUnitaryBypassVAV {
         bool ErrorsFound(false);            // Set to true if errors in input, fatal at end of routine
         bool DXErrorsFound(false);          // Set to true if errors in get coil input
         bool FanErrFlag(false);             // Error flag returned during CALL to GetFanType
-        bool errFlag(false);                // Error flag returned during CALL to mining functions
         Array1D_int OANodeNums(4);          // Node numbers of OA mixer (OA, EA, RA, MA)
         std::string HXDXCoolCoilName;       // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
         std::string MixerInletNodeName;     // Name of mixer inlet node
@@ -567,7 +566,7 @@ namespace HVACUnitaryBypassVAV {
             CBVAV(CBVAVNum).OAMixType = Alphas(8);
             CBVAV(CBVAVNum).OAMixName = Alphas(9);
 
-            errFlag = false;
+            bool errFlag = false;
             ValidateComponent(state, CBVAV(CBVAVNum).OAMixType, CBVAV(CBVAVNum).OAMixName, errFlag, CurrentModuleObject);
             if (errFlag) {
                 ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, CBVAV(CBVAVNum).Name));
@@ -614,7 +613,7 @@ namespace HVACUnitaryBypassVAV {
             int fanOutletNode(0);
 
             // check that the fan exists
-            bool errFlag = false;
+            errFlag = false;
             ValidateComponent(state, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, errFlag, CurrentModuleObject);
             if (errFlag) {
                 ShowContinueError(state, format("...occurs in {}, unit=\"{}\".", CurrentModuleObject, CBVAV(CBVAVNum).Name));
