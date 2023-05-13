@@ -1717,28 +1717,26 @@ namespace HWBaseboardRadiator {
         int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
-        int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
-        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
-        auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
-        auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
+        int const NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
 
         // Initialize arrays
         state.dataHeatBalFanSys->SurfQHWBaseboard = 0.0;
         state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson = 0.0;
 
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
+            auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
+            auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
 
             HWBaseboardDesignData HWBaseboardDesignDataObject{
-                HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for the design object
-            ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
+                state.dataHWBaseboardRad->HWBaseboardDesignObject(HWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
+            ZoneNum = HWBaseboard.ZonePtr;
             if (ZoneNum <= 0) continue;
-            state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson(ZoneNum) += QBBRadSource(BaseboardNum) * HWBaseboardDesignDataObject.FracDistribPerson;
+            state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson(ZoneNum) += QBBRadSource * HWBaseboardDesignDataObject.FracDistribPerson;
 
-            for (RadSurfNum = 1; RadSurfNum <= HWBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {
-                SurfNum = HWBaseboard(BaseboardNum).SurfacePtr(RadSurfNum);
+            for (RadSurfNum = 1; RadSurfNum <= HWBaseboard.TotSurfToDistrib; ++RadSurfNum) {
+                SurfNum = HWBaseboard.SurfacePtr(RadSurfNum);
                 if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
-                    ThisSurfIntensity = (QBBRadSource(BaseboardNum) * HWBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) /
-                                         state.dataSurface->Surface(SurfNum).Area);
+                    ThisSurfIntensity = (QBBRadSource * HWBaseboard.FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
                     state.dataHeatBalFanSys->SurfQHWBaseboard(SurfNum) += ThisSurfIntensity;
                     state.dataHeatBalSurf->AnyRadiantSystems = true;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
@@ -1746,7 +1744,7 @@ namespace HWBaseboardRadiator {
                         ShowSevereError(state, "DistributeBBRadGains:  excessive thermal radiation heat flux intensity detected");
                         ShowContinueError(state, format("Surface = {}", state.dataSurface->Surface(SurfNum).Name));
                         ShowContinueError(state, format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area));
-                        ShowContinueError(state, format("Occurs in {} = {}", cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID));
+                        ShowContinueError(state, format("Occurs in {} = {}", cCMO_BBRadiator_Water, HWBaseboard.EquipID));
                         ShowContinueError(state, format("Radiation intensity = {:.2R} [W/m2]", ThisSurfIntensity));
                         ShowContinueError(state, format("Assign a larger surface area or more surfaces in {}", cCMO_BBRadiator_Water));
                         ShowFatalError(state, "DistributeBBRadGains:  excessive thermal radiation heat flux intensity detected");
@@ -1755,7 +1753,7 @@ namespace HWBaseboardRadiator {
                     ShowSevereError(state, "DistributeBBRadGains:  surface not large enough to receive thermal radiation heat flux");
                     ShowContinueError(state, format("Surface = {}", state.dataSurface->Surface(SurfNum).Name));
                     ShowContinueError(state, format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area));
-                    ShowContinueError(state, format("Occurs in {} = {}", cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID));
+                    ShowContinueError(state, format("Occurs in {} = {}", cCMO_BBRadiator_Water, HWBaseboard.EquipID));
                     ShowContinueError(state, format("Assign a larger surface area or more surfaces in {}", cCMO_BBRadiator_Water));
                     ShowFatalError(state, "DistributeBBRadGains:  surface not large enough to receive thermal radiation heat flux");
                 }
