@@ -154,7 +154,6 @@ namespace HWBaseboardRadiator {
 
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
         int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
-        auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
 
         // Find the correct Baseboard Equipment
         if (CompIndex == 0) {
@@ -185,8 +184,8 @@ namespace HWBaseboardRadiator {
         }
 
         if (CompIndex > 0) {
-            HWBaseboardDesignData HWBaseboardDesignDataObject{
-                HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
+            HWBaseboardDesignData HWBaseboardDesignDataObject{state.dataHWBaseboardRad->HWBaseboardDesignObject(
+                HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
 
             InitHWBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
