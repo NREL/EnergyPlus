@@ -729,7 +729,7 @@ namespace HVACUnitaryBypassVAV {
                         ErrorsFound = true;
                     } else {
 
-                        DXCoilErrFlag = false;
+                        bool DXCoilErrFlag = false;
                         DXCoils::GetDXCoilIndex(
                             state, CBVAV(CBVAVNum).DXCoolCoilName, CBVAV(CBVAVNum).DXCoolCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).DXCoolCoilType);
                         if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
@@ -751,7 +751,7 @@ namespace HVACUnitaryBypassVAV {
                         ShowContinueError(state, format("Coil:Cooling:DX:VariableSpeed \"{}\" not found.", CBVAV(CBVAVNum).DXCoolCoilName));
                         ErrorsFound = true;
                     } else {
-                        DXCoilErrFlag = false;
+                        bool DXCoilErrFlag = false;
                         CBVAV(CBVAVNum).DXCoolCoilIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(
                             state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
                         if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
@@ -775,7 +775,7 @@ namespace HVACUnitaryBypassVAV {
                                           format("CoilSystem:Cooling:DX:HeatExchangerAssisted \"{}\" not found.", CBVAV(CBVAVNum).DXCoolCoilName));
                         ErrorsFound = true;
                     } else {
-                        DXCoilErrFlag = false;
+                        bool DXCoilErrFlag = false;
                         int ActualCoolCoilType = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(
                             state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
                         if (ActualCoolCoilType == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
@@ -824,7 +824,7 @@ namespace HVACUnitaryBypassVAV {
                         ErrorsFound = true;
                     } else {
 
-                        DXCoilErrFlag = false;
+                        bool DXCoilErrFlag = false;
                         DXCoils::GetDXCoilIndex(
                             state, CBVAV(CBVAVNum).DXCoolCoilName, CBVAV(CBVAVNum).DXCoolCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).DXCoolCoilType);
                         if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
