@@ -351,14 +351,12 @@ namespace HVACUnitaryBypassVAV {
         // find the number of each type of CBVAV unit
         std::string CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
 
-        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
-
         // Update Num in state and make local convenience copy
         int NumCBVAV = state.dataHVACUnitaryBypassVAV->NumCBVAV =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         // allocate the data structures
-        CBVAV.allocate(NumCBVAV);
+        state.dataHVACUnitaryBypassVAV->CBVAV.allocate(NumCBVAV);
         state.dataHVACUnitaryBypassVAV->CheckEquipName.dimension(NumCBVAV, true);
 
         // loop over CBVAV units; get and load the input data
@@ -375,80 +373,81 @@ namespace HVACUnitaryBypassVAV {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
-            CBVAV(CBVAVNum).Name = Alphas(1);
-            CBVAV(CBVAVNum).UnitType = CurrentModuleObject;
-            CBVAV(CBVAVNum).Sched = Alphas(2);
+            auto &thisCBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
+
+            thisCBVAV.Name = Alphas(1);
+            thisCBVAV.UnitType = CurrentModuleObject;
+            thisCBVAV.Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                CBVAV(CBVAVNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
+                thisCBVAV.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                CBVAV(CBVAVNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
-                if (CBVAV(CBVAVNum).SchedPtr == 0) {
+                thisCBVAV.SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
+                if (thisCBVAV.SchedPtr == 0) {
                     ShowSevereError(state, format("{} {} not found = {}", CurrentModuleObject, cAlphaFields(2), Alphas(2)));
-                    ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                    ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                     ErrorsFound = true;
                 }
             }
 
-            CBVAV(CBVAVNum).MaxCoolAirVolFlow = Numbers(1);
-            if (CBVAV(CBVAVNum).MaxCoolAirVolFlow <= 0.0 && CBVAV(CBVAVNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
+            thisCBVAV.MaxCoolAirVolFlow = Numbers(1);
+            if (thisCBVAV.MaxCoolAirVolFlow <= 0.0 && thisCBVAV.MaxCoolAirVolFlow != DataSizing::AutoSize) {
                 ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(1), Numbers(1)));
                 ShowContinueError(state, format("{} must be greater than zero.", cNumericFields(1)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                 ErrorsFound = true;
             }
 
-            CBVAV(CBVAVNum).MaxHeatAirVolFlow = Numbers(2);
-            if (CBVAV(CBVAVNum).MaxHeatAirVolFlow <= 0.0 && CBVAV(CBVAVNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
+            thisCBVAV.MaxHeatAirVolFlow = Numbers(2);
+            if (thisCBVAV.MaxHeatAirVolFlow <= 0.0 && thisCBVAV.MaxHeatAirVolFlow != DataSizing::AutoSize) {
                 ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(2), Numbers(2)));
                 ShowContinueError(state, format("{} must be greater than zero.", cNumericFields(2)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                 ErrorsFound = true;
             }
 
-            CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow = Numbers(3);
-            if (CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow < 0.0 && CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
+            thisCBVAV.MaxNoCoolHeatAirVolFlow = Numbers(3);
+            if (thisCBVAV.MaxNoCoolHeatAirVolFlow < 0.0 && thisCBVAV.MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
                 ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(3), Numbers(3)));
                 ShowContinueError(state, format("{} must be greater than or equal to zero.", cNumericFields(3)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                 ErrorsFound = true;
             }
 
-            CBVAV(CBVAVNum).CoolOutAirVolFlow = Numbers(4);
-            if (CBVAV(CBVAVNum).CoolOutAirVolFlow < 0.0 && CBVAV(CBVAVNum).CoolOutAirVolFlow != DataSizing::AutoSize) {
+            thisCBVAV.CoolOutAirVolFlow = Numbers(4);
+            if (thisCBVAV.CoolOutAirVolFlow < 0.0 && thisCBVAV.CoolOutAirVolFlow != DataSizing::AutoSize) {
                 ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(4), Numbers(4)));
                 ShowContinueError(state, format("{} must be greater than or equal to zero.", cNumericFields(4)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                 ErrorsFound = true;
             }
 
-            CBVAV(CBVAVNum).HeatOutAirVolFlow = Numbers(5);
-            if (CBVAV(CBVAVNum).HeatOutAirVolFlow < 0.0 && CBVAV(CBVAVNum).HeatOutAirVolFlow != DataSizing::AutoSize) {
+            thisCBVAV.HeatOutAirVolFlow = Numbers(5);
+            if (thisCBVAV.HeatOutAirVolFlow < 0.0 && thisCBVAV.HeatOutAirVolFlow != DataSizing::AutoSize) {
                 ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(5), Numbers(5)));
                 ShowContinueError(state, format("{} must be greater than or equal to zero.", cNumericFields(5)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                 ErrorsFound = true;
             }
 
-            CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow = Numbers(6);
-            if (CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow < 0.0 && CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow != DataSizing::AutoSize) {
+            thisCBVAV.NoCoolHeatOutAirVolFlow = Numbers(6);
+            if (thisCBVAV.NoCoolHeatOutAirVolFlow < 0.0 && thisCBVAV.NoCoolHeatOutAirVolFlow != DataSizing::AutoSize) {
                 ShowSevereError(state, format("{} illegal {} = {:.7T}", CurrentModuleObject, cNumericFields(6), Numbers(6)));
                 ShowContinueError(state, format("{} must be greater than or equal to zero.", cNumericFields(6)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                 ErrorsFound = true;
             }
 
-            CBVAV(CBVAVNum).OutAirSchPtr = ScheduleManager::GetScheduleIndex(state, Alphas(3)); // convert schedule name to pointer (index number)
-            if (CBVAV(CBVAVNum).OutAirSchPtr != 0) {
-                if (!ScheduleManager::CheckScheduleValueMinMax(state, CBVAV(CBVAVNum).OutAirSchPtr, "<", 0.0, ">", 1.0)) {
-                    ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+            thisCBVAV.OutAirSchPtr = ScheduleManager::GetScheduleIndex(state, Alphas(3)); // convert schedule name to pointer (index number)
+            if (thisCBVAV.OutAirSchPtr != 0) {
+                if (!ScheduleManager::CheckScheduleValueMinMax(state, thisCBVAV.OutAirSchPtr, "<", 0.0, ">", 1.0)) {
+                    ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, format("The schedule values in {} must be 0 to 1.", cAlphaFields(3)));
                     ErrorsFound = true;
                 }
             }
 
-            CBVAV(CBVAVNum).AirInNode =
+            thisCBVAV.AirInNode =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     Alphas(4),
                                                     ErrorsFound,
@@ -462,7 +461,7 @@ namespace HVACUnitaryBypassVAV {
             std::string MixerInletNodeName = Alphas(5);
             std::string SplitterOutletNodeName = Alphas(6);
 
-            CBVAV(CBVAVNum).AirOutNode =
+            thisCBVAV.AirOutNode =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     Alphas(7),
                                                     ErrorsFound,
@@ -473,7 +472,7 @@ namespace HVACUnitaryBypassVAV {
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsParent);
 
-            CBVAV(CBVAVNum).SplitterOutletAirNode =
+            thisCBVAV.SplitterOutletAirNode =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     SplitterOutletNodeName,
                                                     ErrorsFound,
@@ -485,7 +484,7 @@ namespace HVACUnitaryBypassVAV {
                                                     DataLoopNode::ObjectIsParent);
 
             if (NumAlphas > 19 && !lAlphaBlanks(20)) {
-                CBVAV(CBVAVNum).PlenumMixerInletAirNode =
+                thisCBVAV.PlenumMixerInletAirNode =
                     NodeInputManager::GetOnlySingleNode(state,
                                                         Alphas(20),
                                                         ErrorsFound,
@@ -495,7 +494,7 @@ namespace HVACUnitaryBypassVAV {
                                                         DataLoopNode::ConnectionType::Internal,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsParent);
-                CBVAV(CBVAVNum).PlenumMixerInletAirNode =
+                thisCBVAV.PlenumMixerInletAirNode =
                     NodeInputManager::GetOnlySingleNode(state,
                                                         Alphas(20),
                                                         ErrorsFound,
@@ -507,16 +506,16 @@ namespace HVACUnitaryBypassVAV {
                                                         DataLoopNode::ObjectIsParent);
             }
 
-            CBVAV(CBVAVNum).plenumIndex = ZonePlenum::getReturnPlenumIndexFromInletNode(state, CBVAV(CBVAVNum).PlenumMixerInletAirNode);
-            CBVAV(CBVAVNum).mixerIndex = MixerComponent::getZoneMixerIndexFromInletNode(state, CBVAV(CBVAVNum).PlenumMixerInletAirNode);
-            if (CBVAV(CBVAVNum).plenumIndex > 0 && CBVAV(CBVAVNum).mixerIndex > 0) {
-                ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+            thisCBVAV.plenumIndex = ZonePlenum::getReturnPlenumIndexFromInletNode(state, thisCBVAV.PlenumMixerInletAirNode);
+            thisCBVAV.mixerIndex = MixerComponent::getZoneMixerIndexFromInletNode(state, thisCBVAV.PlenumMixerInletAirNode);
+            if (thisCBVAV.plenumIndex > 0 && thisCBVAV.mixerIndex > 0) {
+                ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                 ShowContinueError(state, format("Illegal connection for {} = \"{}\".", cAlphaFields(20), Alphas(20)));
                 ShowContinueError(
                     state, format("{} cannot be connected to both an AirloopHVAC:ReturnPlenum and an AirloopHVAC:ZoneMixer.", cAlphaFields(20)));
                 ErrorsFound = true;
-            } else if (CBVAV(CBVAVNum).plenumIndex == 0 && CBVAV(CBVAVNum).mixerIndex == 0 && CBVAV(CBVAVNum).PlenumMixerInletAirNode > 0) {
-                ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+            } else if (thisCBVAV.plenumIndex == 0 && thisCBVAV.mixerIndex == 0 && thisCBVAV.PlenumMixerInletAirNode > 0) {
+                ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                 ShowContinueError(state, format("Illegal connection for {} = \"{}\".", cAlphaFields(20), Alphas(20)));
                 ShowContinueError(
                     state,
@@ -524,7 +523,7 @@ namespace HVACUnitaryBypassVAV {
                 ErrorsFound = true;
             }
 
-            CBVAV(CBVAVNum).MixerInletAirNode =
+            thisCBVAV.MixerInletAirNode =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     MixerInletNodeName,
                                                     ErrorsFound,
@@ -535,7 +534,7 @@ namespace HVACUnitaryBypassVAV {
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsParent);
 
-            CBVAV(CBVAVNum).MixerInletAirNode =
+            thisCBVAV.MixerInletAirNode =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     MixerInletNodeName,
                                                     ErrorsFound,
@@ -546,7 +545,7 @@ namespace HVACUnitaryBypassVAV {
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsParent);
 
-            CBVAV(CBVAVNum).SplitterOutletAirNode =
+            thisCBVAV.SplitterOutletAirNode =
                 NodeInputManager::GetOnlySingleNode(state,
                                                     SplitterOutletNodeName,
                                                     ErrorsFound,
@@ -557,149 +556,148 @@ namespace HVACUnitaryBypassVAV {
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsParent);
 
-            CBVAV(CBVAVNum).OAMixType = Alphas(8);
-            CBVAV(CBVAVNum).OAMixName = Alphas(9);
+            thisCBVAV.OAMixType = Alphas(8);
+            thisCBVAV.OAMixName = Alphas(9);
 
             bool errFlag = false;
-            ValidateComponent(state, CBVAV(CBVAVNum).OAMixType, CBVAV(CBVAVNum).OAMixName, errFlag, CurrentModuleObject);
+            ValidateComponent(state, thisCBVAV.OAMixType, thisCBVAV.OAMixName, errFlag, CurrentModuleObject);
             if (errFlag) {
-                ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, thisCBVAV.Name));
                 ErrorsFound = true;
             } else {
                 // Get OA Mixer node numbers
-                OANodeNums = MixedAir::GetOAMixerNodeNumbers(state, CBVAV(CBVAVNum).OAMixName, errFlag);
+                OANodeNums = MixedAir::GetOAMixerNodeNumbers(state, thisCBVAV.OAMixName, errFlag);
                 if (errFlag) {
-                    ShowContinueError(state, format("that was specified in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                    ShowContinueError(state, format("that was specified in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, "..OutdoorAir:Mixer is required. Enter an OutdoorAir:Mixer object with this name.");
                     ErrorsFound = true;
                 } else {
-                    CBVAV(CBVAVNum).MixerOutsideAirNode = OANodeNums(1);
-                    CBVAV(CBVAVNum).MixerReliefAirNode = OANodeNums(2);
-                    // CBVAV(CBVAVNum)%MixerInletAirNode  = OANodeNums(3)
-                    CBVAV(CBVAVNum).MixerMixedAirNode = OANodeNums(4);
+                    thisCBVAV.MixerOutsideAirNode = OANodeNums(1);
+                    thisCBVAV.MixerReliefAirNode = OANodeNums(2);
+                    // thisCBVAV%MixerInletAirNode  = OANodeNums(3)
+                    thisCBVAV.MixerMixedAirNode = OANodeNums(4);
                 }
             }
 
-            if (CBVAV(CBVAVNum).MixerInletAirNode != OANodeNums(3)) {
-                ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+            if (thisCBVAV.MixerInletAirNode != OANodeNums(3)) {
+                ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                 ShowContinueError(state, format("Illegal {} = {}.", cAlphaFields(5), MixerInletNodeName));
                 ShowContinueError(
                     state, format("{} must be the same as the return air stream node specified in the OutdoorAir:Mixer object.", cAlphaFields(5)));
                 ErrorsFound = true;
             }
 
-            if (CBVAV(CBVAVNum).MixerInletAirNode == CBVAV(CBVAVNum).AirInNode) {
-                ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+            if (thisCBVAV.MixerInletAirNode == thisCBVAV.AirInNode) {
+                ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                 ShowContinueError(state, format("Illegal {} = {}.", cAlphaFields(5), MixerInletNodeName));
                 ShowContinueError(state, format("{} must be different than the {}.", cAlphaFields(5), cAlphaFields(4)));
                 ErrorsFound = true;
             }
 
-            if (CBVAV(CBVAVNum).SplitterOutletAirNode == CBVAV(CBVAVNum).AirOutNode) {
-                ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+            if (thisCBVAV.SplitterOutletAirNode == thisCBVAV.AirOutNode) {
+                ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                 ShowContinueError(state, format("Illegal {} = {}.", cAlphaFields(6), SplitterOutletNodeName));
                 ShowContinueError(state, format("{} must be different than the {}.", cAlphaFields(6), cAlphaFields(7)));
                 ErrorsFound = true;
             }
 
-            CBVAV(CBVAVNum).FanType = Alphas(10);
-            CBVAV(CBVAVNum).FanName = Alphas(11);
+            thisCBVAV.FanType = Alphas(10);
+            thisCBVAV.FanName = Alphas(11);
             int fanOutletNode(0);
 
             // check that the fan exists
             errFlag = false;
-            ValidateComponent(state, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, errFlag, CurrentModuleObject);
+            ValidateComponent(state, thisCBVAV.FanType, thisCBVAV.FanName, errFlag, CurrentModuleObject);
             if (errFlag) {
-                ShowContinueError(state, format("...occurs in {}, unit=\"{}\".", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("...occurs in {}, unit=\"{}\".", CurrentModuleObject, thisCBVAV.Name));
                 ShowContinueError(state, format("check {} and {}", cAlphaFields(10), cAlphaFields(11)));
                 ErrorsFound = true;
-                CBVAV(CBVAVNum).FanVolFlow = 9999.0;
+                thisCBVAV.FanVolFlow = 9999.0;
             } else {
-                if (UtilityRoutines::SameString(CBVAV(CBVAVNum).FanType, "Fan:SystemModel")) {
-                    CBVAV(CBVAVNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, CBVAV(CBVAVNum).FanName)); // call constructor
-                    CBVAV(CBVAVNum).FanIndex = HVACFan::getFanObjectVectorIndex(state, CBVAV(CBVAVNum).FanName);
-                    CBVAV(CBVAVNum).FanInletNodeNum = state.dataHVACFan->fanObjs[CBVAV(CBVAVNum).FanIndex]->inletNodeNum;
-                    fanOutletNode = state.dataHVACFan->fanObjs[CBVAV(CBVAVNum).FanIndex]->outletNodeNum;
-                    CBVAV(CBVAVNum).FanVolFlow = state.dataHVACFan->fanObjs[CBVAV(CBVAVNum).FanIndex]->designAirVolFlowRate;
+                if (UtilityRoutines::SameString(thisCBVAV.FanType, "Fan:SystemModel")) {
+                    thisCBVAV.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisCBVAV.FanName)); // call constructor
+                    thisCBVAV.FanIndex = HVACFan::getFanObjectVectorIndex(state, thisCBVAV.FanName);
+                    thisCBVAV.FanInletNodeNum = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->inletNodeNum;
+                    fanOutletNode = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->outletNodeNum;
+                    thisCBVAV.FanVolFlow = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->designAirVolFlowRate;
                 } else {
-                    Fans::GetFanType(
-                        state, CBVAV(CBVAVNum).FanName, CBVAV(CBVAVNum).FanType_Num, FanErrFlag, CurrentModuleObject, CBVAV(CBVAVNum).Name);
-                    CBVAV(CBVAVNum).FanInletNodeNum = Fans::GetFanInletNode(state, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, FanErrFlag);
-                    fanOutletNode = Fans::GetFanOutletNode(state, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, ErrorsFound);
-                    Fans::GetFanIndex(state, CBVAV(CBVAVNum).FanName, CBVAV(CBVAVNum).FanIndex, FanErrFlag);
-                    Fans::GetFanVolFlow(state, CBVAV(CBVAVNum).FanIndex, CBVAV(CBVAVNum).FanVolFlow);
+                    Fans::GetFanType(state, thisCBVAV.FanName, thisCBVAV.FanType_Num, FanErrFlag, CurrentModuleObject, thisCBVAV.Name);
+                    thisCBVAV.FanInletNodeNum = Fans::GetFanInletNode(state, thisCBVAV.FanType, thisCBVAV.FanName, FanErrFlag);
+                    fanOutletNode = Fans::GetFanOutletNode(state, thisCBVAV.FanType, thisCBVAV.FanName, ErrorsFound);
+                    Fans::GetFanIndex(state, thisCBVAV.FanName, thisCBVAV.FanIndex, FanErrFlag);
+                    Fans::GetFanVolFlow(state, thisCBVAV.FanIndex, thisCBVAV.FanVolFlow);
                 }
             }
 
             if (UtilityRoutines::SameString(Alphas(12), "BlowThrough")) {
-                CBVAV(CBVAVNum).FanPlace = DataHVACGlobals::BlowThru;
+                thisCBVAV.FanPlace = DataHVACGlobals::BlowThru;
             } else if (UtilityRoutines::SameString(Alphas(12), "DrawThrough")) {
-                CBVAV(CBVAVNum).FanPlace = DataHVACGlobals::DrawThru;
+                thisCBVAV.FanPlace = DataHVACGlobals::DrawThru;
             } else {
                 ShowSevereError(state, format("{} illegal {} = {}", CurrentModuleObject, cAlphaFields(12), Alphas(12)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                 ErrorsFound = true;
             }
 
-            if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::DrawThru) {
-                if (CBVAV(CBVAVNum).SplitterOutletAirNode != fanOutletNode) {
-                    ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+            if (thisCBVAV.FanPlace == DataHVACGlobals::DrawThru) {
+                if (thisCBVAV.SplitterOutletAirNode != fanOutletNode) {
+                    ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, format("Illegal {} = {}.", cAlphaFields(6), SplitterOutletNodeName));
                     ShowContinueError(state,
                                       format("{} must be the same as the fan outlet node specified in {} = {}: {} when draw through {} is selected.",
                                              cAlphaFields(6),
                                              cAlphaFields(10),
-                                             CBVAV(CBVAVNum).FanType,
-                                             CBVAV(CBVAVNum).FanName,
+                                             thisCBVAV.FanType,
+                                             thisCBVAV.FanName,
                                              cAlphaFields(11)));
                     ErrorsFound = true;
                 }
             }
 
-            if (CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
-                if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).MaxCoolAirVolFlow && CBVAV(CBVAVNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
+            if (thisCBVAV.FanVolFlow != DataSizing::AutoSize) {
+                if (thisCBVAV.FanVolFlow < thisCBVAV.MaxCoolAirVolFlow && thisCBVAV.MaxCoolAirVolFlow != DataSizing::AutoSize) {
                     ShowWarningError(state,
                                      format("{} - air flow rate = {:.7T} in {} = {} is less than the ",
                                             CurrentModuleObject,
-                                            CBVAV(CBVAVNum).FanVolFlow,
+                                            thisCBVAV.FanVolFlow,
                                             cAlphaFields(11),
-                                            CBVAV(CBVAVNum).FanName) +
+                                            thisCBVAV.FanName) +
                                          cNumericFields(1));
                     ShowContinueError(state, format(" {} is reset to the fan flow rate and the simulation continues.", cNumericFields(1)));
-                    ShowContinueError(state, format(" Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                    CBVAV(CBVAVNum).MaxCoolAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
+                    ShowContinueError(state, format(" Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
+                    thisCBVAV.MaxCoolAirVolFlow = thisCBVAV.FanVolFlow;
                 }
-                if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).MaxHeatAirVolFlow && CBVAV(CBVAVNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
+                if (thisCBVAV.FanVolFlow < thisCBVAV.MaxHeatAirVolFlow && thisCBVAV.MaxHeatAirVolFlow != DataSizing::AutoSize) {
                     ShowWarningError(state,
                                      format("{} - air flow rate = {:.7T} in {} = {} is less than the ",
                                             CurrentModuleObject,
-                                            CBVAV(CBVAVNum).FanVolFlow,
+                                            thisCBVAV.FanVolFlow,
                                             cAlphaFields(11),
-                                            CBVAV(CBVAVNum).FanName) +
+                                            thisCBVAV.FanName) +
                                          cNumericFields(2));
                     ShowContinueError(state, format(" {} is reset to the fan flow rate and the simulation continues.", cNumericFields(2)));
-                    ShowContinueError(state, format(" Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                    CBVAV(CBVAVNum).MaxHeatAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
+                    ShowContinueError(state, format(" Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
+                    thisCBVAV.MaxHeatAirVolFlow = thisCBVAV.FanVolFlow;
                 }
             }
 
             //   only check that OA flow in cooling is >= SA flow in cooling when they are not autosized
-            if (CBVAV(CBVAVNum).CoolOutAirVolFlow > CBVAV(CBVAVNum).MaxCoolAirVolFlow && CBVAV(CBVAVNum).CoolOutAirVolFlow != DataSizing::AutoSize &&
-                CBVAV(CBVAVNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
+            if (thisCBVAV.CoolOutAirVolFlow > thisCBVAV.MaxCoolAirVolFlow && thisCBVAV.CoolOutAirVolFlow != DataSizing::AutoSize &&
+                thisCBVAV.MaxCoolAirVolFlow != DataSizing::AutoSize) {
                 ShowWarningError(state, format("{}: {} cannot be greater than {}", CurrentModuleObject, cNumericFields(4), cNumericFields(1)));
                 ShowContinueError(state, format(" {} is reset to the fan flow rate and the simulation continues.", cNumericFields(4)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                CBVAV(CBVAVNum).CoolOutAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
+                thisCBVAV.CoolOutAirVolFlow = thisCBVAV.FanVolFlow;
             }
 
             //   only check that SA flow in heating is >= OA flow in heating when they are not autosized
-            if (CBVAV(CBVAVNum).HeatOutAirVolFlow > CBVAV(CBVAVNum).MaxHeatAirVolFlow && CBVAV(CBVAVNum).HeatOutAirVolFlow != DataSizing::AutoSize &&
-                CBVAV(CBVAVNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
+            if (thisCBVAV.HeatOutAirVolFlow > thisCBVAV.MaxHeatAirVolFlow && thisCBVAV.HeatOutAirVolFlow != DataSizing::AutoSize &&
+                thisCBVAV.MaxHeatAirVolFlow != DataSizing::AutoSize) {
                 ShowWarningError(state, format("{}: {} cannot be greater than {}", CurrentModuleObject, cNumericFields(5), cNumericFields(2)));
                 ShowContinueError(state, format(" {} is reset to the fan flow rate and the simulation continues.", cNumericFields(5)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                CBVAV(CBVAVNum).HeatOutAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
+                thisCBVAV.HeatOutAirVolFlow = thisCBVAV.FanVolFlow;
             }
 
             if (UtilityRoutines::SameString(Alphas(14), "Coil:Cooling:DX:SingleSpeed") ||
@@ -707,140 +705,129 @@ namespace HVACUnitaryBypassVAV {
                 UtilityRoutines::SameString(Alphas(14), "Coil:Cooling:DX:TwoStageWithHumidityControlMode") ||
                 UtilityRoutines::SameString(Alphas(14), "Coil:Cooling:DX:VariableSpeed")) {
 
-                CBVAV(CBVAVNum).DXCoolCoilType = Alphas(14);
-                CBVAV(CBVAVNum).DXCoolCoilName = Alphas(15);
+                thisCBVAV.DXCoolCoilType = Alphas(14);
+                thisCBVAV.DXCoolCoilName = Alphas(15);
 
                 if (UtilityRoutines::SameString(Alphas(14), "Coil:Cooling:DX:SingleSpeed")) {
-                    CBVAV(CBVAVNum).DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-                    CBVAV(CBVAVNum).DXCoilInletNode =
-                        DXCoils::GetCoilInletNode(state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
-                    CBVAV(CBVAVNum).DXCoilOutletNode =
-                        DXCoils::GetCoilOutletNode(state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
+                    thisCBVAV.DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
+                    thisCBVAV.DXCoilInletNode = DXCoils::GetCoilInletNode(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
+                    thisCBVAV.DXCoilOutletNode = DXCoils::GetCoilOutletNode(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
                     if (DXErrorsFound) {
-                        ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                        ShowContinueError(state, format("Coil:Cooling:DX:SingleSpeed \"{}\" not found.", CBVAV(CBVAVNum).DXCoolCoilName));
+                        ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
+                        ShowContinueError(state, format("Coil:Cooling:DX:SingleSpeed \"{}\" not found.", thisCBVAV.DXCoolCoilName));
                         ErrorsFound = true;
                     } else {
 
                         DXCoilErrFlag = false;
                         DXCoils::GetDXCoilIndex(
-                            state, CBVAV(CBVAVNum).DXCoolCoilName, CBVAV(CBVAVNum).DXCoolCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).DXCoolCoilType);
-                        if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
+                            state, thisCBVAV.DXCoolCoilName, thisCBVAV.DXCoolCoilIndexNum, DXCoilErrFlag, thisCBVAV.DXCoolCoilType);
+                        if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", thisCBVAV.UnitType, thisCBVAV.Name));
 
                         //         Mine outdoor condenser node from DX coil object
                         OANodeErrFlag = false;
-                        CBVAV(CBVAVNum).CondenserNodeNum =
-                            DXCoils::GetCoilCondenserInletNode(state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, OANodeErrFlag);
-                        if (OANodeErrFlag) ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                        thisCBVAV.CondenserNodeNum =
+                            DXCoils::GetCoilCondenserInletNode(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, OANodeErrFlag);
+                        if (OANodeErrFlag) ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                     }
                 } else if (UtilityRoutines::SameString(Alphas(14), "Coil:Cooling:DX:VariableSpeed")) {
-                    CBVAV(CBVAVNum).DXCoolCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
-                    CBVAV(CBVAVNum).DXCoilInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(
-                        state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
-                    CBVAV(CBVAVNum).DXCoilOutletNode = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
-                        state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
+                    thisCBVAV.DXCoolCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
+                    thisCBVAV.DXCoilInletNode =
+                        VariableSpeedCoils::GetCoilInletNodeVariableSpeed(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
+                    thisCBVAV.DXCoilOutletNode =
+                        VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
                     if (DXErrorsFound) {
-                        ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                        ShowContinueError(state, format("Coil:Cooling:DX:VariableSpeed \"{}\" not found.", CBVAV(CBVAVNum).DXCoolCoilName));
+                        ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
+                        ShowContinueError(state, format("Coil:Cooling:DX:VariableSpeed \"{}\" not found.", thisCBVAV.DXCoolCoilName));
                         ErrorsFound = true;
                     } else {
                         DXCoilErrFlag = false;
-                        CBVAV(CBVAVNum).DXCoolCoilIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(
-                            state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXCoilErrFlag);
-                        if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
+                        thisCBVAV.DXCoolCoilIndexNum =
+                            VariableSpeedCoils::GetCoilIndexVariableSpeed(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXCoilErrFlag);
+                        if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", thisCBVAV.UnitType, thisCBVAV.Name));
                         OANodeErrFlag = false;
-                        CBVAV(CBVAVNum).CondenserNodeNum =
-                            VariableSpeedCoils::GetVSCoilCondenserInletNode(state, CBVAV(CBVAVNum).DXCoolCoilName, OANodeErrFlag);
-                        if (OANodeErrFlag) ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                        thisCBVAV.CondenserNodeNum = VariableSpeedCoils::GetVSCoilCondenserInletNode(state, thisCBVAV.DXCoolCoilName, OANodeErrFlag);
+                        if (OANodeErrFlag) ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                     }
 
                 } else if (UtilityRoutines::SameString(Alphas(14), "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
-                    CBVAV(CBVAVNum).DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingHXAssisted;
-                    HXDXCoolCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(
-                        state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
-                    CBVAV(CBVAVNum).DXCoilInletNode = HVACHXAssistedCoolingCoil::GetCoilInletNode(
-                        state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
-                    CBVAV(CBVAVNum).DXCoilOutletNode = HVACHXAssistedCoolingCoil::GetCoilOutletNode(
-                        state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
+                    thisCBVAV.DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingHXAssisted;
+                    HXDXCoolCoilName =
+                        HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
+                    thisCBVAV.DXCoilInletNode =
+                        HVACHXAssistedCoolingCoil::GetCoilInletNode(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
+                    thisCBVAV.DXCoilOutletNode =
+                        HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
                     if (DXErrorsFound) {
-                        ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                        ShowContinueError(state,
-                                          format("CoilSystem:Cooling:DX:HeatExchangerAssisted \"{}\" not found.", CBVAV(CBVAVNum).DXCoolCoilName));
+                        ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
+                        ShowContinueError(state, format("CoilSystem:Cooling:DX:HeatExchangerAssisted \"{}\" not found.", thisCBVAV.DXCoolCoilName));
                         ErrorsFound = true;
                     } else {
                         DXCoilErrFlag = false;
-                        int ActualCoolCoilType = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(
-                            state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
+                        int ActualCoolCoilType =
+                            HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
                         if (ActualCoolCoilType == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-                            DXCoils::GetDXCoilIndex(state,
-                                                    HVACHXAssistedCoolingCoil::GetHXDXCoilName(
-                                                        state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXCoilErrFlag),
-                                                    CBVAV(CBVAVNum).DXCoolCoilIndexNum,
-                                                    DXCoilErrFlag,
-                                                    "Coil:Cooling:DX:SingleSpeed");
-                            if (DXCoilErrFlag)
-                                ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
+                            DXCoils::GetDXCoilIndex(
+                                state,
+                                HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXCoilErrFlag),
+                                thisCBVAV.DXCoolCoilIndexNum,
+                                DXCoilErrFlag,
+                                "Coil:Cooling:DX:SingleSpeed");
+                            if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", thisCBVAV.UnitType, thisCBVAV.Name));
 
                             //         Mine outdoor condenser node from DX coil through HXAssistedDXCoil object
                             OANodeErrFlag = false;
-                            CBVAV(CBVAVNum).CondenserNodeNum =
+                            thisCBVAV.CondenserNodeNum =
                                 DXCoils::GetCoilCondenserInletNode(state, "Coil:Cooling:DX:SingleSpeed", HXDXCoolCoilName, OANodeErrFlag);
-                            if (OANodeErrFlag) ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                            if (OANodeErrFlag) ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                         } else if (ActualCoolCoilType == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                            CBVAV(CBVAVNum).DXCoolCoilIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(
+                            thisCBVAV.DXCoolCoilIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(
                                 state,
                                 "Coil:Cooling:DX:VariableSpeed",
-                                HVACHXAssistedCoolingCoil::GetHXDXCoilName(
-                                    state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXCoilErrFlag),
+                                HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXCoilErrFlag),
                                 DXCoilErrFlag);
-                            if (DXCoilErrFlag)
-                                ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
+                            if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", thisCBVAV.UnitType, thisCBVAV.Name));
                             OANodeErrFlag = false;
-                            CBVAV(CBVAVNum).CondenserNodeNum = VariableSpeedCoils::GetVSCoilCondenserInletNode(
+                            thisCBVAV.CondenserNodeNum = VariableSpeedCoils::GetVSCoilCondenserInletNode(
                                 state,
-                                HVACHXAssistedCoolingCoil::GetHXDXCoilName(
-                                    state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXCoilErrFlag),
+                                HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXCoilErrFlag),
                                 OANodeErrFlag);
-                            if (OANodeErrFlag) ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                            if (OANodeErrFlag) ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                         }
                     }
                 } else if (UtilityRoutines::SameString(Alphas(14), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
-                    CBVAV(CBVAVNum).DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl;
-                    CBVAV(CBVAVNum).DXCoilInletNode =
-                        DXCoils::GetCoilInletNode(state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
-                    CBVAV(CBVAVNum).DXCoilOutletNode =
-                        DXCoils::GetCoilOutletNode(state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXErrorsFound);
+                    thisCBVAV.DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl;
+                    thisCBVAV.DXCoilInletNode = DXCoils::GetCoilInletNode(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
+                    thisCBVAV.DXCoilOutletNode = DXCoils::GetCoilOutletNode(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
                     if (DXErrorsFound) {
-                        ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                        ShowContinueError(
-                            state, format("Coil:Cooling:DX:TwoStageWithHumidityControlMode \"{}\" not found.", CBVAV(CBVAVNum).DXCoolCoilName));
+                        ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
+                        ShowContinueError(state,
+                                          format("Coil:Cooling:DX:TwoStageWithHumidityControlMode \"{}\" not found.", thisCBVAV.DXCoolCoilName));
                         ErrorsFound = true;
                     } else {
 
                         DXCoilErrFlag = false;
                         DXCoils::GetDXCoilIndex(
-                            state, CBVAV(CBVAVNum).DXCoolCoilName, CBVAV(CBVAVNum).DXCoolCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).DXCoolCoilType);
-                        if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
+                            state, thisCBVAV.DXCoolCoilName, thisCBVAV.DXCoolCoilIndexNum, DXCoilErrFlag, thisCBVAV.DXCoolCoilType);
+                        if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", thisCBVAV.UnitType, thisCBVAV.Name));
 
                         //         Mine outdoor condenser node from multimode DX coil object
                         OANodeErrFlag = false;
-                        CBVAV(CBVAVNum).CondenserNodeNum =
-                            DXCoils::GetCoilCondenserInletNode(state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, OANodeErrFlag);
-                        if (OANodeErrFlag) ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                        thisCBVAV.CondenserNodeNum =
+                            DXCoils::GetCoilCondenserInletNode(state, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, OANodeErrFlag);
+                        if (OANodeErrFlag) ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                     }
                 }
 
             } else {
-                ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                 ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(14), Alphas(14)));
                 ErrorsFound = true;
             }
 
-            CBVAV(CBVAVNum).FanOpModeSchedPtr =
-                ScheduleManager::GetScheduleIndex(state, Alphas(13)); // convert schedule name to pointer (index number)
-            if (CBVAV(CBVAVNum).FanOpModeSchedPtr != 0) {
-                if (!ScheduleManager::CheckScheduleValueMinMax(state, CBVAV(CBVAVNum).FanOpModeSchedPtr, "<", 0.0, ">", 1.0)) {
-                    ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+            thisCBVAV.FanOpModeSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(13)); // convert schedule name to pointer (index number)
+            if (thisCBVAV.FanOpModeSchedPtr != 0) {
+                if (!ScheduleManager::CheckScheduleValueMinMax(state, thisCBVAV.FanOpModeSchedPtr, "<", 0.0, ">", 1.0)) {
+                    ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, format("The schedule values in {} must be 0 to 1.", cAlphaFields(13)));
                     ShowContinueError(state, "A value of 0 represents cycling fan mode, any other value up to 1 represents constant fan mode.");
                     ErrorsFound = true;
@@ -848,356 +835,334 @@ namespace HVACUnitaryBypassVAV {
 
                 //     Check supply air fan operating mode for cycling fan, if NOT cycling fan set AirFlowControl
                 if (!ScheduleManager::CheckScheduleValueMinMax(
-                        state, CBVAV(CBVAVNum).FanOpModeSchedPtr, ">=", 0.0, "<=", 0.0)) { // Autodesk:Note Range is 0 to 0?
+                        state, thisCBVAV.FanOpModeSchedPtr, ">=", 0.0, "<=", 0.0)) { // Autodesk:Note Range is 0 to 0?
                     //       set air flow control mode,
                     //       UseCompressorOnFlow  = operate at last cooling or heating air flow requested when compressor is off
                     //       UseCompressorOffFlow = operate at value specified by user (no input for this object type, UseCompONFlow)
                     //       AirFlowControl only valid if fan opmode = DataHVACGlobals::ContFanCycCoil
-                    if (CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow == 0.0) {
-                        CBVAV(CBVAVNum).AirFlowControl = AirFlowCtrlMode::UseCompressorOnFlow;
+                    if (thisCBVAV.MaxNoCoolHeatAirVolFlow == 0.0) {
+                        thisCBVAV.AirFlowControl = AirFlowCtrlMode::UseCompressorOnFlow;
                     } else {
-                        CBVAV(CBVAVNum).AirFlowControl = AirFlowCtrlMode::UseCompressorOffFlow;
+                        thisCBVAV.AirFlowControl = AirFlowCtrlMode::UseCompressorOffFlow;
                     }
                 }
 
             } else {
                 if (!lAlphaBlanks(13)) {
-                    ShowWarningError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                    ShowWarningError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state,
                                       format("{} = {} not found. Supply air fan operating mode set to constant operation and simulation continues.",
                                              cAlphaFields(13),
                                              Alphas(13)));
                 }
-                CBVAV(CBVAVNum).OpMode = DataHVACGlobals::ContFanCycCoil;
-                if (CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow == 0.0) {
-                    CBVAV(CBVAVNum).AirFlowControl = AirFlowCtrlMode::UseCompressorOnFlow;
+                thisCBVAV.OpMode = DataHVACGlobals::ContFanCycCoil;
+                if (thisCBVAV.MaxNoCoolHeatAirVolFlow == 0.0) {
+                    thisCBVAV.AirFlowControl = AirFlowCtrlMode::UseCompressorOnFlow;
                 } else {
-                    CBVAV(CBVAVNum).AirFlowControl = AirFlowCtrlMode::UseCompressorOffFlow;
+                    thisCBVAV.AirFlowControl = AirFlowCtrlMode::UseCompressorOffFlow;
                 }
             }
 
             //   Check FanVolFlow, must be >= CBVAV flow
-            if (CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
-                if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow &&
-                    CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize && CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow != 0.0) {
+            if (thisCBVAV.FanVolFlow != DataSizing::AutoSize) {
+                if (thisCBVAV.FanVolFlow < thisCBVAV.MaxNoCoolHeatAirVolFlow && thisCBVAV.MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize &&
+                    thisCBVAV.MaxNoCoolHeatAirVolFlow != 0.0) {
                     ShowWarningError(state,
                                      format("{} - air flow rate = {:.7T} in {} = {} is less than ",
                                             CurrentModuleObject,
-                                            CBVAV(CBVAVNum).FanVolFlow,
+                                            thisCBVAV.FanVolFlow,
                                             cAlphaFields(11),
-                                            CBVAV(CBVAVNum).FanName) +
+                                            thisCBVAV.FanName) +
                                          cNumericFields(3));
                     ShowContinueError(state, format(" {} is reset to the fan flow rate and the simulation continues.", cNumericFields(3)));
-                    ShowContinueError(state, format(" Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                    CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
+                    ShowContinueError(state, format(" Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
+                    thisCBVAV.MaxNoCoolHeatAirVolFlow = thisCBVAV.FanVolFlow;
                 }
             }
             //   only check that OA flow when compressor is OFF is >= SA flow when compressor is OFF when both are not autosized and
             //   that MaxNoCoolHeatAirVolFlow is /= 0 (trigger to use compressor ON flow, see AirFlowControl variable initialization above)
-            if (CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow > CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow &&
-                CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow != DataSizing::AutoSize && CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize &&
-                CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow != 0.0) {
+            if (thisCBVAV.NoCoolHeatOutAirVolFlow > thisCBVAV.MaxNoCoolHeatAirVolFlow && thisCBVAV.NoCoolHeatOutAirVolFlow != DataSizing::AutoSize &&
+                thisCBVAV.MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize && thisCBVAV.MaxNoCoolHeatAirVolFlow != 0.0) {
                 ShowWarningError(state, format("{}: {} cannot be greater than {}", CurrentModuleObject, cNumericFields(6), cNumericFields(3)));
                 ShowContinueError(state, format(" {} is reset to the fan flow rate and the simulation continues.", cNumericFields(6)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
+                thisCBVAV.NoCoolHeatOutAirVolFlow = thisCBVAV.FanVolFlow;
             }
 
             if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:DX:SingleSpeed") ||
                 UtilityRoutines::SameString(Alphas(16), "Coil:Heating:DX:VariableSpeed") ||
                 UtilityRoutines::SameString(Alphas(16), "Coil:Heating:Fuel") || UtilityRoutines::SameString(Alphas(16), "Coil:Heating:Electric") ||
                 UtilityRoutines::SameString(Alphas(16), "Coil:Heating:Water") || UtilityRoutines::SameString(Alphas(16), "Coil:Heating:Steam")) {
-                CBVAV(CBVAVNum).HeatCoilType = Alphas(16);
-                CBVAV(CBVAVNum).HeatCoilName = Alphas(17);
+                thisCBVAV.HeatCoilType = Alphas(16);
+                thisCBVAV.HeatCoilName = Alphas(17);
 
                 if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:DX:SingleSpeed")) {
-                    CBVAV(CBVAVNum).HeatCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
+                    thisCBVAV.HeatCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
                     DXCoilErrFlag = false;
-                    DXCoils::GetDXCoilIndex(
-                        state, CBVAV(CBVAVNum).HeatCoilName, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).HeatCoilType);
-                    CBVAV(CBVAVNum).MinOATCompressor = DXCoils::GetMinOATCompressor(state, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag);
-                    CBVAV(CBVAVNum).HeatingCoilInletNode =
-                        DXCoils::GetCoilInletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
-                    CBVAV(CBVAVNum).HeatingCoilOutletNode =
-                        DXCoils::GetCoilOutletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
-                    if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
+                    DXCoils::GetDXCoilIndex(state, thisCBVAV.HeatCoilName, thisCBVAV.DXHeatCoilIndexNum, DXCoilErrFlag, thisCBVAV.HeatCoilType);
+                    thisCBVAV.MinOATCompressor = DXCoils::GetMinOATCompressor(state, thisCBVAV.DXHeatCoilIndexNum, DXCoilErrFlag);
+                    thisCBVAV.HeatingCoilInletNode = DXCoils::GetCoilInletNode(state, thisCBVAV.HeatCoilType, thisCBVAV.HeatCoilName, DXCoilErrFlag);
+                    thisCBVAV.HeatingCoilOutletNode =
+                        DXCoils::GetCoilOutletNode(state, thisCBVAV.HeatCoilType, thisCBVAV.HeatCoilName, DXCoilErrFlag);
+                    if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", thisCBVAV.UnitType, thisCBVAV.Name));
 
                 } else if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:DX:VariableSpeed")) {
-                    CBVAV(CBVAVNum).HeatCoilType_Num = DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed;
+                    thisCBVAV.HeatCoilType_Num = DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed;
                     DXCoilErrFlag = false;
-                    CBVAV(CBVAVNum).DXHeatCoilIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(
-                        state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
-                    CBVAV(CBVAVNum).MinOATCompressor =
-                        VariableSpeedCoils::GetVSCoilMinOATCompressor(state, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag);
-                    CBVAV(CBVAVNum).HeatingCoilInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(
-                        state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
-                    CBVAV(CBVAVNum).HeatingCoilOutletNode = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
-                        state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
-                    if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
+                    thisCBVAV.DXHeatCoilIndexNum =
+                        VariableSpeedCoils::GetCoilIndexVariableSpeed(state, thisCBVAV.HeatCoilType, thisCBVAV.HeatCoilName, DXCoilErrFlag);
+                    thisCBVAV.MinOATCompressor = VariableSpeedCoils::GetVSCoilMinOATCompressor(state, thisCBVAV.DXHeatCoilIndexNum, DXCoilErrFlag);
+                    thisCBVAV.HeatingCoilInletNode =
+                        VariableSpeedCoils::GetCoilInletNodeVariableSpeed(state, thisCBVAV.HeatCoilType, thisCBVAV.HeatCoilName, DXCoilErrFlag);
+                    thisCBVAV.HeatingCoilOutletNode =
+                        VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(state, thisCBVAV.HeatCoilType, thisCBVAV.HeatCoilName, DXCoilErrFlag);
+                    if (DXCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", thisCBVAV.UnitType, thisCBVAV.Name));
                 } else if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:Fuel")) {
-                    CBVAV(CBVAVNum).HeatCoilType_Num = DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
-                    CBVAV(CBVAVNum).MinOATCompressor = -999.9;
-                    CBVAV(CBVAVNum).HeatingCoilInletNode =
-                        HeatingCoils::GetCoilInletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, ErrorsFound);
-                    CBVAV(CBVAVNum).HeatingCoilOutletNode =
-                        HeatingCoils::GetCoilOutletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, ErrorsFound);
+                    thisCBVAV.HeatCoilType_Num = DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
+                    thisCBVAV.MinOATCompressor = -999.9;
+                    thisCBVAV.HeatingCoilInletNode =
+                        HeatingCoils::GetCoilInletNode(state, thisCBVAV.HeatCoilType, thisCBVAV.HeatCoilName, ErrorsFound);
+                    thisCBVAV.HeatingCoilOutletNode =
+                        HeatingCoils::GetCoilOutletNode(state, thisCBVAV.HeatCoilType, thisCBVAV.HeatCoilName, ErrorsFound);
                 } else if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:Electric")) {
-                    CBVAV(CBVAVNum).HeatCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
-                    CBVAV(CBVAVNum).MinOATCompressor = -999.9;
-                    CBVAV(CBVAVNum).HeatingCoilInletNode =
-                        HeatingCoils::GetCoilInletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, ErrorsFound);
-                    CBVAV(CBVAVNum).HeatingCoilOutletNode =
-                        HeatingCoils::GetCoilOutletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, ErrorsFound);
+                    thisCBVAV.HeatCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
+                    thisCBVAV.MinOATCompressor = -999.9;
+                    thisCBVAV.HeatingCoilInletNode =
+                        HeatingCoils::GetCoilInletNode(state, thisCBVAV.HeatCoilType, thisCBVAV.HeatCoilName, ErrorsFound);
+                    thisCBVAV.HeatingCoilOutletNode =
+                        HeatingCoils::GetCoilOutletNode(state, thisCBVAV.HeatCoilType, thisCBVAV.HeatCoilName, ErrorsFound);
                 } else if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:Water")) {
-                    CBVAV(CBVAVNum).HeatCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
+                    thisCBVAV.HeatCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
                     errFlag = false;
-                    CBVAV(CBVAVNum).CoilControlNode =
-                        WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, errFlag);
-                    CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
-                        WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, errFlag);
-                    int HeatCoilInletNodeNum = WaterCoils::GetCoilInletNode(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, errFlag);
-                    CBVAV(CBVAVNum).HeatingCoilInletNode = HeatCoilInletNodeNum;
-                    int HeatCoilOutletNodeNum = WaterCoils::GetCoilOutletNode(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, errFlag);
-                    CBVAV(CBVAVNum).HeatingCoilOutletNode = HeatCoilOutletNodeNum;
+                    thisCBVAV.CoilControlNode = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", thisCBVAV.HeatCoilName, errFlag);
+                    thisCBVAV.MaxHeatCoilFluidFlow =
+                        WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", thisCBVAV.HeatCoilName, errFlag);
+                    int HeatCoilInletNodeNum = WaterCoils::GetCoilInletNode(state, "Coil:Heating:Water", thisCBVAV.HeatCoilName, errFlag);
+                    thisCBVAV.HeatingCoilInletNode = HeatCoilInletNodeNum;
+                    int HeatCoilOutletNodeNum = WaterCoils::GetCoilOutletNode(state, "Coil:Heating:Water", thisCBVAV.HeatCoilName, errFlag);
+                    thisCBVAV.HeatingCoilOutletNode = HeatCoilOutletNodeNum;
                     if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
+                        ShowContinueError(state, format("...occurs in {} \"{}\"", thisCBVAV.UnitType, thisCBVAV.Name));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(Alphas(16), "COIL:HEATING:STEAM")) {
-                    CBVAV(CBVAVNum).HeatCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
+                    thisCBVAV.HeatCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
                     errFlag = false;
-                    CBVAV(CBVAVNum).HeatCoilIndex = SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", CBVAV(CBVAVNum).HeatCoilName, errFlag);
+                    thisCBVAV.HeatCoilIndex = SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", thisCBVAV.HeatCoilName, errFlag);
 
-                    int HeatCoilInletNodeNum =
-                        SteamCoils::GetCoilAirInletNode(state, CBVAV(CBVAVNum).HeatCoilIndex, CBVAV(CBVAVNum).HeatCoilName, errFlag);
-                    CBVAV(CBVAVNum).HeatingCoilInletNode = HeatCoilInletNodeNum;
-                    CBVAV(CBVAVNum).CoilControlNode =
-                        SteamCoils::GetCoilSteamInletNode(state, CBVAV(CBVAVNum).HeatCoilIndex, CBVAV(CBVAVNum).HeatCoilName, errFlag);
-                    CBVAV(CBVAVNum).MaxHeatCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, CBVAV(CBVAVNum).HeatCoilIndex, errFlag);
+                    int HeatCoilInletNodeNum = SteamCoils::GetCoilAirInletNode(state, thisCBVAV.HeatCoilIndex, thisCBVAV.HeatCoilName, errFlag);
+                    thisCBVAV.HeatingCoilInletNode = HeatCoilInletNodeNum;
+                    thisCBVAV.CoilControlNode = SteamCoils::GetCoilSteamInletNode(state, thisCBVAV.HeatCoilIndex, thisCBVAV.HeatCoilName, errFlag);
+                    thisCBVAV.MaxHeatCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, thisCBVAV.HeatCoilIndex, errFlag);
                     int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                     Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(
                         state, fluidNameSteam, state.dataHVACUnitaryBypassVAV->TempSteamIn, 1.0, SteamIndex, getUnitaryHeatCoolVAVChangeoverBypass);
-                    if (CBVAV(CBVAVNum).MaxHeatCoilFluidFlow > 0.0) {
-                        CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
-                            SteamCoils::GetCoilMaxSteamFlowRate(state, CBVAV(CBVAVNum).HeatCoilIndex, errFlag) * SteamDensity;
+                    if (thisCBVAV.MaxHeatCoilFluidFlow > 0.0) {
+                        thisCBVAV.MaxHeatCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, thisCBVAV.HeatCoilIndex, errFlag) * SteamDensity;
                     }
-                    int HeatCoilOutletNodeNum =
-                        SteamCoils::GetCoilAirOutletNode(state, CBVAV(CBVAVNum).HeatCoilIndex, CBVAV(CBVAVNum).HeatCoilName, errFlag);
-                    CBVAV(CBVAVNum).HeatingCoilOutletNode = HeatCoilOutletNodeNum;
+                    int HeatCoilOutletNodeNum = SteamCoils::GetCoilAirOutletNode(state, thisCBVAV.HeatCoilIndex, thisCBVAV.HeatCoilName, errFlag);
+                    thisCBVAV.HeatingCoilOutletNode = HeatCoilOutletNodeNum;
                     if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
+                        ShowContinueError(state, format("...occurs in {} \"{}\"", thisCBVAV.UnitType, thisCBVAV.Name));
                         ErrorsFound = true;
                     }
                 }
             } else {
                 ShowSevereError(state, format("{} illegal {} = {}", CurrentModuleObject, cAlphaFields(16), Alphas(16)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                 ErrorsFound = true;
             }
 
-            if (CBVAV(CBVAVNum).DXCoilOutletNode != CBVAV(CBVAVNum).HeatingCoilInletNode) {
+            if (thisCBVAV.DXCoilOutletNode != thisCBVAV.HeatingCoilInletNode) {
                 ShowSevereError(state, format("{} illegal coil placement. Cooling coil must be upstream of heating coil.", CurrentModuleObject));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                 ErrorsFound = true;
             }
 
-            if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::BlowThru) {
-                if (CBVAV(CBVAVNum).SplitterOutletAirNode != CBVAV(CBVAVNum).HeatingCoilOutletNode) {
-                    ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+            if (thisCBVAV.FanPlace == DataHVACGlobals::BlowThru) {
+                if (thisCBVAV.SplitterOutletAirNode != thisCBVAV.HeatingCoilOutletNode) {
+                    ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, format("Illegal {} = {}.", cAlphaFields(6), SplitterOutletNodeName));
                     ShowContinueError(
                         state,
                         format(
                             "{} must be the same as the outlet node specified in the heating coil object = {}: {} when blow through {} is selected.",
                             cAlphaFields(6),
-                            CBVAV(CBVAVNum).HeatCoilType,
-                            CBVAV(CBVAVNum).HeatCoilName,
+                            thisCBVAV.HeatCoilType,
+                            thisCBVAV.HeatCoilName,
                             cAlphaFields(12)));
                     ErrorsFound = true;
                 }
-                if (CBVAV(CBVAVNum).MixerMixedAirNode != CBVAV(CBVAVNum).FanInletNodeNum) {
-                    ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                if (thisCBVAV.MixerMixedAirNode != thisCBVAV.FanInletNodeNum) {
+                    ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state,
                                       format("Illegal {}. The fan inlet node name must be the same as the mixed air node specified in the {} = {} "
                                              "when blow through {} is selected.",
                                              cAlphaFields(11),
                                              cAlphaFields(9),
-                                             CBVAV(CBVAVNum).OAMixName,
+                                             thisCBVAV.OAMixName,
                                              cAlphaFields(12)));
                     ErrorsFound = true;
                 }
             }
 
-            if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::DrawThru) {
-                if (CBVAV(CBVAVNum).MixerMixedAirNode != CBVAV(CBVAVNum).DXCoilInletNode) {
-                    ShowSevereError(state, format("{}: {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+            if (thisCBVAV.FanPlace == DataHVACGlobals::DrawThru) {
+                if (thisCBVAV.MixerMixedAirNode != thisCBVAV.DXCoilInletNode) {
+                    ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state,
                                       format("Illegal cooling coil placement. The cooling coil inlet node name must be the same as the mixed air "
                                              "node specified in the {} = {} when draw through {} is selected.",
                                              cAlphaFields(9),
-                                             CBVAV(CBVAVNum).OAMixName,
+                                             thisCBVAV.OAMixName,
                                              cAlphaFields(12)));
                     ErrorsFound = true;
                 }
             }
 
             if (UtilityRoutines::SameString(Alphas(18), "CoolingPriority")) {
-                CBVAV(CBVAVNum).PriorityControl = PriorityCtrlMode::CoolingPriority;
+                thisCBVAV.PriorityControl = PriorityCtrlMode::CoolingPriority;
             } else if (UtilityRoutines::SameString(Alphas(18), "HeatingPriority")) {
-                CBVAV(CBVAVNum).PriorityControl = PriorityCtrlMode::HeatingPriority;
+                thisCBVAV.PriorityControl = PriorityCtrlMode::HeatingPriority;
             } else if (UtilityRoutines::SameString(Alphas(18), "ZonePriority")) {
-                CBVAV(CBVAVNum).PriorityControl = PriorityCtrlMode::ZonePriority;
+                thisCBVAV.PriorityControl = PriorityCtrlMode::ZonePriority;
             } else if (UtilityRoutines::SameString(Alphas(18), "LoadPriority")) {
-                CBVAV(CBVAVNum).PriorityControl = PriorityCtrlMode::LoadPriority;
+                thisCBVAV.PriorityControl = PriorityCtrlMode::LoadPriority;
             } else {
                 ShowSevereError(state, format("{} illegal {} = {}", CurrentModuleObject, cAlphaFields(18), Alphas(18)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                 ShowContinueError(state, "Valid choices are CoolingPriority, HeatingPriority, ZonePriority or LoadPriority.");
                 ErrorsFound = true;
             }
 
             if (Numbers(7) > 0.0) {
-                CBVAV(CBVAVNum).MinLATCooling = Numbers(7);
+                thisCBVAV.MinLATCooling = Numbers(7);
             } else {
-                CBVAV(CBVAVNum).MinLATCooling = 10.0;
+                thisCBVAV.MinLATCooling = 10.0;
             }
 
             if (Numbers(8) > 0.0) {
-                CBVAV(CBVAVNum).MaxLATHeating = Numbers(8);
+                thisCBVAV.MaxLATHeating = Numbers(8);
             } else {
-                CBVAV(CBVAVNum).MaxLATHeating = 50.0;
+                thisCBVAV.MaxLATHeating = 50.0;
             }
 
-            if (CBVAV(CBVAVNum).MinLATCooling > CBVAV(CBVAVNum).MaxLATHeating) {
+            if (thisCBVAV.MinLATCooling > thisCBVAV.MaxLATHeating) {
                 ShowWarningError(state, format("{}: illegal leaving air temperature specified.", CurrentModuleObject));
                 ShowContinueError(state, format("Resetting {} equal to {} and the simulation continues.", cNumericFields(7), cNumericFields(8)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                CBVAV(CBVAVNum).MinLATCooling = CBVAV(CBVAVNum).MaxLATHeating;
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
+                thisCBVAV.MinLATCooling = thisCBVAV.MaxLATHeating;
             }
 
             // Dehumidification control mode
             if (UtilityRoutines::SameString(Alphas(19), "None")) {
-                CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
+                thisCBVAV.DehumidControlType = DehumidControl::None;
             } else if (UtilityRoutines::SameString(Alphas(19), "")) {
-                CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
+                thisCBVAV.DehumidControlType = DehumidControl::None;
             } else if (UtilityRoutines::SameString(Alphas(19), "Multimode")) {
-                if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl::Multimode;
+                if (thisCBVAV.DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                    thisCBVAV.DehumidControlType = DehumidControl::Multimode;
                 } else {
                     ShowWarningError(state, format("Invalid {} = {}", cAlphaFields(19), Alphas(19)));
-                    ShowContinueError(state, format("In {} \"{}\".", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                    ShowContinueError(state, format("In {} \"{}\".", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, format("Valid only with {} = Coil:Cooling:DX:TwoStageWithHumidityControlMode.", cAlphaFields(14)));
                     ShowContinueError(state, format("Setting {} to \"None\" and the simulation continues.", cAlphaFields(19)));
-                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
+                    thisCBVAV.DehumidControlType = DehumidControl::None;
                 }
             } else if (UtilityRoutines::SameString(Alphas(19), "CoolReheat")) {
-                if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl::CoolReheat;
+                if (thisCBVAV.DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                    thisCBVAV.DehumidControlType = DehumidControl::CoolReheat;
                 } else {
                     ShowWarningError(state, format("Invalid {} = {}", cAlphaFields(19), Alphas(19)));
-                    ShowContinueError(state, format("In {} \"{}\".", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                    ShowContinueError(state, format("In {} \"{}\".", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, format("Valid only with {} = Coil:Cooling:DX:TwoStageWithHumidityControlMode.", cAlphaFields(14)));
                     ShowContinueError(state, format("Setting {} to \"None\" and the simulation continues.", cAlphaFields(19)));
-                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
+                    thisCBVAV.DehumidControlType = DehumidControl::None;
                 }
             } else {
                 ShowSevereError(state, format("Invalid {} ={}", cAlphaFields(19), Alphas(19)));
-                ShowContinueError(state, format("In {} \"{}\".", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+                ShowContinueError(state, format("In {} \"{}\".", CurrentModuleObject, thisCBVAV.Name));
             }
 
             if (NumNumbers > 8) {
-                CBVAV(CBVAVNum).minModeChangeTime = Numbers(9);
+                thisCBVAV.minModeChangeTime = Numbers(9);
             }
 
             //   Initialize last mode of compressor operation
-            CBVAV(CBVAVNum).LastMode = HeatingMode;
+            thisCBVAV.LastMode = HeatingMode;
 
-            if (CBVAV(CBVAVNum).FanType_Num != DataHVACGlobals::FanType_SimpleOnOff &&
-                CBVAV(CBVAVNum).FanType_Num != DataHVACGlobals::FanType_SimpleConstVolume &&
-                CBVAV(CBVAVNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                ShowSevereError(state, format("{} illegal {} in fan object = {}", CurrentModuleObject, cAlphaFields(10), CBVAV(CBVAVNum).FanName));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
+            if (thisCBVAV.FanType_Num != DataHVACGlobals::FanType_SimpleOnOff &&
+                thisCBVAV.FanType_Num != DataHVACGlobals::FanType_SimpleConstVolume &&
+                thisCBVAV.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                ShowSevereError(state, format("{} illegal {} in fan object = {}", CurrentModuleObject, cAlphaFields(10), thisCBVAV.FanName));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
                 ShowContinueError(state, " The fan object type must be Fan:SystemModel, Fan:OnOff or Fan:ConstantVolume.");
                 ErrorsFound = true;
-            } else if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff ||
-                       CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff &&
-                    !UtilityRoutines::SameString(CBVAV(CBVAVNum).FanType, "Fan:OnOff")) {
-                    ShowWarningError(state,
-                                     format("{} has {} = {} which is inconsistent with the fan object.",
-                                            CurrentModuleObject,
-                                            cAlphaFields(10),
-                                            CBVAV(CBVAVNum).FanType));
-                    ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                    ShowContinueError(
-                        state, format(" The fan object ({}) is actually a valid fan type and the simulation continues.", CBVAV(CBVAVNum).FanName));
-                    ShowContinueError(state, " Node connections errors may result due to the inconsistent fan type.");
-                }
-                if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume &&
-                    !UtilityRoutines::SameString(CBVAV(CBVAVNum).FanType, "Fan:ConstantVolume")) {
+            } else if (thisCBVAV.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff ||
+                       thisCBVAV.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
+                if (thisCBVAV.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff && !UtilityRoutines::SameString(thisCBVAV.FanType, "Fan:OnOff")) {
                     ShowWarningError(
                         state,
                         format(
-                            "{} has {} = {} which is inconsistent with fan object.", CurrentModuleObject, cAlphaFields(10), CBVAV(CBVAVNum).FanType));
-                    ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                    ShowContinueError(
-                        state, format(" The fan object ({}) is actually a valid fan type and the simulation continues.", CBVAV(CBVAVNum).FanName));
+                            "{} has {} = {} which is inconsistent with the fan object.", CurrentModuleObject, cAlphaFields(10), thisCBVAV.FanType));
+                    ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
+                    ShowContinueError(state,
+                                      format(" The fan object ({}) is actually a valid fan type and the simulation continues.", thisCBVAV.FanName));
+                    ShowContinueError(state, " Node connections errors may result due to the inconsistent fan type.");
+                }
+                if (thisCBVAV.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume &&
+                    !UtilityRoutines::SameString(thisCBVAV.FanType, "Fan:ConstantVolume")) {
+                    ShowWarningError(
+                        state,
+                        format("{} has {} = {} which is inconsistent with fan object.", CurrentModuleObject, cAlphaFields(10), thisCBVAV.FanType));
+                    ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
+                    ShowContinueError(state,
+                                      format(" The fan object ({}) is actually a valid fan type and the simulation continues.", thisCBVAV.FanName));
                     ShowContinueError(state, " Node connections errors may result due to the inconsistent fan type.");
                 }
             }
 
             // Add fan to component sets array
-            if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::BlowThru) {
-                CompSetFanInlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).MixerMixedAirNode);
-                CompSetFanOutlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).DXCoilInletNode);
+            if (thisCBVAV.FanPlace == DataHVACGlobals::BlowThru) {
+                CompSetFanInlet = state.dataLoopNodes->NodeID(thisCBVAV.MixerMixedAirNode);
+                CompSetFanOutlet = state.dataLoopNodes->NodeID(thisCBVAV.DXCoilInletNode);
             } else {
-                CompSetFanInlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).HeatingCoilOutletNode);
+                CompSetFanInlet = state.dataLoopNodes->NodeID(thisCBVAV.HeatingCoilOutletNode);
                 CompSetFanOutlet = SplitterOutletNodeName;
             }
-            std::string CompSetCoolInlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).DXCoilInletNode);
-            std::string CompSetCoolOutlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).DXCoilOutletNode);
+            std::string CompSetCoolInlet = state.dataLoopNodes->NodeID(thisCBVAV.DXCoilInletNode);
+            std::string CompSetCoolOutlet = state.dataLoopNodes->NodeID(thisCBVAV.DXCoilOutletNode);
 
             // Add fan to component sets array
-            BranchNodeConnections::SetUpCompSets(state,
-                                                 CBVAV(CBVAVNum).UnitType,
-                                                 CBVAV(CBVAVNum).Name,
-                                                 CBVAV(CBVAVNum).FanType,
-                                                 CBVAV(CBVAVNum).FanName,
-                                                 CompSetFanInlet,
-                                                 CompSetFanOutlet);
+            BranchNodeConnections::SetUpCompSets(
+                state, thisCBVAV.UnitType, thisCBVAV.Name, thisCBVAV.FanType, thisCBVAV.FanName, CompSetFanInlet, CompSetFanOutlet);
 
             // Add cooling coil to component sets array
-            BranchNodeConnections::SetUpCompSets(state,
-                                                 CBVAV(CBVAVNum).UnitType,
-                                                 CBVAV(CBVAVNum).Name,
-                                                 CBVAV(CBVAVNum).DXCoolCoilType,
-                                                 CBVAV(CBVAVNum).DXCoolCoilName,
-                                                 CompSetCoolInlet,
-                                                 CompSetCoolOutlet);
+            BranchNodeConnections::SetUpCompSets(
+                state, thisCBVAV.UnitType, thisCBVAV.Name, thisCBVAV.DXCoolCoilType, thisCBVAV.DXCoolCoilName, CompSetCoolInlet, CompSetCoolOutlet);
 
             // Add heating coil to component sets array
             BranchNodeConnections::SetUpCompSets(state,
-                                                 CBVAV(CBVAVNum).UnitType,
-                                                 CBVAV(CBVAVNum).Name,
-                                                 CBVAV(CBVAVNum).HeatCoilType,
-                                                 CBVAV(CBVAVNum).HeatCoilName,
-                                                 state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).HeatingCoilInletNode),
-                                                 state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).HeatingCoilOutletNode));
+                                                 thisCBVAV.UnitType,
+                                                 thisCBVAV.Name,
+                                                 thisCBVAV.HeatCoilType,
+                                                 thisCBVAV.HeatCoilName,
+                                                 state.dataLoopNodes->NodeID(thisCBVAV.HeatingCoilInletNode),
+                                                 state.dataLoopNodes->NodeID(thisCBVAV.HeatingCoilOutletNode));
 
             // Set up component set for OA mixer - use OA node and Mixed air node
             BranchNodeConnections::SetUpCompSets(state,
-                                                 CBVAV(CBVAVNum).UnitType,
-                                                 CBVAV(CBVAVNum).Name,
-                                                 CBVAV(CBVAVNum).OAMixType,
-                                                 CBVAV(CBVAVNum).OAMixName,
-                                                 state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).MixerOutsideAirNode),
-                                                 state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).MixerMixedAirNode));
+                                                 thisCBVAV.UnitType,
+                                                 thisCBVAV.Name,
+                                                 thisCBVAV.OAMixType,
+                                                 thisCBVAV.OAMixName,
+                                                 state.dataLoopNodes->NodeID(thisCBVAV.MixerOutsideAirNode),
+                                                 state.dataLoopNodes->NodeID(thisCBVAV.MixerMixedAirNode));
 
             BranchNodeConnections::TestCompSet(state,
-                                               CBVAV(CBVAVNum).UnitType,
-                                               CBVAV(CBVAVNum).Name,
-                                               state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).AirInNode),
-                                               state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).AirOutNode),
+                                               thisCBVAV.UnitType,
+                                               thisCBVAV.Name,
+                                               state.dataLoopNodes->NodeID(thisCBVAV.AirInNode),
+                                               state.dataLoopNodes->NodeID(thisCBVAV.AirOutNode),
                                                "Air Nodes");
 
             //   Find air loop associated with CBVAV system
@@ -1206,70 +1171,66 @@ namespace HVACUnitaryBypassVAV {
                     for (int CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                          ++CompNum) {
                         if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-                                                         CBVAV(CBVAVNum).Name) ||
+                                                         thisCBVAV.Name) ||
                             !UtilityRoutines::SameString(
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                CBVAV(CBVAVNum).UnitType))
+                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf, thisCBVAV.UnitType))
                             continue;
-                        CBVAV(CBVAVNum).AirLoopNumber = AirLoopNum;
+                        thisCBVAV.AirLoopNumber = AirLoopNum;
                         //         Should EXIT here or do other checking?
                         break;
                     }
                 }
             }
 
-            if (CBVAV(CBVAVNum).AirLoopNumber > 0) {
-                CBVAV(CBVAVNum).NumControlledZones = state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).NumZonesCooled;
-                CBVAV(CBVAVNum).ControlledZoneNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
-                CBVAV(CBVAVNum).ControlledZoneNodeNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
-                CBVAV(CBVAVNum).CBVAVBoxOutletNode.allocate(CBVAV(CBVAVNum).NumControlledZones);
-                CBVAV(CBVAVNum).ZoneSequenceCoolingNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
-                CBVAV(CBVAVNum).ZoneSequenceHeatingNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
+            if (thisCBVAV.AirLoopNumber > 0) {
+                thisCBVAV.NumControlledZones = state.dataAirLoop->AirToZoneNodeInfo(thisCBVAV.AirLoopNumber).NumZonesCooled;
+                thisCBVAV.ControlledZoneNum.allocate(thisCBVAV.NumControlledZones);
+                thisCBVAV.ControlledZoneNodeNum.allocate(thisCBVAV.NumControlledZones);
+                thisCBVAV.CBVAVBoxOutletNode.allocate(thisCBVAV.NumControlledZones);
+                thisCBVAV.ZoneSequenceCoolingNum.allocate(thisCBVAV.NumControlledZones);
+                thisCBVAV.ZoneSequenceHeatingNum.allocate(thisCBVAV.NumControlledZones);
 
-                CBVAV(CBVAVNum).ControlledZoneNum = 0;
-                for (int AirLoopZoneNum = 1; AirLoopZoneNum <= state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).NumZonesCooled;
+                thisCBVAV.ControlledZoneNum = 0;
+                for (int AirLoopZoneNum = 1; AirLoopZoneNum <= state.dataAirLoop->AirToZoneNodeInfo(thisCBVAV.AirLoopNumber).NumZonesCooled;
                      ++AirLoopZoneNum) {
-                    CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum) =
-                        state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).CoolCtrlZoneNums(AirLoopZoneNum);
-                    if (CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum) > 0) {
-                        CBVAV(CBVAVNum).ControlledZoneNodeNum(AirLoopZoneNum) =
-                            state.dataZoneEquip->ZoneEquipConfig(CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum)).ZoneNode;
-                        CBVAV(CBVAVNum).CBVAVBoxOutletNode(AirLoopZoneNum) =
-                            state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).CoolZoneInletNodes(AirLoopZoneNum);
+                    thisCBVAV.ControlledZoneNum(AirLoopZoneNum) =
+                        state.dataAirLoop->AirToZoneNodeInfo(thisCBVAV.AirLoopNumber).CoolCtrlZoneNums(AirLoopZoneNum);
+                    if (thisCBVAV.ControlledZoneNum(AirLoopZoneNum) > 0) {
+                        thisCBVAV.ControlledZoneNodeNum(AirLoopZoneNum) =
+                            state.dataZoneEquip->ZoneEquipConfig(thisCBVAV.ControlledZoneNum(AirLoopZoneNum)).ZoneNode;
+                        thisCBVAV.CBVAVBoxOutletNode(AirLoopZoneNum) =
+                            state.dataAirLoop->AirToZoneNodeInfo(thisCBVAV.AirLoopNumber).CoolZoneInletNodes(AirLoopZoneNum);
                         // check for thermostat in controlled zone
                         bool FoundTstatZone = false;
                         for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
-                            if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum !=
-                                CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum))
+                            if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum != thisCBVAV.ControlledZoneNum(AirLoopZoneNum))
                                 continue;
                             FoundTstatZone = true;
                         }
                         if (!FoundTstatZone) {
-                            ShowWarningError(state, format("{} \"{}\"", CurrentModuleObject, CBVAV(CBVAVNum).Name));
-                            ShowContinueError(
-                                state,
-                                format("Thermostat not found in zone = {} and the simulation continues.",
-                                       state.dataZoneEquip->ZoneEquipConfig(CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum)).ZoneName));
+                            ShowWarningError(state, format("{} \"{}\"", CurrentModuleObject, thisCBVAV.Name));
+                            ShowContinueError(state,
+                                              format("Thermostat not found in zone = {} and the simulation continues.",
+                                                     state.dataZoneEquip->ZoneEquipConfig(thisCBVAV.ControlledZoneNum(AirLoopZoneNum)).ZoneName));
                             ShowContinueError(state, "This zone will not be controlled to a temperature setpoint.");
                         }
-                        int zoneNum = CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum);
-                        int zoneInlet = CBVAV(CBVAVNum).CBVAVBoxOutletNode(AirLoopZoneNum);
+                        int zoneNum = thisCBVAV.ControlledZoneNum(AirLoopZoneNum);
+                        int zoneInlet = thisCBVAV.CBVAVBoxOutletNode(AirLoopZoneNum);
                         // setup zone equipment sequence information based on finding matching air terminal
                         if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
                             int coolingPriority = 0;
                             int heatingPriority = 0;
                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex)
                                 .getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
-                            CBVAV(CBVAVNum).ZoneSequenceCoolingNum(AirLoopZoneNum) = coolingPriority;
-                            CBVAV(CBVAVNum).ZoneSequenceHeatingNum(AirLoopZoneNum) = heatingPriority;
+                            thisCBVAV.ZoneSequenceCoolingNum(AirLoopZoneNum) = coolingPriority;
+                            thisCBVAV.ZoneSequenceHeatingNum(AirLoopZoneNum) = heatingPriority;
                         }
-                        if (CBVAV(CBVAVNum).ZoneSequenceCoolingNum(AirLoopZoneNum) == 0 ||
-                            CBVAV(CBVAVNum).ZoneSequenceHeatingNum(AirLoopZoneNum) == 0) {
+                        if (thisCBVAV.ZoneSequenceCoolingNum(AirLoopZoneNum) == 0 || thisCBVAV.ZoneSequenceHeatingNum(AirLoopZoneNum) == 0) {
                             ShowSevereError(
                                 state,
                                 format("AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass, \"{}\": Airloop air terminal in the zone equipment list for "
                                        "zone = {} not found or is not allowed Zone Equipment Cooling or Heating Sequence = 0.",
-                                       CBVAV(CBVAVNum).Name,
+                                       thisCBVAV.Name,
                                        state.dataZoneEquip->ZoneEquipConfig(zoneNum).ZoneName));
                             ErrorsFound = true;
                         }
@@ -1288,140 +1249,141 @@ namespace HVACUnitaryBypassVAV {
         }
 
         for (int CBVAVNum = 1; CBVAVNum <= NumCBVAV; ++CBVAVNum) {
-            // Setup Report variables for the Fan Coils
+            // Setup Report variables
+            auto &thisCBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
             SetupOutputVariable(state,
                                 "Unitary System Total Heating Rate",
                                 OutputProcessor::Unit::W,
-                                CBVAV(CBVAVNum).TotHeatEnergyRate,
+                                thisCBVAV.TotHeatEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Total Heating Energy",
                                 OutputProcessor::Unit::J,
-                                CBVAV(CBVAVNum).TotHeatEnergy,
+                                thisCBVAV.TotHeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Total Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                CBVAV(CBVAVNum).TotCoolEnergyRate,
+                                thisCBVAV.TotCoolEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Total Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                CBVAV(CBVAVNum).TotCoolEnergy,
+                                thisCBVAV.TotCoolEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
-                                CBVAV(CBVAVNum).SensHeatEnergyRate,
+                                thisCBVAV.SensHeatEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
-                                CBVAV(CBVAVNum).SensHeatEnergy,
+                                thisCBVAV.SensHeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                CBVAV(CBVAVNum).SensCoolEnergyRate,
+                                thisCBVAV.SensCoolEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                CBVAV(CBVAVNum).SensCoolEnergy,
+                                thisCBVAV.SensCoolEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Latent Heating Rate",
                                 OutputProcessor::Unit::W,
-                                CBVAV(CBVAVNum).LatHeatEnergyRate,
+                                thisCBVAV.LatHeatEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Latent Heating Energy",
                                 OutputProcessor::Unit::J,
-                                CBVAV(CBVAVNum).LatHeatEnergy,
+                                thisCBVAV.LatHeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                CBVAV(CBVAVNum).LatCoolEnergyRate,
+                                thisCBVAV.LatCoolEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Latent Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                CBVAV(CBVAVNum).LatCoolEnergy,
+                                thisCBVAV.LatCoolEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Electricity Rate",
                                 OutputProcessor::Unit::W,
-                                CBVAV(CBVAVNum).ElecPower,
+                                thisCBVAV.ElecPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                CBVAV(CBVAVNum).ElecConsumption,
+                                thisCBVAV.ElecConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Fan Part Load Ratio",
                                 OutputProcessor::Unit::None,
-                                CBVAV(CBVAVNum).FanPartLoadRatio,
+                                thisCBVAV.FanPartLoadRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Compressor Part Load Ratio",
                                 OutputProcessor::Unit::None,
-                                CBVAV(CBVAVNum).CompPartLoadRatio,
+                                thisCBVAV.CompPartLoadRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Bypass Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                CBVAV(CBVAVNum).BypassMassFlowRate,
+                                thisCBVAV.BypassMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Air Outlet Setpoint Temperature",
                                 OutputProcessor::Unit::C,
-                                CBVAV(CBVAVNum).OutletTempSetPoint,
+                                thisCBVAV.OutletTempSetPoint,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Operating Mode Index",
                                 OutputProcessor::Unit::None,
-                                CBVAV(CBVAVNum).HeatCoolMode,
+                                thisCBVAV.HeatCoolMode,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                CBVAV(CBVAVNum).Name);
+                                thisCBVAV.Name);
         }
     }
 
