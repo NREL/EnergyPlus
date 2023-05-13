@@ -2226,16 +2226,16 @@ namespace HVACUnitaryBypassVAV {
         Real64 FullOutput = 0; // Unit full output when compressor is operating [W]
         PartLoadFrac = 0.0;
 
-        auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
+        auto &cBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
 
-        if (ScheduleManager::GetCurrentScheduleValue(state, CBVAV(CBVAVNum).SchedPtr) == 0.0) return;
+        if (ScheduleManager::GetCurrentScheduleValue(state, cBVAV.SchedPtr) == 0.0) return;
 
         // Get operating result
         PartLoadFrac = 1.0;
         CalcCBVAV(state, CBVAVNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
 
-        if ((state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirOutNode).Temp - CBVAV(CBVAVNum).OutletTempSetPoint) > DataHVACGlobals::SmallTempDiff &&
-            CBVAV(CBVAVNum).HeatCoolMode > 0 && PartLoadFrac < 1.0) {
+        if ((state.dataLoopNodes->Node(cBVAV.AirOutNode).Temp - cBVAV.OutletTempSetPoint) > DataHVACGlobals::SmallTempDiff &&
+            cBVAV.HeatCoolMode > 0 && PartLoadFrac < 1.0) {
             CalcCBVAV(state, CBVAVNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
         }
     }
