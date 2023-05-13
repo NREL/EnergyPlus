@@ -1383,14 +1383,10 @@ namespace HWBaseboardRadiator {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNum;
         Real64 RadHeat;
         Real64 BBHeat;
-        Real64 AirInletTemp;
         Real64 AirOutletTemp;
-        Real64 WaterInletTemp;
         Real64 WaterOutletTemp;
-        Real64 WaterMassFlowRate;
         Real64 AirMassFlowRate;
         Real64 CapacitanceAir;
         Real64 CapacitanceWater;
@@ -1402,20 +1398,17 @@ namespace HWBaseboardRadiator {
         Real64 AA;
         Real64 BB;
         Real64 CC;
-        Real64 QZnReq;
         Real64 Cp;
         auto &hWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
-        auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
-        auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
 
-        ZoneNum = hWBaseboard.ZonePtr;
+        int ZoneNum = hWBaseboard.ZonePtr;
         auto &zeroSourceSumHATsurf = state.dataHWBaseboardRad->ZeroSourceSumHATsurf(ZoneNum);
-        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        AirInletTemp = hWBaseboard.AirInletTemp;
-        WaterInletTemp = hWBaseboard.WaterInletTemp;
-        WaterMassFlowRate = state.dataLoopNodes->Node(hWBaseboard.WaterInletNode).MassFlowRate;
+        Real64 QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        Real64 AirInletTemp = hWBaseboard.AirInletTemp;
+        Real64 WaterInletTemp = hWBaseboard.WaterInletTemp;
+        Real64 WaterMassFlowRate = state.dataLoopNodes->Node(hWBaseboard.WaterInletNode).MassFlowRate;
         HWBaseboardDesignData HWBaseboardDesignDataObject{
-            HWBaseboardDesignObject(hWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
+            state.dataHWBaseboardRad->HWBaseboardDesignObject(hWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
 
         if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) &&
             (GetCurrentScheduleValue(state, hWBaseboard.SchedPtr) > 0) && (WaterMassFlowRate > 0.0)) {
@@ -1455,7 +1448,7 @@ namespace HWBaseboardRadiator {
             WaterOutletTemp = WaterInletTemp - CapacitanceAir * (AirOutletTemp - AirInletTemp) / CapacitanceWater;
             BBHeat = CapacitanceWater * (WaterInletTemp - WaterOutletTemp);
             RadHeat = BBHeat * HWBaseboardDesignDataObject.FracRadiant;
-            QBBRadSource(BaseboardNum) = RadHeat;
+            state.dataHWBaseboardRad->QBBRadSource(BaseboardNum) = RadHeat;
 
             if (HWBaseboardDesignDataObject.FracRadiant <= MinFrac) {
                 LoadMet = BBHeat;
@@ -1493,7 +1486,7 @@ namespace HWBaseboardRadiator {
             RadHeat = 0.0;
             WaterMassFlowRate = 0.0;
             AirMassFlowRate = 0.0;
-            QBBRadSource(BaseboardNum) = 0.0;
+            state.dataHWBaseboardRad->QBBRadSource(BaseboardNum) = 0.0;
             hWBaseboard.WaterOutletEnthalpy = hWBaseboard.WaterInletEnthalpy;
             SetActuatedBranchFlowRate(state, WaterMassFlowRate, hWBaseboard.WaterInletNode, hWBaseboard.plantLoc, false);
         }
