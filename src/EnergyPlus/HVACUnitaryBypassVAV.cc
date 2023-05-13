@@ -3139,7 +3139,7 @@ namespace HVACUnitaryBypassVAV {
                 Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
                 Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
                 Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-                Real64 PartLoadFrac(0.0);
+                PartLoadFrac = 0.0;
                 Real64 SpeedRatio(0.0);
                 int SpeedNum(1);
                 // run model with no load
