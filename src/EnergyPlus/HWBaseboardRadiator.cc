@@ -122,9 +122,6 @@ namespace HWBaseboardRadiator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the Baseboard Radiators.
 
-        // Using/Aliasing
-        using ScheduleManager::GetCurrentScheduleValue;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum; // Index of unit in baseboard array
         Real64 QZnReq;    // Zone load not yet satisfied
@@ -230,26 +227,12 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
         //       DATE WRITTEN   Aug 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the input for the baseboard units.
 
         // METHODOLOGY EMPLOYED:
         // Standard input processor calls.
-
-        // Using/Aliasing
-        using BranchNodeConnections::TestCompSet;
-        using DataLoopNode::ObjectIsNotParent;
-        using DataSizing::AutoSize;
-        using DataSizing::CapacityPerFloorArea;
-        using DataSizing::FractionOfAutosizedHeatingCapacity;
-        using DataSizing::HeatingDesignCapacity;
-        using GlobalNames::VerifyUniqueBaseboardName;
-        using NodeInputManager::GetOnlySingleNode;
-        using ScheduleManager::GetCurrentScheduleValue;
-        using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetHWBaseboardInput:");
@@ -325,7 +308,7 @@ namespace HWBaseboardRadiator {
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueBaseboardName(
+            GlobalNames::VerifyUniqueBaseboardName(
                 state, cCMO_BBRadiator_Water_Design, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water_Design + " Name");
 
             HWBaseboardDesignObject(BaseboardDesignNum).designName = state.dataIPShortCut->cAlphaArgs(1); // Name of this baseboard design object
@@ -333,9 +316,9 @@ namespace HWBaseboardRadiator {
 
             // Determine HW radiant baseboard heating design capacity sizing method
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = HeatingDesignCapacity;
+                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = CapacityPerFloorArea;
+                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity =
                         state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
@@ -352,7 +335,7 @@ namespace HWBaseboardRadiator {
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
                                                  state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
-                    } else if (HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity == AutoSize) {
+                    } else if (HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity == DataSizing::AutoSize) {
                         ShowSevereError(
                             state,
                             format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, HWBaseboardDesignObject(BaseboardDesignNum).designName));
@@ -377,7 +360,7 @@ namespace HWBaseboardRadiator {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity =
                         state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
@@ -485,7 +468,7 @@ namespace HWBaseboardRadiator {
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueBaseboardName(
+            GlobalNames::VerifyUniqueBaseboardName(
                 state, cCMO_BBRadiator_Water, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water + " Name");
 
             HWBaseboard(BaseboardNum).EquipID = state.dataIPShortCut->cAlphaArgs(1); // Name of this baseboard
@@ -503,7 +486,7 @@ namespace HWBaseboardRadiator {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 HWBaseboard(BaseboardNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                HWBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+                HWBaseboard(BaseboardNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (HWBaseboard(BaseboardNum).SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}\", {}=\"{}\" not found.",
@@ -525,7 +508,7 @@ namespace HWBaseboardRadiator {
                                                                          DataLoopNode::NodeFluidType::Water,
                                                                          DataLoopNode::ConnectionType::Inlet,
                                                                          NodeInputManager::CompFluidStream::Primary,
-                                                                         ObjectIsNotParent);
+                                                                         DataLoopNode::ObjectIsNotParent);
 
             // Get outlet node number
             HWBaseboard(BaseboardNum).WaterOutletNode = GetOnlySingleNode(state,
@@ -536,13 +519,13 @@ namespace HWBaseboardRadiator {
                                                                           DataLoopNode::NodeFluidType::Water,
                                                                           DataLoopNode::ConnectionType::Outlet,
                                                                           NodeInputManager::CompFluidStream::Primary,
-                                                                          ObjectIsNotParent);
-            TestCompSet(state,
-                        cCMO_BBRadiator_Water,
-                        state.dataIPShortCut->cAlphaArgs(1),
-                        state.dataIPShortCut->cAlphaArgs(4),
-                        state.dataIPShortCut->cAlphaArgs(5),
-                        "Hot Water Nodes");
+                                                                          DataLoopNode::ObjectIsNotParent);
+            BranchNodeConnections::TestCompSet(state,
+                                               cCMO_BBRadiator_Water,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaArgs(4),
+                                               state.dataIPShortCut->cAlphaArgs(5),
+                                               "Hot Water Nodes");
 
             HWBaseboard(BaseboardNum).WaterTempAvg = state.dataIPShortCut->rNumericArgs(1);
             if (HWBaseboard(BaseboardNum).WaterTempAvg > MaxWaterTempAvg + 0.001) {
@@ -580,10 +563,11 @@ namespace HWBaseboardRadiator {
 
             // Determine HW radiant baseboard heating design capacity sizing method
             HWBaseboard(BaseboardNum).HeatingCapMethod = HWBaseboardDesignDataObject.HeatingCapMethod;
-            if (HWBaseboard(BaseboardNum).HeatingCapMethod == HeatingDesignCapacity) {
+            if (HWBaseboard(BaseboardNum).HeatingCapMethod == DataSizing::HeatingDesignCapacity) {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                     HWBaseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
-                    if (HWBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0 && HWBaseboard(BaseboardNum).ScaledHeatingCapacity != AutoSize) {
+                    if (HWBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0 &&
+                        HWBaseboard(BaseboardNum).ScaledHeatingCapacity != DataSizing::AutoSize) {
                         ShowSevereError(state, format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, HWBaseboard(BaseboardNum).EquipID));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
@@ -601,10 +585,10 @@ namespace HWBaseboardRadiator {
                         state, format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum)));
                     ErrorsFound = true;
                 }
-            } else if (HWBaseboard(BaseboardNum).HeatingCapMethod == CapacityPerFloorArea) {
+            } else if (HWBaseboard(BaseboardNum).HeatingCapMethod == DataSizing::CapacityPerFloorArea) {
                 HWBaseboard(BaseboardNum).ScaledHeatingCapacity = HWBaseboardDesignDataObject.ScaledHeatingCapacity;
 
-            } else if (HWBaseboard(BaseboardNum).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
+            } else if (HWBaseboard(BaseboardNum).HeatingCapMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
                 HWBaseboard(BaseboardNum).ScaledHeatingCapacity = HWBaseboardDesignDataObject.ScaledHeatingCapacity;
 
             } else {
