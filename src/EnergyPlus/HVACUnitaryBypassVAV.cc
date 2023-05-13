@@ -4118,7 +4118,6 @@ namespace HVACUnitaryBypassVAV {
         Real64 MinWaterFlow;    // minimum water mass flow rate
         Real64 MaxHotWaterFlow; // maximum hot water mass flow rate, kg/s
         Real64 HotWaterMdot;    // actual hot water mass flow rate
-        int SolFlag;            // error flag
 
         Real64 QCoilActual = 0.0; // actual heating load met
 
@@ -4139,7 +4138,7 @@ namespace HVACUnitaryBypassVAV {
                     state, thisCBVAV.HeatCoilName, FirstHVACIteration, thisCBVAV.HeatCoilIndex, QCoilActual, FanMode);
                 if (QCoilActual > (HeatCoilLoad + DataHVACGlobals::SmallLoad)) {
                     // control water flow to obtain output matching HeatCoilLoad
-                    SolFlag = 0;
+                    int SolFlag = 0;
                     MinWaterFlow = 0.0;
                     auto f = [&state, CBVAVNum, FirstHVACIteration, HeatCoilLoad](Real64 const HWFlow) {
                         auto &thiscBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
