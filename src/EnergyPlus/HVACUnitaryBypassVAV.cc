@@ -4049,10 +4049,9 @@ namespace HVACUnitaryBypassVAV {
             state.dataLoopNodes->Node(MixerOutsideAirNode).MassFlowRate = AverageOAMassFlow;
             state.dataLoopNodes->Node(MixerReliefAirNode).MassFlowRate = AverageOAMassFlow;
             OnOffAirFlowRatio = 1.0;
-            auto &cbVAVBoxOut(cBVAV.CBVAVBoxOutletNode);
             Real64 boxOutletNodeFlow = 0.0;
             for (int i = 1; i <= cBVAV.NumControlledZones; ++i) {
-                boxOutletNodeFlow += state.dataLoopNodes->Node(cbVAVBoxOut(i)).MassFlowRate;
+                boxOutletNodeFlow += state.dataLoopNodes->Node(cBVAV.CBVAVBoxOutletNode(i)).MassFlowRate;
             }
             state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction = max(0.0, 1.0 - (boxOutletNodeFlow / AverageUnitMassFlow));
         }
