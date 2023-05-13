@@ -199,7 +199,7 @@ namespace HVACUnitaryBypassVAV {
                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                   Real64 &QSensUnitOut,          // Sensible delivered capacity [W]
                   Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to AVERAGE airflow over timestep
-                  bool &HXUnitOn                 // flag to enable heat exchanger
+                  bool const HXUnitOn            // flag to enable heat exchanger
     )
     {
 
@@ -1430,7 +1430,7 @@ namespace HVACUnitaryBypassVAV {
                    bool const FirstHVACIteration, // TRUE if first HVAC iteration
                    int const AirLoopNum,          // air loop index
                    Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to average airflow over timestep
-                   bool &HXUnitOn                 // flag to enable heat exchanger
+                   bool const HXUnitOn            // flag to enable heat exchanger
     )
     {
 
@@ -2136,7 +2136,7 @@ namespace HVACUnitaryBypassVAV {
                             bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                             Real64 &PartLoadFrac,          // Unit part load fraction
                             Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to AVERAGE airflow over timestep
-                            bool &HXUnitOn                 // flag to enable heat exchanger
+                            bool const HXUnitOn            // flag to enable heat exchanger
     )
     {
 
