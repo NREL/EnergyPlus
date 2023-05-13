@@ -911,7 +911,7 @@ namespace HWBaseboardRadiator {
         auto &LastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed;
         auto &LastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys;
         int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
-        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
+        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
 
         // Do the one time initializations
         if (state.dataHWBaseboardRad->MyOneTimeFlag) {
@@ -931,23 +931,15 @@ namespace HWBaseboardRadiator {
             for (int Loop = 1; Loop <= NumHWBaseboards; ++Loop) {
                 // Air mass flow rate is obtained from the following linear equation (reset if autosize is used)
                 // m_dot = 0.0062 + 2.75e-05*q
-                HWBaseboard(Loop).AirMassFlowRateStd = Constant + Coeff * HWBaseboard(Loop).RatedCapacity;
+                state.dataHWBaseboardRad->HWBaseboard(Loop).AirMassFlowRateStd =
+                    Constant + Coeff * state.dataHWBaseboardRad->HWBaseboard(Loop).RatedCapacity;
             }
         }
 
         if (state.dataHWBaseboardRad->SetLoopIndexFlag(BaseboardNum)) {
             if (allocated(state.dataPlnt->PlantLoop)) {
                 bool errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        HWBaseboard(BaseboardNum).EquipID,
-                                        HWBaseboard(BaseboardNum).EquipType,
-                                        HWBaseboard(BaseboardNum).plantLoc,
-                                        errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                ScanPlantLoopsForObject(state, HWBaseboard.EquipID, HWBaseboard.EquipType, HWBaseboard.plantLoc, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError(state, "InitHWBaseboard: Program terminated for previous conditions.");
                 }
@@ -966,28 +958,24 @@ namespace HWBaseboardRadiator {
         if (state.dataGlobal->BeginEnvrnFlag && state.dataHWBaseboardRad->MyEnvrnFlag(BaseboardNum)) {
             // Initialize
             RhoAirStdInit = state.dataEnvrn->StdRhoAir;
-            WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
+            WaterInletNode = HWBaseboard.WaterInletNode;
 
             rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(HWBaseboard.plantLoc.loopNum).FluidName,
                                    Constant::HWInitConvTemp,
-                                   state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(HWBaseboard.plantLoc.loopNum).FluidIndex,
                                    RoutineName);
 
-            HWBaseboard(BaseboardNum).WaterMassFlowRateMax = rho * HWBaseboard(BaseboardNum).WaterVolFlowRateMax;
+            HWBaseboard.WaterMassFlowRateMax = rho * HWBaseboard.WaterVolFlowRateMax;
 
-            InitComponentNodes(state,
-                               0.0,
-                               HWBaseboard(BaseboardNum).WaterMassFlowRateMax,
-                               HWBaseboard(BaseboardNum).WaterInletNode,
-                               HWBaseboard(BaseboardNum).WaterOutletNode);
+            InitComponentNodes(state, 0.0, HWBaseboard.WaterMassFlowRateMax, HWBaseboard.WaterInletNode, HWBaseboard.WaterOutletNode);
 
             state.dataLoopNodes->Node(WaterInletNode).Temp = 60.0;
 
             Cp = GetSpecificHeatGlycol(state,
-                                       state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(HWBaseboard.plantLoc.loopNum).FluidName,
                                        state.dataLoopNodes->Node(WaterInletNode).Temp,
-                                       state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(HWBaseboard.plantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
             state.dataLoopNodes->Node(WaterInletNode).Enthalpy = Cp * state.dataLoopNodes->Node(WaterInletNode).Temp;
@@ -1010,7 +998,7 @@ namespace HWBaseboardRadiator {
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-            int ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
+            int ZoneNum = HWBaseboard.ZonePtr;
             ZeroSourceSumHATsurf(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
             QBBRadSrcAvg(BaseboardNum) = 0.0;
             LastQBBRadSrc(BaseboardNum) = 0.0;
@@ -1019,22 +1007,22 @@ namespace HWBaseboardRadiator {
         }
 
         // Do the every time step initializations
-        WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
+        WaterInletNode = HWBaseboard.WaterInletNode;
         int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-        HWBaseboard(BaseboardNum).WaterMassFlowRate = state.dataLoopNodes->Node(WaterInletNode).MassFlowRate;
-        HWBaseboard(BaseboardNum).WaterInletTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
-        HWBaseboard(BaseboardNum).WaterInletEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;
-        HWBaseboard(BaseboardNum).AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
-        HWBaseboard(BaseboardNum).AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
+        HWBaseboard.WaterMassFlowRate = state.dataLoopNodes->Node(WaterInletNode).MassFlowRate;
+        HWBaseboard.WaterInletTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
+        HWBaseboard.WaterInletEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;
+        HWBaseboard.AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
+        HWBaseboard.AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
 
-        HWBaseboard(BaseboardNum).TotPower = 0.0;
-        HWBaseboard(BaseboardNum).Power = 0.0;
-        HWBaseboard(BaseboardNum).ConvPower = 0.0;
-        HWBaseboard(BaseboardNum).RadPower = 0.0;
-        HWBaseboard(BaseboardNum).TotEnergy = 0.0;
-        HWBaseboard(BaseboardNum).Energy = 0.0;
-        HWBaseboard(BaseboardNum).ConvEnergy = 0.0;
-        HWBaseboard(BaseboardNum).RadEnergy = 0.0;
+        HWBaseboard.TotPower = 0.0;
+        HWBaseboard.Power = 0.0;
+        HWBaseboard.ConvPower = 0.0;
+        HWBaseboard.RadPower = 0.0;
+        HWBaseboard.TotEnergy = 0.0;
+        HWBaseboard.Energy = 0.0;
+        HWBaseboard.ConvEnergy = 0.0;
+        HWBaseboard.RadEnergy = 0.0;
     }
 
     void SizeHWBaseboard(EnergyPlusData &state, int const BaseboardNum)
@@ -1088,10 +1076,8 @@ namespace HWBaseboardRadiator {
         Real64 TempSize; // autosized value of coil input field
 
         int PltSizHeatNum = 0;
-        int PltSizNum = 0;
         Real64 DesCoilLoad = 0.0;
         bool ErrorsFound = false;
-        bool CapAutoSize = false;
         Real64 WaterVolFlowRateMaxDes = 0.0;
         Real64 WaterVolFlowRateMaxUser = 0.0;
         Real64 RatedCapacityDes = 0.0;
@@ -1401,8 +1387,8 @@ namespace HWBaseboardRadiator {
         Real64 Cp;
         auto &hWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
 
-        int ZoneNum = hWBaseboard.ZonePtr;
-        auto &zeroSourceSumHATsurf = state.dataHWBaseboardRad->ZeroSourceSumHATsurf(ZoneNum);
+        int const ZoneNum = hWBaseboard.ZonePtr;
+        auto const &zeroSourceSumHATsurf = state.dataHWBaseboardRad->ZeroSourceSumHATsurf(ZoneNum);
         Real64 QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         Real64 AirInletTemp = hWBaseboard.AirInletTemp;
         Real64 WaterInletTemp = hWBaseboard.WaterInletTemp;
@@ -1539,11 +1525,11 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
         int WaterOutletNode;
-        auto &hWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
+        auto const &hWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
         auto &lastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed(BaseboardNum);
         auto &qBBRadSrcAvg = state.dataHWBaseboardRad->QBBRadSrcAvg(BaseboardNum);
         auto &lastQBBRadSrc = state.dataHWBaseboardRad->LastQBBRadSrc(BaseboardNum);
-        auto &qBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
+        auto const &qBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
         auto &lastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys(BaseboardNum);
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataHWBaseboardRad->MyEnvrnFlag2) {
@@ -1667,7 +1653,6 @@ namespace HWBaseboardRadiator {
         int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
         int BaseboardNum;         // Counter for the baseboard
         int SurfNum;              // Pointer to the Surface derived type
-        int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
         int const NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
@@ -1682,7 +1667,7 @@ namespace HWBaseboardRadiator {
 
             HWBaseboardDesignData HWBaseboardDesignDataObject{
                 state.dataHWBaseboardRad->HWBaseboardDesignObject(HWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
-            ZoneNum = HWBaseboard.ZonePtr;
+            int ZoneNum = HWBaseboard.ZonePtr;
             if (ZoneNum <= 0) continue;
             state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson(ZoneNum) += QBBRadSource * HWBaseboardDesignDataObject.FracDistribPerson;
 
