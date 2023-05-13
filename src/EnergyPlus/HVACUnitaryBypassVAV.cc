@@ -1456,7 +1456,6 @@ namespace HVACUnitaryBypassVAV {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QSensUnitOut;         // Output of CBVAV system with coils off
         Real64 OutsideAirMultiplier; // Outside air multiplier schedule (= 1.0 if no schedule)
-        bool ErrorsFound(false);     // Set to true if errors in input, fatal at end of routine
         Real64 QCoilActual;          // actual CBVAV steam heating coil load met (W)
         bool ErrorFlag;              // local error flag returned from data mining
         Real64 mdot;                 // heating coil fluid mass flow rate, kg/s
@@ -1486,6 +1485,7 @@ namespace HVACUnitaryBypassVAV {
 
         if (state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((cBVAV.HeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) || (cBVAV.HeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam)) {
+                bool ErrorsFound = false; // Set to true if errors in input, fatal at end of routine
                 if (cBVAV.HeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
 
                     ErrorFlag = false;
@@ -1527,6 +1527,9 @@ namespace HVACUnitaryBypassVAV {
                     }
                 }
 
+                if (ErrorsFound) {
+                    ShowContinueError(state, format("Occurs in {} = {}", "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass", cBVAV.Name));
+                }
                 // fill outlet node for heating coil
                 cBVAV.CoilOutletNode = DataPlant::CompData::getPlantComponent(state, cBVAV.plantLoc).NodeNumOut;
                 state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) = false;
@@ -3613,7 +3616,6 @@ namespace HVACUnitaryBypassVAV {
         // mode of operation, either cooling, heating, or none.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int lastDayOfSim(0);   // used during warmup to reset changeOverTimer since need to do same thing next warmup day
         Real64 ZoneLoad = 0.0; // Total load in controlled zone [W]
 
         auto &cBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
@@ -3621,8 +3623,8 @@ namespace HVACUnitaryBypassVAV {
         int dayOfSim = state.dataGlobal->DayOfSim; // DayOfSim increments during Warmup when it actually simulates the same day
         if (state.dataGlobal->WarmupFlag) {
             // when warmupday increments then reset timer
-            if (lastDayOfSim != dayOfSim) cBVAV.changeOverTimer = -1.0; // reset to default (thisTime always > -1)
-            lastDayOfSim = dayOfSim;
+            if (cBVAV.lastDayOfSim != dayOfSim) cBVAV.changeOverTimer = -1.0; // reset to default (thisTime always > -1)
+            cBVAV.lastDayOfSim = dayOfSim;
             dayOfSim = 1; // reset so that thisTime is <= 24 during warmup
         }
         Real64 thisTime = (dayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +

@@ -259,6 +259,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 minModeChangeTime;                // time limit before mode change is allowed (hr)
         int OutNodeSPMIndex;                     // set point manager index if exists on outlet node
         bool modeChanged;                        // identifies operating mode changed this time step
+        int lastDayOfSim = 0;
 
         // Default Constructor
         CBVAVData()
