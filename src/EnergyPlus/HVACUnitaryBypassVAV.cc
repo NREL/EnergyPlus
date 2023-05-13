@@ -3073,7 +3073,7 @@ namespace HVACUnitaryBypassVAV {
                     Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
                     Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
                     Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-                    Real64 PartLoadFrac(0.0);
+                    Real64 LocalPartLoadFrac(0.0);
                     Real64 SpeedRatio(0.0);
                     int SpeedNum(1);
                     // Get no load result
@@ -3085,7 +3085,7 @@ namespace HVACUnitaryBypassVAV {
                                                               HPTimeConstant,
                                                               FanDelayTime,
                                                               DataHVACGlobals::CompressorOperation::Off,
-                                                              PartLoadFrac,
+                                                              LocalPartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
                                                               QZnReq,
@@ -3120,7 +3120,7 @@ namespace HVACUnitaryBypassVAV {
                 Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
                 Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
                 Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-                Real64 PartLoadFrac(0.0);
+                Real64 LocalPartLoadFrac(0.0);
                 Real64 SpeedRatio(0.0);
                 int SpeedNum(1);
                 // run model with no load
@@ -3132,7 +3132,7 @@ namespace HVACUnitaryBypassVAV {
                                                           HPTimeConstant,
                                                           FanDelayTime,
                                                           DataHVACGlobals::CompressorOperation::Off,
-                                                          PartLoadFrac,
+                                                          LocalPartLoadFrac,
                                                           SpeedNum,
                                                           SpeedRatio,
                                                           QZnReq,
@@ -3228,13 +3228,13 @@ namespace HVACUnitaryBypassVAV {
             }
         } break;
         case DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed: {
-            Real64 QZnReq(0.0);                // Zone load (W), input to variable-speed DX coil
-            Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-            Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-            Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
-            Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-            Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-            Real64 PartLoadFrac(0.0);
+            Real64 QZnReq(0.0);                 // Zone load (W), input to variable-speed DX coil
+            Real64 QLatReq(0.0);                // Zone latent load, input to variable-speed DX coil
+            Real64 MaxONOFFCyclesperHour(4.0);  // Maximum cycling rate of heat pump [cycles/hr]
+            Real64 HPTimeConstant(0.0);         // Heat pump time constant [s]
+            Real64 FanDelayTime(0.0);           // Fan delay time, time delay for the HP's fan to
+            Real64 LocalOnOffAirFlowRatio(1.0); // ratio of compressor on flow to average flow over time step
+            Real64 LocalPartLoadFrac(0.0);
             Real64 SpeedRatio(0.0);
             int SpeedNum(1);
             bool errorFlag(false);
@@ -3249,7 +3249,7 @@ namespace HVACUnitaryBypassVAV {
                                                       HPTimeConstant,
                                                       FanDelayTime,
                                                       DataHVACGlobals::CompressorOperation::Off,
-                                                      PartLoadFrac,
+                                                      LocalPartLoadFrac,
                                                       SpeedNum,
                                                       SpeedRatio,
                                                       QZnReq,
@@ -3264,7 +3264,7 @@ namespace HVACUnitaryBypassVAV {
             // Real64 NoLoadHumRatOut = VariableSpeedCoils::VarSpeedCoil( CBVAV( CBVAVNum ).CoolCoilCompIndex ).OutletAirHumRat;
 
             // Get full load result
-            PartLoadFrac = 1.0;
+            LocalPartLoadFrac = 1.0;
             SpeedNum = maxNumSpeeds;
             SpeedRatio = 1.0;
             QZnReq = 0.001; // to indicate the coil is running
@@ -3276,7 +3276,7 @@ namespace HVACUnitaryBypassVAV {
                                                       HPTimeConstant,
                                                       FanDelayTime,
                                                       DataHVACGlobals::CompressorOperation::On,
-                                                      PartLoadFrac,
+                                                      LocalPartLoadFrac,
                                                       SpeedNum,
                                                       SpeedRatio,
                                                       QZnReq,
@@ -3297,7 +3297,7 @@ namespace HVACUnitaryBypassVAV {
             Real64 tempAccuracy(0.001);                   // delta C, temperature
             if ((NoOutput - ReqOutput) > -loadAccuracy) { //         IF NoOutput is higher than (more heating than required) or very near the
                                                           //         ReqOutput, do not run the compressor
-                PartLoadFrac = 0.0;
+                LocalPartLoadFrac = 0.0;
                 SpeedNum = 1;
                 SpeedRatio = 0.0;
                 QZnReq = 0.0;
@@ -3310,22 +3310,22 @@ namespace HVACUnitaryBypassVAV {
                                                           HPTimeConstant,
                                                           FanDelayTime,
                                                           DataHVACGlobals::CompressorOperation::Off,
-                                                          PartLoadFrac,
+                                                          LocalPartLoadFrac,
                                                           SpeedNum,
                                                           SpeedRatio,
                                                           QZnReq,
                                                           QLatReq);
 
             } else if ((FullOutput - ReqOutput) < loadAccuracy) { //         If the FullOutput is less than (insufficient cooling) or very near
-                                                                  //         the ReqOutput, run the compressor at PartLoadFrac = 1.
+                                                                  //         the ReqOutput, run the compressor at LocalPartLoadFrac = 1.
                                                                   // which we just did so nothing to be done
 
             } else { //  Else find how the coil is modulating (speed level and speed ratio or part load between off and speed 1) to meet the load
-                //           OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above. If this temp is
-                //           greater than the desired outlet temp, then run the compressor at PartLoadFrac = 1, otherwise find the operating PLR.
+                //           OutletTempDXCoil is the full capacity outlet temperature at LocalPartLoadFrac = 1 from the CALL above. If this temp is
+                //           greater than the desired outlet temp, then run the compressor at LocalPartLoadFrac = 1, otherwise find the operating PLR.
                 Real64 OutletTempDXCoil = state.dataVariableSpeedCoils->VarSpeedCoil(cBVAV.DXHeatCoilIndexNum).OutletAirDBTemp;
                 if (OutletTempDXCoil < DesOutTemp) {
-                    PartLoadFrac = 1.0;
+                    LocalPartLoadFrac = 1.0;
                     SpeedNum = maxNumSpeeds;
                     SpeedRatio = 1.0;
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
@@ -3336,15 +3336,15 @@ namespace HVACUnitaryBypassVAV {
                                                               HPTimeConstant,
                                                               FanDelayTime,
                                                               DataHVACGlobals::CompressorOperation::On,
-                                                              PartLoadFrac,
+                                                              LocalPartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
                                                               QZnReq,
                                                               QLatReq,
-                                                              OnOffAirFlowRatio);
+                                                              LocalOnOffAirFlowRatio);
                 } else {
                     // run at lowest speed
-                    PartLoadFrac = 1.0;
+                    LocalPartLoadFrac = 1.0;
                     SpeedNum = 1;
                     SpeedRatio = 1.0;
                     QZnReq = 0.001; // to indicate the coil is running
@@ -3356,19 +3356,19 @@ namespace HVACUnitaryBypassVAV {
                                                               HPTimeConstant,
                                                               FanDelayTime,
                                                               DataHVACGlobals::CompressorOperation::On,
-                                                              PartLoadFrac,
+                                                              LocalPartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
                                                               QZnReq,
                                                               QLatReq,
-                                                              OnOffAirFlowRatio);
+                                                              LocalOnOffAirFlowRatio);
 
                     Real64 TempSpeedOut = state.dataLoopNodes->Node(cBVAV.HeatingCoilOutletNode).Temp;
                     Real64 TempSpeedOutSpeed1 = TempSpeedOut;
 
                     if ((TempSpeedOut - DesOutTemp) < tempAccuracy) {
                         // Check to see which speed to meet the load
-                        PartLoadFrac = 1.0;
+                        LocalPartLoadFrac = 1.0;
                         SpeedRatio = 1.0;
                         for (int I = 2; I <= maxNumSpeeds; ++I) {
                             SpeedNum = I;
@@ -3380,12 +3380,12 @@ namespace HVACUnitaryBypassVAV {
                                                                       HPTimeConstant,
                                                                       FanDelayTime,
                                                                       DataHVACGlobals::CompressorOperation::On,
-                                                                      PartLoadFrac,
+                                                                      LocalPartLoadFrac,
                                                                       SpeedNum,
                                                                       SpeedRatio,
                                                                       QZnReq,
                                                                       QLatReq,
-                                                                      OnOffAirFlowRatio);
+                                                                      LocalOnOffAirFlowRatio);
 
                             TempSpeedOut = state.dataLoopNodes->Node(cBVAV.HeatingCoilOutletNode).Temp;
 
@@ -3421,8 +3421,8 @@ namespace HVACUnitaryBypassVAV {
                                     cBVAV.HeatCoilType + " \"" + cBVAV.HeatCoilName +
                                         "\" - Iteration limit exceeded calculating speed ratio error continues. Speed Ratio statistics follow.",
                                     cBVAV.DXHeatIterationExceededIndex,
-                                    PartLoadFrac,
-                                    PartLoadFrac);
+                                    LocalPartLoadFrac,
+                                    LocalPartLoadFrac);
                             }
                         } else if (SolFla == -2) {
 
@@ -3456,19 +3456,19 @@ namespace HVACUnitaryBypassVAV {
                                                                   HPTimeConstant,
                                                                   FanDelayTime,
                                                                   DataHVACGlobals::CompressorOperation::On,
-                                                                  PartLoadFrac,
+                                                                  LocalPartLoadFrac,
                                                                   SpeedNum,
                                                                   SpeedRatio,
                                                                   QZnReq,
                                                                   QLatReq,
-                                                                  OnOffAirFlowRatio);
+                                                                  LocalOnOffAirFlowRatio);
                     } else {
                         // cycling compressor at lowest speed number, find part load fraction
                         int VSCoilIndex = cBVAV.DXHeatCoilIndexNum;
                         auto f = [&state, VSCoilIndex, DesOutTemp](Real64 const x) {
                             return HVACDXHeatPumpSystem::VSCoilCyclingResidual(state, x, VSCoilIndex, DesOutTemp, DataHVACGlobals::ContFanCycCoil);
                         };
-                        General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, PartLoadFrac, f, 1.0e-10, 1.0);
+                        General::SolveRoot(state, tempAccuracy, MaxIte, SolFla, LocalPartLoadFrac, f, 1.0e-10, 1.0);
                         if (SolFla == -1) {
                             if (!state.dataGlobal->WarmupFlag) {
                                 if (cBVAV.DXHeatCyclingIterationExceeded < 4) {
@@ -3480,7 +3480,7 @@ namespace HVACUnitaryBypassVAV {
                                                             cBVAV.HeatCoilName,
                                                             cBVAV.Name));
                                     ShowContinueError(state, format("Estimated cycling ratio  = {:.3R}", (DesOutTemp / TempSpeedOut)));
-                                    ShowContinueError(state, format("Calculated cycling ratio = {:.3R}", PartLoadFrac));
+                                    ShowContinueError(state, format("Calculated cycling ratio = {:.3R}", LocalPartLoadFrac));
                                     ShowContinueErrorTimeStamp(
                                         state, "The calculated cycling ratio will be used and the simulation continues. Occurrence info:");
                                 }
@@ -3489,8 +3489,8 @@ namespace HVACUnitaryBypassVAV {
                                                                    "\" - Iteration limit exceeded calculating low speed cycling ratio error "
                                                                    "continues. Sensible PLR statistics follow.",
                                                                cBVAV.DXHeatCyclingIterationExceededIndex,
-                                                               PartLoadFrac,
-                                                               PartLoadFrac);
+                                                               LocalPartLoadFrac,
+                                                               LocalPartLoadFrac);
                             }
                         } else if (SolFla == -2) {
 
@@ -3512,10 +3512,10 @@ namespace HVACUnitaryBypassVAV {
                                                                    "\" - DX unit low speed cycling ratio calculation failed error continues. "
                                                                    "cycling ratio statistics follow.",
                                                                cBVAV.DXHeatCyclingIterationFailedIndex,
-                                                               PartLoadFrac,
-                                                               PartLoadFrac);
+                                                               LocalPartLoadFrac,
+                                                               LocalPartLoadFrac);
                             }
-                            PartLoadFrac = (DesOutTemp - TempNoOutput) / (TempSpeedOutSpeed1 - TempNoOutput);
+                            LocalPartLoadFrac = (DesOutTemp - TempNoOutput) / (TempSpeedOutSpeed1 - TempNoOutput);
                         }
                         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                   cBVAV.HeatCoilName,
@@ -3525,20 +3525,20 @@ namespace HVACUnitaryBypassVAV {
                                                                   HPTimeConstant,
                                                                   FanDelayTime,
                                                                   DataHVACGlobals::CompressorOperation::On,
-                                                                  PartLoadFrac,
+                                                                  LocalPartLoadFrac,
                                                                   SpeedNum,
                                                                   SpeedRatio,
                                                                   QZnReq,
                                                                   QLatReq,
-                                                                  OnOffAirFlowRatio);
+                                                                  LocalOnOffAirFlowRatio);
                     }
                 }
             }
 
-            if (PartLoadFrac > 1.0) {
-                PartLoadFrac = 1.0;
-            } else if (PartLoadFrac < 0.0) {
-                PartLoadFrac = 0.0;
+            if (LocalPartLoadFrac > 1.0) {
+                LocalPartLoadFrac = 1.0;
+            } else if (LocalPartLoadFrac < 0.0) {
+                LocalPartLoadFrac = 0.0;
             }
             state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = VariableSpeedCoils::getVarSpeedPartLoadRatio(state, cBVAV.DXHeatCoilIndexNum);
         } break;
