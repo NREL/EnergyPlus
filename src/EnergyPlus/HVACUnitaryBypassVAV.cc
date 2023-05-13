@@ -328,18 +328,18 @@ namespace HVACUnitaryBypassVAV {
         static constexpr std::string_view getUnitaryHeatCoolVAVChangeoverBypass("GetUnitaryHeatCool:VAVChangeoverBypass");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumAlphas;                 // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                // Number of Numbers for each GetObjectItem call
-        int IOStatus;                  // Used in GetObjectItem
-        std::string CompSetFanInlet;   // Used in SetUpCompSets call
-        std::string CompSetFanOutlet;  // Used in SetUpCompSets call
-        bool ErrorsFound(false);       // Set to true if errors in input, fatal at end of routine
-        bool DXErrorsFound(false);     // Set to true if errors in get coil input
-        bool FanErrFlag(false);        // Error flag returned during CALL to GetFanType
-        Array1D_int OANodeNums(4);     // Node numbers of OA mixer (OA, EA, RA, MA)
-        std::string HXDXCoolCoilName;  // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
-        bool OANodeErrFlag;            // TRUE if DX Coil condenser node is not found
-        bool DXCoilErrFlag;            // used in warning messages
+        int NumAlphas;                // Number of Alphas for each GetObjectItem call
+        int NumNumbers;               // Number of Numbers for each GetObjectItem call
+        int IOStatus;                 // Used in GetObjectItem
+        std::string CompSetFanInlet;  // Used in SetUpCompSets call
+        std::string CompSetFanOutlet; // Used in SetUpCompSets call
+        bool ErrorsFound(false);      // Set to true if errors in input, fatal at end of routine
+        bool DXErrorsFound(false);    // Set to true if errors in get coil input
+        bool FanErrFlag(false);       // Error flag returned during CALL to GetFanType
+        Array1D_int OANodeNums(4);    // Node numbers of OA mixer (OA, EA, RA, MA)
+        std::string HXDXCoolCoilName; // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
+        bool OANodeErrFlag;           // TRUE if DX Coil condenser node is not found
+        bool DXCoilErrFlag;           // used in warning messages
 
         Array1D_string Alphas(20, "");
         Array1D<Real64> Numbers(9, 0.0);
@@ -1254,10 +1254,10 @@ namespace HVACUnitaryBypassVAV {
                         }
                         int zoneNum = CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum);
                         int zoneInlet = CBVAV(CBVAVNum).CBVAVBoxOutletNode(AirLoopZoneNum);
-                        int coolingPriority = 0;
-                        int heatingPriority = 0;
                         // setup zone equipment sequence information based on finding matching air terminal
                         if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
+                            int coolingPriority = 0;
+                            int heatingPriority = 0;
                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex)
                                 .getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
                             CBVAV(CBVAVNum).ZoneSequenceCoolingNum(AirLoopZoneNum) = coolingPriority;
