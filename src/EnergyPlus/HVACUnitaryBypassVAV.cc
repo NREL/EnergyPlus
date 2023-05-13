@@ -1461,13 +1461,12 @@ namespace HVACUnitaryBypassVAV {
         static constexpr std::string_view RoutineName("InitCBVAV");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 QSensUnitOut;          // Output of CBVAV system with coils off
-        Real64 OutsideAirMultiplier;  // Outside air multiplier schedule (= 1.0 if no schedule)
-        bool EMSSetPointCheck(false); // local temporary
-        bool ErrorsFound(false);      // Set to true if errors in input, fatal at end of routine
-        Real64 QCoilActual;           // actual CBVAV steam heating coil load met (W)
-        bool ErrorFlag;               // local error flag returned from data mining
-        Real64 mdot;                  // heating coil fluid mass flow rate, kg/s
+        Real64 QSensUnitOut;         // Output of CBVAV system with coils off
+        Real64 OutsideAirMultiplier; // Outside air multiplier schedule (= 1.0 if no schedule)
+        bool ErrorsFound(false);     // Set to true if errors in input, fatal at end of routine
+        Real64 QCoilActual;          // actual CBVAV steam heating coil load met (W)
+        bool ErrorFlag;              // local error flag returned from data mining
+        Real64 mdot;                 // heating coil fluid mass flow rate, kg/s
 
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
         int NumCBVAV = state.dataHVACUnitaryBypassVAV->NumCBVAV;
@@ -1623,7 +1622,8 @@ namespace HVACUnitaryBypassVAV {
                         Real64 CoilMaxVolFlowRate =
                             WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, ErrorFlag);
                         if (ErrorFlag) {
-                            ErrorsFound = true;
+                            ShowContinueError(state,
+                                              format("Occurs in {} = {}", "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass", CBVAV(CBVAVNum).Name));
                         }
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             Real64 FluidDensity =
@@ -1645,7 +1645,8 @@ namespace HVACUnitaryBypassVAV {
                         ErrorFlag = false;
                         Real64 CoilMaxVolFlowRate = SteamCoils::GetCoilMaxSteamFlowRate(state, CBVAV(CBVAVNum).HeatCoilIndex, ErrorFlag);
                         if (ErrorFlag) {
-                            ErrorsFound = true;
+                            ShowContinueError(state,
+                                              format("Occurs in {} = {}", "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass", CBVAV(CBVAVNum).Name));
                         }
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
@@ -1869,7 +1870,7 @@ namespace HVACUnitaryBypassVAV {
                         CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
                     } else {
                         // need call to EMS to check node
-                        EMSSetPointCheck = false;
+                        bool EMSSetPointCheck = false;
                         EMSManager::CheckIfNodeSetPointManagedByEMS(
                             state, OutNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, EMSSetPointCheck);
                         bool foundControl = state.dataLoopNodes->NodeSetpointCheck(OutNode).needsSetpointChecking = false;
