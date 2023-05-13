@@ -1400,7 +1400,6 @@ namespace HVACUnitaryBypassVAV {
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   July 2006
         //       MODIFIED       B. Griffith, May 2009, EMS setpoint check
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the changeover-bypass VAV system components.
