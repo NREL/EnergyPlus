@@ -328,22 +328,18 @@ namespace HVACUnitaryBypassVAV {
         static constexpr std::string_view getUnitaryHeatCoolVAVChangeoverBypass("GetUnitaryHeatCool:VAVChangeoverBypass");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumAlphas;                      // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                     // Number of Numbers for each GetObjectItem call
-        int IOStatus;                       // Used in GetObjectItem
-        std::string CompSetFanInlet;        // Used in SetUpCompSets call
-        std::string CompSetCoolInlet;       // Used in SetUpCompSets call
-        std::string CompSetFanOutlet;       // Used in SetUpCompSets call
-        std::string CompSetCoolOutlet;      // Used in SetUpCompSets call
-        bool ErrorsFound(false);            // Set to true if errors in input, fatal at end of routine
-        bool DXErrorsFound(false);          // Set to true if errors in get coil input
-        bool FanErrFlag(false);             // Error flag returned during CALL to GetFanType
-        Array1D_int OANodeNums(4);          // Node numbers of OA mixer (OA, EA, RA, MA)
-        std::string HXDXCoolCoilName;       // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
-        std::string MixerInletNodeName;     // Name of mixer inlet node
-        std::string SplitterOutletNodeName; // Name of splitter outlet node
-        bool OANodeErrFlag;                 // TRUE if DX Coil condenser node is not found
-        bool DXCoilErrFlag;                 // used in warning messages
+        int NumAlphas;                 // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                // Number of Numbers for each GetObjectItem call
+        int IOStatus;                  // Used in GetObjectItem
+        std::string CompSetFanInlet;   // Used in SetUpCompSets call
+        std::string CompSetFanOutlet;  // Used in SetUpCompSets call
+        bool ErrorsFound(false);       // Set to true if errors in input, fatal at end of routine
+        bool DXErrorsFound(false);     // Set to true if errors in get coil input
+        bool FanErrFlag(false);        // Error flag returned during CALL to GetFanType
+        Array1D_int OANodeNums(4);     // Node numbers of OA mixer (OA, EA, RA, MA)
+        std::string HXDXCoolCoilName;  // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
+        bool OANodeErrFlag;            // TRUE if DX Coil condenser node is not found
+        bool DXCoilErrFlag;            // used in warning messages
 
         Array1D_string Alphas(20, "");
         Array1D<Real64> Numbers(9, 0.0);
@@ -367,8 +363,6 @@ namespace HVACUnitaryBypassVAV {
 
         // loop over CBVAV units; get and load the input data
         for (int CBVAVNum = 1; CBVAVNum <= NumCBVAV; ++CBVAVNum) {
-            int HeatCoilInletNodeNum = 0;
-            int HeatCoilOutletNodeNum = 0;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      CBVAVNum,
@@ -465,8 +459,8 @@ namespace HVACUnitaryBypassVAV {
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsParent);
 
-            MixerInletNodeName = Alphas(5);
-            SplitterOutletNodeName = Alphas(6);
+            std::string MixerInletNodeName = Alphas(5);
+            std::string SplitterOutletNodeName = Alphas(6);
 
             CBVAV(CBVAVNum).AirOutNode =
                 NodeInputManager::GetOnlySingleNode(state,
@@ -961,9 +955,9 @@ namespace HVACUnitaryBypassVAV {
                         WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, errFlag);
                     CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
                         WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, errFlag);
-                    HeatCoilInletNodeNum = WaterCoils::GetCoilInletNode(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, errFlag);
+                    int HeatCoilInletNodeNum = WaterCoils::GetCoilInletNode(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, errFlag);
                     CBVAV(CBVAVNum).HeatingCoilInletNode = HeatCoilInletNodeNum;
-                    HeatCoilOutletNodeNum = WaterCoils::GetCoilOutletNode(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, errFlag);
+                    int HeatCoilOutletNodeNum = WaterCoils::GetCoilOutletNode(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, errFlag);
                     CBVAV(CBVAVNum).HeatingCoilOutletNode = HeatCoilOutletNodeNum;
                     if (errFlag) {
                         ShowContinueError(state, format("...occurs in {} \"{}\"", CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name));
@@ -974,7 +968,7 @@ namespace HVACUnitaryBypassVAV {
                     errFlag = false;
                     CBVAV(CBVAVNum).HeatCoilIndex = SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", CBVAV(CBVAVNum).HeatCoilName, errFlag);
 
-                    HeatCoilInletNodeNum =
+                    int HeatCoilInletNodeNum =
                         SteamCoils::GetCoilAirInletNode(state, CBVAV(CBVAVNum).HeatCoilIndex, CBVAV(CBVAVNum).HeatCoilName, errFlag);
                     CBVAV(CBVAVNum).HeatingCoilInletNode = HeatCoilInletNodeNum;
                     CBVAV(CBVAVNum).CoilControlNode =
@@ -987,7 +981,7 @@ namespace HVACUnitaryBypassVAV {
                         CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
                             SteamCoils::GetCoilMaxSteamFlowRate(state, CBVAV(CBVAVNum).HeatCoilIndex, errFlag) * SteamDensity;
                     }
-                    HeatCoilOutletNodeNum =
+                    int HeatCoilOutletNodeNum =
                         SteamCoils::GetCoilAirOutletNode(state, CBVAV(CBVAVNum).HeatCoilIndex, CBVAV(CBVAVNum).HeatCoilName, errFlag);
                     CBVAV(CBVAVNum).HeatingCoilOutletNode = HeatCoilOutletNodeNum;
                     if (errFlag) {
@@ -1160,8 +1154,8 @@ namespace HVACUnitaryBypassVAV {
                 CompSetFanInlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).HeatingCoilOutletNode);
                 CompSetFanOutlet = SplitterOutletNodeName;
             }
-            CompSetCoolInlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).DXCoilInletNode);
-            CompSetCoolOutlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).DXCoilOutletNode);
+            std::string CompSetCoolInlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).DXCoilInletNode);
+            std::string CompSetCoolOutlet = state.dataLoopNodes->NodeID(CBVAV(CBVAVNum).DXCoilOutletNode);
 
             // Add fan to component sets array
             BranchNodeConnections::SetUpCompSets(state,
