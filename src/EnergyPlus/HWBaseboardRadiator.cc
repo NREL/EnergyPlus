@@ -1108,7 +1108,6 @@ namespace HWBaseboardRadiator {
             state.dataSize->DataZoneNumber = hWBaseboard.ZonePtr;
             int SizingMethod = HeatingCapacitySizing;
             int FieldNum = 3; // IDD numeric field number where input field description is found
-            bool PrintFlag = false;
             std::string SizingString = state.dataHWBaseboardRad->HWBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
             int CapSizingMethod = hWBaseboard.HeatingCapMethod;
             zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
@@ -1138,6 +1137,7 @@ namespace HWBaseboardRadiator {
                 } else {
                     TempSize = hWBaseboard.ScaledHeatingCapacity;
                 }
+                bool PrintFlag = false;
                 bool errorsFound = false;
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
@@ -1404,35 +1404,35 @@ namespace HWBaseboardRadiator {
         Real64 CC;
         Real64 QZnReq;
         Real64 Cp;
-        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
+        auto &hWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
         auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
         auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
-        auto &ZeroSourceSumHATsurf = state.dataHWBaseboardRad->ZeroSourceSumHATsurf;
 
-        ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
+        ZoneNum = hWBaseboard.ZonePtr;
+        auto &zeroSourceSumHATsurf = state.dataHWBaseboardRad->ZeroSourceSumHATsurf(ZoneNum);
         QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        AirInletTemp = HWBaseboard(BaseboardNum).AirInletTemp;
-        WaterInletTemp = HWBaseboard(BaseboardNum).WaterInletTemp;
-        WaterMassFlowRate = state.dataLoopNodes->Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRate;
+        AirInletTemp = hWBaseboard.AirInletTemp;
+        WaterInletTemp = hWBaseboard.WaterInletTemp;
+        WaterMassFlowRate = state.dataLoopNodes->Node(hWBaseboard.WaterInletNode).MassFlowRate;
         HWBaseboardDesignData HWBaseboardDesignDataObject{
-            HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for the design object
+            HWBaseboardDesignObject(hWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
 
         if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) &&
-            (GetCurrentScheduleValue(state, HWBaseboard(BaseboardNum).SchedPtr) > 0) && (WaterMassFlowRate > 0.0)) {
+            (GetCurrentScheduleValue(state, hWBaseboard.SchedPtr) > 0) && (WaterMassFlowRate > 0.0)) {
             // Calculate air mass flow rate
-            AirMassFlowRate = HWBaseboard(BaseboardNum).AirMassFlowRateStd * (WaterMassFlowRate / HWBaseboard(BaseboardNum).WaterMassFlowRateMax);
-            CapacitanceAir = PsyCpAirFnW(HWBaseboard(BaseboardNum).AirInletHumRat) * AirMassFlowRate;
+            AirMassFlowRate = hWBaseboard.AirMassFlowRateStd * (WaterMassFlowRate / hWBaseboard.WaterMassFlowRateMax);
+            CapacitanceAir = PsyCpAirFnW(hWBaseboard.AirInletHumRat) * AirMassFlowRate;
             Cp = GetSpecificHeatGlycol(state,
-                                       state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(hWBaseboard.plantLoc.loopNum).FluidName,
                                        WaterInletTemp,
-                                       state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(hWBaseboard.plantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
             CapacitanceWater = Cp * WaterMassFlowRate;
             CapacitanceMax = max(CapacitanceAir, CapacitanceWater);
             CapacitanceMin = min(CapacitanceAir, CapacitanceWater);
             CapacityRatio = CapacitanceMin / CapacitanceMax;
-            NTU = HWBaseboard(BaseboardNum).UA / CapacitanceMin;
+            NTU = hWBaseboard.UA / CapacitanceMin;
 
             // The effectiveness is given by the following formula:
             // Effectiveness = 1. - EXP((1./CapacityRatio)*(NTU)**0.22*(EXP(-CapacityRatio*(NTU)**0.78)-1.))
@@ -1476,10 +1476,10 @@ namespace HWBaseboardRadiator {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
-                LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - ZeroSourceSumHATsurf(ZoneNum)) +
-                          (BBHeat * HWBaseboard(BaseboardNum).FracConvect) + (RadHeat * HWBaseboardDesignDataObject.FracDistribPerson);
+                LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - zeroSourceSumHATsurf) + (BBHeat * hWBaseboard.FracConvect) +
+                          (RadHeat * HWBaseboardDesignDataObject.FracDistribPerson);
             }
-            HWBaseboard(BaseboardNum).WaterOutletEnthalpy = HWBaseboard(BaseboardNum).WaterInletEnthalpy - BBHeat / WaterMassFlowRate;
+            hWBaseboard.WaterOutletEnthalpy = hWBaseboard.WaterInletEnthalpy - BBHeat / WaterMassFlowRate;
         } else {
             CapacitanceWater = 0.0;
             CapacitanceMax = 0.0;
@@ -1494,18 +1494,18 @@ namespace HWBaseboardRadiator {
             WaterMassFlowRate = 0.0;
             AirMassFlowRate = 0.0;
             QBBRadSource(BaseboardNum) = 0.0;
-            HWBaseboard(BaseboardNum).WaterOutletEnthalpy = HWBaseboard(BaseboardNum).WaterInletEnthalpy;
-            SetActuatedBranchFlowRate(state, WaterMassFlowRate, HWBaseboard(BaseboardNum).WaterInletNode, HWBaseboard(BaseboardNum).plantLoc, false);
+            hWBaseboard.WaterOutletEnthalpy = hWBaseboard.WaterInletEnthalpy;
+            SetActuatedBranchFlowRate(state, WaterMassFlowRate, hWBaseboard.WaterInletNode, hWBaseboard.plantLoc, false);
         }
 
-        HWBaseboard(BaseboardNum).WaterOutletTemp = WaterOutletTemp;
-        HWBaseboard(BaseboardNum).AirOutletTemp = AirOutletTemp;
-        HWBaseboard(BaseboardNum).WaterMassFlowRate = WaterMassFlowRate;
-        HWBaseboard(BaseboardNum).AirMassFlowRate = AirMassFlowRate;
-        HWBaseboard(BaseboardNum).TotPower = LoadMet;
-        HWBaseboard(BaseboardNum).Power = BBHeat;
-        HWBaseboard(BaseboardNum).ConvPower = BBHeat - RadHeat;
-        HWBaseboard(BaseboardNum).RadPower = RadHeat;
+        hWBaseboard.WaterOutletTemp = WaterOutletTemp;
+        hWBaseboard.AirOutletTemp = AirOutletTemp;
+        hWBaseboard.WaterMassFlowRate = WaterMassFlowRate;
+        hWBaseboard.AirMassFlowRate = AirMassFlowRate;
+        hWBaseboard.TotPower = LoadMet;
+        hWBaseboard.Power = BBHeat;
+        hWBaseboard.ConvPower = BBHeat - RadHeat;
+        hWBaseboard.RadPower = RadHeat;
     }
 
     void UpdateHWBaseboard(EnergyPlusData &state, int const BaseboardNum)
