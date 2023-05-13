@@ -154,7 +154,6 @@ namespace HWBaseboardRadiator {
 
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
         int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
-        auto &CheckEquipName = state.dataHWBaseboardRad->CheckEquipName;
         auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
 
         // Find the correct Baseboard Equipment
@@ -173,7 +172,7 @@ namespace HWBaseboardRadiator {
                                       NumHWBaseboards,
                                       EquipName));
             }
-            if (CheckEquipName(BaseboardNum)) {
+            if (state.dataHWBaseboardRad->CheckEquipName(BaseboardNum)) {
                 if (EquipName != HWBaseboard(BaseboardNum).EquipID) {
                     ShowFatalError(state,
                                    format("SimHWBaseboard: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
@@ -181,7 +180,7 @@ namespace HWBaseboardRadiator {
                                           EquipName,
                                           HWBaseboard(BaseboardNum).EquipID));
                 }
-                CheckEquipName(BaseboardNum) = false;
+                state.dataHWBaseboardRad->CheckEquipName(BaseboardNum) = false;
             }
         }
 
@@ -1450,9 +1449,7 @@ namespace HWBaseboardRadiator {
         ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
         QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         AirInletTemp = HWBaseboard(BaseboardNum).AirInletTemp;
-        AirOutletTemp = AirInletTemp;
         WaterInletTemp = HWBaseboard(BaseboardNum).WaterInletTemp;
-        WaterOutletTemp = WaterInletTemp;
         WaterMassFlowRate = state.dataLoopNodes->Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRate;
         HWBaseboardDesignData HWBaseboardDesignDataObject{
             HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for the design object
@@ -1586,12 +1583,12 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
         int WaterOutletNode;
-        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
-        auto &LastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed;
-        auto &QBBRadSrcAvg = state.dataHWBaseboardRad->QBBRadSrcAvg;
-        auto &LastQBBRadSrc = state.dataHWBaseboardRad->LastQBBRadSrc;
-        auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
-        auto &LastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys;
+        auto &hWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
+        auto &lastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed(BaseboardNum);
+        auto &qBBRadSrcAvg = state.dataHWBaseboardRad->QBBRadSrcAvg(BaseboardNum);
+        auto &lastQBBRadSrc = state.dataHWBaseboardRad->LastQBBRadSrc(BaseboardNum);
+        auto &qBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
+        auto &lastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys(BaseboardNum);
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataHWBaseboardRad->MyEnvrnFlag2) {
             state.dataHWBaseboardRad->Iter = 0;
@@ -1602,24 +1599,24 @@ namespace HWBaseboardRadiator {
         }
 
         // First, update the running average if necessary...
-        if (LastSysTimeElapsed(BaseboardNum) == state.dataHVACGlobal->SysTimeElapsed) {
-            QBBRadSrcAvg(BaseboardNum) -= LastQBBRadSrc(BaseboardNum) * LastTimeStepSys(BaseboardNum) / state.dataGlobal->TimeStepZone;
+        if (lastSysTimeElapsed == state.dataHVACGlobal->SysTimeElapsed) {
+            qBBRadSrcAvg -= lastQBBRadSrc * lastTimeStepSys / state.dataGlobal->TimeStepZone;
         }
         // Update the running average and the "last" values with the current values of the appropriate variables
-        QBBRadSrcAvg(BaseboardNum) += QBBRadSource(BaseboardNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
+        qBBRadSrcAvg += qBBRadSource * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
 
-        LastQBBRadSrc(BaseboardNum) = QBBRadSource(BaseboardNum);
-        LastSysTimeElapsed(BaseboardNum) = state.dataHVACGlobal->SysTimeElapsed;
-        LastTimeStepSys(BaseboardNum) = state.dataHVACGlobal->TimeStepSys;
+        lastQBBRadSrc = qBBRadSource;
+        lastSysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        lastTimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
-        WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
-        WaterOutletNode = HWBaseboard(BaseboardNum).WaterOutletNode;
+        WaterInletNode = hWBaseboard.WaterInletNode;
+        WaterOutletNode = hWBaseboard.WaterOutletNode;
 
         // Set the outlet air nodes of the Baseboard
         // Set the outlet water nodes for the Coil
         SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
-        state.dataLoopNodes->Node(WaterOutletNode).Temp = HWBaseboard(BaseboardNum).WaterOutletTemp;
-        state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = HWBaseboard(BaseboardNum).WaterOutletEnthalpy;
+        state.dataLoopNodes->Node(WaterOutletNode).Temp = hWBaseboard.WaterOutletTemp;
+        state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = hWBaseboard.WaterOutletEnthalpy;
     }
 
     void UpdateBBRadSourceValAvg(EnergyPlusData &state, bool &HWBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step
@@ -1725,7 +1722,7 @@ namespace HWBaseboardRadiator {
 
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
             auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
-            auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
+            auto const &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
 
             HWBaseboardDesignData HWBaseboardDesignDataObject{
                 state.dataHWBaseboardRad->HWBaseboardDesignObject(HWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
