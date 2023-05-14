@@ -152,7 +152,6 @@ namespace HVACUnitaryBypassVAV {
         Real64 FanDelayTimeCycling = 0.0;                                    // Fan delay time, time delay for the HP's fan to
         bool CheckFanFlow = true;                                            // Check fan volumetric flow versus system flow in init routine.
         std::string DXCoolCoilName;                                          // Name of DX cooling coil
-        std::string DXCoolCoilType;                                          // Type of DX cooling coil, Coil:DX:Cooling:SingleSpeed or
         int DXCoolCoilType_Num = 0;                                          // Numeric equivalent for DX cooling coil type
         int CoolCoilCompIndex = 0;                                           // cooling coil component index number
         int DXCoolCoilIndexNum = 0;                                          // actual DX cooling coil index number
