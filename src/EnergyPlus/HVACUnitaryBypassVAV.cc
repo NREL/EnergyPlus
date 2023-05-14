@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
@@ -615,32 +614,25 @@ namespace HVACUnitaryBypassVAV {
                 thisCBVAV.FanVolFlow = 9999.0;
             } else {
                 if (UtilityRoutines::SameString(thisCBVAV.FanType, "Fan:SystemModel")) {
+                    thisCBVAV.FanIndex = HVACFan::getFanObjectVectorIndex(state, thisCBVAV.FanName);
                     thisCBVAV.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisCBVAV.FanName)); // call constructor
-                    thisCBVAV.FanIndex = HVACFan::getFanObjectVectorIndex(state, thisCBVAV.FanName);
                     thisCBVAV.FanInletNodeNum = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->inletNodeNum;
                     fanOutletNode = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->outletNodeNum;
                     thisCBVAV.FanVolFlow = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->designAirVolFlowRate;
                 } else {
-                    Fans::GetFanType(state, thisCBVAV.FanName, thisCBVAV.FanType_Num, FanErrFlag, CurrentModuleObject, thisCBVAV.Name);
-                    thisCBVAV.FanInletNodeNum = Fans::GetFanInletNode(state, thisCBVAV.FanType, thisCBVAV.FanName, FanErrFlag);
-                    fanOutletNode = Fans::GetFanOutletNode(state, thisCBVAV.FanType, thisCBVAV.FanName, ErrorsFound);
                     Fans::GetFanIndex(state, thisCBVAV.FanName, thisCBVAV.FanIndex, FanErrFlag);
-                    Fans::GetFanVolFlow(state, thisCBVAV.FanIndex, thisCBVAV.FanVolFlow);
+                    thisCBVAV.FanType_Num = state.dataFans->Fan(thisCBVAV.FanIndex).FanType_Num;
+                    thisCBVAV.FanInletNodeNum = state.dataFans->Fan(thisCBVAV.FanIndex).InletNodeNum;
+                    fanOutletNode = state.dataFans->Fan(thisCBVAV.FanIndex).OutletNodeNum;
+                    thisCBVAV.FanVolFlow = state.dataFans->Fan(thisCBVAV.FanIndex).MaxAirFlowRate;
                 }
             }
 
-            if (UtilityRoutines::SameString(Alphas(12), "BlowThrough")) {
-                thisCBVAV.FanPlace = DataHVACGlobals::BlowThru;
-            } else if (UtilityRoutines::SameString(Alphas(12), "DrawThrough")) {
-                thisCBVAV.FanPlace = DataHVACGlobals::DrawThru;
-            } else {
-                ShowSevereError(state, format("{} illegal {} = {}", CurrentModuleObject, cAlphaFields(12), Alphas(12)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
-                ErrorsFound = true;
-            }
+            // required field must be Key=BlowThrough or DrawThrough and read in as BLOWTHROUGH or DRAWTHROUGH
+            thisCBVAV.FanPlace = static_cast<DataHVACGlobals::FanLoc>(getEnumerationValue(DataHVACGlobals::fanLocUC, Alphas(12)));
 
-            if (thisCBVAV.FanPlace == DataHVACGlobals::DrawThru) {
+            if (thisCBVAV.FanPlace == DataHVACGlobals::FanLoc::DrawThrough) {
                 if (thisCBVAV.SplitterOutletAirNode != fanOutletNode) {
                     ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, format("Illegal {} = {}.", cAlphaFields(6), SplitterOutletNodeName));
@@ -979,7 +971,7 @@ namespace HVACUnitaryBypassVAV {
                 ErrorsFound = true;
             }
 
-            if (thisCBVAV.FanPlace == DataHVACGlobals::BlowThru) {
+            if (thisCBVAV.FanPlace == DataHVACGlobals::FanLoc::BlowThrough) {
                 if (thisCBVAV.SplitterOutletAirNode != thisCBVAV.HeatingCoilOutletNode) {
                     ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, format("Illegal {} = {}.", cAlphaFields(6), SplitterOutletNodeName));
@@ -1006,7 +998,7 @@ namespace HVACUnitaryBypassVAV {
                 }
             }
 
-            if (thisCBVAV.FanPlace == DataHVACGlobals::DrawThru) {
+            if (thisCBVAV.FanPlace == DataHVACGlobals::FanLoc::DrawThrough) {
                 if (thisCBVAV.MixerMixedAirNode != thisCBVAV.DXCoilInletNode) {
                     ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state,
@@ -1122,7 +1114,7 @@ namespace HVACUnitaryBypassVAV {
             }
 
             // Add fan to component sets array
-            if (thisCBVAV.FanPlace == DataHVACGlobals::BlowThru) {
+            if (thisCBVAV.FanPlace == DataHVACGlobals::FanLoc::BlowThrough) {
                 CompSetFanInlet = state.dataLoopNodes->NodeID(thisCBVAV.MixerMixedAirNode);
                 CompSetFanOutlet = state.dataLoopNodes->NodeID(thisCBVAV.DXCoilInletNode);
             } else {
@@ -1873,7 +1865,7 @@ namespace HVACUnitaryBypassVAV {
         // The setpoint is used to control the DX coils at their respective outlet nodes (not the unit outlet), correct
         // for fan heat for draw thru units only (fan heat is included at the outlet of each coil when blowthru is used)
         cBVAV.CoilTempSetPoint = cBVAV.OutletTempSetPoint;
-        if (cBVAV.FanPlace == DataHVACGlobals::DrawThru) {
+        if (cBVAV.FanPlace == DataHVACGlobals::FanLoc::DrawThrough) {
             cBVAV.CoilTempSetPoint -= (state.dataLoopNodes->Node(cBVAV.AirOutNode).Temp - state.dataLoopNodes->Node(cBVAV.FanInletNodeNum).Temp);
         }
 
@@ -1947,9 +1939,9 @@ namespace HVACUnitaryBypassVAV {
                 state.dataAirSystemsData->PrimaryAirSystems(curSysNum).SupFanNum = cBVAV.FanIndex;
                 state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
             }
-            if (cBVAV.FanPlace == DataHVACGlobals::BlowThru) {
+            if (cBVAV.FanPlace == DataHVACGlobals::FanLoc::BlowThrough) {
                 state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
-            } else if (cBVAV.FanPlace == DataHVACGlobals::DrawThru) {
+            } else if (cBVAV.FanPlace == DataHVACGlobals::FanLoc::DrawThrough) {
                 state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanLocation = DataAirSystems::FanPlacement::DrawThru;
             }
         }
@@ -2194,7 +2186,7 @@ namespace HVACUnitaryBypassVAV {
         }
         MixedAir::SimOAMixer(state, cBVAV.OAMixName, cBVAV.OAMixIndex);
 
-        if (cBVAV.FanPlace == DataHVACGlobals::BlowThru) {
+        if (cBVAV.FanPlace == DataHVACGlobals::FanLoc::BlowThrough) {
             if (cBVAV.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[cBVAV.FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _);
             } else {
@@ -3523,7 +3515,7 @@ namespace HVACUnitaryBypassVAV {
         } break;
         }
 
-        if (cBVAV.FanPlace == DataHVACGlobals::DrawThru) {
+        if (cBVAV.FanPlace == DataHVACGlobals::FanLoc::DrawThrough) {
             if (cBVAV.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[cBVAV.FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _);
             } else {

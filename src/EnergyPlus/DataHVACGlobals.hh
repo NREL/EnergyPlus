@@ -145,6 +145,15 @@ namespace DataHVACGlobals {
     int constexpr CycFanCycCoil(1);  // Cycling fan, cycling coil = 1
     int constexpr ContFanCycCoil(2); // Continuous fan, cycling coil = 2
     // Fan placement
+    enum FanLoc
+    {
+        Invalid = -1,
+        BlowThrough,
+        DrawThrough,
+        Num
+    };
+    static constexpr std::array<std::string_view, 2> fanLocUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
+
     int constexpr BlowThru(1); // fan before coil
     int constexpr DrawThru(2); // fan after coil
     // OA Controller Heat Recovery Bypass Control Types

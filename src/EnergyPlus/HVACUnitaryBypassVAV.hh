@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -138,7 +139,7 @@ namespace HVACUnitaryBypassVAV {
         int OAMixIndex;                      // Index to OA mixer
         std::string FanName;                 // Name of fan
         std::string FanType;                 // Type of fan
-        int FanPlace;                        // Fan placement is either blowthru (1) or drawthru (2)
+        DataHVACGlobals::FanLoc FanPlace;    // Fan placement is either blowthru (1) or drawthru (2)
         int FanType_Num;                     // Fan type number (see DataHVACGlobals)
         int FanIndex;                        // Index number to fan
         int FanOpModeSchedPtr;               // Fan operating mode schedule pointer
@@ -267,28 +268,29 @@ namespace HVACUnitaryBypassVAV {
               MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0), NoCoolHeatOutAirVolFlow(0.0),
               CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), OutAirSchPtr(0), AirInNode(0), AirOutNode(0),
               CondenserNodeNum(0), MixerOutsideAirNode(0), MixerMixedAirNode(0), MixerReliefAirNode(0), MixerInletAirNode(0),
-              SplitterOutletAirNode(0), PlenumMixerInletAirNode(0), OAMixIndex(0), FanPlace(0), FanType_Num(0), FanIndex(0), FanOpModeSchedPtr(0),
-              FanVolFlow(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0), MaxONOFFCyclesperHourCycling(4.0),
-              HPTimeConstantCycling(0.0), FanDelayTimeCycling(0.0), CheckFanFlow(true), DXCoolCoilType_Num(0), CoolCoilCompIndex(0),
-              DXCoolCoilIndexNum(0), DXHeatCoilIndexNum(0), HeatCoilType_Num(0), HeatCoilIndex(0), OpMode(0), CoilControlNode(0), CoilOutletNode(0),
-              HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), MaxHeatCoilFluidFlow(0.0), DesignHeatingCapacity(0.0),
-              DesignSuppHeatingCapacity(0.0), MinOATCompressor(0.0), MinLATCooling(0.0), MaxLATHeating(0.0), TotHeatEnergyRate(0.0),
-              TotHeatEnergy(0.0), TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0), SensCoolEnergyRate(0.0),
-              SensCoolEnergy(0.0), LatHeatEnergyRate(0.0), LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0),
-              ElecConsumption(0.0), FanPartLoadRatio(0.0), CompPartLoadRatio(0.0), LastMode(0), AirFlowControl(AirFlowCtrlMode::Invalid),
-              CompPartLoadFrac(0.0), AirLoopNumber(0), NumControlledZones(0), PriorityControl(PriorityCtrlMode::Invalid), NumZonesCooled(0),
-              NumZonesHeated(0), PLRMaxIter(0), PLRMaxIterIndex(0), DXCoilInletNode(0), DXCoilOutletNode(0), HeatingCoilInletNode(0),
-              HeatingCoilOutletNode(0), FanInletNodeNum(0), OutletTempSetPoint(0.0), CoilTempSetPoint(0.0), HeatCoolMode(0), BypassMassFlowRate(0.0),
-              DehumidificationMode(0), DehumidControlType(DehumidControl::None), HumRatMaxCheck(true), DXIterationExceeded(0),
-              DXIterationExceededIndex(0), DXIterationFailed(0), DXIterationFailedIndex(0), DXCyclingIterationExceeded(0),
-              DXCyclingIterationExceededIndex(0), DXCyclingIterationFailed(0), DXCyclingIterationFailedIndex(0), DXHeatIterationExceeded(0),
-              DXHeatIterationExceededIndex(0), DXHeatIterationFailed(0), DXHeatIterationFailedIndex(0), DXHeatCyclingIterationExceeded(0),
-              DXHeatCyclingIterationExceededIndex(0), DXHeatCyclingIterationFailed(0), DXHeatCyclingIterationFailedIndex(0), HXDXIterationExceeded(0),
-              HXDXIterationExceededIndex(0), HXDXIterationFailed(0), HXDXIterationFailedIndex(0), MMDXIterationExceeded(0),
-              MMDXIterationExceededIndex(0), MMDXIterationFailed(0), MMDXIterationFailedIndex(0), DMDXIterationExceeded(0),
-              DMDXIterationExceededIndex(0), DMDXIterationFailed(0), DMDXIterationFailedIndex(0), CRDXIterationExceeded(0),
-              CRDXIterationExceededIndex(0), CRDXIterationFailed(0), CRDXIterationFailedIndex(0), FirstPass(true), plenumIndex(0), mixerIndex(0),
-              changeOverTimer(-1.0), minModeChangeTime(-1.0), OutNodeSPMIndex(0), modeChanged(false)
+              SplitterOutletAirNode(0), PlenumMixerInletAirNode(0), OAMixIndex(0), FanPlace(DataHVACGlobals::FanLoc::Invalid), FanType_Num(0),
+              FanIndex(0), FanOpModeSchedPtr(0), FanVolFlow(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0),
+              MaxONOFFCyclesperHourCycling(4.0), HPTimeConstantCycling(0.0), FanDelayTimeCycling(0.0), CheckFanFlow(true), DXCoolCoilType_Num(0),
+              CoolCoilCompIndex(0), DXCoolCoilIndexNum(0), DXHeatCoilIndexNum(0), HeatCoilType_Num(0), HeatCoilIndex(0), OpMode(0),
+              CoilControlNode(0), CoilOutletNode(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), MaxHeatCoilFluidFlow(0.0),
+              DesignHeatingCapacity(0.0), DesignSuppHeatingCapacity(0.0), MinOATCompressor(0.0), MinLATCooling(0.0), MaxLATHeating(0.0),
+              TotHeatEnergyRate(0.0), TotHeatEnergy(0.0), TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0),
+              SensCoolEnergyRate(0.0), SensCoolEnergy(0.0), LatHeatEnergyRate(0.0), LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0),
+              ElecPower(0.0), ElecConsumption(0.0), FanPartLoadRatio(0.0), CompPartLoadRatio(0.0), LastMode(0),
+              AirFlowControl(AirFlowCtrlMode::Invalid), CompPartLoadFrac(0.0), AirLoopNumber(0), NumControlledZones(0),
+              PriorityControl(PriorityCtrlMode::Invalid), NumZonesCooled(0), NumZonesHeated(0), PLRMaxIter(0), PLRMaxIterIndex(0), DXCoilInletNode(0),
+              DXCoilOutletNode(0), HeatingCoilInletNode(0), HeatingCoilOutletNode(0), FanInletNodeNum(0), OutletTempSetPoint(0.0),
+              CoilTempSetPoint(0.0), HeatCoolMode(0), BypassMassFlowRate(0.0), DehumidificationMode(0), DehumidControlType(DehumidControl::None),
+              HumRatMaxCheck(true), DXIterationExceeded(0), DXIterationExceededIndex(0), DXIterationFailed(0), DXIterationFailedIndex(0),
+              DXCyclingIterationExceeded(0), DXCyclingIterationExceededIndex(0), DXCyclingIterationFailed(0), DXCyclingIterationFailedIndex(0),
+              DXHeatIterationExceeded(0), DXHeatIterationExceededIndex(0), DXHeatIterationFailed(0), DXHeatIterationFailedIndex(0),
+              DXHeatCyclingIterationExceeded(0), DXHeatCyclingIterationExceededIndex(0), DXHeatCyclingIterationFailed(0),
+              DXHeatCyclingIterationFailedIndex(0), HXDXIterationExceeded(0), HXDXIterationExceededIndex(0), HXDXIterationFailed(0),
+              HXDXIterationFailedIndex(0), MMDXIterationExceeded(0), MMDXIterationExceededIndex(0), MMDXIterationFailed(0),
+              MMDXIterationFailedIndex(0), DMDXIterationExceeded(0), DMDXIterationExceededIndex(0), DMDXIterationFailed(0),
+              DMDXIterationFailedIndex(0), CRDXIterationExceeded(0), CRDXIterationExceededIndex(0), CRDXIterationFailed(0),
+              CRDXIterationFailedIndex(0), FirstPass(true), plenumIndex(0), mixerIndex(0), changeOverTimer(-1.0), minModeChangeTime(-1.0),
+              OutNodeSPMIndex(0), modeChanged(false)
         {
         }
     };
