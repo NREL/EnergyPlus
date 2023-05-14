@@ -165,7 +165,7 @@ namespace HWBaseboardRadiator {
         }
 
         if (CompIndex > 0) {
-            HWBaseboardDesignData HWBaseboardDesignDataObject{state.dataHWBaseboardRad->HWBaseboardDesignObject(
+            HWBaseboardDesignData &HWBaseboardDesignDataObject{state.dataHWBaseboardRad->HWBaseboardDesignObject(
                 HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
 
             InitHWBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
@@ -477,7 +477,7 @@ namespace HWBaseboardRadiator {
             HWBaseboard(BaseboardNum).designObjectName = state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
             HWBaseboard(BaseboardNum).DesignObjectPtr =
                 UtilityRoutines::FindItemInList(HWBaseboard(BaseboardNum).designObjectName, HWBaseboardDesignNames);
-            HWBaseboardDesignData HWBaseboardDesignDataObject{
+            HWBaseboardDesignData &HWBaseboardDesignDataObject{
                 HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for the design object
 
             // Get schedule
@@ -867,12 +867,6 @@ namespace HWBaseboardRadiator {
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
 
-        auto &ZeroSourceSumHATsurf = state.dataHWBaseboardRad->ZeroSourceSumHATsurf;
-        auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
-        auto &QBBRadSrcAvg = state.dataHWBaseboardRad->QBBRadSrcAvg;
-        auto &LastQBBRadSrc = state.dataHWBaseboardRad->LastQBBRadSrc;
-        auto &LastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed;
-        auto &LastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys;
         int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
 
@@ -882,12 +876,12 @@ namespace HWBaseboardRadiator {
             // Initialize the environment and sizing flags
             state.dataHWBaseboardRad->MyEnvrnFlag.dimension(NumHWBaseboards, true);
             state.dataHWBaseboardRad->MySizeFlag.dimension(NumHWBaseboards, true);
-            ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            QBBRadSource.dimension(NumHWBaseboards, 0.0);
-            QBBRadSrcAvg.dimension(NumHWBaseboards, 0.0);
-            LastQBBRadSrc.dimension(NumHWBaseboards, 0.0);
-            LastSysTimeElapsed.dimension(NumHWBaseboards, 0.0);
-            LastTimeStepSys.dimension(NumHWBaseboards, 0.0);
+            state.dataHWBaseboardRad->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHWBaseboardRad->QBBRadSource.dimension(NumHWBaseboards, 0.0);
+            state.dataHWBaseboardRad->QBBRadSrcAvg.dimension(NumHWBaseboards, 0.0);
+            state.dataHWBaseboardRad->LastQBBRadSrc.dimension(NumHWBaseboards, 0.0);
+            state.dataHWBaseboardRad->LastSysTimeElapsed.dimension(NumHWBaseboards, 0.0);
+            state.dataHWBaseboardRad->LastTimeStepSys.dimension(NumHWBaseboards, 0.0);
             state.dataHWBaseboardRad->SetLoopIndexFlag.dimension(NumHWBaseboards, true);
             state.dataHWBaseboardRad->MyOneTimeFlag = false;
 
@@ -947,12 +941,12 @@ namespace HWBaseboardRadiator {
             state.dataLoopNodes->Node(WaterInletNode).Press = 0.0;
             state.dataLoopNodes->Node(WaterInletNode).HumRat = 0.0;
 
-            ZeroSourceSumHATsurf = 0.0;
-            QBBRadSource = 0.0;
-            QBBRadSrcAvg = 0.0;
-            LastQBBRadSrc = 0.0;
-            LastSysTimeElapsed = 0.0;
-            LastTimeStepSys = 0.0;
+            state.dataHWBaseboardRad->ZeroSourceSumHATsurf = 0.0;
+            state.dataHWBaseboardRad->QBBRadSource = 0.0;
+            state.dataHWBaseboardRad->QBBRadSrcAvg = 0.0;
+            state.dataHWBaseboardRad->LastQBBRadSrc = 0.0;
+            state.dataHWBaseboardRad->LastSysTimeElapsed = 0.0;
+            state.dataHWBaseboardRad->LastTimeStepSys = 0.0;
 
             state.dataHWBaseboardRad->MyEnvrnFlag(BaseboardNum) = false;
         }
@@ -963,11 +957,11 @@ namespace HWBaseboardRadiator {
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             int ZoneNum = HWBaseboard.ZonePtr;
-            ZeroSourceSumHATsurf(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
-            QBBRadSrcAvg(BaseboardNum) = 0.0;
-            LastQBBRadSrc(BaseboardNum) = 0.0;
-            LastSysTimeElapsed(BaseboardNum) = 0.0;
-            LastTimeStepSys(BaseboardNum) = 0.0;
+            state.dataHWBaseboardRad->ZeroSourceSumHATsurf(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
+            state.dataHWBaseboardRad->QBBRadSrcAvg(BaseboardNum) = 0.0;
+            state.dataHWBaseboardRad->LastQBBRadSrc(BaseboardNum) = 0.0;
+            state.dataHWBaseboardRad->LastSysTimeElapsed(BaseboardNum) = 0.0;
+            state.dataHWBaseboardRad->LastTimeStepSys(BaseboardNum) = 0.0;
         }
 
         // Do the every time step initializations
@@ -1327,7 +1321,7 @@ namespace HWBaseboardRadiator {
         Real64 AirInletTemp = hWBaseboard.AirInletTemp;
         Real64 WaterInletTemp = hWBaseboard.WaterInletTemp;
         Real64 WaterMassFlowRate = state.dataLoopNodes->Node(hWBaseboard.WaterInletNode).MassFlowRate;
-        HWBaseboardDesignData HWBaseboardDesignDataObject{
+        HWBaseboardDesignData &HWBaseboardDesignDataObject{
             state.dataHWBaseboardRad->HWBaseboardDesignObject(hWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
 
         if (QZnReq > DataHVACGlobals::SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) &&
@@ -1552,7 +1546,7 @@ namespace HWBaseboardRadiator {
             auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
             auto const &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
 
-            HWBaseboardDesignData HWBaseboardDesignDataObject{
+            HWBaseboardDesignData &HWBaseboardDesignDataObject{
                 state.dataHWBaseboardRad->HWBaseboardDesignObject(HWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
             int ZoneNum = HWBaseboard.ZonePtr;
             if (ZoneNum <= 0) continue;
