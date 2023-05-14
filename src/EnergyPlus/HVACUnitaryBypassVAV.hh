@@ -254,7 +254,6 @@ namespace HVACUnitaryBypassVAV {
         Real64 minModeChangeTime = -1.0;                              // time limit before mode change is allowed (hr)
         int OutNodeSPMIndex = 0;                                      // set point manager index if exists on outlet node
         bool modeChanged = false;                                     // identifies operating mode changed this time step
-        int lastDayOfSim = 0;
     };
 
     void SimUnitaryBypassVAV(EnergyPlusData &state,
