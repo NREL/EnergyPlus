@@ -158,7 +158,7 @@ namespace HVACUnitaryBypassVAV {
         int DXCoolCoilIndexNum = 0;                                          // actual DX cooling coil index number
         int DXHeatCoilIndexNum = 0;                                          // actual DX heating coil index number
         std::string HeatCoilName;                                            // Name of heating coil
-        int HeatCoilType_Num = 0;                                            // Numeric equivalent for DX heating coil type
+        int HeatCoilType = 0;                                                // Numeric equivalent for DX heating coil type
         int HeatCoilIndex = 0;                                               // DX heating coil index number
         int OpMode = 0;                                                      // mode of operation
         int CoilControlNode = 0;                                             // heating coil hot water or steam inlet node
