@@ -3021,14 +3021,14 @@ namespace HVACUnitaryBypassVAV {
                                                 DataHVACGlobals::ContFanCycCoil);
                     state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(cBVAV.DXCoolCoilIndexNum);
                 } else if (cBVAV.DXCoolCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                    Real64 QZnReq(0.0);                // Zone load (W), input to variable-speed DX coil
-                    Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-                    Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-                    Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
-                    Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-                    Real64 LocalPartLoadFrac(0.0);
-                    Real64 SpeedRatio(0.0);
-                    int SpeedNum(1);
+                    Real64 QZnReq = 0.0;                // Zone load (W), input to variable-speed DX coil
+                    Real64 QLatReq = 0.0;               // Zone latent load, input to variable-speed DX coil
+                    Real64 MaxONOFFCyclesperHour = 4.0; // Maximum cycling rate of heat pump [cycles/hr]
+                    Real64 HPTimeConstant = 0.0;        // Heat pump time constant [s]
+                    Real64 FanDelayTime = 0.0;          // Fan delay time, time delay for the HP's fan to
+                    Real64 LocalPartLoadFrac = 0.0;
+                    Real64 SpeedRatio = 0.0;
+                    int SpeedNum = 1;
                     // Get no load result
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                               cBVAV.DXCoolCoilName,
@@ -3068,14 +3068,14 @@ namespace HVACUnitaryBypassVAV {
                                    0.0,
                                    OnOffAirFlowRatio);
             } else if (cBVAV.DXCoolCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                Real64 QZnReq(0.0);                // Zone load (W), input to variable-speed DX coil
-                Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-                Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-                Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
-                Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-                Real64 LocalPartLoadFrac(0.0);
-                Real64 SpeedRatio(0.0);
-                int SpeedNum(1);
+                Real64 QZnReq = 0.0;                // Zone load (W), input to variable-speed DX coil
+                Real64 QLatReq = 0.0;               // Zone latent load, input to variable-speed DX coil
+                Real64 MaxONOFFCyclesperHour = 4.0; // Maximum cycling rate of heat pump [cycles/hr]
+                Real64 HPTimeConstant = 0.0;        // Heat pump time constant [s]
+                Real64 FanDelayTime = 0.0;          // Fan delay time, time delay for the HP's fan to
+                Real64 LocalPartLoadFrac = 0.0;
+                Real64 SpeedRatio = 0.0;
+                int SpeedNum = 1;
                 // run model with no load
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           cBVAV.DXCoolCoilName,
@@ -3181,16 +3181,16 @@ namespace HVACUnitaryBypassVAV {
             }
         } break;
         case DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed: {
-            Real64 QZnReq(0.0);                 // Zone load (W), input to variable-speed DX coil
-            Real64 QLatReq(0.0);                // Zone latent load, input to variable-speed DX coil
-            Real64 MaxONOFFCyclesperHour(4.0);  // Maximum cycling rate of heat pump [cycles/hr]
-            Real64 HPTimeConstant(0.0);         // Heat pump time constant [s]
-            Real64 FanDelayTime(0.0);           // Fan delay time, time delay for the HP's fan to
-            Real64 LocalOnOffAirFlowRatio(1.0); // ratio of compressor on flow to average flow over time step
-            Real64 LocalPartLoadFrac(0.0);
-            Real64 SpeedRatio(0.0);
-            int SpeedNum(1);
-            bool errorFlag(false);
+            Real64 QZnReq = 0.0;                 // Zone load (W), input to variable-speed DX coil
+            Real64 QLatReq = 0.0;                // Zone latent load, input to variable-speed DX coil
+            Real64 MaxONOFFCyclesperHour = 4.0;  // Maximum cycling rate of heat pump [cycles/hr]
+            Real64 HPTimeConstant = 0.0;         // Heat pump time constant [s]
+            Real64 FanDelayTime = 0.0;           // Fan delay time, time delay for the HP's fan to
+            Real64 LocalOnOffAirFlowRatio = 1.0; // ratio of compressor on flow to average flow over time step
+            Real64 LocalPartLoadFrac = 0.0;
+            Real64 SpeedRatio = 0.0;
+            int SpeedNum = 1;
+            bool errorFlag = false;
             int maxNumSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state, cBVAV.HeatCoilName, errorFlag);
             Real64 DesOutTemp = cBVAV.CoilTempSetPoint;
             // Get no load result
@@ -3246,8 +3246,8 @@ namespace HVACUnitaryBypassVAV {
                                 Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(cBVAV.HeatingCoilInletNode).Temp,
                                                            state.dataLoopNodes->Node(cBVAV.HeatingCoilOutletNode).HumRat));
 
-            Real64 loadAccuracy(0.001);                   // Watts, power
-            Real64 tempAccuracy(0.001);                   // delta C, temperature
+            Real64 loadAccuracy = 0.001;                  // Watts, power
+            Real64 tempAccuracy = 0.001;                  // delta C, temperature
             if ((NoOutput - ReqOutput) > -loadAccuracy) { //         IF NoOutput is higher than (more heating than required) or very near the
                                                           //         ReqOutput, do not run the compressor
                 LocalPartLoadFrac = 0.0;
@@ -3969,8 +3969,8 @@ namespace HVACUnitaryBypassVAV {
         // is calculated iteratively.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 constexpr ErrTolerance(0.001); // convergence limit for hotwater coil
-        int constexpr SolveMaxIter(50);
+        Real64 constexpr ErrTolerance = 0.001; // convergence limit for hotwater coil
+        int constexpr SolveMaxIter = 50;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 mdot;            // heating coil steam or hot water mass flow rate
