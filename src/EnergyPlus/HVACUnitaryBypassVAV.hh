@@ -138,9 +138,8 @@ namespace HVACUnitaryBypassVAV {
         std::string OAMixName;                                               // Name of OA mixer
         int OAMixIndex = 0;                                                  // Index to OA mixer
         std::string FanName;                                                 // Name of fan
-        std::string FanType;                                                 // Type of fan
+        DataHVACGlobals::FanTypes FanType = DataHVACGlobals::FanTypes::Invalid;
         DataHVACGlobals::FanLoc FanPlace = DataHVACGlobals::FanLoc::Invalid; // Fan placement is either blowthru (1) or drawthru (2)
-        int FanType_Num = 0;                                                 // Fan type number (see DataHVACGlobals)
         int FanIndex = 0;                                                    // Index number to fan
         int FanOpModeSchedPtr = 0;                                           // Fan operating mode schedule pointer
         Real64 FanVolFlow = 0.0;                                             // Volumetric flow rate of system supply air fan [m3/s]

@@ -130,7 +130,20 @@ namespace DataHVACGlobals {
     // parameters describing fan types
     int constexpr NumAllFanTypes(6);
 
-    // fan types
+    enum class FanTypes
+    {
+        Invalid = -1,
+        Constant,
+        VAV,
+        OnOff,
+        Exhaust,
+        Component,
+        System,
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(FanTypes::Num)> fanTypesUC = {
+        "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
+
     int constexpr FanType_SimpleConstVolume(1);
     int constexpr FanType_SimpleVAV(2);
     int constexpr FanType_SimpleOnOff(3);
@@ -145,14 +158,14 @@ namespace DataHVACGlobals {
     int constexpr CycFanCycCoil(1);  // Cycling fan, cycling coil = 1
     int constexpr ContFanCycCoil(2); // Continuous fan, cycling coil = 2
     // Fan placement
-    enum FanLoc
+    enum class FanLoc
     {
         Invalid = -1,
         BlowThrough,
         DrawThrough,
         Num
     };
-    static constexpr std::array<std::string_view, 2> fanLocUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
+    static constexpr std::array<std::string_view, static_cast<int>(FanLoc::Num)> fanLocUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
 
     int constexpr BlowThru(1); // fan before coil
     int constexpr DrawThru(2); // fan after coil
