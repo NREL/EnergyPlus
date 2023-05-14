@@ -2662,13 +2662,15 @@ namespace HVACUnitaryBypassVAV {
                                             ShowContinueErrorTimeStamp(
                                                 state, "The calculated cycling ratio will be used and the simulation continues. Occurrence info:");
                                         }
-                                        ShowRecurringWarningErrorAtEnd(state,
-                                                                       cBVAV.DXCoolCoilType + " \"" + cBVAV.DXCoolCoilName +
-                                                                           "\" - Iteration limit exceeded calculating low speed cycling ratio "
-                                                                           "error continues. Sensible PLR statistics follow.",
-                                                                       cBVAV.DXCyclingIterationExceededIndex,
-                                                                       LocalPartLoadFrac,
-                                                                       LocalPartLoadFrac);
+                                        ShowRecurringWarningErrorAtEnd(
+                                            state,
+                                            format(" {} \"{}\" - Iteration limit exceeded calculating low speed cycling ratio "
+                                                   "error continues. Sensible PLR statistics follow.",
+                                                   cBVAV.DXCoolCoilType,
+                                                   cBVAV.DXCoolCoilName),
+                                            cBVAV.DXCyclingIterationExceededIndex,
+                                            LocalPartLoadFrac,
+                                            LocalPartLoadFrac);
                                     }
                                 } else if (SolFla == -2) {
 
@@ -2687,9 +2689,10 @@ namespace HVACUnitaryBypassVAV {
                                                                        "continues. Occurrence info:");
                                         }
                                         ShowRecurringWarningErrorAtEnd(state,
-                                                                       cBVAV.DXCoolCoilType + " \"" + cBVAV.DXCoolCoilName +
-                                                                           "\" - DX unit low speed cycling ratio calculation failed error "
-                                                                           "continues. cycling ratio statistics follow.",
+                                                                       format("{} \"{}\" - DX unit low speed cycling ratio calculation failed error "
+                                                                              "continues. cycling ratio statistics follow.",
+                                                                              cBVAV.DXCoolCoilType,
+                                                                              cBVAV.DXCoolCoilName),
                                                                        cBVAV.DXCyclingIterationFailedIndex,
                                                                        LocalPartLoadFrac,
                                                                        LocalPartLoadFrac);
