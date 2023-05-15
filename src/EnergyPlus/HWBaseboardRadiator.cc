@@ -133,12 +133,11 @@ namespace HWBaseboardRadiator {
             state.dataHWBaseboardRad->GetInputFlag = false;
         }
 
-        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
         int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
 
         // Find the correct Baseboard Equipment
         if (CompIndex == 0) {
-            BaseboardNum = UtilityRoutines::FindItemInList(EquipName, HWBaseboard, &HWBaseboardParams::EquipID);
+            BaseboardNum = UtilityRoutines::FindItemInList(EquipName, state.dataHWBaseboardRad->HWBaseboard, &HWBaseboardParams::EquipID);
             if (BaseboardNum == 0) {
                 ShowFatalError(state, format("SimHWBaseboard: Unit not found={}", EquipName));
             }
@@ -153,20 +152,21 @@ namespace HWBaseboardRadiator {
                                       EquipName));
             }
             if (state.dataHWBaseboardRad->CheckEquipName(BaseboardNum)) {
-                if (EquipName != HWBaseboard(BaseboardNum).EquipID) {
+                if (EquipName != state.dataHWBaseboardRad->HWBaseboard(BaseboardNum).EquipID) {
                     ShowFatalError(state,
                                    format("SimHWBaseboard: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
                                           BaseboardNum,
                                           EquipName,
-                                          HWBaseboard(BaseboardNum).EquipID));
+                                          state.dataHWBaseboardRad->HWBaseboard(BaseboardNum).EquipID));
                 }
                 state.dataHWBaseboardRad->CheckEquipName(BaseboardNum) = false;
             }
         }
 
         if (CompIndex > 0) {
-            HWBaseboardDesignData &HWBaseboardDesignDataObject = state.dataHWBaseboardRad->HWBaseboardDesignObject(
-                HWBaseboard(BaseboardNum).DesignObjectPtr); // Contains the data for variable flow hydronic systems
+            auto &thisHWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
+            HWBaseboardDesignData const &HWBaseboardDesignDataObject = state.dataHWBaseboardRad->HWBaseboardDesignObject(
+                thisHWBaseboard.DesignObjectPtr); // Contains the data for variable flow hydronic systems
 
             InitHWBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
@@ -175,42 +175,42 @@ namespace HWBaseboardRadiator {
             // On the first HVAC iteration the system values are given to the controller, but after that
             // the demand limits are in place and there needs to be feedback to the Zone Equipment
             if (FirstHVACIteration) {
-                MaxWaterFlow = HWBaseboard(BaseboardNum).WaterMassFlowRateMax;
+                MaxWaterFlow = thisHWBaseboard.WaterMassFlowRateMax;
                 MinWaterFlow = 0.0;
             } else {
-                MaxWaterFlow = state.dataLoopNodes->Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRateMaxAvail;
-                MinWaterFlow = state.dataLoopNodes->Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRateMinAvail;
+                MaxWaterFlow = state.dataLoopNodes->Node(thisHWBaseboard.WaterInletNode).MassFlowRateMaxAvail;
+                MinWaterFlow = state.dataLoopNodes->Node(thisHWBaseboard.WaterInletNode).MassFlowRateMinAvail;
             }
 
-            switch (HWBaseboard(BaseboardNum).EquipType) {
+            switch (thisHWBaseboard.EquipType) {
             case DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water: { // 'ZoneHVAC:Baseboard:RadiantConvective:Water'
                 ControlCompOutput(state,
-                                  HWBaseboard(BaseboardNum).EquipID,
+                                  thisHWBaseboard.EquipID,
                                   cCMO_BBRadiator_Water,
                                   BaseboardNum,
                                   FirstHVACIteration,
                                   QZnReq,
-                                  HWBaseboard(BaseboardNum).WaterInletNode,
+                                  thisHWBaseboard.WaterInletNode,
                                   MaxWaterFlow,
                                   MinWaterFlow,
                                   HWBaseboardDesignDataObject.Offset,
-                                  HWBaseboard(BaseboardNum).ControlCompTypeNum,
-                                  HWBaseboard(BaseboardNum).CompErrIndex,
+                                  thisHWBaseboard.ControlCompTypeNum,
+                                  thisHWBaseboard.CompErrIndex,
                                   _,
                                   _,
                                   _,
                                   _,
                                   _,
-                                  HWBaseboard(BaseboardNum).plantLoc);
+                                  thisHWBaseboard.plantLoc);
             } break;
             default: {
-                ShowSevereError(state, format("SimBaseboard: Errors in Baseboard={}", HWBaseboard(BaseboardNum).EquipID));
-                ShowContinueError(state, format("Invalid or unimplemented equipment type={}", HWBaseboard(BaseboardNum).EquipType));
+                ShowSevereError(state, format("SimBaseboard: Errors in Baseboard={}", thisHWBaseboard.EquipID));
+                ShowContinueError(state, format("Invalid or unimplemented equipment type={}", thisHWBaseboard.EquipType));
                 ShowFatalError(state, "Preceding condition causes termination.");
             } break;
             }
 
-            PowerMet = HWBaseboard(BaseboardNum).TotPower;
+            PowerMet = thisHWBaseboard.TotPower;
 
             UpdateHWBaseboard(state, BaseboardNum);
 
