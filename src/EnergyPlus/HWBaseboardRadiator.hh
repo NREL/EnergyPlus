@@ -69,8 +69,8 @@ namespace HWBaseboardRadiator {
 
     struct AccountingData
     {
-        Real64 QBBRadSource = 0.0;         // Need to keep the last value in case we are still iterating
-        Real64 QBBRadSrcAvg = 0.0;         // Need to keep the last value in case we are still iterating
+        Real64 QBBRadSource = 0.0; // Need to keep the last value in case we are still iterating
+        Real64 QBBRadSrcAvg = 0.0; // Need to keep the last value in case we are still iterating
         // Record keeping variables used to calculate QBBRadSrcAvg locally
         Real64 LastQBBRadSrc = 0.0;      // Need to keep the last value in case we are still iterating
         Real64 LastSysTimeElapsed = 0.0; // Need to keep the last value in case we are still iterating
