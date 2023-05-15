@@ -221,6 +221,10 @@ namespace EMSManager {
             state.dataGlobal->AnyEnergyManagementSystemInModel = false;
         }
 
+        if ((numPythonPlugins + numActiveCallbacks) > 0) {
+            state.dataGlobal->anyPluginsOrCallbacksInModel = true;
+        }
+
         state.dataGlobal->AnyEnergyManagementSystemInModel =
             state.dataGlobal->AnyEnergyManagementSystemInModel || state.dataGlobal->externalHVACManager;
 
@@ -1621,7 +1625,7 @@ namespace EMSManager {
 
     bool isScheduleManaged(EnergyPlusData &state, int const scheduleNum)
     {
-        // Check if a specific schedule has an EMS actuator assigned to it
+        // Check if a specific schedule has an EMS or External Interface actuator assigned to it
         bool foundControl = false;
         static constexpr std::string_view cControlTypeName = "SCHEDULE VALUE";
         std::string_view cSchedName = state.dataScheduleMgr->Schedule(scheduleNum).Name;
