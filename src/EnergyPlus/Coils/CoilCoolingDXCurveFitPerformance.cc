@@ -586,15 +586,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
         // IEER 2022 -->
         // TODO: we can always decide and give precedence to Alternate Mode 1 or Alternate Mode 2 if present | Needs Discussion about the
         // applicability.
-        Real64 IEER_2022(0.0);
-        Real64 EER_2022(0.0);
-        Real64 NetCoolingCapRated2022(0.0);
-        std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
+        std::tie(this->standardRatingIEER2, this->standardRatingCoolingCapacity2023, this->standardRatingEER2) =
             StandardRatings::IEERCalulcationCurveFit(state, "Coil:Cooling:DX:CurveFit", this->normalMode);
-
-        this->standardRatingIEER2 = IEER_2022;
-        this->standardRatingEER2 = EER_2022;
-        this->standardRatingCoolingCapacity2023 = NetCoolingCapRated2022;
 
     } else {
         ShowSevereError(state,

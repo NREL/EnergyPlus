@@ -5842,13 +5842,12 @@ namespace VariableSpeedCoils {
             CondenserType.push_back(varSpeedCoil.CondenserType);
             switch (varSpeedCoil.DefrostControl) // defrost control; 1=timed, 2=on-demand
             {
-            case 1:
-                DefrostControl = StandardRatings::HPdefrostControl::Timed;
-                break;
             case 2:
                 DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
                 break;
+            case 1:
             default:
+                DefrostControl = StandardRatings::HPdefrostControl::Timed;
                 break;
             }
             StandardRatings::CalcDXCoilStandardRating(state,

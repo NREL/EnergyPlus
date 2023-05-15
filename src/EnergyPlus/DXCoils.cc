@@ -2411,17 +2411,17 @@ void GetDXCoils(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) = Numbers(1);
-        state.dataDXCoils->DXCoil(DXCoilNum).RatedSHR(1) = Numbers(2);
-        state.dataDXCoils->DXCoil(DXCoilNum).RatedCOP(1) = Numbers(3);
-        state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = Numbers(4);
+        thisDXCoil.RatedTotCap(1) = Numbers(1);
+        thisDXCoil.RatedSHR(1) = Numbers(2);
+        thisDXCoil.RatedCOP(1) = Numbers(3);
+        thisDXCoil.RatedAirVolFlowRate(1) = Numbers(4);
 
-        state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate(1) = Numbers(5);
-        state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_2023(1) = Numbers(6);
+        thisDXCoil.FanPowerPerEvapAirFlowRate(1) = Numbers(5);
+        thisDXCoil.FanPowerPerEvapAirFlowRate_2023(1) = Numbers(6);
 
         if (!lNumericBlanks(7)) {
-            state.dataDXCoils->DXCoil(DXCoilNum).InternalStaticPressureDrop = Numbers(7);
-            state.dataDXCoils->DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject = true;
+            thisDXCoil.InternalStaticPressureDrop = Numbers(7);
+            thisDXCoil.RateWithInternalStaticAndFanObject = true;
         } else {
             thisDXCoil.InternalStaticPressureDrop = -999.0;
             thisDXCoil.RateWithInternalStaticAndFanObject = false;
@@ -2622,20 +2622,20 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        state.dataDXCoils->DXCoil(DXCoilNum).RatedEIR(1) = 1.0 / state.dataDXCoils->DXCoil(DXCoilNum).RatedCOP(1);
+        thisDXCoil.RatedEIR(1) = 1.0 / thisDXCoil.RatedCOP(1);
 
-        state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap2 = Numbers(8);
-        state.dataDXCoils->DXCoil(DXCoilNum).RatedSHR2 = Numbers(9);
-        state.dataDXCoils->DXCoil(DXCoilNum).RatedCOP2 = Numbers(10);
-        state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate2 = Numbers(11);
+        thisDXCoil.RatedTotCap2 = Numbers(8);
+        thisDXCoil.RatedSHR2 = Numbers(9);
+        thisDXCoil.RatedCOP2 = Numbers(10);
+        thisDXCoil.RatedAirVolFlowRate2 = Numbers(11);
 
-        state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_LowSpeed(1) = Numbers(12);
-        state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_2023_LowSpeed(1) = Numbers(13);
+        thisDXCoil.FanPowerPerEvapAirFlowRate_LowSpeed(1) = Numbers(12);
+        thisDXCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed(1) = Numbers(13);
 
         if (lNumericBlanks(14)) {
-            state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor = -25.0;
+            thisDXCoil.MinOATCompressor = -25.0;
         } else {
-            state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor = Numbers(14);
+            thisDXCoil.MinOATCompressor = Numbers(14);
         }
 
         thisDXCoil.CCapFTemp2 = GetCurveIndex(state, Alphas(10)); // convert curve name to number
@@ -2737,51 +2737,49 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        state.dataDXCoils->DXCoil(DXCoilNum).EvapCondEffect(1) = Numbers(15);
-        if (state.dataDXCoils->DXCoil(DXCoilNum).EvapCondEffect(1) < 0.0 || state.dataDXCoils->DXCoil(DXCoilNum).EvapCondEffect(1) > 1.0) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataDXCoils->DXCoil(DXCoilNum).Name));
+        thisDXCoil.EvapCondEffect(1) = Numbers(15);
+        if (thisDXCoil.EvapCondEffect(1) < 0.0 || thisDXCoil.EvapCondEffect(1) > 1.0) {
+            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format("...{} cannot be < 0.0 or > 1.0.", cNumericFields(15)));
             ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(15)));
             ErrorsFound = true;
         }
 
-        state.dataDXCoils->DXCoil(DXCoilNum).EvapCondAirFlow(1) = Numbers(16);
-        if (state.dataDXCoils->DXCoil(DXCoilNum).EvapCondAirFlow(1) < 0.0 && state.dataDXCoils->DXCoil(DXCoilNum).EvapCondAirFlow(1) != AutoSize) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataDXCoils->DXCoil(DXCoilNum).Name));
+        thisDXCoil.EvapCondAirFlow(1) = Numbers(16);
+        if (thisDXCoil.EvapCondAirFlow(1) < 0.0 && thisDXCoil.EvapCondAirFlow(1) != AutoSize) {
+            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(16)));
             ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(16)));
             ErrorsFound = true;
         }
 
-        state.dataDXCoils->DXCoil(DXCoilNum).EvapCondPumpElecNomPower(1) = Numbers(17);
-        if (state.dataDXCoils->DXCoil(DXCoilNum).EvapCondPumpElecNomPower(1) < 0.0 &&
-            state.dataDXCoils->DXCoil(DXCoilNum).EvapCondPumpElecNomPower(1) != AutoSize) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataDXCoils->DXCoil(DXCoilNum).Name));
+        thisDXCoil.EvapCondPumpElecNomPower(1) = Numbers(17);
+        if (thisDXCoil.EvapCondPumpElecNomPower(1) < 0.0 && thisDXCoil.EvapCondPumpElecNomPower(1) != AutoSize) {
+            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(17)));
             ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(17)));
             ErrorsFound = true;
         }
 
-        state.dataDXCoils->DXCoil(DXCoilNum).EvapCondEffect2 = Numbers(18);
-        if (state.dataDXCoils->DXCoil(DXCoilNum).EvapCondEffect2 < 0.0 || state.dataDXCoils->DXCoil(DXCoilNum).EvapCondEffect2 > 1.0) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataDXCoils->DXCoil(DXCoilNum).Name));
+        thisDXCoil.EvapCondEffect2 = Numbers(18);
+        if (thisDXCoil.EvapCondEffect2 < 0.0 || thisDXCoil.EvapCondEffect2 > 1.0) {
+            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format("...{} cannot be cannot be < 0.0 or > 1.0.", cNumericFields(18)));
             ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(18)));
             ErrorsFound = true;
         }
 
-        state.dataDXCoils->DXCoil(DXCoilNum).EvapCondAirFlow2 = Numbers(19);
-        if (state.dataDXCoils->DXCoil(DXCoilNum).EvapCondAirFlow2 < 0.0 && state.dataDXCoils->DXCoil(DXCoilNum).EvapCondAirFlow2 != AutoSize) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataDXCoils->DXCoil(DXCoilNum).Name));
+        thisDXCoil.EvapCondAirFlow2 = Numbers(19);
+        if (thisDXCoil.EvapCondAirFlow2 < 0.0 && thisDXCoil.EvapCondAirFlow2 != AutoSize) {
+            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(19)));
             ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(19)));
             ErrorsFound = true;
         }
 
-        state.dataDXCoils->DXCoil(DXCoilNum).EvapCondPumpElecNomPower2 = Numbers(20);
-        if (state.dataDXCoils->DXCoil(DXCoilNum).EvapCondPumpElecNomPower2 < 0.0 &&
-            state.dataDXCoils->DXCoil(DXCoilNum).EvapCondPumpElecNomPower2 != AutoSize) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataDXCoils->DXCoil(DXCoilNum).Name));
+        thisDXCoil.EvapCondPumpElecNomPower2 = Numbers(20);
+        if (thisDXCoil.EvapCondPumpElecNomPower2 < 0.0 && thisDXCoil.EvapCondPumpElecNomPower2 != AutoSize) {
+            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(20)));
             ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(20)));
             ErrorsFound = true;
@@ -2821,18 +2819,18 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // Basin heater power as a function of temperature must be greater than or equal to 0
-        state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff = Numbers(21);
+        thisDXCoil.BasinHeaterPowerFTempDiff = Numbers(21);
         if (Numbers(21) < 0.0) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataDXCoils->DXCoil(DXCoilNum).Name));
+            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format("...{} must be >= 0.0.", cNumericFields(21)));
             ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(21)));
             ErrorsFound = true;
         }
 
-        state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterSetPointTemp = Numbers(22);
-        if (state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterPowerFTempDiff > 0.0) {
+        thisDXCoil.BasinHeaterSetPointTemp = Numbers(22);
+        if (thisDXCoil.BasinHeaterPowerFTempDiff > 0.0) {
             if (NumNumbers < 22) {
-                state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterSetPointTemp = 2.0;
+                thisDXCoil.BasinHeaterSetPointTemp = 2.0;
             }
             if (thisDXCoil.BasinHeaterSetPointTemp < 2.0) {
                 ShowWarningError(state, format("{}{}=\"{}\", freeze possible", RoutineName, CurrentModuleObject, thisDXCoil.Name));
@@ -8564,82 +8562,80 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
     }
 
     // Call routine that computes AHRI certified rating for single-speed DX Coils
-    if ((state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingSingleSpeed &&
-         (state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air ||
-          state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(1) == DataHeatBalance::RefrigCondenserType::Evap)) ||
-        state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical) {
+    if ((thisDXCoil.DXCoilType_Num == CoilDX_CoolingSingleSpeed && (thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air ||
+                                                                    thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Evap)) ||
+        thisDXCoil.DXCoilType_Num == CoilDX_HeatingEmpirical) {
         CalcDXCoilStandardRating(state,
                                  thisDXCoil.Name,
                                  thisDXCoil.DXCoilType,
                                  thisDXCoil.DXCoilType_Num,
                                  1,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1),
-                                 state.dataDXCoils->DXCoil(DXCoilNum).RatedCOP(1),
-                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow(1),
-                                 state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(1),
-                                 state.dataDXCoils->DXCoil(DXCoilNum).EIRFFlow(1),
-                                 state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1),
-                                 state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1),
-                                 state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate(1),
-                                 state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate(1),
-                                 state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_2023(1),
-                                 state.dataDXCoils->DXCoil(DXCoilNum).CondenserType,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).RegionNum,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).OATempCompressorOn,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).OATempCompressorOnOffBlank,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).ASHRAE127StdRprt);
+                                 thisDXCoil.RatedTotCap(1),
+                                 thisDXCoil.RatedCOP(1),
+                                 thisDXCoil.CCapFFlow(1),
+                                 thisDXCoil.CCapFTemp(1),
+                                 thisDXCoil.EIRFFlow(1),
+                                 thisDXCoil.EIRFTemp(1),
+                                 thisDXCoil.PLFFPLR(1),
+                                 thisDXCoil.RatedAirVolFlowRate(1),
+                                 thisDXCoil.FanPowerPerEvapAirFlowRate(1),
+                                 thisDXCoil.FanPowerPerEvapAirFlowRate_2023(1),
+                                 thisDXCoil.CondenserType,
+                                 thisDXCoil.RegionNum,
+                                 thisDXCoil.MinOATCompressor,
+                                 thisDXCoil.OATempCompressorOn,
+                                 thisDXCoil.OATempCompressorOnOffBlank,
+                                 thisDXCoil.DefrostControl,
+                                 thisDXCoil.ASHRAE127StdRprt);
     }
     // Call routine that computes AHRI certified rating for multi-speed DX cooling Coils
     if (thisDXCoil.DXCoilType_Num == CoilDX_MultiSpeedCooling || thisDXCoil.DXCoilType_Num == CoilDX_MultiSpeedHeating) {
         CalcDXCoilStandardRating(state,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).MSRatedCOP,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFFlow,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFFlow,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).MSEIRFTemp,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).MSPLFFPLR,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).MSRatedAirVolFlowRate,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate_2023,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).CondenserType,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).RegionNum,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).OATempCompressorOn,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).OATempCompressorOnOffBlank,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl,
+                                 thisDXCoil.Name,
+                                 thisDXCoil.DXCoilType,
+                                 thisDXCoil.DXCoilType_Num,
+                                 thisDXCoil.NumOfSpeeds,
+                                 thisDXCoil.MSRatedTotCap,
+                                 thisDXCoil.MSRatedCOP,
+                                 thisDXCoil.MSCCapFFlow,
+                                 thisDXCoil.MSCCapFTemp,
+                                 thisDXCoil.MSEIRFFlow,
+                                 thisDXCoil.MSEIRFTemp,
+                                 thisDXCoil.MSPLFFPLR,
+                                 thisDXCoil.MSRatedAirVolFlowRate,
+                                 thisDXCoil.MSFanPowerPerEvapAirFlowRate,
+                                 thisDXCoil.MSFanPowerPerEvapAirFlowRate_2023,
+                                 thisDXCoil.CondenserType,
+                                 thisDXCoil.RegionNum,
+                                 thisDXCoil.MinOATCompressor,
+                                 thisDXCoil.OATempCompressorOn,
+                                 thisDXCoil.OATempCompressorOnOffBlank,
+                                 thisDXCoil.DefrostControl,
                                  ObjexxFCL::Optional_bool_const());
     }
 
-    if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed &&
-        (state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air ||
-         state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(1) == DataHeatBalance::RefrigCondenserType::Evap)) {
+    if (thisDXCoil.DXCoilType_Num == CoilDX_CoolingTwoSpeed && (thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air ||
+                                                                thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Evap)) {
         StandardRatings::CalcTwoSpeedDXCoilRating(state,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap2,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).RatedCOP,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).RatedCOP2,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).CCapFFlow, // High Speed
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp2,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).EIRFFlow, // High Speed
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).EIRFTemp2,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate2,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_2023,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).FanPowerPerEvapAirFlowRate_2023_LowSpeed,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).CondenserType,
-                                                  state.dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1));
+                                                  thisDXCoil.Name,
+                                                  thisDXCoil.DXCoilType,
+                                                  thisDXCoil.DXCoilType_Num,
+                                                  thisDXCoil.RatedTotCap,
+                                                  thisDXCoil.RatedTotCap2,
+                                                  thisDXCoil.RatedCOP,
+                                                  thisDXCoil.RatedCOP2,
+                                                  thisDXCoil.CCapFFlow, // High Speed
+                                                  thisDXCoil.CCapFTemp,
+                                                  thisDXCoil.CCapFTemp2,
+                                                  thisDXCoil.EIRFFlow, // High Speed
+                                                  thisDXCoil.EIRFTemp,
+                                                  thisDXCoil.EIRFTemp2,
+                                                  thisDXCoil.RatedAirVolFlowRate,
+                                                  thisDXCoil.RatedAirVolFlowRate2,
+                                                  thisDXCoil.FanPowerPerEvapAirFlowRate_2023,
+                                                  thisDXCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed,
+                                                  thisDXCoil.CondenserType,
+                                                  thisDXCoil.PLFFPLR(1));
     }
 
     // create predefined report entries

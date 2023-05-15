@@ -4162,7 +4162,7 @@ namespace StandardRatings {
         Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput,      // 2017 rated fan power per evap air flow rate [W/(m3/s)]
         Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput_2023, // 2023 rated fan power per evap air flow rate [W/(m3/s)]
         int const nsp,                                                  // Number of compressor speeds
-        Array1D<DataHeatBalance::RefrigCondenserType> CondenserType)
+        Array1D<DataHeatBalance::RefrigCondenserType> const &CondenserType)
     {
 
         // SUBROUTINE INFORMATION:
