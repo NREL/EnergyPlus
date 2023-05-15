@@ -8724,9 +8724,9 @@ Curve:Biquadratic,
 
   Boiler:HotWater,
     Primary HW Aux Boiler,         !- Name
-    NATURALGAS,              !- Fuel Type
+    Electricity,              !- Fuel Type
     AUTOSIZE,                !- Nominal Capacity {W}
-    0.78,                    !- Nominal Thermal Efficiency
+    1.0,                    !- Nominal Thermal Efficiency
     LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable
     ,                        !- Normalized Boiler Efficiency Curve Name
     AUTOSIZE,                !- Design Water Flow Rate {m3/s}
@@ -8897,7 +8897,7 @@ Curve:Biquadratic,
 
   Sizing:Plant,
     Secondary Hot Water Loop,!- Plant or Condenser Loop Name
-    Cooling,                 !- Loop Type
+    Heating,                 !- Loop Type
     46.0,                    !- Design Loop Exit Temperature {C}
     18.0,                    !- Loop Design Temperature Difference {deltaC}
     Coincident,              !- Sizing Option
@@ -9298,14 +9298,14 @@ Curve:Biquadratic,
     ,                        !- Heater Minimum Capacity {W}
     ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
     ,                        !- Heater Ignition Delay {s}
-    NATURALGAS,              !- Heater Fuel Type
-    0.8,                     !- Heater Thermal Efficiency
+    Electricity,              !- Heater Fuel Type
+    1.0,                     !- Heater Thermal Efficiency
     ,                        !- Part Load Factor Curve Name
     20,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}
-    NATURALGAS,              !- Off Cycle Parasitic Fuel Type
+    Electricity,              !- Off Cycle Parasitic Fuel Type
     0.8,                     !- Off Cycle Parasitic Heat Fraction to Tank
     ,                        !- On Cycle Parasitic Fuel Consumption Rate {W}
-    NATURALGAS,              !- On Cycle Parasitic Fuel Type
+    Electricity,              !- On Cycle Parasitic Fuel Type
     ,                        !- On Cycle Parasitic Heat Fraction to Tank
     SCHEDULE,                !- Ambient Temperature Indicator
     SWHSys1 Water Heater Ambient Temperature Schedule Name,  !- Ambient Temperature Schedule Name

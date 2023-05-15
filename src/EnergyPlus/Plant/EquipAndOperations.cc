@@ -865,7 +865,7 @@ namespace DataPlant {
         InitAirSourcePlantEquipmentOff(state, FirstHVACIteration);
         ProcessAndSetAirSourcePlantEquipLists(state);
         ProcessAndSetDedicatedHeatRecovWWHP(state, FirstHVACIteration);
-        ProcessAndSetAuxilBoiler(state, FirstHVACIteration);
+        ProcessAndSetAuxilBoiler(state);
     }
 
     void ChillerHeaterSupervisoryOperationData::DetermineCurrentBuildingLoads(EnergyPlusData &state)
@@ -1107,10 +1107,7 @@ namespace DataPlant {
 
     void ChillerHeaterSupervisoryOperationData::ProcessAndSetAirSourcePlantEquipLists(EnergyPlusData &state)
     {
-        // TODO this routine is currently code to compare building wide loads to the ranges in the equipment lists,
-        // will need to test if real current plant loads can be used instead and revise this.
-        //   Real64 CoolingLoadSignal = this->Report.BuildingPolledCoolingLoad;
-        //   Real64 HeatingLoadSignal = this->Report.BuildingPolledHeatingLoad;
+        // TODO this routine is currently code to compare real current plant loads, polled building loads have also been studied.
         Real64 CoolingLoadSignal = this->Report.AirSourcePlantCoolingLoad;
         Real64 HeatingLoadSignal = this->Report.AirSourcePlantHeatingLoad;
 
@@ -1457,7 +1454,7 @@ namespace DataPlant {
                     .LoopSide(this->DedicatedHR_ChWRetControl_LoadSideComp.LoopSideNumPtr)
                     .Branch(this->DedicatedHR_ChWRetControl_LoadSideComp.BranchNumPtr)
                     .Comp(this->DedicatedHR_ChWRetControl_LoadSideComp.CompNumPtr)
-                    .MyLoad = CW_Qdot;
+                    .MyLoad = DataPrecisionGlobals::constant_minusone * CW_Qdot; // turn negative
 
                 int OutletChWReturnNodeNum = state.dataPlnt->PlantLoop(this->DedicatedHR_ChWRetControl_LoadSideComp.LoopNumPtr)
                                                  .LoopSide(this->DedicatedHR_ChWRetControl_LoadSideComp.LoopSideNumPtr)
@@ -1535,7 +1532,7 @@ namespace DataPlant {
         }
     }
 
-    void ChillerHeaterSupervisoryOperationData::ProcessAndSetAuxilBoiler(EnergyPlusData &state, [[maybe_unused]] bool const FirstHVACIteration)
+    void ChillerHeaterSupervisoryOperationData::ProcessAndSetAuxilBoiler(EnergyPlusData &state)
     {
         // Check for boiler used as auxiliary or supplemental
         // Assume boilers are in-line on supply side outlet branch, typically on secodary loop but may be on primary loop
@@ -1572,16 +1569,20 @@ namespace DataPlant {
             for (int BoilerNum = 1; BoilerNum <= this->PlantOps.numBoilers; ++BoilerNum) {
                 // determine if primary or secondary setpoint in use
                 Real64 HWsetpt = 0.0;
+                Real64 BoilerStPntOffset = 0.0;
+                bool IsAuxiliaryBoiler = false;
                 if (this->SecondaryPlantLoopIndicesBeingSupervised(this->PlantBoilerComps(BoilerNum).loopNum) >
-                    0) { // appears to be on secondary loop
+                    0) { // appears to be on secondary loop, supplemental boiler
                     HWsetpt = min(this->Setpoint.SecHW,
                                   DetermineHWSetpointOARest(
                                       state)); // Assume if OA reset is lower than setting for secondary HW loop, then use the lower of the two
-                } else {
+                    BoilerStPntOffset = 0.5;   // turn down the boiler a bit so it runs less
+                } else {                       // primary loop, auxiliary boiler
                     HWsetpt = DetermineHWSetpointOARest(state);
+                    IsAuxiliaryBoiler = true;
+                    BoilerStPntOffset = 0.0;
                 }
-                // Make this an input?  usually need to down shift a supplemental heater setpoint so it runs less
-                Real64 BoilerStPntOffset = 0.5; // deg C
+
                 HWsetpt = HWsetpt - BoilerStPntOffset;
 
                 // check inlet temperature
@@ -1598,13 +1599,14 @@ namespace DataPlant {
                                                            state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).FluidName,
                                                            Tin,
                                                            state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).FluidIndex,
-                                                           "EvaluateChillerHeaterChangeoverOpScheme");
+                                                           "ChillerHeaterSupervisoryOperationData::ProcessAndSetAuxilBoiler");
                 Real64 LoadToSetpoint = max(0.0, Mdot * CpHW * (HWsetpt - Tin));
                 int pltSizNum = state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).PlantSizNum;
                 Real64 const thresholdPlantLoad =
                     0.001 * state.dataSize->PlantSizData(pltSizNum)
-                                .DesCapacity;              // model an operating threshold at 0.1% of loop capacity, only run if larger than that
-                if (LoadToSetpoint > thresholdPlantLoad) { // run this boiler with load to setpoint set to MyLoad
+                                .DesCapacity; // model an operating threshold at 0.1% of loop capacity, only run if larger than that
+                if (LoadToSetpoint > thresholdPlantLoad ||
+                    (LowOAAuxiliaryNeeded && IsAuxiliaryBoiler)) { // run this boiler with load to setpoint set to MyLoad
                     state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
                         .LoopSide(this->PlantBoilerComps(BoilerNum).loopSideNum)
                         .Branch(this->PlantBoilerComps(BoilerNum).branchNum)
@@ -1634,6 +1636,15 @@ namespace DataPlant {
                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).TempSetPointNodeNum).TempSetPoint =
                         HWsetpt;
                     this->Report.BoilerAux_OpMode = 1;
+                } else { // still apply the setpoint
+                    int OutletBoilerNodeNum = state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
+                                                  .LoopSide(this->PlantBoilerComps(BoilerNum).loopSideNum)
+                                                  .Branch(this->PlantBoilerComps(BoilerNum).branchNum)
+                                                  .Comp(this->PlantBoilerComps(BoilerNum).compNum)
+                                                  .NodeNumOut;
+                    state.dataLoopNodes->Node(OutletBoilerNodeNum).TempSetPoint = HWsetpt;
+                    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).TempSetPointNodeNum).TempSetPoint =
+                        HWsetpt;
                 }
             }
         }

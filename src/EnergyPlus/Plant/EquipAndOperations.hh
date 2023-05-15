@@ -236,7 +236,7 @@ struct ChillerHeaterSupervisoryOperationData
 
     void ProcessAndSetDedicatedHeatRecovWWHP(EnergyPlusData &state, bool const FirstHVACIteration);
 
-    void ProcessAndSetAuxilBoiler(EnergyPlusData &state, bool const FirstHVACIteration);
+    void ProcessAndSetAuxilBoiler(EnergyPlusData &state);
 
     Real64 DetermineHWSetpointOARest(EnergyPlusData &state);
 };
