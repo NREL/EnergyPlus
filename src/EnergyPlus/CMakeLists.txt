@@ -875,45 +875,47 @@ add_custom_command(
     -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}" -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}" -P
     "${PROJECT_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake")
 
-install(
-  TARGETS energyplusapi energyplus
-  EXPORT energyplus
-  RUNTIME DESTINATION ./
-  LIBRARY DESTINATION ./
-  ARCHIVE DESTINATION ./
-  INCLUDES DESTINATION include
-                       include/EnergyPlus/api
-)
+if(NOT BUILD_STATIC_ENERGYPLUS_API)
+  install(
+    TARGETS energyplusapi energyplus
+    EXPORT energyplus
+    RUNTIME DESTINATION ./
+    LIBRARY DESTINATION ./
+    ARCHIVE DESTINATION ./
+    INCLUDES DESTINATION include
+                         include/EnergyPlus/api
+  )
 
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-  "${PROJECT_BINARY_DIR}/energyplusConfigVersion.cmake"
-  VERSION ${ENERGYPLUS_VERSION}
-  COMPATIBILITY AnyNewerVersion
-)
-
-export(
-  EXPORT
-  energyplus
-       NAMESPACE "energyplus::"
-       FILE "${PROJECT_BINARY_DIR}/energyplusConfig.cmake"
-)
-
-install(
-  EXPORT energyplus
-        DESTINATION lib/cmake/energyplus
-        NAMESPACE "energyplus::"
-        COMPONENT "CPPAPI"
-  FILE energyplusConfig.cmake
-)
-
-install(
-  FILES
+  include(CMakePackageConfigHelpers)
+  write_basic_package_version_file(
     "${PROJECT_BINARY_DIR}/energyplusConfigVersion.cmake"
-  DESTINATION
-    lib/cmake/energyplus/
-  COMPONENT "CPPAPI"
-)
+    VERSION ${ENERGYPLUS_VERSION}
+    COMPATIBILITY AnyNewerVersion
+  )
+
+  export(
+    EXPORT
+    energyplus
+         NAMESPACE "energyplus::"
+         FILE "${PROJECT_BINARY_DIR}/energyplusConfig.cmake"
+  )
+
+  install(
+    EXPORT energyplus
+          DESTINATION lib/cmake/energyplus
+          NAMESPACE "energyplus::"
+          COMPONENT "CPPAPI"
+    FILE energyplusConfig.cmake
+  )
+
+  install(
+    FILES
+      "${PROJECT_BINARY_DIR}/energyplusConfigVersion.cmake"
+    DESTINATION
+      lib/cmake/energyplus/
+    COMPONENT "CPPAPI"
+  )
+endif()
 
 if(LINK_WITH_PYTHON)
   # link the executable to the dll and bring it in

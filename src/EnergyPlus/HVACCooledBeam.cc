@@ -267,7 +267,6 @@ namespace HVACCooledBeam {
                                                                      cAlphaFields,
                                                                      cNumericFields);
             int CBNum = CBIndex;
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             CoolBeam(CBNum).Name = Alphas(1);
             CoolBeam(CBNum).UnitType = CurrentModuleObject;
