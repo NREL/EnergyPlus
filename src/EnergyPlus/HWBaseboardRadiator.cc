@@ -262,7 +262,6 @@ namespace HWBaseboardRadiator {
         int IOStat;
         bool ErrorsFound(false); // If errors detected in input
 
-        auto &HWBaseboardDesignObject = state.dataHWBaseboardRad->HWBaseboardDesignObject;
         auto &CheckEquipName = state.dataHWBaseboardRad->CheckEquipName;
         auto &HWBaseboardNumericFields = state.dataHWBaseboardRad->HWBaseboardNumericFields;
         auto &HWBaseboardDesignNumericFields = state.dataHWBaseboardRad->HWBaseboardDesignNumericFields;
@@ -277,7 +276,7 @@ namespace HWBaseboardRadiator {
         // Count total number of baseboard units
 
         state.dataHWBaseboardRad->HWBaseboard.allocate(NumHWBaseboards);
-        HWBaseboardDesignObject.allocate(NumHWBaseboardDesignObjs);
+        state.dataHWBaseboardRad->HWBaseboardDesignObject.allocate(NumHWBaseboardDesignObjs);
         CheckEquipName.allocate(NumHWBaseboards);
         HWBaseboardNumericFields.allocate(NumHWBaseboards);
         HWBaseboardDesignNumericFields.allocate(NumHWBaseboardDesignObjs);
@@ -286,6 +285,7 @@ namespace HWBaseboardRadiator {
 
         // Get the data from the user input related to design data for baseboard heaters
         for (BaseboardDesignNum = 1; BaseboardDesignNum <= NumHWBaseboardDesignObjs; ++BaseboardDesignNum) {
+            auto &thisHWBaseboardDesign = state.dataHWBaseboardRad->HWBaseboardDesignObject(BaseboardDesignNum);
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCMO_BBRadiator_Water_Design,
                                                                      BaseboardDesignNum,
@@ -307,21 +307,18 @@ namespace HWBaseboardRadiator {
             GlobalNames::VerifyUniqueBaseboardName(
                 state, cCMO_BBRadiator_Water_Design, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water_Design + " Name");
 
-            HWBaseboardDesignObject(BaseboardDesignNum).designName = state.dataIPShortCut->cAlphaArgs(1); // Name of this baseboard design object
+            thisHWBaseboardDesign.designName = state.dataIPShortCut->cAlphaArgs(1); // Name of this baseboard design object
             HWBaseboardDesignNames(BaseboardDesignNum) = state.dataIPShortCut->cAlphaArgs(1);
 
             // Determine HW radiant baseboard heating design capacity sizing method
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+                thisHWBaseboardDesign.HeatingCapMethod = DataSizing::HeatingDesignCapacity;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
+                thisHWBaseboardDesign.HeatingCapMethod = DataSizing::CapacityPerFloorArea;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
-                    HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity =
-                        state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
-                    if (HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity <= 0.0) {
-                        ShowSevereError(
-                            state,
-                            format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, HWBaseboardDesignObject(BaseboardDesignNum).designName));
+                    thisHWBaseboardDesign.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
+                    if (thisHWBaseboardDesign.ScaledHeatingCapacity <= 0.0) {
+                        ShowSevereError(state, format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, thisHWBaseboardDesign.designName));
                         ShowContinueError(state,
                                           format("Input for {} = {}",
                                                  state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
@@ -331,10 +328,8 @@ namespace HWBaseboardRadiator {
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
                                                  state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
-                    } else if (HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity == DataSizing::AutoSize) {
-                        ShowSevereError(
-                            state,
-                            format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, HWBaseboardDesignObject(BaseboardDesignNum).designName));
+                    } else if (thisHWBaseboardDesign.ScaledHeatingCapacity == DataSizing::AutoSize) {
+                        ShowSevereError(state, format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, thisHWBaseboardDesign.designName));
                         ShowContinueError(state,
                                           format("Input for {} = {}",
                                                  state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
@@ -344,8 +339,7 @@ namespace HWBaseboardRadiator {
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(
-                        state, format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, HWBaseboardDesignObject(BaseboardDesignNum).designName));
+                    ShowSevereError(state, format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, thisHWBaseboardDesign.designName));
                     ShowContinueError(state,
                                       format("Input for {} = {}",
                                              state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
@@ -356,14 +350,11 @@ namespace HWBaseboardRadiator {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                HWBaseboardDesignObject(BaseboardDesignNum).HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
+                thisHWBaseboardDesign.HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
-                    HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity =
-                        state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
-                    if (HWBaseboardDesignObject(BaseboardDesignNum).ScaledHeatingCapacity < 0.0) {
-                        ShowSevereError(
-                            state,
-                            format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, HWBaseboardDesignObject(BaseboardDesignNum).designName));
+                    thisHWBaseboardDesign.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
+                    if (thisHWBaseboardDesign.ScaledHeatingCapacity < 0.0) {
+                        ShowSevereError(state, format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, thisHWBaseboardDesign.designName));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
@@ -371,8 +362,7 @@ namespace HWBaseboardRadiator {
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(
-                        state, format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, HWBaseboardDesignObject(BaseboardDesignNum).designName));
+                    ShowSevereError(state, format("{} = {}", state.dataIPShortCut->cCurrentModuleObject, thisHWBaseboardDesign.designName));
                     ShowContinueError(state,
                                       format("Input for {} = {}",
                                              state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
@@ -384,9 +374,9 @@ namespace HWBaseboardRadiator {
                 }
             }
 
-            HWBaseboardDesignObject(BaseboardDesignNum).Offset = state.dataIPShortCut->rNumericArgs(3);
+            thisHWBaseboardDesign.Offset = state.dataIPShortCut->rNumericArgs(3);
             // Set default convergence tolerance
-            if (HWBaseboardDesignObject(BaseboardDesignNum).Offset <= 0.0) {
+            if (thisHWBaseboardDesign.Offset <= 0.0) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", {} was less than the allowable minimum.",
                                         RoutineName,
@@ -394,11 +384,11 @@ namespace HWBaseboardRadiator {
                                         state.dataIPShortCut->cAlphaArgs(1),
                                         state.dataIPShortCut->cNumericFieldNames(3)));
                 ShowContinueError(state, format("...reset to a default value=[{:.2R}].", MaxFraction));
-                HWBaseboardDesignObject(BaseboardDesignNum).Offset = 0.001;
+                thisHWBaseboardDesign.Offset = 0.001;
             }
 
-            HWBaseboardDesignObject(BaseboardDesignNum).FracRadiant = state.dataIPShortCut->rNumericArgs(4);
-            if (HWBaseboardDesignObject(BaseboardDesignNum).FracRadiant < MinFraction) {
+            thisHWBaseboardDesign.FracRadiant = state.dataIPShortCut->rNumericArgs(4);
+            if (thisHWBaseboardDesign.FracRadiant < MinFraction) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", {} was lower than the allowable minimum.",
                                         RoutineName,
@@ -406,9 +396,9 @@ namespace HWBaseboardRadiator {
                                         state.dataIPShortCut->cAlphaArgs(1),
                                         state.dataIPShortCut->cNumericFieldNames(4)));
                 ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinFraction));
-                HWBaseboardDesignObject(BaseboardDesignNum).FracRadiant = MinFraction;
+                thisHWBaseboardDesign.FracRadiant = MinFraction;
             }
-            if (HWBaseboardDesignObject(BaseboardDesignNum).FracRadiant > MaxFraction) {
+            if (thisHWBaseboardDesign.FracRadiant > MaxFraction) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", {} was higher than the allowable maximum.",
                                         RoutineName,
@@ -416,11 +406,11 @@ namespace HWBaseboardRadiator {
                                         state.dataIPShortCut->cAlphaArgs(1),
                                         state.dataIPShortCut->cNumericFieldNames(4)));
                 ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxFraction));
-                HWBaseboardDesignObject(BaseboardDesignNum).FracRadiant = MaxFraction;
+                thisHWBaseboardDesign.FracRadiant = MaxFraction;
             }
 
-            HWBaseboardDesignObject(BaseboardDesignNum).FracDistribPerson = state.dataIPShortCut->rNumericArgs(5);
-            if (HWBaseboardDesignObject(BaseboardDesignNum).FracDistribPerson < MinFraction) {
+            thisHWBaseboardDesign.FracDistribPerson = state.dataIPShortCut->rNumericArgs(5);
+            if (thisHWBaseboardDesign.FracDistribPerson < MinFraction) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", {} was lower than the allowable minimum.",
                                         RoutineName,
@@ -428,9 +418,9 @@ namespace HWBaseboardRadiator {
                                         state.dataIPShortCut->cAlphaArgs(1),
                                         state.dataIPShortCut->cNumericFieldNames(5)));
                 ShowContinueError(state, format("...reset to minimum value=[{:.3R}].", MinFraction));
-                HWBaseboardDesignObject(BaseboardDesignNum).FracDistribPerson = MinFraction;
+                thisHWBaseboardDesign.FracDistribPerson = MinFraction;
             }
-            if (HWBaseboardDesignObject(BaseboardDesignNum).FracDistribPerson > MaxFraction) {
+            if (thisHWBaseboardDesign.FracDistribPerson > MaxFraction) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", {} was higher than the allowable maximum.",
                                         RoutineName,
@@ -438,7 +428,7 @@ namespace HWBaseboardRadiator {
                                         state.dataIPShortCut->cAlphaArgs(1),
                                         state.dataIPShortCut->cNumericFieldNames(5)));
                 ShowContinueError(state, format("...reset to maximum value=[{:.3R}].", MaxFraction));
-                HWBaseboardDesignObject(BaseboardDesignNum).FracDistribPerson = MaxFraction;
+                thisHWBaseboardDesign.FracDistribPerson = MaxFraction;
             }
         }
 
@@ -473,7 +463,7 @@ namespace HWBaseboardRadiator {
             thisHWBaseboard.designObjectName = state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
             thisHWBaseboard.DesignObjectPtr = UtilityRoutines::FindItemInList(thisHWBaseboard.designObjectName, HWBaseboardDesignNames);
             HWBaseboardDesignData &HWBaseboardDesignDataObject =
-                HWBaseboardDesignObject(thisHWBaseboard.DesignObjectPtr); // Contains the data for the design object
+                state.dataHWBaseboardRad->HWBaseboardDesignObject(thisHWBaseboard.DesignObjectPtr); // Contains the data for the design object
 
             // Get schedule
             thisHWBaseboard.Schedule = state.dataIPShortCut->cAlphaArgs(3);
