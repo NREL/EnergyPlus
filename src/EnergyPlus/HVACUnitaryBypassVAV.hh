@@ -138,7 +138,7 @@ namespace HVACUnitaryBypassVAV {
         std::string OAMixName;                 // Name of OA mixer
         int OAMixIndex = 0;                    // Index to OA mixer
         std::string FanName;                   // Name of fan
-        DataHVACGlobals::FanTypes FanType = DataHVACGlobals::FanTypes::Invalid;
+        DataHVACGlobals::FanType FanType = DataHVACGlobals::FanType::Invalid;
         DataHVACGlobals::FanLoc FanPlace = DataHVACGlobals::FanLoc::Invalid; // Fan placement is either blowthru (1) or drawthru (2)
         int FanIndex = 0;                                                    // Index number to fan
         int FanOpModeSchedPtr = 0;                                           // Fan operating mode schedule pointer
@@ -151,12 +151,12 @@ namespace HVACUnitaryBypassVAV {
         Real64 FanDelayTimeCycling = 0.0;                                    // Fan delay time, time delay for the HP's fan to
         bool CheckFanFlow = true;                                            // Check fan volumetric flow versus system flow in init routine.
         std::string DXCoolCoilName;                                          // Name of DX cooling coil
-        DataHVACGlobals::AllCoilTypes CoolCoilType = DataHVACGlobals::AllCoilTypes::Invalid;
+        DataHVACGlobals::CoilType CoolCoilType = DataHVACGlobals::CoilType::Invalid;
         int CoolCoilCompIndex = 0;  // cooling coil component index number
         int DXCoolCoilIndexNum = 0; // actual DX cooling coil index number
         int DXHeatCoilIndexNum = 0; // actual DX heating coil index number
         std::string HeatCoilName;   // Name of heating coil
-        DataHVACGlobals::AllCoilTypes HeatCoilType = DataHVACGlobals::AllCoilTypes::Invalid;
+        DataHVACGlobals::CoilType HeatCoilType = DataHVACGlobals::CoilType::Invalid;
         int HeatCoilIndex = 0;                  // DX heating coil index number
         int OpMode = 0;                         // mode of operation
         int CoilControlNode = 0;                // heating coil hot water or steam inlet node

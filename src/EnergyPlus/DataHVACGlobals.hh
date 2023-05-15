@@ -130,7 +130,7 @@ namespace DataHVACGlobals {
     // parameters describing fan types
     int constexpr NumAllFanTypes(6);
 
-    enum class FanTypes
+    enum class FanType
     {
         Invalid = -1,
         Constant,
@@ -141,7 +141,7 @@ namespace DataHVACGlobals {
         System,
         Num
     };
-    static constexpr std::array<std::string_view, static_cast<int>(FanTypes::Num)> fanTypesUC = {
+    static constexpr std::array<std::string_view, static_cast<int>(FanType::Num)> fanTypeNamesUC = {
         "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
 
     int constexpr FanType_SimpleConstVolume(1);
@@ -165,7 +165,7 @@ namespace DataHVACGlobals {
         DrawThrough,
         Num
     };
-    static constexpr std::array<std::string_view, static_cast<int>(FanLoc::Num)> fanLocUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
+    static constexpr std::array<std::string_view, static_cast<int>(FanLoc::Num)> fanLocNamesUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
 
     int constexpr BlowThru(1); // fan before coil
     int constexpr DrawThru(2); // fan after coil
@@ -184,7 +184,7 @@ namespace DataHVACGlobals {
     int constexpr UnitarySys_HeatPump_WaterToAir(6);
     int constexpr UnitarySys_AnyCoilType(7);
 
-    enum class AllCoilTypes
+    enum class CoilType
     {
         Invalid = -1,
         DXCoolingSingleSpeed,
@@ -226,7 +226,7 @@ namespace DataHVACGlobals {
         DXCurveFitSpeed,
         Num
     };
-    static constexpr std::array<std::string_view, static_cast<int>(AllCoilTypes::Num)> allCoilTypesUC = {
+    static constexpr std::array<std::string_view, static_cast<int>(CoilType::Num)> coilTypeNamesUC = {
         "COIL:COOLING:DX:SINGLESPEED",
         "COIL:HEATING:DX:SINGLESPEED",
         "COIL:COOLING:DX:TWOSPEED",
