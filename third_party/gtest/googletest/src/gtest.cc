@@ -2662,7 +2662,7 @@ Result HandleExceptionsInMethodIfSupported(
     return HandleSehExceptionsInMethodIfSupported(object, method, location);
 #endif  // GTEST_HAS_EXCEPTIONS
   } else {
-    return (object->*method)();
+      return (object->*method)();
   }
 }
 
