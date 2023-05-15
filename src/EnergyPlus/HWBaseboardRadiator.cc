@@ -270,6 +270,7 @@ namespace HWBaseboardRadiator {
 
         // Allocate total number of baseboard units
         state.dataHWBaseboardRad->HWBaseboard.allocate(NumHWBaseboards);
+        state.dataHWBaseboardRad->HWBaseboardNumericFields.allocate(NumHWBaseboards);
         state.dataHWBaseboardRad->HWBaseboardDesignObject.allocate(NumHWBaseboardDesignObjs);
         state.dataHWBaseboardRad->CheckEquipName.allocate(NumHWBaseboards);
         state.dataHWBaseboardRad->CheckEquipName = true;
