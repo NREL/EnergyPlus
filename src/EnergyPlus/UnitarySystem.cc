@@ -15930,8 +15930,7 @@ namespace UnitarySystems {
             if (this->m_LastMode == CoolingMode) {
                 this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
             }
-
-            elecHeatingPower = state.dataHVACGlobal->DXElecCoolingPower;
+            elecCoolingPower = state.dataHVACGlobal->DXElecCoolingPower;
         } break;
         case DataHVACGlobals::CoilDX_Cooling: {
             if (this->m_NumOfSpeedCooling > 1) {
