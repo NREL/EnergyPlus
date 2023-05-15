@@ -108,36 +108,36 @@ namespace HVACUnitaryBypassVAV {
     {
         // Members
         // input data
-        std::string Name;                                                    // Name of unit
-        std::string UnitType;                                                // Type of unit
-        std::string Sched;                                                   // Availability schedule name
-        int SchedPtr = 0;                                                    // Index number to availability schedule
-        Real64 MaxCoolAirVolFlow = 0.0;                                      // System air volumetric flow rate during cooling operation [m3/s]
-        Real64 MaxHeatAirVolFlow = 0.0;                                      // System air volumetric flow rate during heating operation [m3/s]
-        Real64 MaxNoCoolHeatAirVolFlow = 0.0;                                // System air volumetric flow rate when no cooling or heating [m3/s]
-        Real64 MaxCoolAirMassFlow = 0.0;                                     // System air mass flow rate during cooling operation [kg/s]
-        Real64 MaxHeatAirMassFlow = 0.0;                                     // System air mass flow rate during heating operation [kg/s]
-        Real64 MaxNoCoolHeatAirMassFlow = 0.0;                               // System air mass flow rate when no cooling or heating [kg/s]
-        Real64 CoolOutAirVolFlow = 0.0;                                      // OA volumetric flow rate during cooling operation [m3/s]
-        Real64 HeatOutAirVolFlow = 0.0;                                      // OA volumetric flow rate during heating operation [m3/s]
-        Real64 NoCoolHeatOutAirVolFlow = 0.0;                                // OA volumetric flow rate when no cooling or heating [m3/s]
-        Real64 CoolOutAirMassFlow = 0.0;                                     // OA mass flow rate during cooling operation [kg/s]
-        Real64 HeatOutAirMassFlow = 0.0;                                     // OA mass flow rate during heating operation [kg/s]
-        Real64 NoCoolHeatOutAirMassFlow = 0.0;                               // OA mass flow rate when no cooling or heating [kg/s]
-        int OutAirSchPtr = 0;                                                // Index number to outside air multiplier schedule
-        int AirInNode = 0;                                                   // Inlet air node number for CBVAV unit
-        int AirOutNode = 0;                                                  // Outlet air node number for CBVAV unit
-        int CondenserNodeNum = 0;                                            // DX Coil condenser air inlet node number
-        int MixerOutsideAirNode = 0;                                         // Outside air node number for OA mixer
-        int MixerMixedAirNode = 0;                                           // Mixed air node number for OA mixer
-        int MixerReliefAirNode = 0;                                          // Relief air node number for OA mixer
-        int MixerInletAirNode = 0;                                           // Return air node number for OA mixer
-        int SplitterOutletAirNode = 0;                                       // Air node number for splitter (last component outlet node)
-        int PlenumMixerInletAirNode = 0;                                     // only used when bypass is connected to plenum or mixer
-        std::string OAMixType;                                               // type of outside air mixer
-        std::string OAMixName;                                               // Name of OA mixer
-        int OAMixIndex = 0;                                                  // Index to OA mixer
-        std::string FanName;                                                 // Name of fan
+        std::string Name;                      // Name of unit
+        std::string UnitType;                  // Type of unit
+        std::string Sched;                     // Availability schedule name
+        int SchedPtr = 0;                      // Index number to availability schedule
+        Real64 MaxCoolAirVolFlow = 0.0;        // System air volumetric flow rate during cooling operation [m3/s]
+        Real64 MaxHeatAirVolFlow = 0.0;        // System air volumetric flow rate during heating operation [m3/s]
+        Real64 MaxNoCoolHeatAirVolFlow = 0.0;  // System air volumetric flow rate when no cooling or heating [m3/s]
+        Real64 MaxCoolAirMassFlow = 0.0;       // System air mass flow rate during cooling operation [kg/s]
+        Real64 MaxHeatAirMassFlow = 0.0;       // System air mass flow rate during heating operation [kg/s]
+        Real64 MaxNoCoolHeatAirMassFlow = 0.0; // System air mass flow rate when no cooling or heating [kg/s]
+        Real64 CoolOutAirVolFlow = 0.0;        // OA volumetric flow rate during cooling operation [m3/s]
+        Real64 HeatOutAirVolFlow = 0.0;        // OA volumetric flow rate during heating operation [m3/s]
+        Real64 NoCoolHeatOutAirVolFlow = 0.0;  // OA volumetric flow rate when no cooling or heating [m3/s]
+        Real64 CoolOutAirMassFlow = 0.0;       // OA mass flow rate during cooling operation [kg/s]
+        Real64 HeatOutAirMassFlow = 0.0;       // OA mass flow rate during heating operation [kg/s]
+        Real64 NoCoolHeatOutAirMassFlow = 0.0; // OA mass flow rate when no cooling or heating [kg/s]
+        int OutAirSchPtr = 0;                  // Index number to outside air multiplier schedule
+        int AirInNode = 0;                     // Inlet air node number for CBVAV unit
+        int AirOutNode = 0;                    // Outlet air node number for CBVAV unit
+        int CondenserNodeNum = 0;              // DX Coil condenser air inlet node number
+        int MixerOutsideAirNode = 0;           // Outside air node number for OA mixer
+        int MixerMixedAirNode = 0;             // Mixed air node number for OA mixer
+        int MixerReliefAirNode = 0;            // Relief air node number for OA mixer
+        int MixerInletAirNode = 0;             // Return air node number for OA mixer
+        int SplitterOutletAirNode = 0;         // Air node number for splitter (last component outlet node)
+        int PlenumMixerInletAirNode = 0;       // only used when bypass is connected to plenum or mixer
+        std::string OAMixType;                 // type of outside air mixer
+        std::string OAMixName;                 // Name of OA mixer
+        int OAMixIndex = 0;                    // Index to OA mixer
+        std::string FanName;                   // Name of fan
         DataHVACGlobals::FanTypes FanType = DataHVACGlobals::FanTypes::Invalid;
         DataHVACGlobals::FanLoc FanPlace = DataHVACGlobals::FanLoc::Invalid; // Fan placement is either blowthru (1) or drawthru (2)
         int FanIndex = 0;                                                    // Index number to fan
@@ -152,24 +152,24 @@ namespace HVACUnitaryBypassVAV {
         bool CheckFanFlow = true;                                            // Check fan volumetric flow versus system flow in init routine.
         std::string DXCoolCoilName;                                          // Name of DX cooling coil
         DataHVACGlobals::AllCoilTypes CoolCoilType = DataHVACGlobals::AllCoilTypes::Invalid;
-        int CoolCoilCompIndex = 0;                                           // cooling coil component index number
-        int DXCoolCoilIndexNum = 0;                                          // actual DX cooling coil index number
-        int DXHeatCoilIndexNum = 0;                                          // actual DX heating coil index number
-        std::string HeatCoilName;                                            // Name of heating coil
-        int HeatCoilType = 0;                                                // Numeric equivalent for DX heating coil type
-        int HeatCoilIndex = 0;                                               // DX heating coil index number
-        int OpMode = 0;                                                      // mode of operation
-        int CoilControlNode = 0;                                             // heating coil hot water or steam inlet node
-        int CoilOutletNode = 0;                                              // outlet node for hot water and steam coil
-        PlantLocation plantLoc;                                              // plant loop component location object for water heating coil
-        int HotWaterCoilMaxIterIndex = 0;                                    // Index to recurring warning message
-        int HotWaterCoilMaxIterIndex2 = 0;                                   // Index to recurring warning message
-        Real64 MaxHeatCoilFluidFlow = 0.0;                                   // water or steam mass flow rate for heating coil [kg/s]
-        Real64 DesignHeatingCapacity = 0.0;                                  // design heating capacity of the heating coil
-        Real64 DesignSuppHeatingCapacity = 0.0;                              // Operating capacity of supplemental Heating Coil [W]
-        Real64 MinOATCompressor = 0.0;                                       // Minimum OAT for compressor operation [C]
-        Real64 MinLATCooling = 0.0;                                          // Minimum leaving air temp for compressor cooling operation [C]
-        Real64 MaxLATHeating = 0.0;                                          // Maximum leaving air temp for heating operation [C]
+        int CoolCoilCompIndex = 0;  // cooling coil component index number
+        int DXCoolCoilIndexNum = 0; // actual DX cooling coil index number
+        int DXHeatCoilIndexNum = 0; // actual DX heating coil index number
+        std::string HeatCoilName;   // Name of heating coil
+        DataHVACGlobals::AllCoilTypes HeatCoilType = DataHVACGlobals::AllCoilTypes::Invalid;
+        int HeatCoilIndex = 0;                  // DX heating coil index number
+        int OpMode = 0;                         // mode of operation
+        int CoilControlNode = 0;                // heating coil hot water or steam inlet node
+        int CoilOutletNode = 0;                 // outlet node for hot water and steam coil
+        PlantLocation plantLoc;                 // plant loop component location object for water heating coil
+        int HotWaterCoilMaxIterIndex = 0;       // Index to recurring warning message
+        int HotWaterCoilMaxIterIndex2 = 0;      // Index to recurring warning message
+        Real64 MaxHeatCoilFluidFlow = 0.0;      // water or steam mass flow rate for heating coil [kg/s]
+        Real64 DesignHeatingCapacity = 0.0;     // design heating capacity of the heating coil
+        Real64 DesignSuppHeatingCapacity = 0.0; // Operating capacity of supplemental Heating Coil [W]
+        Real64 MinOATCompressor = 0.0;          // Minimum OAT for compressor operation [C]
+        Real64 MinLATCooling = 0.0;             // Minimum leaving air temp for compressor cooling operation [C]
+        Real64 MaxLATHeating = 0.0;             // Maximum leaving air temp for heating operation [C]
         // Report data
         Real64 TotHeatEnergyRate = 0.0;                            // Total heating output [W]
         Real64 TotHeatEnergy = 0.0;                                // Total heating output [J]
