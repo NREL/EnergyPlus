@@ -4085,7 +4085,9 @@
     EvaporativeCooler:Indirect:CelDekPad,  !- First Evaporative Cooler Object Type
     LGstore1 Indirect Evaporative Cooler,  !- First Evaporative Cooler Object Name
     EvaporativeCooler:Direct:ResearchSpecial,  !- Second Evaporative Cooler Object Type
-    LGstore1 Direct Evaporative Cooler;  !- Second Evaporative Cooler Name
+    LGstore1 Direct Evaporative Cooler,  !- Second Evaporative Cooler Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    0.0;                     !- Shut Off Relative Humidity
 
   OutdoorAir:Node,
     LGstore1 Cooler Unit OA Inlet;  !- Name
@@ -5305,45 +5307,17 @@
 
   Output:VariableDictionary,IDF;
 
-  Output:Variable,*,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,hourly;
+  Output:Variable,LGstore1 Direct Evaporative Cooler,Evaporative Cooler Electricity Energy,hourly;
 
-  Output:Variable,*,Evaporative Cooler Wet Bulb Effectiveness,hourly;
+  Output:Variable,LGstore1 Direct Evaporative Cooler,Evaporative Cooler Water Volume,hourly;
 
-  Output:Variable,*,Evaporative Cooler Electricity Energy,hourly;
+  Output:Variable,LGstore1 Supply Fan,Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Evaporative Cooler Electricity Rate,hourly;
+  Output:Variable,LGstore1 Zone Evap Unit,Zone Evaporative Cooler Unit Fan Speed Ratio,hourly;
 
-  Output:Variable,*,Evaporative Cooler Water Volume,hourly;
+  Output:Variable,LGstore1,Zone Air Temperature,hourly;
 
-  Output:Variable,*,Evaporative Cooler Mains Water Volume,hourly;
-
-  Output:Variable,*,Fan Electricity Rate,hourly;
-
-  Output:Variable,*,Fan Rise in Air Temperature,hourly;
-
-  Output:Variable,*,Zone Evaporative Cooler Unit Total Cooling Rate,hourly;
-
-  Output:Variable,*,Zone Evaporative Cooler Unit Total Cooling Energy,hourly;
-
-  Output:Variable,*,Zone Evaporative Cooler Unit Sensible Cooling Rate,hourly;
-
-  Output:Variable,*,Zone Evaporative Cooler Unit Sensible Cooling Energy,hourly;
-
-  Output:Variable,*,Zone Evaporative Cooler Unit Latent Heating Rate,hourly;
-
-  Output:Variable,*,Zone Evaporative Cooler Unit Latent Heating Energy,hourly;
-
-  Output:Variable,*,Zone Evaporative Cooler Unit Latent Cooling Rate,hourly;
-
-  Output:Variable,*,Zone Evaporative Cooler Unit Latent Cooling Energy,hourly;
-
-  Output:Variable,*,Zone Evaporative Cooler Unit Fan Speed Ratio,hourly;
-
-  Output:Variable,*,Zone Evaporative Cooler Unit Fan Availability Status,hourly;
-
-  Output:Variable,*,Zone Air Temperature,hourly;
-
-  Output:Variable,*,Baseboard Electricity Rate,hourly;
+  Output:Variable,LGstore1,Zone Air Relative Humidity,hourly; !- HVAC Average [%]
 
   Output:Diagnostics,
     DisplayUnusedSchedules;  !- Key 1
