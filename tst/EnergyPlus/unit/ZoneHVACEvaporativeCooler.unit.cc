@@ -533,6 +533,11 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
 TEST_F(ZoneHVACEvapCoolerUnitTest, RHcontrol)
 {
 
+    int ActualZoneNum = 1;
+    int ZoneEquipIndex = 1;
+    Real64 SensOutputProvided(0.0);
+    Real64 LatOutputProvided(0.0);
+
     std::string const idf_objects = delimited_string({
         " ZoneHVAC:EvaporativeCoolerUnit,",
         "   ZoneEvapCooler Unit,          !- Name",
@@ -553,7 +558,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, RHcontrol)
         "   ,",
         "   ,",
         "   ,",
-        "   90;                           !- Shut Off Relative Humidity",
+        "   40;                           !- Shut Off Relative Humidity",
 
         " Fan:OnOff,",
         "    ZoneEvapCool Supply Fan,     !- Name",
@@ -576,6 +581,9 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, RHcontrol)
         "    ZoneEvapCool Inlet Node,     !- Air Outlet Node Name",
         "    ;                            !- Control Type",
 
+        "    OutdoorAir:Node,",
+        "    Secondary OA inlet node;     !- Name",
+
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -589,10 +597,48 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, RHcontrol)
     EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(*state);
     ASSERT_FALSE(ErrorsFound);
 
+    OutAirNodeManager::SetOutAirNodes(*state);
+
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
 
     auto &thisZoneEvapCooler(state->dataEvapCoolers->ZoneEvapUnit(UnitNum));
 
-    EXPECT_EQ(thisZoneEvapCooler.ShutOffRelativeHumidity, 90);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = thisZoneEvapCooler.UnitReliefNodeNum;
+
+    state->dataLoopNodes->Node.redimension(NumOfNodes);
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 24.0;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0080;
+    state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
+                                   state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
+
+    state->dataLoopNodes->Node(thisZoneEvapCooler.OAInletNodeNum).Temp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(thisZoneEvapCooler.OAInletNodeNum).HumRat = state->dataEnvrn->OutHumRat;
+    state->dataLoopNodes->Node(thisZoneEvapCooler.OAInletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -15000.0;
+    state->dataZoneEquip->ZoneEquipList(1).EquipName(1) = thisZoneEvapCooler.Name;
+
+    // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
+    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(
+        *state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
+    Real64 FullSensibleOutput = 0.0;
+    Real64 FullLatentOutput = 0.0;
+    Real64 PartLoadRatio = 1.0;
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(*state, UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
+
+    Real64 relativeHumidity =
+        100.0 * Psychrometrics::PsyRhFnTdbWPb(*state,
+                                              state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp,
+                                              state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat,
+                                              state->dataEnvrn->OutBaroPress,
+                                              "CalcZoneEvaporativeCoolerUnit");
+    //    when relative humidity is higher than the threshold, the evaporative cooler is off
+    EXPECT_EQ(thisZoneEvapCooler.ShutOffRelativeHumidity, 40);
+    ASSERT_TRUE(relativeHumidity > thisZoneEvapCooler.ShutOffRelativeHumidity);
+    EXPECT_FALSE(thisZoneEvapCooler.IsOnThisTimestep);
 }
