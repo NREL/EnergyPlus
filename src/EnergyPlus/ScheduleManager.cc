@@ -2781,16 +2781,10 @@ namespace ScheduleManager {
         // Return value
         Real64 scheduleValue(0.0);
 
-        if (ThisHour > 24) {
-            ShowFatalError(state, format("LookUpScheduleValue called with thisHour={}", ThisHour));
-        }
-
         if (ScheduleIndex == -1) {
             return 1.0;
         } else if (ScheduleIndex == 0) {
             return 0.0;
-        } else if (state.dataScheduleMgr->Schedule(ScheduleIndex).EMSActuatedOn) {
-            return state.dataScheduleMgr->Schedule(ScheduleIndex).EMSValue;
         }
 
         if (!state.dataScheduleMgr->ScheduleInputProcessed) {
@@ -2798,9 +2792,17 @@ namespace ScheduleManager {
             state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
+        if (state.dataScheduleMgr->Schedule(ScheduleIndex).EMSActuatedOn) {
+            return state.dataScheduleMgr->Schedule(ScheduleIndex).EMSValue;
+        }
+
         //  so, current date, but maybe TimeStep added
 
         // Hourly Value
+        if (ThisHour > 24) {
+            ShowFatalError(state, format("LookUpScheduleValue called with thisHour={}", ThisHour));
+        }
+
         int thisHour = ThisHour + state.dataEnvrn->DSTIndicator * state.dataScheduleMgr->Schedule(ScheduleIndex).UseDaylightSaving;
 
         int thisDayOfYear = state.dataEnvrn->DayOfYear_Schedule;
