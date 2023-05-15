@@ -11056,7 +11056,9 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_ShadingSurfaceScheduleChecks)
     SolarShading::checkShadingSurfaceSchedules(*state);
     std::string const error_string = delimited_string(
         {"   ** Warning ** Shading Surface=\"SITESHADE:FLATSHADESURFACE\", Transmittance Schedule Name=\"ALWAYSONE\", is always transparent.",
-         "   ** Warning ** Shading Surface=\"ZONESHADE:LIVING:SOUTH:SHADE002\", Transmittance Schedule Name=\"ALWAYSONE\", is always transparent."});
+         "   **   ~~~   ** This shading surface will be ignored.",
+         "   ** Warning ** Shading Surface=\"ZONESHADE:LIVING:SOUTH:SHADE002\", Transmittance Schedule Name=\"ALWAYSONE\", is always transparent.",
+         "   **   ~~~   ** This shading surface will be ignored."});
 
     compare_err_stream(error_string);
     EXPECT_FALSE(ErrorsFound); // expect no errors

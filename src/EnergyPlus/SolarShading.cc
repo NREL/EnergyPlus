@@ -372,8 +372,10 @@ void checkShadingSurfaceSchedules(EnergyPlusData &state)
     for (int surfNum = state.dataSurface->ShadingSurfaceFirst; surfNum <= state.dataSurface->ShadingSurfaceLast; ++surfNum) {
         auto &thisSurface = state.dataSurface->Surface(surfNum);
         if (!thisSurface.IsTransparent) continue;
-        if (EMSManager::isScheduleManaged(state, thisSurface.SchedShadowSurfIndex)) {
-            // Transmittance schedule has an actuator, set not transparent so it won't be skipped during shading calcs
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel &&
+            (EMSManager::isScheduleManaged(state, thisSurface.SchedShadowSurfIndex) || state.dataGlobal->anyPluginsOrCallbacksInModel)) {
+            // Transmittance schedule defintely has an actuator or may have one via python plugin or API
+            // Set not transparent so it won't be skipped during shading calcs
             thisSurface.IsTransparent = false;
             // Also set global flags
             state.dataSolarShading->anyScheduledShadingSurface = true;
@@ -384,6 +386,7 @@ void checkShadingSurfaceSchedules(EnergyPlusData &state)
                              format("Shading Surface=\"{}\", Transmittance Schedule Name=\"{}\", is always transparent.",
                                     thisSurface.Name,
                                     state.dataScheduleMgr->Schedule(thisSurface.SchedShadowSurfIndex).Name));
+            ShowContinueError(state, "This shading surface will be ignored.");
         }
     }
 }
@@ -516,7 +519,7 @@ void GetShadowingInput(EnergyPlusData &state)
         ShowSevereError(state, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
         ShowContinueError(state, "and there is at least one shading surface of type ");
         ShowContinueError(state, "Shading:Site:Detailed, Shading:Building:Detailed, or Shading:Zone:Detailed, ");
-        ShowContinueError(state, "that has an active transmittance schedule value greater than zero.");
+        ShowContinueError(state, "that has an active transmittance schedule value greater than zero or may vary.");
         ShowContinueError(state, "With \"PixelCounting\" Shading Calculation Method, the shading surfaces will be treated as ");
         ShowContinueError(state, "completely opaque (transmittance = 0) during the shading calculation, ");
         ShowContinueError(state, "which may result in inaccurate or unexpected results.");
@@ -743,7 +746,7 @@ void GetShadowingInput(EnergyPlusData &state)
     if (!state.dataSysVars->DetailedSolarTimestepIntegration && state.dataSurface->ShadingTransmittanceVaries &&
         state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) {
 
-        ShowWarningError(state, "GetShadowingInput: The shading transmittance for shading devices changes throughout the year.");
+        ShowWarningError(state, "GetShadowingInput: The shading transmittance for shading devices may change throughout the year.");
         ShowContinueError(state,
                           format("Choose Shading Calculation Update Frequency Method = Timestep in the {} object to capture all shading impacts.",
                                  cCurrentModuleObject));
@@ -751,11 +754,9 @@ void GetShadowingInput(EnergyPlusData &state)
     if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm && state.dataSurface->ShadingTransmittanceVaries &&
         state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) {
 
-        ShowWarningError(state,
-                         format("GetShadowingInput: The shading transmittance for shading devices changes throughout the year. Choose "
-                                "DetailedSkyDiffuseModeling in the {} object to remove this warning.",
-                                cCurrentModuleObject));
+        ShowWarningError(state, "GetShadowingInput: The shading transmittance for shading devices may change throughout the year.");
         ShowContinueError(state, "Simulation has been reset to use DetailedSkyDiffuseModeling. Simulation continues.");
+        ShowContinueError(state, format("Choose DetailedSkyDiffuseModeling in the {} object to remove this warning.", cCurrentModuleObject));
         state.dataSysVars->DetailedSkyDiffuseAlgorithm = true;
         state.dataIPShortCut->cAlphaArgs(2) = "DetailedSkyDiffuseModeling";
         if (!state.dataSysVars->DetailedSolarTimestepIntegration && state.dataSolarShading->ShadowingCalcFrequency > 1) {
