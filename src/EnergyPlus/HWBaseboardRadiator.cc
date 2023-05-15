@@ -165,8 +165,8 @@ namespace HWBaseboardRadiator {
         }
 
         if (CompIndex > 0) {
-            HWBaseboardDesignData &HWBaseboardDesignDataObject{state.dataHWBaseboardRad->HWBaseboardDesignObject(
-                HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
+            HWBaseboardDesignData &HWBaseboardDesignDataObject = state.dataHWBaseboardRad->HWBaseboardDesignObject(
+                HWBaseboard(BaseboardNum).DesignObjectPtr); // Contains the data for variable flow hydronic systems
 
             InitHWBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
@@ -277,7 +277,7 @@ namespace HWBaseboardRadiator {
 
         // Count total number of baseboard units
 
-        HWBaseboard.allocate(NumHWBaseboards);
+        state.dataHWBaseboardRad->HWBaseboard.allocate(NumHWBaseboards);
         HWBaseboardDesignObject.allocate(NumHWBaseboardDesignObjs);
         CheckEquipName.allocate(NumHWBaseboards);
         HWBaseboardNumericFields.allocate(NumHWBaseboards);
@@ -303,8 +303,6 @@ namespace HWBaseboardRadiator {
             HWBaseboardDesignNumericFields(BaseboardDesignNum).FieldNames.allocate(NumNumbers);
             HWBaseboardDesignNumericFields(BaseboardDesignNum).FieldNames = "";
             HWBaseboardDesignNumericFields(BaseboardDesignNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
-
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBaseboardName(
@@ -464,7 +462,6 @@ namespace HWBaseboardRadiator {
             HWBaseboardNumericFields(BaseboardNum).FieldNames.allocate(NumNumbers);
             HWBaseboardNumericFields(BaseboardNum).FieldNames = "";
             HWBaseboardNumericFields(BaseboardNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBaseboardName(
@@ -477,8 +474,8 @@ namespace HWBaseboardRadiator {
             HWBaseboard(BaseboardNum).designObjectName = state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
             HWBaseboard(BaseboardNum).DesignObjectPtr =
                 UtilityRoutines::FindItemInList(HWBaseboard(BaseboardNum).designObjectName, HWBaseboardDesignNames);
-            HWBaseboardDesignData &HWBaseboardDesignDataObject{
-                HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for the design object
+            HWBaseboardDesignData &HWBaseboardDesignDataObject =
+                HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr); // Contains the data for the design object
 
             // Get schedule
             HWBaseboard(BaseboardNum).Schedule = state.dataIPShortCut->cAlphaArgs(3);
@@ -1321,7 +1318,7 @@ namespace HWBaseboardRadiator {
         Real64 AirInletTemp = hWBaseboard.AirInletTemp;
         Real64 WaterInletTemp = hWBaseboard.WaterInletTemp;
         Real64 WaterMassFlowRate = state.dataLoopNodes->Node(hWBaseboard.WaterInletNode).MassFlowRate;
-        HWBaseboardDesignData &HWBaseboardDesignDataObject{
+        HWBaseboardDesignData const &HWBaseboardDesignDataObject{
             state.dataHWBaseboardRad->HWBaseboardDesignObject(hWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
 
         if (QZnReq > DataHVACGlobals::SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) &&
@@ -1433,11 +1430,7 @@ namespace HWBaseboardRadiator {
         int WaterInletNode;
         int WaterOutletNode;
         auto const &hWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
-        auto &lastSysTimeElapsed = state.dataHWBaseboardRad->LastSysTimeElapsed(BaseboardNum);
-        auto &qBBRadSrcAvg = state.dataHWBaseboardRad->QBBRadSrcAvg(BaseboardNum);
-        auto &lastQBBRadSrc = state.dataHWBaseboardRad->LastQBBRadSrc(BaseboardNum);
-        auto const &qBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
-        auto &lastTimeStepSys = state.dataHWBaseboardRad->LastTimeStepSys(BaseboardNum);
+        Real64 const qBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataHWBaseboardRad->MyEnvrnFlag2) {
             state.dataHWBaseboardRad->Iter = 0;
@@ -1448,15 +1441,17 @@ namespace HWBaseboardRadiator {
         }
 
         // First, update the running average if necessary...
-        if (lastSysTimeElapsed == state.dataHVACGlobal->SysTimeElapsed) {
-            qBBRadSrcAvg -= lastQBBRadSrc * lastTimeStepSys / state.dataGlobal->TimeStepZone;
+        if (state.dataHWBaseboardRad->LastSysTimeElapsed(BaseboardNum) == state.dataHVACGlobal->SysTimeElapsed) {
+            state.dataHWBaseboardRad->QBBRadSrcAvg(BaseboardNum) -= state.dataHWBaseboardRad->LastQBBRadSrc(BaseboardNum) *
+                                                                    state.dataHWBaseboardRad->LastTimeStepSys(BaseboardNum) /
+                                                                    state.dataGlobal->TimeStepZone;
         }
         // Update the running average and the "last" values with the current values of the appropriate variables
-        qBBRadSrcAvg += qBBRadSource * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
+        state.dataHWBaseboardRad->QBBRadSrcAvg(BaseboardNum) += qBBRadSource * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
 
-        lastQBBRadSrc = qBBRadSource;
-        lastSysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        lastTimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        state.dataHWBaseboardRad->LastQBBRadSrc(BaseboardNum) = qBBRadSource;
+        state.dataHWBaseboardRad->LastSysTimeElapsed(BaseboardNum) = state.dataHVACGlobal->SysTimeElapsed;
+        state.dataHWBaseboardRad->LastTimeStepSys(BaseboardNum) = state.dataHVACGlobal->TimeStepSys;
 
         WaterInletNode = hWBaseboard.WaterInletNode;
         WaterOutletNode = hWBaseboard.WaterOutletNode;
@@ -1544,10 +1539,10 @@ namespace HWBaseboardRadiator {
 
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
             auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
-            auto const &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
+            Real64 const &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
 
-            HWBaseboardDesignData &HWBaseboardDesignDataObject{
-                state.dataHWBaseboardRad->HWBaseboardDesignObject(HWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
+            HWBaseboardDesignData const &HWBaseboardDesignDataObject =
+                state.dataHWBaseboardRad->HWBaseboardDesignObject(HWBaseboard.DesignObjectPtr); // Contains the data for the design object
             int ZoneNum = HWBaseboard.ZonePtr;
             if (ZoneNum <= 0) continue;
             state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson(ZoneNum) += QBBRadSource * HWBaseboardDesignDataObject.FracDistribPerson;
