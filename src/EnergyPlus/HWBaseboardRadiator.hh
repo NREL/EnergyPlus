@@ -226,14 +226,12 @@ struct HWBaseboardRadiatorData : BaseGlobalStruct
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
     Array1D_bool SetLoopIndexFlag; // get loop number flag
-    Array1D_string HWBaseboardDesignNames;
     int NumHWBaseboards = 0;
     int NumHWBaseboardDesignObjs = 0; // Number of HW Baseboard systems design objects
     // Object Data
     Array1D<HWBaseboardRadiator::HWBaseboardParams> HWBaseboard;
     Array1D<HWBaseboardRadiator::HWBaseboardDesignData> HWBaseboardDesignObject;
     Array1D<HWBaseboardRadiator::HWBaseboardNumericFieldData> HWBaseboardNumericFields;
-    Array1D<HWBaseboardRadiator::HWBaseboardDesignNumericFieldData> HWBaseboardDesignNumericFields;
     bool GetInputFlag = true; // One time get input flag
     bool MyOneTimeFlag = true;
     int Iter = 0;
@@ -251,13 +249,11 @@ struct HWBaseboardRadiatorData : BaseGlobalStruct
         this->MySizeFlag.clear();
         this->CheckEquipName.clear();
         this->SetLoopIndexFlag.clear();
-        this->HWBaseboardDesignNames.clear();
         this->NumHWBaseboards = 0;
         this->NumHWBaseboardDesignObjs = 0;
         this->HWBaseboard.clear();
         this->HWBaseboardDesignObject.clear();
         this->HWBaseboardNumericFields.clear();
-        this->HWBaseboardDesignNumericFields.clear();
         this->GetInputFlag = true;
         this->MyOneTimeFlag = true;
         this->MyEnvrnFlag.clear();
