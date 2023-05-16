@@ -272,7 +272,6 @@ void ControlCompOutput(EnergyPlusData &state,
             // First check to see if the component is running; if not converge and return
             if (ZoneInterHalf.MaxResult == ZoneInterHalf.MinResult) {
                 // Set to converged controller
-                Converged = true;
                 ZoneInterHalf.MaxFlowCalc = true;
                 ZoneInterHalf.MinFlowCalc = false;
                 ZoneInterHalf.NormFlowCalc = false;
@@ -522,7 +521,6 @@ void ControlCompOutput(EnergyPlusData &state,
         // Check for Controller convergence to see if within the offset
         if (std::abs(ZoneController.SensedValue) <= ControlOffset || std::abs(ZoneController.SensedValue) <= HalvingPrec) {
             // Set to converged controller
-            Converged = true;
             ZoneInterHalf.MaxFlowCalc = true;
             ZoneInterHalf.MinFlowCalc = false;
             ZoneInterHalf.NormFlowCalc = false;
@@ -535,7 +533,6 @@ void ControlCompOutput(EnergyPlusData &state,
             bool BBConvergeCheckFlag = BBConvergeCheck(SimCompNum, ZoneInterHalf.MaxFlow, ZoneInterHalf.MinFlow);
             if (BBConvergeCheckFlag) {
                 // Set to converged controller
-                Converged = true;
                 ZoneInterHalf.MaxFlowCalc = true;
                 ZoneInterHalf.MinFlowCalc = false;
                 ZoneInterHalf.NormFlowCalc = false;

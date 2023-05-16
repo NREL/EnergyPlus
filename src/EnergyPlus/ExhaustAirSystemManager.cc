@@ -366,7 +366,7 @@ namespace ExhaustAirSystemManager {
 
         if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-            state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->simulate(state, _, _, _, _);
+            state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->simulate(state, _, _);
 
             // Update report variables
             outletNode_Num = state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->outletNodeNum;

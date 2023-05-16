@@ -942,31 +942,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     lAlphaBlanks.deallocate();
     lNumericBlanks.deallocate();
 
-    // setup zone equipment info for convection correlations
-    SetupZoneEquipmentForConvectionFlowRegime(state);
-
     if (state.dataZoneEquip->GetZoneEquipmentDataErrorsFound) {
         ShowFatalError(state, format("{}Errors found in getting Zone Equipment input.", RoutineName));
-    }
-}
-
-void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   Aug 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Decide a few one-time things for later
-    // determination of flow regime for convection
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneLoop;
-
-    for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
     }
 }
 
