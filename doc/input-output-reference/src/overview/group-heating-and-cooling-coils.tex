@@ -2095,11 +2095,19 @@ The air volume flow rate, in \si{\volumeFlowRate}, across the DX cooling coil at
 
 \paragraph{Field: 2017 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-2017-rated-evaporator-fan-power-per-volume-flow-rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. Note: two values are calculated for SEER. `SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation. `SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: Standard Ratings using this field will be reported in the "2017 Standard Ratings for DX Coils" table
+Note 2: two values are calculated for SEER: 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation; 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
+Note 3: SEER User, SEER Standard, EER, and IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 210-240 (2017).
+Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2013).
 
 \paragraph{Field: 2023 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-2023-rated-evaporator-fan-power-per-volume-flow-rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m\(^{3}\)/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER2), Integrated Energy Efficiency Ratio (IEER2) and the Standard Rating (Net) Cooling Capacity which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER2, IEER2 and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. Note: two values are calculated for SEER2. `SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. `SEER2 Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: Standard Ratings using this field will be reported in the "2023 Standard Ratings for DX Coils" table
+Note 2: two values are calculated for SEER2. 'SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER2 Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
+Note 3: SEER2 User, SEER2 Standard, EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr - will be calculated according to ANSI/AHRI standard 210-240 (2023).
+Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacities between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2022).
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-9}
 
@@ -2316,9 +2324,28 @@ The coefficient of performance is the ratio of the gross total cooling capacity 
 
 The high speed air volume flow rate, in \si{\volumeFlowRate}, across the DX cooling coil at rated conditions. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of gross rated total cooling capacity. For DOAS applications the rated air volume flow rate should be between 0.00001677 m\(^{3}\)/s and 0.00003355 m\(^{3}\)/s per watt of gross rated total cooling capacity (125 to 250 cfm/ton). The gross rated total cooling capacity, gross rated SHR and gross rated COP should be performance information for the unit with air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb, air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb, and the rated air volume flow rate defined here.
 
+\paragraph{Field: High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-2017-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: Standard Ratings using this field will be reported in the "2017 Standard Ratings for DX Coils" table
+Note 2: two values are calculated for SEER: 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation; 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
+Note 3: SEER User, SEER Standard, EER, and IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 210-240 (2017).
+Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2013).
+
+\paragraph{Field: High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-2023-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: Standard Ratings using this field will be reported in the "2023 Standard Ratings for DX Coils" table
+Note 2: two values are calculated for SEER2. 'SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER2 Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
+Note 3: SEER2 User, SEER2 Standard, EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr - will be calculated according to ANSI/AHRI standard 210-240 (2023).
+Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacities between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2022).
+
 \paragraph{Field: Unit Internal Static Air Pressure}\label{field-unit-internal-static-air-pressure}
 
-If this coil is used with a \hyperref[fanvariablevolume]{Fan:VariableVolume} to model a packaged variable-air-volume unit, then ratings for standard rated net capacity, EER, and IEER will be calculated per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2. This field is to specify the internal static air pressure, in units of Pascals, associated with the unit s supply air flow for rating purposes. This field does not affect the performance during operation. This field is optional. If this field is used, then the internal static air pressure is used with the associated fan characteristics when calculating standard rated net capacity, EER, and IEER. If this field is not used, then the standard ratings are still performed but use a default for specific fan power of 773.3 (W/(m\(^{3}\)/s)). The air pressure drop/rise input here should be internal in the sense that it is for the entire package of unitary equipment as it would be tested in a laboratory (including other non-cooling sections inside the package for filters, dampers, and or heating coils) but none of the external pressure drop for distributing supply air throughout the building. This is different from the input field called Pressure Rise in the fan object which includes both the external static pressure and the internal static pressure. The results of standard rating calculations are reported to the EIO file and to predefined output tables called DX Cooling Coils and VAV DX Cooling Standard Rating Details.
+This field is to specify the internal static air pressure, in units of Pascals, associated with the unit s supply air flow for rating purposes. This field does not affect the performance during operation. The air pressure drop/rise input here should be internal in the sense that it is for the entire package of unitary equipment as it would be tested in a laboratory (including other non-cooling sections inside the package for filters, dampers, and or heating coils) but none of the external pressure drop for distributing supply air throughout the building. This is different from the input field called Pressure Rise in the fan object which includes both the external static pressure and the internal static pressure.
+If this coil is used with a \hyperref[fanvariablevolume]{Fan:VariableVolume} to model a packaged variable-air-volume unit, then ratings for  EER, IEER, SEER, and Standard Rating (Net) Cooling Capacity will be calculated as defined ANSI/AHRI Standard 340/360 standard.  See also - the fields "High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate" and "Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate", which are also used to calculate the 2017 version of these standard ratings. The 2017 standard ratings are reported to the EIO file and to the predefined output table "2017 Standard Ratings for DX Coils."
+Additionally, a newer definition for calculating EER, IEER, SEER2, and Standard Rating (Net) Cooling Capacity, was published in the 2022 version of AHRI 340-360.  These ratings are calculated using values in the fields "High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate" and "Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate"  The 2023 standard ratings are reported to the EIO file and to the predefined output table "2023 Standard Ratings for DX Coils", which are also used to calculate the 2023 version of these standard ratings. The 2023 standard ratings are reported to the EIO file and to the predefined output table "2023 Standard Ratings for DX Coils."
+This field is optional. If a value is provided, then it will be used, together with the associated fan characteristics when calculating the standard ratings described above. If a value is not provided, then the standard ratings are still calculated, using values (user provided or default values) in the 'Rated Evaporator Fan Power Per Volume Flow Rate' fields, as described in those fields.
 
 \paragraph{Field: Air Inlet Node}\label{field-air-inlet-node}
 
@@ -2381,6 +2408,22 @@ The coefficient of performance is the ratio of gross total cooling capacity in w
 \paragraph{Field: Low Speed Rated Air Flow Rate}\label{field-low-speed-rated-air-flow-rate}
 
 The low speed volume air flow rate, in \si{\volumeFlowRate}, across the DX cooling coil at rated conditions. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of the gross rated total cooling capacity. For DOAS applications the rated air volume flow rate should be between 0.00001677 m\(^{3}\)/s and 0.00003355 m\(^{3}\)/s per watt of gross rated total cooling capacity (125 to 250 cfm/ton). The gross rated total cooling capacity, gross rated SHR and gross rated COP should be performance information for the unit with air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb, air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb, and the rated air volume flow rate defined here.
+
+\paragraph{Field: Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-2017-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: two values are calculated for SEER. 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
+Note 2: SEER2 and Standard Rating (Net) Cooling Capacity -- will only be reported for coils with cooling capacity less than 65,000 Btu/hr - according to ANSI/AHRI standard 210-240 (2013).
+Note 3: EER & IEER with cooling capacities less than 65,000 Btu/hr will be calculated according to ANSI/AHRI standard 210-240 (2017).
+Note 4: EER & IEER with cooling capacities between 65,000 and 135,000 Btu/hr will be calculated according to ANSI/AHRI standard 340-360 (2013).
+
+\paragraph{Field: Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-2023-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: two values are calculated for SEER. 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
+Note 2: SEER2 and Standard Rating (Net) Cooling Capacity -- will only be reported for coils with cooling capacity less than 65,000 Btu/hr - according to ANSI/AHRI standard 210-240 (2023).
+Note 3: EER & IEER with cooling capacities less than 65,000 Btu/hr will be calculated according to ANSI/AHRI standard 210-240 (2023).
+Note 4: EER & IEER with cooling capacities between 65,000 and 135,000 Btu/hr will be calculated according to ANSI/AHRI standard 340-360 (2022).
 
 \paragraph{Field: Low Speed Total Cooling Capacity Function of Temperature Curve Name}\label{field-low-speed-total-cooling-capacity-function-of-temperature-curve-name}
 
@@ -2815,11 +2858,19 @@ The volumetric air flow rate for Speed \textless{}x\textgreater{}, in \si{\volum
 
 \paragraph{Field: Speed \textless{}X\textgreater{} 2017 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-speed-x-2017-rated-evaporator-fan-power-per-volume-flow-rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed \textless{}x\textgreater{} in W/(m3/s). The default value is 773.3 W/(m3/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m3/s). This value is only used to calculate the following metrics according to the 2017 version of ANSI/AHRI 201-240 standard: Seasonal Energy Efficiency Ratio (SEER) and the Standard Rating (Net) Cooling Capacity. These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Cooling Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating the metrics listed above to assist the user in verifying their inputs for modeling this type of equipment. Note: two values are calculated for SEER. `SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation. `SEER Standard' is calculated using AHRI Standard 210/240-2023 default PLF curve and cooling coefficient of degradation.
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: Standard Ratings using this field will be reported in the "2017 Standard Ratings for DX Coils" table
+Note 2: two values are calculated for SEER: 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation; 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
+Note 3: SEER User, SEER Standard, EER, and IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 210-240 (2017).
+Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2013).
 
 \paragraph{Field: Speed \textless{}X\textgreater{} 2023 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-speed-x-2023-rated-evaporator-fan-power-per-volume-flow-rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed \textless{}x\textgreater{} in W/(m3/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m3/s). This value is only used to calculate the following metrics according to the 2023 version of ANSI/AHRI 201-240 standard: Seasonal Energy Efficiency Ratio (SEER2) and the Standard Rating (Net) Cooling Capacity. These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Cooling Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating the metrics listed above to assist the user in verifying their inputs for modeling this type of equipment. Note: two values are calculated for SEER2. `SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. `SEER2 Standard' is calculated using AHRI Standard 210/240-2023 default PLF curve and cooling coefficient of degradation.
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: Standard Ratings using this field will be reported in the "2023 Standard Ratings for DX Coils" table
+Note 2: two values are calculated for SEER2. 'SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER2 Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
+Note 3: SEER2 User, SEER2 Standard, EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr - will be calculated according to ANSI/AHRI standard 210-240 (2023).
+Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacities between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2022).
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Total Cooling Capacity Function of Temperature Curve Name}\label{field-speed-x-total-cooling-capacity-function-of-temperature-curve-name}
 
@@ -2947,8 +2998,8 @@ Coil:Cooling:DX:MultiSpeed,
   0.75,                            !- Speed 1 Gross Rated Sensible Heat Ratio {dimensionless}
   3.0,                             !- Speed 1 Gross Rated Cooling COP {dimensionless}
   0.40,                            !- Speed 1 Rated Air Flow Rate {m3/s}
-  ,                                !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  ,                                !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  453.3,                           !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  547.7,                           !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACCoolCapFT Speed 1,           !- Speed 1 Total Cooling Capacity Modifier Curve (temperature)
   HPACCoolCapFF Speed 1,           !- Speed 1 Total Cooling Capacity Modifier Curve (flow fraction)
   HPACCOOLEIRFT Speed 1,           !- Speed 1 Energy Input Ratio Modifier Curve (temperature)
@@ -2967,8 +3018,8 @@ Coil:Cooling:DX:MultiSpeed,
   0.75,                            !- Speed 2 Gross Rated Sensible Heat Ratio {dimensionless}
   3.0,                             !- Speed 2 Gross Rated Cooling COP {dimensionless}
   0.85,                            !- Speed 2 Rated Air Flow Rate {m3/s}
-  ,                                !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  ,                                !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  523.3,                           !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  632.3,                           !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACCoolCapFT Speed 2,           !- Speed 2 Total Cooling Capacity Modifier Curve (temperature)
   HPACCoolCapFF Speed 2,           !- Speed 2 Total Cooling Capacity Modifier Curve (flow fraction)
   HPACCOOLEIRFT Speed 2,           !- Speed 2 Energy Input Ratio Modifier Curve (temperature)
@@ -2987,8 +3038,8 @@ Coil:Cooling:DX:MultiSpeed,
   0.75,                            !- Speed 3 Gross Rated Sensible Heat Ratio {dimensionless}
   3.0,                             !- Speed 3 Gross Rated Cooling COP {dimensionless}
   1.25,                            !- Speed 3 Rated Air Flow Rate {m3/s}
-  ,                                !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  ,                                !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  573.3,                           !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  692.7,                           !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACCoolCapFT Speed 3,           !- Speed 3 Total Cooling Capacity Modifier Curve (temperature)
   HPACCoolCapFF Speed 3,           !- Speed 3 Total Cooling Capacity Modifier Curve (flow fraction)
   HPACCOOLEIRFT Speed 3,           !- Speed 3 Energy Input Ratio Modifier Curve (temperature)
@@ -3007,8 +3058,8 @@ Coil:Cooling:DX:MultiSpeed,
   0.75,                            !- Speed 4 Gross Rated Sensible Heat Ratio {dimensionless}
   3.0,                             !- Speed 4 Gross Rated Cooling COP {dimensionless}
   1.75,                            !- Speed 4 Rated Air Flow Rate {m3/s}
-  ,                                !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  ,                                !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  673.3,                           !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  813.5,                           !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACCoolCapFT Speed 4,           !- Speed 4 Total Cooling Capacity Modifier Curve (temperature)
   HPACCoolCapFF Speed 4,           !- Speed 4 Total Cooling Capacity Modifier Curve (flow fraction)
   HPACCOOLEIRFT Speed 4,           !- Speed 4 Energy Input Ratio Modifier Curve (temperature)
@@ -3347,6 +3398,22 @@ This numeric field defines the coefficient of performance (COP = the gross total
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Air Flow Rate}\label{field-speed-x-reference-unit-rated-air-flow-rate}
 
 This numeric field defines the volumetric air flow rate, in \si{\volumeFlowRate}, across the cooling coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given cooling capacity and COP at the speed, as above.
+
+\paragraph{Field: Speed \textless{}X\textgreater{} 2017 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-speed-x-2017-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: Standard Ratings using this field will be reported in the "2017 Standard Ratings for DX Coils" table
+Note 2: two values are calculated for SEER: 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation; 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
+Note 3: SEER User, SEER Standard, EER, and IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 210-240 (2017).
+Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2013).
+
+\paragraph{Field: Speed \textless{}X\textgreater{} 2023 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-speed-x-2023-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: Standard Ratings using this field will be reported in the "2023 Standard Ratings for DX Coils" table
+Note 2: two values are calculated for SEER2. 'SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER2 Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
+Note 3: SEER2 User, SEER2 Standard, EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr - will be calculated according to ANSI/AHRI standard 210-240 (2023).
+Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacities between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2022).
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Condenser Air Flow Rate}\label{field-speed-x-reference-unit-rated-condenser-air-flow-rate}
 
@@ -4024,10 +4091,12 @@ This numeric field defines the volume air flow rate, in \si{\volumeFlowRate}, ac
 \paragraph{Field: 2017 Rated Supply Fan Power Per Volume Flow Rate}\label{field-2017-rated-supply-fan-power-per-volume-flow-rate-1}
 
 This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity, and Heating Seasonal Performance Factor (HSPF). These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Heating Coil, Standard Ratings) and in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the heating coil (condenser) fan during simulations; instead, it is used for calculating the above standard ratings to assist the user in verifying their inputs for modeling this type of equipment.
+Note 1: These (3) metrics will only be reported for coils with heating capacity less than 65,000 Btu/hr - according to ANSI/AHRI standard 210-240 (2017).
 
 \paragraph{Field: 2023 Rated Supply Fan Power Per Volume Flow Rate}\label{field-2023-rated-supply-fan-power-per-volume-flow-rate-1}
 
 This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m\(^{3}\)/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity, and Heating Seasonal Performance Factor (HSPF2). These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Heating Coil, Standard Ratings) and in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the heating coil (condenser) fan during simulations; instead, it is used for calculating the above standard ratings to assist the user in verifying their inputs for modeling this type of equipment.
+Note 1: These (3) metrics will only be reported for coils with heating capacity less than 65,000 Btu/hr - according to ANSI/AHRI standard 210-240 (2023).
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-13}
 
@@ -4157,8 +4226,8 @@ Coil:Heating:DX:SingleSpeed,
   35000,                           ! Gross Rated Heating Capacity
   2.75,                            ! Gross Rated Heating COP
   1.7,                             ! Rated air flow rate (m3/s)
-  ,                                ! 2017 Rated supply fan power per volume flow rate (m3/s)
-  ,                                ! 2023 Rated supply fan power per volume flow rate (m3/s)
+  773.3,                           ! 2017 Rated supply fan power per volume flow rate (m3/s)
+  934.4,                           ! 2023 Rated supply fan power per volume flow rate (m3/s)
   Heating Coil Air Inlet Node,     ! Heating coil air side inlet node
   SuppHeating Coil Air Inlet Node, ! Heating coil air side outlet node
   HPACHeatCapFT,                   ! Heating cap modifier curve (temperature, C)
@@ -4356,10 +4425,12 @@ This numeric field defines the volume air flow rate, in \si{\volumeFlowRate}, ac
 \paragraph{Field: Speed \textless{}x\textgreater{} 2017 Rated Supply Air Fan Power Per Volume Flow Rate}\label{field-speed-x-2017-rated-supply-air-fan-power-per-volume-flow-rate-1}
 
 This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions for Speed \textless{}x\textgreater{} in W/(m3/s). The default value is 773.3 W/(m3/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m3/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210/240 standard: High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity, and Heating Seasonal Performance Factor (HSPF). These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Heating Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the heating coil (condenser) fan during simulations; instead, it is used for calculating Standard Ratings listed above to assist the user in verifying their inputs for modeling this type of equipment.
+Note 1: These (3) metrics will only be reported for coils with heating capacity less than 65,000 Btu/hr - according to ANSI/AHRI standard 210-240 (2017).
 
 \paragraph{Field: Speed \textless{}x\textgreater{} 2023 Rated Supply Air Fan Power Per Volume Flow Rate}\label{field-speed-x-2023-rated-supply-air-fan-power-per-volume-flow-rate-1}
 
-This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions for Speed \textless{}x\textgreater{} in W/(m3/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m3/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210/240 standard: High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity, and Heating Seasonal Performance Factor (HSPF). These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Heating Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the heating coil (condenser) fan during simulations; instead, it is used for calculating Standard Ratings listed above to assist the user in verifying their inputs for modeling this type of equipment.
+This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions for Speed \textless{}x\textgreater{} in W/(m3/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m3/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210/240 standard: High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity, and Heating Seasonal Performance Factor (HSPF2). These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Heating Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the heating coil (condenser) fan during simulations; instead, it is used for calculating Standard Ratings listed above to assist the user in verifying their inputs for modeling this type of equipment.
+Note 1: These (3) metrics will only be reported for coils with heating capacity less than 65,000 Btu/hr - according to ANSI/AHRI standard 210-240 (2023).
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Heating Capacity Function of Temperature Curve Name}\label{field-speed-x-heating-capacity-function-of-temperature-curve-name}
 
@@ -4716,6 +4787,16 @@ This numeric field defines the coefficient of performance (COP = gross heating c
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Air Flow Rate}\label{field-speed-x-reference-unit-rated-air-flow-rate-1}
 
 This numeric field defines the volume air flow rate, in \si{\volumeFlowRate}, across the heating coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated heating capacity and gross rated heating COP at the speed, as above.
+
+\paragraph{Field: Speed \textless{}x\textgreater{} 2017 Rated Supply Air Fan Power Per Volume Flow Rate}\label{field-speed-x-2017-rated-supply-air-fan-power-per-volume-flow-rate-1}
+
+This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions for Speed \textless{}x\textgreater{} in W/(m3/s). The default value is 773.3 W/(m3/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m3/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210/240 standard: High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity, and Heating Seasonal Performance Factor (HSPF). These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Heating Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the heating coil (condenser) fan during simulations; instead, it is used for calculating Standard Ratings listed above to assist the user in verifying their inputs for modeling this type of equipment.
+Note 1: These (3) metrics will only be reported for coils with heating capacity less than 65,000 Btu/hr - according to ANSI/AHRI standard 210-240 (2017).
+
+\paragraph{Field: Speed \textless{}x\textgreater{} 2023 Rated Supply Air Fan Power Per Volume Flow Rate}\label{field-speed-x-2023-rated-supply-air-fan-power-per-volume-flow-rate-1}
+
+This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions for Speed \textless{}x\textgreater{} in W/(m3/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m3/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210/240 standard: High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity, and Heating Seasonal Performance Factor (HSPF2). These values will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Multi-Speed DX Heating Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the heating coil (condenser) fan during simulations; instead, it is used for calculating Standard Ratings listed above to assist the user in verifying their inputs for modeling this type of equipment.
+Note 1: These (3) metrics will only be reported for coils with heating capacity less than 65,000 Btu/hr - according to ANSI/AHRI standard 210-240 (2023)
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Heating Capacity Function of Temperature Curve Name}\label{field-speed-x-heating-capacity-function-of-temperature-curve-name-1}
 
@@ -7002,6 +7083,22 @@ This alpha field contains the cooling coil air outlet node name.
 
 This numeric field contains the rated volumetric air flow rate on the load side of the heat pump in m3/s. This field is autosizable.
 
+\paragraph{Field: 2017 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-2017-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: Standard Ratings using this field will be reported in the "2017 Standard Ratings for DX Coils" table
+Note 2: two values are calculated for SEER: 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation; 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
+Note 3: SEER User, SEER Standard, EER, and IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 210-240 (2017).
+Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2013).
+
+\paragraph{Field: 2023 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-2023-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: Standard Ratings using this field will be reported in the "2023 Standard Ratings for DX Coils" table
+Note 2: two values are calculated for SEER2. 'SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER2 Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
+Note 3: SEER2 User, SEER2 Standard, EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr - will be calculated according to ANSI/AHRI standard 210-240 (2023).
+Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacities between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2022).
+
 \paragraph{Field: Rated Water Flow Rate}\label{field-rated-water-flow-rate}
 
 This numeric field contains the rated volumetric water flow rate on the source side of the heat pump in m3/s. This field is autosizable.
@@ -7335,6 +7432,8 @@ And the volumetric air flow rates in the parent objects are calculated as below,
   \end{array}
 \end{equation}
 
+
+
 \paragraph{Field: Rated Volumetric Water Flow Rate}\label{field-rated-volumetric-water-flow-rate}
 
 This numeric field contains the rated volumetric water flow rate on the source side of the heat pump at the nominal speed level. This field is autosizable. The value is used to determine an internal scaling factor, and calculate the water flow rates in the water loop. It is recommended that the ratio of the rated volumetric water flow rate to the rated capacity is the same as the unit performance from the Reference Unit data.
@@ -7405,6 +7504,22 @@ This numeric field defines the coefficient of performance (COP = gross total coo
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Air Flow Rate}\label{field-speed-x-reference-unit-rated-air-flow-rate-2}
 
 This numeric field defines the volumetric air flow rate, in \si{\volumeFlowRate}, across the cooling coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated total cooling capacity and gross rated cooling COP at the speed, as above.
+
+\paragraph{Field: Speed \textless{}X\textgreater{} 2017 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-speed-x-2017-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: Standard Ratings using this field will be reported in the "2017 Standard Ratings for DX Coils" table
+Note 2: two values are calculated for SEER: 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation; 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
+Note 3: SEER User, SEER Standard, EER, and IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 210-240 (2017).
+Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2013).
+
+\paragraph{Field: Speed \textless{}X\textgreater{} 2023 Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-speed-x-2023-rated-evaporator-fan-power-per-volume-flow-rate}
+
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+Note 1: Standard Ratings using this field will be reported in the "2023 Standard Ratings for DX Coils" table
+Note 2: two values are calculated for SEER2. 'SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER2 Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
+Note 3: SEER2 User, SEER2 Standard, EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr - will be calculated according to ANSI/AHRI standard 210-240 (2023).
+Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacities between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2022).
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Water Flow Rate}\label{field-speed-x-reference-unit-rated-water-flow-rate}
 
@@ -9286,8 +9401,8 @@ Coil:Cooling:DX:SingleSpeed,
   autosize,                !- Gross Rated Sensible Heat Ratio
   3.0,                     !- Gross Rated Cooling COP {W/W}
   autosize,                !- Rated Air Flow Rate {m3/s}
-  ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  773.3,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  934.4,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
   DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
   Heating Coil Air Inlet Node,  !- Air Outlet Node Name
   HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
@@ -9448,7 +9563,7 @@ Coil:Cooling:DX:MultiSpeed,
   3.0,                     !- Speed 4 Gross Rated Cooling COP {W/W}
   autosize,                !- Speed 4 Rated Air Flow Rate {m3/s}
   673.3,                   !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  673.3,                   !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  813.5,                   !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
   HPACCoolCapFT Speed 4,   !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
   HPACCoolCapFF Speed 4,   !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name
   HPACCOOLEIRFT Speed 4,   !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -9502,8 +9617,8 @@ Coil:Heating:DX:SingleSpeed,
   autosize,                !- Gross Rated Heating Capacity {W}
   2.75,                    !- Gross Rated Heating COP {W/W}
   autosize,                !- Rated Air Flow Rate {m3/s}
-  ,                        !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
-  ,                        !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+  773.3,                   !- 2017 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+  934.4,                   !- 2023 Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
   Heating Coil Air Inlet Node,  !- Air Inlet Node Name
   SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
   HPACHeatCapFT,           !- Heating Capacity Function of Temperature Curve Name
