@@ -21208,3 +21208,354 @@ Coil:Heating:Gas:MultiStage,
     EXPECT_TRUE(state->dataUnitarySystems->HeatingLoad);
     EXPECT_FALSE(state->dataUnitarySystems->CoolingLoad);
 }
+
+TEST_F(EnergyPlusFixture, UnitarySystemModel_CoolReheat)
+{
+
+    bool ErrorsFound(false);
+    bool FirstHVACIteration(false);
+    int InletNode(0);      // UnitarySystem inlet node number
+    int OutletNode(0);     // UnitarySystem outlet node number
+    int ControlZoneNum(0); // index to control zone
+
+    std::string_view constexpr idf_objects = R"IDF(
+Zone,
+  EAST ZONE,              !- Name
+  0,                      !- Direction of Relative North{ deg }
+  0,                      !- X Origin{ m }
+  0,                      !- Y Origin{ m }
+  0,                      !- Z Origin{ m }
+  1,                      !- Type
+  1,                      !- Multiplier
+  autocalculate,          !- Ceiling Height{ m }
+  autocalculate;          !- Volume{ m3 }
+
+ZoneHVAC:EquipmentConnections,
+EAST ZONE,                 !- Zone Name
+  Zone2Equipment,          !- Zone Conditioning Equipment List Name
+  Zone 2 Inlet Node,       !- Zone Air Inlet Node or NodeList Name
+  Zone Exhaust Node,       !- Zone Air Exhaust Node or NodeList Name
+  Zone 2 Node,             !- Zone Air Node Name
+  Zone 2 Outlet Node;      !- Zone Return Air Node Name
+
+ZoneHVAC:EquipmentList,
+  Zone2Equipment,          !- Name
+  SequentialLoad,          !- Load Distribution Scheme
+  AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type
+  Unitary System Model,          !- Zone Equipment 1 Name
+  1,                       !- Zone Equipment 1 Cooling Sequence
+  1,                       !- Zone Equipment 1 Heating or No - Load Sequence
+  ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+  ;                        !- Zone Equipment 1 Sequential Heating Fraction
+
+AirLoopHVAC:UnitarySystem,
+  Unitary System Model, !- Name
+  Load,                   !- Control Type
+  East Zone,              !- Controlling Zone or Thermostat Location
+  CoolReheat,             !- Dehumidification Control Type
+  FanAndCoilAvailSched,   !- Availability Schedule Name
+  Zone Exhaust Node,         !- Air Inlet Node Name
+  Zone 2 Inlet Node,   !- Air Outlet Node Name
+  Fan:OnOff,              !- Supply Fan Object Type
+  Supply Fan 1,           !- Supply Fan Name
+  BlowThrough,            !- Fan Placement
+  ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name
+  Coil:Heating:Fuel,       !- Heating Coil Object Type
+  Furnace Heating Coil 1, !- Heating Coil Name
+  ,                       !- DX Heating Coil Sizing Ratio
+  Coil:Cooling:DX:SingleSpeed, !- Cooling Coil Object Type
+  Furnace ACDXCoil 1,     !- Cooling Coil Name
+  ,                       !- Use DOAS DX Cooling Coil
+  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }
+  LatentOrSensibleLoadControl,  !- Latent Load Control
+  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
+  Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name
+  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation
+  1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }
+  ,                       !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }
+  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
+  SupplyAirFlowRate,      !- Supply air Flow Rate Method During Heating Operation
+  1.6,                    !- Supply Air Flow Rate During Heating Operation{ m3/s }
+  ,                       !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }
+  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
+  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  SupplyAirFlowRate,      !- Supply Air Flow Rate Method When No Cooling or Heating is Required
+  1.6,                    !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }
+  ,                       !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }
+  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
+  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
+  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  80;                     !- Maximum Supply Air Temperature{ C }
+
+Fan:OnOff,
+  Supply Fan 1,           !- Name
+  FanAndCoilAvailSched,   !- Availability Schedule Name
+  0.7,                    !- Fan Total Efficiency
+  600.0,                  !- Pressure Rise{ Pa }
+  1.6,                    !- Maximum Flow Rate{ m3 / s }
+  0.9,                    !- Motor Efficiency
+  1.0,                    !- Motor In Airstream Fraction
+  Zone Exhaust Node,      !- Air Inlet Node Name
+  DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
+
+Coil:Cooling:DX:SingleSpeed,
+  Furnace ACDXCoil 1,      !- Name
+  FanAndCoilAvailSched,    !- Availability Schedule Name
+  32000,                   !- Gross Rated Total Cooling Capacity {W}
+  0.75,                    !- Gross Rated Sensible Heat Ratio
+  3.0,                     !- Gross Rated Cooling COP {W/W}
+  1.6,                     !- Rated Air Flow Rate {m3/s}
+  ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
+  Heating Coil Air Inlet Node,  !- Air Outlet Node Name
+  WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
+  WindACCoolCapFFF,        !- Total Cooling Capacity Function of Flow Fraction Curve Name
+  WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
+  WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
+  WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+   ,                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+  1000,                    !- Nominal Time for Condensate Removal to Begin {s}
+  0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+  4,                       !- Maximum Cycling Rate {cycles/hr}
+  45;                      !- Latent Capacity Time Constant {s}
+
+Coil:Heating:Fuel,
+  Furnace Heating Coil 1, !- Name
+  FanAndCoilAvailSched,   !- Availability Schedule Name
+  NaturalGas,             !- Fuel Type
+  0.8,                    !- Gas Burner Efficiency
+  32000,                  !- Nominal Capacity{ W }
+  Heating Coil Air Inlet Node, !- Air Inlet Node Name
+  Reheat Coil Air Inlet Node;  !- Air Outlet Node Name
+
+Coil:Heating:Fuel,
+  Humidistat Reheat Coil 1, !- Name
+  FanAndCoilAvailSched,     !- Availability Schedule Name
+  NaturalGas,               !- Fuel Type
+  0.8,                      !- Gas Burner Efficiency
+  32000,                    !- Nominal Capacity{ W }
+  Reheat Coil Air Inlet Node, !- Air Inlet Node Name
+  Zone 2 Inlet Node;        !- Air Outlet Node Name
+
+ScheduleTypeLimits,
+  Any Number;               !- Name
+
+Schedule:Compact,
+  FanAndCoilAvailSched,   !- Name
+  Any Number,             !- Schedule Type Limits Name
+  Through: 12/31,         !- Field 1
+  For: AllDays,           !- Field 2
+  Until: 24:00, 1.0;      !- Field 3
+
+Schedule:Compact,
+  ContinuousFanSchedule,  !- Name
+  Any Number,             !- Schedule Type Limits Name
+  Through: 12/31,         !- Field 1
+  For: AllDays,           !- Field 2
+  Until: 24:00, 1.0;      !- Field 3
+
+Curve:Quadratic,
+  WindACCoolCapFFF,       !- Name
+  0.8,                    !- Coefficient1 Constant
+  0.2,                    !- Coefficient2 x
+  0.0,                    !- Coefficient3 x**2
+  0.5,                    !- Minimum Value of x
+  1.5;                    !- Maximum Value of x
+
+Curve:Quadratic,
+  WindACEIRFFF,           !- Name
+  1.1552,                 !- Coefficient1 Constant
+  -0.1808,                !- Coefficient2 x
+  0.0256,                 !- Coefficient3 x**2
+  0.5,                    !- Minimum Value of x
+  1.5;                    !- Maximum Value of x
+
+Curve:Quadratic,
+  WindACPLFFPLR,          !- Name
+  0.85,                   !- Coefficient1 Constant
+  0.15,                   !- Coefficient2 x
+  0.0,                    !- Coefficient3 x**2
+  0.0,                    !- Minimum Value of x
+  1.0;                    !- Maximum Value of x
+
+Curve:Biquadratic,
+  WindACCoolCapFT,        !- Name
+  0.942587793,            !- Coefficient1 Constant
+  0.009543347,            !- Coefficient2 x
+  0.000683770,            !- Coefficient3 x**2
+  -0.011042676,           !- Coefficient4 y
+  0.000005249,            !- Coefficient5 y**2
+  -0.000009720,           !- Coefficient6 x*y
+  12.77778,               !- Minimum Value of x
+  23.88889,               !- Maximum Value of x
+  18.0,                   !- Minimum Value of y
+  46.11111,               !- Maximum Value of y
+  ,                       !- Minimum Curve Output
+  ,                       !- Maximum Curve Output
+  Temperature,            !- Input Unit Type for X
+  Temperature,            !- Input Unit Type for Y
+  Dimensionless;          !- Output Unit Type
+
+Curve:Biquadratic,
+  WindACEIRFT,            !- Name
+  0.342414409,            !- Coefficient1 Constant
+  0.034885008,            !- Coefficient2 x
+  -0.000623700,           !- Coefficient3 x**2
+  0.004977216,            !- Coefficient4 y
+  0.000437951,            !- Coefficient5 y**2
+  -0.000728028,           !- Coefficient6 x*y
+  12.77778,               !- Minimum Value of x
+  23.88889,               !- Maximum Value of x
+  18.0,                   !- Minimum Value of y
+  46.11111,               !- Maximum Value of y
+  ,                       !- Minimum Curve Output
+  ,                       !- Maximum Curve Output
+  Temperature,            !- Input Unit Type for X
+  Temperature,            !- Input Unit Type for Y
+  Dimensionless;          !- Output Unit Type
+
+ScheduleTypeLimits,
+    Percent,                 !- Name
+    0,                       !- Lower Limit Value
+    100,                     !- Upper Limit Value
+    Continuous,              !- Numeric Type
+    percent;                 !- Unit Type
+
+Schedule:Constant,
+    Schedule_Constant_Humdifier,  !- Name
+    Percent,                      !- Schedule Type Limits Name
+    0;                            !- Hourly Value
+
+Schedule:Constant,
+    Schedule_Constant_Dehumidifier,  !- Name
+    Percent,                      !- Schedule Type Limits Name
+    50;                           !- Hourly Value
+
+)IDF";
+
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);                            // expect no errors
+
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
+
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+
+    state->dataZoneCtrls->NumHumidityControlZones = 1;
+    state->dataZoneCtrls->HumidityControlZone.allocate(state->dataZoneCtrls->NumHumidityControlZones);
+    state->dataZoneCtrls->HumidityControlZone(1).ControlName = "East Zone";
+    state->dataZoneCtrls->HumidityControlZone(1).ZoneName = "East Zone";
+    state->dataZoneCtrls->HumidityControlZone(1).ActualZoneNum = 1;
+    state->dataZoneCtrls->HumidityControlZone(1).HumidifyingSchedIndex = ScheduleManager::GetScheduleIndex(*state, "Schedule_Constant_Humdifier");
+    state->dataZoneCtrls->HumidityControlZone(1).DehumidifyingSchedIndex =
+        ScheduleManager::GetScheduleIndex(*state, "Schedule_Constant_Dehumidifier");
+
+    std::string compName = "UNITARY SYSTEM MODEL";
+    bool zoneEquipment = true;
+    int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
+    FirstHVACIteration = true;
+    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
+
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // check model inputs
+    ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
+    EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum));
+    EXPECT_TRUE(compare_enums(UnitarySys::UnitarySysCtrlType::Load, thisSys->m_ControlType));
+    EXPECT_TRUE(compare_enums(UnitarySys::DehumCtrlType::CoolReheat, thisSys->m_DehumidControlType_Num));
+    // set sizing is already done
+    state->dataGlobal->SysSizingCalc = true;
+    InletNode = thisSys->AirInNode;
+    OutletNode = thisSys->AirOutNode;
+    ControlZoneNum = thisSys->NodeNumOfControlledZone;
+    // set up unitary system inlet condtions
+    state->dataLoopNodes->Node(InletNode).Temp = 22.0;
+    state->dataLoopNodes->Node(InletNode).HumRat = 0.010;
+    state->dataLoopNodes->Node(InletNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNode).Temp, state->dataLoopNodes->Node(InletNode).HumRat);
+    // initialize other incidentals that are used within the UnitarySystem module during calculations
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    auto &zoneSysEnergyDemand = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum);
+    auto &zoneSysMoistureDemand = state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum);
+    zoneSysEnergyDemand.RemainingOutputRequired = 0.0; // no heating or cooling load
+    zoneSysEnergyDemand.RemainingOutputReqToCoolSP = 2000.0;
+    zoneSysEnergyDemand.RemainingOutputReqToHeatSP = -2000.0;
+    zoneSysMoistureDemand.RemainingOutputReqToDehumidSP = -0.002; // dehumidification load only
+    // set zone predictyed loads sequence
+    zoneSysEnergyDemand.SequencedOutputRequired.allocate(1);
+    zoneSysEnergyDemand.SequencedOutputRequiredToCoolingSP.allocate(1);
+    zoneSysEnergyDemand.SequencedOutputRequiredToHeatingSP.allocate(1);
+    zoneSysMoistureDemand.SequencedOutputRequiredToDehumidSP.allocate(1);
+    zoneSysEnergyDemand.SequencedOutputRequired(1) = zoneSysEnergyDemand.RemainingOutputRequired;
+    zoneSysEnergyDemand.SequencedOutputRequiredToCoolingSP(1) = zoneSysEnergyDemand.OutputRequiredToCoolingSP;
+    zoneSysEnergyDemand.SequencedOutputRequiredToHeatingSP(1) = zoneSysEnergyDemand.OutputRequiredToHeatingSP;
+    zoneSysMoistureDemand.SequencedOutputRequiredToDehumidSP(1) = zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP;
+    // set thermostat control type
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlTypeRpt.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
+    state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * state->dataEnvrn->StdRhoAir;
+
+    // set zone air conditions
+    state->dataLoopNodes->Node(ControlZoneNum).Temp = 22.0;
+    state->dataLoopNodes->Node(ControlZoneNum).HumRat = 0.010;
+    state->dataEnvrn->OutDryBulbTemp = 15.0;
+    state->dataEnvrn->OutHumRat = 0.1;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 12.0;
+    state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.1;
+    state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = state->dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
+
+    int CompIndex = 1;
+    int AirLoopNum = 0;
+    int constexpr ZoneOAUnitNum = 0;
+    bool HeatActive = false;
+    bool CoolActive = true;
+    bool const ZoneEquipment = true;
+    Real64 sensOut = 0.0;
+    Real64 latOut = 0.0;
+    Real64 constexpr OAUCoilOutTemp = 0.0;
+    // check cool and heat flags are set false
+    EXPECT_FALSE(state->dataUnitarySystems->CoolingLoad);
+    EXPECT_FALSE(state->dataUnitarySystems->HeatingLoad);
+    EXPECT_DOUBLE_EQ(zoneSysMoistureDemand.RemainingOutputReqToDehumidSP, -0.002);
+    EXPECT_TRUE(thisSys->m_Humidistat);
+    Real64 results_moistureLoad = Psychrometrics::PsyHfgAirFnWTdb(0.010, 22.0) * zoneSysMoistureDemand.RemainingOutputReqToDehumidSP;
+
+    // run simulation
+    thisSys->simulate(*state,
+                      thisSys->Name,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatActive,
+                      CoolActive,
+                      ZoneOAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipment,
+                      sensOut,
+                      latOut);
+
+    // check model output parameters
+    EXPECT_TRUE(state->dataUnitarySystems->CoolingLoad);
+    EXPECT_FALSE(state->dataUnitarySystems->HeatingLoad);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, thisSys->MaxHeatAirMassFlow * thisSys->m_PartLoadFrac);
+    EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
+    EXPECT_NEAR(thisSys->m_LatentLoadMet, results_moistureLoad, 0.25);
+    EXPECT_NEAR(thisSys->m_MoistureLoadPredicted, results_moistureLoad, 0.25);
+}
