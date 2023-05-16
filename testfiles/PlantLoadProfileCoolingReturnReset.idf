@@ -262,7 +262,8 @@
     Demand Outlet Node,      !- Outlet Node Name
     Load Profile 1 Load Schedule,  !- Load Schedule Name
     0.01,                    !- Peak Flow Rate {m3/s}
-    Load Profile 1 Flow Frac Schedule;  !- Flow Rate Fraction Schedule Name
+    Load Profile 1 Flow Frac Schedule,  !- Flow Rate Fraction Schedule Name
+    Water;                   !- Plant Loop Fluid Type
 
   ScheduleTypeLimits,
     Any Number;              !- Name

@@ -65,6 +65,14 @@ struct EnergyPlusData;
 
 namespace PlantLoadProfile {
 
+    enum class PlantLoopFluidType
+    {
+        Invalid = -1,
+        Water,
+        Steam,
+        Num
+    };
+
     struct PlantProfileData : public PlantComponent
     {
         virtual ~PlantProfileData() = default;
@@ -72,7 +80,8 @@ namespace PlantLoadProfile {
         // Members
         std::string Name;                   // Name of Plant Load Profile object
         DataPlant::PlantEquipmentType Type; // Plant Side Connection: 'Type' assigned in DataPlant
-        PlantLocation plantLoc;             // water plant loop component location object
+        PlantLocation plantLoc;             // plant loop component location object
+        PlantLoopFluidType FluidType;       // plant loop fluid type: water or steam
         bool Init;                          // Flag for initialization:  TRUE means do the init
         bool InitSizing;                    // Flag for initialization of plant sizing
         int InletNode;
@@ -86,6 +95,8 @@ namespace PlantLoadProfile {
         int FlowRateFracSchedule; // Pointer to schedule object
         Real64 VolFlowRate;       // Volumetric flow rate (m3/s)
         Real64 MassFlowRate;      // Mass flow rate (kg/s)
+        Real64 DegOfSubcooling;   // Degree of subcooling in steam outlet
+        Real64 LoopSubcoolReturn; // Loop subcooling for steam return
         bool EMSOverrideMassFlow;
         Real64 EMSMassFlowValue;
         // Report variables
@@ -96,10 +107,10 @@ namespace PlantLoadProfile {
 
         // Default Constructor
         PlantProfileData()
-            : Type(DataPlant::PlantEquipmentType::Invalid), plantLoc{}, Init(true), InitSizing(true), InletNode(0), InletTemp(0.0), OutletNode(0),
-              OutletTemp(0.0), LoadSchedule(0), EMSOverridePower(false), EMSPowerValue(0.0), PeakVolFlowRate(0.0), FlowRateFracSchedule(0),
-              VolFlowRate(0.0), MassFlowRate(0.0), EMSOverrideMassFlow(false), EMSMassFlowValue(0.0), Power(0.0), Energy(0.0), HeatingEnergy(0.0),
-              CoolingEnergy(0.0)
+            : Type(DataPlant::PlantEquipmentType::Invalid), plantLoc{}, FluidType(PlantLoopFluidType::Invalid), Init(true), InitSizing(true),
+              InletNode(0), InletTemp(0.0), OutletNode(0), OutletTemp(0.0), LoadSchedule(0), EMSOverridePower(false), EMSPowerValue(0.0),
+              PeakVolFlowRate(0.0), FlowRateFracSchedule(0), VolFlowRate(0.0), MassFlowRate(0.0), DegOfSubcooling(0.0), LoopSubcoolReturn(0.0),
+              EMSOverrideMassFlow(false), EMSMassFlowValue(0.0), Power(0.0), Energy(0.0), HeatingEnergy(0.0), CoolingEnergy(0.0)
         {
         }
 

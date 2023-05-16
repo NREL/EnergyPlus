@@ -3997,7 +3997,7 @@ namespace OutputProcessor {
             state.dataOutputProcessor->indexGroupKey = 100;
         } else if (has(meterName, "NaturalGas:Facility")) {
             state.dataOutputProcessor->indexGroupKey = 101;
-        } else if (has(meterName, "DistricHeating:Facility")) {
+        } else if (has(meterName, "DistricHeatingWater:Facility")) {
             state.dataOutputProcessor->indexGroupKey = 102;
         } else if (has(meterName, "DistricCooling:Facility")) {
             state.dataOutputProcessor->indexGroupKey = 103;
@@ -7298,7 +7298,8 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
                                                 {"Electricity:Facility",
                                                  "Diesel:Facility",
                                                  "DistrictCooling:Facility",
-                                                 "DistrictHeating:Facility",
+                                                 "DistrictHeatingWater:Facility",
+                                                 "DistrictHeatingSteam:Facility",
                                                  "NaturalGas:Facility",
                                                  "GASOLINE:Facility",
                                                  "COAL:Facility",
@@ -7306,7 +7307,6 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
                                                  "FuelOilNo2:Facility",
                                                  "Propane:Facility",
                                                  "ElectricityProduced:Facility",
-                                                 "Steam:Facility",
                                                  "CO2:Facility",
                                                  "CO:Facility",
                                                  "CH4:Facility",

@@ -1207,6 +1207,11 @@ void GetPlantInput(EnergyPlusData &state)
                             OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, PlantEquipmentType::PurchHotWater, CompNames(CompNum));
                         break;
                     }
+                    case PlantEquipmentType::PurchSteam: {
+                        this_comp.compPtr =
+                            OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, PlantEquipmentType::PurchSteam, CompNames(CompNum));
+                        break;
+                    }
                     case PlantEquipmentType::TS_IceSimple: {
                         this_comp.compPtr = IceThermalStorage::SimpleIceStorageData::factory(state, CompNames(CompNum));
                         break;
@@ -1220,6 +1225,15 @@ void GetPlantInput(EnergyPlusData &state)
                         break;
                     }
                     case PlantEquipmentType::FluidToFluidPlantHtExchg: {
+                        if (LoopSideNum == LoopSideLocation::Demand) {
+                            this_comp.CurOpSchemeType = OpScheme::Demand;
+                        } else if (LoopSideNum == LoopSideLocation::Supply) {
+                            this_comp.CurOpSchemeType = OpScheme::FreeRejection;
+                        }
+                        this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(state, CompNames(CompNum));
+                        break;
+                    }
+                    case PlantEquipmentType::SteamToWaterPlantHtExchg: {
                         if (LoopSideNum == LoopSideLocation::Demand) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == LoopSideLocation::Supply) {
@@ -3842,6 +3856,11 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                         this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
                         this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapHiOutLimit;
                     } break;
+                    case DataPlant::PlantEquipmentType::PurchSteam: { //
+                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
+                        this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                        this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapHiOutLimit;
+                    } break;
                     case DataPlant::PlantEquipmentType::TS_IceDetailed: { //                   = 28
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
@@ -4169,6 +4188,16 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                         this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                     } break;
                     case DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg: { //          = 84
+                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
+                        if (LoopSideCtr == LoopSideLocation::Demand) {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
+                        } else {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
+                        }
+                    } break;
+                    case DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg: { //
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         if (LoopSideCtr == LoopSideLocation::Demand) {
                             this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;

@@ -113,7 +113,7 @@ namespace DataPlant {
         "Pipe:Indoor",
         "Pipe:Underground",
         "DistrictCooling",
-        "DistrictHeating",
+        "DistrictHeating:Water",
         "ThermalStorage:Ice:Detailed",
         "ThermalStorage:Ice:Simple",
         "TemperingValve",
@@ -184,7 +184,9 @@ namespace DataPlant {
         "HeatPump:PlantLoop:EIR:Cooling",
         "HeatPump:PlantLoop:EIR:Heating",
         "HeatPump:AirToWater:FuelFired:Cooling",
-        "HeatPump:AirToWater:FuelFired:Heating"};
+        "HeatPump:AirToWater:FuelFired:Heating",
+        "DistrictHeating:Steam",
+        "HeatExchanger:SteamToWater"};
 
     static constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
         "BOILER:HOTWATER",
@@ -214,7 +216,7 @@ namespace DataPlant {
         "PIPE:INDOOR",
         "PIPE:UNDERGROUND",
         "DISTRICTCOOLING",
-        "DISTRICTHEATING",
+        "DISTRICTHEATING:WATER",
         "THERMALSTORAGE:ICE:DETAILED",
         "THERMALSTORAGE:ICE:SIMPLE",
         "TEMPERINGVALVE",
@@ -285,7 +287,9 @@ namespace DataPlant {
         "HEATPUMP:PLANTLOOP:EIR:COOLING",
         "HEATPUMP:PLANTLOOP:EIR:HEATING",
         "HEATPUMP:AIRTOWATER:FUELFIRED:COOLING",
-        "HEATPUMP:AIRTOWATER:FUELFIRED:HEATING"};
+        "HEATPUMP:AIRTOWATER:FUELFIRED:HEATING",
+        "DISTRICTHEATING:STEAM",
+        "HEATEXCHANGER:STEAMTOWATER"};
 
     static constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
         LoopType::Plant, //	"Boiler:HotWater"
@@ -315,7 +319,7 @@ namespace DataPlant {
         LoopType::Both,  //	"Pipe:Indoor"
         LoopType::Both,  //	"Pipe:Underground"
         LoopType::Both,  //	"DistrictCooling"
-        LoopType::Both,  //	"DistrictHeating"
+        LoopType::Both,  //	"DistrictHeating:Water"
         LoopType::Plant, //	"ThermalStorage:Ice:Detailed"
         LoopType::Plant, //	"ThermalStorage:Ice:Simple"
         LoopType::Both,  //	"TemperingValve"
@@ -384,7 +388,9 @@ namespace DataPlant {
         LoopType::Plant, //	"AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam"
         LoopType::Plant, //	"ZoneHVAC:CoolingPanel:RadiantConvective:Water"
         LoopType::Both,  //	"HeatPump:PlantLoop:EIR:Cooling"
-        LoopType::Both   //	"HeatPump:PlantLoop:EIR:Heating"
+        LoopType::Both,  //	"HeatPump:PlantLoop:EIR:Heating"
+        LoopType::Both,  //	"DistrictHeating:Steam"
+        LoopType::Both   //	"HeatExchanger:SteamToWater"
     };
 } // namespace DataPlant
 
