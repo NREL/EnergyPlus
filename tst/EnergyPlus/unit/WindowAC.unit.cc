@@ -180,6 +180,8 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
         "    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}",
         "    3.776,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    10.62,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}",
         "    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}",
         "    HPCoolingCAPFTemp4,      !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
