@@ -396,6 +396,167 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with B, insert the rules here
 
               ! If your original object starts with C, insert the rules here
+              CASE('COIL:COOLING:DX:TWOSPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:6)=InArgs(1:6)
+                OutArgs(7) = ''  ! new high speed 2017 rated field
+                OutArgs(8) = ''  ! new high speed 2023 rated field
+                OutArgs(9:20)=InArgs(7:18)
+                OutArgs(21) = ''  ! new low speed 2017 rated field
+                OutArgs(22) = ''  ! new low speed 2023 rated field
+                OutArgs(23:CurArgs+4)=InArgs(19:CurArgs)
+                CurArgs = CurArgs + 4
+
+              CASE('COIL:COOLING:DX:VARIABLESPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                ! manipulate all the speeds regardless of CurArgs count
+                OutArgs(1:25)=InArgs(1:25)
+                OutArgs(26) = ''  ! new speed 1 2017 rated field
+                OutArgs(27) = ''  ! new speed 1 2023 rated field
+                OutArgs(28:37)=InArgs(26:35)
+                OutArgs(38)='' ! new speed 2 2017 rated field
+                OutArgs(39)='' ! new speed 2 2023 rated field
+                OutArgs(40:49)=InArgs(36:45)
+                OutArgs(50)='' ! new speed 3 2017 rated field
+                OutArgs(51)='' ! new speed 3 2023 rated field
+                OutArgs(52:61)=InArgs(46:55)
+                OutArgs(62)='' ! new speed 4 2017 rated field
+                OutArgs(63)='' ! new speed 4 2023 rated field
+                OutArgs(64:73)=InArgs(56:65)
+                OutArgs(74)='' ! new speed 5 2017 rated field
+                OutArgs(75)='' ! new speed 5 2023 rated field
+                OutArgs(76:85)=InArgs(66:75)
+                OutArgs(86)='' ! new speed 6 2017 rated field
+                OutArgs(87)='' ! new speed 6 2023 rated field
+                OutArgs(88:97)=InArgs(76:85)
+                OutArgs(98)='' ! new speed 7 2017 rated field
+                OutArgs(99)='' ! new speed 7 2023 rated field
+                OutArgs(100:109)=InArgs(86:95)
+                OutArgs(110)='' ! new speed 8 2017 rated field
+                OutArgs(111)='' ! new speed 8 2023 rated field
+                OutArgs(112:121)=InArgs(96:105)
+                OutArgs(122)='' ! new speed 9 2017 rated field
+                OutArgs(123)='' ! new speed 9 2023 rated field
+                OutArgs(124:133)=InArgs(106:115)
+                OutArgs(134)='' ! new speed 10 2017 rated field
+                OutArgs(135)='' ! new speed 10 2023 rated field
+                OutArgs(136:CurArgs+20)=InArgs(116:CurArgs)
+                ! But then only modify CurArgs based on the number of fields
+                IF (CurArgs .GE. 25) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
+                IF (CurArgs .GE. 35) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 45) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 55) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 65) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 75) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 85) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 95) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 105) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 115) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+
+              CASE('COIL:HEATING:DX:VARIABLESPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                ! manipulate all the speeds regardless of CurArgs count
+                OutArgs(1:21)=InArgs(1:21)
+                OutArgs(22) = ''  ! new speed 1 2017 rated field
+                OutArgs(23) = ''  ! new speed 1 2023 rated field
+                OutArgs(24:30)=InArgs(22:28)
+                OutArgs(31)='' ! new speed 2 2017 rated field
+                OutArgs(32)='' ! new speed 2 2023 rated field
+                OutArgs(33:39)=InArgs(29:35)
+                OutArgs(40)='' ! new speed 3 2017 rated field
+                OutArgs(41)='' ! new speed 3 2023 rated field
+                OutArgs(42:48)=InArgs(36:42)
+                OutArgs(49)='' ! new speed 4 2017 rated field
+                OutArgs(50)='' ! new speed 4 2023 rated field
+                OutArgs(51:57)=InArgs(43:49)
+                OutArgs(58)='' ! new speed 5 2017 rated field
+                OutArgs(59)='' ! new speed 5 2023 rated field
+                OutArgs(60:66)=InArgs(50:56)
+                OutArgs(67)='' ! new speed 6 2017 rated field
+                OutArgs(68)='' ! new speed 6 2023 rated field
+                OutArgs(69:75)=InArgs(57:63)
+                OutArgs(76)='' ! new speed 7 2017 rated field
+                OutArgs(77)='' ! new speed 7 2023 rated field
+                OutArgs(78:84)=InArgs(64:70)
+                OutArgs(85)='' ! new speed 8 2017 rated field
+                OutArgs(86)='' ! new speed 8 2023 rated field
+                OutArgs(87:93)=InArgs(71:77)
+                OutArgs(94)='' ! new speed 9 2017 rated field
+                OutArgs(95)='' ! new speed 9 2023 rated field
+                OutArgs(96:102)=InArgs(78:84)
+                OutArgs(103)='' ! new speed 10 2017 rated field
+                OutArgs(104)='' ! new speed 10 2023 rated field
+                OutArgs(105:CurArgs+20)=InArgs(85:CurArgs)
+                ! But then only modify CurArgs based on the number of fields
+                IF (CurArgs .GE. 21) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
+                IF (CurArgs .GE. 38) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 35) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 42) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 49) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 56) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 63) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 70) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 77) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 84) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+
+              CASE('COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:6)=InArgs(1:6)
+                OutArgs(7) = ''  ! 2017 rated field
+                OutArgs(8) = ''  ! 2023 rated field
+                OutArgs(9:CurArgs+2)=InArgs(7:CurArgs)
+                CurArgs = CurArgs + 2
+
+              CASE('COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                ! manipulate all the speeds regardless of CurArgs count
+                OutArgs(1:18)=InArgs(1:18)
+                OutArgs(19) = ''  ! new speed 1 2017 rated field
+                OutArgs(20) = ''  ! new speed 1 2023 rated field
+                OutArgs(21:33)=InArgs(19:31)
+                OutArgs(34)='' ! new speed 2 2017 rated field
+                OutArgs(35)='' ! new speed 2 2023 rated field
+                OutArgs(36:48)=InArgs(32:44)
+                OutArgs(49)='' ! new speed 3 2017 rated field
+                OutArgs(50)='' ! new speed 3 2023 rated field
+                OutArgs(51:63)=InArgs(45:57)
+                OutArgs(64)='' ! new speed 4 2017 rated field
+                OutArgs(65)='' ! new speed 4 2023 rated field
+                OutArgs(66:78)=InArgs(58:70)
+                OutArgs(79)='' ! new speed 5 2017 rated field
+                OutArgs(80)='' ! new speed 5 2023 rated field
+                OutArgs(81:93)=InArgs(71:83)
+                OutArgs(94)='' ! new speed 6 2017 rated field
+                OutArgs(95)='' ! new speed 6 2023 rated field
+                OutArgs(96:108)=InArgs(84:96)
+                OutArgs(109)='' ! new speed 7 2017 rated field
+                OutArgs(110)='' ! new speed 7 2023 rated field
+                OutArgs(111:123)=InArgs(97:109)
+                OutArgs(124)='' ! new speed 8 2017 rated field
+                OutArgs(125)='' ! new speed 8 2023 rated field
+                OutArgs(126:138)=InArgs(110:122)
+                OutArgs(139)='' ! new speed 9 2017 rated field
+                OutArgs(140)='' ! new speed 9 2023 rated field
+                OutArgs(141:153)=InArgs(123:135)
+                OutArgs(154)='' ! new speed 10 2017 rated field
+                OutArgs(155)='' ! new speed 10 2023 rated field
+                OutArgs(156:CurArgs+20)=InArgs(136:CurArgs)
+                ! But then only modify CurArgs based on the number of fields
+                IF (CurArgs .GE. 18) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
+                IF (CurArgs .GE. 31) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 44) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 57) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 70) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 83) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 96) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 109) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 122) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 135) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
 
               ! If your original object starts with D, insert the rules here
 

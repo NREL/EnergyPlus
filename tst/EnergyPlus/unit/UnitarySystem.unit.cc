@@ -844,7 +844,6 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     // at PLR very near 0.5, m_TotalAuxElecPower should be very near 75 W.
     EXPECT_NEAR(73.96002, thisSys->m_TotalAuxElecPower, 0.0001);
 }
-
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
 {
 
@@ -907,6 +906,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
           0.8,                            !- High Speed Rated Sensible Heat Ratio
           3.0,                            !- High Speed Gross Rated Cooling COP{ W / W }
          autosize,                        !- High Speed Rated Air Flow Rate{ m3 / s }
+          ,
+          ,
          450,                             !- Unit Internal Static Air Pressure{ Pa }
          Cooling Coil Air Inlet Node,     !- Air Inlet Node Name
          Zone 2 Inlet Node,               !- Air Outlet Node Name
@@ -919,6 +920,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
          0.8,                             !- Low Speed Gross Rated Sensible Heat Ratio
          4.2,                             !- Low Speed Gross Rated Cooling COP{ W / W }
          autosize,                        !- Low Speed Rated Air Flow Rate{ m3 / s }
+          ,
+          ,
          Biquadratic,                     !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
          Biquadratic,                     !- Low Speed Energy Input Ratio Function of Temperature Curve Name
          ,                                !- Condenser Air Inlet Node Name
@@ -3627,6 +3630,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1359072,                      !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.26,                           !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -3637,6 +3642,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.151008,                       !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.30,                           !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -3647,6 +3654,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1661088,                      !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.33,                           !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -3657,6 +3666,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1963104,                      !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.38,                           !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -3667,6 +3678,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.226512,                       !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.44,                           !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -3677,6 +3690,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 6 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.2567136,                      !- Speed 6 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.50,                           !- Speed 6 Reference Unit Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -3687,16 +3702,22 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 7 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.2869152,                      !- Speed 7 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.57,                           !- Speed 7 Reference Unit Condenser Flow Rate{ m3 / s }
   ,                               !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
   Quadratic,                      !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+)IDF"
+                                             R"IDF(
   5520.7,                         !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity{ w }
   0.75,                           !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 8 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.3171168,                      !- Speed 8 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.63,                           !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -3709,6 +3730,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 9 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.3473184,                      !- Speed 9 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.69,                           !- Speed 9 Reference Unit Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -3719,13 +3742,17 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 10 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.37752,                        !- Speed 10 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.74,                           !- Speed 10 Reference Unit Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
   Quadratic;                      !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+)IDF"
 
+                                             R"IDF(
 Coil:Heating:DX:VariableSpeed,
   DX Heating Coil,                !- Name
   Heating Coil Air Inlet Node,    !- Indoor Air Inlet Node Name
@@ -3748,6 +3775,8 @@ Coil:Heating:DX:VariableSpeed,
   1838.7,                         !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
   0.1661088,                      !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -3755,6 +3784,8 @@ Coil:Heating:DX:VariableSpeed,
   2295.5,                         !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
   0.179322,                       !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -3762,6 +3793,8 @@ Coil:Heating:DX:VariableSpeed,
   2751.3,                         !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
   0.1925352,                      !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -3769,6 +3802,8 @@ Coil:Heating:DX:VariableSpeed,
   3659.6,                         !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2189616,                      !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -3776,6 +3811,8 @@ Coil:Heating:DX:VariableSpeed,
   4563.7,                         !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
    0.245388,                      !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
@@ -3783,6 +3820,8 @@ Coil:Heating:DX:VariableSpeed,
   5463.3,                         !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2718144,                      !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
@@ -3790,6 +3829,8 @@ Coil:Heating:DX:VariableSpeed,
   6358.4,                         !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2982408,                      !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
@@ -3797,6 +3838,8 @@ Coil:Heating:DX:VariableSpeed,
   7248.5,                         !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
   0.3246672,                      !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
@@ -3804,6 +3847,8 @@ Coil:Heating:DX:VariableSpeed,
   8133.6,                         !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
   0.3510936,                      !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
@@ -3811,11 +3856,14 @@ Coil:Heating:DX:VariableSpeed,
   9013.2,                         !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
   0.37752,                        !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
   Quadratic;                      !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
-
+)IDF"
+                                             R"IDF(
 ScheduleTypeLimits,
   Any Number;                     !- Name
 
@@ -6266,7 +6314,6 @@ Coil:Cooling:DX:SingleSpeed,
   0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
   4,                       !- Maximum Cycling Rate {cycles/hr}
   45;                      !- Latent Capacity Time Constant {s}
-
 Coil:Heating:DX:VariableSpeed,
   Furnace Heating Coil 1, !- Name
   Heating Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
@@ -6289,6 +6336,8 @@ Coil:Heating:DX:VariableSpeed,
   1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
   0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 1 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -6296,6 +6345,8 @@ Coil:Heating:DX:VariableSpeed,
   2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
   0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 2 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -6303,6 +6354,8 @@ Coil:Heating:DX:VariableSpeed,
   2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
   0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 3 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -6310,6 +6363,8 @@ Coil:Heating:DX:VariableSpeed,
   3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 4 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -6317,6 +6372,8 @@ Coil:Heating:DX:VariableSpeed,
   4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
    0.245388,               !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 5 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
@@ -6324,6 +6381,8 @@ Coil:Heating:DX:VariableSpeed,
   5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 6 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
@@ -6331,6 +6390,8 @@ Coil:Heating:DX:VariableSpeed,
    6358.4,                 !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2982408,             !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 7 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,        !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,         !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
@@ -6338,6 +6399,8 @@ Coil:Heating:DX:VariableSpeed,
     7248.5,                !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}
     5.0,                   !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
      0.3246672,            !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 8 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,        !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,         !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
@@ -6345,6 +6408,8 @@ Coil:Heating:DX:VariableSpeed,
     8133.6,                !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}
     5.0,                   !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3510936,             !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 9 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,        !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name
      HPACHeatEIRFT,        !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
@@ -6352,6 +6417,8 @@ Coil:Heating:DX:VariableSpeed,
     9013.2,                !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}
     5.0,                   !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
     0.37752,               !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 10 Heating Capacity Function of Temperature Curve Name
      HPACHeatCapFFF,       !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
      HPACHeatEIRFT,        !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
@@ -6649,6 +6716,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1359072, !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.26, !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -6659,6 +6728,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.151008, !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.30, !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -6669,6 +6740,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1661088, !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.33, !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -6679,6 +6752,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1963104, !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.38, !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -6689,6 +6764,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.226512, !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.44, !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -6699,6 +6776,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 6 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.2567136, !- Speed 6 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.50, !- Speed 6 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -6709,6 +6788,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 7 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.2869152, !- Speed 7 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.57, !- Speed 7 Reference Unit Condenser Flow Rate{ m3 / s }
   , !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -6719,6 +6800,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 8 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.3171168, !- Speed 8 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.63, !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -6729,6 +6812,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 9 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.3473184, !- Speed 9 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.69, !- Speed 9 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -6739,6 +6824,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 10 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.37752, !- Speed 10 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.74, !- Speed 10 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -7120,6 +7207,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1359072, !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.26, !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -7130,6 +7219,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.151008, !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.30, !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -7140,6 +7231,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1661088, !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.33, !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -7150,6 +7243,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.1963104, !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.38, !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -7160,6 +7255,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.226512, !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.44, !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   , !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -7170,6 +7267,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 6 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.2567136, !- Speed 6 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.50, !- Speed 6 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -7180,6 +7279,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 7 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.2869152, !- Speed 7 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.57, !- Speed 7 Reference Unit Condenser Flow Rate{ m3 / s }
   , !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -7190,6 +7291,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 8 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.3171168, !- Speed 8 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.63, !- Speed 8 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -7200,6 +7303,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 9 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.3473184, !- Speed 9 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.69, !- Speed 9 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -7210,6 +7315,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75, !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0, !- Speed 10 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.37752, !- Speed 10 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.74, !- Speed 10 Reference Unit Condenser Air Flow Rate{ m3 / s }
   , !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   CoolCapFT, !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -8583,7 +8690,6 @@ Coil:Cooling:DX:MultiSpeed,
   ;                        !- Speed 3 Rated Evaporative Condenser Pump Power Consumption {W}
 )IDF"
                                              R"IDF(
-
 Coil:Heating:DX:VariableSpeed,
   VS Heating Coil 1,       !- Name
   Heating Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
@@ -8606,6 +8712,8 @@ Coil:Heating:DX:VariableSpeed,
   1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
   0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 1 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -8613,6 +8721,8 @@ Coil:Heating:DX:VariableSpeed,
   2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
   0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 2 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -8620,6 +8730,8 @@ Coil:Heating:DX:VariableSpeed,
   2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
   0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 3 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -8627,6 +8739,8 @@ Coil:Heating:DX:VariableSpeed,
   3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 4 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -8634,6 +8748,8 @@ Coil:Heating:DX:VariableSpeed,
   4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
    0.245388,               !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 5 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
@@ -8641,6 +8757,8 @@ Coil:Heating:DX:VariableSpeed,
   5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}
   0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   HPACHeatCapFT,           !- Speed 6 Heating Capacity Function of Temperature Curve Name
   HPACHeatCapFFF,          !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name
   HPACHeatEIRFT,           !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
@@ -8648,6 +8766,8 @@ Coil:Heating:DX:VariableSpeed,
    6358.4,                 !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}
     0.2982408,             !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 7 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,        !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,         !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
@@ -8655,6 +8775,8 @@ Coil:Heating:DX:VariableSpeed,
     7248.5,                !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}
     5.0,                   !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}
      0.3246672,            !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 8 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,        !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,         !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
@@ -8662,6 +8784,8 @@ Coil:Heating:DX:VariableSpeed,
     8133.6,                !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}
     5.0,                   !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}
     0.3510936,             !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 9 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,        !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name
      HPACHeatEIRFT,        !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
@@ -8669,6 +8793,8 @@ Coil:Heating:DX:VariableSpeed,
     9013.2,                !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}
     5.0,                   !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}
     0.37752,               !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
     HPACHeatCapFT,         !- Speed 10 Heating Capacity Function of Temperature Curve Name
      HPACHeatCapFFF,       !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
      HPACHeatEIRFT,        !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
@@ -9270,13 +9396,15 @@ Fan:OnOff,
   Zone Exhaust Node,      !- Air Inlet Node Name
   DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-Coil:Cooling:WaterToAirHeatPump:EquationFit,
+   Coil:Cooling:WaterToAirHeatPump:EquationFit,
   Sys 1 Heat Pump Cooling Mode,  !- Name
   Sys 1 Water to Air Heat Pump Source Side1 Inlet Node,  !- Water Inlet Node Name
   Sys 1 Water to Air Heat Pump Source Side1 Outlet Node,  !- Water Outlet Node Name
   DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
   Heating Coil Air Inlet Node,  !- Air Outlet Node Name
   1.4,                     !- Rated Air Flow Rate {m3/s}
+  ,
+  ,
   0.00165,                 !- Rated Water Flow Rate {m3/s}
   40125.6,                 !- Gross Rated Total Cooling Capacity {W}
   28267.06,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -9356,7 +9484,7 @@ Curve:Quadratic,
   0.0,                    !- Minimum Value of x
   1.0;                    !- Maximum Value of x
 
-Curve:Biquadratic,
+      Curve:Biquadratic,
   CoolCapFT,        !- Name
   0.942587793,            !- Coefficient1 Constant
   0.009543347,            !- Coefficient2 x
@@ -9673,449 +9801,6 @@ Curve:QuadLinear,
     // Unitary System mines data from coil objects
     EXPECT_EQ(thisSys->m_MinOATCompressorCooling, -1000.0);
     EXPECT_EQ(thisSys->m_MinOATCompressorHeating, -1000.0);
-}
-
-TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump_SetPointControl)
-{
-
-    bool ErrorsFound(false);
-    bool FirstHVACIteration(false);
-
-    std::string_view constexpr idf_objects = R"IDF(
-
-    Zone,
-      EAST ZONE,              !- Name
-      0,                      !- Direction of Relative North{ deg }
-      0,                      !- X Origin{ m }
-      0,                      !- Y Origin{ m }
-      0,                      !- Z Origin{ m }
-      1,                      !- Type
-      1,                      !- Multiplier
-      autocalculate,          !- Ceiling Height{ m }
-      autocalculate;          !- Volume{ m3 }
-      
-
-    ZoneHVAC:EquipmentConnections,
-    EAST ZONE,                 !- Zone Name
-      Zone2Equipment,          !- Zone Conditioning Equipment List Name
-      Zone 2 Inlet Node,       !- Zone Air Inlet Node or NodeList Name
-      Zone Exhaust Node,       !- Zone Air Exhaust Node or NodeList Name
-      Zone 2 Node,             !- Zone Air Node Name
-      Zone 2 Outlet Node;      !- Zone Return Air Node Name
-      
-
-    ZoneHVAC:EquipmentList,
-      Zone2Equipment,          !- Name
-      SequentialLoad,          !- Load Distribution Scheme
-      AirLoopHVAC:UnitarySystem, !- Zone Equipment 1 Object Type
-      Unitary System Model,    !- Zone Equipment 1 Name
-      1,                       !- Zone Equipment 1 Cooling Sequence
-      1,                       !- Zone Equipment 1 Heating or No - Load Sequence
-      ,                        !- Zone Equipment 1 Sequential Cooling Fraction
-      ;                        !- Zone Equipment 1 Sequential Heating Fraction
-      
-
-    AirLoopHVAC:UnitarySystem,
-      Unitary System Model,   !- Name
-      Setpoint,               !- Control Type
-      East Zone,              !- Controlling Zone or Thermostat Location
-      None,                   !- Dehumidification Control Type
-      FanAndCoilAvailSched,   !- Availability Schedule Name
-      Zone Exhaust Node,      !- Air Inlet Node Name
-      Zone 2 Inlet Node,      !- Air Outlet Node Name
-      Fan:OnOff,              !- Supply Fan Object Type
-      Supply Fan 1,           !- Supply Fan Name
-      BlowThrough,            !- Fan Placement
-      ContinuousFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name
-      Coil:Heating:WaterToAirHeatPump:EquationFit,       !- Heating Coil Object Type
-      Sys 1 Heat Pump Heating Mode,  !- Heating Coil Name
-      ,                       !- DX Heating Coil Sizing Ratio
-      Coil:Cooling:WaterToAirHeatPump:EquationFit, !- Cooling Coil Object Type
-      Sys 1 Heat Pump Cooling Mode,  !- Cooling Coil Name
-      ,                       !- Use DOAS DX Cooling Coil
-      ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }
-      ,                       !- Latent Load Control
-      Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
-      Humidistat Reheat Coil 1, !- Supplemental Heating Coil Name
-      SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation
-      1.6,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }
-      ,                       !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }
-      ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-      ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
-      SupplyAirFlowRate,      !- Supply air Flow Rate Method During Heating Operation
-      1.6,                    !- Supply Air Flow Rate During Heating Operation{ m3/s }
-      ,                       !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }
-      ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
-      ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
-      SupplyAirFlowRate,      !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-      1.6,                    !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }
-      ,                       !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }
-      ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-      ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
-      ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
-      ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
-      80;                     !- Maximum Supply Air Temperature{ C }
-
-    Fan:OnOff,
-      Supply Fan 1,           !- Name
-      FanAndCoilAvailSched,   !- Availability Schedule Name
-      0.7,                    !- Fan Total Efficiency
-      600.0,                  !- Pressure Rise{ Pa }
-      1.6,                    !- Maximum Flow Rate{ m3 / s }
-      0.9,                    !- Motor Efficiency
-      1.0,                    !- Motor In Airstream Fraction
-      Zone Exhaust Node,      !- Air Inlet Node Name
-      DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
-
-    Coil:Cooling:WaterToAirHeatPump:EquationFit,
-      Sys 1 Heat Pump Cooling Mode,  !- Name
-      Sys 1 Water to Air Heat Pump Source Side1 Inlet Node,  !- Water Inlet Node Name
-      Sys 1 Water to Air Heat Pump Source Side1 Outlet Node,  !- Water Outlet Node Name
-      DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
-      Heating Coil Air Inlet Node,  !- Air Outlet Node Name
-      1.4,                     !- Rated Air Flow Rate {m3/s}
-      0.00165,                 !- Rated Water Flow Rate {m3/s}
-      40125.6,                 !- Gross Rated Total Cooling Capacity {W}
-      28267.06,                !- Gross Rated Sensible Cooling Capacity {W}
-      7.007757577,             !- Gross Rated Cooling COP
-      ,                        !- Rated Entering Water Temperature
-      ,                        !- Rated Entering Air Dry-Bulb Temperature
-      ,                        !- Rated Entering Air Wet-Bulb Temperature
-      TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
-      SensCoolCapCurve,        !- Sensible Cooling Capacity Curve Name
-      CoolPowCurve,            !- Cooling Power Consumption Curve Name
-      0,                       !- Nominal Time for Condensate Removal to Begin {s}
-      0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-
-    Coil:Heating:WaterToAirHeatPump:EquationFit,
-      Sys 1 Heat Pump Heating Mode,  !- Name
-      Sys 1 Water to Air Heat Pump Source Side2 Inlet Node,  !- Water Inlet Node Name
-      Sys 1 Water to Air Heat Pump Source Side2 Outlet Node,  !- Water Outlet Node Name
-      Heating Coil Air Inlet Node,  !- Air Inlet Node Name
-      Reheat Coil Air Inlet Node,  !- Air Outlet Node Name
-      1.4,                     !- Rated Air Flow Rate {m3/s}
-      0.00165,                 !- Rated Water Flow Rate {m3/s}
-      33156.73,                !- Gross Rated Heating Capacity {W}
-      3.167053691,             !- Gross Rated Heating COP
-      ,                         !- Rated Entering Water Temperature
-      ,                         !- Rated Entering Air Dry-Bulb Temperature
-      ,                         !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
-      HeatCapCurve,             !- Heating Capacity Curve Name
-      HeatPowCurve;             !- Heating Power Consumption Curve Name
-
-    Coil:Heating:Fuel,
-      Humidistat Reheat Coil 1, !- Name
-      FanAndCoilAvailSched, !- Availability Schedule Name
-      NaturalGas,             !- Fuel Type
-      0.8, !- Gas Burner Efficiency
-      32000, !- Nominal Capacity{ W }
-      Reheat Coil Air Inlet Node, !- Air Inlet Node Name
-      Zone 2 Inlet Node;    !- Air Outlet Node Name
-
-    ScheduleTypeLimits,
-      Any Number;             !- Name
-
-    Schedule:Compact,
-      FanAndCoilAvailSched,   !- Name
-      Any Number,             !- Schedule Type Limits Name
-      Through: 12/31,         !- Field 1
-      For: AllDays,           !- Field 2
-      Until: 24:00, 1.0;      !- Field 3
-
-    Schedule:Compact,
-      ContinuousFanSchedule,  !- Name
-      Any Number,             !- Schedule Type Limits Name
-      Through: 12/31,         !- Field 1
-      For: AllDays,           !- Field 2
-      Until: 24:00, 1.0;      !- Field 3
-
-    Schedule:Compact,
-      Always 20C,                     !- Name
-      Any Number,                     !- Schedule Type Limits Name
-      Through: 12/31,                 !- Field 1
-      For: AllDays,                   !- Field 2
-      Until: 24:00, 20.0;             !- Field 3
-
-    SetpointManager:Scheduled,
-      Cooling Coil Setpoint Manager,  !- Name
-      Temperature,                    !- Control Variable
-      Always 20C,                     !- Schedule Name
-      Zone 2 Inlet Node;              !- Setpoint Node or NodeList Name
-
-    Curve:Quadratic,
-      CoolCapFFF,       !- Name
-      0.8,                    !- Coefficient1 Constant
-      0.2,                    !- Coefficient2 x
-      0.0,                    !- Coefficient3 x**2
-      0.5,                    !- Minimum Value of x
-      1.5;                    !- Maximum Value of x
-
-    Curve:Quadratic,
-      COOLEIRFFF,           !- Name
-      1.1552,                 !- Coefficient1 Constant
-      -0.1808,                !- Coefficient2 x
-      0.0256,                 !- Coefficient3 x**2
-      0.5,                    !- Minimum Value of x
-      1.5;                    !- Maximum Value of x
-
-    Curve:Quadratic,
-      PLFFPLR,          !- Name
-      0.85,                   !- Coefficient1 Constant
-      0.15,                   !- Coefficient2 x
-      0.0,                    !- Coefficient3 x**2
-      0.0,                    !- Minimum Value of x
-      1.0;                    !- Maximum Value of x
-
-    Curve:Biquadratic,
-      CoolCapFT,        !- Name
-      0.942587793,            !- Coefficient1 Constant
-      0.009543347,            !- Coefficient2 x
-      0.000683770,            !- Coefficient3 x**2
-      -0.011042676,           !- Coefficient4 y
-      0.000005249,            !- Coefficient5 y**2
-      -0.000009720,           !- Coefficient6 x*y
-      12.77778,               !- Minimum Value of x
-      23.88889,               !- Maximum Value of x
-      18.0,                   !- Minimum Value of y
-      46.11111,               !- Maximum Value of y
-      ,                       !- Minimum Curve Output
-      ,                       !- Maximum Curve Output
-      Temperature,            !- Input Unit Type for X
-      Temperature,            !- Input Unit Type for Y
-      Dimensionless;          !- Output Unit Type
-
-    Curve:Biquadratic,
-      COOLEIRFT,            !- Name
-      0.342414409,            !- Coefficient1 Constant
-      0.034885008,            !- Coefficient2 x
-      -0.000623700,           !- Coefficient3 x**2
-      0.004977216,            !- Coefficient4 y
-      0.000437951,            !- Coefficient5 y**2
-      -0.000728028,           !- Coefficient6 x*y
-      12.77778,               !- Minimum Value of x
-      23.88889,               !- Maximum Value of x
-      18.0,                   !- Minimum Value of y
-      46.11111,               !- Maximum Value of y
-      ,                       !- Minimum Curve Output
-      ,                       !- Maximum Curve Output
-      Temperature,            !- Input Unit Type for X
-      Temperature,            !- Input Unit Type for Y
-      Dimensionless;          !- Output Unit Type
-
-    Curve:QuintLinear,
-      SensCoolCapCurve,     ! Curve Name
-      2.24209455,           ! CoefficientC1
-      7.28913391,           ! CoefficientC2
-      -9.06079896,          ! CoefficientC3
-      -0.36729404,          ! CoefficientC4
-      0.218826161,          ! CoefficientC5
-      0.00901534,           ! CoefficientC6
-      0.,                   ! Minimum Value of v
-      100.,                 ! Maximum Value of v
-      0.,                   ! Minimum Value of w
-      100.,                 ! Maximum Value of w
-      0.,                   ! Minimum Value of x
-      100.,                 ! Maximum Value of x
-      0.,                   ! Minimum Value of y
-      100.,                 ! Maximum Value of y
-      0,                    ! Minimum Value of z
-      100,                  ! Maximum Value of z
-      0.,                   ! Minimum Curve Output
-      38.;                  ! Maximum Curve Output
-
-    Curve:QuadLinear,
-      TotCoolCapCurve,      ! Curve Name
-      -0.68126221,          ! CoefficientC1
-      1.99529297,           ! CoefficientC2
-      -0.93611888,          ! CoefficientC3
-      0.02081177,           ! CoefficientC4
-      0.008438868,          ! CoefficientC5
-      0.,                   ! Minimum Value of w
-      100.,                 ! Maximum Value of w
-      0.,                   ! Minimum Value of x
-      100.,                 ! Maximum Value of x
-      0.,                   ! Minimum Value of y
-      100.,                 ! Maximum Value of y
-      0,                    ! Minimum Value of z
-      100,                  ! Maximum Value of z
-      0.,                   ! Minimum Curve Output
-      38.;                  ! Maximum Curve Output
-
-    Curve:QuadLinear,
-      CoolPowCurve,         ! Curve Name
-      -3.20456384,          ! CoefficientC1
-      0.47656454,           ! CoefficientC2
-      3.16734236,           ! CoefficientC3
-      0.10244637,           ! CoefficientC4
-      -0.038132556,         ! CoefficientC5
-      0.,                   ! Minimum Value of w
-      100.,                 ! Maximum Value of w
-      0.,                   ! Minimum Value of x
-      100.,                 ! Maximum Value of x
-      0.,                   ! Minimum Value of y
-      100.,                 ! Maximum Value of y
-      0,                    ! Minimum Value of z
-      100,                  ! Maximum Value of z
-      0.,                   ! Minimum Curve Output
-      38.;                  ! Maximum Curve Output
-
-    Curve:QuadLinear,
-      HeatCapCurve,         ! Curve Name
-      -5.50102734,          ! CoefficientC1
-      -0.96688754,          ! CoefficientC2
-      7.70755007,           ! CoefficientC3
-      0.031928881,          ! CoefficientC4
-      0.028112522,          ! CoefficientC5
-      0.,                   ! Minimum Value of w
-      100.,                 ! Maximum Value of w
-      0.,                   ! Minimum Value of x
-      100.,                 ! Maximum Value of x
-      0.,                   ! Minimum Value of y
-      100.,                 ! Maximum Value of y
-      0,                    ! Minimum Value of z
-      100,                  ! Maximum Value of z
-      0.,                   ! Minimum Curve Output
-      38.;                  ! Maximum Curve Output
-
-    Curve:QuadLinear,
-      HeatPowCurve,         ! Curve Name
-      -7.47517858,          ! CoefficientC1
-      6.40876653,           ! CoefficientC2
-      1.99711665,           ! CoefficientC3
-      -0.050682973,         ! CoefficientC4
-      0.011385145,          ! CoefficientC5
-      0.,                   ! Minimum Value of w
-      100.,                 ! Maximum Value of w
-      0.,                   ! Minimum Value of x
-      100.,                 ! Maximum Value of x
-      0.,                   ! Minimum Value of y
-      100.,                 ! Maximum Value of y
-      0,                    ! Minimum Value of z
-      100,                  ! Maximum Value of z
-      0.,                   ! Minimum Curve Output
-      38.;                  ! Maximum Curve Output
-)IDF";
-
-    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
-
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
-    EXPECT_FALSE(ErrorsFound);                            // expect no errors
-
-    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
-
-    state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataSize->ZoneEqSizing.allocate(1);
-    state->dataSize->CurZoneEqNum = 1;
-    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
-    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
-
-    state->dataPlnt->TotNumLoops = 2;
-    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
-        loopside.TotalBranches = 1;
-        loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
-        loopsidebranch.TotalComponents = 1;
-        loopsidebranch.Comp.allocate(1);
-    }
-    auto &plantLoop1 = state->dataPlnt->PlantLoop(1);
-    auto &plantLoop2 = state->dataPlnt->PlantLoop(2);
-    plantLoop1.Name = "ChilledWaterLoop";
-    plantLoop1.FluidName = "FluidWaterLoop";
-    plantLoop1.FluidIndex = 1;
-    plantLoop1.FluidName = "WATER";
-    plantLoop1.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "SYS 1 HEAT PUMP COOLING MODE";
-    plantLoop1.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
-    plantLoop1.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 6;
-
-    plantLoop2.Name = "HotWaterLoop";
-    plantLoop2.FluidName = "FluidWaterLoop";
-    plantLoop2.FluidIndex = 1;
-    plantLoop2.FluidName = "WATER";
-    plantLoop2.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "SYS 1 HEAT PUMP HEATING MODE";
-    plantLoop2.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
-    plantLoop2.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 9;
-
-    std::string compName = "UNITARY SYSTEM MODEL";
-    int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
-    bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
-    UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
-
-    state->dataZoneEquip->ZoneEquipInputsFilled = true;
-    thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
-    EXPECT_FALSE(ErrorsFound);                                                           // expect no errors
-
-    ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
-    EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
-
-    state->dataGlobal->SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
-    state->dataHVACGlobal->DoSetPointTest = true; // Force setpoint check
-
-    auto &inletNode = state->dataLoopNodes->Node(thisSys->AirInNode);
-    auto &outletNode = state->dataLoopNodes->Node(thisSys->AirOutNode);
-
-    // set up unitary system inlet condtions
-    inletNode.Temp = 26.666667;             // AHRI condition 80F dry-bulb temp
-    inletNode.HumRat = 0.01117049542334198; // AHRI condition at 80F DB/67F WB lb/lb or kg/kg
-    inletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(inletNode.Temp, inletNode.HumRat);
-
-    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
-    state->dataGlobal->BeginEnvrnFlag = true;
-    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
-    inletNode.MassFlowRate = thisSys->m_DesignFanVolFlowRate * state->dataEnvrn->StdRhoAir;
-    inletNode.MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * state->dataEnvrn->StdRhoAir;
-
-    OutputReportPredefined::SetPredefinedTables(*state);
-
-    int AirLoopNum = 0;
-    int CompIndex = 1;
-    bool HeatActive = false;
-    bool CoolActive = true;
-    int constexpr ZoneOAUnitNum = 0;
-    Real64 constexpr OAUCoilOutTemp = 0.0;
-    bool const ZoneEquipment = true;
-    Real64 sensOut = 0.0;
-    Real64 latOut = 0.0;
-
-    outletNode.TempSetPoint = 20.0; // expect cooling coil operation
-    thisSys->simulate(*state,
-                      thisSys->Name,
-                      FirstHVACIteration,
-                      AirLoopNum,
-                      CompIndex,
-                      HeatActive,
-                      CoolActive,
-                      ZoneOAUnitNum,
-                      OAUCoilOutTemp,
-                      ZoneEquipment,
-                      sensOut,
-                      latOut);
-
-    auto &coolingCoil = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(thisSys->m_CoolingCoilIndex);
-    auto &heatingCoil = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(thisSys->m_HeatingCoilIndex);
-    EXPECT_NEAR(outletNode.Temp, 20.0, 0.01);
-    EXPECT_NEAR(coolingCoil.QLoadTotal, 19885.0, 1.0);
-    EXPECT_NEAR(heatingCoil.QLoadTotal, 0.0, 1.0);
-
-    outletNode.TempSetPoint = 30.0; // expect heating coil operation
-    thisSys->simulate(*state,
-                      thisSys->Name,
-                      FirstHVACIteration,
-                      AirLoopNum,
-                      CompIndex,
-                      HeatActive,
-                      CoolActive,
-                      ZoneOAUnitNum,
-                      OAUCoilOutTemp,
-                      ZoneEquipment,
-                      sensOut,
-                      latOut);
-
-    EXPECT_NEAR(outletNode.Temp, 30.0, 0.01);
-    EXPECT_NEAR(coolingCoil.QLoadTotal, 0.0, 1.0);
-    EXPECT_NEAR(heatingCoil.QLoadTotal, 5216.7, 1.0);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
@@ -11391,731 +11076,729 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     int OutletNode(0);     // UnitarySystem outlet node number
     int ControlZoneNum(0); // index to control zone
 
-    std::string_view constexpr idf_objects = R"IDF(
-Zone,
-  EAST ZONE,              !- Name
-  0,                      !- Direction of Relative North{ deg }
-  0,                      !- X Origin{ m }
-  0,                      !- Y Origin{ m }
-  0,                      !- Z Origin{ m }
-  1,                      !- Type
-  1,                      !- Multiplier
-  autocalculate,          !- Ceiling Height{ m }
-  autocalculate;          !- Volume{ m3 }
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  EAST ZONE,              !- Name",
+        "  0,                      !- Direction of Relative North{ deg }",
+        "  0,                      !- X Origin{ m }",
+        "  0,                      !- Y Origin{ m }",
+        "  0,                      !- Z Origin{ m }",
+        "  1,                      !- Type",
+        "  1,                      !- Multiplier",
+        "  autocalculate,          !- Ceiling Height{ m }",
+        "  autocalculate;          !- Volume{ m3 }",
+        "  ",
+        "ZoneHVAC:EquipmentConnections,",
+        "EAST ZONE,                 !- Zone Name",
+        "  Zone2Equipment,          !- Zone Conditioning Equipment List Name",
+        "  Zone 2 Inlet Node,       !- Zone Air Inlet Node or NodeList Name",
+        "  Zone Exhaust Node,       !- Zone Air Exhaust Node or NodeList Name",
+        "  Zone 2 Node,             !- Zone Air Node Name",
+        "  Zone 2 Outlet Node;      !- Zone Return Air Node Name",
+        "  ",
 
-ZoneHVAC:EquipmentConnections,
-EAST ZONE,                 !- Zone Name
-  Zone2Equipment,          !- Zone Conditioning Equipment List Name
-  Zone 2 Inlet Node,       !- Zone Air Inlet Node or NodeList Name
-  Zone Exhaust Node,       !- Zone Air Exhaust Node or NodeList Name
-  Zone 2 Node,             !- Zone Air Node Name
-  Zone 2 Outlet Node;      !- Zone Return Air Node Name
+        "  ZoneHVAC:EquipmentList,",
+        "    Zone2Equipment,          !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Zone2DirectAirADU,       !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
 
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Zone2DirectAirADU,       !- Name",
+        "    Zone 2 Inlet Node,       !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    Zone2DirectAir;          !- Air Terminal Name",
 
-  ZoneHVAC:EquipmentList,
-    Zone2Equipment,          !- Name
-    SequentialLoad,          !- Load Distribution Scheme
-    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    Zone2DirectAirADU,       !- Zone Equipment 1 Name
-    1,                       !- Zone Equipment 1 Cooling Sequence
-    1,                       !- Zone Equipment 1 Heating or No - Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    Zone2DirectAir,          !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    Zone 2 Inlet Node 2AT,   !- Air Inlet Node Name",
+        "    Zone 2 Inlet Node,       !- Air Outlet Node Name",
+        "    0.467;                   !- Maximum Air Flow Rate {m3/s}",
 
-  ZoneHVAC:AirDistributionUnit,
-    Zone2DirectAirADU,       !- Name
-    Zone 2 Inlet Node,       !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
-    Zone2DirectAir;          !- Air Terminal Name
-
-  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
-    Zone2DirectAir,          !- Name
-    FanAndCoilAvailSched,    !- Availability Schedule Name
-    Zone 2 Inlet Node 2AT,   !- Air Inlet Node Name
-    Zone 2 Inlet Node,       !- Air Outlet Node Name
-    0.467;                   !- Maximum Air Flow Rate {m3/s}
-
-
-BranchList,
-  Air Loop Branches, !- Name
-  Air Loop Main Branch;    !- Branch 1 Name
-
-Branch,
-  Air Loop Main Branch, !- Name
-  , !- Pressure Drop Curve Name
-  AirLoopHVAC:UnitarySystem, !- Component 2 Object Type
-  Unitary System Model, !- Component 2 Name
-  	Mixed Air Node, !- Component 2 Inlet Node Name
-  Air Loop Outlet Node; !- Component 2 Outlet Node Name
-
-AirLoopHVAC,
-  Heat Pump Sys 1, !- Name
-  , !- Controller List Name
-  Heat Pump 1 Avail List, !- Availability Manager List Name
-  1.7, !- Design Supply Air Flow Rate{ m3 / s }
-  Air Loop Branches, !- Branch List Name
-  , !- Connector List Name
-  Mixed Air Node, !- Supply Side Inlet Node Name
-  Return Air Mixer Outlet, !- Demand Side Outlet Node Name
-  Zone Equipment Inlet Node, !- Demand Side Inlet Node Names
-  Air Loop Outlet Node;    !- Supply Side Outlet Node Names
-
-AirLoopHVAC:UnitarySystem,
-  Unitary System Model, !- Name
-  Load,                   !- Control Type
-  East Zone,              !- Controlling Zone or Thermostat Location
-  None,                   !- Dehumidification Control Type
-  FanAndCoilAvailSched,   !- Availability Schedule Name
-  Mixed Air Node,         !- Air Inlet Node Name
-  Air Loop Outlet Node,   !- Air Outlet Node Name
-  Fan:OnOff,              !- Supply Fan Object Type
-  Supply Fan 1,           !- Supply Fan Name
-  BlowThrough,            !- Fan Placement
-  CyclingFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name
-  Coil:Heating:DX:MultiSpeed,       !- Heating Coil Object Type
-  Heat Pump DX Heating Coil 2, !- Heating Coil Name
-  ,                       !- DX Heating Coil Sizing Ratio
-  Coil:Cooling:DX:MultiSpeed, !- Cooling Coil Object Type
-  Heat Pump ACDXCoil 2,     !- Cooling Coil Name
-  ,                       !- Use DOAS DX Cooling Coil
-  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }
-  ,                       !- Latent Load Control
-  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
-  Heat Pump DX Supp Heating Coil 1, !- Supplemental Heating Coil Name
-  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation
-  1.7,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }
-  ,                       !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }
-  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
-  SupplyAirFlowRate,      !- Supply air Flow Rate Method During Heating Operation
-  1.7,                    !- Supply Air Flow Rate During Heating Operation{ m3/s }
-  ,                       !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }
-  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
-  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
-  SupplyAirFlowRate,      !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-  0,                    !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }
-  ,                       !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }
-  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
-  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
-  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
-  50, !- Maximum Supply Air Temperature{ C }
-  		21, !- Maximum Outdoor Dry - Bulb Temperature for Supplemental Heater Operation{ C }
-  		, !- Outdoor Dry - Bulb Temperature Sensor Node Name
-  		, !- Maximum Cycling Rate
-  		, !- Heat Pump Time Constant
-  		, !- Fraction of On - Cycle Power Use
-  		, !- Heat Pump Fan Delay Time
-  		, !- Ancillary On - Cycle Electric Power
-  		, !- Ancillary Off - Cycle Electric Power
-  		, !- Design Heat Recovery Water Flow Rate
-  		, !- Maximum Temperature for Heat Recovery
-  		, !- Heat Recovery Water Inlet Node Name
-  		, !- Heat Recovery Water Outlet Node Name
-  	UnitarySystemPerformance:Multispeed, !- Design Specification Multispeed Object Type
-   MyMultiSpeed;            !- Design Specification Multispeed Object Name
-
-UnitarySystemPerformance:Multispeed,
-   MyMultiSpeed, !- Name
-   4, !- Number of Speeds for Heating
-   4, !- Number of Speeds for Cooling
-   Yes, !- Single Mode Operation
-   ,     !- No Load Supply Air Flow Rate Ratio
-   0.24, !- Heating Speed 1 Supply Air Flow Ratio
-   0.24, !- Cooling Speed 1 Supply Air Flow Ratio
-   0.47, !- Heating Speed 2 Supply Air Flow Ratio
-   0.47, !- Cooling Speed 2 Supply Air Flow Ratio
-   0.75, !- Heating Speed 3 Supply Air Flow Ratio
-   0.75, !- Cooling Speed 3 Supply Air Flow Ratio
-   1.0,  !- Heating Speed 4 Supply Air Flow Ratio
-   1.0;  !- Cooling Speed 4 Supply Air Flow Ratio
-
-Fan:OnOff,
-  Supply Fan 1,           !- Name
-  FanAndCoilAvailSched,   !- Availability Schedule Name
-  0.7,                    !- Fan Total Efficiency
-  300.0,                  !- Pressure Rise{ Pa }
-  1.7,                    !- Maximum Flow Rate{ m3 / s }
-  0.9,                    !- Motor Efficiency
-  1.0,                    !- Motor In Airstream Fraction
-  Mixed Air Node,      !- Air Inlet Node Name
-  DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
-
-Coil:Heating:Fuel,
-  Heat Pump DX Supp Heating Coil 1, !- Name
-  FanAndCoilAvailSched, !- Availability Schedule Name
-  NaturalGas,             !- Fuel Type
-  0.8, !- Gas Burner Efficiency
-  45000, !- Nominal Capacity{ W }
-  SuppHeating Coil Air Inlet Node, !- Air Inlet Node Name
-  Air Loop Outlet Node;    !- Air Outlet Node Name
-
-Coil:Heating:DX:MultiSpeed,
-  Heat Pump DX Heating Coil 2, !- Name
-  FanAndCoilAvailSched, !- Availability Schedule Name
-  Heating Coil Air Inlet Node, !- Air Inlet Node Name
-  SuppHeating Coil Air Inlet Node, !- Air Outlet Node Name
-  -8.0, !- Minimum Outdoor Dry - Bulb Temperature for Compressor Operation{ C }
-  -5.0, !- Outdoor Dry - Bulb Temperature to Turn On Compressor{ C }
-  200.0, !- Crankcase Heater Capacity{ W }
-  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }
-  HPACDefrostCAPFT, !- Defrost Energy Input Ratio Function of Temperature Curve Name
-  7.22, !- Maximum Outdoor Dry - Bulb Temperature for Defrost Operation{ C }
-  ReverseCycle, !- Defrost Strategy
-  timed, !- Defrost Control
-  0.058333, !- Defrost Time Period Fraction
-  2000.0, !- Resistive Defrost Heater Capacity{ W }
-  No, !- Apply Part Load Fraction to Speeds Greater than 1
-  NaturalGas, !- Fuel Type
-  4, !- Region number for Calculating HSPF
-  4, !- Number of Speeds
-  7500, !- Speed 1 Gross Rated Heating Capacity{ W }
-  2.75, !- Speed 1 Gross Rated Heating COP{ W / W }
-  0.45, !- Speed 1 Rated Air Flow Rate{ m3 / s }
-  345.0, !- 2017 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
-  345.0, !- 2023 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
-  HPACHeatCapFT Speed 1, !- Speed 1 Heating Capacity Function of Temperature Curve Name
-  HPACHeatCapFF Speed 1, !- Speed 1 Heating Capacity Function of Flow Fraction Curve Name
-  HPACHeatEIRFT Speed 1, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
-  HPACHeatEIRFF Speed 1, !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name
-  HPACHeatPLFFPLR Speed 1, !- Speed 1 Part Load Fraction Correlation Curve Name
-  0.2, !- Speed 1 Rated Waste Heat Fraction of Power Input{ dimensionless }
-  HAPCHeatWHFT Speed 1, !- Speed 1 Waste Heat Function of Temperature Curve Name
-  17500, !- Speed 2 Gross Rated Heating Capacity{ W }
-  2.75, !- Speed 2 Gross Rated Heating COP{ W / W }
-  0.85, !- Speed 2 Rated Air Flow Rate{ m3 / s }
-  425.0, !- 2017 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
-  425.0, !- 2023 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
-  HPACHeatCapFT Speed 2, !- Speed 2 Heating Capacity Function of Temperature Curve Name
-  HPACHeatCapFF Speed 2, !- Speed 2 Heating Capacity Function of Flow Fraction Curve Name
-  HPACHeatEIRFT Speed 2, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
-  HPACHeatEIRFF Speed 2, !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name
-  HPACHeatPLFFPLR Speed 2, !- Speed 2 Part Load Fraction Correlation Curve Name
-  0.2, !- Speed 2 Rated Waste Heat Fraction of Power Input{ dimensionless }
-  HAPCHeatWHFT Speed 2, !- Speed 2 Waste Heat Function of Temperature Curve Name
-  25500, !- Speed 3 Gross Rated Heating Capacity{ W }
-  2.75, !- Speed 3 Gross Rated Heating COP{ W / W }
-  1.25, !- Speed 3 Rated Air Flow Rate{ m3 / s }
-  525.0, !- 2017 Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
-  525.0, !- 2023 Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
-  HPACHeatCapFT Speed 3, !- Speed 3 Heating Capacity Function of Temperature Curve Name
-  HPACHeatCapFF Speed 3, !- Speed 3 Heating Capacity Function of Flow Fraction Curve Name
-  HPACHeatEIRFT Speed 3, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
-  HPACHeatEIRFF Speed 3, !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name
-  HPACHeatPLFFPLR Speed 3, !- Speed 3 Part Load Fraction Correlation Curve Name
-  0.2, !- Speed 3 Rated Waste Heat Fraction of Power Input{ dimensionless }
-  HAPCHeatWHFT Speed 3, !- Speed 3 Waste Heat Function of Temperature Curve Name
-  35500, !- Speed 4 Gross Rated Heating Capacity{ W }
-  2.75, !- Speed 4 Gross Rated Heating COP{ W / W }
-  1.75, !- Speed 4 Rated Air Flow Rate{ m3 / s }
-  673.0, !- 2017 Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
-  673.0, !- 2023 Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
-  HPACHeatCapFT Speed 4, !- Speed 4 Heating Capacity Function of Temperature Curve Name
-  HPACHeatCapFF Speed 4, !- Speed 4 Heating Capacity Function of Flow Fraction Curve Name
-  HPACHeatEIRFT Speed 4, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
-  HPACHeatEIRFF Speed 4, !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name
-  HPACHeatPLFFPLR Speed 4, !- Speed 4 Part Load Fraction Correlation Curve Name
-  0.2, !- Speed 4 Rated Waste Heat Fraction of Power Input{ dimensionless }
-  HAPCHeatWHFT Speed 4;    !- Speed 4 Waste Heat Function of Temperature Curve Name
-
-Curve:Cubic,
-  HPACHeatCapFT Speed 1, !- Name
-  0.758746, !- Coefficient1 Constant
-  0.027626, !- Coefficient2 x
-  0.000148716, !- Coefficient3 x**2
-  0.0000034992, !- Coefficient4 x**3
-  -20.0, !- Minimum Value of x
-  20.0, !- Maximum Value of x
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Dimensionless;           !- Output Unit
-
-Curve:Cubic,
-  HPACHeatCapFT Speed 2, !- Name
-  0.758746, !- Coefficient1 Constant
-  0.027626, !- Coefficient2 x
-  0.000148716, !- Coefficient3 x**2
-  0.0000034992, !- Coefficient4 x**3
-  -20.0, !- Minimum Value of x
-  20.0, !- Maximum Value of x
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Dimensionless;           !- Output Unit Type
-
-Curve:Cubic,
-  HPACHeatCapFT Speed 3, !- Name
-  0.758746, !- Coefficient1 Constant
-  0.027626, !- Coefficient2 x
-  0.000148716, !- Coefficient3 x**2
-  0.0000034992, !- Coefficient4 x**3
-  -20.0, !- Minimum Value of x
-  20.0, !- Maximum Value of x
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Dimensionless;           !- Output Unit Type
-
-Curve:Cubic,
-  HPACHeatCapFT Speed 4, !- Name
-  0.758746, !- Coefficient1 Constant
-  0.027626, !- Coefficient2 x
-  0.000148716, !- Coefficient3 x**2
-  0.0000034992, !- Coefficient4 x**3
-  -20.0, !- Minimum Value of x
-  20.0, !- Maximum Value of x
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Dimensionless;           !- Output Unit Type
-
-Curve:Cubic,
-  HPACHeatCapFF Speed 1, !- Name
-  0.84, !- Coefficient1 Constant
-  0.16, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Coefficient4 x**3
-  0.5, !- Minimum Value of x
-  1.5;                     !- Maximum Value of x
-
-Curve:Cubic,
-  HPACHeatCapFF Speed 2, !-
-  0.84, !- Coefficient1 Constant
-  0.16, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Coefficient4 x**3
-  0.5, !- Minimum Value of x
-  1.5;                     !- Maximum Value of x
-
-Curve:Cubic,
-  HPACHeatCapFF Speed 3, !- Name
-  0.84, !- Coefficient1 Constant
-  0.16, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Coefficient4 x**3
-  0.5, !- Minimum Value of x
-  1.5;                     !- Maximum Value of x
-
-Curve:Cubic,
-  HPACHeatCapFF Speed 4, !- Name
-  0.84, !- Coefficient1 Constant
-  0.16, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Coefficient4 x**3
-  0.5, !- Minimum Value of x
-  1.5;                     !- Maximum Value of x
-
-Curve:Cubic,
-  HPACHeatEIRFT Speed 1, !- Name
-  1.19248, !- Coefficient1 Constant
-  -0.0300438, !- Coefficient2 x
-  0.00103745, !- Coefficient3 x**2
-  -0.000023328, !- Coefficient4 x**3
-  -20.0, !- Minimum Value of x
-  20.0, !- Maximum Value of x
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Dimensionless;           !- Output Unit Type
-
-Curve:Cubic,
-  HPACHeatEIRFT Speed 2, !- Name
-  1.19248, !- Coefficient1 Constant
-  -0.0300438, !- Coefficient2 x
-  0.00103745, !- Coefficient3 x**2
-  -0.000023328, !- Coefficient4 x**3
-  -20.0, !- Minimum Value of x
-  20.0, !- Maximum Value of x
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Dimensionless;           !- Output Unit Type
-
-Curve:Cubic,
-  HPACHeatEIRFT Speed 3, !- Name
-  1.19248, !- Coefficient1 Constant
-  -0.0300438, !- Coefficient2 x
-  0.00103745, !- Coefficient3 x**2
-  -0.000023328, !- Coefficient4 x**3
-  -20.0, !- Minimum Value of x
-  20.0, !- Maximum Value of x
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Dimensionless;           !- Output Unit Type
-)IDF"
-                                             R"IDF(
-
-Curve:Cubic,
-  HPACHeatEIRFT Speed 4, !- Name
-  1.19248, !- Coefficient1 Constant
-  -0.0300438, !- Coefficient2 x
-  0.00103745, !- Coefficient3 x**2
-  -0.000023328, !- Coefficient4 x**3
-  -20.0, !- Minimum Value of x
-  20.0, !- Maximum Value of x
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Dimensionless;           !- Output Unit Type
-
-Curve:Quadratic,
-  HPACHeatEIRFF Speed 1, !- Name
-  1.3824, !- Coefficient1 Constant
-  -0.4336, !- Coefficient2 x
-  0.0512, !- Coefficient3 x**2
-  0.0, !- Minimum Value of x
-  1.0;                     !- Maximum Value of x
-
-Curve:Quadratic,
-  HPACHeatEIRFF Speed 2, !- Name
-  1.3824, !- Coefficient1 Constant
-  -0.4336, !- Coefficient2 x
-  0.0512, !- Coefficient3 x**2
-  0.0, !- Minimum Value of x
-  1.0;                     !- Maximum Value of x
-
-Curve:Quadratic,
-  HPACHeatEIRFF Speed 3, !- Name
-  1.3824, !- Coefficient1 Constant
-  -0.4336, !- Coefficient2 x
-  0.0512, !- Coefficient3 x**2
-  0.0, !- Minimum Value of x
-  1.0;                     !- Maximum Value of x
-
-Curve:Quadratic,
-  HPACHeatEIRFF Speed 4, !- Name
-  1.3824, !- Coefficient1 Constant
-  -0.4336, !- Coefficient2 x
-  0.0512, !- Coefficient3 x**2
-  0.0, !- Minimum Value of x
-  1.0;                     !- Maximum Value of x
-
-Curve:Quadratic,
-  HPACHeatPLFFPLR Speed 1, !- Name
-  0.85, !- Coefficient1 Constant
-  0.15, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Minimum Value of x
-  1.0;                     !- Maximum Value of x
-
-Curve:Quadratic,
-  HPACHeatPLFFPLR Speed 2, !- Name
-  0.85, !- Coefficient1 Constant
-  0.15, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Minimum Value of x
-  1.0;                     !- Maximum Value of x
-
-Curve:Quadratic,
-  HPACHeatPLFFPLR Speed 3, !- Name
-  0.85, !- Coefficient1 Constant
-  0.15, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Minimum Value of x
-  1.0;                     !- Maximum Value of x
-
-Curve:Quadratic,
-  HPACHeatPLFFPLR Speed 4, !- Name
-  0.85, !- Coefficient1 Constant
-  0.15, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Minimum Value of x
-  1.0;                     !- Maximum Value of x
-
- Curve:Biquadratic,
-  HPACDefrostCAPFT, !- Name
-  1.0, !- Coefficient1 Constant
-  0.0, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Coefficient4 y
-  0.0, !- Coefficient5 y**2
-  0.0, !- Coefficient6 x*y
-  0, !- Minimum Value of x
-  50, !- Maximum Value of x
-  0, !- Minimum Value of y
-  50, !- Maximum Value of y
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Temperature, !- Input Unit Type for Y
-  Dimensionless;           !- Output Unit Type
-
-Curve:Biquadratic,
-  HAPCHeatWHFT Speed 1, !- Name
-  1.0, !- Coefficient1 Constant
-  0.0, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Coefficient4 y
-  0.0, !- Coefficient5 y**2
-  0.0, !- Coefficient6 x*y
-  0, !- Minimum Value of x
-  50, !- Maximum Value of x
-  0, !- Minimum Value of y
-  50, !- Maximum Value of y
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Temperature, !- Input Unit Type for Y
-  Dimensionless;           !- Output Unit Type
-
-Curve:Biquadratic,
-  HAPCHeatWHFT Speed 2, !- Name
-  1.0, !- Coefficient1 Constant
-  0.0, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Coefficient4 y
-  0.0, !- Coefficient5 y**2
-  0.0, !- Coefficient6 x*y
-  0, !- Minimum Value of x
-  50, !- Maximum Value of x
-  0, !- Minimum Value of y
-  50, !- Maximum Value of y
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Temperature, !- Input Unit Type for Y
-  Dimensionless;           !- Output Unit Type
-
-Curve:Biquadratic,
-  HAPCHeatWHFT Speed 3, !- Name
-  1.0, !- Coefficient1 Constant
-  0.0, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Coefficient4 y
-  0.0, !- Coefficient5 y**2
-  0.0, !- Coefficient6 x*y
-  0, !- Minimum Value of x
-  50, !- Maximum Value of x
-  0, !- Minimum Value of y
-  50, !- Maximum Value of y
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Temperature, !- Input Unit Type for Y
-  Dimensionless;           !- Output Unit Type
-
-Curve:Biquadratic,
-  HAPCHeatWHFT Speed 4, !- Name
-  1.0, !- Coefficient1 Constant
-  0.0, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Coefficient4 y
-  0.0, !- Coefficient5 y**2
-  0.0, !- Coefficient6 x*y
-  0, !- Minimum Value of x
-  50, !- Maximum Value of x
-  0, !- Minimum Value of y
-  50, !- Maximum Value of y
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Temperature, !- Input Unit Type for Y
-  Dimensionless;           !- Output Unit Type
-
-Coil:Cooling:DX:MultiSpeed,
-  Heat Pump ACDXCoil 2, !- Name
-  FanAndCoilAvailSched, !- Availability Schedule Name
-  DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name
-  Heating Coil Air Inlet Node, !- Air Outlet Node Name
-  Outdoor Condenser Air Node, !- Condenser Air Inlet Node Name
-  AirCooled, !- Condenser Type
-  , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-  , !- Supply Water Storage Tank Name
-  , !- Condensate Collection Water Storage Tank Name
-  No, !- Apply Part Load Fraction to Speeds Greater than 1
-  No, !- Apply Latent Degradation to Speeds Greater than 1
-  200.0, !- Crankcase Heater Capacity{ W }
-  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }
-  , !- Basin Heater Capacity{ W / K }
-  , !- Basin Heater Setpoint Temperature{ C }
-  , !- Basin Heater Operating Schedule Name
-  NaturalGas, !- Fuel Type
-  4, !- Number of Speeds
-  7500, !- Speed 1 Gross Rated Total Cooling Capacity{ W }
-  0.75, !- Speed 1 Gross Rated Sensible Heat Ratio
-  3.0, !- Speed 1 Gross Rated Cooling COP{ W / W }
-  0.40, !- Speed 1 Rated Air Flow Rate{ m3 / s }
-  453.3, !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  453.3, !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  HPACCoolCapFT Speed 1, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
-  HPACCoolCapFF Speed 1, !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
-  HPACCOOLEIRFT Speed 1, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
-  HPACCOOLEIRFF Speed 1, !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name
-  HPACCOOLPLFFPLR Speed 1, !- Speed 1 Part Load Fraction Correlation Curve Name
-  1000.0, !- Speed 1 Nominal Time for Condensate Removal to Begin{ s }
-  1.5, !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity{ dimensionless }
-  3.0, !- Speed 1 Maximum Cycling Rate{ cycles / hr }
-  45.0, !- Speed 1 Latent Capacity Time Constant{ s }
-  0.2, !- Speed 1 Rated Waste Heat Fraction of Power Input{ dimensionless }
-  HAPCCoolWHFT Speed 1, !- Speed 1 Waste Heat Function of Temperature Curve Name
-  0.9, !- Speed 1 Evaporative Condenser Effectiveness{ dimensionless }
-  0.05, !- Speed 1 Evaporative Condenser Air Flow Rate{ m3 / s }
-  50, !- Speed 1 Rated Evaporative Condenser Pump Power Consumption{ W }
-  17500, !- Speed 2 Gross Rated Total Cooling Capacity{ W }
-  0.75, !- Speed 2 Gross Rated Sensible Heat Ratio
-  3.0, !- Speed 2 Gross Rated Cooling COP{ W / W }
-  0.85, !- Speed 2 Rated Air Flow Rate{ m3 / s }
-  523.3, !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  523.3, !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  HPACCoolCapFT Speed 1, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
-  HPACCoolCapFF Speed 1, !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
-  HPACCOOLEIRFT Speed 1, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
-  HPACCOOLEIRFF Speed 1, !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name
-  HPACCOOLPLFFPLR Speed 1, !- Speed 2 Part Load Fraction Correlation Curve Name
-  1000.0, !- Speed 2 Nominal Time for Condensate Removal to Begin{ s }
-  1.5, !- Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }
-  3.0, !- Speed 2 Maximum Cycling Rate{ cycles / hr }
-  45.0, !- Speed 2 Latent Capacity Time Constant{ s }
-  0.2, !- Speed 2 Rated Waste Heat Fraction of Power Input{ dimensionless }
-  HAPCCoolWHFT Speed 1, !- Speed 2 Waste Heat Function of Temperature Curve Name
-  0.9, !- Speed 2 Evaporative Condenser Effectiveness{ dimensionless }
-  0.1, !- Speed 2 Evaporative Condenser Air Flow Rate{ m3 / s }
-  60, !- Speed 2 Rated Evaporative Condenser Pump Power Consumption{ W }
-  25500, !- Speed 3 Gross Rated Total Cooling Capacity{ W }
-  0.75, !- Speed 3 Gross Rated Sensible Heat Ratio
-  3.0, !- Speed 3 Gross Rated Cooling COP{ W / W }
-  1.25, !- Speed 3 Rated Air Flow Rate{ m3 / s }
-  573.3, !- 2017 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  573.3, !- 2023 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  HPACCoolCapFT Speed 1, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
-  HPACCoolCapFF Speed 1, !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name
-  HPACCOOLEIRFT Speed 1, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
-  HPACCOOLEIRFF Speed 1, !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name
-  HPACCOOLPLFFPLR Speed 1, !- Speed 3 Part Load Fraction Correlation Curve Name
-  1000.0, !- Speed 3 Nominal Time for Condensate Removal to Begin{ s }
-  1.5, !- Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }
-  3.0, !- Speed 3 Maximum Cycling Rate{ cycles / hr }
-  45.0, !- Speed 3 Latent Capacity Time Constant{ s }
-  0.2, !- Speed 3 Rated Waste Heat Fraction of Power Input{ dimensionless }
-  HAPCCoolWHFT Speed 1, !- Speed 3 Waste Heat Function of Temperature Curve Name
-  0.9, !- Speed 3 Evaporative Condenser Effectiveness{ dimensionless }
-  0.2, !- Speed 3 Evaporative Condenser Air Flow Rate{ m3 / s }
-  80, !- Speed 3 Rated Evaporative Condenser Pump Power Consumption{ W }
-  35500, !- Speed 4 Gross Rated Total Cooling Capacity{ W }
-  0.75, !- Speed 4 Gross Rated Sensible Heat Ratio
-  3.0, !- Speed 4 Gross Rated Cooling COP{ W / W }
-  1.75, !- Speed 4 Rated Air Flow Rate{ m3 / s }
-  673.3, !- 2017 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  673.3, !- 2023 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  HPACCoolCapFT Speed 1, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
-  HPACCoolCapFF Speed 1, !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name
-  HPACCOOLEIRFT Speed 1, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
-  HPACCOOLEIRFF Speed 1, !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name
-  HPACCOOLPLFFPLR Speed 1, !- Speed 4 Part Load Fraction Correlation Curve Name
-  1000.0, !- Speed 4 Nominal Time for Condensate Removal to Begin{ s }
-  1.5, !- Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }
-  3.0, !- Speed 4 Maximum Cycling Rate{ cycles / hr }
-  45.0, !- Speed 4 Latent Capacity Time Constant{ s }
-  0.2, !- Speed 4 Rated Waste Heat Fraction of Power Input{ dimensionless }
-  HAPCCoolWHFT Speed 1, !- Speed 4 Waste Heat Function of Temperature Curve Name
-  0.9, !- Speed 4 Evaporative Condenser Effectiveness{ dimensionless }
-  0.3, !- Speed 4 Evaporative Condenser Air Flow Rate{ m3 / s }
-  100;                     !- Speed 4 Rated Evaporative Condenser Pump Power Consumption{ W }
-
-OutdoorAir:Node,
-  Outdoor Condenser Air Node, !- Name
-  1.0;                     !- Height Above Ground{ m }
-
-Curve:Biquadratic,
-  HPACCoolCapFT Speed 1, !- Name
-  1, !- Coefficient1 Constant
-  0, !- Coefficient2 x
-  0, !- Coefficient3 x**2
-  0, !- Coefficient4 y
-  0, !- Coefficient5 y**2
-  0, !- Coefficient6 x*y
-  0, !- Minimum Value of x
-  0, !- Maximum Value of x
-  0, !- Minimum Value of y
-  46.11111, !- Maximum Value of y
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Temperature, !- Input Unit Type for Y
-  Dimensionless;           !- Output Unit Type
-
-Curve:Cubic,
-  HPACCoolCapFF Speed 1, !- Name
-  1, !- Coefficient1 Constant
-  0, !- Coefficient2 x
-  0, !- Coefficient3 x**2
-  0, !- Coefficient4 x**3
-  0.5, !- Minimum Value of x
-  1.5;                     !- Maximum Value of x
-
-Curve:Biquadratic,
-  HPACCOOLEIRFT Speed 1, !- Name
-  1, !- Coefficient1 Constant
-  0, !- Coefficient2 x
-  0, !- Coefficient3 x**2
-  0, !- Coefficient4 y
-  0, !- Coefficient5 y**2
-  0, !- Coefficient6 x*y
-  12.77778, !- Minimum Value of x
-  23.88889, !- Maximum Value of x
-  23.88889, !- Minimum Value of y
-  46.11111, !- Maximum Value of y
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Temperature, !- Input Unit Type for Y
-  Dimensionless;           !- Output Unit Type
-
-Curve:Cubic,
-  HPACCOOLEIRFF Speed 1, !- Name
-  1, !- Coefficient1 Constant
-  0, !- Coefficient2 x
-  0, !- Coefficient3 x**2
-  0, !- Coefficient4 x**3
-  0.5, !- Minimum Value of x
-  1.5;                     !- Maximum Value of x
-
-Curve:Quadratic,
-  HPACCOOLPLFFPLR Speed 1, !- Name
-  0.85, !- Coefficient1 Constant
-  0.15, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Minimum Value of x
-  1.0;                     !- Maximum Value of x
-
-Curve:Biquadratic,
-  HAPCCoolWHFT Speed 1, !- Name
-  1.0, !- Coefficient1 Constant
-  0.0, !- Coefficient2 x
-  0.0, !- Coefficient3 x**2
-  0.0, !- Coefficient4 y
-  0.0, !- Coefficient5 y**2
-  0.0, !- Coefficient6 x*y
-  0, !- Minimum Value of x
-  50, !- Maximum Value of x
-  0, !- Minimum Value of y
-  50, !- Maximum Value of y
-  , !- Minimum Curve Output
-  , !- Maximum Curve Output
-  Temperature, !- Input Unit Type for X
-  Temperature, !- Input Unit Type for Y
-  Dimensionless;           !- Output Unit Type
-
-ScheduleTypeLimits,
-  Any Number;             !- Name
-
-Schedule:Compact,
-  FanAndCoilAvailSched,   !- Name
-  Any Number,             !- Schedule Type Limits Name
-  Through: 12/31,         !- Field 1
-  For: AllDays,           !- Field 2
-  Until: 24:00, 1.0;      !- Field 3
-
-Schedule:Compact,
-  CyclingFanSchedule,  !- Name
-  Any Number,             !- Schedule Type Limits Name
-  Through: 12/31,         !- Field 1
-  For: AllDays,           !- Field 2
-  Until: 24:00, 0.0;      !- Field 3
-
-)IDF";
+        "  ",
+        "BranchList,",
+        "  Air Loop Branches, !- Name",
+        "  Air Loop Main Branch;    !- Branch 1 Name",
+        "  ",
+        "Branch,",
+        "  Air Loop Main Branch, !- Name",
+        "  , !- Pressure Drop Curve Name",
+        "  AirLoopHVAC:UnitarySystem, !- Component 2 Object Type",
+        "  Unitary System Model, !- Component 2 Name",
+        "  	Mixed Air Node, !- Component 2 Inlet Node Name",
+        "  Air Loop Outlet Node; !- Component 2 Outlet Node Name",
+        "  ",
+        "AirLoopHVAC,",
+        "  Heat Pump Sys 1, !- Name",
+        "  , !- Controller List Name",
+        "  Heat Pump 1 Avail List, !- Availability Manager List Name",
+        "  1.7, !- Design Supply Air Flow Rate{ m3 / s }",
+        "  Air Loop Branches, !- Branch List Name",
+        "  , !- Connector List Name",
+        "  Mixed Air Node, !- Supply Side Inlet Node Name",
+        "  Return Air Mixer Outlet, !- Demand Side Outlet Node Name",
+        "  Zone Equipment Inlet Node, !- Demand Side Inlet Node Names",
+        "  Air Loop Outlet Node;    !- Supply Side Outlet Node Names",
+        "  ",
+        "AirLoopHVAC:UnitarySystem,",
+        "  Unitary System Model, !- Name",
+        "  Load,                   !- Control Type",
+        "  East Zone,              !- Controlling Zone or Thermostat Location",
+        "  None,                   !- Dehumidification Control Type",
+        "  FanAndCoilAvailSched,   !- Availability Schedule Name",
+        "  Mixed Air Node,         !- Air Inlet Node Name",
+        "  Air Loop Outlet Node,   !- Air Outlet Node Name",
+        "  Fan:OnOff,              !- Supply Fan Object Type",
+        "  Supply Fan 1,           !- Supply Fan Name",
+        "  BlowThrough,            !- Fan Placement",
+        "  CyclingFanSchedule,  !- Supply Air Fan Operating Mode Schedule Name",
+        "  Coil:Heating:DX:MultiSpeed,       !- Heating Coil Object Type",
+        "  Heat Pump DX Heating Coil 2, !- Heating Coil Name",
+        "  ,                       !- DX Heating Coil Sizing Ratio",
+        "  Coil:Cooling:DX:MultiSpeed, !- Cooling Coil Object Type",
+        "  Heat Pump ACDXCoil 2,     !- Cooling Coil Name",
+        "  ,                       !- Use DOAS DX Cooling Coil",
+        "  ,                       !- DOAS DX Cooling Coil Leaving Minimum Air Temperature{ C }",
+        "  ,                       !- Latent Load Control",
+        "  Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type",
+        "  Heat Pump DX Supp Heating Coil 1, !- Supplemental Heating Coil Name",
+        "  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
+        "  1.7,                    !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
+        "  ,                       !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
+        "  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+        "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+        "  SupplyAirFlowRate,      !- Supply air Flow Rate Method During Heating Operation",
+        "  1.7,                    !- Supply Air Flow Rate During Heating Operation{ m3/s }",
+        "  ,                       !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
+        "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+        "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "  SupplyAirFlowRate,      !- Supply Air Flow Rate Method When No Cooling or Heating is Required",
+        "  0,                    !- Supply Air Flow Rate When No Cooling or Heating is Required{ m3/s }",
+        "  ,                       !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
+        "  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
+        "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+        "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
+        "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "  50, !- Maximum Supply Air Temperature{ C }",
+        "  		21, !- Maximum Outdoor Dry - Bulb Temperature for Supplemental Heater Operation{ C }",
+        "  		, !- Outdoor Dry - Bulb Temperature Sensor Node Name",
+        "  		, !- Maximum Cycling Rate",
+        "  		, !- Heat Pump Time Constant",
+        "  		, !- Fraction of On - Cycle Power Use",
+        "  		, !- Heat Pump Fan Delay Time",
+        "  		, !- Ancillary On - Cycle Electric Power",
+        "  		, !- Ancillary Off - Cycle Electric Power",
+        "  		, !- Design Heat Recovery Water Flow Rate",
+        "  		, !- Maximum Temperature for Heat Recovery",
+        "  		, !- Heat Recovery Water Inlet Node Name",
+        "  		, !- Heat Recovery Water Outlet Node Name",
+        "  	UnitarySystemPerformance:Multispeed, !- Design Specification Multispeed Object Type",
+        "   MyMultiSpeed;            !- Design Specification Multispeed Object Name",
+        "  ",
+        "UnitarySystemPerformance:Multispeed,",
+        "   MyMultiSpeed, !- Name",
+        "   4, !- Number of Speeds for Heating",
+        "   4, !- Number of Speeds for Cooling",
+        "   Yes, !- Single Mode Operation",
+        "   ,     !- No Load Supply Air Flow Rate Ratio",
+        "   0.24, !- Heating Speed 1 Supply Air Flow Ratio",
+        "   0.24, !- Cooling Speed 1 Supply Air Flow Ratio",
+        "   0.47, !- Heating Speed 2 Supply Air Flow Ratio",
+        "   0.47, !- Cooling Speed 2 Supply Air Flow Ratio",
+        "   0.75, !- Heating Speed 3 Supply Air Flow Ratio",
+        "   0.75, !- Cooling Speed 3 Supply Air Flow Ratio",
+        "   1.0,  !- Heating Speed 4 Supply Air Flow Ratio",
+        "   1.0;  !- Cooling Speed 4 Supply Air Flow Ratio",
+        "  ",
+        "Fan:OnOff,",
+        "  Supply Fan 1,           !- Name",
+        "  FanAndCoilAvailSched,   !- Availability Schedule Name",
+        "  0.7,                    !- Fan Total Efficiency",
+        "  300.0,                  !- Pressure Rise{ Pa }",
+        "  1.7,                    !- Maximum Flow Rate{ m3 / s }",
+        "  0.9,                    !- Motor Efficiency",
+        "  1.0,                    !- Motor In Airstream Fraction",
+        "  Mixed Air Node,      !- Air Inlet Node Name",
+        "  DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name",
+        "  ",
+        "Coil:Heating:Fuel,",
+        "  Heat Pump DX Supp Heating Coil 1, !- Name",
+        "  FanAndCoilAvailSched, !- Availability Schedule Name",
+        "  NaturalGas,             !- Fuel Type",
+        "  0.8, !- Gas Burner Efficiency",
+        "  45000, !- Nominal Capacity{ W }",
+        "  SuppHeating Coil Air Inlet Node, !- Air Inlet Node Name",
+        "  Air Loop Outlet Node;    !- Air Outlet Node Name",
+        "  ",
+        "Coil:Heating:DX:MultiSpeed,",
+        "  Heat Pump DX Heating Coil 2, !- Name",
+        "  FanAndCoilAvailSched, !- Availability Schedule Name",
+        "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
+        "  SuppHeating Coil Air Inlet Node, !- Air Outlet Node Name",
+        "  -8.0, !- Minimum Outdoor Dry - Bulb Temperature for Compressor Operation{ C }",
+        "  -5.0, !- Outdoor Dry - Bulb Temperature to Turn On Compressor{ C }",
+        "  200.0, !- Crankcase Heater Capacity{ W }",
+        "  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+        "  HPACDefrostCAPFT, !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+        "  7.22, !- Maximum Outdoor Dry - Bulb Temperature for Defrost Operation{ C }",
+        "  ReverseCycle, !- Defrost Strategy",
+        "  timed, !- Defrost Control",
+        "  0.058333, !- Defrost Time Period Fraction",
+        "  2000.0, !- Resistive Defrost Heater Capacity{ W }",
+        "  No, !- Apply Part Load Fraction to Speeds Greater than 1",
+        "  NaturalGas, !- Fuel Type",
+        "  4, !- Region number for Calculating HSPF",
+        "  4, !- Number of Speeds",
+        "  7500, !- Speed 1 Gross Rated Heating Capacity{ W }",
+        "  2.75, !- Speed 1 Gross Rated Heating COP{ W / W }",
+        "  0.45, !- Speed 1 Rated Air Flow Rate{ m3 / s }",
+        "  345.0, !- 2017 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  345.0, !- 2023 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}", //??
+        "  HPACHeatCapFT Speed 1, !- Speed 1 Heating Capacity Function of Temperature Curve Name",
+        "  HPACHeatCapFF Speed 1, !- Speed 1 Heating Capacity Function of Flow Fraction Curve Name",
+        "  HPACHeatEIRFT Speed 1, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "  HPACHeatEIRFF Speed 1, !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  HPACHeatPLFFPLR Speed 1, !- Speed 1 Part Load Fraction Correlation Curve Name",
+        "  0.2, !- Speed 1 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        "  HAPCHeatWHFT Speed 1, !- Speed 1 Waste Heat Function of Temperature Curve Name",
+        "  17500, !- Speed 2 Gross Rated Heating Capacity{ W }",
+        "  2.75, !- Speed 2 Gross Rated Heating COP{ W / W }",
+        "  0.85, !- Speed 2 Rated Air Flow Rate{ m3 / s }",
+        "  425.0, !- 2017 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  425.0, !- 2023 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}", //??
+        "  HPACHeatCapFT Speed 2, !- Speed 2 Heating Capacity Function of Temperature Curve Name",
+        "  HPACHeatCapFF Speed 2, !- Speed 2 Heating Capacity Function of Flow Fraction Curve Name",
+        "  HPACHeatEIRFT Speed 2, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "  HPACHeatEIRFF Speed 2, !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  HPACHeatPLFFPLR Speed 2, !- Speed 2 Part Load Fraction Correlation Curve Name",
+        "  0.2, !- Speed 2 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        "  HAPCHeatWHFT Speed 2, !- Speed 2 Waste Heat Function of Temperature Curve Name",
+        "  25500, !- Speed 3 Gross Rated Heating Capacity{ W }",
+        "  2.75, !- Speed 3 Gross Rated Heating COP{ W / W }",
+        "  1.25, !- Speed 3 Rated Air Flow Rate{ m3 / s }",
+        "  525.0, !- 2017 Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  525.0, !- 2023 Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}", //??
+        "  HPACHeatCapFT Speed 3, !- Speed 3 Heating Capacity Function of Temperature Curve Name",
+        "  HPACHeatCapFF Speed 3, !- Speed 3 Heating Capacity Function of Flow Fraction Curve Name",
+        "  HPACHeatEIRFT Speed 3, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "  HPACHeatEIRFF Speed 3, !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  HPACHeatPLFFPLR Speed 3, !- Speed 3 Part Load Fraction Correlation Curve Name",
+        "  0.2, !- Speed 3 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        "  HAPCHeatWHFT Speed 3, !- Speed 3 Waste Heat Function of Temperature Curve Name",
+        "  35500, !- Speed 4 Gross Rated Heating Capacity{ W }",
+        "  2.75, !- Speed 4 Gross Rated Heating COP{ W / W }",
+        "  1.75, !- Speed 4 Rated Air Flow Rate{ m3 / s }",
+        "  673.0, !- 2017 Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  673.0, !- 2023 Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}", //??
+        "  HPACHeatCapFT Speed 4, !- Speed 4 Heating Capacity Function of Temperature Curve Name",
+        "  HPACHeatCapFF Speed 4, !- Speed 4 Heating Capacity Function of Flow Fraction Curve Name",
+        "  HPACHeatEIRFT Speed 4, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "  HPACHeatEIRFF Speed 4, !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  HPACHeatPLFFPLR Speed 4, !- Speed 4 Part Load Fraction Correlation Curve Name",
+        "  0.2, !- Speed 4 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        "  HAPCHeatWHFT Speed 4;    !- Speed 4 Waste Heat Function of Temperature Curve Name",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACHeatCapFT Speed 1, !- Name",
+        "  0.758746, !- Coefficient1 Constant",
+        "  0.027626, !- Coefficient2 x",
+        "  0.000148716, !- Coefficient3 x**2",
+        "  0.0000034992, !- Coefficient4 x**3",
+        "  -20.0, !- Minimum Value of x",
+        "  20.0, !- Maximum Value of x",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit ",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACHeatCapFT Speed 2, !- Name",
+        "  0.758746, !- Coefficient1 Constant",
+        "  0.027626, !- Coefficient2 x",
+        "  0.000148716, !- Coefficient3 x**2",
+        "  0.0000034992, !- Coefficient4 x**3",
+        "  -20.0, !- Minimum Value of x",
+        "  20.0, !- Maximum Value of x",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACHeatCapFT Speed 3, !- Name",
+        "  0.758746, !- Coefficient1 Constant",
+        "  0.027626, !- Coefficient2 x",
+        "  0.000148716, !- Coefficient3 x**2",
+        "  0.0000034992, !- Coefficient4 x**3",
+        "  -20.0, !- Minimum Value of x",
+        "  20.0, !- Maximum Value of x",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACHeatCapFT Speed 4, !- Name",
+        "  0.758746, !- Coefficient1 Constant",
+        "  0.027626, !- Coefficient2 x",
+        "  0.000148716, !- Coefficient3 x**2",
+        "  0.0000034992, !- Coefficient4 x**3",
+        "  -20.0, !- Minimum Value of x",
+        "  20.0, !- Maximum Value of x",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACHeatCapFF Speed 1, !- Name",
+        "  0.84, !- Coefficient1 Constant",
+        "  0.16, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Coefficient4 x**3",
+        "  0.5, !- Minimum Value of x",
+        "  1.5;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACHeatCapFF Speed 2, !- ",
+        "  0.84, !- Coefficient1 Constant",
+        "  0.16, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Coefficient4 x**3",
+        "  0.5, !- Minimum Value of x",
+        "  1.5;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACHeatCapFF Speed 3, !- Name",
+        "  0.84, !- Coefficient1 Constant",
+        "  0.16, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Coefficient4 x**3",
+        "  0.5, !- Minimum Value of x",
+        "  1.5;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACHeatCapFF Speed 4, !- Name",
+        "  0.84, !- Coefficient1 Constant",
+        "  0.16, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Coefficient4 x**3",
+        "  0.5, !- Minimum Value of x",
+        "  1.5;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACHeatEIRFT Speed 1, !- Name",
+        "  1.19248, !- Coefficient1 Constant",
+        "  -0.0300438, !- Coefficient2 x",
+        "  0.00103745, !- Coefficient3 x**2",
+        "  -0.000023328, !- Coefficient4 x**3",
+        "  -20.0, !- Minimum Value of x",
+        "  20.0, !- Maximum Value of x",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACHeatEIRFT Speed 2, !- Name",
+        "  1.19248, !- Coefficient1 Constant",
+        "  -0.0300438, !- Coefficient2 x",
+        "  0.00103745, !- Coefficient3 x**2",
+        "  -0.000023328, !- Coefficient4 x**3",
+        "  -20.0, !- Minimum Value of x",
+        "  20.0, !- Maximum Value of x",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACHeatEIRFT Speed 3, !- Name",
+        "  1.19248, !- Coefficient1 Constant",
+        "  -0.0300438, !- Coefficient2 x",
+        "  0.00103745, !- Coefficient3 x**2",
+        "  -0.000023328, !- Coefficient4 x**3",
+        "  -20.0, !- Minimum Value of x",
+        "  20.0, !- Maximum Value of x",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACHeatEIRFT Speed 4, !- Name",
+        "  1.19248, !- Coefficient1 Constant",
+        "  -0.0300438, !- Coefficient2 x",
+        "  0.00103745, !- Coefficient3 x**2",
+        "  -0.000023328, !- Coefficient4 x**3",
+        "  -20.0, !- Minimum Value of x",
+        "  20.0, !- Maximum Value of x",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Quadratic,",
+        "  HPACHeatEIRFF Speed 1, !- Name",
+        "  1.3824, !- Coefficient1 Constant",
+        "  -0.4336, !- Coefficient2 x",
+        "  0.0512, !- Coefficient3 x**2",
+        "  0.0, !- Minimum Value of x",
+        "  1.0;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Quadratic,",
+        "  HPACHeatEIRFF Speed 2, !- Name",
+        "  1.3824, !- Coefficient1 Constant",
+        "  -0.4336, !- Coefficient2 x",
+        "  0.0512, !- Coefficient3 x**2",
+        "  0.0, !- Minimum Value of x",
+        "  1.0;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Quadratic,",
+        "  HPACHeatEIRFF Speed 3, !- Name",
+        "  1.3824, !- Coefficient1 Constant",
+        "  -0.4336, !- Coefficient2 x",
+        "  0.0512, !- Coefficient3 x**2",
+        "  0.0, !- Minimum Value of x",
+        "  1.0;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Quadratic,",
+        "  HPACHeatEIRFF Speed 4, !- Name",
+        "  1.3824, !- Coefficient1 Constant",
+        "  -0.4336, !- Coefficient2 x",
+        "  0.0512, !- Coefficient3 x**2",
+        "  0.0, !- Minimum Value of x",
+        "  1.0;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Quadratic,",
+        "  HPACHeatPLFFPLR Speed 1, !- Name",
+        "  0.85, !- Coefficient1 Constant",
+        "  0.15, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Minimum Value of x",
+        "  1.0;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Quadratic,",
+        "  HPACHeatPLFFPLR Speed 2, !- Name",
+        "  0.85, !- Coefficient1 Constant",
+        "  0.15, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Minimum Value of x",
+        "  1.0;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Quadratic,",
+        "  HPACHeatPLFFPLR Speed 3, !- Name",
+        "  0.85, !- Coefficient1 Constant",
+        "  0.15, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Minimum Value of x",
+        "  1.0;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Quadratic,",
+        "  HPACHeatPLFFPLR Speed 4, !- Name",
+        "  0.85, !- Coefficient1 Constant",
+        "  0.15, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Minimum Value of x",
+        "  1.0;                     !- Maximum Value of x",
+        "  ",
+        " Curve:Biquadratic,",
+        "  HPACDefrostCAPFT, !- Name",
+        "  1.0, !- Coefficient1 Constant",
+        "  0.0, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Coefficient4 y",
+        "  0.0, !- Coefficient5 y**2",
+        "  0.0, !- Coefficient6 x*y",
+        "  0, !- Minimum Value of x",
+        "  50, !- Maximum Value of x",
+        "  0, !- Minimum Value of y",
+        "  50, !- Maximum Value of y",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Temperature, !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Biquadratic,",
+        "  HAPCHeatWHFT Speed 1, !- Name",
+        "  1.0, !- Coefficient1 Constant",
+        "  0.0, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Coefficient4 y",
+        "  0.0, !- Coefficient5 y**2",
+        "  0.0, !- Coefficient6 x*y",
+        "  0, !- Minimum Value of x",
+        "  50, !- Maximum Value of x",
+        "  0, !- Minimum Value of y",
+        "  50, !- Maximum Value of y",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Temperature, !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Biquadratic,",
+        "  HAPCHeatWHFT Speed 2, !- Name",
+        "  1.0, !- Coefficient1 Constant",
+        "  0.0, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Coefficient4 y",
+        "  0.0, !- Coefficient5 y**2",
+        "  0.0, !- Coefficient6 x*y",
+        "  0, !- Minimum Value of x",
+        "  50, !- Maximum Value of x",
+        "  0, !- Minimum Value of y",
+        "  50, !- Maximum Value of y",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Temperature, !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Biquadratic,",
+        "  HAPCHeatWHFT Speed 3, !- Name",
+        "  1.0, !- Coefficient1 Constant",
+        "  0.0, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Coefficient4 y",
+        "  0.0, !- Coefficient5 y**2",
+        "  0.0, !- Coefficient6 x*y",
+        "  0, !- Minimum Value of x",
+        "  50, !- Maximum Value of x",
+        "  0, !- Minimum Value of y",
+        "  50, !- Maximum Value of y",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Temperature, !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Biquadratic,",
+        "  HAPCHeatWHFT Speed 4, !- Name",
+        "  1.0, !- Coefficient1 Constant",
+        "  0.0, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Coefficient4 y",
+        "  0.0, !- Coefficient5 y**2",
+        "  0.0, !- Coefficient6 x*y",
+        "  0, !- Minimum Value of x",
+        "  50, !- Maximum Value of x",
+        "  0, !- Minimum Value of y",
+        "  50, !- Maximum Value of y",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Temperature, !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Coil:Cooling:DX:MultiSpeed,",
+        "  Heat Pump ACDXCoil 2, !- Name",
+        "  FanAndCoilAvailSched, !- Availability Schedule Name",
+        "  DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+        "  Heating Coil Air Inlet Node, !- Air Outlet Node Name",
+        "  Outdoor Condenser Air Node, !- Condenser Air Inlet Node Name",
+        "  AirCooled, !- Condenser Type",
+        "  , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "  , !- Supply Water Storage Tank Name",
+        "  , !- Condensate Collection Water Storage Tank Name",
+        "  No, !- Apply Part Load Fraction to Speeds Greater than 1",
+        "  No, !- Apply Latent Degradation to Speeds Greater than 1",
+        "  200.0, !- Crankcase Heater Capacity{ W }",
+        "  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+        "  , !- Basin Heater Capacity{ W / K }",
+        "  , !- Basin Heater Setpoint Temperature{ C }",
+        "  , !- Basin Heater Operating Schedule Name",
+        "  NaturalGas, !- Fuel Type",
+        "  4, !- Number of Speeds",
+        "  7500, !- Speed 1 Gross Rated Total Cooling Capacity{ W }",
+        "  0.75, !- Speed 1 Gross Rated Sensible Heat Ratio",
+        "  3.0, !- Speed 1 Gross Rated Cooling COP{ W / W }",
+        "  0.40, !- Speed 1 Rated Air Flow Rate{ m3 / s }",
+        "  453.3, !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  453.3, !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??BPS:TBD
+        "  HPACCoolCapFT Speed 1, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+        "  HPACCoolCapFF Speed 1, !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  HPACCOOLEIRFT Speed 1, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "  HPACCOOLEIRFF Speed 1, !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  HPACCOOLPLFFPLR Speed 1, !- Speed 1 Part Load Fraction Correlation Curve Name",
+        "  1000.0, !- Speed 1 Nominal Time for Condensate Removal to Begin{ s }",
+        "  1.5, !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity{ dimensionless }",
+        "  3.0, !- Speed 1 Maximum Cycling Rate{ cycles / hr }",
+        "  45.0, !- Speed 1 Latent Capacity Time Constant{ s }",
+        "  0.2, !- Speed 1 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        "  HAPCCoolWHFT Speed 1, !- Speed 1 Waste Heat Function of Temperature Curve Name",
+        "  0.9, !- Speed 1 Evaporative Condenser Effectiveness{ dimensionless }",
+        "  0.05, !- Speed 1 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "  50, !- Speed 1 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "  17500, !- Speed 2 Gross Rated Total Cooling Capacity{ W }",
+        "  0.75, !- Speed 2 Gross Rated Sensible Heat Ratio",
+        "  3.0, !- Speed 2 Gross Rated Cooling COP{ W / W }",
+        "  0.85, !- Speed 2 Rated Air Flow Rate{ m3 / s }",
+        "  523.3, !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  523.3, !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "  HPACCoolCapFT Speed 1, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+        "  HPACCoolCapFF Speed 1, !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  HPACCOOLEIRFT Speed 1, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "  HPACCOOLEIRFF Speed 1, !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  HPACCOOLPLFFPLR Speed 1, !- Speed 2 Part Load Fraction Correlation Curve Name",
+        "  1000.0, !- Speed 2 Nominal Time for Condensate Removal to Begin{ s }",
+        "  1.5, !- Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+        "  3.0, !- Speed 2 Maximum Cycling Rate{ cycles / hr }",
+        "  45.0, !- Speed 2 Latent Capacity Time Constant{ s }",
+        "  0.2, !- Speed 2 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        "  HAPCCoolWHFT Speed 1, !- Speed 2 Waste Heat Function of Temperature Curve Name",
+        "  0.9, !- Speed 2 Evaporative Condenser Effectiveness{ dimensionless }",
+        "  0.1, !- Speed 2 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "  60, !- Speed 2 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "  25500, !- Speed 3 Gross Rated Total Cooling Capacity{ W }",
+        "  0.75, !- Speed 3 Gross Rated Sensible Heat Ratio",
+        "  3.0, !- Speed 3 Gross Rated Cooling COP{ W / W }",
+        "  1.25, !- Speed 3 Rated Air Flow Rate{ m3 / s }",
+        "  573.3, !- 2017 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  573.3, !- 2023 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "  HPACCoolCapFT Speed 1, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+        "  HPACCoolCapFF Speed 1, !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  HPACCOOLEIRFT Speed 1, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "  HPACCOOLEIRFF Speed 1, !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  HPACCOOLPLFFPLR Speed 1, !- Speed 3 Part Load Fraction Correlation Curve Name",
+        "  1000.0, !- Speed 3 Nominal Time for Condensate Removal to Begin{ s }",
+        "  1.5, !- Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+        "  3.0, !- Speed 3 Maximum Cycling Rate{ cycles / hr }",
+        "  45.0, !- Speed 3 Latent Capacity Time Constant{ s }",
+        "  0.2, !- Speed 3 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        "  HAPCCoolWHFT Speed 1, !- Speed 3 Waste Heat Function of Temperature Curve Name",
+        "  0.9, !- Speed 3 Evaporative Condenser Effectiveness{ dimensionless }",
+        "  0.2, !- Speed 3 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "  80, !- Speed 3 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "  35500, !- Speed 4 Gross Rated Total Cooling Capacity{ W }",
+        "  0.75, !- Speed 4 Gross Rated Sensible Heat Ratio",
+        "  3.0, !- Speed 4 Gross Rated Cooling COP{ W / W }",
+        "  1.75, !- Speed 4 Rated Air Flow Rate{ m3 / s }",
+        "  673.3, !- 2017 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  673.3, !- 2023 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "  HPACCoolCapFT Speed 1, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+        "  HPACCoolCapFF Speed 1, !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  HPACCOOLEIRFT Speed 1, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "  HPACCOOLEIRFF Speed 1, !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  HPACCOOLPLFFPLR Speed 1, !- Speed 4 Part Load Fraction Correlation Curve Name",
+        "  1000.0, !- Speed 4 Nominal Time for Condensate Removal to Begin{ s }",
+        "  1.5, !- Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+        "  3.0, !- Speed 4 Maximum Cycling Rate{ cycles / hr }",
+        "  45.0, !- Speed 4 Latent Capacity Time Constant{ s }",
+        "  0.2, !- Speed 4 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        "  HAPCCoolWHFT Speed 1, !- Speed 4 Waste Heat Function of Temperature Curve Name",
+        "  0.9, !- Speed 4 Evaporative Condenser Effectiveness{ dimensionless }",
+        "  0.3, !- Speed 4 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "  100;                     !- Speed 4 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "  ",
+        "OutdoorAir:Node,",
+        "  Outdoor Condenser Air Node, !- Name",
+        "  1.0;                     !- Height Above Ground{ m }",
+        "  ",
+        "Curve:Biquadratic,",
+        "  HPACCoolCapFT Speed 1, !- Name",
+        "  1, !- Coefficient1 Constant",
+        "  0, !- Coefficient2 x",
+        "  0, !- Coefficient3 x**2",
+        "  0, !- Coefficient4 y",
+        "  0, !- Coefficient5 y**2",
+        "  0, !- Coefficient6 x*y",
+        "  0, !- Minimum Value of x",
+        "  0, !- Maximum Value of x",
+        "  0, !- Minimum Value of y",
+        "  46.11111, !- Maximum Value of y",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Temperature, !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACCoolCapFF Speed 1, !- Name",
+        "  1, !- Coefficient1 Constant",
+        "  0, !- Coefficient2 x",
+        "  0, !- Coefficient3 x**2",
+        "  0, !- Coefficient4 x**3",
+        "  0.5, !- Minimum Value of x",
+        "  1.5;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Biquadratic,",
+        "  HPACCOOLEIRFT Speed 1, !- Name",
+        "  1, !- Coefficient1 Constant",
+        "  0, !- Coefficient2 x",
+        "  0, !- Coefficient3 x**2",
+        "  0, !- Coefficient4 y",
+        "  0, !- Coefficient5 y**2",
+        "  0, !- Coefficient6 x*y",
+        "  12.77778, !- Minimum Value of x",
+        "  23.88889, !- Maximum Value of x",
+        "  23.88889, !- Minimum Value of y",
+        "  46.11111, !- Maximum Value of y",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Temperature, !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "Curve:Cubic,",
+        "  HPACCOOLEIRFF Speed 1, !- Name",
+        "  1, !- Coefficient1 Constant",
+        "  0, !- Coefficient2 x",
+        "  0, !- Coefficient3 x**2",
+        "  0, !- Coefficient4 x**3",
+        "  0.5, !- Minimum Value of x",
+        "  1.5;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Quadratic,",
+        "  HPACCOOLPLFFPLR Speed 1, !- Name",
+        "  0.85, !- Coefficient1 Constant",
+        "  0.15, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Minimum Value of x",
+        "  1.0;                     !- Maximum Value of x",
+        "  ",
+        "Curve:Biquadratic,",
+        "  HAPCCoolWHFT Speed 1, !- Name",
+        "  1.0, !- Coefficient1 Constant",
+        "  0.0, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Coefficient4 y",
+        "  0.0, !- Coefficient5 y**2",
+        "  0.0, !- Coefficient6 x*y",
+        "  0, !- Minimum Value of x",
+        "  50, !- Maximum Value of x",
+        "  0, !- Minimum Value of y",
+        "  50, !- Maximum Value of y",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Temperature, !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+        "  ",
+        "ScheduleTypeLimits,",
+        "  Any Number;             !- Name",
+        "  ",
+        "Schedule:Compact,",
+        "  FanAndCoilAvailSched,   !- Name",
+        "  Any Number,             !- Schedule Type Limits Name",
+        "  Through: 12/31,         !- Field 1",
+        "  For: AllDays,           !- Field 2",
+        "  Until: 24:00, 1.0;      !- Field 3",
+        "  ",
+        "Schedule:Compact,",
+        "  CyclingFanSchedule,  !- Name",
+        "  Any Number,             !- Schedule Type Limits Name",
+        "  Through: 12/31,         !- Field 1",
+        "  For: AllDays,           !- Field 2",
+        "  Until: 24:00, 0.0;      !- Field 3",
+        "  ",
+    });
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
     state->dataLoopNodes->Node.allocate(10);
@@ -17087,6 +16770,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 1 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.188,                          !- Speed 1 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.260,                          !- Speed 1 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -17097,6 +16782,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 2 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.376,                          !- Speed 2 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.520,                          !- Speed 2 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -17107,6 +16794,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 3 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.564,                          !- Speed 3 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   0.780,                          !- Speed 3 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -17117,6 +16806,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 4 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.752,                          !- Speed 4 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   1.040,                          !- Speed 4 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -17127,6 +16818,8 @@ Coil:Cooling:DX:VariableSpeed,
   0.75,                           !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio{ dimensionless }
   4.0,                            !- Speed 5 Reference Unit Gross Rated Cooling COP{ dimensionless }
   0.940,                          !- Speed 5 Reference Unit Rated Air Flow Rate{ m3 / s }
+  ,
+  ,
   1.300,                          !- Speed 5 Reference Unit Rated Condenser Air Flow Rate{ m3 / s }
   ,                               !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling{ dimensionless }
   Biquadratic,                    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -17156,6 +16849,8 @@ Coil:Heating:DX:VariableSpeed,
   3600.0,                         !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
   0.169,                          !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -17163,6 +16858,8 @@ Coil:Heating:DX:VariableSpeed,
   7200.0,                         !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}
   0.387,                          !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -17170,6 +16867,8 @@ Coil:Heating:DX:VariableSpeed,
   10800.0,                        !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}
   0.580,                          !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -17177,6 +16876,8 @@ Coil:Heating:DX:VariableSpeed,
   14400.0,                        !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}
   0.773,                          !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -17184,13 +16885,14 @@ Coil:Heating:DX:VariableSpeed,
   18000.0,                        !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}
   5.0,                            !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}
   0.966,                          !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+  ,
+  ,
   Biquadratic,                    !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
   Quadratic,                      !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
   Biquadratic,                    !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
   Quadratic;                      !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
 )IDF"
                                              R"IDF(
-
 Curve:Quadratic,
   Quadratic,                      !- Name
   1.0,                            !- Coefficient1 Constant
