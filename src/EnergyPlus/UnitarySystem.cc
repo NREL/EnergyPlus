@@ -10420,7 +10420,7 @@ namespace UnitarySystems {
 
         if (this->m_SuppCoilExists) {
             if (this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
-                if (state.dataUnitarySystems->MoistureLoad < 0.0 && this->m_HeatPump) {
+                if (state.dataUnitarySystems->MoistureLoad < 0.0 && this->m_CoolCoilExists) {
                     state.dataUnitarySystems->HeatingLoad = false;
                     state.dataUnitarySystems->CoolingLoad = true;
                 }
