@@ -7715,20 +7715,20 @@ void WriteBEPSTable(EnergyPlusData &state)
             collapsedEndUse(14, jEndUse) = ort->gatherEndUseBEPS(7, jEndUse);  // water
         }
         // repeat with totals
-        collapsedTotal(1) = ort->gatherTotalsBEPS(1);                             // electricity
-        collapsedTotal(2) = ort->gatherTotalsBEPS(2);                             // natural gas
-        collapsedTotal(3) = ort->gatherTotalsBEPS(6);                             // gasoline
-        collapsedTotal(4) = ort->gatherTotalsBEPS(8);                             // diesel
-        collapsedTotal(5) = ort->gatherTotalsBEPS(9);                             // coal
-        collapsedTotal(6) = ort->gatherTotalsBEPS(10);                            // Fuel Oil No1
-        collapsedTotal(7) = ort->gatherTotalsBEPS(11);                            // Fuel Oil No2
-        collapsedTotal(8) = ort->gatherTotalsBEPS(12);                            // propane
-        collapsedTotal(9) = ort->gatherTotalsBEPS(13);                            // other fuel 1
-        collapsedTotal(10) = ort->gatherTotalsBEPS(14);                           // other fuel 2
-        collapsedTotal(11) = ort->gatherTotalsBEPS(3);                            // district cooling <- purchased cooling
-        collapsedTotal(12) = ort->gatherTotalsBEPS(4);                            // district heating water <- purchased heating
-        collapsedTotal(13) = ort->gatherTotalsBEPS(5);                            // distrcit heating steam  <- purchased heating
-        collapsedTotal(14) = ort->gatherTotalsBEPS(7);                            // water
+        collapsedTotal(1) = ort->gatherTotalsBEPS(1);   // electricity
+        collapsedTotal(2) = ort->gatherTotalsBEPS(2);   // natural gas
+        collapsedTotal(3) = ort->gatherTotalsBEPS(6);   // gasoline
+        collapsedTotal(4) = ort->gatherTotalsBEPS(8);   // diesel
+        collapsedTotal(5) = ort->gatherTotalsBEPS(9);   // coal
+        collapsedTotal(6) = ort->gatherTotalsBEPS(10);  // Fuel Oil No1
+        collapsedTotal(7) = ort->gatherTotalsBEPS(11);  // Fuel Oil No2
+        collapsedTotal(8) = ort->gatherTotalsBEPS(12);  // propane
+        collapsedTotal(9) = ort->gatherTotalsBEPS(13);  // other fuel 1
+        collapsedTotal(10) = ort->gatherTotalsBEPS(14); // other fuel 2
+        collapsedTotal(11) = ort->gatherTotalsBEPS(3);  // district cooling <- purchased cooling
+        collapsedTotal(12) = ort->gatherTotalsBEPS(4);  // district heating water <- purchased heating
+        collapsedTotal(13) = ort->gatherTotalsBEPS(5);  // distrcit heating steam  <- purchased heating
+        collapsedTotal(14) = ort->gatherTotalsBEPS(7);  // water
 
         if (produceTabular) {
             if (state.dataGlobal->createPerfLog) {
@@ -7894,7 +7894,7 @@ void WriteBEPSTable(EnergyPlusData &state)
         Real64 heatingMaximum = 0.0;
         for (int iResource = 1; iResource <= 13; ++iResource) { // don't do water
             if (collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating) + 1) > heatingMaximum) {
-                heatingMaximum = collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating) + 1);  // +1 because enum is 0-based
+                heatingMaximum = collapsedEndUse(iResource, static_cast<int>(Constant::EndUse::Heating) + 1); // +1 because enum is 0-based
                 resourcePrimaryHeating = iResource;
             }
         }
@@ -7951,8 +7951,8 @@ void WriteBEPSTable(EnergyPlusData &state)
                                     ort->gatherTotalsBEPS(6) + ort->gatherTotalsBEPS(8) + ort->gatherTotalsBEPS(9) + ort->gatherTotalsBEPS(10) +
                                     ort->gatherTotalsBEPS(11) + ort->gatherTotalsBEPS(12) + ort->gatherTotalsBEPS(13) + ort->gatherTotalsBEPS(14)) /
                                        largeConversionFactor; // electricity (already in GJ) | natural gas | district cooling |
-                                                              // district heating water | district heating steam | gasoline | diesel | coal | Fuel Oil No1
-                                                              // | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
+                                                              // district heating water | district heating steam | gasoline | diesel | coal | Fuel Oil
+                                                              // No1 | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
 
         if (ort->efficiencyDistrictCooling == 0) ort->efficiencyDistrictCooling = 1.0;
         if (ort->efficiencyDistrictHeatingWater == 0) ort->efficiencyDistrictHeatingWater = 1.0;
@@ -8094,7 +8094,8 @@ void WriteBEPSTable(EnergyPlusData &state)
             (netSourceEnergyUse + netSourceElecPurchasedSold + ort->gatherTotalsBEPS(3) * ort->sourceFactorElectric / ort->efficiencyDistrictCooling +
              ort->gatherTotalsBEPS(4) * ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeatingWater +
              ort->gatherTotalsBEPS(5) * ort->sourceFactorDistrictHeatingSteam) /
-            largeConversionFactor; // from other fuels | net source from electricity | district cooling | district heating water | district heating steam
+            largeConversionFactor; // from other fuels | net source from electricity | district cooling | district heating water | district heating
+                                   // steam
 
         // show annual values
         tableBody(1, 1) = RealToStr(totalSiteEnergyUse, 2);
@@ -8150,19 +8151,19 @@ void WriteBEPSTable(EnergyPlusData &state)
 
         columnHead(1) = "Site=>Source Conversion Factor";
 
-            rowHead(1) = "Electricity";
-            rowHead(2) = "Natural Gas";
-            rowHead(3) = "District Cooling";
-            rowHead(4) = "District Heating Water";
-            rowHead(5) = "District Heating Steam";
-            rowHead(6) = "Gasoline";
-            rowHead(7) = "Diesel";
-            rowHead(8) = "Coal";
-            rowHead(9) = "Fuel Oil No 1";
-            rowHead(10) = "Fuel Oil No 2";
-            rowHead(11) = "Propane";
-            rowHead(12) = "Other Fuel 1";
-            rowHead(13) = "Other Fuel 2";
+        rowHead(1) = "Electricity";
+        rowHead(2) = "Natural Gas";
+        rowHead(3) = "District Cooling";
+        rowHead(4) = "District Heating Water";
+        rowHead(5) = "District Heating Steam";
+        rowHead(6) = "Gasoline";
+        rowHead(7) = "Diesel";
+        rowHead(8) = "Coal";
+        rowHead(9) = "Fuel Oil No 1";
+        rowHead(10) = "Fuel Oil No 2";
+        rowHead(11) = "Propane";
+        rowHead(12) = "Other Fuel 1";
+        rowHead(13) = "Other Fuel 2";
 
         tableBody = "";
 
@@ -8200,9 +8201,9 @@ void WriteBEPSTable(EnergyPlusData &state)
 
         tableBody(1, 3) = RealToStr(ort->sourceFactorElectric / ort->efficiencyDistrictCooling, 3); // District Cooling
 
-            tableBody(1, 4) = RealToStr(ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeatingWater, 3); // District Heating Water
+        tableBody(1, 4) = RealToStr(ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeatingWater, 3); // District Heating Water
 
-            tableBody(1, 5) = RealToStr(ort->sourceFactorDistrictHeatingSteam, 3); // District Heating Steam
+        tableBody(1, 5) = RealToStr(ort->sourceFactorDistrictHeatingSteam, 3); // District Heating Steam
 
         if (!ort->ffSchedUsed(6)) {
             tableBody(1, 6) = RealToStr(ort->sourceFactorGasoline, 3);
@@ -8395,56 +8396,56 @@ void WriteBEPSTable(EnergyPlusData &state)
         rowHead(15) = "";
         rowHead(16) = "Total End Uses";
 
-            switch (unitsStyle_cur) {
-            case UnitsStyle::JtoKWH: {
-                columnHead(1) = "Electricity [kWh]";
-                columnHead(2) = "Natural Gas [kWh]";
-                columnHead(3) = "Gasoline [kWh]";
-                columnHead(4) = "Diesel [kWh]";
-                columnHead(5) = "Coal [kWh]";
-                columnHead(6) = "Fuel Oil No 1 [kWh]";
-                columnHead(7) = "Fuel Oil No 2 [kWh]";
-                columnHead(8) = "Propane [kWh]";
-                columnHead(9) = "Other Fuel 1 [kWh]";
-                columnHead(10) = "Other Fuel 2 [kWh]";
-                columnHead(11) = "District Cooling [kWh]";
-                columnHead(12) = "District Heating Water [kWh]";
-                columnHead(13) = "District Heating Steam [kWh]";
-                columnHead(14) = "Water [m3]";
-            } break;
-            case UnitsStyle::InchPound: {
-                columnHead(1) = "Electricity [kBtu]";
-                columnHead(2) = "Natural Gas [kBtu]";
-                columnHead(3) = "Gasoline [kBtu]";
-                columnHead(4) = "Diesel [kBtu]";
-                columnHead(5) = "Coal [kBtu]";
-                columnHead(6) = "Fuel Oil No 1 [kBtu]";
-                columnHead(7) = "Fuel Oil No 2 [kBtu]";
-                columnHead(8) = "Propane [kBtu]";
-                columnHead(9) = "Other Fuel 1 [kBtu]";
-                columnHead(10) = "Other Fuel 2 [kBtu]";
-                columnHead(11) = "District Cooling [kBtu]";
-                columnHead(12) = "District Heating Water [kBtu]";
-                columnHead(13) = "District Heating Steam [kBtu]";
-                columnHead(14) = "Water [gal]";
-            } break;
-            default: {
-                columnHead(1) = "Electricity [GJ]";
-                columnHead(2) = "Natural Gas [GJ]";
-                columnHead(3) = "Gasoline [GJ]";
-                columnHead(4) = "Diesel [GJ]";
-                columnHead(5) = "Coal [GJ]";
-                columnHead(6) = "Fuel Oil No 1 [GJ]";
-                columnHead(7) = "Fuel Oil No 2 [GJ]";
-                columnHead(8) = "Propane [GJ]";
-                columnHead(9) = "Other Fuel 1 [GJ]";
-                columnHead(10) = "Other Fuel 2 [GJ]";
-                columnHead(11) = "District Cooling [GJ]";
-                columnHead(12) = "District Heating Water [GJ]";
-                columnHead(13) = "District Heating Steam [GJ]";
-                columnHead(14) = "Water [m3]";
-            } break;
-            }
+        switch (unitsStyle_cur) {
+        case UnitsStyle::JtoKWH: {
+            columnHead(1) = "Electricity [kWh]";
+            columnHead(2) = "Natural Gas [kWh]";
+            columnHead(3) = "Gasoline [kWh]";
+            columnHead(4) = "Diesel [kWh]";
+            columnHead(5) = "Coal [kWh]";
+            columnHead(6) = "Fuel Oil No 1 [kWh]";
+            columnHead(7) = "Fuel Oil No 2 [kWh]";
+            columnHead(8) = "Propane [kWh]";
+            columnHead(9) = "Other Fuel 1 [kWh]";
+            columnHead(10) = "Other Fuel 2 [kWh]";
+            columnHead(11) = "District Cooling [kWh]";
+            columnHead(12) = "District Heating Water [kWh]";
+            columnHead(13) = "District Heating Steam [kWh]";
+            columnHead(14) = "Water [m3]";
+        } break;
+        case UnitsStyle::InchPound: {
+            columnHead(1) = "Electricity [kBtu]";
+            columnHead(2) = "Natural Gas [kBtu]";
+            columnHead(3) = "Gasoline [kBtu]";
+            columnHead(4) = "Diesel [kBtu]";
+            columnHead(5) = "Coal [kBtu]";
+            columnHead(6) = "Fuel Oil No 1 [kBtu]";
+            columnHead(7) = "Fuel Oil No 2 [kBtu]";
+            columnHead(8) = "Propane [kBtu]";
+            columnHead(9) = "Other Fuel 1 [kBtu]";
+            columnHead(10) = "Other Fuel 2 [kBtu]";
+            columnHead(11) = "District Cooling [kBtu]";
+            columnHead(12) = "District Heating Water [kBtu]";
+            columnHead(13) = "District Heating Steam [kBtu]";
+            columnHead(14) = "Water [gal]";
+        } break;
+        default: {
+            columnHead(1) = "Electricity [GJ]";
+            columnHead(2) = "Natural Gas [GJ]";
+            columnHead(3) = "Gasoline [GJ]";
+            columnHead(4) = "Diesel [GJ]";
+            columnHead(5) = "Coal [GJ]";
+            columnHead(6) = "Fuel Oil No 1 [GJ]";
+            columnHead(7) = "Fuel Oil No 2 [GJ]";
+            columnHead(8) = "Propane [GJ]";
+            columnHead(9) = "Other Fuel 1 [GJ]";
+            columnHead(10) = "Other Fuel 2 [GJ]";
+            columnHead(11) = "District Cooling [GJ]";
+            columnHead(12) = "District Heating Water [GJ]";
+            columnHead(13) = "District Heating Steam [GJ]";
+            columnHead(14) = "Water [m3]";
+        } break;
+        }
 
         tableBody = "";
         for (int iResource = 1; iResource <= 14; ++iResource) {
@@ -8600,16 +8601,17 @@ void WriteBEPSTable(EnergyPlusData &state)
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchLeedEusProc,
                              "Additional",
-                             unconvert * (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) +
-                                              useVal(colPurchHeatWtr, 5) + useVal(colPurchHeatWtr, 13) + useVal(colPurchHeatSt, 5) +
-                                              useVal(colPurchHeatSt, 13)),
+                             unconvert *
+                                 (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) +
+                                  useVal(colPurchHeatWtr, 5) + useVal(colPurchHeatWtr, 13) + useVal(colPurchHeatSt, 5) + useVal(colPurchHeatSt, 13)),
                              2);
         }
 
         Real64 processOthrCost = 0.0;
         if ((useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeatWtr, 15) + useVal(colPurchHeatSt, 15)) > 0.001) {
-            Real64 const processFraction = (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) + useVal(colPurchHeatWtr, 5) +
-                useVal(colPurchHeatWtr, 13) + useVal(colPurchHeatSt, 5) + useVal(colPurchHeatSt, 13)) /
+            Real64 const processFraction =
+                (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) + useVal(colPurchHeatWtr, 5) +
+                 useVal(colPurchHeatWtr, 13) + useVal(colPurchHeatSt, 5) + useVal(colPurchHeatSt, 13)) /
                 (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeatWtr, 15) + useVal(colPurchHeatSt, 15));
             processOthrCost = state.dataOutRptPredefined->LEEDothrCostTotal * processFraction;
         }
@@ -8780,21 +8782,21 @@ void WriteBEPSTable(EnergyPlusData &state)
         // EAp2-4/5. Performance Rating Method Compliance
         // repeat some of the code for the end use subcategory table but only looping over the energy resources and not including water
 
-            Array1D_int resource_entry_map;
-            resource_entry_map.allocate(13);
-            resource_entry_map(1) = state.dataOutRptPredefined->pdchLeedPerfElEneUse;          // electricity
-            resource_entry_map(2) = state.dataOutRptPredefined->pdchLeedPerfGasEneUse;         // natural gas
-            resource_entry_map(3) = state.dataOutRptPredefined->pdchLeedPerfGasolineEneUse;    // gasoline
-            resource_entry_map(4) = state.dataOutRptPredefined->pdchLeedPerfDieselEneUse;      // diesel
-            resource_entry_map(5) = state.dataOutRptPredefined->pdchLeedPerfCoalEneUse;        // coal
-            resource_entry_map(6) = state.dataOutRptPredefined->pdchLeedPerfFuelOil1EneUse;    // fuel oil no 1
-            resource_entry_map(7) = state.dataOutRptPredefined->pdchLeedPerfFuelOil2EneUse;    // fuel oil no 2
-            resource_entry_map(8) = state.dataOutRptPredefined->pdchLeedPerfPropaneEneUse;     // propane
-            resource_entry_map(9) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel1EneUse;  // other fuel 1
-            resource_entry_map(10) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel2EneUse; // other fuel 2
-            resource_entry_map(11) = state.dataOutRptPredefined->pdchLeedPerfDisClEneUse;      // district cooling
-            resource_entry_map(12) = state.dataOutRptPredefined->pdchLeedPerfDisHtWtrEneUse;   // district heating Water
-            resource_entry_map(13) = state.dataOutRptPredefined->pdchLeedPerfDisHtStEneUse;    // district heating Steam
+        Array1D_int resource_entry_map;
+        resource_entry_map.allocate(13);
+        resource_entry_map(1) = state.dataOutRptPredefined->pdchLeedPerfElEneUse;          // electricity
+        resource_entry_map(2) = state.dataOutRptPredefined->pdchLeedPerfGasEneUse;         // natural gas
+        resource_entry_map(3) = state.dataOutRptPredefined->pdchLeedPerfGasolineEneUse;    // gasoline
+        resource_entry_map(4) = state.dataOutRptPredefined->pdchLeedPerfDieselEneUse;      // diesel
+        resource_entry_map(5) = state.dataOutRptPredefined->pdchLeedPerfCoalEneUse;        // coal
+        resource_entry_map(6) = state.dataOutRptPredefined->pdchLeedPerfFuelOil1EneUse;    // fuel oil no 1
+        resource_entry_map(7) = state.dataOutRptPredefined->pdchLeedPerfFuelOil2EneUse;    // fuel oil no 2
+        resource_entry_map(8) = state.dataOutRptPredefined->pdchLeedPerfPropaneEneUse;     // propane
+        resource_entry_map(9) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel1EneUse;  // other fuel 1
+        resource_entry_map(10) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel2EneUse; // other fuel 2
+        resource_entry_map(11) = state.dataOutRptPredefined->pdchLeedPerfDisClEneUse;      // district cooling
+        resource_entry_map(12) = state.dataOutRptPredefined->pdchLeedPerfDisHtWtrEneUse;   // district heating Water
+        resource_entry_map(13) = state.dataOutRptPredefined->pdchLeedPerfDisHtStEneUse;    // district heating Steam
 
         for (int iResource = 1; iResource <= 13; ++iResource) {
             int i = 1;
@@ -8875,56 +8877,56 @@ void WriteBEPSTable(EnergyPlusData &state)
         rowHead(3) = "Other";
         rowHead(4) = "Total";
 
-            switch (unitsStyle_cur) {
-            case UnitsStyle::JtoKWH: {
-                columnHead(1) = "Electricity Intensity [kWh/m2]";
-                columnHead(2) = "Natural Gas Intensity [kWh/m2]";
-                columnHead(3) = "Gasoline Intensity [kWh/m2]";
-                columnHead(4) = "Diesel Intensity [kWh/m2]";
-                columnHead(5) = "Coal Intensity [kWh/m2]";
-                columnHead(6) = "Fuel Oil No 1 Intensity [kWh/m2]";
-                columnHead(7) = "Fuel Oil No 2 Intensity [kWh/m2]";
-                columnHead(8) = "Propane Intensity [kWh/m2]";
-                columnHead(9) = "Other Fuel 1 Intensity [kWh/m2]";
-                columnHead(10) = "Other Fuel 2 Intensity [kWh/m2]";
-                columnHead(11) = "District Cooling Intensity [kWh/m2]";
-                columnHead(12) = "District Heating Water Intensity [kWh/m2]";
-                columnHead(13) = "District Heating Steam Intensity [kWh/m2]";
-                columnHead(14) = "Water Intensity [m3/m2]";
-            } break;
-            case UnitsStyle::InchPound: {
-                columnHead(1) = "Electricity Intensity [kBtu/ft2]";
-                columnHead(2) = "Natural Gas Intensity [kBtu/ft2]";
-                columnHead(3) = "Gasoline Intensity [kBtu/ft2]";
-                columnHead(4) = "Diesel Intensity [kBtu/ft2]";
-                columnHead(5) = "Coal Intensity [kBtu/ft2]";
-                columnHead(6) = "Fuel Oil No 1 Intensity [kBtu/ft2]";
-                columnHead(7) = "Fuel Oil No 2 Intensity [kBtu/ft2]";
-                columnHead(8) = "Propane Intensity [kBtu/ft2]";
-                columnHead(9) = "Other Fuel 1 Intensity [kBtu/ft2]";
-                columnHead(10) = "Other Fuel 2 Intensity [kBtu/ft2]";
-                columnHead(11) = "District Cooling Intensity [kBtu/ft2]";
-                columnHead(12) = "District Heating Water Intensity [kBtu/ft2]";
-                columnHead(13) = "District Heating Steam Intensity [kBtu/ft2]";
-                columnHead(14) = "Water Intensity [gal/ft2]";
-            } break;
-            default: {
-                columnHead(1) = "Electricity Intensity [MJ/m2]";
-                columnHead(2) = "Natural Gas Intensity [MJ/m2]";
-                columnHead(3) = "Gasoline Intensity [MJ/m2]";
-                columnHead(4) = "Diesel Intensity [MJ/m2]";
-                columnHead(5) = "Coal Intensity [MJ/m2]";
-                columnHead(6) = "Fuel Oil No 1 Intensity [MJ/m2]";
-                columnHead(7) = "Fuel Oil No 2 Intensity [MJ/m2]";
-                columnHead(8) = "Propane Intensity [MJ/m2]";
-                columnHead(9) = "Other Fuel 1 Intensity [MJ/m2]";
-                columnHead(10) = "Other Fuel 2 Intensity [MJ/m2]";
-                columnHead(11) = "District Cooling Intensity [MJ/m2]";
-                columnHead(12) = "District Heating Water Intensity [MJ/m2]";
-                columnHead(13) = "District Heating Steam Intensity [MJ/m2]";
-                columnHead(14) = "Water Intensity [m3/m2]";
-            } break;
-            }
+        switch (unitsStyle_cur) {
+        case UnitsStyle::JtoKWH: {
+            columnHead(1) = "Electricity Intensity [kWh/m2]";
+            columnHead(2) = "Natural Gas Intensity [kWh/m2]";
+            columnHead(3) = "Gasoline Intensity [kWh/m2]";
+            columnHead(4) = "Diesel Intensity [kWh/m2]";
+            columnHead(5) = "Coal Intensity [kWh/m2]";
+            columnHead(6) = "Fuel Oil No 1 Intensity [kWh/m2]";
+            columnHead(7) = "Fuel Oil No 2 Intensity [kWh/m2]";
+            columnHead(8) = "Propane Intensity [kWh/m2]";
+            columnHead(9) = "Other Fuel 1 Intensity [kWh/m2]";
+            columnHead(10) = "Other Fuel 2 Intensity [kWh/m2]";
+            columnHead(11) = "District Cooling Intensity [kWh/m2]";
+            columnHead(12) = "District Heating Water Intensity [kWh/m2]";
+            columnHead(13) = "District Heating Steam Intensity [kWh/m2]";
+            columnHead(14) = "Water Intensity [m3/m2]";
+        } break;
+        case UnitsStyle::InchPound: {
+            columnHead(1) = "Electricity Intensity [kBtu/ft2]";
+            columnHead(2) = "Natural Gas Intensity [kBtu/ft2]";
+            columnHead(3) = "Gasoline Intensity [kBtu/ft2]";
+            columnHead(4) = "Diesel Intensity [kBtu/ft2]";
+            columnHead(5) = "Coal Intensity [kBtu/ft2]";
+            columnHead(6) = "Fuel Oil No 1 Intensity [kBtu/ft2]";
+            columnHead(7) = "Fuel Oil No 2 Intensity [kBtu/ft2]";
+            columnHead(8) = "Propane Intensity [kBtu/ft2]";
+            columnHead(9) = "Other Fuel 1 Intensity [kBtu/ft2]";
+            columnHead(10) = "Other Fuel 2 Intensity [kBtu/ft2]";
+            columnHead(11) = "District Cooling Intensity [kBtu/ft2]";
+            columnHead(12) = "District Heating Water Intensity [kBtu/ft2]";
+            columnHead(13) = "District Heating Steam Intensity [kBtu/ft2]";
+            columnHead(14) = "Water Intensity [gal/ft2]";
+        } break;
+        default: {
+            columnHead(1) = "Electricity Intensity [MJ/m2]";
+            columnHead(2) = "Natural Gas Intensity [MJ/m2]";
+            columnHead(3) = "Gasoline Intensity [MJ/m2]";
+            columnHead(4) = "Diesel Intensity [MJ/m2]";
+            columnHead(5) = "Coal Intensity [MJ/m2]";
+            columnHead(6) = "Fuel Oil No 1 Intensity [MJ/m2]";
+            columnHead(7) = "Fuel Oil No 2 Intensity [MJ/m2]";
+            columnHead(8) = "Propane Intensity [MJ/m2]";
+            columnHead(9) = "Other Fuel 1 Intensity [MJ/m2]";
+            columnHead(10) = "Other Fuel 2 Intensity [MJ/m2]";
+            columnHead(11) = "District Cooling Intensity [MJ/m2]";
+            columnHead(12) = "District Heating Water Intensity [MJ/m2]";
+            columnHead(13) = "District Heating Steam Intensity [MJ/m2]";
+            columnHead(14) = "Water Intensity [m3/m2]";
+        } break;
+        }
 
         if (produceTabular) {
             WriteTextLine(state, "Normalized Metrics", true);
@@ -9718,38 +9720,38 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
         bool produceSQLite = false;
         if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
-            // collapse the gatherEndUseBEPS array to the resource groups displayed
-            for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-                collapsedEndUse(1, jEndUse) = ort->gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
-                collapsedEndUse(2, jEndUse) = ort->gatherEndUseBySourceBEPS(2, jEndUse);   // natural gas
-                collapsedEndUse(3, jEndUse) = ort->gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
-                collapsedEndUse(4, jEndUse) = ort->gatherEndUseBySourceBEPS(8, jEndUse);   // diesel
-                collapsedEndUse(5, jEndUse) = ort->gatherEndUseBySourceBEPS(9, jEndUse);   // coal
-                collapsedEndUse(6, jEndUse) = ort->gatherEndUseBySourceBEPS(10, jEndUse);  // Fuel Oil No1
-                collapsedEndUse(7, jEndUse) = ort->gatherEndUseBySourceBEPS(11, jEndUse);  // Fuel Oil No2
-                collapsedEndUse(8, jEndUse) = ort->gatherEndUseBySourceBEPS(12, jEndUse);  // propane
-                collapsedEndUse(9, jEndUse) = ort->gatherEndUseBySourceBEPS(13, jEndUse);  // otherfuel1
-                collapsedEndUse(10, jEndUse) = ort->gatherEndUseBySourceBEPS(14, jEndUse); // otherfuel2
-                collapsedEndUse(11, jEndUse) = ort->gatherEndUseBySourceBEPS(3, jEndUse);  // district cooling <- purchased cooling
-                collapsedEndUse(12, jEndUse) = ort->gatherEndUseBySourceBEPS(4, jEndUse);  // district heating water <- purchased heating
-                collapsedEndUse(13, jEndUse) = ort->gatherEndUseBySourceBEPS(5, jEndUse);  // district heating steam <- purchased heating
-                collapsedEndUse(14, jEndUse) = ort->gatherEndUseBySourceBEPS(7, jEndUse);  // water
-            }
-            // repeat with totals
-            collapsedTotal(1) = ort->gatherTotalsBySourceBEPS(1);   // electricity
-            collapsedTotal(2) = ort->gatherTotalsBySourceBEPS(2);   // natural gas
-            collapsedTotal(3) = ort->gatherTotalsBySourceBEPS(6);   // gasoline
-            collapsedTotal(4) = ort->gatherTotalsBySourceBEPS(8);   // diesel
-            collapsedTotal(5) = ort->gatherTotalsBySourceBEPS(9);   // coal
-            collapsedTotal(6) = ort->gatherTotalsBySourceBEPS(10);  // Fuel Oil No1
-            collapsedTotal(7) = ort->gatherTotalsBySourceBEPS(11);  // Fuel Oil No2
-            collapsedTotal(8) = ort->gatherTotalsBySourceBEPS(12);  // propane
-            collapsedTotal(9) = ort->gatherTotalsBySourceBEPS(13);  // otherfuel1
-            collapsedTotal(10) = ort->gatherTotalsBySourceBEPS(14); // otherfuel2
-            collapsedTotal(11) = ort->gatherTotalsBySourceBEPS(3);  // district cooling <- purchased cooling
-            collapsedTotal(12) = ort->gatherTotalsBySourceBEPS(4);  // district heating water <- purchased heating
-            collapsedTotal(13) = ort->gatherTotalsBySourceBEPS(5);  // district heating steam <- purchased heating
-            collapsedTotal(14) = ort->gatherTotalsBySourceBEPS(7);  // water
+        // collapse the gatherEndUseBEPS array to the resource groups displayed
+        for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
+            collapsedEndUse(1, jEndUse) = ort->gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
+            collapsedEndUse(2, jEndUse) = ort->gatherEndUseBySourceBEPS(2, jEndUse);   // natural gas
+            collapsedEndUse(3, jEndUse) = ort->gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
+            collapsedEndUse(4, jEndUse) = ort->gatherEndUseBySourceBEPS(8, jEndUse);   // diesel
+            collapsedEndUse(5, jEndUse) = ort->gatherEndUseBySourceBEPS(9, jEndUse);   // coal
+            collapsedEndUse(6, jEndUse) = ort->gatherEndUseBySourceBEPS(10, jEndUse);  // Fuel Oil No1
+            collapsedEndUse(7, jEndUse) = ort->gatherEndUseBySourceBEPS(11, jEndUse);  // Fuel Oil No2
+            collapsedEndUse(8, jEndUse) = ort->gatherEndUseBySourceBEPS(12, jEndUse);  // propane
+            collapsedEndUse(9, jEndUse) = ort->gatherEndUseBySourceBEPS(13, jEndUse);  // otherfuel1
+            collapsedEndUse(10, jEndUse) = ort->gatherEndUseBySourceBEPS(14, jEndUse); // otherfuel2
+            collapsedEndUse(11, jEndUse) = ort->gatherEndUseBySourceBEPS(3, jEndUse);  // district cooling <- purchased cooling
+            collapsedEndUse(12, jEndUse) = ort->gatherEndUseBySourceBEPS(4, jEndUse);  // district heating water <- purchased heating
+            collapsedEndUse(13, jEndUse) = ort->gatherEndUseBySourceBEPS(5, jEndUse);  // district heating steam <- purchased heating
+            collapsedEndUse(14, jEndUse) = ort->gatherEndUseBySourceBEPS(7, jEndUse);  // water
+        }
+        // repeat with totals
+        collapsedTotal(1) = ort->gatherTotalsBySourceBEPS(1);   // electricity
+        collapsedTotal(2) = ort->gatherTotalsBySourceBEPS(2);   // natural gas
+        collapsedTotal(3) = ort->gatherTotalsBySourceBEPS(6);   // gasoline
+        collapsedTotal(4) = ort->gatherTotalsBySourceBEPS(8);   // diesel
+        collapsedTotal(5) = ort->gatherTotalsBySourceBEPS(9);   // coal
+        collapsedTotal(6) = ort->gatherTotalsBySourceBEPS(10);  // Fuel Oil No1
+        collapsedTotal(7) = ort->gatherTotalsBySourceBEPS(11);  // Fuel Oil No2
+        collapsedTotal(8) = ort->gatherTotalsBySourceBEPS(12);  // propane
+        collapsedTotal(9) = ort->gatherTotalsBySourceBEPS(13);  // otherfuel1
+        collapsedTotal(10) = ort->gatherTotalsBySourceBEPS(14); // otherfuel2
+        collapsedTotal(11) = ort->gatherTotalsBySourceBEPS(3);  // district cooling <- purchased cooling
+        collapsedTotal(12) = ort->gatherTotalsBySourceBEPS(4);  // district heating water <- purchased heating
+        collapsedTotal(13) = ort->gatherTotalsBySourceBEPS(5);  // district heating steam <- purchased heating
+        collapsedTotal(14) = ort->gatherTotalsBySourceBEPS(7);  // water
 
         // unit conversion - all values are used as divisors
         Real64 largeConversionFactor;
@@ -9808,54 +9810,54 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
         largeConversionFactor = 1.0;
 
-            switch (unitsStyle_cur) {
-            case UnitsStyle::JtoKWH: {
-                columnHead(1) = "Source Electricity [kWh]";
-                columnHead(2) = "Source Natural Gas [kWh]";
-                columnHead(3) = "Source Gasoline [kWh]";
-                columnHead(4) = "Source Diesel [kWh]";
-                columnHead(5) = "Source Coal [kWh]";
-                columnHead(6) = "Source Fuel Oil No 1 [kWh]";
-                columnHead(7) = "Source Fuel Oil No 2 [kWh]";
-                columnHead(8) = "Source Propane [kWh]";
-                columnHead(9) = "Source Other Fuel 1 [kWh]";
-                columnHead(10) = "Source Other Fuel 2 [kWh]";
-                columnHead(11) = "Source District Cooling [kWh]";
-                columnHead(12) = "Source District Heating Water [kWh]";
-                columnHead(13) = "Source District Heating Steam [kWh]";
-            } break;
-            case UnitsStyle::InchPound: {
-                columnHead(1) = "Source Electricity [kBtu]";
-                columnHead(2) = "Source Natural Gas [kBtu]";
-                columnHead(3) = "Source Gasoline [kBtu]";
-                columnHead(4) = "Source Diesel [kBtu]";
-                columnHead(5) = "Source Coal [kBtu]";
-                columnHead(6) = "Source Fuel Oil No 1 [kBtu]";
-                columnHead(7) = "Source Fuel Oil No 2 [kBtu]";
-                columnHead(8) = "Source Propane [kBtu]";
-                columnHead(9) = "Source Other Fuel 1 [kBtu]";
-                columnHead(10) = "Source Other Fuel 2 [kBtu]";
-                columnHead(11) = "Source District Cooling [kBtu]";
-                columnHead(12) = "Source District Heating Water [kBtu]";
-                columnHead(13) = "Source District Heating Steam [kBtu]";
-            } break;
-            default: {
-                columnHead(1) = "Source Electricity [GJ]";
-                columnHead(2) = "Source Natural Gas [GJ]";
-                columnHead(3) = "Source Gasoline [GJ]";
-                columnHead(4) = "Source Diesel [GJ]";
-                columnHead(5) = "Source Coal [GJ]";
-                columnHead(6) = "Source Fuel Oil No 1 [GJ]";
-                columnHead(7) = "Source Fuel Oil No 2 [GJ]";
-                columnHead(8) = "Source Propane [GJ]";
-                columnHead(9) = "Source Other Fuel 1 [GJ]";
-                columnHead(10) = "Source Other Fuel 2 [GJ]";
-                columnHead(11) = "Source District Cooling [GJ]";
-                columnHead(12) = "Source District Heating Water [GJ]";
-                columnHead(13) = "Source District Heating Steam [GJ]";
-                largeConversionFactor = 1000.0; // for converting MJ to GJ
-            } break;
-            }
+        switch (unitsStyle_cur) {
+        case UnitsStyle::JtoKWH: {
+            columnHead(1) = "Source Electricity [kWh]";
+            columnHead(2) = "Source Natural Gas [kWh]";
+            columnHead(3) = "Source Gasoline [kWh]";
+            columnHead(4) = "Source Diesel [kWh]";
+            columnHead(5) = "Source Coal [kWh]";
+            columnHead(6) = "Source Fuel Oil No 1 [kWh]";
+            columnHead(7) = "Source Fuel Oil No 2 [kWh]";
+            columnHead(8) = "Source Propane [kWh]";
+            columnHead(9) = "Source Other Fuel 1 [kWh]";
+            columnHead(10) = "Source Other Fuel 2 [kWh]";
+            columnHead(11) = "Source District Cooling [kWh]";
+            columnHead(12) = "Source District Heating Water [kWh]";
+            columnHead(13) = "Source District Heating Steam [kWh]";
+        } break;
+        case UnitsStyle::InchPound: {
+            columnHead(1) = "Source Electricity [kBtu]";
+            columnHead(2) = "Source Natural Gas [kBtu]";
+            columnHead(3) = "Source Gasoline [kBtu]";
+            columnHead(4) = "Source Diesel [kBtu]";
+            columnHead(5) = "Source Coal [kBtu]";
+            columnHead(6) = "Source Fuel Oil No 1 [kBtu]";
+            columnHead(7) = "Source Fuel Oil No 2 [kBtu]";
+            columnHead(8) = "Source Propane [kBtu]";
+            columnHead(9) = "Source Other Fuel 1 [kBtu]";
+            columnHead(10) = "Source Other Fuel 2 [kBtu]";
+            columnHead(11) = "Source District Cooling [kBtu]";
+            columnHead(12) = "Source District Heating Water [kBtu]";
+            columnHead(13) = "Source District Heating Steam [kBtu]";
+        } break;
+        default: {
+            columnHead(1) = "Source Electricity [GJ]";
+            columnHead(2) = "Source Natural Gas [GJ]";
+            columnHead(3) = "Source Gasoline [GJ]";
+            columnHead(4) = "Source Diesel [GJ]";
+            columnHead(5) = "Source Coal [GJ]";
+            columnHead(6) = "Source Fuel Oil No 1 [GJ]";
+            columnHead(7) = "Source Fuel Oil No 2 [GJ]";
+            columnHead(8) = "Source Propane [GJ]";
+            columnHead(9) = "Source Other Fuel 1 [GJ]";
+            columnHead(10) = "Source Other Fuel 2 [GJ]";
+            columnHead(11) = "Source District Cooling [GJ]";
+            columnHead(12) = "Source District Heating Water [GJ]";
+            columnHead(13) = "Source District Heating Steam [GJ]";
+            largeConversionFactor = 1000.0; // for converting MJ to GJ
+        } break;
+        }
 
         //---- End Uses by Source Energy Sub-Table
 
@@ -9895,53 +9897,53 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
         // Normalized by Area tables
 
-            switch (unitsStyle_cur) {
-            case UnitsStyle::JtoKWH: {
-                columnHead(1) = "Source Electricity [kWh/m2]";
-                columnHead(2) = "Source Natural Gas [kWh/m2]";
-                columnHead(3) = "Source Gasoline [kWh/m2]";
-                columnHead(4) = "Source Diesel [kWh/m2]";
-                columnHead(5) = "Source Coal [kWh/m2]";
-                columnHead(6) = "Source Fuel Oil No 1 [kWh/m2]";
-                columnHead(7) = "Source Fuel Oil No 2 [kWh/m2]";
-                columnHead(8) = "Source Propane [kWh/m2]";
-                columnHead(9) = "Source Other Fuel 1 [kWh/m2]";
-                columnHead(10) = "Source Other Fuel 2 [kWh/m2]";
-                columnHead(11) = "Source District Cooling [kWh/m2]";
-                columnHead(12) = "Source District Heating Water [kWh/m2]";
-                columnHead(13) = "Source District Heating Steam [kWh/m2]";
-            } break;
-            case UnitsStyle::InchPound: {
-                columnHead(1) = "Source Electricity [kBtu/ft2]";
-                columnHead(2) = "Source Natural Gas [kBtu/ft2]";
-                columnHead(3) = "Source Gasoline [kBtu/ft2]";
-                columnHead(4) = "Source Diesel [kBtu/ft2]";
-                columnHead(5) = "Source Coal [kBtu/ft2]";
-                columnHead(6) = "Source Fuel Oil No 1 [kBtu/ft2]";
-                columnHead(7) = "Source Fuel Oil No 2 [kBtu/ft2]";
-                columnHead(8) = "Source Propane [kBtu/ft2]";
-                columnHead(9) = "Source Other Fuel 1 [kBtu/ft2]";
-                columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
-                columnHead(11) = "Source District Cooling [kBtu/ft2]";
-                columnHead(12) = "Source District Heating Water [kBtu/ft2]";
-                columnHead(13) = "Source District Heating Steam [kBtu/ft2]";
-            } break;
-            default: {
-                columnHead(1) = "Source Electricity [MJ/m2]";
-                columnHead(2) = "Source Natural Gas [MJ/m2]";
-                columnHead(3) = "Source Gasoline [MJ/m2]";
-                columnHead(4) = "Source Diesel [MJ/m2]";
-                columnHead(5) = "Source Coal [MJ/m2]";
-                columnHead(6) = "Source Fuel Oil No 1 [MJ/m2]";
-                columnHead(7) = "Source Fuel Oil No 2 [MJ/m2]";
-                columnHead(8) = "Source Propane [MJ/m2]";
-                columnHead(9) = "Source Other Fuel 1 [MJ/m2]";
-                columnHead(10) = "Source Other Fuel 2 [MJ/m2]";
-                columnHead(11) = "Source District Cooling [MJ/m2]";
-                columnHead(12) = "Source District Heating Water [MJ/m2]";
-                columnHead(13) = "Source District Heating Steam [MJ/m2]";
-            } break;
-            }
+        switch (unitsStyle_cur) {
+        case UnitsStyle::JtoKWH: {
+            columnHead(1) = "Source Electricity [kWh/m2]";
+            columnHead(2) = "Source Natural Gas [kWh/m2]";
+            columnHead(3) = "Source Gasoline [kWh/m2]";
+            columnHead(4) = "Source Diesel [kWh/m2]";
+            columnHead(5) = "Source Coal [kWh/m2]";
+            columnHead(6) = "Source Fuel Oil No 1 [kWh/m2]";
+            columnHead(7) = "Source Fuel Oil No 2 [kWh/m2]";
+            columnHead(8) = "Source Propane [kWh/m2]";
+            columnHead(9) = "Source Other Fuel 1 [kWh/m2]";
+            columnHead(10) = "Source Other Fuel 2 [kWh/m2]";
+            columnHead(11) = "Source District Cooling [kWh/m2]";
+            columnHead(12) = "Source District Heating Water [kWh/m2]";
+            columnHead(13) = "Source District Heating Steam [kWh/m2]";
+        } break;
+        case UnitsStyle::InchPound: {
+            columnHead(1) = "Source Electricity [kBtu/ft2]";
+            columnHead(2) = "Source Natural Gas [kBtu/ft2]";
+            columnHead(3) = "Source Gasoline [kBtu/ft2]";
+            columnHead(4) = "Source Diesel [kBtu/ft2]";
+            columnHead(5) = "Source Coal [kBtu/ft2]";
+            columnHead(6) = "Source Fuel Oil No 1 [kBtu/ft2]";
+            columnHead(7) = "Source Fuel Oil No 2 [kBtu/ft2]";
+            columnHead(8) = "Source Propane [kBtu/ft2]";
+            columnHead(9) = "Source Other Fuel 1 [kBtu/ft2]";
+            columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
+            columnHead(11) = "Source District Cooling [kBtu/ft2]";
+            columnHead(12) = "Source District Heating Water [kBtu/ft2]";
+            columnHead(13) = "Source District Heating Steam [kBtu/ft2]";
+        } break;
+        default: {
+            columnHead(1) = "Source Electricity [MJ/m2]";
+            columnHead(2) = "Source Natural Gas [MJ/m2]";
+            columnHead(3) = "Source Gasoline [MJ/m2]";
+            columnHead(4) = "Source Diesel [MJ/m2]";
+            columnHead(5) = "Source Coal [MJ/m2]";
+            columnHead(6) = "Source Fuel Oil No 1 [MJ/m2]";
+            columnHead(7) = "Source Fuel Oil No 2 [MJ/m2]";
+            columnHead(8) = "Source Propane [MJ/m2]";
+            columnHead(9) = "Source Other Fuel 1 [MJ/m2]";
+            columnHead(10) = "Source Other Fuel 2 [MJ/m2]";
+            columnHead(11) = "Source District Cooling [MJ/m2]";
+            columnHead(12) = "Source District Heating Water [MJ/m2]";
+            columnHead(13) = "Source District Heating Steam [MJ/m2]";
+        } break;
+        }
 
         //---- Normalized by Conditioned Area Sub-Table
         {
@@ -10080,36 +10082,36 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         bool produceSQLite = false;
         if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
-            // totals - select which additional fuel to display
-            collapsedTotal = 0.0;
-            collapsedTotal(1) = ort->gatherDemandTotal(1); // electricity
-            collapsedTimeStep(1) = ort->gatherDemandTimeStamp(1);
-            collapsedTotal(2) = ort->gatherDemandTotal(2); // natural gas
-            collapsedTimeStep(2) = ort->gatherDemandTimeStamp(2);
-            collapsedTotal(3) = ort->gatherDemandTotal(6); // gasoline
-            collapsedTimeStep(3) = ort->gatherDemandTimeStamp(6);
-            collapsedTotal(4) = ort->gatherDemandTotal(8); // diesel
-            collapsedTimeStep(4) = ort->gatherDemandTimeStamp(8);
-            collapsedTotal(5) = ort->gatherDemandTotal(9); // coal
-            collapsedTimeStep(5) = ort->gatherDemandTimeStamp(9);
-            collapsedTotal(6) = ort->gatherDemandTotal(10); // fuel oil no 1
-            collapsedTimeStep(6) = ort->gatherDemandTimeStamp(10);
-            collapsedTotal(7) = ort->gatherDemandTotal(11); // fuel oil no 2
-            collapsedTimeStep(7) = ort->gatherDemandTimeStamp(11);
-            collapsedTotal(8) = ort->gatherDemandTotal(12); // propane
-            collapsedTimeStep(8) = ort->gatherDemandTimeStamp(12);
-            collapsedTotal(9) = ort->gatherDemandTotal(13); // other fuel 1
-            collapsedTimeStep(9) = ort->gatherDemandTimeStamp(13);
-            collapsedTotal(10) = ort->gatherDemandTotal(14); // other fuel 2
-            collapsedTimeStep(10) = ort->gatherDemandTimeStamp(14);
-            collapsedTotal(11) = ort->gatherDemandTotal(3); // district cooling <- purchased cooling
-            collapsedTimeStep(11) = ort->gatherDemandTimeStamp(3);
-            collapsedTotal(12) = ort->gatherDemandTotal(4); // district heating water <- purchased heating
-            collapsedTimeStep(12) = ort->gatherDemandTimeStamp(4);
-            collapsedTotal(13) = ort->gatherDemandTotal(5); // district heating steam <- purchased heating
-            collapsedTimeStep(13) = ort->gatherDemandTimeStamp(5);
-            collapsedTotal(14) = ort->gatherDemandTotal(7); // water
-            collapsedTimeStep(14) = ort->gatherDemandTimeStamp(7);
+        // totals - select which additional fuel to display
+        collapsedTotal = 0.0;
+        collapsedTotal(1) = ort->gatherDemandTotal(1); // electricity
+        collapsedTimeStep(1) = ort->gatherDemandTimeStamp(1);
+        collapsedTotal(2) = ort->gatherDemandTotal(2); // natural gas
+        collapsedTimeStep(2) = ort->gatherDemandTimeStamp(2);
+        collapsedTotal(3) = ort->gatherDemandTotal(6); // gasoline
+        collapsedTimeStep(3) = ort->gatherDemandTimeStamp(6);
+        collapsedTotal(4) = ort->gatherDemandTotal(8); // diesel
+        collapsedTimeStep(4) = ort->gatherDemandTimeStamp(8);
+        collapsedTotal(5) = ort->gatherDemandTotal(9); // coal
+        collapsedTimeStep(5) = ort->gatherDemandTimeStamp(9);
+        collapsedTotal(6) = ort->gatherDemandTotal(10); // fuel oil no 1
+        collapsedTimeStep(6) = ort->gatherDemandTimeStamp(10);
+        collapsedTotal(7) = ort->gatherDemandTotal(11); // fuel oil no 2
+        collapsedTimeStep(7) = ort->gatherDemandTimeStamp(11);
+        collapsedTotal(8) = ort->gatherDemandTotal(12); // propane
+        collapsedTimeStep(8) = ort->gatherDemandTimeStamp(12);
+        collapsedTotal(9) = ort->gatherDemandTotal(13); // other fuel 1
+        collapsedTimeStep(9) = ort->gatherDemandTimeStamp(13);
+        collapsedTotal(10) = ort->gatherDemandTotal(14); // other fuel 2
+        collapsedTimeStep(10) = ort->gatherDemandTimeStamp(14);
+        collapsedTotal(11) = ort->gatherDemandTotal(3); // district cooling <- purchased cooling
+        collapsedTimeStep(11) = ort->gatherDemandTimeStamp(3);
+        collapsedTotal(12) = ort->gatherDemandTotal(4); // district heating water <- purchased heating
+        collapsedTimeStep(12) = ort->gatherDemandTimeStamp(4);
+        collapsedTotal(13) = ort->gatherDemandTotal(5); // district heating steam <- purchased heating
+        collapsedTimeStep(13) = ort->gatherDemandTimeStamp(5);
+        collapsedTotal(14) = ort->gatherDemandTotal(7); // water
+        collapsedTimeStep(14) = ort->gatherDemandTimeStamp(7);
 
         Real64 powerConversion = 1.0;
         Real64 flowConversion = 1.0;
@@ -10123,17 +10125,17 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         // collapse the gatherEndUseBEPS array to the resource groups displayed
         collapsedEndUse = 0.0;
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-            collapsedEndUse(1, jEndUse) = ort->gatherDemandEndUse(1, jEndUse) * powerConversion;                  // electricity
-            collapsedEndUse(2, jEndUse) = ort->gatherDemandEndUse(2, jEndUse) * powerConversion;                  // natural gas
-            collapsedEndUse(3, jEndUse) = ort->gatherDemandEndUse(6, jEndUse) * powerConversion;                  // gasoline
-            collapsedEndUse(4, jEndUse) = ort->gatherDemandEndUse(8, jEndUse) * powerConversion;                  // diesel
-            collapsedEndUse(5, jEndUse) = ort->gatherDemandEndUse(9, jEndUse) * powerConversion;                  // coal
-            collapsedEndUse(6, jEndUse) = ort->gatherDemandEndUse(10, jEndUse) * powerConversion;                 // fuel oil no 1
-            collapsedEndUse(7, jEndUse) = ort->gatherDemandEndUse(11, jEndUse) * powerConversion;                 // fuel oil no 2
-            collapsedEndUse(8, jEndUse) = ort->gatherDemandEndUse(12, jEndUse) * powerConversion;                 // propane
-            collapsedEndUse(9, jEndUse) = ort->gatherDemandEndUse(13, jEndUse) * powerConversion;                 // otherfuel1
-            collapsedEndUse(10, jEndUse) = ort->gatherDemandEndUse(14, jEndUse) * powerConversion;                // otherfuel2
-            collapsedEndUse(11, jEndUse) = ort->gatherDemandEndUse(3, jEndUse) * powerConversion;                 // purchased cooling
+            collapsedEndUse(1, jEndUse) = ort->gatherDemandEndUse(1, jEndUse) * powerConversion;   // electricity
+            collapsedEndUse(2, jEndUse) = ort->gatherDemandEndUse(2, jEndUse) * powerConversion;   // natural gas
+            collapsedEndUse(3, jEndUse) = ort->gatherDemandEndUse(6, jEndUse) * powerConversion;   // gasoline
+            collapsedEndUse(4, jEndUse) = ort->gatherDemandEndUse(8, jEndUse) * powerConversion;   // diesel
+            collapsedEndUse(5, jEndUse) = ort->gatherDemandEndUse(9, jEndUse) * powerConversion;   // coal
+            collapsedEndUse(6, jEndUse) = ort->gatherDemandEndUse(10, jEndUse) * powerConversion;  // fuel oil no 1
+            collapsedEndUse(7, jEndUse) = ort->gatherDemandEndUse(11, jEndUse) * powerConversion;  // fuel oil no 2
+            collapsedEndUse(8, jEndUse) = ort->gatherDemandEndUse(12, jEndUse) * powerConversion;  // propane
+            collapsedEndUse(9, jEndUse) = ort->gatherDemandEndUse(13, jEndUse) * powerConversion;  // otherfuel1
+            collapsedEndUse(10, jEndUse) = ort->gatherDemandEndUse(14, jEndUse) * powerConversion; // otherfuel2
+            collapsedEndUse(11, jEndUse) = ort->gatherDemandEndUse(3, jEndUse) * powerConversion;  // purchased cooling
             collapsedEndUse(12, jEndUse) = ort->gatherDemandEndUse(4, jEndUse) * powerConversion;  // district heating water
             collapsedEndUse(13, jEndUse) = ort->gatherDemandEndUse(5, jEndUse) * powerConversion;  // district heating steam
             collapsedEndUse(14, jEndUse) = ort->gatherDemandEndUse(7, jEndUse) * flowConversion;   // water
@@ -10163,20 +10165,20 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         // no unit conversion, it is done at the reporting stage if necessary
         collapsedIndEndUse = 0.0;
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-            collapsedIndEndUse(1, jEndUse) = ort->gatherDemandIndEndUse(1, jEndUse);                  // electricity
-            collapsedIndEndUse(2, jEndUse) = ort->gatherDemandIndEndUse(2, jEndUse);                  // natural gas
-            collapsedIndEndUse(3, jEndUse) = ort->gatherDemandIndEndUse(6, jEndUse);                  // gasoline
-            collapsedIndEndUse(4, jEndUse) = ort->gatherDemandIndEndUse(8, jEndUse);                  // diesel
-            collapsedIndEndUse(5, jEndUse) = ort->gatherDemandIndEndUse(9, jEndUse);                  // coal
-            collapsedIndEndUse(6, jEndUse) = ort->gatherDemandIndEndUse(10, jEndUse);                 // fuel oil no 1
-            collapsedIndEndUse(7, jEndUse) = ort->gatherDemandIndEndUse(11, jEndUse);                 // fuel oil no 2
-            collapsedIndEndUse(8, jEndUse) = ort->gatherDemandIndEndUse(12, jEndUse);                 // propane
-            collapsedIndEndUse(9, jEndUse) = ort->gatherDemandIndEndUse(13, jEndUse);                 // otherfuel1
-            collapsedIndEndUse(10, jEndUse) = ort->gatherDemandIndEndUse(14, jEndUse);                // otherfuel2
-            collapsedIndEndUse(11, jEndUse) = ort->gatherDemandIndEndUse(3, jEndUse);                 // purchased cooling
-            collapsedIndEndUse(12, jEndUse) = ort->gatherDemandIndEndUse(4, jEndUse); // district heating water
-            collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(5, jEndUse);                 // district heating steam
-            collapsedIndEndUse(14, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);                 // water
+            collapsedIndEndUse(1, jEndUse) = ort->gatherDemandIndEndUse(1, jEndUse);   // electricity
+            collapsedIndEndUse(2, jEndUse) = ort->gatherDemandIndEndUse(2, jEndUse);   // natural gas
+            collapsedIndEndUse(3, jEndUse) = ort->gatherDemandIndEndUse(6, jEndUse);   // gasoline
+            collapsedIndEndUse(4, jEndUse) = ort->gatherDemandIndEndUse(8, jEndUse);   // diesel
+            collapsedIndEndUse(5, jEndUse) = ort->gatherDemandIndEndUse(9, jEndUse);   // coal
+            collapsedIndEndUse(6, jEndUse) = ort->gatherDemandIndEndUse(10, jEndUse);  // fuel oil no 1
+            collapsedIndEndUse(7, jEndUse) = ort->gatherDemandIndEndUse(11, jEndUse);  // fuel oil no 2
+            collapsedIndEndUse(8, jEndUse) = ort->gatherDemandIndEndUse(12, jEndUse);  // propane
+            collapsedIndEndUse(9, jEndUse) = ort->gatherDemandIndEndUse(13, jEndUse);  // otherfuel1
+            collapsedIndEndUse(10, jEndUse) = ort->gatherDemandIndEndUse(14, jEndUse); // otherfuel2
+            collapsedIndEndUse(11, jEndUse) = ort->gatherDemandIndEndUse(3, jEndUse);  // purchased cooling
+            collapsedIndEndUse(12, jEndUse) = ort->gatherDemandIndEndUse(4, jEndUse);  // district heating water
+            collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(5, jEndUse);  // district heating steam
+            collapsedIndEndUse(14, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);  // water
         }
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
             for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
@@ -10243,37 +10245,37 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         rowHead(16) = "";
         rowHead(17) = "Total End Uses";
 
-            if (unitsStyle_cur == UnitsStyle::InchPound) {
-                columnHead(1) = "Electricity [kBtuh]";
-                columnHead(2) = "Natural Gas [kBtuh]";
-                columnHead(3) = "Gasoline [kBtuh]";
-                columnHead(4) = "Diesel [kBtuh]";
-                columnHead(5) = "Coal [kBtuh]";
-                columnHead(6) = "Fuel Oil No 1 [kBtuh]";
-                columnHead(7) = "Fuel Oil No 2 [kBtuh]";
-                columnHead(8) = "Propane [kBtuh]";
-                columnHead(9) = "Other Fuel 1 [kBtuh]";
-                columnHead(10) = "Other Fuel 2 [kBtuh]";
-                columnHead(11) = "District Cooling [kBtuh]";
-                columnHead(12) = "District Heating Water [kBtuh]";
-                columnHead(13) = "District Heating Steam [kBtuh]";
-                columnHead(14) = "Water [gal/min]";
-            } else {
-                columnHead(1) = "Electricity [W]";
-                columnHead(2) = "Natural Gas [W]";
-                columnHead(3) = "Gasoline [W]";
-                columnHead(4) = "Diesel [W]";
-                columnHead(5) = "Coal [W]";
-                columnHead(6) = "Fuel Oil No 1 [W]";
-                columnHead(7) = "Fuel Oil No 2 [W]";
-                columnHead(8) = "Propane [W]";
-                columnHead(9) = "Other Fuel 1 [W]";
-                columnHead(10) = "Other Fuel 2 [W]";
-                columnHead(11) = "District Cooling [W]";
-                columnHead(12) = "District Heating Water [W]";
-                columnHead(13) = "District Heating Steam [W]";
-                columnHead(14) = "Water [m3/s]";
-            }
+        if (unitsStyle_cur == UnitsStyle::InchPound) {
+            columnHead(1) = "Electricity [kBtuh]";
+            columnHead(2) = "Natural Gas [kBtuh]";
+            columnHead(3) = "Gasoline [kBtuh]";
+            columnHead(4) = "Diesel [kBtuh]";
+            columnHead(5) = "Coal [kBtuh]";
+            columnHead(6) = "Fuel Oil No 1 [kBtuh]";
+            columnHead(7) = "Fuel Oil No 2 [kBtuh]";
+            columnHead(8) = "Propane [kBtuh]";
+            columnHead(9) = "Other Fuel 1 [kBtuh]";
+            columnHead(10) = "Other Fuel 2 [kBtuh]";
+            columnHead(11) = "District Cooling [kBtuh]";
+            columnHead(12) = "District Heating Water [kBtuh]";
+            columnHead(13) = "District Heating Steam [kBtuh]";
+            columnHead(14) = "Water [gal/min]";
+        } else {
+            columnHead(1) = "Electricity [W]";
+            columnHead(2) = "Natural Gas [W]";
+            columnHead(3) = "Gasoline [W]";
+            columnHead(4) = "Diesel [W]";
+            columnHead(5) = "Coal [W]";
+            columnHead(6) = "Fuel Oil No 1 [W]";
+            columnHead(7) = "Fuel Oil No 2 [W]";
+            columnHead(8) = "Propane [W]";
+            columnHead(9) = "Other Fuel 1 [W]";
+            columnHead(10) = "Other Fuel 2 [W]";
+            columnHead(11) = "District Cooling [W]";
+            columnHead(12) = "District Heating Water [W]";
+            columnHead(13) = "District Heating Steam [W]";
+            columnHead(14) = "Water [m3/s]";
+        }
 
         tableBody = "";
         for (int iResource = 1; iResource <= 14; ++iResource) {
@@ -10315,11 +10317,11 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             }
         }
 
-            rowHead.allocate(numRows);
-            columnHead.allocate(15);
-            columnWidth.allocate(15);
-            columnWidth = 10; // array assignment - same for all columns
-            tableBody.allocate(15, numRows);
+        rowHead.allocate(numRows);
+        columnHead.allocate(15);
+        columnWidth.allocate(15);
+        columnWidth = 10; // array assignment - same for all columns
+        tableBody.allocate(15, numRows);
 
         rowHead = "";
         tableBody = "";
@@ -10341,39 +10343,39 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             }
         }
 
-            if (unitsStyle_cur == UnitsStyle::InchPound) {
-                columnHead(1) = "Subcategory";
-                columnHead(2) = "Electricity [kBtuh]";
-                columnHead(3) = "Natural Gas [kBtuh]";
-                columnHead(4) = "Gasoline [kBtuh]";
-                columnHead(5) = "Diesel [kBtuh]";
-                columnHead(6) = "Coal [kBtuh]";
-                columnHead(7) = "Fuel Oil No 1 [kBtuh]";
-                columnHead(8) = "Fuel Oil No 2 [kBtuh]";
-                columnHead(9) = "Propane [kBtuh]";
-                columnHead(10) = "Other Fuel 1 [kBtuh]";
-                columnHead(11) = "Other Fuel 2 [kBtuh]";
-                columnHead(12) = "District Cooling [kBtuh]";
-                columnHead(13) = "District Heating Water [kBtuh]";
-                columnHead(14) = "District Heating Steam [kBtuh]";
-                columnHead(15) = "Water [gal/min]";
-            } else {
-                columnHead(1) = "Subcategory";
-                columnHead(2) = "Electricity [W]";
-                columnHead(3) = "Natural Gas [W]";
-                columnHead(4) = "Gasoline [W]";
-                columnHead(5) = "Diesel [W]";
-                columnHead(6) = "Coal [W]";
-                columnHead(7) = "Fuel Oil No 1 [W]";
-                columnHead(8) = "Fuel Oil No 2 [W]";
-                columnHead(9) = "Propane [W]";
-                columnHead(10) = "Other Fuel 1 [W]";
-                columnHead(11) = "Other Fuel 2 [W]";
-                columnHead(12) = "District Cooling [W]";
-                columnHead(13) = "District Heating Water [W]";
-                columnHead(14) = "District Heating Steam [W]";
-                columnHead(15) = "Water [m3/s]";
-            }
+        if (unitsStyle_cur == UnitsStyle::InchPound) {
+            columnHead(1) = "Subcategory";
+            columnHead(2) = "Electricity [kBtuh]";
+            columnHead(3) = "Natural Gas [kBtuh]";
+            columnHead(4) = "Gasoline [kBtuh]";
+            columnHead(5) = "Diesel [kBtuh]";
+            columnHead(6) = "Coal [kBtuh]";
+            columnHead(7) = "Fuel Oil No 1 [kBtuh]";
+            columnHead(8) = "Fuel Oil No 2 [kBtuh]";
+            columnHead(9) = "Propane [kBtuh]";
+            columnHead(10) = "Other Fuel 1 [kBtuh]";
+            columnHead(11) = "Other Fuel 2 [kBtuh]";
+            columnHead(12) = "District Cooling [kBtuh]";
+            columnHead(13) = "District Heating Water [kBtuh]";
+            columnHead(14) = "District Heating Steam [kBtuh]";
+            columnHead(15) = "Water [gal/min]";
+        } else {
+            columnHead(1) = "Subcategory";
+            columnHead(2) = "Electricity [W]";
+            columnHead(3) = "Natural Gas [W]";
+            columnHead(4) = "Gasoline [W]";
+            columnHead(5) = "Diesel [W]";
+            columnHead(6) = "Coal [W]";
+            columnHead(7) = "Fuel Oil No 1 [W]";
+            columnHead(8) = "Fuel Oil No 2 [W]";
+            columnHead(9) = "Propane [W]";
+            columnHead(10) = "Other Fuel 1 [W]";
+            columnHead(11) = "Other Fuel 2 [W]";
+            columnHead(12) = "District Cooling [W]";
+            columnHead(13) = "District Heating Water [W]";
+            columnHead(14) = "District Heating Steam [W]";
+            columnHead(15) = "Water [m3/s]";
+        }
 
         for (int iResource = 1; iResource <= 14; ++iResource) {
             int i = 1;
@@ -10447,21 +10449,21 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         }
     }
 
-        Array1D_int resource_entry_map;
-        resource_entry_map.allocate(13);
-        resource_entry_map(1) = state.dataOutRptPredefined->pdchLeedPerfElDem;          // electricity
-        resource_entry_map(2) = state.dataOutRptPredefined->pdchLeedPerfGasDem;         // natural gas
-        resource_entry_map(3) = state.dataOutRptPredefined->pdchLeedPerfGasolineDem;    // gasoline
-        resource_entry_map(4) = state.dataOutRptPredefined->pdchLeedPerfDieselDem;      // diesel
-        resource_entry_map(5) = state.dataOutRptPredefined->pdchLeedPerfCoalDem;        // coal
-        resource_entry_map(6) = state.dataOutRptPredefined->pdchLeedPerfFuelOil1Dem;    // fuel oil no 1
-        resource_entry_map(7) = state.dataOutRptPredefined->pdchLeedPerfFuelOil2Dem;    // fuel oil no 2
-        resource_entry_map(8) = state.dataOutRptPredefined->pdchLeedPerfPropaneDem;     // propane
-        resource_entry_map(9) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel1Dem;  // other fuel 1
-        resource_entry_map(10) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel2Dem; // other fuel 2
-        resource_entry_map(11) = state.dataOutRptPredefined->pdchLeedPerfDisClDem;      // district cooling
-        resource_entry_map(12) = state.dataOutRptPredefined->pdchLeedPerfDisHtWtrDem;   // district heating water
-        resource_entry_map(13) = state.dataOutRptPredefined->pdchLeedPerfDisHtStDem;    // district heating steam
+    Array1D_int resource_entry_map;
+    resource_entry_map.allocate(13);
+    resource_entry_map(1) = state.dataOutRptPredefined->pdchLeedPerfElDem;          // electricity
+    resource_entry_map(2) = state.dataOutRptPredefined->pdchLeedPerfGasDem;         // natural gas
+    resource_entry_map(3) = state.dataOutRptPredefined->pdchLeedPerfGasolineDem;    // gasoline
+    resource_entry_map(4) = state.dataOutRptPredefined->pdchLeedPerfDieselDem;      // diesel
+    resource_entry_map(5) = state.dataOutRptPredefined->pdchLeedPerfCoalDem;        // coal
+    resource_entry_map(6) = state.dataOutRptPredefined->pdchLeedPerfFuelOil1Dem;    // fuel oil no 1
+    resource_entry_map(7) = state.dataOutRptPredefined->pdchLeedPerfFuelOil2Dem;    // fuel oil no 2
+    resource_entry_map(8) = state.dataOutRptPredefined->pdchLeedPerfPropaneDem;     // propane
+    resource_entry_map(9) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel1Dem;  // other fuel 1
+    resource_entry_map(10) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel2Dem; // other fuel 2
+    resource_entry_map(11) = state.dataOutRptPredefined->pdchLeedPerfDisClDem;      // district cooling
+    resource_entry_map(12) = state.dataOutRptPredefined->pdchLeedPerfDisHtWtrDem;   // district heating water
+    resource_entry_map(13) = state.dataOutRptPredefined->pdchLeedPerfDisHtStDem;    // district heating steam
 
     for (int iResource = 1; iResource <= 13; ++iResource) {
         int i = 1;

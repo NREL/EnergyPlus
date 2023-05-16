@@ -391,8 +391,7 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
                                                                      Constant::InitConvTemp,
                                                                      state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                      "SizeDistrict" + typeName);
-            NomCapDes =
-                Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
+            NomCapDes = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
         } else { // this->EnergyType == DataPlant::TypeOf_PurchSteam
             Real64 const tempSteam = FluidProperties::GetSatTemperatureRefrig(state,
                                                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
