@@ -647,17 +647,6 @@ namespace UtilityRoutines {
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);
 
-    bool ValidateFuelType(EnergyPlusData &state,
-                          std::string const &FuelTypeInput,
-                          std::string &FuelTypeOutput,
-                          bool &FuelTypeErrorsFound,
-                          bool AllowSteamAndDistrict = false);
-
-    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
-                                                   std::string &FuelTypeOutput,
-                                                   Constant::ResourceType &FuelTypeNum,
-                                                   bool &FuelTypeErrorsFound);
-
 } // namespace UtilityRoutines
 
 constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)

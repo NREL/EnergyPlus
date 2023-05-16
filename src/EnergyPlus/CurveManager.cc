@@ -141,18 +141,16 @@ namespace Curve {
         }
     }
 
-    void ResetPerformanceCurveOutput(EnergyPlusData &state)
+    void ResetPerformanceCurveOutput(const EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   August 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
         // PURPOSE OF THIS SUBROUTINE:
         // Reset curve outputs prior to simulating air loops, plant loops, etc.
         // This allows the report variable for curve/table objects to show an inactive state.
 
-        for (auto &c : state.dataCurveManager->PerfCurve) {
+        for (auto const &c : state.dataCurveManager->PerfCurve) {
             c->output = DataLoopNode::SensedNodeFlagValue;
             for (auto &i : c->inputs) {
                 i = DataLoopNode::SensedNodeFlagValue;

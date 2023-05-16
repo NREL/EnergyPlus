@@ -10023,7 +10023,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
     Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
@@ -10742,4 +10742,32 @@ TEST_F(EnergyPlusFixture, CalculatZoneVolume_WithoutAirBoundaries)
     EXPECT_FALSE(zone3.ceilingHeightEntered);
     EXPECT_EQ(zone3.CeilingHeight, 2.0);
     EXPECT_EQ(zone3.Volume, 8.0);
+}
+
+TEST_F(EnergyPlusFixture, Test_Rotational_Azimuth_Diffs)
+{
+    // Test Pull Request 9920 that fixes Issue 9910
+    SurfaceData BaseSurface;
+    SurfaceData SubSurface;
+    bool surfaceError;
+
+    // Base surface: Northeast
+    surfaceError = false;
+    BaseSurface.Azimuth = 30.0;
+    BaseSurface.Tilt = 90.0;
+    BaseSurface.NewellSurfaceNormalVector = Vectors::VecNormalize(DataVectorTypes::Vector(1, std::sqrt(3.0), 0));
+
+    // Sub surface: Northwest
+    // should be no error message and no surfaceError
+    SubSurface.Azimuth = 330.0;
+    SubSurface.Tilt = 90.0;
+    SubSurface.NewellSurfaceNormalVector = Vectors::VecNormalize(DataVectorTypes::Vector(-1, std::sqrt(3.0), 0));
+
+    checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
+
+    // This test would fail due to a severe error if without RP 9920 fix
+    EXPECT_FALSE(surfaceError);
+
+    // This should be true due to a warning error (but not due to sever surface error)
+    EXPECT_TRUE(has_err_output());
 }

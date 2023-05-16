@@ -781,10 +781,10 @@ namespace SolarCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
         } else if (this->Type == DataPlant::PlantEquipmentType::SolarCollectorICS) {
 
@@ -843,10 +843,10 @@ namespace SolarCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -864,10 +864,10 @@ namespace SolarCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -885,10 +885,10 @@ namespace SolarCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
         }
     }

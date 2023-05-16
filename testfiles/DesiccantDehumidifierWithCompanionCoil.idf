@@ -104,7 +104,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,23.2;
 
   Building,
     Building,                !- Name
@@ -2784,6 +2784,8 @@
     0.75,                    !- High Speed Rated Sensible Heat Ratio
     3.0,                     !- High Speed Gross Rated Cooling COP {W/W}
     2.5893,                  !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     Mixed Air Node 1,        !- Air Inlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name
@@ -2796,6 +2798,8 @@
     0.69,                    !- Low Speed Gross Rated Sensible Heat Ratio
     4.2,                     !- Low Speed Gross Rated Cooling COP {W/W}
     0.863,                   !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     VarSpeedCoolCapLSFT,     !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     VarSpeedCoolEIRLSFT,     !- Low Speed Energy Input Ratio Function of Temperature Curve Name
     Main Cooling Coil 1 Condenser Node;  !- Condenser Air Inlet Node Name

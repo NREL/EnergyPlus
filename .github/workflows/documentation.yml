@@ -104,12 +104,6 @@ jobs:
         name: PlantApplicationGuide
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/PlantApplicationGuide.pdf
 
-    - name: Upload TipsAndTricksUsingEnergyPlus
-      uses: actions/upload-artifact@v3
-      with:
-        name: TipsAndTricksUsingEnergyPlus
-        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/TipsAndTricksUsingEnergyPlus.pdf
-
     - name: Upload UsingEnergyPlusForCompliance
       uses: actions/upload-artifact@v3
       with:

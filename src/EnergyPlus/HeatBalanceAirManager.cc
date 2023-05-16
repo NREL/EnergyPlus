@@ -493,7 +493,6 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
         IsNotOK = false;
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         state.dataHeatBal->ZoneAirBalance(Loop).Name = cAlphaArgs(1);
         state.dataHeatBal->ZoneAirBalance(Loop).ZoneName = cAlphaArgs(2);
         state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
@@ -693,7 +692,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Fans",
                                 "Ventilation (simple)",
@@ -2043,7 +2042,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
                                             thisZone.Name,
-                                            _,
+                                            {},
                                             "Electricity",
                                             "Fans",
                                             "Ventilation (simple)",
@@ -2523,7 +2522,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
                                             thisZone.Name,
-                                            _,
+                                            {},
                                             "Electricity",
                                             "Fans",
                                             "Ventilation (simple)",
@@ -3823,7 +3822,6 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                                                      lAlphaFieldBlanks,
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             NameThisObject = cAlphaArgs(1);
 

@@ -217,7 +217,6 @@ void GetGshpInput(EnergyPlusData &state)
 
     for (GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterClg->NumGSHPs; ++GSHPNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state, ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), ModuleCompNameUC, ErrorsFound);
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name = AlphArray(1);
 
@@ -400,10 +399,10 @@ void GetGshpInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name,
-                            _,
+                            {},
                             "Electricity",
                             "Cooling",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,

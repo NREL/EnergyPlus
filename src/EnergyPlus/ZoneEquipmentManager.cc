@@ -3046,17 +3046,12 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
         InitSystemOutputRequired(state, ControlledZoneNum, FirstHVACIteration, true);
 
-        auto &TurnFansOn = state.dataHVACGlobal->TurnFansOn;
-        auto &TurnFansOff = state.dataHVACGlobal->TurnFansOff;
-        auto &TurnZoneFansOnlyOn = state.dataHVACGlobal->TurnZoneFansOnlyOn;
-
-        // Air loop system availability manager status only applies to PIU and exhaust fans
-        // Reset fan SAM operation flags for zone fans.
-        TurnFansOn = false;
-        TurnZoneFansOnlyOn = false;
-        TurnFansOff = false;
-
         for (int EquipTypeNum = 1; EquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ControlledZoneNum).NumOfEquipTypes; ++EquipTypeNum) {
+
+            // Air loop system availability manager status only applies to PIU and exhaust fans
+            // Reset fan SAM operation flags for zone fans.
+            state.dataHVACGlobal->TurnFansOn = false;
+            state.dataHVACGlobal->TurnFansOff = false;
 
             state.dataHVACGlobal->UnbalExhMassFlow = 0.0;
             state.dataHVACGlobal->BalancedExhMassFlow = 0.0;
@@ -3107,18 +3102,12 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 SystemAvailabilityManager::GetZoneEqAvailabilityManager(state, ZoneEquipTypeNum, ZoneCompNum, ErrorFlag);
 
                 if (ZoneComp(ZoneEquipTypeNum).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == DataHVACGlobals::CycleOn) {
-                    state.dataHVACGlobal->ZoneCompTurnFansOn = true;
-                    state.dataHVACGlobal->ZoneCompTurnFansOff = false;
+                    state.dataHVACGlobal->TurnFansOn = true;
+                    state.dataHVACGlobal->TurnFansOff = false;
                 } else if (ZoneComp(ZoneEquipTypeNum).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == DataHVACGlobals::ForceOff) {
-                    state.dataHVACGlobal->ZoneCompTurnFansOn = false;
-                    state.dataHVACGlobal->ZoneCompTurnFansOff = true;
-                } else {
-                    state.dataHVACGlobal->ZoneCompTurnFansOn = TurnFansOn;
-                    state.dataHVACGlobal->ZoneCompTurnFansOff = TurnFansOff;
+                    state.dataHVACGlobal->TurnFansOn = false;
+                    state.dataHVACGlobal->TurnFansOff = true;
                 }
-            } else {
-                state.dataHVACGlobal->ZoneCompTurnFansOn = TurnFansOn;
-                state.dataHVACGlobal->ZoneCompTurnFansOff = TurnFansOff;
             }
 
             switch (ZoneEquipTypeNum) {
@@ -3128,14 +3117,10 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 // and set fan on/off flags accordingly.
                 if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOn ||
                     state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) {
-                    TurnFansOn = true;
-                }
-                if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) {
-                    // Currently used only by parallel powered induction unit
-                    TurnZoneFansOnlyOn = true;
+                    state.dataHVACGlobal->TurnFansOn = true;
                 }
                 if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::ForceOff) {
-                    TurnFansOff = true;
+                    state.dataHVACGlobal->TurnFansOff = true;
                 }
 
                 ZoneAirLoopEquipmentManager::ManageZoneAirLoopEquipment(state,
@@ -3146,11 +3131,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                                         LatOutputProvided,
                                                                         ControlledZoneNum,
                                                                         zoneEquipList.EquipIndex(EquipPtr));
-
-                //            reset status flags for other zone equipment
-                TurnFansOn = false;
-                TurnZoneFansOnlyOn = false;
-                TurnFansOff = false;
 
                 thisZoneHB.NonAirSystemResponse += NonAirSysOutput;
                 SysOutputProvided = NonAirSysOutput + AirSysOutput;
@@ -3336,10 +3316,10 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 // and set fan on/off flags accordingly.
                 if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOn ||
                     state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::CycleOnZoneFansOnly) {
-                    TurnFansOn = true;
+                    state.dataHVACGlobal->TurnFansOn = true;
                 }
                 if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == DataHVACGlobals::ForceOff) {
-                    TurnFansOff = true;
+                    state.dataHVACGlobal->TurnFansOff = true;
                 }
 
                 Fans::SimulateFanComponents(state,
@@ -3347,9 +3327,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                             FirstHVACIteration,
                                             zoneEquipList.EquipIndex(EquipPtr));
 
-                //            reset status flags for other zone equipment
-                TurnFansOn = false;
-                TurnFansOff = false;
             } break;
             case ZoneEquip::HeatXchngr: { // 'HeatExchanger:AirToAir:FlatPlate'
                 HeatRecovery::SimHeatRecovery(state,

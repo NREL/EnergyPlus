@@ -299,7 +299,7 @@ namespace GroundHeatExchangers {
                       Real64 &CurLoad,
                       bool RunFlag) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
+        static GLHEBase *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
 
         virtual Real64 getGFunc(Real64) = 0;
 
@@ -487,7 +487,7 @@ namespace GroundHeatExchangers {
     std::shared_ptr<GLHEResponseFactors>
     BuildAndGetResponseFactorsObjectFromSingleBHs(EnergyPlusData &state, std::vector<std::shared_ptr<GLHEVertSingle>> const &singleBHsForRFVect);
 
-    void SetupBHPointsForResponseFactorsObject(std::shared_ptr<GLHEResponseFactors> &thisRF);
+    void SetupBHPointsForResponseFactorsObject(const std::shared_ptr<GLHEResponseFactors> &thisRF);
 
     std::shared_ptr<GLHEResponseFactors> GetResponseFactor(EnergyPlusData &state, std::string const &objectName);
 

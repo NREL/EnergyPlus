@@ -678,8 +678,6 @@ namespace HeatRecovery {
             thisPerfData.NumericFieldNames = "";
             thisPerfData.NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
             thisPerfData.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisPerfData.PerfType = cCurrentModuleObject;
             thisPerfData.NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
@@ -1093,10 +1091,10 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEAT RECOVERY FOR HEATING",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Cooling Rate",
@@ -1140,10 +1138,10 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEAT RECOVERY FOR COOLING",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -1160,10 +1158,10 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
-                                _,
+                                {},
                                 "ELECTRICITY",
                                 "HEATRECOVERY",
-                                _,
+                                {},
                                 "System");
         }
 
