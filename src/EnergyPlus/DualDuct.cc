@@ -251,7 +251,7 @@ namespace DualDuct {
                 thisDD.Name = AlphArray(1);
                 thisDD.DamperType = DualDuctDamper::ConstantVolume;
                 if (lAlphaBlanks(2)) {
-                    thisDD.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisDD.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisDD.SchedPtr = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
                     if (thisDD.SchedPtr == 0) {
@@ -390,7 +390,7 @@ namespace DualDuct {
                 thisDD.Name = AlphArray(1);
                 thisDD.DamperType = DualDuctDamper::VariableVolume;
                 if (lAlphaBlanks(2)) {
-                    thisDD.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisDD.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisDD.SchedPtr = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
                     if (thisDD.SchedPtr == 0) {
@@ -550,7 +550,7 @@ namespace DualDuct {
                 thisDD.Name = AlphArray(1);
                 thisDD.DamperType = DualDuctDamper::OutdoorAir;
                 if (lAlphaBlanks(2)) {
-                    thisDD.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisDD.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisDD.SchedPtr = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
                     if (thisDD.SchedPtr == 0) {

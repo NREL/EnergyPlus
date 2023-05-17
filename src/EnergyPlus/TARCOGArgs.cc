@@ -611,14 +611,14 @@ void PrepVariablesISO15099(int const nlayer,
             if (ThermalMod == TARCOGThermalModel::SCW) {
                 // bi...the idea here is to have glass-to-glass width the same as before scaling
                 // bi...TODO: check for outdoor and indoor blinds! SCW model is only applicable to in-between SDs!!!
-                thick(i) = SlatWidth(i) * std::cos(SlatAngle(i) * DataGlobalConstants::Pi / 180.0);
+                thick(i) = SlatWidth(i) * std::cos(SlatAngle(i) * Constant::Pi / 180.0);
                 if (i > 1) gap(i - 1) += (1.0 - SDScalar) / 2.0 * thick(i); // Autodesk:BoundsViolation gap(i-1) @ i=1: Added if condition
                 gap(i) += (1.0 - SDScalar) / 2.0 * thick(i);
                 thick(i) *= SDScalar;
                 if (thick(i) < SlatThick(i)) thick(i) = SlatThick(i);
             } else if ((ThermalMod == TARCOGThermalModel::ISO15099) || (ThermalMod == TARCOGThermalModel::CSM)) {
                 thick(i) = SlatThick(i);
-                const Real64 slatAngRad = SlatAngle(i) * 2.0 * DataGlobalConstants::Pi / 360.0;
+                const Real64 slatAngRad = SlatAngle(i) * 2.0 * Constant::Pi / 360.0;
                 Real64 C4_VENET(0);
                 if ((TARCOGLayerType)LayerType(i) == TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ) {
                     C4_VENET = C4_VENET_HORIZONTAL;
@@ -633,17 +633,17 @@ void PrepVariablesISO15099(int const nlayer,
 
     hint = hin;
     houtt = hout;
-    tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0; // convert tilt in degrees to radians
+    tiltr = tilt * 2.0 * Constant::Pi / 360.0; // convert tilt in degrees to radians
 
     // external radiation term
     switch (isky) {
     case 3:
         Gout = outir;
-        trmout = root_4(Gout / DataGlobalConstants::StefanBoltzmann);
+        trmout = root_4(Gout / Constant::StefanBoltzmann);
         break;
     case 2: // effective clear sky emittance from swinbank (SPC142/ISO15099 equations 131, 132, ...)
         Rsky = 5.31e-13 * pow_6(tout);
-        esky = Rsky / (DataGlobalConstants::StefanBoltzmann * pow_4(tout)); // check esky const, also check what esky to use when tsky input...
+        esky = Rsky / (Constant::StefanBoltzmann * pow_4(tout)); // check esky const, also check what esky to use when tsky input...
         break;
     case 1:
         esky = pow_4(tsky) / pow_4(tout);
@@ -671,7 +671,7 @@ void PrepVariablesISO15099(int const nlayer,
             trmout = tout * root_4(e0);
         }
 
-        Gout = DataGlobalConstants::StefanBoltzmann * pow_4(trmout);
+        Gout = Constant::StefanBoltzmann * pow_4(trmout);
     } // if (isky.ne.3) then
 
     ebsky = Gout;
@@ -680,7 +680,7 @@ void PrepVariablesISO15099(int const nlayer,
         trmin = tind;
     }
 
-    Gin = DataGlobalConstants::StefanBoltzmann * pow_4(trmin);
+    Gin = Constant::StefanBoltzmann * pow_4(trmin);
     ebroom = Gin;
 
     // calculate ir reflectance:

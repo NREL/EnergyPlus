@@ -422,7 +422,7 @@ namespace TranspiredCollector {
             }
             state.dataTranspiredCollector->UTSC(Item).OSCMPtr = Found;
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                state.dataTranspiredCollector->UTSC(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataTranspiredCollector->UTSC(Item).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataTranspiredCollector->UTSC(Item).SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (state.dataTranspiredCollector->UTSC(Item).SchedPtr == 0) {
@@ -735,13 +735,13 @@ namespace TranspiredCollector {
             } break;
             case Layout_Square: { // 'SQUARE'
                 state.dataTranspiredCollector->UTSC(Item).Porosity =
-                    (DataGlobalConstants::Pi / 4.0) * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia) /
+                    (Constant::Pi / 4.0) * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia) /
                     pow_2(state.dataTranspiredCollector->UTSC(Item).Pitch); // Waterloo equation, square layout
             } break;
             default:
                 break;
             }
-            TiltRads = std::abs(AvgTilt) * DataGlobalConstants::DegToRadians;
+            TiltRads = std::abs(AvgTilt) * Constant::DegToRadians;
             tempHdeltaNPL = std::sin(TiltRads) * state.dataTranspiredCollector->UTSC(Item).Height / 4.0;
             state.dataTranspiredCollector->UTSC(Item).HdeltaNPL = max(tempHdeltaNPL, state.dataTranspiredCollector->UTSC(Item).PlenGapThick);
 
@@ -794,10 +794,10 @@ namespace TranspiredCollector {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataTranspiredCollector->UTSC(Item).Name,
-                                _,
+                                {},
                                 "SolarAir",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -1184,8 +1184,8 @@ namespace TranspiredCollector {
             AbsThermSurf =
                 dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
                     ->AbsorpThermal;
-            TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + DataGlobalConstants::KelvinConv;
-            TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + DataGlobalConstants::KelvinConv;
+            TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + Constant::KelvinConv;
+            TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + Constant::KelvinConv;
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
         }
         //        AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
@@ -1434,7 +1434,7 @@ namespace TranspiredCollector {
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveACH =
             (MdotVent / RhoAir) *
             (1.0 / (state.dataTranspiredCollector->UTSC(UTSCNum).ProjArea * state.dataTranspiredCollector->UTSC(UTSCNum).PlenGapThick)) *
-            DataGlobalConstants::SecInHour;
+            Constant::SecInHour;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotVent = MdotVent;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotWind = VdotWind * RhoAir;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotTherm = VdotThermal * RhoAir;

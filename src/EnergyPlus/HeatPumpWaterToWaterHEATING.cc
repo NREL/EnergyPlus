@@ -221,7 +221,6 @@ void GetGshpInput(EnergyPlusData &state)
 
     for (GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterHtg->NumGSHPs; ++GSHPNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state, ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), ModuleCompNameUC, ErrorsFound);
 
         state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name = AlphArray(1);
 
@@ -390,10 +389,10 @@ void GetGshpInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name,
-                            _,
+                            {},
                             "Electricity",
                             "Heating",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -505,7 +504,7 @@ void GshpPeHeatingSpecs::initialize(EnergyPlusData &state)
         this->beginEnvironFlag = false;
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::CWInitConvTemp,
+                                                       Constant::CWInitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
         this->LoadSideDesignMassFlow = this->LoadSideVolFlowRate * rho;
@@ -514,7 +513,7 @@ void GshpPeHeatingSpecs::initialize(EnergyPlusData &state)
 
         rho = FluidProperties::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                                DataGlobalConstants::CWInitConvTemp,
+                                                Constant::CWInitConvTemp,
                                                 state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                                 RoutineName);
         this->SourceSideDesignMassFlow = this->SourceSideVolFlowRate * rho;
@@ -858,7 +857,7 @@ void GshpPeHeatingSpecs::update(EnergyPlusData &state)
         // set node flow rates;  for these load based models
         // assume that the sufficient Source Side flow rate available
 
-        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         this->Energy = this->Power * ReportingConstant;
         this->QSourceEnergy = QSource * ReportingConstant;

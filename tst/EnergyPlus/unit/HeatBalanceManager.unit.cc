@@ -500,7 +500,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeADUNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
@@ -526,7 +526,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1) = 8;
     state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = true;
-    state->dataZoneEquip->ZoneEquipConfig(2).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnFlowSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
     state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).InletNodeADUNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitCool.allocate(1);
@@ -2583,7 +2583,7 @@ TEST_F(EnergyPlusFixture, ReadIncidentSolarMultiplierInput)
     state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * Constant::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 

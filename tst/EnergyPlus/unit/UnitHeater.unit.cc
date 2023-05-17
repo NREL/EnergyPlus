@@ -1125,7 +1125,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
 
     state->dataLoopNodes->MoreNodeInfo.allocate(20);
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
-    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
 
@@ -1153,12 +1153,12 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     HWMaxVolFlowRate = state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
     HWDensity = GetDensityGlycol(*state,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidName,
-                                 DataGlobalConstants::HWInitConvTemp,
+                                 Constant::HWInitConvTemp,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidIndex,
                                  "xxx");
     CpHW = GetSpecificHeatGlycol(*state,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidName,
-                                 DataGlobalConstants::HWInitConvTemp,
+                                 Constant::HWInitConvTemp,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidIndex,
                                  "xxx");
     HWPlantDeltaTDesign = state->dataSize->PlantSizData(PltSizHeatNum).DeltaT;
@@ -1350,8 +1350,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataGlobal->DoingSizing = true;
 
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);

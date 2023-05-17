@@ -101,7 +101,6 @@ namespace HeatingCoils {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
-    using namespace DataGlobalConstants;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -352,7 +351,7 @@ namespace HeatingCoils {
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
 
             CurrentModuleObject = "Coil:Heating:Electric";
-            heatingCoil.FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
+            heatingCoil.ResourceType = Constant::eResource::Electricity;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -371,15 +370,13 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, state.dataHeatingCoils->InputErrorsFound);
-
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
 
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -447,10 +444,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
@@ -466,10 +463,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",
@@ -488,7 +485,7 @@ namespace HeatingCoils {
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
 
             CurrentModuleObject = "Coil:Heating:Electric:MultiStage";
-            heatingCoil.FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
+            heatingCoil.ResourceType = Constant::eResource::Electricity;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -507,13 +504,12 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, state.dataHeatingCoils->InputErrorsFound);
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -590,10 +586,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
@@ -609,10 +605,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",
@@ -649,13 +645,12 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, state.dataHeatingCoils->InputErrorsFound);
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -675,17 +670,13 @@ namespace HeatingCoils {
             heatingCoil.HeatingCoilModel = "Fuel";
             heatingCoil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
-            heatingCoil.FuelType_Num = AssignResourceTypeNum(Alphas(3));
-            if (!(heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::Natural_Gas ||
-                  heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::Propane ||
-                  heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::Diesel ||
-                  heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::Gasoline ||
-                  heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::FuelOil_1 ||
-                  heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::FuelOil_2 ||
-                  heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::OtherFuel1 ||
-                  heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::OtherFuel2 ||
-                  heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::Coal) ||
-                heatingCoil.FuelType_Num == DataGlobalConstants::ResourceType::None) {
+            heatingCoil.ResourceType = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, Alphas(3)));
+            if (!(heatingCoil.ResourceType == Constant::eResource::NaturalGas || heatingCoil.ResourceType == Constant::eResource::Propane ||
+                  heatingCoil.ResourceType == Constant::eResource::Diesel || heatingCoil.ResourceType == Constant::eResource::Gasoline ||
+                  heatingCoil.ResourceType == Constant::eResource::FuelOilNo1 || heatingCoil.ResourceType == Constant::eResource::FuelOilNo2 ||
+                  heatingCoil.ResourceType == Constant::eResource::OtherFuel1 || heatingCoil.ResourceType == Constant::eResource::OtherFuel2 ||
+                  heatingCoil.ResourceType == Constant::eResource::Coal) ||
+                heatingCoil.ResourceType == Constant::eResource::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}: Invalid {} entered ={} for {}={}",
                                        RoutineName,
@@ -696,7 +687,7 @@ namespace HeatingCoils {
                                        Alphas(1)));
                 state.dataHeatingCoils->InputErrorsFound = true;
             }
-            std::string const FuelType(GetResourceTypeChar(heatingCoil.FuelType_Num));
+            std::string const FuelType(Constant::eResourceNames[static_cast<int>(heatingCoil.ResourceType)]);
 
             heatingCoil.Efficiency = Numbers(1);
             heatingCoil.NominalCapacity = Numbers(2);
@@ -755,10 +746,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
@@ -774,10 +765,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 FuelType,
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil " + FuelType + " Rate",
@@ -793,10 +784,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",
@@ -826,10 +817,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 FuelType,
                                 "Heating",
-                                _,
+                                {},
                                 "System");
         }
 
@@ -841,7 +832,7 @@ namespace HeatingCoils {
             auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
             CurrentModuleObject = "Coil:Heating:Gas:MultiStage";
-            heatingCoil.FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
+            heatingCoil.ResourceType = Constant::eResource::NaturalGas;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -860,13 +851,12 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, state.dataHeatingCoils->InputErrorsFound);
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -954,10 +944,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
@@ -973,10 +963,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 "NaturalGas",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil NaturalGas Rate",
@@ -992,10 +982,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",
@@ -1025,10 +1015,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 "NaturalGas",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
         }
 
@@ -1040,7 +1030,7 @@ namespace HeatingCoils {
             auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
             auto &heatingCoilNumericFields = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum);
             CurrentModuleObject = "Coil:Heating:Desuperheater";
-            heatingCoil.FuelType_Num = DataGlobalConstants::ResourceType::Electricity;
+            heatingCoil.ResourceType = Constant::eResource::Electricity;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -1059,13 +1049,12 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, state.dataHeatingCoils->InputErrorsFound);
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                heatingCoil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
@@ -1376,10 +1365,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
@@ -1395,10 +1384,10 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",

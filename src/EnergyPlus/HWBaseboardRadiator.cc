@@ -519,7 +519,7 @@ namespace HWBaseboardRadiator {
             // Get schedule
             HWBaseboard(BaseboardNum).Schedule = state.dataIPShortCut->cAlphaArgs(3);
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                HWBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                HWBaseboard(BaseboardNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 HWBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (HWBaseboard(BaseboardNum).SchedPtr == 0) {
@@ -790,10 +790,10 @@ namespace HWBaseboardRadiator {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 HWBaseboard(BaseboardNum).EquipID,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -817,10 +817,10 @@ namespace HWBaseboardRadiator {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 HWBaseboard(BaseboardNum).EquipID,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Mass Flow Rate",
@@ -974,7 +974,7 @@ namespace HWBaseboardRadiator {
 
             rho = GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
-                                   DataGlobalConstants::HWInitConvTemp,
+                                   Constant::HWInitConvTemp,
                                    state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
                                    RoutineName);
 
@@ -1204,12 +1204,12 @@ namespace HWBaseboardRadiator {
                     if (DesCoilLoad >= SmallLoad) {
                         Cp = GetSpecificHeatGlycol(state,
                                                    state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
-                                                   DataGlobalConstants::HWInitConvTemp,
+                                                   Constant::HWInitConvTemp,
                                                    state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
                                                    RoutineName);
                         rho = GetDensityGlycol(state,
                                                state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
-                                               DataGlobalConstants::HWInitConvTemp,
+                                               Constant::HWInitConvTemp,
                                                state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         WaterVolFlowRateMaxDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -1260,7 +1260,7 @@ namespace HWBaseboardRadiator {
                     DesCoilLoad = RatedCapacityDes;
                     rho = GetDensityGlycol(state,
                                            state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidName,
-                                           DataGlobalConstants::HWInitConvTemp,
+                                           Constant::HWInitConvTemp,
                                            state.dataPlnt->PlantLoop(HWBaseboard(BaseboardNum).plantLoc.loopNum).FluidIndex,
                                            RoutineNameFull);
                     WaterMassFlowRateStd = HWBaseboard(BaseboardNum).WaterVolFlowRateMax * rho;
@@ -1773,11 +1773,10 @@ namespace HWBaseboardRadiator {
         //       RE-ENGINEERED  na
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
 
-        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        HWBaseboard(BaseboardNum).ConvEnergy =
-            HWBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        HWBaseboard(BaseboardNum).TotEnergy = HWBaseboard(BaseboardNum).TotPower * state.dataHVACGlobal->TimeStepSysSec;
+        HWBaseboard(BaseboardNum).Energy = HWBaseboard(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSysSec;
+        HWBaseboard(BaseboardNum).ConvEnergy = HWBaseboard(BaseboardNum).ConvPower * state.dataHVACGlobal->TimeStepSysSec;
+        HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * state.dataHVACGlobal->TimeStepSysSec;
     }
 
     void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,

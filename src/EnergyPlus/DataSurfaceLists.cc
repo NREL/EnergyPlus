@@ -143,7 +143,6 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject1, ErrorsFound);
 
             SurfList(Item).Name = Alphas(1);
             SurfList(Item).NumOfSurfaces = NumAlphas - 1;
@@ -167,6 +166,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
 
             SumOfAllFractions = 0.0;
             bool showSameZoneWarning = true;
+            int ZoneForSurface = 0; // Zone number that first surface is attached to
             for (int SurfNum = 1; SurfNum <= SurfList(Item).NumOfSurfaces; ++SurfNum) {
                 SurfList(Item).SurfName(SurfNum) = Alphas(SurfNum + 1);
                 SurfList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(SurfNum + 1), state.dataSurface->Surface);
@@ -178,7 +178,6 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                     ErrorsFound = true;
                 } else { // Make sure that all of the surfaces are located in the same zone
                     state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(SurfList(Item).SurfPtr(SurfNum)) = true;
-                    int ZoneForSurface; // Zone number that a particular surface is attached to
                     if (SurfNum == 1) {
                         ZoneForSurface = state.dataSurface->Surface(SurfList(Item).SurfPtr(SurfNum)).Zone;
                     }
@@ -251,7 +250,6 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject2, ErrorsFound);
 
             SlabList(Item).Name = Alphas(1);
             SlabList(Item).NumOfSurfaces = ((NumAlphas - 1) / 4);

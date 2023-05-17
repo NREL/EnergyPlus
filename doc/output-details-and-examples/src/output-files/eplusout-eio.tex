@@ -308,7 +308,7 @@ This is the WindPressureCoefficientValues object name entered from the IDF.
 
 \subsubsection{Field: Wind Pressure Coefficients \#1 to n}\label{field-wind-pressure-coefficients-1-to-n}
 
-These values are the wind pressure coefficient for the building façade. These wind pressure coefficient values correspond to the first through Nth wind directions reported above for \textless{}AirflowNetwork Model:Wind Direction\textgreater{}. If Wind Pressure Coefficient Type = INPUT in the AirflowNetwork:SimulationControl object, the wind pressure coefficients described here are the inputs specified in the AirflowNetwork:MultiZone:Wind Pressure Coefficient Values object,. If Wind Pressure Coefficient Type = SurfaceAverageCalculation in the AirflowNetwork:SimulationControl object, the wind pressure coefficients are calculated internally and also described here.
+These values are the wind pressure coefficient for the building facade. These wind pressure coefficient values correspond to the first through Nth wind directions reported above for \textless{}AirflowNetwork Model:Wind Direction\textgreater{}. If Wind Pressure Coefficient Type = INPUT in the AirflowNetwork:SimulationControl object, the wind pressure coefficients described here are the inputs specified in the AirflowNetwork:MultiZone:Wind Pressure Coefficient Values object,. If Wind Pressure Coefficient Type = SurfaceAverageCalculation in the AirflowNetwork:SimulationControl object, the wind pressure coefficients are calculated internally and also described here.
 
 \subsection{Zone Volume Capacitance Multiplier}\label{zone-volume-capacitance-multiplier}
 
@@ -458,11 +458,11 @@ This is the name given to the location whether from the IDF or the weather file.
 
 \subsubsection{Field: Latitude}\label{field-latitude}
 
-This is the latitude of the site, expressed decimally. Convention uses positive (+) values for North of the Equator and negative (-) values for South of the Equator. For example, S 30° 15' is expressed as --30.25.
+This is the latitude of the site, expressed decimally. Convention uses positive (+) values for North of the Equator and negative (-) values for South of the Equator. For example, S 30$^{\circ}$ 15' is expressed as --30.25.
 
 \subsubsection{Field: Longitude}\label{field-longitude}
 
-This is the longitude of the site, expressed decimally. Convention uses positive (+) values for East of the Greenwich meridian and negative (-) values for West of the Greenwich meridian. For example, E 130° 45' is expressed as +130.75.
+This is the longitude of the site, expressed decimally. Convention uses positive (+) values for East of the Greenwich meridian and negative (-) values for West of the Greenwich meridian. For example, E 130$^{\circ}$ 45' is expressed as +130.75.
 
 \subsubsection{Field: Time Zone Number}\label{field-time-zone-number}
 
@@ -1561,7 +1561,7 @@ This field is the air changes per hour for the given ventilation rate.
 
 \subsubsection{Field: Fan Type \{Exhaust;Intake;Natural\}}\label{field-fan-type-exhaustintakenatural}
 
-This field shows the entered value for the type of ventilation {[}NATURAL, EXHAUST, or INTAKE{]}. Natural ventilation is the air movement/exchange a result of openings in the building façade and does not consume any fan energy. For either EXHAUST or INTAKE, values for fan pressure and efficiency define the fan electric consumption. For NATURAL and EXHAUST ventilation, the conditions of the air entering the space are assumed to be equivalent to outdoor air conditions. For INTAKE ventilation, an appropriate amount of fan heat is added to the air stream.
+This field shows the entered value for the type of ventilation {[}NATURAL, EXHAUST, or INTAKE{]}. Natural ventilation is the air movement/exchange a result of openings in the building facade and does not consume any fan energy. For either EXHAUST or INTAKE, values for fan pressure and efficiency define the fan electric consumption. For NATURAL and EXHAUST ventilation, the conditions of the air entering the space are assumed to be equivalent to outdoor air conditions. For INTAKE ventilation, an appropriate amount of fan heat is added to the air stream.
 
 \subsubsection{Field: Fan Pressure Rise \{Pa\}}\label{field-fan-pressure-rise-pa}
 
@@ -2118,11 +2118,11 @@ where:
 \item
   T = Exterior Surface Temperatre when Combined convective/radiative film Coeff \textless{} = 0
 \item
-  Tzone~ = Temperature of the zone being simulated (°C)
+  Tzone~ = Temperature of the zone being simulated (Celsius)
 \item
-  Toadb~ = Dry-bulb temperature of the outdoor air (°C)
+  Toadb~ = Dry-bulb temperature of the outdoor air (Celsius)
 \item
-  Tgrnd~ = Temperature of the ground (°C)
+  Tgrnd~ = Temperature of the ground (Celsius)
 \item
   Wspd~ = Outdoor wind speed (m/sec)
 \end{itemize}
@@ -2673,7 +2673,7 @@ WindowMaterial:Gas,AIR 8MM,Air,~ 8.000E-03,
 WindowMaterial:Glazing,SB60CLEAR3PPG,Spectral,SB60CLEAR3PPGSP,~ 0.00328,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.03500,~ 0.84000,~ 1.00000,~ 1.00000,No
 \end{lstlisting}
 
-Then, there will be a list of window constructions reported with each one corresponding to a particular temperature of the thermochromic glazing layer. For example, the following excerpt shows a list of window constructions for the thermochromic window TCWINDOW at different temperature of the thermochromic layer - TCWINDOW\_TC\_25 at 25°C, TCWINDOW\_TC\_27 at 27°C, and TCWINDOW\_TC\_29 at 29°C. Detailed properties of the thermochromic glazing layer are also listed for each temperature - WO18RT25 \textbf{at} 25°C, WO18RT27 \textbf{at} 27°C, and WO18RT29 \textbf{at} 29°C.
+Then, there will be a list of window constructions reported with each one corresponding to a particular temperature of the thermochromic glazing layer. For example, the following excerpt shows a list of window constructions for the thermochromic window TCWINDOW at different temperature of the thermochromic layer - TCWINDOW\_TC\_25 at 25$^{\circ}$C, TCWINDOW\_TC\_27 at 27$^{\circ}$C, and TCWINDOW\_TC\_29 at 29$^{\circ}$C. Detailed properties of the thermochromic glazing layer are also listed for each temperature - WO18RT25 \textbf{at} 25$^{\circ}$C, WO18RT27 \textbf{at} 27$^{\circ}$C, and WO18RT29 \textbf{at} 29$^{\circ}$C.
 
 \begin{lstlisting}
 WindowConstruction,TCWINDOW\_TC\_25,~~ 5,VerySmooth,~~ 1.666,~~ 1.666,~~ 1.000,~~ 0.429,~~ 0.242,~~ 0.520
@@ -4186,16 +4186,12 @@ Finally, grey interchange coefficients are presented. These are the coefficients
 
 \subsection{DX Coil Outputs}\label{dx-coil-outputs}
 
-\subsection{DX Cooling Coil Outputs}\label{dx-cooling-coil-outputs}
+\subsection{DX Cooling Coil Standard Rating Information}\label{dx-cooling-coil-standard-ratings-2010}
 
 Outputs are provided for air-cooled, single-speed direct expansion (DX) cooling coils as follows:
 
 \begin{lstlisting}
-! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, SEER Default {Btu/W-h}, IEER {Btu/W-h}
-\end{lstlisting}
-~ DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC\_1:1\_COOLC DXCOIL, 23990.7, 2.57, 8.77, 9.30, 8.80, 9.03
-\begin{lstlisting}
-DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC\_2:2\_COOLC DXCOIL, 17626.1, 3.19, 10.88, 12.53, 11.46, 12.16
+! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER {Btu/W-h}
 \end{lstlisting}
 
 \subsubsection{Field: Component Type}\label{field-component-type-3}
@@ -4206,15 +4202,15 @@ This is the component type, currently Coil:Cooling:DX:SingleSpeed is the only va
 
 The name of the DX cooling coil from the input data file (IDF).
 
-\subsubsection{Field: Standard Rating (Net) Cooling Capacity \{W\}}\label{field-standard-rating-net-cooling-capacity-w}
+\subsubsection{Field: Standard Rating (Net) Cooling Capacity \{W\}}
 
 The standard rating (net) cooling capacity for this DX cooling coil. Units are Watts. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.
 
-\subsubsection{Field: Standard Rated Net COP \{W/W\}}\label{field-standard-rated-net-cop-ww}
+\subsubsection{Field: Standard Rated Net COP \{W/W\}}
 
 The standard rated net COP or energy efficiency ratio (\emph{EER}) at standard rating conditions for the DX cooling coil in SI units of W/W. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.
 
-\subsubsection{Field: EER \{Btu/W-h\}}\label{field-eer-btuw-h}
+\subsubsection{Field: EER \{Btu/W-h\}}
 
 The energy efficiency ratio (\emph{EER}) at standard rating conditions for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.
 
@@ -4222,21 +4218,102 @@ The energy efficiency ratio (\emph{EER}) at standard rating conditions for the D
 
 The seasonal energy efficiency ratio (SEER) for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil and Multi Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated. SEER User value calculation uses user specified Part Load Factor (PLF) curve to account for cycling effect.
 
-\subsubsection{Field: SEER Standard \{Btu/W-h\}}\label{field-seer-btuw-h}
+\subsubsection{Field: SEER Standard \{Btu/W-h\}}
 
 The seasonal energy efficiency ratio (SEER) for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil and Multi Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated. SEER Standard value calculation uses AHRI Standard 210/240-2008 default Part Load Factor (PLF) curve and cooling coefficient of degradation value of 0.25 to account for cycling effect. Otherwise, the SEER User and SEER Standard values calculation use identical procedure.
 
-\subsubsection{Field: IEER \{Btu/W-h\}}\label{field-ieer-btuw-h}
+\subsubsection{Field: IEER \{Btu/W-h\}}
 
 The integrated energy efficiency ratio (\emph{IEER}) for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.
 
-\subsection{DX Cooling Coil Outputs for ASHRAE 127 Standard Ratings}\label{dx-cooling-coil-outputs-for-ashrae-127-standard-ratings}
+
+\subsection{DX Cooling Coil Standard Ratings 2017}\label{dx-cooling-coil-standard-ratings-2017}
+
+Outputs are provided for air-cooled, single-speed and multi-speed direct expansion (DX) cooling coils as follows:
+
+\begin{lstlisting}
+! <DX Cooling Coil Standard Ratings 2017>, Component Name, Component Type, Standard Rating (Net) Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER {Btu/W-h}
+\end{lstlisting}
+
+\subsubsection{field: Component Name}\label{field-component-name-4}
+
+The name of the DX cooling coil from the input data file (IDF).
 
 \subsubsection{Field: Component Type}\label{field-component-type-4}
 
+In the 2017 implementation, supported compontent types include: Coil:Cooling:DX:SingleSpeed and Coil:Cooling:DX:MultiSpeed.
+
+\subsubsection{Field: Standard Rating (Net) Cooling Capacity \{W\}}
+
+The standard rating (net) cooling capacity for this DX cooling coil. Units are Watts. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil and Multi Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.
+
+\subsubsection{Field: Standard Rated Net COP \{W/W\}}
+
+The standard rated net COP or energy efficiency ratio (\emph{EER}) at standard rating conditions for the DX cooling coil in SI units of W/W. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil and Multi Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.
+
+\subsubsection{Field: EER \{Btu/W-h\}}
+
+The energy efficiency ratio (\emph{EER}) at standard rating conditions for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil and Multi Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.
+
+\subsubsection{Field: SEER User \{Btu/W-h\}}
+
+The seasonal energy efficiency ratio (SEER) for the DX cooling coil in IP units of Btu/W-hr. This calculation uses the user specified Part Load Factor (PLF) curve and cooling coefficient of degradation to account for cycling effects. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil and Multi Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated. 
+
+\subsubsection{Field: SEER Standard \{Btu/W-h\}}
+
+The seasonal energy efficiency ratio (SEER) for the DX cooling coil in IP units of Btu/W-hr. This calculation uses the AHRI Standard 210/240-2017 default Part Load Factor (PLF) curve and cooling coefficient of degradation value of 0.25 to account for cycling effects. Otherwise, the SEER User and SEER Standard values calculation use identical procedure. See the EnergyPlus Engineering Reference (DX Cooling Coil and Multi Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated. 
+
+\subsubsection{Field: IEER \{Btu/W-h\}}
+
+The integrated energy efficiency ratio (\emph{IEER}) for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (DX Cooling Coil and Multi Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.
+
+\subsection{DX Cooling Coil Standard Ratings 2023}\label{dx-cooling-coil-standard-ratings-2023}
+
+Outputs are provided for the following types of air cooled and evaporatively cooled direct expansion (DX) cooling coils: CurveFit, SingleSpeed, ToSpeed, MultiSpeed, and VariableSpeed.
+
+\begin{lstlisting}
+! <DX Cooling Coil Standard Ratings 2023>, Component Name, Component Type, Standard Rating (Net) Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER {Btu/W-h}
+\end{lstlisting}
+
+\subsubsection{field: Component Name}\label{field-component-name-5}
+
+The name of the DX cooling coil from the input data file (IDF).
+
+\subsubsection{Field: Component Type}\label{field-component-type-5}
+
+In the 2023 implementation, supported compontent types include: Coil:Cooling:DX:CurveFit, Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, and Coil:Cooling:DX:VariableSpeed.
+
+\subsubsection{Field: Standard Rating (Net) Cooling Capacity \{W\}}
+
+The standard rating (net) cooling capacity for this DX cooling coil. Units are Watts. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil and Multi Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.
+
+\subsubsection{Field: Standard Rated Net COP \{W/W\}}
+
+The standard rated net COP or energy efficiency ratio (\emph{EER}) at standard rating conditions for the DX cooling coil in SI units of W/W. See the EnergyPlus Engineering Reference (CurveFit, SingleSpeed, TwoSpeed, MultiSpeed, and VariableSpeed DX Cooling Coils, Standard Ratings) for details on how this value is calculated for the various configurations.
+
+\subsubsection{Field: EER \{Btu/W-h\}}
+
+The energy efficiency ratio (\emph{EER}) at standard rating conditions for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (CurveFit, SingleSpeed, TwoSpeed, MultiSpeed, and VariableSpeed DX Cooling Coils, Standard Ratings) for details on how this value is calculated.
+
+\subsubsection{Field: SEER User \{Btu/W-h\}}
+
+The seasonal energy efficiency ratio (SEER) for the DX cooling coil in IP units of Btu/W-hr. This calculation uses the user specified Part Load Factor (PLF) curve and cooling coefficient of degradation to account for cycling effects. See the EnergyPlus Engineering Reference (CurveFit, SingleSpeed, TwoSpeed, MultiSpeed, and VariableSpeed DX Cooling Coils, Standard Ratings) for details on how this value is calculated. 
+
+\subsubsection{Field: SEER Standard \{Btu/W-h\}}
+
+The seasonal energy efficiency ratio (SEER) for the DX cooling coil in IP units of Btu/W-hr. This calculation uses the AHRI Standard 210/240-2017 default Part Load Factor (PLF) curve and cooling coefficient of degradation value of 0.25 to account for cycling effects. Otherwise, the SEER User and SEER Standard values calculation use identical procedure. See the EnergyPlus Engineering Reference (CurveFit, SingleSpeed, TwoSpeed, MultiSpeed, and VariableSpeed DX Cooling Coils, Standard Ratings) for details on how this value is calculated. 
+
+\subsubsection{Field: IEER \{Btu/W-h\}}
+
+The integrated energy efficiency ratio (\emph{IEER}) for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (CurveFit, SingleSpeed, TwoSpeed, MultiSpeed, and VariableSpeed DX Cooling Coils, Standard Ratings) for details on how this value is calculated.
+
+\subsection{DX Cooling Coil Outputs for ASHRAE 127 Standard Ratings}\label{dx-cooling-coil-outputs-for-ashrae-127-standard-ratings}
+
+\subsubsection{Field: Component Type}\label{field-component-type-6}
+
 This is the component type, currently Coil:Cooling:DX:SingleSpeed is the only valid type.
 
-\subsubsection{Field: Component Name}\label{field-component-name-4}
+\subsubsection{Field: Component Name}\label{field-component-name-6}
 
 The name of the DX cooling coil from the input data file (IDF).
 
@@ -4293,11 +4370,11 @@ Outputs are provided for single-speed direct expansion (DX) heating coils as fol
 DX Heating Coil Standard Rating Information, Coil:Heating:DX:SingleSpeed, PSZ-AC\_1:1\_HEATC DXCOIL, 10476.1, 5833.2, 6.10, 4
 \end{lstlisting}
 
-\subsubsection{Field: Component Type}\label{field-component-type-5}
+\subsubsection{Field: Component Type}\label{field-component-type-7}
 
 This is the component type, currently Coil:Heating:DX:SingleSpeed is the only valid type.
 
-\subsubsection{Field: Component Name}\label{field-component-name-5}
+\subsubsection{Field: Component Name}\label{field-component-name-7}
 
 The name of the DX heating coil from the input data file (IDF).
 
@@ -4327,11 +4404,11 @@ Chiller Standard Rating Information, Chiller:Electric:EIR, Big Chiller 1, 4.5, 1
 Chiller Standard Rating Information, Chiller:Electric:ReformulatedEIR, Big Chiller 2, 4.8, 16.4
 \end{lstlisting}
 
-\subsubsection{Field: Component Type}\label{field-component-type-6}
+\subsubsection{Field: Component Type}\label{field-component-type-8}
 
 This is the component type, Chiller:Electric:EIR and/or Chiller:Electric:ReformulatedEIR.
 
-\subsubsection{Field: Component Name}\label{field-component-name-6}
+\subsubsection{Field: Component Name}\label{field-component-name-8}
 
 The name of the Chiller:Electric:EIR and Chiller:Electric:ReformulatedEIR objects from the input data file (IDF).
 
@@ -4345,7 +4422,7 @@ The integrated part load value (\emph{IPLV}) for the Chiller:Electric:EIR and Ch
 
 \subsection{Warmup Days Line}
 
-As described elsewhere, EnergyPlus simulates the first day of each simulation period until it reaches “convergence”. This data line will show how many warm up days were required to reach that state.
+As described elsewhere, EnergyPlus simulates the first day of each simulation period until it reaches ``convergence''. This data line will show how many warm up days were required to reach that state.
 
 \begin{lstlisting}
 ! <Environment:WarmupDays>, NumberofWarmupDays
@@ -4362,7 +4439,7 @@ This field will show the number of days required to reach the convergence state 
 
 \subsection{Warmup Convergence Outputs}
 
-Warmup is performed for each environment being simulated. When a file passes convergence, no warnings are shown.  However, when it doesn’t a warning appears in the eplusout.err file, for example:
+Warmup is performed for each environment being simulated. When a file passes convergence, no warnings are shown.  However, when it doesn't a warning appears in the eplusout.err file, for example:
 
 \begin{lstlisting}
 CheckWarmupConvergence: Loads Initialization, Zone = "BACKROOM" did not converge after 25 warmup days.
@@ -4384,7 +4461,7 @@ See Warmup Convergence Information in .eio file for details
 
 \subsection{Warmup Convergence Information}
 
-Warmup convergence information reflects the warmup days calculations and whether or not the zone has reached “convergence”. Warmup calculations are done for each environment (e.g. each sizing period simulated, each run period simulated). Reference the building parameters on Minimum and Maximum Number of Warmup Days as well as Loads and Temperature convergence Tolerance. The file contains two possible flavors of warmup information: summary and detailed.
+Warmup convergence information reflects the warmup days calculations and whether or not the zone has reached ``convergence''. Warmup calculations are done for each environment (e.g. each sizing period simulated, each run period simulated). Reference the building parameters on Minimum and Maximum Number of Warmup Days as well as Loads and Temperature convergence Tolerance. The file contains two possible flavors of warmup information: summary and detailed.
 
 \subsection{Summary Warmup Convergence Information}
 
@@ -4412,7 +4489,7 @@ This field will show the name of individual zone.
 
 \subsubsection{Field: Environment Type/Name}
 
-Type of environment being run (SizingPeriod, RunPeriod) as well as it’s "name".
+Type of environment being run (SizingPeriod, RunPeriod) as well as it's ``name''.
 
 \subsubsection{Field: Average Warmup Temperature Difference \{deltaC\}}
 

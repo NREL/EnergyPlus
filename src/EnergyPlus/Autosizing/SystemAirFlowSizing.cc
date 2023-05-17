@@ -63,8 +63,8 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
         return 0.0;
     }
     this->preSize(state, _originalValue);
-    std::string DDNameFanPeak = "";
-    std::string dateTimeFanPeak = "";
+    std::string DDNameFanPeak;
+    std::string dateTimeFanPeak;
 
     if (this->dataEMSOverrideON) {
         this->autoSizedValue = this->dataEMSOverride;

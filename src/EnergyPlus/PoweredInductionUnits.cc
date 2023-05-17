@@ -297,7 +297,7 @@ void GetPIUs(EnergyPlusData &state)
         thisPIU.UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
         thisPIU.Sched = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisPIU.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisPIU.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisPIU.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (thisPIU.SchedPtr == 0) {
@@ -535,7 +535,7 @@ void GetPIUs(EnergyPlusData &state)
         thisPIU.UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
         thisPIU.Sched = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisPIU.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisPIU.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisPIU.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2)); // convert schedule name to pointer
             if (thisPIU.SchedPtr == 0) {
@@ -871,7 +871,7 @@ void InitPIU(EnergyPlusData &state,
             // local plant fluid density
             Real64 const rho = GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidName,
-                                                DataGlobalConstants::HWInitConvTemp,
+                                                Constant::HWInitConvTemp,
                                                 state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidIndex,
                                                 RoutineName);
 
@@ -1347,12 +1347,12 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
 
                             Real64 const rho = GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidName,
-                                                                DataGlobalConstants::HWInitConvTemp,
+                                                                Constant::HWInitConvTemp,
                                                                 state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidIndex,
                                                                 RoutineName);
                             Real64 const Cp = GetSpecificHeatGlycol(state,
                                                                     state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidName,
-                                                                    DataGlobalConstants::HWInitConvTemp,
+                                                                    Constant::HWInitConvTemp,
                                                                     state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidIndex,
                                                                     RoutineName);
 
@@ -1583,11 +1583,6 @@ void CalcSeriesPIU(EnergyPlusData &state,
     Real64 MinSteamFlow; // TODO: this is unused
     Real64 MaxSteamFlow; // TODO: this is unused
 
-    // Initialize local fan flags to global system flags
-    bool PIUTurnFansOn =
-        (state.dataHVACGlobal->TurnFansOn || state.dataHVACGlobal->TurnZoneFansOnlyOn); // If True, overrides fan schedule and cycles PIU fan on
-    bool const PIUTurnFansOff = state.dataHVACGlobal->TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
-
     // initialize local variables
     auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUNum);
 
@@ -1619,7 +1614,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
     if (GetCurrentScheduleValue(state, thisPIU.SchedPtr) <= 0.0) {
         UnitOn = false;
     }
-    if ((GetCurrentScheduleValue(state, thisPIU.FanAvailSchedPtr) <= 0.0 || PIUTurnFansOff) && !PIUTurnFansOn) {
+    if ((GetCurrentScheduleValue(state, thisPIU.FanAvailSchedPtr) <= 0.0 || state.dataHVACGlobal->TurnFansOff) && !state.dataHVACGlobal->TurnFansOn) {
         UnitOn = false;
     }
     if (PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow) {
@@ -1634,7 +1629,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
             // PIU fan off if there is no heating load, also reset fan flag if fan should be off
             if (QZnReq <= SmallLoad) {
                 SecAirMassFlow = 0.0;
-                PIUTurnFansOn = false;
+                state.dataHVACGlobal->TurnFansOn = false;
             } else {
                 SecAirMassFlow = thisPIU.MaxTotAirMassFlow;
             }
@@ -1654,15 +1649,10 @@ void CalcSeriesPIU(EnergyPlusData &state,
             state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate = thisPIU.MaxTotAirMassFlow;
             SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num); // fire the mixer
             if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
+                state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
             } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                Fans::SimulateFanComponents(state,
-                                            thisPIU.FanName,
-                                            FirstHVACIteration,
-                                            thisPIU.Fan_Index,
-                                            _,
-                                            PIUTurnFansOn,
-                                            PIUTurnFansOff); // fire the fan
+                Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index,
+                                            _); // fire the fan
             }
 
             // fan temperature rise [C]
@@ -1704,10 +1694,9 @@ void CalcSeriesPIU(EnergyPlusData &state,
     SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num);
     // fire the fan
     if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-        state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
+        state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
     } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _, PIUTurnFansOn,
-                                    PIUTurnFansOff); // fire the fan
+        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _); // fire the fan
     }
     // the heating load seen by the reheat coil [W]
     Real64 const QActualHeating =
@@ -1872,11 +1861,6 @@ void CalcParallelPIU(EnergyPlusData &state,
         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // [W]  remaining load to heating setpoint
     Real64 const CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);          // zone air specific heat [J/kg-C]
 
-    // Initialize local fan flags to global system flags
-    bool PIUTurnFansOn =
-        (state.dataHVACGlobal->TurnFansOn || state.dataHVACGlobal->TurnZoneFansOnlyOn); // If True, overrides fan schedule and cycles PIU fan on
-    bool const PIUTurnFansOff = state.dataHVACGlobal->TurnFansOff; // If True, overrides fan schedule and PIUTurnFansOn and cycles PIU fan off
-
     // On the first HVAC iteration the system values are given to the controller, but after that
     // the demand limits are in place and there needs to be feedback to the Zone Equipment
     if (thisPIU.HotControlNode > 0) {
@@ -1912,10 +1896,9 @@ void CalcParallelPIU(EnergyPlusData &state,
             // PIU fan off if there is no heating load, also reset fan flag if fan should be off
             if (QZnReq <= SmallLoad) {
                 SecAirMassFlow = 0.0;
-                PIUTurnFansOn = false;
+                state.dataHVACGlobal->TurnFansOn = false;
             } else {
                 SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
-                PIUTurnFansOn = (state.dataHVACGlobal->TurnFansOn || state.dataHVACGlobal->TurnZoneFansOnlyOn);
             }
         } else if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
             // in deadband or very small load: set primary air flow to the minimum
@@ -1923,10 +1906,10 @@ void CalcParallelPIU(EnergyPlusData &state,
             // PIU fan off if reheat is not needed, also reset fan flag if fan should be off
             if (ReheatRequired) {
                 SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
-                PIUTurnFansOn = true;
+                state.dataHVACGlobal->TurnFansOn = true;
             } else {
                 SecAirMassFlow = 0.0;
-                PIUTurnFansOn = false;
+                state.dataHVACGlobal->TurnFansOn = false;
             }
         } else if (QZnReq > SmallLoad) {
             // heating: set primary air flow to the minimum
@@ -1940,15 +1923,10 @@ void CalcParallelPIU(EnergyPlusData &state,
             state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = 0.0;
 
             if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
+                state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
             } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                Fans::SimulateFanComponents(state,
-                                            thisPIU.FanName,
-                                            FirstHVACIteration,
-                                            thisPIU.Fan_Index,
-                                            _,
-                                            PIUTurnFansOn,
-                                            PIUTurnFansOff); // fire the fan
+                Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index,
+                                            _); // fire the fan
             }
             SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num); // fire the mixer
             // fan temperature rise [C]
@@ -1962,7 +1940,7 @@ void CalcParallelPIU(EnergyPlusData &state,
             // check for fan on or off
             if ((PriAirMassFlow > thisPIU.FanOnAirMassFlow) && !ReheatRequired) {
                 SecAirMassFlow = 0.0; // Fan is off unless reheat is required; no secondary air; also reset fan flag
-                PIUTurnFansOn = false;
+                state.dataHVACGlobal->TurnFansOn = false;
             } else {
                 // fan is on; recalc primary air flow
                 // CpAir*PriAirMassFlow*(Node(thisPIU.PriAirInNode)%Temp - Node(ZoneNodeNum)%Temp) +
@@ -1994,10 +1972,9 @@ void CalcParallelPIU(EnergyPlusData &state,
     // fire the fan
 
     if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-        state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
+        state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
     } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _, PIUTurnFansOn,
-                                    PIUTurnFansOff); // fire the fan
+        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _); // fire the fan
     }
     // fire the mixer
     SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num);

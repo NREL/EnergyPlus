@@ -200,15 +200,15 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                         sUpdateFreq,
                                         sAvgOrSum,
                                         thisObjectName,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        1,
+                                        1,
+                                        -999,
                                         units);
                 }
             } else {
@@ -377,10 +377,10 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                         sUpdateFreq,
                                         sAvgOrSum,
                                         thisObjectName,
-                                        _,
+                                        {},
                                         sResourceType,
                                         sEndUse,
-                                        _,
+                                        {},
                                         sGroupType);
                 } else { // has subcategory
                     SetupOutputVariable(state,
@@ -390,7 +390,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                         sUpdateFreq,
                                         sAvgOrSum,
                                         thisObjectName,
-                                        _,
+                                        {},
                                         sResourceType,
                                         sEndUse,
                                         sEndUseSubcategory,
@@ -830,7 +830,7 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
         char *zStr = PyBytes_AsString(pStrObj);
         std::string s(zStr);
         Py_DECREF(pStrObj); // PyUnicode_AsUTF8String returns a new reference, decrement it
-        ShowMessage(state, format("PythonPlugin: Class {} imported from: ", className));
+        ShowMessage(state, format("PythonPlugin: Class {} imported from: {}", className, s));
     }
     PyObject *pClass = PyDict_GetItemString(pModuleDict, className.c_str());
     // Py_DECREF(pModuleDict);  // PyModule_GetDict returns a borrowed reference, DO NOT decrement
@@ -896,7 +896,7 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
         EnergyPlus::ShowFatalError(state, format("Program terminates after call to _detect_overridden() on {} failed!", this->stringIdentifier));
     }
     if (!PyList_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
-        EnergyPlus::ShowFatalError(state, format("Invalid return from _detect_overridden() on class \"{}, this is weird", this->stringIdentifier));
+        EnergyPlus::ShowFatalError(state, format("Invalid return from _detect_overridden() on class \"{}\", this is weird", this->stringIdentifier));
     }
     unsigned long numVals = PyList_Size(pFunctionResponse);
     // at this point we know which base class methods are being overridden by the derived class

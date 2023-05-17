@@ -57,6 +57,7 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -346,14 +347,13 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         }
 
         // Validate fuel type input
-        bool FuelTypeError(false);
-        UtilityRoutines::ValidateFuelType(state, AlphArray(5), state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType, FuelTypeError);
-        if (FuelTypeError) {
+        state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType =
+            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, AlphArray(5)));
+        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType == Constant::eResource::Invalid) {
             ShowSevereError(
                 state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
             ShowSevereError(state, format("Invalid {}  = {}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
             ErrorsFound = true;
-            FuelTypeError = false;
         }
 
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelHigherHeatingValue = NumArray(8);
@@ -899,6 +899,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
 void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
 {
+    std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(this->FuelType)];
     SetupOutputVariable(state,
                         "Generator Produced AC Electricity Rate",
                         OutputProcessor::Unit::W,
@@ -914,10 +915,10 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ElectricityProduced",
                         "COGENERATION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -930,7 +931,7 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
 
     //    Fuel specific report variables
     SetupOutputVariable(state,
-                        "Generator " + this->FuelType + " HHV Basis Rate",
+                        format("Generator {} HHV Basis Rate", sFuelType),
                         OutputProcessor::Unit::W,
                         this->FuelEnergyUseRateHHV,
                         OutputProcessor::SOVTimeStepType::System,
@@ -938,20 +939,20 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        "Generator " + this->FuelType + " HHV Basis Energy",
+                        format("Generator {} HHV Basis Energy", sFuelType),
                         OutputProcessor::Unit::J,
                         this->FuelEnergyHHV,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
-                        this->FuelType,
+                        {},
+                        sFuelType,
                         "COGENERATION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
-                        "Generator " + this->FuelType + " Mass Flow Rate",
+                        format("Generator {} Mass Flow Rate", sFuelType),
                         OutputProcessor::Unit::kg_s,
                         this->FuelMdot,
                         OutputProcessor::SOVTimeStepType::System,
@@ -993,10 +994,10 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATRECOVERY",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -1048,10 +1049,10 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
+                            {},
                             "Electricity",
                             "Cogeneration",
-                            _,
+                            {},
                             "Plant");
     }
 
@@ -1927,9 +1928,9 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
             state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).MassFlowRateMinAvail;
     }
 
-    this->EnergyGen = this->ElecPowerGenerated * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->ExhaustEnergyRec = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->EnergyGen = this->ElecPowerGenerated * state.dataHVACGlobal->TimeStepSysSec;
+    this->ExhaustEnergyRec = this->QHeatRecovered * state.dataHVACGlobal->TimeStepSysSec;
+    this->FuelEnergyHHV = this->FuelEnergyUseRateHHV * state.dataHVACGlobal->TimeStepSysSec;
     if (this->FuelEnergyUseRateLHV > 0.0) {
         this->ElectricEfficiencyLHV = this->ElecPowerGenerated / this->FuelEnergyUseRateLHV;
         this->ThermalEfficiencyLHV = this->QHeatRecovered / this->FuelEnergyUseRateLHV;
@@ -1937,8 +1938,8 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
         this->ElectricEfficiencyLHV = 0.0;
         this->ThermalEfficiencyLHV = 0.0;
     }
-    this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSysSec;
 }
 void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
 {
@@ -1967,7 +1968,7 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
         // size mass flow rate
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::InitConvTemp,
+                                                       Constant::InitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 

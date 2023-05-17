@@ -690,8 +690,7 @@ TEST_F(EnergyPlusFixture, test_GetWindowAssemblyNfrcForReport_withIDF)
     Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
-    EXPECT_FALSE(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
 
     HeatBalanceManager::GetConstructData(*state, FoundError);
     EXPECT_FALSE(FoundError);
@@ -705,8 +704,8 @@ TEST_F(EnergyPlusFixture, test_GetWindowAssemblyNfrcForReport_withIDF)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 

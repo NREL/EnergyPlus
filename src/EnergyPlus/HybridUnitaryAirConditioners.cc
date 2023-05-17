@@ -519,7 +519,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             // A2, \field Availability Schedule Name
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
-                state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr == 0) {
@@ -745,10 +745,10 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Sensible Cooling Rate",
@@ -836,10 +836,10 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HeatingCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Sensible Heating Rate",
@@ -1078,7 +1078,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                            _,
+                            {},
                             "Electricity",
                             "Cooling",
                             "Hybrid HVAC Cooling",
@@ -1171,7 +1171,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                            _,
+                            {},
                             "Electricity",
                             "Fans",
                             "Hybrid HVAC Fans",
@@ -1191,7 +1191,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                _,
+                                {},
                                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SecondFuelType,
                                 "Cooling",
                                 "Hybrid HVAC Cooling",
@@ -1212,7 +1212,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                _,
+                                {},
                                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelType,
                                 "Cooling",
                                 "Hybrid HVAC Cooling",
@@ -1232,7 +1232,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                            _,
+                            {},
                             "Water",
                             "Cooling",
                             "Hybrid HVAC Cooling",

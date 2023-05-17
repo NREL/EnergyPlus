@@ -321,7 +321,7 @@ namespace HeatBalanceManager {
 
         Material::GetMaterialData(state, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
-        GetFrameAndDividerData(state, ErrorsFound);
+        GetFrameAndDividerData(state);
 
         GetConstructData(state, ErrorsFound); // Read constructs from input file/transfer from legacy data structure
 
@@ -1474,8 +1474,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            if (UtilityRoutines::IsNameEmpty(state, SpecDataNames(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) continue;
-
             // Load the spectral data derived type from the input data.
             state.dataHeatBal->SpectralData(Loop).Name = SpecDataNames(1);
             TotLam = SpecDataNumProp / 4;
@@ -2003,7 +2001,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, ConstructAlphas(0), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) continue;
 
             ++ConstrNum;
             WConstructNames(ConstrNum) = ConstructAlphas(0);
@@ -2220,7 +2217,6 @@ namespace HeatBalanceManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataHeatBal->ZoneList(ListNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                 if (UtilityRoutines::FindItemInList(state.dataHeatBal->ZoneList(ListNum).Name, state.dataHeatBal->Zone) > 0) {
@@ -2297,7 +2293,6 @@ namespace HeatBalanceManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataHeatBal->ZoneGroup(GroupNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -2402,12 +2397,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
-                ShowContinueError(
-                    state,
-                    "...each SurfaceProperty:IncidentSolarMultiplier name must not duplicate other SurfaceProperty:IncidentSolarMultiplier name");
-                continue;
-            }
 
             // Assign surface number
             int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
@@ -2524,7 +2513,6 @@ namespace HeatBalanceManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataHeatBal->ZoneLocalEnvironment(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -3006,8 +2994,8 @@ namespace HeatBalanceManager {
             PerformSolarCalculations(state);
         }
 
-        if (state.dataGlobal->BeginDayFlag && !state.dataGlobal->WarmupFlag &&
-            state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && state.dataSysVars->ReportExtShadingSunlitFrac) {
+        if (state.dataGlobal->BeginDayFlag && !state.dataGlobal->WarmupFlag && state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather &&
+            state.dataSysVars->ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     constexpr const char *ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
@@ -3707,8 +3695,8 @@ namespace HeatBalanceManager {
                 CalcMoreNodeInfo(state);
             }
             UpdateDataandReport(state, OutputProcessor::TimeStepType::Zone);
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
-                state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
+            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay ||
+                state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
                     state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
@@ -3754,16 +3742,16 @@ namespace HeatBalanceManager {
                 CalcMoreNodeInfo(state);
             }
             UpdateDataandReport(state, OutputProcessor::TimeStepType::Zone);
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
-                state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
+            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay ||
+                state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
                     state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
 
         } else if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface) { // added for FMI
             UpdateDataandReport(state, OutputProcessor::TimeStepType::Zone);
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
-                state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
+            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay ||
+                state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
                     state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
@@ -3799,7 +3787,7 @@ namespace HeatBalanceManager {
         }
         print(state.files.shade, "\n");
     }
-    void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
+    void GetFrameAndDividerData(EnergyPlusData &state) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -3860,7 +3848,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, FrameDividerAlphas(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) continue;
 
             // Load the frame/divider derived type from the input data.
             ++FrameDividerNum;
@@ -4560,13 +4547,13 @@ namespace HeatBalanceManager {
 
             // Pre-calculate constants
             for (IPhi = 1; IPhi <= 10; ++IPhi) {
-                CosPhiIndepVar(IPhi) = std::cos((IPhi - 1) * 10.0 * DataGlobalConstants::DegToRadians);
+                CosPhiIndepVar(IPhi) = std::cos((IPhi - 1) * 10.0 * Constant::DegToRadians);
             }
 
             // Pre-calculate constants
             for (IPhi = 1; IPhi <= 10; ++IPhi) {
                 Phi = double(IPhi - 1) * 10.0;
-                CosPhi(IPhi) = std::cos(Phi * DataGlobalConstants::DegToRadians);
+                CosPhi(IPhi) = std::cos(Phi * Constant::DegToRadians);
                 if (std::abs(CosPhi(IPhi)) < 0.0001) CosPhi(IPhi) = 0.0;
             }
 
@@ -5285,7 +5272,7 @@ namespace HeatBalanceManager {
                             errorsFound = true;
                         }
                     } else {
-                        thisConstruct.AirBoundaryMixingSched = DataGlobalConstants::ScheduleAlwaysOn;
+                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::ScheduleAlwaysOn;
                     }
                 }
             }
@@ -5359,11 +5346,6 @@ namespace HeatBalanceManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
-                    ShowContinueError(
-                        state, "...each SurfaceProperty:SolarIncidentInside name must not duplicate other SurfaceProperty:SolarIncidentInside name");
-                    continue;
-                }
 
                 state.dataSurface->SurfIncSolSSG(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -5462,12 +5444,6 @@ namespace HeatBalanceManager {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
-                    ShowContinueError(state,
-                                      "...each ComplexFenestrationProperty:SolarAbsorbedLayers name must not duplicate other "
-                                      "ComplexFenestrationProperty:SolarAbsorbedLayers name");
-                    continue;
-                }
 
                 state.dataSurface->FenLayAbsSSG(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -6016,16 +5992,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
-                ShowSevereError(state,
-                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
-                                       RoutineName,
-                                       cCurrentModuleObject,
-                                       state.dataIPShortCut->cAlphaArgs(1),
-                                       state.dataIPShortCut->cAlphaFieldNames(1)));
-                ShowContinueError(state, "...All Material names must be unique regardless of subtype.");
-                continue;
-            }
 
             state.dataHeatBal->SupportPillar(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataHeatBal->SupportPillar(Loop).Spacing = state.dataIPShortCut->rNumericArgs(1);
@@ -6077,16 +6043,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
-                ShowSevereError(state,
-                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
-                                       RoutineName,
-                                       cCurrentModuleObject,
-                                       state.dataIPShortCut->cAlphaArgs(1),
-                                       state.dataIPShortCut->cAlphaFieldNames(1)));
-                ShowContinueError(state, "...All Material names must be unique regardless of subtype.");
-                continue;
-            }
 
             state.dataHeatBal->DeflectionState(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataHeatBal->DeflectionState(Loop).DeflectedThickness = state.dataIPShortCut->rNumericArgs(1);
@@ -6213,16 +6169,6 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
-                ShowSevereError(state,
-                                format("{}{}=\"{}, object. Illegal value for {} has been found.",
-                                       RoutineName,
-                                       cCurrentModuleObject,
-                                       state.dataIPShortCut->cAlphaArgs(1),
-                                       state.dataIPShortCut->cAlphaFieldNames(1)));
-                ShowContinueError(state, "...All Material names must be unique regardless of subtype.");
-                continue;
-            }
 
             ++MaterNum;
             auto *thisMaterial = new Material::MaterialChild;
@@ -6609,7 +6555,6 @@ namespace HeatBalanceManager {
                                                                      _,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
 
             state.dataMaterial->WindowThermalModel(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 

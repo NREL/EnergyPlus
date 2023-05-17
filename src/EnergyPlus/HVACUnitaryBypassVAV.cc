@@ -388,7 +388,7 @@ namespace HVACUnitaryBypassVAV {
             CBVAV(CBVAVNum).UnitType = CurrentModuleObject;
             CBVAV(CBVAVNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                CBVAV(CBVAVNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                CBVAV(CBVAVNum).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 CBVAV(CBVAVNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
                 if (CBVAV(CBVAVNum).SchedPtr == 0) {
@@ -1519,7 +1519,7 @@ namespace HVACUnitaryBypassVAV {
                         Real64 FluidDensity =
                             FluidProperties::GetDensityGlycol(state,
                                                               state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum).FluidName,
-                                                              DataGlobalConstants::HWInitConvTemp,
+                                                              Constant::HWInitConvTemp,
                                                               state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum).FluidIndex,
                                                               RoutineName);
                         CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
@@ -1629,7 +1629,7 @@ namespace HVACUnitaryBypassVAV {
                             Real64 FluidDensity =
                                 FluidProperties::GetDensityGlycol(state,
                                                                   state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum).FluidName,
-                                                                  DataGlobalConstants::HWInitConvTemp,
+                                                                  Constant::HWInitConvTemp,
                                                                   state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum).FluidIndex,
                                                                   RoutineName);
                             CBVAV(CBVAVNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
@@ -2309,7 +2309,7 @@ namespace HVACUnitaryBypassVAV {
 
         if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::BlowThru) {
             if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[CBVAV(CBVAVNum).FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _, _, _);
+                state.dataHVACFan->fanObjs[CBVAV(CBVAVNum).FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _);
             } else {
                 Fans::SimulateFanComponents(
                     state, CBVAV(CBVAVNum).FanName, FirstHVACIteration, CBVAV(CBVAVNum).FanIndex, state.dataHVACUnitaryBypassVAV->FanSpeedRatio);
@@ -3652,7 +3652,7 @@ namespace HVACUnitaryBypassVAV {
 
         if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::DrawThru) {
             if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[CBVAV(CBVAVNum).FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _, _, _);
+                state.dataHVACFan->fanObjs[CBVAV(CBVAVNum).FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _);
             } else {
                 Fans::SimulateFanComponents(
                     state, CBVAV(CBVAVNum).FanName, FirstHVACIteration, CBVAV(CBVAVNum).FanIndex, state.dataHVACUnitaryBypassVAV->FanSpeedRatio);
@@ -4070,7 +4070,7 @@ namespace HVACUnitaryBypassVAV {
 
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
 
-        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
 
         CBVAV(CBVAVNum).TotCoolEnergy = CBVAV(CBVAVNum).TotCoolEnergyRate * ReportingConstant;
         CBVAV(CBVAVNum).TotHeatEnergy = CBVAV(CBVAVNum).TotHeatEnergyRate * ReportingConstant;

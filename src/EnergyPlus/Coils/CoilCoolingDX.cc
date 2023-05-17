@@ -207,7 +207,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     }
 
     if (input_data.availability_schedule_name.empty()) {
-        this->availScheduleIndex = DataGlobalConstants::ScheduleAlwaysOn;
+        this->availScheduleIndex = ScheduleManager::ScheduleAlwaysOn;
     } else {
         this->availScheduleIndex = ScheduleManager::GetScheduleIndex(state, input_data.availability_schedule_name);
     }
@@ -255,10 +255,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "COOLINGCOILS",
-                        _,
+                        {},
                         "System");
     SetupOutputVariable(state,
                         "Cooling Coil Sensible Cooling Rate",
@@ -302,31 +302,32 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->name,
-                        _,
+                        {},
                         "Electricity",
                         "COOLING",
-                        _,
+                        {},
                         "System");
 
-    if (this->performance.compressorFuelType != DataGlobalConstants::ResourceType::Electricity) {
+    if (this->performance.compressorFuelType != Constant::eResource::Electricity) {
+        std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(this->performance.compressorFuelType)];
         SetupOutputVariable(state,
-                            "Cooling Coil " + this->performance.compressorFuelTypeForOutput + " Rate",
+                            format("Cooling Coil {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
                             this->performance.compressorFuelRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
-                            "Cooling Coil " + this->performance.compressorFuelTypeForOutput + " Energy",
+                            format("Cooling Coil {} Energy", sFuelType),
                             OutputProcessor::Unit::J,
                             this->performance.compressorFuelConsumption,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
-                            _,
-                            this->performance.compressorFuelTypeForOutput,
+                            {},
+                            sFuelType,
                             "COOLING",
-                            _,
+                            {},
                             "System");
     }
 
@@ -351,10 +352,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->name,
-                        _,
+                        {},
                         "Electricity",
                         "Cooling",
-                        _,
+                        {},
                         "System");
     // Ported from variable speed coil
     SetupOutputVariable(state,
@@ -457,10 +458,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
-                            _,
+                            {},
                             "Electricity",
                             "COOLING",
-                            _,
+                            {},
                             "System");
     }
     if (this->condensateTankIndex > 0) {
@@ -478,10 +479,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
-                            _,
+                            {},
                             "OnSiteWater",
                             "Condensate",
-                            _,
+                            {},
                             "System");
     }
     if (this->evaporativeCondSupplyTankIndex > 0) {
@@ -499,10 +500,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
-                            _,
+                            {},
                             "Electricity",
                             "COOLING",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Coil Evaporative Condenser Water Volume Flow Rate",
@@ -518,10 +519,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
-                            _,
+                            {},
                             "Water",
                             "Cooling",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
@@ -530,10 +531,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
-                            _,
+                            {},
                             "MainsWater",
                             "Cooling",
-                            _,
+                            {},
                             "System");
     }
     if (this->SubcoolReheatFlag) {
@@ -565,10 +566,10 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "HEATRECOVERY",
-                            _,
+                            {},
                             "System");
     }
 
@@ -723,7 +724,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
-    Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     // update condensate collection tank
     if (this->condensateTankIndex > 0) {
@@ -994,7 +995,7 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
         Real64 constexpr ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
         static constexpr std::string_view Format_990(
             "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-            "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
+            "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER1 {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
         print(state.files.eio, "{}", Format_990);
         for (auto &coil : state.dataCoilCooingDX->coilCoolingDXs) {
             coil.performance.calcStandardRatings210240(state);
@@ -1025,7 +1026,16 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, coil.name, coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
             OutputReportPredefined::addFootNoteSubTable(
-                state, state.dataOutRptPredefined->pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
+                state,
+                state.dataOutRptPredefined->pdstDXCoolCoil,
+                "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
+                "1 - EnergyPlus object type. <br/>"
+                "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2017. <br/>"
+                "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2007. <br/>"
+                "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
+                "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
+                "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
+                "from the appropriate AHRI standard.");
 
             // AHRI 2023 Standard SEER2 Calculations
             static constexpr std::string_view Format_991_(
@@ -1039,7 +1049,7 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
                   coil.performance.standardRatingEER2 * ConvFromSIToIP,
                   coil.performance.standardRatingSEER2_User * ConvFromSIToIP,
                   coil.performance.standardRatingSEER2_Standard * ConvFromSIToIP,
-                  ' ');
+                  coil.performance.standardRatingIEER2 * ConvFromSIToIP);
 
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType_2023, coil.name, "Coil:Cooling:DX");
             OutputReportPredefined::PreDefTableEntry(
@@ -1060,10 +1070,20 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
                                                      coil.name,
                                                      coil.performance.standardRatingSEER2_Standard * ConvFromSIToIP,
                                                      2);
-            // OutputReportPredefined::PreDefTableEntry(
-            // state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, coil.name, coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, coil.name, coil.performance.standardRatingIEER2 * ConvFromSIToIP, 2);
             OutputReportPredefined::addFootNoteSubTable(
-                state, state.dataOutRptPredefined->pdstDXCoolCoil_2023, "ANSI/AHRI 2023 ratings account for supply air fan heat and electric power.");
+                state,
+                state.dataOutRptPredefined->pdstDXCoolCoil_2023,
+                "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
+                "1 - EnergyPlus object type. <br/>"
+                "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2023. <br/>"
+                "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2022. <br/>"
+                "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
+                "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
+                "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
+                "from the appropriate AHRI standard. <br/>"
+                "4 - Value for the Full Speed of the coil.");
         }
     }
     state.dataCoilCooingDX->stillNeedToReportStandardRatings = false;

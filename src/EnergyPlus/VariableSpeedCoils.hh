@@ -60,6 +60,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/StandardRatings.hh>
 
 namespace EnergyPlus {
 
@@ -151,6 +152,8 @@ namespace VariableSpeedCoils {
         // Rated Air volume flow rate per total capacity through unit at rated conditions [m^3/w]
         Array1D<Real64> MSRatedAirVolFlowRate;
         // Air volume flow rate through unit at rated conditions [m3/s]
+        Array1D<Real64> MSRatedEvaporatorFanPowerPerVolumeFlowRate2017; // 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]
+        Array1D<Real64> MSRatedEvaporatorFanPowerPerVolumeFlowRate2023; // 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]
         Array1D<Real64> MSRatedAirMassFlowRate;
         // Air mass flow rate through unit at rated conditions [kg/s]
         Array1D<Real64> MSRatedWaterVolFlowPerRatedTotCap;
@@ -277,7 +280,7 @@ namespace VariableSpeedCoils {
 
         // default constructor
         VariableSpeedCoilData()
-            : NumOfSpeeds(2), NormSpedLevel(DataGlobalConstants::MaxSpeedLevels), RatedWaterVolFlowRate(DataSizing::AutoSize),
+            : NumOfSpeeds(2), NormSpedLevel(DataHVACGlobals::MaxSpeedLevels), RatedWaterVolFlowRate(DataSizing::AutoSize),
               RatedWaterMassFlowRate(DataSizing::AutoSize), RatedAirVolFlowRate(DataSizing::AutoSize), RatedCapHeat(DataSizing::AutoSize),
               RatedCapCoolTotal(DataSizing::AutoSize), MaxONOFFCyclesperHour(0.0), Twet_Rated(0.0), Gamma_Rated(0.0), HOTGASREHEATFLG(0),
               HPTimeConstant(0.0), PLFFPLR(0), VSCoilType(0), SimFlag(false), DesignWaterMassFlowRate(0.0), DesignWaterVolFlowRate(0.0),
@@ -290,19 +293,20 @@ namespace VariableSpeedCoils {
               AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), plantLoc{}, FindCompanionUpStreamCoil(true), IsDXCoilInZone(false),
               CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), FanDelayTime(0.0),
               // This one calls into a std::vector, so it's 0-indexed, so we initialize it to -1
-              MSHPDesignSpecIndex(-1), MSErrIndex(DataGlobalConstants::MaxSpeedLevels, 0),
-              MSRatedPercentTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSRatedSHR(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedCOP(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSRatedAirVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSRatedAirVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedAirMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSRatedWaterVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSRatedWaterVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSRatedWaterMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSRatedCBF(DataGlobalConstants::MaxSpeedLevels, 0.0), MSEffectiveAo(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSCCapFTemp(DataGlobalConstants::MaxSpeedLevels, 0), MSCCapAirFFlow(DataGlobalConstants::MaxSpeedLevels, 0),
-              MSCCapWaterFFlow(DataGlobalConstants::MaxSpeedLevels, 0), MSEIRFTemp(DataGlobalConstants::MaxSpeedLevels, 0),
-              MSEIRAirFFlow(DataGlobalConstants::MaxSpeedLevels, 0), MSEIRWaterFFlow(DataGlobalConstants::MaxSpeedLevels, 0),
-              MSWasteHeat(DataGlobalConstants::MaxSpeedLevels, 0), MSWasteHeatFrac(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSWHPumpPower(DataGlobalConstants::MaxSpeedLevels, 0.0), MSWHPumpPowerPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSHPDesignSpecIndex(-1), MSErrIndex(DataHVACGlobals::MaxSpeedLevels, 0), MSRatedPercentTotCap(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSRatedTotCap(DataHVACGlobals::MaxSpeedLevels, 0.0), MSRatedSHR(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSRatedCOP(DataHVACGlobals::MaxSpeedLevels, 0.0), MSRatedAirVolFlowPerRatedTotCap(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSRatedAirVolFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSRatedEvaporatorFanPowerPerVolumeFlowRate2017(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSRatedEvaporatorFanPowerPerVolumeFlowRate2023(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSRatedAirMassFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0), MSRatedWaterVolFlowPerRatedTotCap(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSRatedWaterVolFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0), MSRatedWaterMassFlowRate(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSRatedCBF(DataHVACGlobals::MaxSpeedLevels, 0.0), MSEffectiveAo(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSCCapFTemp(DataHVACGlobals::MaxSpeedLevels, 0), MSCCapAirFFlow(DataHVACGlobals::MaxSpeedLevels, 0),
+              MSCCapWaterFFlow(DataHVACGlobals::MaxSpeedLevels, 0), MSEIRFTemp(DataHVACGlobals::MaxSpeedLevels, 0),
+              MSEIRAirFFlow(DataHVACGlobals::MaxSpeedLevels, 0), MSEIRWaterFFlow(DataHVACGlobals::MaxSpeedLevels, 0),
+              MSWasteHeat(DataHVACGlobals::MaxSpeedLevels, 0), MSWasteHeatFrac(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSWHPumpPower(DataHVACGlobals::MaxSpeedLevels, 0.0), MSWHPumpPowerPerRatedTotCap(DataHVACGlobals::MaxSpeedLevels, 0.0),
               SpeedNumReport(0.0), SpeedRatioReport(0.0), DefrostStrategy(0), DefrostControl(0), EIRFPLR(0), DefrostEIRFT(0), MinOATCompressor(0.0),
               OATempCompressorOn(0.0), MaxOATDefrost(0.0), DefrostTime(0.0), DefrostCapacity(0.0), HPCompressorRuntime(0.0),
               HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0), DefrostConsumption(0.0), ReportCoolingCoilCrankcasePower(true),
@@ -310,9 +314,8 @@ namespace VariableSpeedCoils {
               CondenserInletNodeNum(0), CondenserType(DataHeatBalance::RefrigCondenserType::Air), ReportEvapCondVars(false),
               EvapCondPumpElecNomPower(0.0), EvapCondPumpElecPower(0.0), EvapWaterConsumpRate(0.0), EvapCondPumpElecConsumption(0.0),
               EvapWaterConsump(0.0), BasinHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0),
-              BasinHeaterSchedulePtr(0), EvapCondAirFlow(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              EvapCondEffect(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSRatedEvapCondVolFlowPerRatedTotCap(DataGlobalConstants::MaxSpeedLevels, 0.0), EvapWaterSupplyMode(101), EvapWaterSupTankID(0),
+              BasinHeaterSchedulePtr(0), EvapCondAirFlow(DataHVACGlobals::MaxSpeedLevels, 0.0), EvapCondEffect(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              MSRatedEvapCondVolFlowPerRatedTotCap(DataHVACGlobals::MaxSpeedLevels, 0.0), EvapWaterSupplyMode(101), EvapWaterSupTankID(0),
               EvapWaterTankDemandARRID(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
               CondensateVol(0.0), CondInletTemp(0.0), SupplyFanIndex(0), SupplyFan_TypeNum(0), SourceAirMassFlowRate(0.0), InletSourceAirTemp(0.0),
               InletSourceAirEnthalpy(0.0),

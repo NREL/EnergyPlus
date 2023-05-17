@@ -143,10 +143,8 @@ namespace BaseboardElectric {
 
         PowerMet = baseboard->baseboards(BaseboardNum).Power;
 
-        baseboard->baseboards(BaseboardNum).Energy =
-            baseboard->baseboards(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        baseboard->baseboards(BaseboardNum).ElecUseLoad =
-            baseboard->baseboards(BaseboardNum).ElecUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+        baseboard->baseboards(BaseboardNum).Energy = baseboard->baseboards(BaseboardNum).Power * state.dataHVACGlobal->TimeStepSysSec;
+        baseboard->baseboards(BaseboardNum).ElecUseLoad = baseboard->baseboards(BaseboardNum).ElecUseRate * state.dataHVACGlobal->TimeStepSysSec;
     }
 
     void GetBaseboardInput(EnergyPlusData &state)
@@ -211,10 +209,6 @@ namespace BaseboardElectric {
                 baseboard->baseboards(ConvElecBBNum).FieldNames = "";
                 baseboard->baseboards(ConvElecBBNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-                if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
-                    continue;
-                }
-
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
                 VerifyUniqueBaseboardName(
                     state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, format("{} Name", cCurrentModuleObject));
@@ -225,7 +219,7 @@ namespace BaseboardElectric {
                 thisBaseboard.EquipType = UtilityRoutines::MakeUPPERCase(cCurrentModuleObject); // the type of baseboard-rename change
                 thisBaseboard.Schedule = state.dataIPShortCut->cAlphaArgs(2);
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    thisBaseboard.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    thisBaseboard.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
                 } else {
                     thisBaseboard.SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                     if (thisBaseboard.SchedPtr == 0) {
@@ -357,10 +351,10 @@ namespace BaseboardElectric {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipName,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -378,10 +372,10 @@ namespace BaseboardElectric {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipName,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,

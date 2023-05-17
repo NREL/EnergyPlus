@@ -546,7 +546,6 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     // loop capacitance based on current plant conditions
 
     Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
@@ -580,7 +579,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     // tank conditions each call.
     // Analytical solution for ODE, formulated for both final tank temp and average tank temp.
 
-    Real64 TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSeconds = state.dataHVACGlobal->TimeStepSysSec;
     Real64 MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
     Real64 PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TotalPumpHeat;
     Real64 ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
@@ -667,7 +666,6 @@ void UpdateCommonPipe(EnergyPlusData &state,
 
     // Using/Aliasing
     Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("UpdateCommonPipe");
@@ -715,7 +713,7 @@ void UpdateCommonPipe(EnergyPlusData &state,
     // no common pipe case.
     // calculation is separated because for common pipe, a different split for mass fraction is applied
     // The pump heat source is swapped around here compared to no common pipe (so pump heat sort stays on its own side).
-    Real64 TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 TimeStepSeconds = state.dataHVACGlobal->TimeStepSysSec;
     Real64 MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
     Real64 PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).TotalPumpHeat;
     Real64 ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
@@ -787,10 +785,10 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     // called from "Demand to Supply" interface or "Supply to Demand" interface. Update the node temperatures
     // accordingly.
 
-    auto &PlantCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe;
-
     // One time call to set up report variables and set common pipe 'type' flag
     if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
+
+    auto &plantCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe(LoopNum);
 
     // fill local node indexes
     int NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn;
@@ -798,14 +796,14 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     int NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
     int NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
 
-    if (PlantCommonPipe(LoopNum).MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
-        PlantCommonPipe(LoopNum).Flow = 0.0;
-        PlantCommonPipe(LoopNum).Temp = 0.0;
-        PlantCommonPipe(LoopNum).FlowDir = NoRecircFlow;
-        PlantCommonPipe(LoopNum).MyEnvrnFlag = false;
+    if (plantCommonPipe.MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
+        plantCommonPipe.Flow = 0.0;
+        plantCommonPipe.Temp = 0.0;
+        plantCommonPipe.FlowDir = NoRecircFlow;
+        plantCommonPipe.MyEnvrnFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        PlantCommonPipe(LoopNum).MyEnvrnFlag = true;
+        plantCommonPipe.MyEnvrnFlag = true;
     }
 
     // every time inits
@@ -870,9 +868,9 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     }
 
     // Update the Common Pipe Data structure for reporting purposes.
-    PlantCommonPipe(LoopNum).Flow = max(MdotPriRCLeg, MdotSecRCLeg);
-    PlantCommonPipe(LoopNum).Temp = CommonPipeTemp;
-    PlantCommonPipe(LoopNum).FlowDir = CPFlowDir;
+    plantCommonPipe.Flow = max(MdotPriRCLeg, MdotSecRCLeg);
+    plantCommonPipe.Temp = CommonPipeTemp;
+    plantCommonPipe.FlowDir = CPFlowDir;
     state.dataLoopNodes->Node(NodeNumSecIn).Temp = TempSecInlet;
     state.dataLoopNodes->Node(NodeNumPriIn).Temp = TempPriInlet;
 

@@ -345,7 +345,7 @@ namespace WindowManager {
             // handling of optical properties
 
             for (IPhi = 1; IPhi <= 10; ++IPhi) {
-                state.dataWindowManager->CosPhiIndepVar(IPhi) = std::cos((IPhi - 1) * 10.0 * DataGlobalConstants::DegToRadians);
+                state.dataWindowManager->CosPhiIndepVar(IPhi) = std::cos((IPhi - 1) * 10.0 * Constant::DegToRadians);
             }
 
             TotLay = thisConstruct.TotLayers;
@@ -646,7 +646,7 @@ namespace WindowManager {
             for (IPhi = 1; IPhi <= TotalIPhi; ++IPhi) {
                 // 10 degree increment for incident angle is only value for a construction without a layer = SpectralAndAngle
                 Phi = double(IPhi - 1) * 10.0;
-                CosPhi = std::cos(Phi * DataGlobalConstants::DegToRadians);
+                CosPhi = std::cos(Phi * Constant::DegToRadians);
                 if (std::abs(CosPhi) < 0.0001) CosPhi = 0.0;
 
                 // For each wavelength, get glass layer properties at this angle of incidence
@@ -846,7 +846,7 @@ namespace WindowManager {
             // When a construction has a layer = SpectralAndAngle, the 10 degree increment will be overridden.
             for (IPhi = 1; IPhi <= TotalIPhi; ++IPhi) {
                 Phi = double(IPhi - 1) * 10.0;
-                CosPhi = std::cos(Phi * DataGlobalConstants::DegToRadians);
+                CosPhi = std::cos(Phi * Constant::DegToRadians);
                 if (std::abs(CosPhi) < 0.0001) CosPhi = 0.0;
 
                 // For each wavelength, get glass layer properties at this angle of incidence
@@ -1437,7 +1437,7 @@ namespace WindowManager {
                     tvisPhiFit(IPhi) = 0.0;
 
                     Phi = double(IPhi - 1) * 10.0;
-                    CosPhi = std::cos(Phi * DataGlobalConstants::DegToRadians);
+                    CosPhi = std::cos(Phi * Constant::DegToRadians);
                     if (std::abs(CosPhi) < 0.0001) CosPhi = 0.0;
                     Real64 cos_pow(1.0);
                     for (CoefNum = 1; CoefNum <= 6; ++CoefNum) {
@@ -1730,7 +1730,7 @@ namespace WindowManager {
         }
 
         for (IPhi = 1; IPhi <= 10; ++IPhi) {
-            state.dataWindowManager->CosPhiIndepVar(IPhi) = std::cos((IPhi - 1) * 10.0 * DataGlobalConstants::DegToRadians);
+            state.dataWindowManager->CosPhiIndepVar(IPhi) = std::cos((IPhi - 1) * 10.0 * Constant::DegToRadians);
         }
     }
 
@@ -2277,7 +2277,7 @@ namespace WindowManager {
             state.dataWindowManager->nglface = 2 * state.dataWindowManager->ngllayer;
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
             state.dataWindowManager->tilt = surface.Tilt;
-            state.dataWindowManager->tiltr = state.dataWindowManager->tilt * DataGlobalConstants::DegToRadians;
+            state.dataWindowManager->tiltr = state.dataWindowManager->tilt * Constant::DegToRadians;
             SurfNumAdj = surface.ExtBoundCond;
             state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
             Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
@@ -2520,8 +2520,8 @@ namespace WindowManager {
                         auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
                         for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
                             SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs = GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                             DataGlobalConstants::KelvinConv;
+                            SrdSurfTempAbs =
+                                GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
                             OutSrdIR += state.dataWindowManager->sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
                         }
                     }
@@ -2687,7 +2687,7 @@ namespace WindowManager {
                     SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                     SrdSurfTempAbs = GetCurrentScheduleValue(
                                          state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                     DataGlobalConstants::KelvinConv;
+                                     Constant::KelvinConv;
                     rad_out_lw_srd_per_area += -emiss_sigma_product * SrdSurfViewFac * (Tsout_4 - pow_4(SrdSurfTempAbs));
                 }
             }
@@ -3658,8 +3658,8 @@ namespace WindowManager {
                 }
                 CalcISO15099WindowIntConvCoeff(state,
                                                SurfNum,
-                                               state.dataWindowManager->thetas[InsideFaceIndex - 1] - DataGlobalConstants::KelvinConv,
-                                               state.dataWindowManager->tin - DataGlobalConstants::KelvinConv);
+                                               state.dataWindowManager->thetas[InsideFaceIndex - 1] - Constant::KelvinConv,
+                                               state.dataWindowManager->tin - Constant::KelvinConv);
                 state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
             }
 
@@ -3920,8 +3920,8 @@ namespace WindowManager {
                     ShowContinueError(state,
                                       format("Glazing face index = {} ; new temperature ={:.4R}C  ; previous temperature = {:.4R}C",
                                              i,
-                                             state.dataWindowManager->thetas[i - 1] - DataGlobalConstants::KelvinConv,
-                                             state.dataWindowManager->thetasPrev[i - 1] - DataGlobalConstants::KelvinConv));
+                                             state.dataWindowManager->thetas[i - 1] - Constant::KelvinConv,
+                                             state.dataWindowManager->thetasPrev[i - 1] - Constant::KelvinConv));
                 }
             }
 
@@ -4647,7 +4647,7 @@ namespace WindowManager {
                 vv[imax - 1] = vv[j - 1];
             }
             indx(j) = imax;
-            if (ajac(j, j) == 0.0) ajac(j, j) = DataGlobalConstants::rTinyValue;
+            if (ajac(j, j) == 0.0) ajac(j, j) = Constant::rTinyValue;
             if (j != n) {
                 dum = 1.0 / ajac(j, j);
                 for (i = j + 1; i <= n; ++i) {
@@ -5172,7 +5172,7 @@ namespace WindowManager {
             asp = 1.524 / state.dataWindowManager->gap[IGap - 1];
         }
 
-        state.dataWindowManager->tiltr = state.dataWindowManager->tilt * DataGlobalConstants::DegToRadians;
+        state.dataWindowManager->tiltr = state.dataWindowManager->tilt * Constant::DegToRadians;
         ra = gr * pr;
         //! fw if (ra > 2.0e6): error that outside range of Rayleigh number?
 
@@ -5989,8 +5989,8 @@ namespace WindowManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // 0,10,20,...,80,90 degress
 
-        Real64 const DPhiR(10.0 * DataGlobalConstants::DegToRadians); // Half of 10-deg incidence angle increment (radians)
-        int IPhi;                                                     // Incidence angle counter
+        Real64 const DPhiR(10.0 * Constant::DegToRadians); // Half of 10-deg incidence angle increment (radians)
+        int IPhi;                                          // Incidence angle counter
 
         DiffuseAverage = 0.0;
         for (IPhi = 1; IPhi <= 9; ++IPhi) {
@@ -6031,11 +6031,11 @@ namespace WindowManager {
 
         Sum = 0.0;
         SumDenom = 0.0;
-        DPhi = 5.0 * DataGlobalConstants::DegToRadians;
+        DPhi = 5.0 * Constant::DegToRadians;
 
         // Integrate from -90 to 0 deg
         for (IPhi = 1; IPhi <= 18; ++IPhi) {
-            Phi = -DataGlobalConstants::PiOvr2 + (IPhi - 0.5) * DPhi;
+            Phi = -Constant::PiOvr2 + (IPhi - 0.5) * DPhi;
             Sum += std::cos(Phi) * DPhi * InterpProfAng(Phi, Property);
             SumDenom += std::cos(Phi) * DPhi;
         }
@@ -6075,11 +6075,11 @@ namespace WindowManager {
 
         Sum = 0.0;
         SumDenom = 0.0;
-        DPhi = 5.0 * DataGlobalConstants::DegToRadians;
+        DPhi = 5.0 * Constant::DegToRadians;
 
         // Integrate from 0 to 90 deg
         for (IPhi = 19; IPhi <= 36; ++IPhi) {
-            Phi = -DataGlobalConstants::PiOvr2 + (IPhi - 0.5) * DPhi;
+            Phi = -Constant::PiOvr2 + (IPhi - 0.5) * DPhi;
             Sum += std::cos(Phi) * DPhi * InterpProfAng(Phi, Property);
             SumDenom += std::cos(Phi) * DPhi;
         }
@@ -6624,7 +6624,7 @@ namespace WindowManager {
             } else {
                 VarSlats = false;
                 if (state.dataMaterial->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Variable) VarSlats = true;
-                SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * Constant::DegToRadians;
                 TBlBmBm = BlindBeamBeamTrans(0.0,
                                              SlatAng,
                                              state.dataMaterial->Blind(BlNum).SlatWidth,
@@ -7018,7 +7018,7 @@ namespace WindowManager {
 
         TiltDeg = 90.0;
 
-        sineTilt = std::sin(TiltDeg * DataGlobalConstants::DegToRadians); // degrees as arg
+        sineTilt = std::sin(TiltDeg * Constant::DegToRadians); // degrees as arg
 
         while (iter < MaxIterations && errtemp > errtemptol) {
             for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
@@ -7726,9 +7726,9 @@ namespace WindowManager {
 
                     st_lay = 0.0;
                     if (state.dataMaterial->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
-                        bld_el = state.dataMaterial->Blind(BlindNum).SlatAngle * DataGlobalConstants::DegToRadians;
-                    } else {                                                                               // Variable slat angle
-                        bld_el = (DataGlobalConstants::Pi / (Material::MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
+                        bld_el = state.dataMaterial->Blind(BlindNum).SlatAngle * Constant::DegToRadians;
+                    } else {                                                                    // Variable slat angle
+                        bld_el = (Constant::Pi / (Material::MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
                     }
                     BlindOpticsDiffuse(state, BlindNum, ISolVis, bld_pr, bld_el, st_lay);
 
@@ -7758,15 +7758,15 @@ namespace WindowManager {
                 // (for Material::MaxSlatAngs = 19). If blind has fixed slat angle, calculate properties at that angle only.
 
                 for (IProfAng = 1; IProfAng <= 37; ++IProfAng) {
-                    sun_el = -DataGlobalConstants::Pi / 2.0 + (DataGlobalConstants::Pi / 36.0) * (IProfAng - 1);
+                    sun_el = -Constant::Pi / 2.0 + (Constant::Pi / 36.0) * (IProfAng - 1);
                     sun_el_deg(IProfAng) = 57.2958 * sun_el;
 
                     for (ISlatAng = 1; ISlatAng <= Material::MaxSlatAngs; ++ISlatAng) {
                         st_lay = 0.0;
                         if (state.dataMaterial->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
-                            bld_el = state.dataMaterial->Blind(BlindNum).SlatAngle * DataGlobalConstants::DegToRadians;
-                        } else {                                                                               // Variable slat angle
-                            bld_el = (DataGlobalConstants::Pi / (Material::MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
+                            bld_el = state.dataMaterial->Blind(BlindNum).SlatAngle * Constant::DegToRadians;
+                        } else {                                                                    // Variable slat angle
+                            bld_el = (Constant::Pi / (Material::MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
                         }
 
                         // Beam solar-optical properties of blind for given profile angle and slat angle
@@ -7889,14 +7889,14 @@ namespace WindowManager {
         relativeAltitude.allocate(N, M);
 
         for (j = 0; j <= N - 1; ++j) {
-            Real64 currAzimuth = (90.0 / N) * j * DataGlobalConstants::DegToRadians;
+            Real64 currAzimuth = (90.0 / N) * j * Constant::DegToRadians;
             sunAzimuth.push_back(currAzimuth); // Azimuth angle of sun during integration
             sin_sunAzimuth.push_back(std::sin(currAzimuth));
             cos_sunAzimuth.push_back(std::cos(currAzimuth));
         }
 
         for (i = 0; i <= M - 1; ++i) {
-            Real64 currAltitude = (90.0 / M) * i * DataGlobalConstants::DegToRadians;
+            Real64 currAltitude = (90.0 / M) * i * Constant::DegToRadians;
             sunAltitude.push_back(currAltitude); // Altitude angle of sun during integration
             sin_sunAltitude.push_back(std::sin(currAltitude));
             cos_sunAltitude.push_back(std::cos(currAltitude));
@@ -8024,8 +8024,8 @@ namespace WindowManager {
                     state.dataMaterial->ScreenTrans(ScreenNum).Scatt = 0.0;
                     for (j = 90 / thisMaterial->ScreenMapResolution + 1; j >= 1; --j) {
                         for (i = 90 / thisMaterial->ScreenMapResolution + 1; i >= 1; --i) {
-                            Real64 SunAzimuth = thisMaterial->ScreenMapResolution * (j - 1) * DataGlobalConstants::DegToRadians;
-                            Real64 SunAltitude = thisMaterial->ScreenMapResolution * (i - 1) * DataGlobalConstants::DegToRadians;
+                            Real64 SunAzimuth = thisMaterial->ScreenMapResolution * (j - 1) * Constant::DegToRadians;
+                            Real64 SunAltitude = thisMaterial->ScreenMapResolution * (i - 1) * Constant::DegToRadians;
                             CalcScreenTransmittance(state, 0, SunAltitude, SunAzimuth, ScreenNum);
                             state.dataMaterial->ScreenTrans(ScreenNum).Trans(i, j) = state.dataMaterial->Screens(ScreenNum).BmBmTrans;
                             state.dataMaterial->ScreenTrans(ScreenNum).Scatt(i, j) = state.dataMaterial->Screens(ScreenNum).BmDifTrans;
@@ -8182,7 +8182,7 @@ namespace WindowManager {
 
         //     Calculate view factors between slat sections (slat is divided longitudinally into two equal parts)
 
-        ViewFac(c(2), c(3), b_el, DataGlobalConstants::PiOvr2, F);
+        ViewFac(c(2), c(3), b_el, Constant::PiOvr2, F);
 
         //     Set up exchange matrix X for diffuse properties
 
@@ -8232,7 +8232,7 @@ namespace WindowManager {
 
         //     Slat edge correction factor
         phib = b_el;
-        delphis = DataGlobalConstants::PiOvr2 / 10.0;
+        delphis = Constant::PiOvr2 / 10.0;
         for (IUpDown = 1; IUpDown <= 2; ++IUpDown) {
             for (Iphis = 1; Iphis <= 10; ++Iphis) {
                 phis = -(Iphis - 0.5) * delphis;
@@ -8241,8 +8241,8 @@ namespace WindowManager {
                 fEdge1 = 0.0;
                 gamma = phib - phis;
                 if (std::abs(std::sin(gamma)) > 0.01) {
-                    if ((phib > 0.0 && phib <= DataGlobalConstants::PiOvr2 && phis <= phib) ||
-                        (phib > DataGlobalConstants::PiOvr2 && phib <= DataGlobalConstants::Pi && phis > -(DataGlobalConstants::Pi - phib))) {
+                    if ((phib > 0.0 && phib <= Constant::PiOvr2 && phis <= phib) ||
+                        (phib > Constant::PiOvr2 && phib <= Constant::Pi && phis > -(Constant::Pi - phib))) {
                         fEdge1 = state.dataMaterial->Blind(BlindNum).SlatThickness * std::abs(std::sin(gamma)) /
                                  ((state.dataMaterial->Blind(BlindNum).SlatSeparation +
                                    state.dataMaterial->Blind(BlindNum).SlatThickness / std::abs(std::sin(phib))) *
@@ -8512,7 +8512,7 @@ namespace WindowManager {
             //       angle (135 deg).
 
             if (i == 2) {
-                phib = DataGlobalConstants::Pi - phib;
+                phib = Constant::Pi - phib;
             }
 
             //       Correction factor that accounts for finite thickness of slats. It is used to modify the
@@ -8524,8 +8524,8 @@ namespace WindowManager {
             fEdge1 = 0.0;
             gamma = phib - phis;
             if (std::abs(std::sin(gamma)) > 0.01) {
-                if ((phib > 0.0 && phib <= DataGlobalConstants::PiOvr2 && phis <= phib) ||
-                    (phib > DataGlobalConstants::PiOvr2 && phib <= DataGlobalConstants::Pi && phis > -(DataGlobalConstants::Pi - phib))) {
+                if ((phib > 0.0 && phib <= Constant::PiOvr2 && phis <= phib) ||
+                    (phib > Constant::PiOvr2 && phib <= Constant::Pi && phis > -(Constant::Pi - phib))) {
                     fEdge1 = state.dataMaterial->Blind(BlindNum).SlatThickness * std::abs(std::sin(gamma)) /
                              ((state.dataMaterial->Blind(BlindNum).SlatSeparation +
                                state.dataMaterial->Blind(BlindNum).SlatThickness / std::abs(std::sin(phib))) *
@@ -8566,12 +8566,12 @@ namespace WindowManager {
             InvertMatrix(state, X, Xinv, indx, 4, 4);
 
             //       Set up sources for direct-diffuse slat properties
-            if (std::abs(phis - phib) <= DataGlobalConstants::PiOvr2) { // Beam hits front of slat
-                Q(3) = c(4) + c(7);                                     // beam-beam trans of slat + beam-diff trans of slat
-                Q(4) = c(5) + c(8);                                     // front beam-beam refl of slat + front beam-diff refl of slat
-            } else {                                                    // Beam hits back of slat
-                Q(3) = c(6) + c(9);                                     // back beam-beam refl of slat  + back beam-diff refl of slat
-                Q(4) = c(4) + c(7);                                     // beam-beam trans of slat + beam-diff trans of slat
+            if (std::abs(phis - phib) <= Constant::PiOvr2) { // Beam hits front of slat
+                Q(3) = c(4) + c(7);                          // beam-beam trans of slat + beam-diff trans of slat
+                Q(4) = c(5) + c(8);                          // front beam-beam refl of slat + front beam-diff refl of slat
+            } else {                                         // Beam hits back of slat
+                Q(3) = c(6) + c(9);                          // back beam-beam refl of slat  + back beam-diff refl of slat
+                Q(4) = c(4) + c(7);                          // beam-beam trans of slat + beam-diff trans of slat
             }
 
             //       Correct for fraction of beam that is not directly transmitted; 1 - this fraction is
@@ -8625,12 +8625,12 @@ namespace WindowManager {
         // Linear interpolation.
 
         // DeltaAng = Pi/36
-        if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
+        if (ProfAng > Constant::PiOvr2 || ProfAng < -Constant::PiOvr2) {
             return 0.0;
         } else {
-            Real64 constexpr DeltaAngRad(DataGlobalConstants::Pi / 36.0);                                             // Profile angle increment (rad)
-            int IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaAngRad);                              // Profile angle index
-            Real64 InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad; // Interpolation factor
+            Real64 constexpr DeltaAngRad(Constant::Pi / 36.0);                                             // Profile angle increment (rad)
+            int IAlpha = 1 + int((ProfAng + Constant::PiOvr2) / DeltaAngRad);                              // Profile angle index
+            Real64 InterpFac = (ProfAng - (-Constant::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad; // Interpolation factor
             return (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
         }
     }
@@ -8655,9 +8655,9 @@ namespace WindowManager {
         // Linear interpolation.
 
         if (VarSlats) { // Variable-angle slats
-            Real64 SlatAng1 = std::clamp(SlatAng, 0.0, DataGlobalConstants::Pi);
-            static Real64 constexpr DeltaAng(DataGlobalConstants::Pi / (double(Material::MaxSlatAngs) - 1.0));
-            static Real64 constexpr DeltaAng_inv((double(Material::MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi);
+            Real64 SlatAng1 = std::clamp(SlatAng, 0.0, Constant::Pi);
+            static Real64 constexpr DeltaAng(Constant::Pi / (double(Material::MaxSlatAngs) - 1.0));
+            static Real64 constexpr DeltaAng_inv((double(Material::MaxSlatAngs) - 1.0) / Constant::Pi);
             int IBeta = 1 + int(SlatAng1 * DeltaAng_inv);                          // Slat angle index
             Real64 InterpFac = (SlatAng1 - DeltaAng * (IBeta - 1)) * DeltaAng_inv; // Interpolation factor
             return PropArray(IBeta) + InterpFac * (PropArray(min(Material::MaxSlatAngs, IBeta + 1)) - PropArray(IBeta));
@@ -8689,21 +8689,20 @@ namespace WindowManager {
         // Argument array dimensioning
         PropArray.dim(Material::MaxSlatAngs, 37);
 
-        Real64 SlatAng1 = std::clamp(SlatAng, 0.0, DataGlobalConstants::Pi);
+        Real64 SlatAng1 = std::clamp(SlatAng, 0.0, Constant::Pi);
 
         // This is not correct, fixed 2/17/2010
         // ProfAng1 = MIN(MAX(SlatAng,-PiOvr2),PiOvr2)
-        Real64 ProfAng1 = std::clamp(ProfAng, -DataGlobalConstants::PiOvr2, DataGlobalConstants::PiOvr2);
+        Real64 ProfAng1 = std::clamp(ProfAng, -Constant::PiOvr2, Constant::PiOvr2);
 
-        Real64 constexpr DeltaProfAng(DataGlobalConstants::Pi / 36.0);
-        int IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2) / DeltaProfAng) + 1; // Profile angle index
-        Real64 ProfAngRatio =
-            (ProfAng1 + DataGlobalConstants::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng; // Profile angle interpolation factor
+        Real64 constexpr DeltaProfAng(Constant::Pi / 36.0);
+        int IAlpha = int((ProfAng1 + Constant::PiOvr2) / DeltaProfAng) + 1;                               // Profile angle index
+        Real64 ProfAngRatio = (ProfAng1 + Constant::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng; // Profile angle interpolation factor
 
         Real64 Val1;
         Real64 Val2;
         if (VarSlats) { // Variable-angle slats: interpolate in profile angle and slat angle
-            Real64 constexpr DeltaSlatAng(DataGlobalConstants::Pi / (double(Material::MaxSlatAngs) - 1.0));
+            Real64 constexpr DeltaSlatAng(Constant::Pi / (double(Material::MaxSlatAngs) - 1.0));
             int IBeta = int(SlatAng1 / DeltaSlatAng) + 1;                                 // Slat angle index
             Real64 SlatAngRatio = (SlatAng1 - (IBeta - 1) * DeltaSlatAng) / DeltaSlatAng; // Slat angle interpolation factor
             Val1 = PropArray(IBeta, IAlpha); // Property values at points enclosing the given ProfAngle and SlatAngle
@@ -8755,8 +8754,8 @@ namespace WindowManager {
             Real64 fEdge = 0.0; // Slat edge correction factor
             Real64 fEdge1 = 0.0;
             if (std::abs(std::sin(gamma)) > 0.01) {
-                if ((SlatAng > 0.0 && SlatAng <= DataGlobalConstants::PiOvr2 && ProfAng <= SlatAng) ||
-                    (SlatAng > DataGlobalConstants::PiOvr2 && SlatAng <= DataGlobalConstants::Pi && ProfAng > -(DataGlobalConstants::Pi - SlatAng)))
+                if ((SlatAng > 0.0 && SlatAng <= Constant::PiOvr2 && ProfAng <= SlatAng) ||
+                    (SlatAng > Constant::PiOvr2 && SlatAng <= Constant::Pi && ProfAng > -(Constant::Pi - SlatAng)))
                     fEdge1 =
                         SlatThickness * std::abs(std::sin(gamma)) / ((SlatSeparation + SlatThickness / std::abs(std::sin(SlatAng))) * CosProfAng);
                 fEdge = min(1.0, std::abs(fEdge1));
@@ -9005,7 +9004,7 @@ namespace WindowManager {
 
             INDX(j) = imax;
             if (j != N) {
-                if (A(j, j) == 0.0) A(j, j) = DataGlobalConstants::rTinyValue;
+                if (A(j, j) == 0.0) A(j, j) = Constant::rTinyValue;
 
                 dum = 1.0 / A(j, j);
                 for (i = j + 1; i <= N; ++i) {
@@ -9014,7 +9013,7 @@ namespace WindowManager {
             }
         }
 
-        if (A(N, N) == 0.0) A(N, N) = DataGlobalConstants::rTinyValue;
+        if (A(N, N) == 0.0) A(N, N) = Constant::rTinyValue;
     }
 
     //*****************************************************************************************
