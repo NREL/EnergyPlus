@@ -104,7 +104,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,23.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2420,6 +2420,8 @@
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
     TC VS AirFrac Test,      !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
@@ -2433,6 +2435,8 @@
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
     TC VS AirFrac Test,      !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
@@ -2446,6 +2450,8 @@
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
     TC VS AirFrac Test,      !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
@@ -2459,6 +2465,8 @@
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
     TC VS AirFrac Test,      !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
@@ -2472,6 +2480,8 @@
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
     TC VS AirFrac Test,      !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
@@ -2485,6 +2495,8 @@
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 6 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 6 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
     TC VS AirFrac Test,      !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
@@ -2498,6 +2510,8 @@
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 7 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 7 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
     TC VS AirFrac Test,      !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
@@ -2511,6 +2525,8 @@
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 8 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 8 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
     TC VS AirFrac Test,      !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
@@ -2524,6 +2540,8 @@
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 9 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 9 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
     TC VS AirFrac Test,      !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
@@ -2537,6 +2555,8 @@
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 10 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 10 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}
     TC VS Temp1 Test,        !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
     TC VS AirFrac Test,      !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
@@ -3171,6 +3191,8 @@
     SPACE1-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE1-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -3184,26 +3206,6 @@
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
     0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
 
-!  Coil:Cooling:WaterToAirHeatPump:EquationFit,
-!    SPACE2-1 HP Cooling Mode,!- Name
-!    SPACE2-1 HP Cooling Water Inlet,  !- Water Inlet Node Name
-!    SPACE2-1 HP Cooling Water Outlet,  !- Water Outlet Node Name
-!    SPACE2-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
-!    SPACE2-1 Cooling Coil Outlet,  !- Air Outlet Node Name
-!    Autosize,                !- Rated Air Flow Rate {m3/s}
-!    Autosize,                !- Rated Water Flow Rate {m3/s}
-!    Autosize,                !- Gross Rated Total Cooling Capacity {W}
-!    Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
-!    5.12,                    !- Gross Rated Cooling COP {W/W}
-!    30.0,                   !- Rated Entering Water Temperature {C}
-!    27.0,                   !- Rated Entering Air Dry-Bulb Temperature {C}
-!    19.0,                   !- Rated Entering Air Wet-Bulb Temperature {C}
-!    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
-!    CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
-!    CoolPowCurve,            !- Cooling Power Consumption Curve Name
-!    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-!    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-
   Coil:Cooling:WaterToAirHeatPump:EquationFit,
     SPACE3-1 HP Cooling Mode,!- Name
     SPACE3-1 HP Cooling Water Inlet,  !- Water Inlet Node Name
@@ -3211,6 +3213,8 @@
     SPACE3-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE3-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -3231,6 +3235,8 @@
     SPACE4-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE4-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -3251,6 +3257,8 @@
     SPACE5-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE5-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
