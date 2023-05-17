@@ -1597,13 +1597,12 @@ namespace HWBaseboardRadiator {
         // check input, provide comp index, call utility routines
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
-        int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
+        int const NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
         int BaseboardNum;
 
         // Find the correct baseboard
         if (CompIndex == 0) {
-            BaseboardNum = UtilityRoutines::FindItemInList(BaseboardName, HWBaseboard, &HWBaseboardParams::Name);
+            BaseboardNum = UtilityRoutines::FindItemInList(BaseboardName, state.dataHWBaseboardRad->HWBaseboard, &HWBaseboardParams::Name);
             if (BaseboardNum == 0) {
                 ShowFatalError(state, format("UpdateHWBaseboardPlantConnection: Specified baseboard not valid ={}", BaseboardName));
             }
@@ -1619,13 +1618,13 @@ namespace HWBaseboardRadiator {
                            BaseboardName));
             }
             if (state.dataGlobal->KickOffSimulation) {
-                if (BaseboardName != HWBaseboard(BaseboardNum).Name) {
+                if (BaseboardName != state.dataHWBaseboardRad->HWBaseboard(BaseboardNum).Name) {
                     ShowFatalError(state,
                                    format("UpdateHWBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard Name "
                                           "for that index={}",
                                           BaseboardNum,
                                           BaseboardName,
-                                          HWBaseboard(BaseboardNum).Name));
+                                          state.dataHWBaseboardRad->HWBaseboard(BaseboardNum).Name));
                 }
                 if (BaseboardTypeNum != static_cast<int>(DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water)) {
                     ShowFatalError(state,
@@ -1642,26 +1641,27 @@ namespace HWBaseboardRadiator {
             return;
         }
 
+        auto &thisHWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
         PlantUtilities::PullCompInterconnectTrigger(state,
-                                                    HWBaseboard(BaseboardNum).plantLoc,
-                                                    HWBaseboard(BaseboardNum).BBLoadReSimIndex,
-                                                    HWBaseboard(BaseboardNum).plantLoc,
+                                                    thisHWBaseboard.plantLoc,
+                                                    thisHWBaseboard.BBLoadReSimIndex,
+                                                    thisHWBaseboard.plantLoc,
                                                     DataPlant::CriteriaType::HeatTransferRate,
-                                                    HWBaseboard(BaseboardNum).Power);
+                                                    thisHWBaseboard.Power);
 
         PlantUtilities::PullCompInterconnectTrigger(state,
-                                                    HWBaseboard(BaseboardNum).plantLoc,
-                                                    HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,
-                                                    HWBaseboard(BaseboardNum).plantLoc,
+                                                    thisHWBaseboard.plantLoc,
+                                                    thisHWBaseboard.BBMassFlowReSimIndex,
+                                                    thisHWBaseboard.plantLoc,
                                                     DataPlant::CriteriaType::MassFlowRate,
-                                                    HWBaseboard(BaseboardNum).WaterMassFlowRate);
+                                                    thisHWBaseboard.WaterMassFlowRate);
 
         PlantUtilities::PullCompInterconnectTrigger(state,
-                                                    HWBaseboard(BaseboardNum).plantLoc,
-                                                    HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,
-                                                    HWBaseboard(BaseboardNum).plantLoc,
+                                                    thisHWBaseboard.plantLoc,
+                                                    thisHWBaseboard.BBInletTempFlowReSimIndex,
+                                                    thisHWBaseboard.plantLoc,
                                                     DataPlant::CriteriaType::Temperature,
-                                                    HWBaseboard(BaseboardNum).WaterOutletTemp);
+                                                    thisHWBaseboard.WaterOutletTemp);
     }
 
     //*****************************************************************************************
