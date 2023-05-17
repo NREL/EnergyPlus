@@ -946,12 +946,15 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfIntConvClassification.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvClassificationRpt.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvHcModelEq.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvHcModelEqRpt.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvHcUserCurveIndex.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfOutConvClassification.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfOutConvClassificationRpt.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfOutConvHfModelEq.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutConvHfModelEqRpt.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfOutConvHfUserCurveIndex.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfOutConvHnModelEq.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfOutConvHnModelEqRpt.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfOutConvHnUserCurveIndex.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfOutConvFaceArea.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfOutConvFacePerimeter.allocate(state.dataSurface->TotSurfaces);
@@ -2765,7 +2768,8 @@ namespace SurfaceGeometry {
                         }
                     }
                 }
-                // Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
+
+		// Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
                 if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond > 0) continue;
                 if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == Ground) continue;
                 if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == KivaFoundation) {
@@ -2820,6 +2824,41 @@ namespace SurfaceGeometry {
                     ShowContinueError(state, "For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
                 }
             }
+
+	    // Populate SurfaceFilter lists
+	    for (int iSurfaceFilter; iSurfaceFilter < static_cast<int>(SurfaceFilter::Num); ++iSurfaceFilter)
+	        state.dataSurface->SurfaceFilterLists[iSurfaceFilter].reserve(state.dataSurface->TotSurfaces);
+
+	    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+                auto const &surf = state.dataSurface->Surface(SurfNum);
+                if (!surf.HeatTransSurf) continue;
+		if (surf.ExtBoundCond > 0) {
+                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorSurfaces)].push_back(SurfNum);
+		    if (state.dataConstruction->Construction(surf.Construction).TypeIsWindow) {
+		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorWindows)].push_back(SurfNum);
+		    } else if (surf.Class == SurfaceClass::Wall) {
+		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorWalls)].push_back(SurfNum);
+		    } else if (surf.Class == SurfaceClass::Floor) {
+		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorFloors)].push_back(SurfNum);
+		    } else if (surf.Class == SurfaceClass::Roof) {
+		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorRoofs)].push_back(SurfNum);
+		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorCeilings)].push_back(SurfNum);
+		    }
+		} else {
+                    state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorSurfaces)].push_back(SurfNum);
+		    if (state.dataConstruction->Construction(surf.Construction).TypeIsWindow) {
+		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorWindows)].push_back(SurfNum);
+		    } else if (surf.Class == SurfaceClass::Wall) {
+		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorWalls)].push_back(SurfNum);
+		    } else if (surf.Class == SurfaceClass::Floor) {
+		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorFloors)].push_back(SurfNum);
+		    } else if (surf.Class == SurfaceClass::Roof) {
+		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorRoofs)].push_back(SurfNum);
+		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorCeilings)].push_back(SurfNum);
+		    }
+		}
+	    }
+	    
 
             // Note, could do same for Window Area and detecting if Interzone Surface in Zone
 

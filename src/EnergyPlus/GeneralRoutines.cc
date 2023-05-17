@@ -888,7 +888,6 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     // Nat. Vent. equations from ASHRAE HoF 2001 Chapt. 26
 
     // Using/Aliasing
-    using Convect::InitExteriorConvectionCoeff;
     using DataSurfaces::SurfaceData;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -991,7 +990,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         // Initializations for this surface
         HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
-        InitExteriorConvectionCoeff(
+	Convect::InitExtConvCoeff(
             state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
         AbsThermSurf =

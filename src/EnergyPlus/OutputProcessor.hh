@@ -846,7 +846,7 @@ namespace OutputProcessor {
 void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const VariableName,                  // String Name of variable (with units)
                          OutputProcessor::Unit VariableUnit,                   // Actual units corresponding to the actual variable
-                         Real64 &ActualVariable,                               // Actual Variable, used to set up pointer
+                         Real64 const &ActualVariable,                               // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey,     // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                    // Associated Key for this variable
@@ -866,7 +866,7 @@ void SetupOutputVariable(EnergyPlusData &state,
 void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const VariableName,              // String Name of variable
                          OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
-                         int &ActualVariable,                              // Actual Variable, used to set up pointer
+                         int const &ActualVariable,                              // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                // Associated Key for this variable

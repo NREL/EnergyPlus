@@ -1,3 +1,4 @@
+
 // EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
@@ -549,8 +550,8 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.ViewFactorSky = round(ViewFactorSky * 10.0) / 10.0;
 
     calcHashKey.HeatTransferAlgorithm = HeatTransferAlgorithm;
-    calcHashKey.IntConvCoeff = state.dataSurface->SurfIntConvCoeffIndex(SurfNum);
-    calcHashKey.ExtConvCoeff = state.dataSurface->SurfExtConvCoeffIndex(SurfNum);
+    calcHashKey.IntConvCoeff = state.dataSurface->SurfIntConvUserCoeffNum(SurfNum);
+    calcHashKey.ExtConvCoeff = state.dataSurface->SurfExtConvUserCoeffNum(SurfNum);
     calcHashKey.OSCPtr = OSCPtr;
     calcHashKey.OSCMPtr = OSCMPtr;
 

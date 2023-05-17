@@ -132,9 +132,6 @@ namespace EcoRoofManager {
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
         using namespace DataSurfaces;
-        using Convect::InitExteriorConvectionCoeff;
-        using Convect::SetExtConvectionCoeff;
-        using Convect::SetIntConvectionCoeff;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr Kv(0.4);           // Von Karmen's constant (source FASST)
@@ -230,13 +227,13 @@ namespace EcoRoofManager {
         HMovInsul = 0.0;
 
         if (state.dataSurface->Surface(SurfNum).ExtWind) {
-            InitExteriorConvectionCoeff(state,
+            Convect::InitExtConvCoeff(state,
                                         SurfNum,
                                         HMovInsul,
                                         RoughSurf,
                                         AbsThermSurf,
                                         state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
-                                        state.dataHeatBalSurf->SurfHcExt(SurfNum),
+                                        state.dataHeatBalSurf->SurfHConvExt(SurfNum),
                                         state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
                                         state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
                                         state.dataHeatBalSurf->SurfHAirExt(SurfNum));

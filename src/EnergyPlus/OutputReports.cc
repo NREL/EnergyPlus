@@ -1118,8 +1118,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 AlgoName = DataSurfaces::HeatTransAlgoStrs[(int)thisSurface.HeatTransferAlgorithm];
 
                 // Default Convection Coefficient Calculation Algorithms
-                IntConvCoeffCalc = ConvCoeffCalcs[state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo - 1];
-                ExtConvCoeffCalc = ConvCoeffCalcs[state.dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo - 1];
+                IntConvCoeffCalc = Convect::HcIntNamesUC[static_cast<int>(state.dataHeatBal->Zone(ZoneNum).IntConvAlgo)];
+                ExtConvCoeffCalc = Convect::HcExtNamesUC[static_cast<int>(state.dataHeatBal->Zone(ZoneNum).ExtConvAlgo)];
 
                 *eiostream << "HeatTransfer Surface," << thisSurface.Name << "," << cSurfaceClass(thisSurface.Class) << "," << BaseSurfName << ","
                            << AlgoName << ",";
@@ -1194,22 +1194,22 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                            << format("{:.2R}", thisSurface.Tilt) << "," << format("{:.2R}", thisSurface.Width) << ","
                            << format("{:.2R}", thisSurface.Height) << "," << format("{:.2R}", thisSurface.Reveal) << ",";
 
-                static constexpr std::array<std::string_view, (int)Convect::ConvCoefOverrideType::Num> overrideTypeStrs = {
+                static constexpr std::array<std::string_view, (int)Convect::OverrideType::Num> overrideTypeStrs = {
                     "User Supplied Value", "User Supplied Schedule", "User Supplied Curve", "User Specified Model"};
 
-                if (state.dataSurface->SurfIntConvCoeffIndex(surf) > 0) {
+                if (state.dataSurface->SurfIntConvUserCoeffNum(surf) > 0) {
                     IntConvCoeffCalc =
-                        overrideTypeStrs[(int)state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(surf))
-                                             .OverrideType];
-                } else if (state.dataSurface->SurfIntConvCoeffIndex(surf) < 0) { // not in use yet.
-                    IntConvCoeffCalc = ConvCoeffCalcs[std::abs(state.dataSurface->SurfIntConvCoeffIndex(surf)) - 1];
+                        overrideTypeStrs[(int)state.dataSurface->UserIntConvCoeffs(state.dataSurface->SurfIntConvUserCoeffNum(surf))
+                                             .overrideType];
+                } else if (state.dataSurface->SurfIntConvUserCoeffNum(surf) < 0) { // not in use yet.
+                    IntConvCoeffCalc = ConvCoeffCalcs[std::abs(state.dataSurface->SurfIntConvUserCoeffNum(surf)) - 1];
                 }
-                if (state.dataSurface->SurfExtConvCoeffIndex(surf) > 0) {
+                if (state.dataSurface->SurfExtConvUserCoeffIndex(surf) > 0) {
                     ExtConvCoeffCalc =
-                        overrideTypeStrs[(int)state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(surf))
+                        overrideTypeStrs[(int)state.dataSurface->UserExtConvCoeffs(state.dataSurface->SurfExtConvUserCoeffNum(surf))
                                              .OverrideType];
-                } else if (state.dataSurface->SurfExtConvCoeffIndex(surf) < 0) {
-                    ExtConvCoeffCalc = ConvCoeffCalcs[std::abs(state.dataSurface->SurfExtConvCoeffIndex(surf)) - 1];
+                } else if (state.dataSurface->SurfExtConvUserCoeffNum(surf) < 0) {
+                    ExtConvCoeffCalc = ConvCoeffCalcs[std::abs(state.dataSurface->SurfExtConvUserCoeffNum(surf)) - 1];
                 }
                 if (thisSurface.ExtBoundCond == DataSurfaces::ExternalEnvironment) {
                     *eiostream << "ExternalEnvironment"
