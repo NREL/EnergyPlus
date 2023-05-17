@@ -133,7 +133,6 @@ namespace GeneratorFuelSupply {
                                                                          _,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataGenerator->FuelSupply(FuelSupNum).Name = AlphArray(1);
                 if (UtilityRoutines::SameString("TemperatureFromAirNode", AlphArray(2))) {

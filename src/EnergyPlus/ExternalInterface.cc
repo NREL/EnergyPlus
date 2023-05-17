@@ -290,6 +290,9 @@ void StopExternalInterfaceIfError(EnergyPlusData &state)
                 } else {
                     retVal = sendclientmessage(&state.dataExternalInterface->socketFD, &flag2);
                 }
+                if (retVal == 0) {
+                    ShowSevereError(state, "External Interface not found.");
+                }
             }
             ShowFatalError(state, "Error in ExternalInterface: Check EnergyPlus *.err file.");
         }

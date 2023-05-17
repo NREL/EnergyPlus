@@ -7374,7 +7374,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageTemp)
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
     Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
@@ -7695,7 +7695,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageRefl)
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
     Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
