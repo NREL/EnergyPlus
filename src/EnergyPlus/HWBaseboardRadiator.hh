@@ -74,7 +74,6 @@ namespace HWBaseboardRadiator {
         DataPlant::PlantEquipmentType EquipType;
         std::string designObjectName; // Design Object
         int DesignObjectPtr;
-        Array1D_string SurfaceName;
         Array1D_int SurfacePtr;
         int ZonePtr;
         int SchedPtr;

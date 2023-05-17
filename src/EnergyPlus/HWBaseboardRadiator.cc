@@ -634,8 +634,6 @@ namespace HWBaseboardRadiator {
                 thisHWBaseboard.TotSurfToDistrib = 0; // error
             }
 
-            thisHWBaseboard.SurfaceName.allocate(thisHWBaseboard.TotSurfToDistrib);
-            thisHWBaseboard.SurfaceName = "";
             thisHWBaseboard.SurfacePtr.allocate(thisHWBaseboard.TotSurfToDistrib);
             thisHWBaseboard.SurfacePtr = 0;
             thisHWBaseboard.FracDistribToSurf.allocate(thisHWBaseboard.TotSurfToDistrib);
@@ -646,13 +644,13 @@ namespace HWBaseboardRadiator {
 
             AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= thisHWBaseboard.TotSurfToDistrib; ++SurfNum) {
-                thisHWBaseboard.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 5);
-                thisHWBaseboard.SurfacePtr(SurfNum) = HeatBalanceIntRadExchange::GetRadiantSystemSurface(state,
-                                                                                                         cCMO_BBRadiator_Water,
-                                                                                                         thisHWBaseboard.EquipID,
-                                                                                                         thisHWBaseboard.ZonePtr,
-                                                                                                         thisHWBaseboard.SurfaceName(SurfNum),
-                                                                                                         ErrorsFound);
+                thisHWBaseboard.SurfacePtr(SurfNum) =
+                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(state,
+                                                                       cCMO_BBRadiator_Water,
+                                                                       thisHWBaseboard.EquipID,
+                                                                       thisHWBaseboard.ZonePtr,
+                                                                       state.dataIPShortCut->cAlphaArgs(SurfNum + 5),
+                                                                       ErrorsFound);
                 thisHWBaseboard.FracDistribToSurf(SurfNum) = state.dataIPShortCut->rNumericArgs(SurfNum + 4);
                 if (thisHWBaseboard.FracDistribToSurf(SurfNum) > MaxFraction) {
                     ShowWarningError(state,
