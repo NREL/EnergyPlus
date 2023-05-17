@@ -12096,6 +12096,8 @@ DO iSys = 1, numCompactSysPVAV
       CALL AddToObjFld('Rated High Speed Sensible Heat Ratio', base + pvavsCoolCoilSHROff, '')
       CALL AddToObjFld('Rated High Speed COP', base + pvavsCoolCoilCOPOff, '')
       CALL AddToObjStr('Rated High Speed Air Flow Rate', 'autosize')
+      CALL AddToObjStr('High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate', '')
+      CALL AddToObjStr('High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate', '')
       ! DX Ratings - Jul 2012
       CALL AddToObjStr('Unit Internal Static Air Pressure','')
       IF (supFanPlacement .EQ. sfpBlowThru) THEN
@@ -12129,6 +12131,8 @@ DO iSys = 1, numCompactSysPVAV
       CALL AddToObjNum('Rated Low Speed COP',StringToReal(FldVal(base + pvavsCoolCoilCOPOff)) * 1.5)
       ! assume low speed air flow rate is automatically sized
       CALL AddToObjStr('Rated Low Speed Air Flow Rate','Autosize')
+      CALL AddToObjStr('Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate', '')
+      CALL AddToObjStr('Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate', '')
       ! assume the same curves as full speed
       CALL AddToObjFld('Low Speed Total Cooling Capacity Function of Temperature Curve Name',   &
          base + pvavsAirHandlerNameOff,' DX Coil Low Cap-FT')
@@ -16303,6 +16307,8 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjFld('Rated High Speed Sensible Heat Ratio', base + ussCoolCoilSHROff, '')
       CALL AddToObjFld('Rated High Speed COP', base + ussCoolCoilCOPOff, '')
       CALL AddToObjStr('Rated High Speed Air Flow Rate', 'autosize')
+      CALL AddToObjStr('High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate', '')
+      CALL AddToObjStr('High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate', '')
       ! DX Ratings - Jul 2012
       CALL AddToObjStr('Unit Internal Static Air Pressure','')
       CALL AddToObjFld('Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(coolCoilUnitInlet))
@@ -16328,6 +16334,8 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjNum('Rated Low Speed COP',StringToReal(FldVal(base + ussCoolCoilCOPOff)) * 1.5)
       ! assume low speed air flow rate is automatically sized
       CALL AddToObjStr('Rated Low Speed Air Flow Rate','Autosize')
+      CALL AddToObjStr('Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate', '')
+      CALL AddToObjStr('Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate', '')
       ! assume the same curves as full speed
       CALL AddToObjFld('Low Speed Total Cooling Capacity Function of Temperature Curve Name',   &
          base + ussAirHandlerNameOff,' DX Coil Low Cap-FT')
@@ -17073,6 +17081,8 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjFld('Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(coolCoilUnitInlet))
       CALL AddToObjFld('Air Outlet Node Name',base + ussAirHandlerNameOff, TRIM(coolCoilUnitOutlet))
       CALL AddToObjStr('Rated Air Flow Rate {m3/s}','Autosize')
+      CALL AddToObjStr('2017 Rated Evaporator Fan Power Per Volume Flow Rate','')
+      CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate','')
       CALL AddToObjStr('Rated Water Flow Rate {m3/s}','Autosize')
       CALL AddToObjFld('Rated Total Cooling Capacity {W}',base + ussCoolCoilCapOff,'')
       IF (isCoolCapAutosize .OR. isSHRAutosize) THEN
@@ -30089,6 +30099,8 @@ DO iZone = 1, numCompactWaterAirHP
   END IF
   CALL AddToObjFld('Air Outlet Node Name', base + wahpNameOff,' WAHP Cooling Coil Outlet')
   CALL AddToObjStr('Rated Air Flow Rate {m3/s}','Autosize')
+  CALL AddToObjStr('2017 Rated Evaporator Fan Power Per Volume Flow Rate','')
+  CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate','')
   CALL AddToObjStr('Rated Water Flow Rate {m3/s}','Autosize')
   CALL AddToObjFld('Rated Total Cooling Capacity {W}',base + wahpCoolCoilCapOff,'')
   IF (isCoolCoilCapAutosize .OR. isSHRAutosize) THEN
@@ -31777,6 +31789,8 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjFld('Rated High Speed Sensible Heat Ratio', base + doasCoolCoilSHROff, '')
       CALL AddToObjFld('Rated High Speed COP', base + doasCoolCoilCOPOff, '')
       CALL AddToObjStr('Rated High Speed Air Flow Rate', 'autosize')
+      CALL AddToObjStr('High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate', '')
+      CALL AddToObjStr('High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate', '')
       ! DX Ratings - Jul 2012
       CALL AddToObjStr('Unit Internal Static Air Pressure','')
       CALL AddToObjStr('Air Inlet Node Name', TRIM(coolCoilUnitInlet))
@@ -31802,6 +31816,8 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjNum('Rated Low Speed COP',StringToReal(FldVal(base + doasCoolCoilCOPOff)) * 1.5)
       ! assume low speed air flow rate is automatically sized
       CALL AddToObjStr('Rated Low Speed Air Flow Rate','Autosize')
+      CALL AddToObjStr('Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate', '')
+      CALL AddToObjStr('Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate', '')
       ! assume the same curves as full speed
       CALL AddToObjFld('Low Speed Total Cooling Capacity Function of Temperature Curve Name',   &
          base + doasNameOff,' DX Coil Low Cap-FT')
