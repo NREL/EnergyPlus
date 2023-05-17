@@ -2551,6 +2551,8 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "    res gshp clg unitary system Fan - Cooling Coil Node,  !- Air Inlet Node Name",
         "    Node 45,                 !- Air Outlet Node Name",
         "    0.951796450842996,       !- Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.000567811767595478,    !- Rated Water Flow Rate {m3/s}",
         "    14067.4113682534,        !- Gross Rated Total Cooling Capacity {W}",
         "    10297.3451215615,        !- Gross Rated Sensible Cooling Capacity {W}",

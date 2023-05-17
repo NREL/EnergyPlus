@@ -583,6 +583,12 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
             this->standardRatingIEER += IEERWeightingFactor[RedCapNum] * EERReduced;
         }
 
+        // IEER 2022 -->
+        // TODO: we can always decide and give precedence to Alternate Mode 1 or Alternate Mode 2 if present | Needs Discussion about the
+        // applicability.
+        std::tie(this->standardRatingIEER2, this->standardRatingCoolingCapacity2023, this->standardRatingEER2) =
+            StandardRatings::IEERCalulcationCurveFit(state, "Coil:Cooling:DX:CurveFit", this->normalMode);
+
     } else {
         ShowSevereError(state,
                         "Standard Ratings: Coil:Cooling:DX " + this->name + // TODO: Use dynamic COIL TYPE and COIL INSTANCE name later

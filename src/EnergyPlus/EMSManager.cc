@@ -221,8 +221,9 @@ namespace EMSManager {
             state.dataGlobal->AnyEnergyManagementSystemInModel = false;
         }
 
+        // turn on EMS capability if we are running with an external HVAC manager or via API
         state.dataGlobal->AnyEnergyManagementSystemInModel =
-            state.dataGlobal->AnyEnergyManagementSystemInModel || state.dataGlobal->externalHVACManager;
+            state.dataGlobal->AnyEnergyManagementSystemInModel || state.dataGlobal->externalHVACManager || state.dataGlobal->eplusRunningViaAPI;
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
 
@@ -1617,6 +1618,21 @@ namespace EMSManager {
         }
 
         return FoundControl;
+    }
+
+    bool isScheduleManaged(EnergyPlusData &state, int const scheduleNum)
+    {
+        // Check if a specific schedule has an EMS or External Interface actuator assigned to it
+        static constexpr std::string_view cControlTypeName = "SCHEDULE VALUE";
+        std::string_view cSchedName = state.dataScheduleMgr->Schedule(scheduleNum).Name;
+
+        for (int Loop = 1; Loop <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed; ++Loop) {
+            if ((UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorUsed(Loop).UniqueIDName, cSchedName)) &&
+                (UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorUsed(Loop).ControlTypeName, cControlTypeName))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     void checkSetpointNodesAtEnd(EnergyPlusData &state)
