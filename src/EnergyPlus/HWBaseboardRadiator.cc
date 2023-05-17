@@ -466,7 +466,6 @@ namespace HWBaseboardRadiator {
                 state.dataHWBaseboardRad->HWBaseboardDesignObject(thisHWBaseboard.DesignObjectPtr); // Contains the data for the design object
 
             // Get schedule
-            thisHWBaseboard.Schedule = state.dataIPShortCut->cAlphaArgs(3);
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 thisHWBaseboard.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
