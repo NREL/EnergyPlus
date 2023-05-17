@@ -70,7 +70,7 @@ namespace HWBaseboardRadiator {
     struct HWBaseboardParams
     {
         // Members
-        std::string EquipID;
+        std::string Name;
         DataPlant::PlantEquipmentType EquipType;
         std::string designObjectName; // Design Object
         int DesignObjectPtr;

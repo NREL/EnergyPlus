@@ -146,7 +146,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0; // zero load test
 
     HWBaseboard(1).DesignObjectPtr = 1;
-    HWBaseboard(1).EquipID = "HWRadiativeConvectiveBB";
+    HWBaseboard(1).Name = "HWRadiativeConvectiveBB";
     HWBaseboard(1).EquipType = DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water;
     HWBaseboard(1).ZonePtr = 1;
     HWBaseboard(1).AirInletTemp = 21.0;
@@ -184,7 +184,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = HWBaseboard(1).EquipID;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = HWBaseboard(1).Name;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = HWBaseboard(1).EquipType;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = HWBaseboard(1).WaterInletNode;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = HWBaseboard(1).WaterOutletNode;
