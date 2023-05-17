@@ -308,7 +308,7 @@ namespace HWBaseboardRadiator {
                 state, cCMO_BBRadiator_Water_Design, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water_Design + " Name");
 
             thisHWBaseboardDesign.designName = state.dataIPShortCut->cAlphaArgs(1); // Name of this baseboard design object
-            HWBaseboardDesignNames(BaseboardDesignNum) = state.dataIPShortCut->cAlphaArgs(1);
+            HWBaseboardDesignNames(BaseboardDesignNum) = thisHWBaseboardDesign.designName;
 
             // Determine HW radiant baseboard heating design capacity sizing method
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
@@ -381,7 +381,7 @@ namespace HWBaseboardRadiator {
                                  format("{}{}=\"{}\", {} was less than the allowable minimum.",
                                         RoutineName,
                                         cCMO_BBRadiator_Water_Design,
-                                        state.dataIPShortCut->cAlphaArgs(1),
+                                        thisHWBaseboardDesign.designName,
                                         state.dataIPShortCut->cNumericFieldNames(3)));
                 ShowContinueError(state, format("...reset to a default value=[{:.2R}].", MaxFraction));
                 thisHWBaseboardDesign.Offset = 0.001;
@@ -393,7 +393,7 @@ namespace HWBaseboardRadiator {
                                  format("{}{}=\"{}\", {} was lower than the allowable minimum.",
                                         RoutineName,
                                         cCMO_BBRadiator_Water,
-                                        state.dataIPShortCut->cAlphaArgs(1),
+                                        thisHWBaseboardDesign.designName,
                                         state.dataIPShortCut->cNumericFieldNames(4)));
                 ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinFraction));
                 thisHWBaseboardDesign.FracRadiant = MinFraction;
@@ -403,7 +403,7 @@ namespace HWBaseboardRadiator {
                                  format("{}{}=\"{}\", {} was higher than the allowable maximum.",
                                         RoutineName,
                                         cCMO_BBRadiator_Water,
-                                        state.dataIPShortCut->cAlphaArgs(1),
+                                        thisHWBaseboardDesign.designName,
                                         state.dataIPShortCut->cNumericFieldNames(4)));
                 ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxFraction));
                 thisHWBaseboardDesign.FracRadiant = MaxFraction;
@@ -415,7 +415,7 @@ namespace HWBaseboardRadiator {
                                  format("{}{}=\"{}\", {} was lower than the allowable minimum.",
                                         RoutineName,
                                         cCMO_BBRadiator_Water,
-                                        state.dataIPShortCut->cAlphaArgs(1),
+                                        thisHWBaseboardDesign.designName,
                                         state.dataIPShortCut->cNumericFieldNames(5)));
                 ShowContinueError(state, format("...reset to minimum value=[{:.3R}].", MinFraction));
                 thisHWBaseboardDesign.FracDistribPerson = MinFraction;
@@ -425,7 +425,7 @@ namespace HWBaseboardRadiator {
                                  format("{}{}=\"{}\", {} was higher than the allowable maximum.",
                                         RoutineName,
                                         cCMO_BBRadiator_Water,
-                                        state.dataIPShortCut->cAlphaArgs(1),
+                                        thisHWBaseboardDesign.designName,
                                         state.dataIPShortCut->cNumericFieldNames(5)));
                 ShowContinueError(state, format("...reset to maximum value=[{:.3R}].", MaxFraction));
                 thisHWBaseboardDesign.FracDistribPerson = MaxFraction;
