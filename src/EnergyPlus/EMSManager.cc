@@ -221,12 +221,9 @@ namespace EMSManager {
             state.dataGlobal->AnyEnergyManagementSystemInModel = false;
         }
 
-        if ((numPythonPlugins + numActiveCallbacks) > 0) {
-            state.dataGlobal->anyPluginsOrCallbacksInModel = true;
-        }
-
+        // turn on EMS capability if we are running with an external HVAC manager or via API
         state.dataGlobal->AnyEnergyManagementSystemInModel =
-            state.dataGlobal->AnyEnergyManagementSystemInModel || state.dataGlobal->externalHVACManager;
+            state.dataGlobal->AnyEnergyManagementSystemInModel || state.dataGlobal->externalHVACManager || state.dataGlobal->eplusRunningViaAPI;
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
 
