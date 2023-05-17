@@ -217,7 +217,6 @@ void GetGshpInput(EnergyPlusData &state)
 
     for (GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterClg->NumGSHPs; ++GSHPNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(state, ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), ModuleCompNameUC, ErrorsFound);
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name = AlphArray(1);
 
