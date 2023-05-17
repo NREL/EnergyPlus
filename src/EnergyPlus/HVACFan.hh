@@ -109,10 +109,6 @@ namespace HVACFan {
 
         void FanInputsForDesignHeatGain(EnergyPlusData &state, Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac);
 
-        int fanNumOfSpeed() const;
-
-        Real64 AirMassFlowRateAtSpeed(int const SpeedNum);
-
         // void
         // fanIsSecondaryDriver();
 
@@ -144,6 +140,8 @@ namespace HVACFan {
         int powerModFuncFlowFractionCurveIndex; // pointer to performance curve or table
         int AirLoopNum;                         // AirLoop number
         bool AirPathFlag;                       // Yes, this fan is a part of airpath
+        int m_numSpeeds;                        // input for how many speed levels for discrete fan
+        std::vector<Real64> m_massFlowAtSpeed;
 
         // Mass Flow Rate Control Variables
         bool fanIsSecondaryDriver; // true if this fan is used to augment flow and may pass air when off.
@@ -209,12 +207,10 @@ namespace HVACFan {
         Real64 m_qdotConvZone;                          // fan power lost to surrounding zone by convection to air (W)
         Real64 m_qdotRadZone;                           // fan power lost to surrounding zone by radiation to zone surfaces(W)
         std::string m_endUseSubcategoryName;
-        int m_numSpeeds;                            // input for how many speed levels for discrete fan
         std::vector<Real64> m_flowFractionAtSpeed;  // array of flow fractions for speed levels
         std::vector<Real64> m_powerFractionAtSpeed; // array of power fractions for speed levels
         std::vector<bool> m_powerFractionInputAtSpeed;
         // calculation variables
-        std::vector<Real64> m_massFlowAtSpeed;
         std::vector<Real64> m_totEfficAtSpeed;
         Real64 m_inletAirMassFlowRate; // MassFlow through the Fan being Simulated [kg/Sec]
         Real64 m_outletAirMassFlowRate;

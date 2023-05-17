@@ -3090,7 +3090,7 @@ namespace UnitarySystems {
                             }
                         } else {
                             this->m_CoolVolumeFlowRate[i] =
-                                state.dataHVACFan->fanObjs[FanIndex]->AirMassFlowRateAtSpeed(i - 1) / state.dataEnvrn->StdRhoAir;
+                                state.dataHVACFan->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1] / state.dataEnvrn->StdRhoAir;
                         }
                         this->m_CoolMassFlowRate[i] = this->m_CoolVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
                     }
@@ -3214,7 +3214,7 @@ namespace UnitarySystems {
                             }
                         } else {
                             this->m_HeatVolumeFlowRate[i] =
-                                state.dataHVACFan->fanObjs[FanIndex]->AirMassFlowRateAtSpeed(i - 1) / state.dataEnvrn->StdRhoAir;
+                                state.dataHVACFan->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1] / state.dataEnvrn->StdRhoAir;
                         }
                         this->m_HeatMassFlowRate[i] = this->m_CoolVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
                     }
@@ -6805,7 +6805,7 @@ namespace UnitarySystems {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 int FanIndex = this->m_FanIndex;
                 if (state.dataHVACFan->fanObjs[FanIndex]->speedControl == HVACFan::FanSystem::SpeedControlMethod::Discrete) {
-                    int NumSpeeds = state.dataHVACFan->fanObjs[FanIndex]->fanNumOfSpeed();
+                    int NumSpeeds = state.dataHVACFan->fanObjs[FanIndex]->m_numSpeeds;
                     if (NumSpeeds > 1) {
                         if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple ||
                             this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
@@ -6817,7 +6817,7 @@ namespace UnitarySystems {
                             this->m_DiscreteSpeedCoolingCoil = true;
                             if (this->m_MaxCoolAirVolFlow != DataSizing::AutoSize) {
                                 for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
-                                    this->m_CoolMassFlowRate[i] = state.dataHVACFan->fanObjs[FanIndex]->AirMassFlowRateAtSpeed(i - 1);
+                                    this->m_CoolMassFlowRate[i] = state.dataHVACFan->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1];
                                     this->m_CoolVolumeFlowRate[i] = this->m_CoolMassFlowRate[i] / state.dataEnvrn->StdRhoAir;
                                     this->m_MSCoolingSpeedRatio[i] = 1.0;
                                 }
@@ -6839,7 +6839,7 @@ namespace UnitarySystems {
                             this->m_MultiOrVarSpeedHeatCoil = true;
                             if (this->m_MaxHeatAirVolFlow != DataSizing::AutoSize) {
                                 for (int i = 1; i <= this->m_NumOfSpeedHeating; ++i) {
-                                    this->m_HeatMassFlowRate[i] = state.dataHVACFan->fanObjs[FanIndex]->AirMassFlowRateAtSpeed(i - 1);
+                                    this->m_HeatMassFlowRate[i] = state.dataHVACFan->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1];
                                     this->m_HeatVolumeFlowRate[i] = this->m_HeatMassFlowRate[i] / state.dataEnvrn->StdRhoAir;
                                     this->m_MSHeatingSpeedRatio[i] = 1.0;
                                 }
@@ -16026,24 +16026,7 @@ namespace UnitarySystems {
         } break;
         case DataHVACGlobals::CoilDX_HeatingEmpirical:
         case DataHVACGlobals::Coil_HeatingWaterToAirHP:
-        case DataHVACGlobals::Coil_HeatingWaterToAirHPSimple: {
-            if (this->m_NumOfSpeedHeating > 1) {
-                this->m_CycRatio = max(this->m_CoolingCycRatio, this->m_HeatingCycRatio);
-                this->m_SpeedRatio = max(this->m_CoolingSpeedRatio, this->m_HeatingSpeedRatio);
-                this->m_SpeedNum = max(this->m_CoolingSpeedNum, this->m_HeatingSpeedNum);
-            }
-            if (state.dataUnitarySystems->HeatingLoad) {
-                this->m_TotalAuxElecPower =
-                    this->m_AncillaryOnPower * this->m_PartLoadFrac + this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac);
-                this->m_HeatingAuxElecConsumption = this->m_AncillaryOnPower * this->m_PartLoadFrac * ReportingConstant;
-            }
-            if (this->m_LastMode == HeatingMode) {
-                this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
-            }
-
-            elecHeatingPower = state.dataHVACGlobal->DXElecHeatingPower;
-            defrostElecPower = state.dataHVACGlobal->DefrostElecPower;
-        } break;
+        case DataHVACGlobals::Coil_HeatingWaterToAirHPSimple:
         case DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit: {
             if (this->m_NumOfSpeedHeating > 1) {
                 this->m_CycRatio = max(this->m_CoolingCycRatio, this->m_HeatingCycRatio);

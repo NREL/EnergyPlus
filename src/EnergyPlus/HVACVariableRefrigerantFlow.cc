@@ -4528,7 +4528,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 int FanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
                 if (state.dataHVACFan->fanObjs[FanIndex]->speedControl == HVACFan::FanSystem::SpeedControlMethod::Discrete) {
-                    int NumSpeeds = state.dataHVACFan->fanObjs[FanIndex]->fanNumOfSpeed();
+                    int NumSpeeds = state.dataHVACFan->fanObjs[FanIndex]->m_numSpeeds;
                     if (NumSpeeds > 1) {
                         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DXCoolCoilType_Num == DataHVACGlobals::CoilVRF_Cooling) {
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NumOfSpeedCooling = NumSpeeds;
@@ -4537,7 +4537,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
                                 for (int i = 1; i <= state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NumOfSpeedCooling; ++i) {
                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] =
-                                        state.dataHVACFan->fanObjs[FanIndex]->AirMassFlowRateAtSpeed(i - 1);
+                                        state.dataHVACFan->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1];
                                 }
                             }
                         }
@@ -4548,7 +4548,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
                                 for (int i = 1; i <= state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NumOfSpeedCooling; ++i) {
                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] =
-                                        state.dataHVACFan->fanObjs[FanIndex]->AirMassFlowRateAtSpeed(i - 1);
+                                        state.dataHVACFan->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1];
                                 }
                             }
                         }
@@ -7968,7 +7968,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 } else {
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] == 0.0) {
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] =
-                            state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->AirMassFlowRateAtSpeed(i - 1);
+                            state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->m_massFlowAtSpeed[i - 1];
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate[i] =
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] / state.dataEnvrn->StdRhoAir;
                     }
@@ -8053,7 +8053,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 } else {
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] == 0.0) {
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] =
-                            state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->AirMassFlowRateAtSpeed(i - 1);
+                            state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->m_massFlowAtSpeed[i - 1];
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatVolumeFlowRate[i] =
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] / state.dataEnvrn->StdRhoAir;
                     }
@@ -8237,7 +8237,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 } else {
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] == 0.0) {
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] =
-                            state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->AirMassFlowRateAtSpeed(i - 1);
+                            state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->m_massFlowAtSpeed[i - 1];
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate[i] =
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] / state.dataEnvrn->StdRhoAir;
                     }
@@ -8275,7 +8275,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 } else {
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] == 0.0) {
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] =
-                            state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->AirMassFlowRateAtSpeed(i - 1);
+                            state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->m_massFlowAtSpeed[i - 1];
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatVolumeFlowRate[i] =
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] / state.dataEnvrn->StdRhoAir;
                     }
