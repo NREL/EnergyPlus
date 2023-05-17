@@ -81,11 +81,10 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 
     state->dataLoopNodes->Node.allocate(1);
     HWBaseboard.allocate(1);
-    state->dataHWBaseboardRad->ZeroSourceSumHATsurf.allocate(1);
-    state->dataHWBaseboardRad->ZeroSourceSumHATsurf = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataPlnt->PlantLoop.allocate(1);
+    state->dataHWBaseboardRad->QBBRadSource.allocate(1);
     HWBaseboardDesignObject.allocate(1);
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.40;
@@ -106,7 +105,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
     state->dataPlnt->PlantLoop(1).FluidName = "Water";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidType = DataLoopNode::NodeFluidType::Water;
-    HWBaseboard(1).Accounting.QBBRadSource = 0.0;
+    state->dataHWBaseboardRad->QBBRadSource(1) = 0.0;
 
     CalcHWBaseboard(*state, BBNum, LoadMet);
 
@@ -135,11 +134,10 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
 
     state->dataLoopNodes->Node.allocate(2);
     HWBaseboard.allocate(1);
-    state->dataHWBaseboardRad->ZeroSourceSumHATsurf.allocate(1);
-    state->dataHWBaseboardRad->ZeroSourceSumHATsurf = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataPlnt->PlantLoop.allocate(1);
+    state->dataHWBaseboardRad->QBBRadSource.allocate(1);
     HWBaseboardDesignObject.allocate(1);
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
@@ -163,7 +161,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     state->dataPlnt->PlantLoop(1).FluidName = "Water";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidType = DataLoopNode::NodeFluidType::Water;
-    HWBaseboard(1).Accounting.QBBRadSource = 0.0;
+    state->dataHWBaseboardRad->QBBRadSource(1) = 0.0;
 
     state->dataLoopNodes->Node(HWBaseboard(1).WaterInletNode).MassFlowRate = 0.2;
     state->dataLoopNodes->Node(HWBaseboard(1).WaterInletNode).MassFlowRateMax = 0.4;

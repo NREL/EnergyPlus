@@ -69,8 +69,6 @@ namespace HWBaseboardRadiator {
 
     struct AccountingData
     {
-        Real64 QBBRadSource = 0.0; // Need to keep the last value in case we are still iterating
-        Real64 QBBRadSrcAvg = 0.0; // Need to keep the last value in case we are still iterating
         // Record keeping variables used to calculate QBBRadSrcAvg locally
         Real64 LastQBBRadSrc = 0.0;      // Need to keep the last value in case we are still iterating
         Real64 LastSysTimeElapsed = 0.0; // Need to keep the last value in case we are still iterating
@@ -227,6 +225,8 @@ namespace HWBaseboardRadiator {
 struct HWBaseboardRadiatorData : BaseGlobalStruct
 {
 
+    Array1D<Real64> QBBRadSource;         // Need to keep the last value in case we are still iterating
+    Array1D<Real64> QBBRadSrcAvg;         // Need to keep the last value in case we are still iterating
     Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
@@ -245,6 +245,8 @@ struct HWBaseboardRadiatorData : BaseGlobalStruct
 
     void clear_state() override
     {
+        this->QBBRadSource.clear();
+        this->QBBRadSrcAvg.clear();
         this->ZeroSourceSumHATsurf.clear();
         this->MySizeFlag.clear();
         this->CheckEquipName.clear();
