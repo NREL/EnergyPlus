@@ -1293,16 +1293,17 @@ namespace HWBaseboardRadiator {
         auto &hWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
 
         int const ZoneNum = hWBaseboard.ZonePtr;
-        auto const &zeroSourceSumHATsurf = state.dataHWBaseboardRad->ZeroSourceSumHATsurf(ZoneNum);
         Real64 QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         Real64 AirInletTemp = hWBaseboard.AirInletTemp;
         Real64 WaterInletTemp = hWBaseboard.WaterInletTemp;
         Real64 WaterMassFlowRate = state.dataLoopNodes->Node(hWBaseboard.WaterInletNode).MassFlowRate;
-        HWBaseboardDesignData const &HWBaseboardDesignDataObject{
-            state.dataHWBaseboardRad->HWBaseboardDesignObject(hWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
 
         if (QZnReq > DataHVACGlobals::SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) &&
             (ScheduleManager::GetCurrentScheduleValue(state, hWBaseboard.SchedPtr) > 0) && (WaterMassFlowRate > 0.0)) {
+
+            HWBaseboardDesignData const &HWBaseboardDesignDataObject{
+                state.dataHWBaseboardRad->HWBaseboardDesignObject(hWBaseboard.DesignObjectPtr)}; // Contains the data for the design object
+
             // Calculate air mass flow rate
             AirMassFlowRate = hWBaseboard.AirMassFlowRateStd * (WaterMassFlowRate / hWBaseboard.WaterMassFlowRateMax);
             CapacitanceAir = Psychrometrics::PsyCpAirFnW(hWBaseboard.AirInletHumRat) * AirMassFlowRate;
@@ -1360,6 +1361,7 @@ namespace HWBaseboardRadiator {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
+                auto const &zeroSourceSumHATsurf = state.dataHWBaseboardRad->ZeroSourceSumHATsurf(ZoneNum);
                 LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - zeroSourceSumHATsurf) + (BBHeat * hWBaseboard.FracConvect) +
                           (RadHeat * HWBaseboardDesignDataObject.FracDistribPerson);
             }
