@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -138,17 +139,12 @@ namespace HWBaseboardRadiator {
     {
         // Members
         std::string designName;
-        int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
-                                      // FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-        Real64 Offset;
-        Real64 FracRadiant;
-        Real64 FracDistribPerson;
-
-        // Default Constructor
-        HWBaseboardDesignData() : HeatingCapMethod(0), ScaledHeatingCapacity(0.0), Offset(0.0), FracRadiant(0.0), FracDistribPerson(0.0)
-        {
-        }
+        // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+        DataSizing::DesignSizingType HeatingCapMethod = DataSizing::DesignSizingType::Invalid;
+        Real64 ScaledHeatingCapacity = 0.0; // scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        Real64 Offset = 0.0;
+        Real64 FracRadiant = 0.0;
+        Real64 FracDistribPerson = 0.0;
     };
 
     struct HWBaseboardNumericFieldData

@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -311,10 +310,9 @@ namespace HWBaseboardRadiator {
             HWBaseboardDesignNames(BaseboardDesignNum) = thisHWBaseboardDesign.designName;
 
             // Determine HW radiant baseboard heating design capacity sizing method
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                thisHWBaseboardDesign.HeatingCapMethod = DataSizing::HeatingDesignCapacity;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                thisHWBaseboardDesign.HeatingCapMethod = DataSizing::CapacityPerFloorArea;
+            thisHWBaseboardDesign.HeatingCapMethod = static_cast<DataSizing::DesignSizingType>(
+                getEnumerationValue(DataSizing::DesignSizingTypeNamesUC, state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
+            if (thisHWBaseboardDesign.HeatingCapMethod == DataSizing::DesignSizingType::CapacityPerFloorArea) {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     thisHWBaseboardDesign.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
                     if (thisHWBaseboardDesign.ScaledHeatingCapacity <= 0.0) {
@@ -349,8 +347,7 @@ namespace HWBaseboardRadiator {
                         format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                thisHWBaseboardDesign.HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
+            } else if (thisHWBaseboardDesign.HeatingCapMethod == DataSizing::DesignSizingType::FractionOfAutosizedHeatingCapacity) {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     thisHWBaseboardDesign.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                     if (thisHWBaseboardDesign.ScaledHeatingCapacity < 0.0) {
@@ -545,7 +542,7 @@ namespace HWBaseboardRadiator {
             }
 
             // Determine HW radiant baseboard heating design capacity sizing method
-            thisHWBaseboard.HeatingCapMethod = HWBaseboardDesignDataObject.HeatingCapMethod;
+            thisHWBaseboard.HeatingCapMethod = static_cast<int>(HWBaseboardDesignDataObject.HeatingCapMethod);
             if (thisHWBaseboard.HeatingCapMethod == DataSizing::HeatingDesignCapacity) {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                     thisHWBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
