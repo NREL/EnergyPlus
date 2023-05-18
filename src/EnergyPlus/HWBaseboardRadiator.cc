@@ -165,7 +165,7 @@ namespace HWBaseboardRadiator {
         if (CompIndex > 0) {
             auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
 
-            HWBaseboardDesignData &HWBaseboardDesignDataObject = state.dataHWBaseboardRad->HWBaseboardDesignObject(
+            HWBaseboardDesignData const &HWBaseboardDesignDataObject = state.dataHWBaseboardRad->HWBaseboardDesignObject(
                 HWBaseboard.DesignObjectPtr); // Contains the data for variable flow hydronic systems
 
             InitHWBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
@@ -262,11 +262,6 @@ namespace HWBaseboardRadiator {
         int IOStat;
         bool ErrorsFound(false); // If errors detected in input
 
-        auto &CheckEquipName = state.dataHWBaseboardRad->CheckEquipName;
-        auto &HWBaseboardNumericFields = state.dataHWBaseboardRad->HWBaseboardNumericFields;
-        auto &HWBaseboardDesignNumericFields = state.dataHWBaseboardRad->HWBaseboardDesignNumericFields;
-        auto &HWBaseboardDesignNames = state.dataHWBaseboardRad->HWBaseboardDesignNames;
-
         // Update Nums in state and make local convenience copies
         int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_BBRadiator_Water);
@@ -277,15 +272,18 @@ namespace HWBaseboardRadiator {
 
         state.dataHWBaseboardRad->HWBaseboard.allocate(NumHWBaseboards);
         state.dataHWBaseboardRad->HWBaseboardDesignObject.allocate(NumHWBaseboardDesignObjs);
-        CheckEquipName.allocate(NumHWBaseboards);
-        HWBaseboardNumericFields.allocate(NumHWBaseboards);
-        HWBaseboardDesignNumericFields.allocate(NumHWBaseboardDesignObjs);
-        HWBaseboardDesignNames.allocate(NumHWBaseboardDesignObjs);
-        CheckEquipName = true;
+        state.dataHWBaseboardRad->CheckEquipName.allocate(NumHWBaseboards);
+        state.dataHWBaseboardRad->HWBaseboardNumericFields.allocate(NumHWBaseboards);
+        state.dataHWBaseboardRad->HWBaseboardDesignNumericFields.allocate(NumHWBaseboardDesignObjs);
+        state.dataHWBaseboardRad->HWBaseboardDesignNames.allocate(NumHWBaseboardDesignObjs);
+        state.dataHWBaseboardRad->CheckEquipName = true;
 
         // Get the data from the user input related to design data for baseboard heaters
         for (BaseboardDesignNum = 1; BaseboardDesignNum <= NumHWBaseboardDesignObjs; ++BaseboardDesignNum) {
             auto &thisHWBaseboardDesign = state.dataHWBaseboardRad->HWBaseboardDesignObject(BaseboardDesignNum);
+            auto &HWBaseboardDesignNumericFields = state.dataHWBaseboardRad->HWBaseboardDesignNumericFields(BaseboardDesignNum);
+            auto &HWBaseboardDesignNames = state.dataHWBaseboardRad->HWBaseboardDesignNames(BaseboardDesignNum);
+
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCMO_BBRadiator_Water_Design,
                                                                      BaseboardDesignNum,
@@ -299,16 +297,16 @@ namespace HWBaseboardRadiator {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            HWBaseboardDesignNumericFields(BaseboardDesignNum).FieldNames.allocate(NumNumbers);
-            HWBaseboardDesignNumericFields(BaseboardDesignNum).FieldNames = "";
-            HWBaseboardDesignNumericFields(BaseboardDesignNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
+            HWBaseboardDesignNumericFields.FieldNames.allocate(NumNumbers);
+            HWBaseboardDesignNumericFields.FieldNames = "";
+            HWBaseboardDesignNumericFields.FieldNames = state.dataIPShortCut->cNumericFieldNames;
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBaseboardName(
                 state, cCMO_BBRadiator_Water_Design, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water_Design + " Name");
 
             thisHWBaseboardDesign.designName = state.dataIPShortCut->cAlphaArgs(1); // Name of this baseboard design object
-            HWBaseboardDesignNames(BaseboardDesignNum) = thisHWBaseboardDesign.designName;
+            HWBaseboardDesignNames = thisHWBaseboardDesign.designName;
 
             // Determine HW radiant baseboard heating design capacity sizing method
             thisHWBaseboardDesign.HeatingCapMethod = static_cast<DataSizing::DesignSizingType>(
@@ -433,6 +431,7 @@ namespace HWBaseboardRadiator {
         // Get the data from the user input related to baseboard heaters
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
             auto &thisHWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
+            auto &HWBaseboardNumericFields = state.dataHWBaseboardRad->HWBaseboardNumericFields(BaseboardNum);
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCMO_BBRadiator_Water,
@@ -447,9 +446,9 @@ namespace HWBaseboardRadiator {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            HWBaseboardNumericFields(BaseboardNum).FieldNames.allocate(NumNumbers);
-            HWBaseboardNumericFields(BaseboardNum).FieldNames = "";
-            HWBaseboardNumericFields(BaseboardNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
+            HWBaseboardNumericFields.FieldNames.allocate(NumNumbers);
+            HWBaseboardNumericFields.FieldNames = "";
+            HWBaseboardNumericFields.FieldNames = state.dataIPShortCut->cNumericFieldNames;
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBaseboardName(
@@ -459,7 +458,8 @@ namespace HWBaseboardRadiator {
             thisHWBaseboard.EquipType = DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water; //'ZoneHVAC:Baseboard:RadiantConvective:Water'
 
             thisHWBaseboard.designObjectName = state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
-            thisHWBaseboard.DesignObjectPtr = UtilityRoutines::FindItemInList(thisHWBaseboard.designObjectName, HWBaseboardDesignNames);
+            thisHWBaseboard.DesignObjectPtr =
+                UtilityRoutines::FindItemInList(thisHWBaseboard.designObjectName, state.dataHWBaseboardRad->HWBaseboardDesignNames);
             HWBaseboardDesignData &HWBaseboardDesignDataObject =
                 state.dataHWBaseboardRad->HWBaseboardDesignObject(thisHWBaseboard.DesignObjectPtr); // Contains the data for the design object
 
