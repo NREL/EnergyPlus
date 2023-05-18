@@ -212,7 +212,6 @@ struct HWBaseboardRadiatorData : BaseGlobalStruct
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
     Array1D_bool SetLoopIndexFlag; // get loop number flag
-    Array1D_string HWBaseboardDesignNames;
     int NumHWBaseboards = 0;
     int NumHWBaseboardDesignObjs = 0; // Number of HW Baseboard systems design objects
     // Object Data
@@ -232,7 +231,6 @@ struct HWBaseboardRadiatorData : BaseGlobalStruct
         this->MySizeFlag.clear();
         this->CheckEquipName.clear();
         this->SetLoopIndexFlag.clear();
-        this->HWBaseboardDesignNames.clear();
         this->NumHWBaseboards = 0;
         this->NumHWBaseboardDesignObjs = 0;
         this->HWBaseboard.clear();

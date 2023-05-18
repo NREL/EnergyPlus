@@ -275,14 +275,14 @@ namespace HWBaseboardRadiator {
         state.dataHWBaseboardRad->CheckEquipName.allocate(NumHWBaseboards);
         state.dataHWBaseboardRad->HWBaseboardNumericFields.allocate(NumHWBaseboards);
         state.dataHWBaseboardRad->HWBaseboardDesignNumericFields.allocate(NumHWBaseboardDesignObjs);
-        state.dataHWBaseboardRad->HWBaseboardDesignNames.allocate(NumHWBaseboardDesignObjs);
+        Array1D_string HWBaseboardDesignNames;
+        HWBaseboardDesignNames.allocate(NumHWBaseboardDesignObjs);
         state.dataHWBaseboardRad->CheckEquipName = true;
 
         // Get the data from the user input related to design data for baseboard heaters
         for (BaseboardDesignNum = 1; BaseboardDesignNum <= NumHWBaseboardDesignObjs; ++BaseboardDesignNum) {
             auto &thisHWBaseboardDesign = state.dataHWBaseboardRad->HWBaseboardDesignObject(BaseboardDesignNum);
             auto &HWBaseboardDesignNumericFields = state.dataHWBaseboardRad->HWBaseboardDesignNumericFields(BaseboardDesignNum);
-            auto &HWBaseboardDesignNames = state.dataHWBaseboardRad->HWBaseboardDesignNames(BaseboardDesignNum);
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCMO_BBRadiator_Water_Design,
@@ -306,7 +306,7 @@ namespace HWBaseboardRadiator {
                 state, cCMO_BBRadiator_Water_Design, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water_Design + " Name");
 
             thisHWBaseboardDesign.designName = state.dataIPShortCut->cAlphaArgs(1); // Name of this baseboard design object
-            HWBaseboardDesignNames = thisHWBaseboardDesign.designName;
+            HWBaseboardDesignNames(BaseboardDesignNum) = thisHWBaseboardDesign.designName;
 
             // Determine HW radiant baseboard heating design capacity sizing method
             thisHWBaseboardDesign.HeatingCapMethod = static_cast<DataSizing::DesignSizingType>(
@@ -458,8 +458,7 @@ namespace HWBaseboardRadiator {
             thisHWBaseboard.EquipType = DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water; //'ZoneHVAC:Baseboard:RadiantConvective:Water'
 
             thisHWBaseboard.designObjectName = state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
-            thisHWBaseboard.DesignObjectPtr =
-                UtilityRoutines::FindItemInList(thisHWBaseboard.designObjectName, state.dataHWBaseboardRad->HWBaseboardDesignNames);
+            thisHWBaseboard.DesignObjectPtr = UtilityRoutines::FindItemInList(thisHWBaseboard.designObjectName, HWBaseboardDesignNames);
             HWBaseboardDesignData &HWBaseboardDesignDataObject =
                 state.dataHWBaseboardRad->HWBaseboardDesignObject(thisHWBaseboard.DesignObjectPtr); // Contains the data for the design object
 
