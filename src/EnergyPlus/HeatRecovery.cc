@@ -678,8 +678,6 @@ namespace HeatRecovery {
             thisPerfData.NumericFieldNames = "";
             thisPerfData.NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
             thisPerfData.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisPerfData.PerfType = cCurrentModuleObject;
             thisPerfData.NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
