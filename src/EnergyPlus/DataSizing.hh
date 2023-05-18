@@ -205,7 +205,37 @@ namespace DataSizing {
         Num
     };
 
-    // Zone HVAC Equipment Supply Air Sizing Option
+    // Zone HVAC Equipment Sizing Option
+    enum class DesignSizingType
+    {
+        Invalid = -1,
+        None,
+        SupplyAirFlowRate,
+        FlowPerFloorArea,
+        FractionOfAutosizedCoolingAirflow,
+        FractionOfAutosizedHeatingAirflow,
+        FlowPerCoolingCapacity,
+        FlowPerHeatingCapacity,
+        CoolingDesignCapacity,
+        HeatingDesignCapacity,
+        CapacityPerFloorArea,
+        FractionOfAutosizedCoolingCapacity,
+        FractionOfAutosizedHeatingCapacity,
+        Num
+    };
+    constexpr std::array<std::string_view, static_cast<int>(DesignSizingType::Num)> DesignSizingTypeNames{"None",
+                                                                                                          "SupplyAirFlowRate",
+                                                                                                          "FlowPerFloorArea",
+                                                                                                          "FractionOfAutosizedCoolingAirflow",
+                                                                                                          "FractionOfAutosizedHeatingAirflow",
+                                                                                                          "FlowPerCoolingCapacity",
+                                                                                                          "FlowPerHeatingCapacity",
+                                                                                                          "CoolingDesignCapacity",
+                                                                                                          "HeatingDesignCapacity",
+                                                                                                          "CapacityPerFloorArea",
+                                                                                                          "FractionOfAutosizedCoolingCapacity",
+                                                                                                          "FractionOfAutosizedHeatingCapacity"};
+
     constexpr int None(1);
     constexpr int SupplyAirFlowRate(2);
     constexpr int FlowPerFloorArea(3);
