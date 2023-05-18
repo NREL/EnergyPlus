@@ -671,11 +671,11 @@ namespace HeatingCoils {
             heatingCoil.HCoilType_Num = Coil_HeatingGasOrOtherFuel;
 
             heatingCoil.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, Alphas(3)));
-            if (heatingCoil.FuelType == Constant::eFuel::NaturalGas || heatingCoil.FuelType == Constant::eFuel::Propane ||
+            if (!(heatingCoil.FuelType == Constant::eFuel::NaturalGas || heatingCoil.FuelType == Constant::eFuel::Propane ||
                 heatingCoil.FuelType == Constant::eFuel::Diesel || heatingCoil.FuelType == Constant::eFuel::Gasoline ||
                 heatingCoil.FuelType == Constant::eFuel::FuelOilNo1 || heatingCoil.FuelType == Constant::eFuel::FuelOilNo2 ||
                 heatingCoil.FuelType == Constant::eFuel::OtherFuel1 || heatingCoil.FuelType == Constant::eFuel::OtherFuel2 ||
-                heatingCoil.FuelType == Constant::eFuel::Coal) {
+                heatingCoil.FuelType == Constant::eFuel::Coal)) {
                 ShowSevereError(state,
                                 format("{}{}: Invalid {} entered ={} for {}={}",
                                        RoutineName,
