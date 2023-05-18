@@ -83,6 +83,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarReflectionManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -372,9 +373,13 @@ void checkShadingSurfaceSchedules(EnergyPlusData &state)
     for (int surfNum = state.dataSurface->ShadingSurfaceFirst; surfNum <= state.dataSurface->ShadingSurfaceLast; ++surfNum) {
         auto &thisSurface = state.dataSurface->Surface(surfNum);
         if (!thisSurface.IsTransparent) continue;
-        if (state.dataGlobal->AnyEnergyManagementSystemInModel &&
-            (EMSManager::isScheduleManaged(state, thisSurface.SchedShadowSurfIndex) || state.dataGlobal->anyPluginsOrCallbacksInModel)) {
-            // Transmittance schedule defintely has an actuator or may have one via python plugin or API
+        // creating some dummy bools here on purpose -- we need to do some renaming and/or consolidate these into a meaningful new global sometime
+        // for now I want the logic to be as readable as possible, so creating shorthand variables makes it very clear
+        bool const anyPlugins = size(state.dataPluginManager->plugins) > 0;
+        bool const runningByAPI = state.dataGlobal->eplusRunningViaAPI;
+        bool const anyEMS = state.dataGlobal->AnyEnergyManagementSystemInModel;
+        if ((anyEMS && EMSManager::isScheduleManaged(state, thisSurface.SchedShadowSurfIndex)) || runningByAPI || anyPlugins) {
+            // Transmittance schedule definitely has an actuator or may have one via python plugin or API
             // Set not transparent so it won't be skipped during shading calcs
             thisSurface.IsTransparent = false;
             // Also set global flags
@@ -383,7 +388,7 @@ void checkShadingSurfaceSchedules(EnergyPlusData &state)
         } else if (!thisSurface.MirroredSurf) {
             // Warning moved here from shading surface input processing (skip warning for mirrored surfaces)
             ShowWarningError(state,
-                             format("Shading Surface=\"{}\", Transmittance Schedule Name=\"{}\", is always transparent.",
+                             format(R"(Shading Surface="{}", Transmittance Schedule Name="{}", is always transparent.)",
                                     thisSurface.Name,
                                     state.dataScheduleMgr->Schedule(thisSurface.SchedShadowSurfIndex).Name));
             ShowContinueError(state, "This shading surface will be ignored.");
