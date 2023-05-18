@@ -68,6 +68,16 @@ namespace HWBaseboardRadiator {
 
     extern std::string const cCMO_BBRadiator_Water;
 
+    struct AccountingData
+    {
+        // Record keeping variables used to calculate QBBRadSrcAvg locally
+        Real64 QBBRadSource = 0.0;       // Need to keep the last value in case we are still iterating
+        Real64 QBBRadSrcAvg = 0.0;       // Need to keep the last value in case we are still iterating
+        Real64 LastQBBRadSrc = 0.0;      // Need to keep the last value in case we are still iterating
+        Real64 LastSysTimeElapsed = 0.0; // Need to keep the last value in case we are still iterating
+        Real64 LastTimeStepSys = 0.0;    // Need to keep the last value in case we are still iterating
+    };
+
     struct HWBaseboardParams
     {
         // Members
@@ -120,6 +130,7 @@ namespace HWBaseboardRadiator {
         int HeatingCapMethod;         // - Method for heating capacity scaled sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
                                       // FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        AccountingData Accounting;
 
         // Default Constructor
         HWBaseboardParams()
@@ -210,13 +221,7 @@ namespace HWBaseboardRadiator {
 struct HWBaseboardRadiatorData : BaseGlobalStruct
 {
 
-    Array1D<Real64> QBBRadSource;         // Need to keep the last value in case we are still iterating
-    Array1D<Real64> QBBRadSrcAvg;         // Need to keep the last value in case we are still iterating
     Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
-    // Record keeping variables used to calculate QBBRadSrcAvg locally
-    Array1D<Real64> LastQBBRadSrc;      // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
     Array1D_bool SetLoopIndexFlag; // get loop number flag
@@ -236,12 +241,7 @@ struct HWBaseboardRadiatorData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->QBBRadSource.clear();
-        this->QBBRadSrcAvg.clear();
         this->ZeroSourceSumHATsurf.clear();
-        this->LastQBBRadSrc.clear();
-        this->LastSysTimeElapsed.clear();
-        this->LastTimeStepSys.clear();
         this->MySizeFlag.clear();
         this->CheckEquipName.clear();
         this->SetLoopIndexFlag.clear();

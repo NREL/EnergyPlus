@@ -855,11 +855,6 @@ namespace HWBaseboardRadiator {
             state.dataHWBaseboardRad->MyEnvrnFlag.dimension(NumHWBaseboards, true);
             state.dataHWBaseboardRad->MySizeFlag.dimension(NumHWBaseboards, true);
             state.dataHWBaseboardRad->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            state.dataHWBaseboardRad->QBBRadSource.dimension(NumHWBaseboards, 0.0);
-            state.dataHWBaseboardRad->QBBRadSrcAvg.dimension(NumHWBaseboards, 0.0);
-            state.dataHWBaseboardRad->LastQBBRadSrc.dimension(NumHWBaseboards, 0.0);
-            state.dataHWBaseboardRad->LastSysTimeElapsed.dimension(NumHWBaseboards, 0.0);
-            state.dataHWBaseboardRad->LastTimeStepSys.dimension(NumHWBaseboards, 0.0);
             state.dataHWBaseboardRad->SetLoopIndexFlag.dimension(NumHWBaseboards, true);
             state.dataHWBaseboardRad->MyOneTimeFlag = false;
 
@@ -919,11 +914,11 @@ namespace HWBaseboardRadiator {
             state.dataLoopNodes->Node(WaterInletNode).HumRat = 0.0;
 
             state.dataHWBaseboardRad->ZeroSourceSumHATsurf = 0.0;
-            state.dataHWBaseboardRad->QBBRadSource = 0.0;
-            state.dataHWBaseboardRad->QBBRadSrcAvg = 0.0;
-            state.dataHWBaseboardRad->LastQBBRadSrc = 0.0;
-            state.dataHWBaseboardRad->LastSysTimeElapsed = 0.0;
-            state.dataHWBaseboardRad->LastTimeStepSys = 0.0;
+            HWBaseboard.Accounting.QBBRadSource = 0.0;
+            HWBaseboard.Accounting.QBBRadSrcAvg = 0.0;
+            HWBaseboard.Accounting.LastQBBRadSrc = 0.0;
+            HWBaseboard.Accounting.LastSysTimeElapsed = 0.0;
+            HWBaseboard.Accounting.LastTimeStepSys = 0.0;
 
             state.dataHWBaseboardRad->MyEnvrnFlag(BaseboardNum) = false;
         }
@@ -935,10 +930,10 @@ namespace HWBaseboardRadiator {
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             int ZoneNum = HWBaseboard.ZonePtr;
             state.dataHWBaseboardRad->ZeroSourceSumHATsurf(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
-            state.dataHWBaseboardRad->QBBRadSrcAvg(BaseboardNum) = 0.0;
-            state.dataHWBaseboardRad->LastQBBRadSrc(BaseboardNum) = 0.0;
-            state.dataHWBaseboardRad->LastSysTimeElapsed(BaseboardNum) = 0.0;
-            state.dataHWBaseboardRad->LastTimeStepSys(BaseboardNum) = 0.0;
+            HWBaseboard.Accounting.QBBRadSrcAvg = 0.0;
+            HWBaseboard.Accounting.LastQBBRadSrc = 0.0;
+            HWBaseboard.Accounting.LastSysTimeElapsed = 0.0;
+            HWBaseboard.Accounting.LastTimeStepSys = 0.0;
         }
 
         // Do the every time step initializations
@@ -1340,7 +1335,7 @@ namespace HWBaseboardRadiator {
             WaterOutletTemp = WaterInletTemp - CapacitanceAir * (AirOutletTemp - AirInletTemp) / CapacitanceWater;
             BBHeat = CapacitanceWater * (WaterInletTemp - WaterOutletTemp);
             RadHeat = BBHeat * HWBaseboardDesignDataObject.FracRadiant;
-            state.dataHWBaseboardRad->QBBRadSource(BaseboardNum) = RadHeat;
+            hWBaseboard.Accounting.QBBRadSource = RadHeat;
 
             if (HWBaseboardDesignDataObject.FracRadiant <= MinFrac) {
                 LoadMet = BBHeat;
@@ -1379,7 +1374,7 @@ namespace HWBaseboardRadiator {
             RadHeat = 0.0;
             WaterMassFlowRate = 0.0;
             AirMassFlowRate = 0.0;
-            state.dataHWBaseboardRad->QBBRadSource(BaseboardNum) = 0.0;
+            hWBaseboard.Accounting.QBBRadSource = 0.0;
             hWBaseboard.WaterOutletEnthalpy = hWBaseboard.WaterInletEnthalpy;
             PlantUtilities::SetActuatedBranchFlowRate(state, WaterMassFlowRate, hWBaseboard.WaterInletNode, hWBaseboard.plantLoc, false);
         }
@@ -1411,8 +1406,7 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterInletNode;
         int WaterOutletNode;
-        auto const &hWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
-        Real64 const qBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
+        auto &hWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataHWBaseboardRad->MyEnvrnFlag2) {
             state.dataHWBaseboardRad->Iter = 0;
@@ -1423,17 +1417,17 @@ namespace HWBaseboardRadiator {
         }
 
         // First, update the running average if necessary...
-        if (state.dataHWBaseboardRad->LastSysTimeElapsed(BaseboardNum) == state.dataHVACGlobal->SysTimeElapsed) {
-            state.dataHWBaseboardRad->QBBRadSrcAvg(BaseboardNum) -= state.dataHWBaseboardRad->LastQBBRadSrc(BaseboardNum) *
-                                                                    state.dataHWBaseboardRad->LastTimeStepSys(BaseboardNum) /
-                                                                    state.dataGlobal->TimeStepZone;
+        if (hWBaseboard.Accounting.LastSysTimeElapsed == state.dataHVACGlobal->SysTimeElapsed) {
+            hWBaseboard.Accounting.QBBRadSrcAvg -=
+                hWBaseboard.Accounting.LastQBBRadSrc * hWBaseboard.Accounting.LastTimeStepSys / state.dataGlobal->TimeStepZone;
         }
         // Update the running average and the "last" values with the current values of the appropriate variables
-        state.dataHWBaseboardRad->QBBRadSrcAvg(BaseboardNum) += qBBRadSource * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
+        hWBaseboard.Accounting.QBBRadSrcAvg +=
+            hWBaseboard.Accounting.QBBRadSource * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
 
-        state.dataHWBaseboardRad->LastQBBRadSrc(BaseboardNum) = qBBRadSource;
-        state.dataHWBaseboardRad->LastSysTimeElapsed(BaseboardNum) = state.dataHVACGlobal->SysTimeElapsed;
-        state.dataHWBaseboardRad->LastTimeStepSys(BaseboardNum) = state.dataHVACGlobal->TimeStepSys;
+        hWBaseboard.Accounting.LastQBBRadSrc = hWBaseboard.Accounting.QBBRadSource;
+        hWBaseboard.Accounting.LastSysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        hWBaseboard.Accounting.LastTimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         WaterInletNode = hWBaseboard.WaterInletNode;
         WaterOutletNode = hWBaseboard.WaterOutletNode;
@@ -1469,17 +1463,16 @@ namespace HWBaseboardRadiator {
         HWBaseboardSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
-        if (!allocated(state.dataHWBaseboardRad->QBBRadSrcAvg)) return;
+        if (state.dataHWBaseboardRad->HWBaseboard.empty()) return;
 
         // If it was allocated, then we have to check to see if this was running at all...
         for (int BaseboardNum = 1; BaseboardNum <= state.dataHWBaseboardRad->NumHWBaseboards; ++BaseboardNum) {
-            if (state.dataHWBaseboardRad->QBBRadSrcAvg(BaseboardNum) != 0.0) {
+            auto &thisHWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
+            if (thisHWBaseboard.Accounting.QBBRadSrcAvg != 0.0) {
                 HWBaseboardSysOn = true;
-                break; // DO loop
             }
+            thisHWBaseboard.Accounting.QBBRadSource = thisHWBaseboard.Accounting.QBBRadSrcAvg;
         }
-
-        state.dataHWBaseboardRad->QBBRadSource = state.dataHWBaseboardRad->QBBRadSrcAvg;
 
         DistributeBBRadGains(state); // QBBRadSource has been modified so we need to redistribute gains
     }
@@ -1521,18 +1514,19 @@ namespace HWBaseboardRadiator {
 
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
             auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
-            Real64 const &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource(BaseboardNum);
 
             HWBaseboardDesignData const &HWBaseboardDesignDataObject =
                 state.dataHWBaseboardRad->HWBaseboardDesignObject(HWBaseboard.DesignObjectPtr); // Contains the data for the design object
             int ZoneNum = HWBaseboard.ZonePtr;
             if (ZoneNum <= 0) continue;
-            state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson(ZoneNum) += QBBRadSource * HWBaseboardDesignDataObject.FracDistribPerson;
+            state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson(ZoneNum) +=
+                HWBaseboard.Accounting.QBBRadSource * HWBaseboardDesignDataObject.FracDistribPerson;
 
             for (RadSurfNum = 1; RadSurfNum <= HWBaseboard.TotSurfToDistrib; ++RadSurfNum) {
                 SurfNum = HWBaseboard.SurfacePtr(RadSurfNum);
                 if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
-                    ThisSurfIntensity = (QBBRadSource * HWBaseboard.FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
+                    ThisSurfIntensity =
+                        (HWBaseboard.Accounting.QBBRadSource * HWBaseboard.FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
                     state.dataHeatBalFanSys->SurfQHWBaseboard(SurfNum) += ThisSurfIntensity;
                     state.dataHeatBalSurf->AnyRadiantSystems = true;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
