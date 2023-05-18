@@ -82,68 +82,55 @@ namespace HWBaseboardRadiator {
     {
         // Members
         std::string Name;
-        DataPlant::PlantEquipmentType EquipType;
+        DataPlant::PlantEquipmentType EquipType = DataPlant::PlantEquipmentType::Invalid;
         std::string designObjectName; // Design Object
-        int DesignObjectPtr;
+        int DesignObjectPtr = 0;
         Array1D_int SurfacePtr;
-        int ZonePtr;
-        int SchedPtr;
-        int WaterInletNode;
-        int WaterOutletNode;
-        int TotSurfToDistrib;
-        int ControlCompTypeNum;
-        int CompErrIndex;
-        Real64 AirMassFlowRate;
-        Real64 AirMassFlowRateStd;
-        Real64 WaterTempAvg;
-        Real64 RatedCapacity;
-        Real64 UA;
-        Real64 WaterMassFlowRate;
-        Real64 WaterMassFlowRateMax;
-        Real64 WaterMassFlowRateStd;
-        Real64 WaterVolFlowRateMax;
-        Real64 WaterInletTempStd;
-        Real64 WaterInletTemp;
-        Real64 WaterInletEnthalpy;
-        Real64 WaterOutletTempStd;
-        Real64 WaterOutletTemp;
-        Real64 WaterOutletEnthalpy;
-        Real64 AirInletTempStd;
-        Real64 AirInletTemp;
-        Real64 AirOutletTemp;
-        Real64 AirInletHumRat;
-        Real64 AirOutletTempStd;
-        Real64 FracConvect;
+        int ZonePtr = 0;
+        int SchedPtr = 0;
+        int WaterInletNode = 0;
+        int WaterOutletNode = 0;
+        int TotSurfToDistrib = 0;
+        int ControlCompTypeNum = 0;
+        int CompErrIndex = 0;
+        Real64 AirMassFlowRate = 0.0;
+        Real64 AirMassFlowRateStd = 0.0;
+        Real64 WaterTempAvg = 0.0;
+        Real64 RatedCapacity = 0.0;
+        Real64 UA = 0.0;
+        Real64 WaterMassFlowRate = 0.0;
+        Real64 WaterMassFlowRateMax = 0.0;
+        Real64 WaterMassFlowRateStd = 0.0;
+        Real64 WaterVolFlowRateMax = 0.0;
+        Real64 WaterInletTempStd = 0.0;
+        Real64 WaterInletTemp = 0.0;
+        Real64 WaterInletEnthalpy = 0.0;
+        Real64 WaterOutletTempStd = 0.0;
+        Real64 WaterOutletTemp = 0.0;
+        Real64 WaterOutletEnthalpy = 0.0;
+        Real64 AirInletTempStd = 0.0;
+        Real64 AirInletTemp = 0.0;
+        Real64 AirOutletTemp = 0.0;
+        Real64 AirInletHumRat = 0.0;
+        Real64 AirOutletTempStd = 0.0;
+        Real64 FracConvect = 0.0;
         Array1D<Real64> FracDistribToSurf;
-        Real64 TotPower;
-        Real64 Power;
-        Real64 ConvPower;
-        Real64 RadPower;
-        Real64 TotEnergy;
-        Real64 Energy;
-        Real64 ConvEnergy;
-        Real64 RadEnergy;
-        PlantLocation plantLoc;
-        int BBLoadReSimIndex;
-        int BBMassFlowReSimIndex;
-        int BBInletTempFlowReSimIndex;
-        int HeatingCapMethod;         // - Method for heating capacity scaled sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
-                                      // FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        Real64 TotPower = 0.0;
+        Real64 Power = 0.0;
+        Real64 ConvPower = 0.0;
+        Real64 RadPower = 0.0;
+        Real64 TotEnergy = 0.0;
+        Real64 Energy = 0.0;
+        Real64 ConvEnergy = 0.0;
+        Real64 RadEnergy = 0.0;
+        PlantLocation plantLoc{};
+        int BBLoadReSimIndex = 0;
+        int BBMassFlowReSimIndex = 0;
+        int BBInletTempFlowReSimIndex = 0;
+        int HeatingCapMethod = 0;           // - Method for heating capacity scaled sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+                                            // FracOfAutosizedHeatingCapacity)
+        Real64 ScaledHeatingCapacity = 0.0; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
         AccountingData Accounting;
-
-        // Default Constructor
-        HWBaseboardParams()
-            : EquipType(DataPlant::PlantEquipmentType::Invalid), DesignObjectPtr(0), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0),
-              TotSurfToDistrib(0), ControlCompTypeNum(0), CompErrIndex(0), AirMassFlowRate(0.0), AirMassFlowRateStd(0.0), WaterTempAvg(0.0),
-              RatedCapacity(0.0), UA(0.0), WaterMassFlowRate(0.0), WaterMassFlowRateMax(0.0), WaterMassFlowRateStd(0.0), WaterVolFlowRateMax(0.0),
-              WaterInletTempStd(0.0), WaterInletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0),
-              WaterOutletEnthalpy(0.0), AirInletTempStd(0.0), AirInletTemp(0.0), AirOutletTemp(0.0), AirInletHumRat(0.0), AirOutletTempStd(0.0),
-              FracConvect(0.0), TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0),
-              RadEnergy(0.0), plantLoc{}, BBLoadReSimIndex(0), BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0), HeatingCapMethod(0),
-              ScaledHeatingCapacity(0.0)
-        {
-        }
     };
 
     struct HWBaseboardDesignData : HWBaseboardParams
