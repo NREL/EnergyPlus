@@ -7239,8 +7239,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                         varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
                         LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                         GetUnitConversion(state, indexUnitConv, curConversionFactor, state.dataOutRptTab->curConversionOffset, curUnits);
-                    } 
-                    else { // just do the Joule conversion
+                    } else { // just do the Joule conversion
                         // if units is in Joules, convert if specified
                         if (UtilityRoutines::SameString(unitEnumToString(ort->MonthlyColumns(curCol).units), "J")) {
                             curUnits = energyUnitsString;
@@ -7600,8 +7599,7 @@ void WriteTimeBinTables(EnergyPlusData &state)
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 curIntervalStart = ConvertIP(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalStart);
                 curIntervalSize = ConvertIPdelta(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalSize);
-            }
-            else {
+            } else {
                 curNameAndUnits = curNameWithSIUnits;
                 curIntervalStart = ort->OutputTableBinned(iInObj).intervalStart;
                 curIntervalSize = ort->OutputTableBinned(iInObj).intervalSize;
@@ -7753,8 +7751,7 @@ void WriteTimeBinTables(EnergyPlusData &state)
                     tableBodyStat(1, 4) = RealToStr(ConvertIP(state, indexUnitConv, repMean + 2 * repStDev), 2);
                     tableBodyStat(1, 5) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).maximum), 2);
                     tableBodyStat(1, 6) = RealToStr(ConvertIPdelta(state, indexUnitConv, repStDev), 2);
-                }
-                else {
+                } else {
                     tableBodyStat(1, 1) = RealToStr(ort->BinStatistics(repIndex).minimum, 2);
                     tableBodyStat(1, 2) = RealToStr(repMean - 2 * repStDev, 2);
                     tableBodyStat(1, 3) = RealToStr(repMean, 2);
@@ -8527,8 +8524,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", RealToStr(convBldgGrossFloorArea, 2));
             }
-        }
-        else {
+        } else {
             if (produceTabular) {
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", RealToStr(convBldgGrossFloorArea, 2));
@@ -10687,8 +10683,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 }
             }
             columnHead(14) = "Water [gal/min]";
-        }
-        else {
+        } else {
             columnHead(1) = "Subcategory";
             columnHead(2) = "Electricity [W]";
             columnHead(3) = "Natural Gas [W]";
@@ -11086,8 +11081,7 @@ void WriteCompCostTable(EnergyPlusData &state)
                     tableBody(4, item) = state.dataCostEstimateManager->CostLineItem(item).Units;
                     tableBody(5, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).ValuePer, 2);
                 }
-            } 
-            else {
+            } else {
                 tableBody(3, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).Qty, 2);
                 tableBody(4, item) = state.dataCostEstimateManager->CostLineItem(item).Units;
                 tableBody(5, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).ValuePer, 2);
@@ -11252,8 +11246,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             SIunit = "[W/m2]";
             LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->Wm2_unitName);
             state.dataOutRptTab->Wm2_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
-        }
-        else {
+        } else {
             state.dataOutRptTab->m_unitName = "[m]";
             state.dataOutRptTab->m_unitConv = 1.0;
             state.dataOutRptTab->m2_unitName = "[m2]";
