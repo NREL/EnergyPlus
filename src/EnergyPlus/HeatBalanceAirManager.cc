@@ -4977,29 +4977,25 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
     using Psychrometrics::PsyTdpFnWPb;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneLoop;             // Counter for the # of zones (nz)
-    int TempControlledZoneID; // index for zone in TempConrolled Zone structure
-    Real64 thisMRTFraction;   // temp working value for radiative fraction/weight
-
-    for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
+    for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
+        auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
+        auto &znAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
         // The mean air temperature is actually ZTAV which is the average
         // temperature of the air temperatures at the system time step for the
         // entire zone time step.
-        state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirTemp = thisZoneHB.ZTAV;
-        state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat = thisZoneHB.ZoneAirHumRatAvg;
-        state.dataHeatBal->ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (thisZoneHB.ZTAV + state.dataHeatBal->ZoneMRT(ZoneLoop));
-        state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirDewPointTemp =
-            PsyTdpFnWPb(state, state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat, state.dataEnvrn->OutBaroPress);
+        znAirRpt.MeanAirTemp = thisZoneHB.ZTAV;
+        znAirRpt.MeanAirHumRat = thisZoneHB.ZoneAirHumRatAvg;
+        znAirRpt.OperativeTemp = 0.5 * (thisZoneHB.ZTAV + state.dataHeatBal->ZoneMRT(ZoneLoop));
+        znAirRpt.MeanAirDewPointTemp = PsyTdpFnWPb(state, znAirRpt.MeanAirHumRat, state.dataEnvrn->OutBaroPress);
 
         // if operative temperature control is being used, then radiative fraction/weighting
         //  might be defined by user to be something different than 0.5, even scheduled over simulation period
         if (state.dataZoneCtrls->AnyOpTempControl) { // dig further...
             // find TempControlledZoneID from ZoneLoop index
-            TempControlledZoneID = state.dataHeatBal->Zone(ZoneLoop).TempControlledZoneIndex;
+            int TempControlledZoneID = state.dataHeatBal->Zone(ZoneLoop).TempControlledZoneIndex;
             if (state.dataHeatBal->Zone(ZoneLoop).IsControlled) {
                 if ((state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).OperativeTempControl)) {
+                    Real64 thisMRTFraction; // temp working value for radiative fraction/weight
                     // is operative temp radiative fraction scheduled or fixed?
                     if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).OpTempCntrlModeScheduled) {
                         thisMRTFraction = GetCurrentScheduleValue(
@@ -5007,7 +5003,7 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
                     } else {
                         thisMRTFraction = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
                     }
-                    state.dataHeatBal->ZnAirRpt(ZoneLoop).ThermOperativeTemp =
+                    znAirRpt.ThermOperativeTemp =
                         (1.0 - thisMRTFraction) * thisZoneHB.ZTAV + thisMRTFraction * state.dataHeatBal->ZoneMRT(ZoneLoop);
                 }
             }
