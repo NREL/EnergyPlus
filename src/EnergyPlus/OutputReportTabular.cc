@@ -3361,6 +3361,11 @@ void WriteTableOfContents(EnergyPlusData &state)
                                     ort->OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInput).units);
                                 [[maybe_unused]] int indexUnitConv = -1;
                                 LookupSItoIP(state, origName, indexUnitConv, curName);
+                            } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                                std::string origName =
+                                    ort->OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInput).units);
+                                [[maybe_unused]] int indexUnitConv = -1;
+                                LookupSItoIP(state, origName, indexUnitConv, curName);
                             } else {
                                 curName = ort->OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInput).units);
                             }
@@ -5543,6 +5548,12 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                                      state.dataOutRptPredefined->pdchWthrVal,
                                      curNameAndUnits,
                                      RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(12, lnPtr))), 1));
+                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchWthrVal,
+                                     curNameAndUnits,
+                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(12, lnPtr))), 1));
                 } else {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, curNameWithSIUnits, lineIn.substr(12, lnPtr));
                 }
@@ -5599,6 +5610,17 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                                              state.dataOutRptPredefined->pdchWthrVal,
                                              "Heating Design Temperature 99% (F)",
                                              RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 3))), 1) + degChar);
+                        } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                            curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
+                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             curNameAndUnits,
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) + degChar);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Heating Design Temperature 99% (F)",
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 3))), 1) + degChar);
                         } else {
                             PreDefTableEntry(state,
                                              state.dataOutRptPredefined->pdchWthrVal,
@@ -5611,6 +5633,17 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         }
                     } else { // 2005 and 2009 are the same
                         if (ort->unitsStyle == UnitsStyle::InchPound) {
+                            curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
+                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             curNameAndUnits,
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) + degChar);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Heating Design Temperature 99% (F)",
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) + degChar);
+                        } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
                             curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(state,
@@ -5651,6 +5684,17 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                                          state.dataOutRptPredefined->pdchWthrVal,
                                          "Heating Design Temperature 99% (F)",
                                          RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) + degChar);
+                    } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                        curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
+                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         curNameAndUnits,
+                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) + degChar);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         "Heating Design Temperature 99% (F)",
+                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) + degChar);
                     } else {
                         PreDefTableEntry(state,
                                          state.dataOutRptPredefined->pdchWthrVal,
@@ -5669,6 +5713,21 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 if (isASHRAE) {
                     if (ashDesYear == "2001") {
                         if (ort->unitsStyle == UnitsStyle::InchPound) {
+                            curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
+                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             curNameAndUnits,
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) + degChar);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Cooling Design Temperature 1% (F)",
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) + degChar);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Cooling Design Temperature 2% (F)",
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 6))), 1) + degChar);
+                        } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
                             curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(state,
@@ -5713,6 +5772,21 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                                              state.dataOutRptPredefined->pdchWthrVal,
                                              "Cooling Design Temperature 2% (F)",
                                              RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 9))), 1) + degChar);
+                        } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                            curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
+                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             curNameAndUnits,
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) + degChar);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Cooling Design Temperature 1% (F)",
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 7))), 1) + degChar);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Cooling Design Temperature 2% (F)",
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 9))), 1) + degChar);
                         } else {
                             PreDefTableEntry(state,
                                              state.dataOutRptPredefined->pdchWthrVal,
@@ -5739,6 +5813,21 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         col3 = 6;
                     }
                     if (ort->unitsStyle == UnitsStyle::InchPound) {
+                        curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
+                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         curNameAndUnits,
+                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) + degChar);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         "Cooling Design Temperature 1% (F)",
+                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) + degChar);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         "Cooling Design Temperature 2% (F)",
+                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col3))), 1) + degChar);
+                    } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
                         curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                         PreDefTableEntry(state,
@@ -5794,6 +5883,13 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                                      state.dataOutRptPredefined->pdchWthrVal,
                                      curNameAndUnits,
                                      RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) + degChar);
+                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                    curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
+                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchWthrVal,
+                                     curNameAndUnits,
+                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) + degChar);
                 } else {
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWthrVal,
@@ -5823,6 +5919,13 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
             }
             if (sposlt != std::string::npos && eposlt != std::string::npos) {
                 if (ort->unitsStyle == UnitsStyle::InchPound) {
+                    curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
+                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchWthrVal,
+                                     curNameAndUnits,
+                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) + degChar);
+                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
                     curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -5864,6 +5967,13 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                                      state.dataOutRptPredefined->pdchWthrVal,
                                      curNameAndUnits,
                                      RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) + degChar);
+                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                    curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
+                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchWthrVal,
+                                     curNameAndUnits,
+                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) + degChar);
                 } else {
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWthrVal,
@@ -5893,6 +6003,13 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
             }
             if (sposlt != std::string::npos && eposlt != std::string::npos) {
                 if (ort->unitsStyle == UnitsStyle::InchPound) {
+                    curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
+                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchWthrVal,
+                                     curNameAndUnits,
+                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) + degChar);
+                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
                     curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -5968,6 +6085,13 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                                      state.dataOutRptPredefined->pdchWthrVal,
                                      curNameAndUnits,
                                      RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(storeASHRAEHDD)), 1));
+                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                    curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
+                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchWthrVal,
+                                     curNameAndUnits,
+                                     RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(storeASHRAEHDD)), 1));
                 } else {
                     PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD);
@@ -5976,12 +6100,26 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 if (ort->unitsStyle == UnitsStyle::InchPound) {
                     PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found");
+                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found");
                 } else {
                     PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found");
                 }
             }
             if (ort->unitsStyle == UnitsStyle::InchPound) {
+                curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
+                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchWthrVal,
+                                 curNameAndUnits,
+                                 RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchLeedGenData,
+                                 "Heating Degree Days",
+                                 RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
+            } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
                 curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 PreDefTableEntry(state,
@@ -6007,6 +6145,13 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                                      state.dataOutRptPredefined->pdchWthrVal,
                                      curNameAndUnits,
                                      RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(storeASHRAECDD)), 1));
+                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                    curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
+                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchWthrVal,
+                                     curNameAndUnits,
+                                     RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(storeASHRAECDD)), 1));
                 } else {
                     PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD);
@@ -6015,12 +6160,26 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 if (ort->unitsStyle == UnitsStyle::InchPound) {
                     PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found");
+                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found");
                 } else {
                     PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found");
                 }
             }
             if (ort->unitsStyle == UnitsStyle::InchPound) {
+                curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
+                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchWthrVal,
+                                 curNameAndUnits,
+                                 RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchLeedGenData,
+                                 "Cooling Degree Days",
+                                 RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
+            } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
                 curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 PreDefTableEntry(state,
@@ -6887,6 +7046,8 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
 
     if (ort->unitsStyle == UnitsStyle::InchPound) {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", "-");
+    } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", "-");
     } else {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", "-");
     }
@@ -7074,7 +7235,12 @@ void WriteMonthlyTables(EnergyPlusData &state)
                         varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
                         LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                         GetUnitConversion(state, indexUnitConv, curConversionFactor, state.dataOutRptTab->curConversionOffset, curUnits);
-                    } else { // just do the Joule conversion
+                    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+                        varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
+                        LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
+                        GetUnitConversion(state, indexUnitConv, curConversionFactor, state.dataOutRptTab->curConversionOffset, curUnits);
+                    } 
+                    else { // just do the Joule conversion
                         // if units is in Joules, convert if specified
                         if (UtilityRoutines::SameString(unitEnumToString(ort->MonthlyColumns(curCol).units), "J")) {
                             curUnits = energyUnitsString;
@@ -7430,7 +7596,12 @@ void WriteTimeBinTables(EnergyPlusData &state)
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 curIntervalStart = ConvertIP(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalStart);
                 curIntervalSize = ConvertIPdelta(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalSize);
-            } else {
+            } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                curIntervalStart = ConvertIP(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalStart);
+                curIntervalSize = ConvertIPdelta(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalSize);
+            }
+            else {
                 curNameAndUnits = curNameWithSIUnits;
                 curIntervalStart = ort->OutputTableBinned(iInObj).intervalStart;
                 curIntervalSize = ort->OutputTableBinned(iInObj).intervalSize;
@@ -7575,7 +7746,15 @@ void WriteTimeBinTables(EnergyPlusData &state)
                     tableBodyStat(1, 4) = RealToStr(ConvertIP(state, indexUnitConv, repMean + 2 * repStDev), 2);
                     tableBodyStat(1, 5) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).maximum), 2);
                     tableBodyStat(1, 6) = RealToStr(ConvertIPdelta(state, indexUnitConv, repStDev), 2);
-                } else {
+                } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+                    tableBodyStat(1, 1) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).minimum), 2);
+                    tableBodyStat(1, 2) = RealToStr(ConvertIP(state, indexUnitConv, repMean - 2 * repStDev), 2);
+                    tableBodyStat(1, 3) = RealToStr(ConvertIP(state, indexUnitConv, repMean), 2);
+                    tableBodyStat(1, 4) = RealToStr(ConvertIP(state, indexUnitConv, repMean + 2 * repStDev), 2);
+                    tableBodyStat(1, 5) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).maximum), 2);
+                    tableBodyStat(1, 6) = RealToStr(ConvertIPdelta(state, indexUnitConv, repStDev), 2);
+                }
+                else {
                     tableBodyStat(1, 1) = RealToStr(ort->BinStatistics(repIndex).minimum, 2);
                     tableBodyStat(1, 2) = RealToStr(repMean - 2 * repStDev, 2);
                     tableBodyStat(1, 3) = RealToStr(repMean, 2);
@@ -7810,6 +7989,12 @@ void WriteBEPSTable(EnergyPlusData &state)
             waterConversionFactor = getSpecificUnitDivider(state, "m3", "gal"); // 0.003785413 m3 to gal
             areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
         } break;
+        case UnitsStyle::InchPoundExceptElectricity: {
+            largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
+            kConversionFactor = 1.0;
+            waterConversionFactor = getSpecificUnitDivider(state, "m3", "gal"); // 0.003785413 m3 to gal
+            areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
+        } break;
         default: {
             largeConversionFactor = 1000000000.0;
             kConversionFactor = 1000.0;
@@ -7907,6 +8092,11 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnHead(3) = "Energy Per Conditioned Building Area [kWh/m2]";
         } break;
         case UnitsStyle::InchPound: {
+            columnHead(1) = "Total Energy [kBtu]";
+            columnHead(2) = "Energy Per Total Building Area [kBtu/ft2]";
+            columnHead(3) = "Energy Per Conditioned Building Area [kBtu/ft2]";
+        } break;
+        case UnitsStyle::InchPoundExceptElectricity: {
             columnHead(1) = "Total Energy [kBtu]";
             columnHead(2) = "Energy Per Total Building Area [kBtu/ft2]";
             columnHead(3) = "Energy Per Conditioned Building Area [kBtu/ft2]";
@@ -8312,6 +8502,9 @@ void WriteBEPSTable(EnergyPlusData &state)
         case UnitsStyle::InchPound: {
             columnHead(1) = "Area [ft2]";
         } break;
+        case UnitsStyle::InchPoundExceptElectricity: {
+            columnHead(1) = "Area [ft2]";
+        } break;
         default: {
             columnHead(1) = "Area [m2]";
         } break;
@@ -8329,7 +8522,13 @@ void WriteBEPSTable(EnergyPlusData &state)
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", RealToStr(convBldgGrossFloorArea, 2));
             }
-        } else {
+        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+            if (produceTabular) {
+                PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", RealToStr(convBldgGrossFloorArea, 2));
+            }
+        }
+        else {
             if (produceTabular) {
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", RealToStr(convBldgGrossFloorArea, 2));
@@ -8407,6 +8606,21 @@ void WriteBEPSTable(EnergyPlusData &state)
         } break;
         case UnitsStyle::InchPound: {
             columnHead(1) = "Electricity [kBtu]";
+            columnHead(2) = "Natural Gas [kBtu]";
+            columnHead(3) = "Gasoline [kBtu]";
+            columnHead(4) = "Diesel [kBtu]";
+            columnHead(5) = "Coal [kBtu]";
+            columnHead(6) = "Fuel Oil No 1 [kBtu]";
+            columnHead(7) = "Fuel Oil No 2 [kBtu]";
+            columnHead(8) = "Propane [kBtu]";
+            columnHead(9) = "Other Fuel 1 [kBtu]";
+            columnHead(10) = "Other Fuel 2 [kBtu]";
+            columnHead(11) = "District Cooling [kBtu]";
+            columnHead(12) = "District Heating [kBtu]";
+            columnHead(13) = "Water [gal]";
+        } break;
+        case UnitsStyle::InchPoundExceptElectricity: {
+            columnHead(1) = "Electricity [kWh]";
             columnHead(2) = "Natural Gas [kBtu]";
             columnHead(3) = "Gasoline [kBtu]";
             columnHead(4) = "Diesel [kBtu]";
@@ -8888,6 +9102,21 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnHead(12) = "District Heating Intensity [kBtu/ft2]";
             columnHead(13) = "Water Intensity [gal/ft2]";
         } break;
+        case UnitsStyle::InchPoundExceptElectricity: {
+            columnHead(1) = "Electricity Intensity [kWh/ft2]";
+            columnHead(2) = "Natural Gas Intensity [kBtu/ft2]";
+            columnHead(3) = "Gasoline Intensity [kBtu/ft2]";
+            columnHead(4) = "Diesel Intensity [kBtu/ft2]";
+            columnHead(5) = "Coal Intensity [kBtu/ft2]";
+            columnHead(6) = "Fuel Oil No 1 Intensity [kBtu/ft2]";
+            columnHead(7) = "Fuel Oil No 2 Intensity [kBtu/ft2]";
+            columnHead(8) = "Propane Intensity [kBtu/ft2]";
+            columnHead(9) = "Other Fuel 1 Intensity [kBtu/ft2]";
+            columnHead(10) = "Other Fuel 2 Intensity [kBtu/ft2]";
+            columnHead(11) = "District Cooling Intensity [kBtu/ft2]";
+            columnHead(12) = "District Heating Intensity [kBtu/ft2]";
+            columnHead(13) = "Water Intensity [gal/ft2]";
+        } break;
         default: {
             columnHead(1) = "Electricity Intensity [MJ/m2]";
             columnHead(2) = "Natural Gas Intensity [MJ/m2]";
@@ -8996,6 +9225,9 @@ void WriteBEPSTable(EnergyPlusData &state)
         case UnitsStyle::InchPound: {
             columnHead(1) = "Electricity [kBtu]";
         } break;
+        case UnitsStyle::InchPoundExceptElectricity: {
+            columnHead(1) = "Electricity [kWh]";
+        } break;
         default: {
             columnHead(1) = "Electricity [GJ]";
         } break;
@@ -9088,6 +9320,9 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnHead(1) = "Heat [kWh]";
         } break;
         case UnitsStyle::InchPound: {
+            columnHead(1) = "Heat [kBtu]";
+        } break;
+        case UnitsStyle::InchPoundExceptElectricity: {
             columnHead(1) = "Heat [kBtu]";
         } break;
         default: {
@@ -9194,6 +9429,9 @@ void WriteBEPSTable(EnergyPlusData &state)
         case UnitsStyle::InchPound: {
             columnHead(1) = "Water [gal]";
         } break;
+        case UnitsStyle::InchPoundExceptElectricity: {
+            columnHead(1) = "Water [gal]";
+        } break;
         default: {
             columnHead(1) = "Water [m3]";
         } break;
@@ -9292,6 +9530,11 @@ void WriteBEPSTable(EnergyPlusData &state)
                 std::string curNameAndUnits;
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 columnHead(1) = curNameAndUnits;
+            } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+                int indexUnitConv = -1;
+                std::string curNameAndUnits;
+                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                columnHead(1) = curNameAndUnits;
             } else {
                 columnHead(1) = curNameWithSIUnits;
             }
@@ -9300,6 +9543,9 @@ void WriteBEPSTable(EnergyPlusData &state)
             rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
 
             if (unitsStyle_cur != UnitsStyle::InchPound) {
+                tableBody(1, 1) = RealToStr(std::abs(state.dataHVACGlobal->deviationFromSetPtThresholdHtg), 2);
+                tableBody(1, 2) = RealToStr(state.dataHVACGlobal->deviationFromSetPtThresholdClg, 2);
+            } else if (unitsStyle_cur != UnitsStyle::InchPoundExceptElectricity) {
                 tableBody(1, 1) = RealToStr(std::abs(state.dataHVACGlobal->deviationFromSetPtThresholdHtg), 2);
                 tableBody(1, 2) = RealToStr(state.dataHVACGlobal->deviationFromSetPtThresholdClg, 2);
             } else {
@@ -9444,6 +9690,21 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
     } break;
     case UnitsStyle::InchPound: {
         columnHead(2) = "Electricity [kBtu]";
+        columnHead(3) = "Natural Gas [kBtu]";
+        columnHead(4) = "Gasoline [kBtu]";
+        columnHead(5) = "Diesel [kBtu]";
+        columnHead(6) = "Coal [kBtu]";
+        columnHead(7) = "Fuel Oil No 1 [kBtu]";
+        columnHead(8) = "Fuel Oil No 2 [kBtu]";
+        columnHead(9) = "Propane [kBtu]";
+        columnHead(10) = "Other Fuel 1 [kBtu]";
+        columnHead(11) = "Other Fuel 2 [kBtu]";
+        columnHead(12) = "District Cooling [kBtu]";
+        columnHead(13) = "District Heating [kBtu]";
+        columnHead(14) = "Water [gal]";
+    } break;
+    case UnitsStyle::InchPoundExceptElectricity: {
+        columnHead(2) = "Electricity [kWh]";
         columnHead(3) = "Natural Gas [kBtu]";
         columnHead(4) = "Gasoline [kBtu]";
         columnHead(5) = "Diesel [kBtu]";
@@ -9738,6 +9999,10 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
             largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
             areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
         } break;
+        case UnitsStyle::InchPoundExceptElectricity: {
+            largeConversionFactor = 3600000.0;                                 // getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
+            areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2"); // 0.092893973 m2 to ft2
+        } break;
         default: {
             largeConversionFactor = 1000000.0; // to MJ
             areaConversionFactor = 1.0;
@@ -9800,6 +10065,20 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
         } break;
         case UnitsStyle::InchPound: {
             columnHead(1) = "Source Electricity [kBtu]";
+            columnHead(2) = "Source Natural Gas [kBtu]";
+            columnHead(3) = "Source Gasoline [kBtu]";
+            columnHead(4) = "Source Diesel [kBtu]";
+            columnHead(5) = "Source Coal [kBtu]";
+            columnHead(6) = "Source Fuel Oil No 1 [kBtu]";
+            columnHead(7) = "Source Fuel Oil No 2 [kBtu]";
+            columnHead(8) = "Source Propane [kBtu]";
+            columnHead(9) = "Source Other Fuel 1 [kBtu]";
+            columnHead(10) = "Source Other Fuel 2 [kBtu]";
+            columnHead(11) = "Source District Cooling [kBtu]";
+            columnHead(12) = "Source District Heating [kBtu]";
+        } break;
+        case UnitsStyle::InchPoundExceptElectricity: {
+            columnHead(1) = "Source Electricity [kWh]";
             columnHead(2) = "Source Natural Gas [kBtu]";
             columnHead(3) = "Source Gasoline [kBtu]";
             columnHead(4) = "Source Diesel [kBtu]";
@@ -9884,6 +10163,20 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
         } break;
         case UnitsStyle::InchPound: {
             columnHead(1) = "Source Electricity [kBtu/ft2]";
+            columnHead(2) = "Source Natural Gas [kBtu/ft2]";
+            columnHead(3) = "Source Gasoline [kBtu/ft2]";
+            columnHead(4) = "Source Diesel [kBtu/ft2]";
+            columnHead(5) = "Source Coal [kBtu/ft2]";
+            columnHead(6) = "Source Fuel Oil No 1 [kBtu/ft2]";
+            columnHead(7) = "Source Fuel Oil No 2 [kBtu/ft2]";
+            columnHead(8) = "Source Propane [kBtu/ft2]";
+            columnHead(9) = "Source Other Fuel 1 [kBtu/ft2]";
+            columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
+            columnHead(11) = "Source District Cooling [kBtu/ft2]";
+            columnHead(12) = "Source District Heating [kBtu/ft2]";
+        } break;
+        case UnitsStyle::InchPoundExceptElectricity: {
+            columnHead(1) = "Source Electricity [kWh/ft2]";
             columnHead(2) = "Source Natural Gas [kBtu/ft2]";
             columnHead(3) = "Source Gasoline [kBtu/ft2]";
             columnHead(4) = "Source Diesel [kBtu/ft2]";
@@ -10101,6 +10394,9 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         if (unitsStyle_cur == UnitsStyle::InchPound) {
             powerConversion = getSpecificUnitMultiplier(state, "W", "kBtuh");
             flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
+        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+            powerConversion = 1.0; // getSpecificUnitMultiplier(state, "W", "kBtuh");
+            flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
         }
 
         // collapse the gatherEndUseBEPS array to the resource groups displayed
@@ -10241,6 +10537,26 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 }
             }
             columnHead(13) = "Water [gal/min]";
+        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+            columnHead(1) = "Electricity [W]";
+            columnHead(2) = "Natural Gas [kBtuh]";
+            columnHead(3) = "Gasoline [kBtuh]";
+            columnHead(4) = "Diesel [kBtuh]";
+            columnHead(5) = "Coal [kBtuh]";
+            columnHead(6) = "Fuel Oil No 1 [kBtuh]";
+            columnHead(7) = "Fuel Oil No 2 [kBtuh]";
+            columnHead(8) = "Propane [kBtuh]";
+            columnHead(9) = "Other Fuel 1 [kBtuh]";
+            columnHead(10) = "Other Fuel 2 [kBtuh]";
+            columnHead(11) = "District Cooling [kBtuh]";
+            {
+                if (distrHeatSelected == 4) {
+                    columnHead(12) = "District Heating [kBtuh]";
+                } else if (distrHeatSelected == 5) {
+                    columnHead(12) = "Steam [kBtuh]";
+                }
+            }
+            columnHead(13) = "Water [gal/min]";
         } else {
             columnHead(1) = "Electricity [W]";
             columnHead(2) = "Natural Gas [W]";
@@ -10350,7 +10666,29 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 }
             }
             columnHead(14) = "Water [gal/min]";
-        } else {
+        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+            columnHead(1) = "Subcategory";
+            columnHead(2) = "Electricity [W]";
+            columnHead(3) = "Natural Gas [kBtuh]";
+            columnHead(4) = "Gasoline [kBtuh]";
+            columnHead(5) = "Diesel [kBtuh]";
+            columnHead(6) = "Coal [kBtuh]";
+            columnHead(7) = "Fuel Oil No 1 [kBtuh]";
+            columnHead(8) = "Fuel Oil No 2 [kBtuh]";
+            columnHead(9) = "Propane [kBtuh]";
+            columnHead(10) = "Other Fuel 1 [kBtuh]";
+            columnHead(11) = "Other Fuel 2 [kBtuh]";
+            columnHead(12) = "District Cooling [kBtuh]";
+            {
+                if (distrHeatSelected == 4) {
+                    columnHead(13) = "District Heating [kBtuh]";
+                } else if (distrHeatSelected == 5) {
+                    columnHead(13) = "Steam [kBtuh]";
+                }
+            }
+            columnHead(14) = "Water [gal/min]";
+        }
+        else {
             columnHead(1) = "Subcategory";
             columnHead(2) = "Electricity [W]";
             columnHead(3) = "Natural Gas [W]";
@@ -10577,6 +10915,12 @@ void WriteCompCostTable(EnergyPlusData &state)
             LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWCCT, m2_unitName);
             state.dataOutRptTab->m2_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWCCT, 1.0);
             rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/ft2)";
+        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+            std::string const SIunit = "[m2]";
+            std::string m2_unitName;
+            LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWCCT, m2_unitName);
+            state.dataOutRptTab->m2_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWCCT, 1.0);
+            rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/ft2)";
         } else {
             rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/m2)";
             state.dataOutRptTab->m2_unitConv = 1.0;
@@ -10724,7 +11068,26 @@ void WriteCompCostTable(EnergyPlusData &state)
                     tableBody(4, item) = state.dataCostEstimateManager->CostLineItem(item).Units;
                     tableBody(5, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).ValuePer, 2);
                 }
-            } else {
+            } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+                std::string IPunitName;
+                LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, state.dataOutRptTab->unitConvIndexWCCT, IPunitName);
+                if (state.dataOutRptTab->unitConvIndexWCCT != 0) {
+                    Real64 const IPqty =
+                        ConvertIP(state, state.dataOutRptTab->unitConvIndexWCCT, state.dataCostEstimateManager->CostLineItem(item).Qty);
+                    tableBody(3, item) = RealToStr(IPqty, 2);
+                    tableBody(4, item) = IPunitName;
+                    Real64 const IPsingleValue = ConvertIP(state, state.dataOutRptTab->unitConvIndexWCCT, 1.0);
+                    if (IPsingleValue != 0.0) {
+                        Real64 const IPvaluePer = state.dataCostEstimateManager->CostLineItem(item).ValuePer / IPsingleValue;
+                        tableBody(5, item) = RealToStr(IPvaluePer, 2);
+                    }
+                } else {
+                    tableBody(3, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).Qty, 2);
+                    tableBody(4, item) = state.dataCostEstimateManager->CostLineItem(item).Units;
+                    tableBody(5, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).ValuePer, 2);
+                }
+            } 
+            else {
                 tableBody(3, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).Qty, 2);
                 tableBody(4, item) = state.dataCostEstimateManager->CostLineItem(item).Units;
                 tableBody(5, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).ValuePer, 2);
@@ -10875,7 +11238,22 @@ void WriteVeriSumTable(EnergyPlusData &state)
             SIunit = "[W/m2]";
             LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->Wm2_unitName);
             state.dataOutRptTab->Wm2_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
-        } else {
+        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+            std::string SIunit;
+            SIunit = "[m]";
+            LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->m_unitName);
+            state.dataOutRptTab->m_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
+            SIunit = "[m2]";
+            LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->m2_unitName);
+            state.dataOutRptTab->m2_unitConvWVST = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
+            SIunit = "[m3]";
+            LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->m3_unitName);
+            state.dataOutRptTab->m3_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
+            SIunit = "[W/m2]";
+            LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->Wm2_unitName);
+            state.dataOutRptTab->Wm2_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
+        }
+        else {
             state.dataOutRptTab->m_unitName = "[m]";
             state.dataOutRptTab->m_unitConv = 1.0;
             state.dataOutRptTab->m2_unitName = "[m2]";
@@ -12154,6 +12532,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
 
     if (unitsStyle_cur == UnitsStyle::InchPound) {
         degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
+    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+        degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
     } else {
         degreeHourConversion = 1.0;
     }
@@ -12168,6 +12548,12 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
     columnWidth = 10;
     Array1D_string columnHead(5);
     if (unitsStyle_cur == UnitsStyle::InchPound) {
+        columnHead(1) = "Safe (≤ 80.1°F) [hr]";
+        columnHead(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
+        columnHead(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
+        columnHead(4) = "Danger (> 102.9, ≤ 125.1°F) [hr]";
+        columnHead(5) = "Extreme Danger (> 125.1°F) [hr]";
+    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
         columnHead(1) = "Safe (≤ 80.1°F) [hr]";
         columnHead(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
         columnHead(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
@@ -12304,6 +12690,12 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
             columnHead(3) = "SET ≤ 54.0°F Occupied Degree-Hours [°F·hr]";
             columnHead(4) = "Longest SET ≤ 54.0°F Duration for Occupied Period [hr]";
             columnHead(5) = "Start Time of the Longest SET ≤ 54.0°F Duration for Occupied Period ";
+        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+            columnHead(1) = "SET ≤ 54.0°F Degree-Hours [°F·hr]";
+            columnHead(2) = "SET ≤ 54.0°F Occupant-Weighted Degree-Hours [°F·hr]";
+            columnHead(3) = "SET ≤ 54.0°F Occupied Degree-Hours [°F·hr]";
+            columnHead(4) = "Longest SET ≤ 54.0°F Duration for Occupied Period [hr]";
+            columnHead(5) = "Start Time of the Longest SET ≤ 54.0°F Duration for Occupied Period ";
         } else {
             columnHead(1) = "SET ≤ 12.2°C Degree-Hours [°C·hr]";
             columnHead(2) = "SET ≤ 12.2°C Occupant-Weighted Degree-Hours [°C·hr]";
@@ -12330,6 +12722,12 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                           degreeHourConversion);
 
         if (unitsStyle_cur == UnitsStyle::InchPound) {
+            columnHead(1) = "SET > 86°F Degree-Hours [°F·hr]";
+            columnHead(2) = "SET > 86°F Occupant-Weighted Degree-Hours [°F·hr]";
+            columnHead(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
+            columnHead(4) = "Longest SET > 86°F Duration for Occupied Period [hr]";
+            columnHead(5) = "Start Time of the Longest SET > 86°F Duration for Occupied Period";
+        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
             columnHead(1) = "SET > 86°F Degree-Hours [°F·hr]";
             columnHead(2) = "SET > 86°F Occupant-Weighted Degree-Hours [°F·hr]";
             columnHead(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
@@ -12403,6 +12801,13 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
     tableName = "Unmet Degree-Hours";
 
     if (unitsStyle_cur == UnitsStyle::InchPound) {
+        int indexUnitConv;
+        std::string curUnits;
+        for (int i = 1; i < columnNumUnmetDegHr; i++) {
+            LookupSItoIP(state, columnHeadUnmetDegHr(i), indexUnitConv, curUnits);
+            columnHeadUnmetDegHr(i) = curUnits;
+        }
+    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
         int indexUnitConv;
         std::string curUnits;
         for (int i = 1; i < columnNumUnmetDegHr; i++) {
@@ -12922,6 +13327,8 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
     UnitsStyle unitsStyle_cur = ort->unitsStyle;
     if (unitsStyle_cur == UnitsStyle::InchPound) {
         degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
+    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+        degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
     } else {
         degreeHourConversion = 1.0;
     }
@@ -12938,6 +13345,12 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
     Array1D_string columnHeadStr(numColumnThermalTbl);
 
     if (unitsStyle_cur == UnitsStyle::InchPound) {
+        columnHeadStr(1) = "Safe (≤ 80.1°F) [hr]";
+        columnHeadStr(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
+        columnHeadStr(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
+        columnHeadStr(4) = "Danger (> 102.9, ≤ 125.1°F) [hr]";
+        columnHeadStr(5) = "Extreme Danger (> 125.1°F) [hr]";
+    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
         columnHeadStr(1) = "Safe (≤ 80.1°F) [hr]";
         columnHeadStr(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
         columnHeadStr(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
@@ -13014,6 +13427,12 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
             columnHeadStr(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
             columnHeadStr(4) = "Longest SET > 86°F Duration for Occupied Period [hr]";
             columnHeadStr(5) = "Start Time of the Longest SET > 86°F Duration for Occupied Period";
+        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+            columnHeadStr(1) = "SET > 86°F Degree-Hours [°F·hr]";
+            columnHeadStr(2) = "SET > 86°F Occupant-Weighted Degree-Hours [°F·hr]";
+            columnHeadStr(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
+            columnHeadStr(4) = "Longest SET > 86°F Duration for Occupied Period [hr]";
+            columnHeadStr(5) = "Start Time of the Longest SET > 86°F Duration for Occupied Period";
         } else {
             columnHeadStr(1) = "SET > 30°C Degree-Hours [°C·hr]";
             columnHeadStr(2) = "SET > 30°C Occupant-Weighted Degree-Hours [°C·hr]";
@@ -13069,6 +13488,13 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
     columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]";
 
     if (unitsStyle_cur == UnitsStyle::InchPound) {
+        int indexUnitConv;
+        std::string curUnits;
+        for (int i = 1; i < numColumnUnmetDegreeHourTbl; i++) {
+            LookupSItoIP(state, columnHeadUnmetDegHr(i), indexUnitConv, curUnits);
+            columnHeadUnmetDegHr(i) = curUnits;
+        }
+    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
         int indexUnitConv;
         std::string curUnits;
         for (int i = 1; i < numColumnUnmetDegreeHourTbl; i++) {
@@ -13339,6 +13765,9 @@ void WriteHeatEmissionTable(EnergyPlusData &state)
             if (unitsStyle_cur == UnitsStyle::InchPound) {
                 rowHead(1) = "Heat Emissions [kBtu]";
                 energyconversion = 1.0 / getSpecificUnitDivider(state, "GJ", "kBtu"); // 1054351.84 J to kBtu
+            } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+                rowHead(1) = "Heat Emissions [kBtu]";
+                energyconversion = 1.0 / getSpecificUnitDivider(state, "GJ", "kBtu"); // 1054351.84 J to kBtu
             } else if (unitsStyle_cur == UnitsStyle::JtoGJ) {
                 rowHead(1) = "Heat Emissions [GJ]";
                 energyconversion = 1.0;
@@ -13534,6 +13963,9 @@ void WritePredefinedTables(EnergyPlusData &state)
                                 if (unitsStyle_cur == UnitsStyle::InchPound) {
                                     LookupSItoIP(state, colTagWithSI, indexUnitConv, curColTag);
                                     colUnitConv(countColumn) = indexUnitConv;
+                                } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+                                    LookupSItoIP(state, colTagWithSI, indexUnitConv, curColTag);
+                                    colUnitConv(countColumn) = indexUnitConv;
                                 } else if (unitsStyle_cur == UnitsStyle::JtoKWH) {
                                     LookupJtokWH(state, colTagWithSI, indexUnitConv, curColTag);
                                     colUnitConv(countColumn) = indexUnitConv;
@@ -13566,10 +13998,11 @@ void WritePredefinedTables(EnergyPlusData &state)
                                     }
                                 }
                                 // finally assign the entry to the place in the table body
-                                if (unitsStyle_cur == UnitsStyle::InchPound || unitsStyle_cur == UnitsStyle::JtoKWH) {
+                                if (unitsStyle_cur == UnitsStyle::InchPound || unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity ||
+                                    unitsStyle_cur == UnitsStyle::JtoKWH) {
                                     int columnUnitConv = colUnitConv(colCurrent);
                                     if (UtilityRoutines::SameString(state.dataOutRptPredefined->subTable(jSubTable).name, "SizingPeriod:DesignDay") &&
-                                        unitsStyle_cur == UnitsStyle::InchPound) {
+                                        (unitsStyle_cur == UnitsStyle::InchPound || unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
                                         if (UtilityRoutines::SameString(columnHead(colCurrent), "Humidity Value")) {
                                             std::string repTableTag;
                                             LookupSItoIP(state,
@@ -13774,6 +14207,10 @@ void WriteComponentSizing(EnergyPlusData &state)
                     LookupSItoIP(
                         state, state.dataOutRptTab->curColHeadWithSI, state.dataOutRptTab->indexUnitConvWCS, state.dataOutRptTab->curColHead);
                     colUnitConv(jUnique) = state.dataOutRptTab->indexUnitConvWCS;
+                } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+                    LookupSItoIP(
+                        state, state.dataOutRptTab->curColHeadWithSI, state.dataOutRptTab->indexUnitConvWCS, state.dataOutRptTab->curColHead);
+                    colUnitConv(jUnique) = state.dataOutRptTab->indexUnitConvWCS;
                 } else {
                     state.dataOutRptTab->curColHead = state.dataOutRptTab->curColHeadWithSI;
                     colUnitConv(jUnique) = 0;
@@ -13806,6 +14243,12 @@ void WriteComponentSizing(EnergyPlusData &state)
                     if ((foundDesc >= 1) && (foundObj >= 1)) {
                         state.dataOutRptTab->curValueSIWCS = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).valField;
                         if (unitsStyle_cur == UnitsStyle::InchPound) {
+                            if (colUnitConv(foundDesc) != 0) {
+                                state.dataOutRptTab->curValueWCS = ConvertIP(state, colUnitConv(foundDesc), state.dataOutRptTab->curValueSIWCS);
+                            } else {
+                                state.dataOutRptTab->curValueWCS = state.dataOutRptTab->curValueSIWCS;
+                            }
+                        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
                             if (colUnitConv(foundDesc) != 0) {
                                 state.dataOutRptTab->curValueWCS = ConvertIP(state, colUnitConv(foundDesc), state.dataOutRptTab->curValueSIWCS);
                             } else {
@@ -14113,7 +14556,8 @@ void WriteEioTables(EnergyPlusData &state)
                             std::vector<std::string> dataFields = splitCommaString(bodyLine);
                             rowHead(rowNum) = fmt::to_string(rowNum);
                             for (int iCol = 1; iCol <= numCols && iCol < int(dataFields.size()); ++iCol) {
-                                if (unitsStyle_cur == UnitsStyle::InchPound || unitsStyle_cur == UnitsStyle::JtoKWH) {
+                                if (unitsStyle_cur == UnitsStyle::InchPound || unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity ||
+                                    unitsStyle_cur == UnitsStyle::JtoKWH) {
                                     if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) { // if it is a number that has a conversion
                                         int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
                                         Real64 convertedVal = ConvertIP(state, colUnitConv(iCol), StrToReal(dataFields[iCol]));
@@ -14173,6 +14617,8 @@ int unitsFromHeading(EnergyPlusData &state, std::string &heading)
     int unitConv = 0;
     if (ort->unitsStyle == UnitsStyle::InchPound) {
         LookupSItoIP(state, heading, unitConv, curHeading);
+    } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+        LookupSItoIP(state, heading, unitConv, curHeading);
     } else if (ort->unitsStyle == UnitsStyle::JtoKWH) {
         LookupJtokWH(state, heading, unitConv, curHeading);
     } else {
@@ -14190,6 +14636,8 @@ int unitsFromHeading(EnergyPlusData &state, std::string &heading, UnitsStyle uni
     std::string curHeading = "";
     int unitConv = 0;
     if (unitsStyle_para == UnitsStyle::InchPound) {
+        LookupSItoIP(state, heading, unitConv, curHeading);
+    } else if (unitsStyle_para == UnitsStyle::InchPoundExceptElectricity) {
         LookupSItoIP(state, heading, unitConv, curHeading);
     } else if (unitsStyle_para == UnitsStyle::JtoKWH) {
         LookupJtokWH(state, heading, unitConv, curHeading);
@@ -16138,6 +16586,8 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
 
     if (ort->unitsStyle != UnitsStyle::InchPound) {
         return;
+    } else if (ort->unitsStyle != UnitsStyle::InchPoundExceptElectricity) {
+        return;
     }
 
     Real64 const powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
@@ -16196,6 +16646,55 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
 void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, UnitsStyle unitsStyle_para)
 {
     if (unitsStyle_para == UnitsStyle::InchPound) {
+        Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
+        Real64 areaConversion = getSpecificUnitMultiplier(state, "m2", "ft2");
+        Real64 powerPerAreaConversion = getSpecificUnitMultiplier(state, "W/m2", "Btu/h-ft2");
+        Real64 airFlowConversion = getSpecificUnitMultiplier(state, "m3/s", "ft3/min");
+        Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier(state, "m3/s-m2", "ft3/min-ft2");
+        Real64 powerPerFlowLiquidConversion = getSpecificUnitMultiplier(state, "W-s/m3", "W-min/gal");
+        for (int row = 1; row <= LoadCompRow::GrdTot; ++row) {
+            for (int col = 1; col <= LoadCompCol::Total; ++col) {
+                if (compLoadTotal.cellUsed(col, row)) {
+                    compLoadTotal.cells(col, row) *= powerConversion;
+                }
+            }
+            if (compLoadTotal.cellUsed(LoadCompCol::PerArea, row)) {
+                compLoadTotal.cells(LoadCompCol::PerArea, row) *= powerConversion;
+            }
+            if (compLoadTotal.cellUsed(LoadCompCol::Area, row)) {
+                compLoadTotal.cells(LoadCompCol::Area, row) *= areaConversion;
+            }
+            if (compLoadTotal.cellUsed(LoadCompCol::PerArea, row)) {
+                compLoadTotal.cells(LoadCompCol::PerArea, row) *= powerPerAreaConversion;
+            }
+        }
+        int tempConvIndx = getSpecificUnitIndex(state, "C", "F");
+        compLoadTotal.outsideDryBulb = ConvertIP(state, tempConvIndx, compLoadTotal.outsideDryBulb);
+        compLoadTotal.outsideWetBulb = ConvertIP(state, tempConvIndx, compLoadTotal.outsideWetBulb);
+        compLoadTotal.zoneDryBulb = ConvertIP(state, tempConvIndx, compLoadTotal.zoneDryBulb);
+        compLoadTotal.peakDesSensLoad *= powerConversion;
+
+        compLoadTotal.supAirTemp = ConvertIP(state, tempConvIndx, compLoadTotal.supAirTemp);
+        compLoadTotal.mixAirTemp = ConvertIP(state, tempConvIndx, compLoadTotal.mixAirTemp);
+        compLoadTotal.mainFanAirFlow *= airFlowConversion;
+        compLoadTotal.outsideAirFlow *= airFlowConversion;
+        compLoadTotal.designPeakLoad *= powerConversion;
+        compLoadTotal.diffDesignPeak *= powerConversion;
+
+        compLoadTotal.estInstDelSensLoad *= powerConversion;
+        compLoadTotal.diffPeakEst *= powerConversion;
+
+        compLoadTotal.airflowPerFlrArea *= airFlowPerAreaConversion;
+        if (powerConversion != 0.) {
+            compLoadTotal.airflowPerTotCap = compLoadTotal.airflowPerTotCap * airFlowPerAreaConversion / powerConversion;
+            compLoadTotal.areaPerTotCap = compLoadTotal.areaPerTotCap * areaConversion / powerConversion;
+        }
+        if (areaConversion != 0.) {
+            compLoadTotal.totCapPerArea = compLoadTotal.totCapPerArea * powerConversion / areaConversion;
+        }
+        compLoadTotal.chlPumpPerFlow *= powerPerFlowLiquidConversion;
+        compLoadTotal.cndPumpPerFlow *= powerPerFlowLiquidConversion;
+    } else if (unitsStyle_para == UnitsStyle::InchPoundExceptElectricity) {
         Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
         Real64 areaConversion = getSpecificUnitMultiplier(state, "m2", "ft2");
         Real64 powerPerAreaConversion = getSpecificUnitMultiplier(state, "W/m2", "Btu/h-ft2");
@@ -16377,6 +16876,15 @@ void OutputCompLoadSummary(EnergyPlusData &state,
             columnHead(LoadCompCol::Perc) = "%Grand Total";
             columnHead(LoadCompCol::Area) = "Related Area [m2]";
             columnHead(LoadCompCol::PerArea) = "Total per Area [W/m2]";
+        } else if (unitsStyle_para != UnitsStyle::InchPoundExceptElectricity) {
+            columnHead(LoadCompCol::SensInst) = "Sensible - Instant [W]";
+            columnHead(LoadCompCol::SensDelay) = "Sensible - Delayed [W]";
+            columnHead(LoadCompCol::SensRA) = "Sensible - Return Air [W]";
+            columnHead(LoadCompCol::Latent) = "Latent [W]";
+            columnHead(LoadCompCol::Total) = "Total [W]";
+            columnHead(LoadCompCol::Perc) = "%Grand Total";
+            columnHead(LoadCompCol::Area) = "Related Area [m2]";
+            columnHead(LoadCompCol::PerArea) = "Total per Area [W/m2]";
         } else {
             columnHead(LoadCompCol::SensInst) = "Sensible - Instant [Btu/h]";
             columnHead(LoadCompCol::SensDelay) = "Sensible - Delayed [Btu/h]";
@@ -16418,6 +16926,25 @@ void OutputCompLoadSummary(EnergyPlusData &state,
 
         columnHead(1) = "Value";
         if (unitsStyle_para != UnitsStyle::InchPound) {
+            rowHead(1) = "Time of Peak Load";
+            rowHead(2) = "Outside Dry Bulb Temperature [C]";
+            rowHead(3) = "Outside Wet Bulb Temperature [C]";
+            rowHead(4) = "Outside Humidity Ratio at Peak [kgWater/kgDryAir]";
+            rowHead(5) = "Zone Dry Bulb Temperature [C]";
+            rowHead(6) = "Zone Relative Humidity [%]";
+            rowHead(7) = "Zone Humidity Ratio at Peak [kgWater/kgDryAir]";
+
+            rowHead(8) = "Supply Air Temperature [C]";
+            rowHead(9) = "Mixed Air Temperature [C]";
+            rowHead(10) = "Main Fan Air Flow [m3/s]";
+            rowHead(11) = "Outside Air Flow [m3/s]";
+            rowHead(12) = "Peak Sensible Load with Sizing Factor [W]";
+            rowHead(13) = "Difference Due to Sizing Factor [W]";
+
+            rowHead(14) = "Peak Sensible Load [W]";
+            rowHead(15) = "Estimated Instant + Delayed Sensible Load [W]";
+            rowHead(16) = "Difference Between Peak and Estimated Sensible Load [W]";
+        } else if (unitsStyle_para != UnitsStyle::InchPoundExceptElectricity) {
             rowHead(1) = "Time of Peak Load";
             rowHead(2) = "Outside Dry Bulb Temperature [C]";
             rowHead(3) = "Outside Wet Bulb Temperature [C]";
@@ -16507,6 +17034,15 @@ void OutputCompLoadSummary(EnergyPlusData &state,
 
         columnHead(1) = "Value";
         if (unitsStyle_para != UnitsStyle::InchPound) {
+            rowHead(1) = "Outside Air Fraction [fraction]";
+            rowHead(2) = "Airflow per Floor Area [m3/s-m2]";
+            rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
+            rowHead(4) = "Floor Area per Total Capacity [m2/W]";
+            rowHead(5) = "Total Capacity per Floor Area [W/m2]";
+            // rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]"; // facility only
+            // rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]"; // facility only
+            rowHead(6) = "Number of People";
+        } else if (unitsStyle_para != UnitsStyle::InchPoundExceptElectricity) {
             rowHead(1) = "Outside Air Fraction [fraction]";
             rowHead(2) = "Airflow per Floor Area [m3/s-m2]";
             rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
