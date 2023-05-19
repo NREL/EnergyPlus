@@ -1065,7 +1065,7 @@ namespace HeatBalFiniteDiffManager {
 
     int numNodesInMaterialLayer(EnergyPlusData &state, std::string const &surfName, std::string const &matName)
     {
-        for (auto &surface : state.dataSurface->Surface) {
+        for (auto const &surface : state.dataSurface->Surface) {
             if (surface.Name == surfName) {
                 int constrNum = surface.Construction;
                 for (int lay = 1; lay <= state.dataConstruction->Construct(constrNum).TotLayers; ++lay) {
