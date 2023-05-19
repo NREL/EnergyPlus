@@ -1139,7 +1139,7 @@ namespace HeatBalFiniteDiffManager {
         SurfTempInTmp = 0.0;
         TempSurfOutTmp = 0.0;
 
-        int const Delt(constructFD.DeltaTime); //   (seconds)
+        int const Delt = constructFD.DeltaTime; //   (seconds)
 
         // Aliases
         auto &surfaceFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf);
@@ -1155,7 +1155,6 @@ namespace HeatBalFiniteDiffManager {
         auto &EnthOld(surfaceFD.EnthOld);
         auto &EnthNew(surfaceFD.EnthNew);
         auto &EnthLast(surfaceFD.EnthLast);
-        auto &GSloopCounter(surfaceFD.GSloopCounter);
         auto &MaxNodeDelTemp(surfaceFD.MaxNodeDelTemp);
 
         Real64 HMovInsul = 0;
@@ -1213,7 +1212,7 @@ namespace HeatBalFiniteDiffManager {
 
             } // End of Gauss Seidell iteration loop
 
-            GSloopCounter = GSiter; // outputs GSloop iterations, useful for pinpointing stability issues with condFD
+            surfaceFD.GSloopCounter = GSiter; // outputs GSloop iterations, useful for pinpointing stability issues with condFD
             if (state.dataHeatBal->CondFDRelaxFactor != 1.0) {
                 // Apply Relaxation factor for stability, use current (TDT) and previous (TDreport) temperature values
                 //   to obtain the actual temperature that is going to be exported/use
