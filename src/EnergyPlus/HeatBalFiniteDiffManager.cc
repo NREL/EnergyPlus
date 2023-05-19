@@ -95,10 +95,6 @@ namespace HeatBalFiniteDiffManager {
     // The MFD moisture balance method
     //  C. O. Pedersen, Enthalpy Formulation of conduction heat transfer problems
     //    involving latent heat, Simulation, Vol 18, No. 2, February 1972
-
-    // Using/Aliasing
-    using DataHeatBalSurface::MinSurfaceTempLimit;
-    using DataSurfaces::Ground;
     // Fan system Source/Sink heat value, and source/sink location temp from CondFD
 
     void ManageHeatBalFiniteDiff(EnergyPlusData &state,
@@ -519,10 +515,6 @@ namespace HeatBalFiniteDiffManager {
         // This routine performs the original allocate, inits and setup output variables for the
         // module.
 
-        // Using/Aliasing
-        using DataHeatBalance::HighDiffusivityThreshold;
-        using DataHeatBalance::ThinMaterialLayerThreshold;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 dxn; // Intermediate calculation of nodal spacing. This is the full dx. There is
         // a half dxn thick node at each surface. dxn is the "capacitor" spacing.
@@ -699,7 +691,7 @@ namespace HeatBalFiniteDiffManager {
                     mAlpha = 0.0;
 
                     // check for Material layers that are too thin and highly conductivity (not appropriate for surface models)
-                    if (Alpha > HighDiffusivityThreshold) {
+                    if (Alpha > DataHeatBalance::HighDiffusivityThreshold) {
                         DeltaTimestep = state.dataGlobal->TimeStepZoneSec;
                         ThicknessThreshold = std::sqrt(Alpha * DeltaTimestep * 3.0);
                         if (thisMaterial->Thickness < ThicknessThreshold) {
@@ -715,12 +707,13 @@ namespace HeatBalFiniteDiffManager {
                             ShowContinueError(state, format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
                             ShowContinueError(
                                 state, format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
-                            if (thisMaterial->Thickness < ThinMaterialLayerThreshold) {
+                            if (thisMaterial->Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
                                 ShowContinueError(
                                     state, format("Material may be too thin to be modeled well, thickness = {:.5R} [m]", thisMaterial->Thickness));
                                 ShowContinueError(
                                     state,
-                                    format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThinMaterialLayerThreshold));
+                                                  format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
+                                                         DataHeatBalance::ThinMaterialLayerThreshold));
                             }
                             ShowFatalError(state, "Preceding conditions cause termination.");
                         }
@@ -1294,8 +1287,6 @@ namespace HeatBalFiniteDiffManager {
         // the initializations for the Finite Difference calculations
         // of each construction.
 
-        using General::ScanForReports;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool DoReport;
 
@@ -1312,7 +1303,7 @@ namespace HeatBalFiniteDiffManager {
               state.dataHeatBal->CondFDRelaxFactorInput,
               state.dataHeatBal->MaxAllowedDelTempCondFD);
 
-        ScanForReports(state, "Constructions", DoReport, "Constructions");
+        General::ScanForReports(state, "Constructions", DoReport, "Constructions");
 
         if (DoReport) {
 
@@ -1502,8 +1493,6 @@ namespace HeatBalFiniteDiffManager {
         //                      November 2011 P. Tabares fixed problems PCM stability problems
         //       RE-ENGINEERED  Curtis Pedersen 2006
 
-        // Using/Aliasing
-        using DataSurfaces::OtherSideCondModeledExt;
         auto &SurfaceFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD;
         auto &ConstructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD;
 
@@ -1513,7 +1502,7 @@ namespace HeatBalFiniteDiffManager {
         Real64 Tsky;
         Real64 QRadSWOutFD;             // Short wave radiation absorbed on outside of opaque surface
         Real64 QRadSWOutMvInsulFD(0.0); // SW radiation at outside of Movable Insulation
-        if (surface_ExtBoundCond == OtherSideCondModeledExt) {
+        if (surface_ExtBoundCond == DataSurfaces::OtherSideCondModeledExt) {
             // CR8046 switch modeled rad temp for sky temp.
             Tsky = state.dataSurface->OSCM(surface.OSCMPtr).TRad;
             QRadSWOutFD = 0.0; // eliminate incident shortwave on underlying surface
@@ -1523,7 +1512,7 @@ namespace HeatBalFiniteDiffManager {
             Tsky = state.dataEnvrn->SkyTemp;
         }
 
-        if (surface_ExtBoundCond == Ground || state.dataEnvrn->IsRain) {
+        if (surface_ExtBoundCond == DataSurfaces::Ground || state.dataEnvrn->IsRain) {
             TDT(i) = TT(i) = state.dataMstBal->TempOutsideAirFD(Surf);
             RhoT(i) = state.dataMstBal->RhoVaporAirOut(Surf);
             SurfaceFD(Surf).CpDelXRhoS1(i) = 0.0;  // Outside face  does not have an outer half node
@@ -1738,8 +1727,8 @@ namespace HeatBalFiniteDiffManager {
                 } // R layer or Regular layer
 
                 // Limit clipping
-                if (TDT_i < MinSurfaceTempLimit) {
-                    TDT_i = MinSurfaceTempLimit;
+                if (TDT_i < DataHeatBalSurface::MinSurfaceTempLimit) {
+                    TDT_i = DataHeatBalSurface::MinSurfaceTempLimit;
                 } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
                     TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
                 }
@@ -1875,8 +1864,8 @@ namespace HeatBalFiniteDiffManager {
         }
 
         // Limit clipping
-        if (TDT_i < MinSurfaceTempLimit) {
-            TDT_i = MinSurfaceTempLimit;
+        if (TDT_i < DataHeatBalSurface::MinSurfaceTempLimit) {
+            TDT_i = DataHeatBalSurface::MinSurfaceTempLimit;
         } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
             TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
         }
@@ -2088,8 +2077,8 @@ namespace HeatBalFiniteDiffManager {
                     }
 
                     // Limit clipping
-                    if (TDT_i < MinSurfaceTempLimit) {
-                        TDT_i = MinSurfaceTempLimit;
+                    if (TDT_i < DataHeatBalSurface::MinSurfaceTempLimit) {
+                        TDT_i = DataHeatBalSurface::MinSurfaceTempLimit;
                     } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
                         TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
                     }
@@ -2142,8 +2131,8 @@ namespace HeatBalFiniteDiffManager {
                     }
 
                     // Limit clipping
-                    if (TDT_i < MinSurfaceTempLimit) {
-                        TDT_i = MinSurfaceTempLimit;
+                    if (TDT_i < DataHeatBalSurface::MinSurfaceTempLimit) {
+                        TDT_i = DataHeatBalSurface::MinSurfaceTempLimit;
                     } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
                         TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
                     }
@@ -2249,8 +2238,8 @@ namespace HeatBalFiniteDiffManager {
                     }
 
                     // Limit clipping
-                    if (TDT_i < MinSurfaceTempLimit) {
-                        TDT_i = MinSurfaceTempLimit;
+                    if (TDT_i < DataHeatBalSurface::MinSurfaceTempLimit) {
+                        TDT_i = DataHeatBalSurface::MinSurfaceTempLimit;
                     } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
                         TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
                     }
@@ -2431,8 +2420,8 @@ namespace HeatBalFiniteDiffManager {
 
             } // Regular or R layer
               // Limit clipping
-            if (TDT_i < MinSurfaceTempLimit) {
-                TDT_i = MinSurfaceTempLimit;
+            if (TDT_i < DataHeatBalSurface::MinSurfaceTempLimit) {
+                TDT_i = DataHeatBalSurface::MinSurfaceTempLimit;
             } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
                 TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
             }
@@ -2468,7 +2457,7 @@ namespace HeatBalFiniteDiffManager {
 
         if (state.dataGlobal->WarmupFlag) ++state.dataHeatBalFiniteDiffMgr->WarmupSurfTemp;
         if (!state.dataGlobal->WarmupFlag || state.dataHeatBalFiniteDiffMgr->WarmupSurfTemp > 10 || state.dataGlobal->DisplayExtraWarnings) {
-            if (CheckTemperature < MinSurfaceTempLimit) {
+            if (CheckTemperature < DataHeatBalSurface::MinSurfaceTempLimit) {
                 if (state.dataSurface->SurfLowTempErrCount(SurfNum) == 0) {
                     ShowSevereMessage(state,
                                       format("Temperature (low) out of bounds [{:.2R}] for zone=\"{}\", for surface=\"{}\"",
