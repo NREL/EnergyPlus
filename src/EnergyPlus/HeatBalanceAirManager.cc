@@ -87,13 +87,10 @@ namespace EnergyPlus::HeatBalanceAirManager {
 //       AUTHOR         Richard J. Liesen
 //       DATE WRITTEN   February 1998
 //       MODIFIED       May-July 2000 Joe Huang for Comis Link
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // To encapsulate the data and algorithms required to
 // manage the air simluation heat balance on the building.
-
-// METHODOLOGY EMPLOYED:
 
 // REFERENCES:
 // The heat balance method is outlined in the "Tarp Alogorithms Manual"
@@ -160,8 +157,6 @@ void ManageAirHeatBalance(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   February 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine manages the heat air balance method of calculating
@@ -190,8 +185,6 @@ void GetAirHeatBalanceInput(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   February 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is the main routine to call other input routines
@@ -200,7 +193,7 @@ void GetAirHeatBalanceInput(EnergyPlusData &state)
     // Uses the status flags to trigger events.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool ErrorsFound(false);
+    bool ErrorsFound = false;
 
     GetAirFlowFlag(state, ErrorsFound);
 
@@ -221,7 +214,6 @@ void GetAirFlowFlag(EnergyPlusData &state, bool &ErrorsFound) // Set to true if 
     //       AUTHOR         Garrett Westmacott
     //       DATE WRITTEN   February 2000
     //       MODIFIED       Oct 2003, FCW: Change "Infiltration-Air Change Rate" from Sum to State
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine calls the routine to get simple air flow input data.
@@ -249,7 +241,6 @@ void SetZoneMassConservationFlag(EnergyPlusData &state)
     // SUBROUTINE INFORMATION :
     // AUTHOR         Bereket Nigusse, FSEC
     // DATE WRITTEN   February 2014
-    // MODIFIED
 
     // PURPOSE OF THIS SUBROUTINE :
     // This subroutine sets the zone mass conservation flag to true.
@@ -286,20 +277,18 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     using SystemAvailabilityManager::GetHybridVentilationControlStatus;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 constexpr VentilTempLimit(100.0);                                    // degrees Celsius
-    Real64 constexpr MixingTempLimit(100.0);                                    // degrees Celsius
-    Real64 constexpr VentilWSLimit(40.0);                                       // m/s
+    Real64 constexpr VentilTempLimit = 100.0;                                   // degrees Celsius
+    Real64 constexpr MixingTempLimit = 100.0;                                   // degrees Celsius
+    Real64 constexpr VentilWSLimit = 40.0;                                      // m/s
     static constexpr std::string_view RoutineName("GetSimpleAirModelInputs: "); // include trailing blank space
     // Refrigeration Door Mixing Protection types, factors used to moderate mixing flow.
-    Real64 constexpr RefDoorNone(0.0);
-    Real64 constexpr RefDoorAirCurtain(0.5);
-    Real64 constexpr RefDoorStripCurtain(0.9);
+    Real64 constexpr RefDoorNone = 0.0;
+    Real64 constexpr RefDoorAirCurtain = 0.5;
+    Real64 constexpr RefDoorStripCurtain = 0.9;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlpha;  // Number of Alphas for each GetobjectItem call
     int NumNumber; // Number of Numbers for each GetobjectItem call
-    int maxAlpha;  // max of Alphas for allocation
-    int maxNumber; // max of Numbers for allocation
     int NumArgs;
     int IOStat;
     Array1D_string cAlphaFieldNames;
@@ -308,7 +297,6 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     Array1D_bool lAlphaFieldBlanks;
     Array1D_string cAlphaArgs;
     Array1D<Real64> rNumericArgs;
-    std::string cCurrentModuleObject;
 
     Array1D_bool RepVarSet;
 
@@ -423,10 +411,10 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                         OutputProcessor::SOVStoreType::Summed,
                         "Environment");
 
-    cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
+    std::string cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
-    maxAlpha = NumAlpha;
-    maxNumber = NumNumber;
+    int maxAlpha = NumAlpha;
+    int maxNumber = NumNumber;
     cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumArgs, NumAlpha, NumNumber);
     maxAlpha = max(NumAlpha, maxAlpha);
@@ -486,10 +474,11 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
         bool IsNotOK = false;
-        state.dataHeatBal->ZoneAirBalance(Loop).Name = cAlphaArgs(1);
-        state.dataHeatBal->ZoneAirBalance(Loop).ZoneName = cAlphaArgs(2);
-        state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
-        if (state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr == 0) {
+        auto &thisZoneAirBalance = state.dataHeatBal->ZoneAirBalance(Loop);
+        thisZoneAirBalance.Name = cAlphaArgs(1);
+        thisZoneAirBalance.ZoneName = cAlphaArgs(2);
+        thisZoneAirBalance.ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+        if (thisZoneAirBalance.ZonePtr == 0) {
             ShowSevereError(state,
                             format(R"({}{}="{}", invalid (not found) {}="{}".)",
                                    RoutineName,
@@ -499,7 +488,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                    cAlphaArgs(2)));
             ErrorsFound = true;
         } else {
-            state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).zoneOABalanceIndex = Loop;
+            state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).zoneOABalanceIndex = Loop;
         }
         GlobalNames::IntraObjUniquenessCheck(
             state, cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), state.dataHeatBalAirMgr->UniqueZoneNames, IsNotOK);
@@ -516,11 +505,11 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
 
         {
-            state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = static_cast<AirBalance>(
+            thisZoneAirBalance.BalanceMethod = static_cast<AirBalance>(
                 getEnumerationValue(DataHeatBalance::AirBalanceTypeNamesUC,
                                     UtilityRoutines::MakeUPPERCase(cAlphaArgs(3)))); // Air balance method type character input-->convert to enum
-            if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Invalid) {
-                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
+            if (thisZoneAirBalance.BalanceMethod == AirBalance::Invalid) {
+                thisZoneAirBalance.BalanceMethod = AirBalance::None;
                 ShowWarningError(state,
                                  format("{}{} = {} not valid choice for {}={}",
                                         RoutineName,
@@ -532,7 +521,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             }
         }
 
-        state.dataHeatBal->ZoneAirBalance(Loop).InducedAirRate = rNumericArgs(1);
+        thisZoneAirBalance.InducedAirRate = rNumericArgs(1);
         if (rNumericArgs(1) < 0.0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid Induced Outdoor Air Due to Duct Leakage Unbalance specification [<0.0]={:.3R}",
@@ -543,8 +532,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             ErrorsFound = true;
         }
 
-        state.dataHeatBal->ZoneAirBalance(Loop).InducedAirSchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
-        if (state.dataHeatBal->ZoneAirBalance(Loop).InducedAirSchedPtr == 0) {
+        thisZoneAirBalance.InducedAirSchedPtr = GetScheduleIndex(state, cAlphaArgs(4));
+        if (thisZoneAirBalance.InducedAirSchedPtr == 0) {
             if (lAlphaFieldBlanks(4)) {
                 ShowSevereError(
                     state,
@@ -560,137 +549,133 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             }
             ErrorsFound = true;
         }
-        if (!CheckScheduleValueMinMax(state, state.dataHeatBal->ZoneAirBalance(Loop).InducedAirSchedPtr, ">=", 0.0, "<=", 1.0)) {
-            ShowSevereError(state,
-                            format("{} = {}:  Error found in {} = {}",
-                                   cCurrentModuleObject,
-                                   state.dataHeatBal->ZoneAirBalance(Loop).Name,
-                                   cAlphaFieldNames(4),
-                                   cAlphaArgs(4)));
+        if (!CheckScheduleValueMinMax(state, thisZoneAirBalance.InducedAirSchedPtr, ">=", 0.0, "<=", 1.0)) {
+            ShowSevereError(
+                state, format("{} = {}:  Error found in {} = {}", cCurrentModuleObject, thisZoneAirBalance.Name, cAlphaFieldNames(4), cAlphaArgs(4)));
             ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
             ErrorsFound = true;
         }
 
         // Check whether this zone is also controleld by hybrid ventilation object with ventilation control option or not
-        bool ControlFlag = GetHybridVentilationControlStatus(state, state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr);
-        if (ControlFlag && state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Quadrature) {
-            state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
+        bool ControlFlag = GetHybridVentilationControlStatus(state, thisZoneAirBalance.ZonePtr);
+        if (ControlFlag && thisZoneAirBalance.BalanceMethod == AirBalance::Quadrature) {
+            thisZoneAirBalance.BalanceMethod = AirBalance::None;
             ShowWarningError(
                 state,
                 format("{} = {}: This Zone ({}) is controlled by AvailabilityManager:HybridVentilation with Simple Airflow Control Type option.",
                        cCurrentModuleObject,
-                       state.dataHeatBal->ZoneAirBalance(Loop).Name,
+                       thisZoneAirBalance.Name,
                        cAlphaArgs(2)));
             ShowContinueError(state,
                               "Air balance method type QUADRATURE and Simple Airflow Control Type cannot co-exist. The NONE method is assigned");
         }
 
-        if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Quadrature) {
-            state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).zoneOAQuadratureSum = true;
+        if (thisZoneAirBalance.BalanceMethod == AirBalance::Quadrature) {
+            state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).zoneOAQuadratureSum = true;
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceHeatLoss,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceHeatLoss,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceHeatGain,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceHeatGain,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceLatentLoss,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceLatentLoss,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceLatentGain,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceLatentGain,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Total Heat Loss Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceTotalLoss,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceTotalLoss,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Total Heat Gain Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceTotalGain,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceTotalGain,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Current Density Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceVdotCurDensity,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceVdotCurDensity,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Standard Density Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceVdotStdDensity,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceVdotStdDensity,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Current Density Volume",
                                 OutputProcessor::Unit::m3,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceVolumeCurDensity,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceVolumeCurDensity,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Standard Density Volume",
                                 OutputProcessor::Unit::m3,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceVolumeStdDensity,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceVolumeStdDensity,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Mass",
                                 OutputProcessor::Unit::kg,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceMass,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceMass,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceMdot,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceMdot,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Changes per Hour",
                                 OutputProcessor::Unit::ach,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceAirChangeRate,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceAirChangeRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceFanElec,
+                                state.dataHeatBal->ZnAirRpt(thisZoneAirBalance.ZonePtr).OABalanceFanElec,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name,
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name,
                                 {},
                                 "Electricity",
                                 "Fans",
                                 "Ventilation (simple)",
                                 "Building",
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
+                                state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
         }
     }
 
@@ -4560,14 +4545,11 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   August 2001
-    //       MODIFIED       na
     //       RE-ENGINEERED  April 2003, Weixiu Kong
     //                      December 2003, CC
 
     // PURPOSE OF THIS SUBROUTINE:
     //     Get room air model parameters for all zones at once
-
-    // Using/Aliasing
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlphas; // States which alpha value to read from a
@@ -4577,13 +4559,12 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
     int AirModelNum;
     int NumOfAirModels;
     int ZoneNum;
-    bool ErrorsFound;
     bool IsNotOK;
 
     // Initialize default values for air model parameters
     state.dataRoomAirMod->AirModel.allocate(state.dataGlobal->NumOfZones);
 
-    ErrorsFound = false;
+    bool ErrorsFound = false;
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
     cCurrentModuleObject = "RoomAirModelType";
@@ -4832,10 +4813,6 @@ void InitAirHeatBalance(EnergyPlusData &state)
     // This subroutine is for  initializations within the
     // air heat balance.
 
-    // Do the Begin Day initializations
-    if (state.dataGlobal->BeginDayFlag) {
-    }
-
     // Do the following initializations (every time step):
     InitSimpleMixingConvectiveHeatGains(state);
 }
@@ -4850,7 +4827,6 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
     //                      May 2009, Brent Griffith added EMS override to mixing and cross mixing flows
     //                      renamed routine and did some cleanup
     //                      August 2011, Therese Stovall added refrigeration door mixing flows
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine sets up the mixing and cross mixing flows
@@ -4955,8 +4931,6 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   July 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the report variables for the AirHeatBalance.
