@@ -319,11 +319,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     Array1D<Real64> TotInfilVentFlow;
     Array1D<Real64> TotMixingFlow;
     Array1D<Real64> ZoneMixingNum;
-    int ConnectTest;
     int ConnectionNumber;
-    int NumbNum;
     int AlphaNum;
-    int Zone1Num;
     int Zone2Num;
     int ZoneNumA;
     int ZoneNumB;
@@ -3826,7 +3823,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             NameThisObject = cAlphaArgs(1);
 
             AlphaNum = 2;
-            Zone1Num = UtilityRoutines::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
+            int Zone1Num = UtilityRoutines::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
             if (Zone1Num == 0) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", invalid (not found) {}=\"{}\".",
@@ -3921,7 +3918,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             // need to make sure same pair of zones is only entered once.
             if (state.dataHeatBal->RefDoorMixing(ZoneNumA).RefDoorMixFlag && state.dataHeatBal->RefDoorMixing(ZoneNumB).RefDoorMixFlag) {
                 if (state.dataHeatBal->RefDoorMixing(ZoneNumA).NumRefDoorConnections > 1) {
-                    for (ConnectTest = 1; ConnectTest <= (ConnectionNumber - 1); ++ConnectTest) {
+                    for (int ConnectTest = 1; ConnectTest <= (ConnectionNumber - 1); ++ConnectTest) {
                         if (state.dataHeatBal->RefDoorMixing(ZoneNumA).MateZonePtr(ConnectTest) !=
                             state.dataHeatBal->RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber))
                             continue;
@@ -3979,7 +3976,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }     // OpenSchedPtr(ConnectionNumber) == 0)
             }         //(lAlphaFieldBlanks(AlphaNum)) THEN
 
-            NumbNum = 1;
+            int NumbNum = 1;
             if (lAlphaFieldBlanks(NumbNum)) {
                 state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber) = 3.0; // default height of 3 meters
                 ShowWarningError(state,
