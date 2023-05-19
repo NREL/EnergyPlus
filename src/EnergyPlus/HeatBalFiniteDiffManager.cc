@@ -1287,11 +1287,6 @@ namespace HeatBalFiniteDiffManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool DoReport;
-        int ThisNum;
-        int Layer;
-        int OutwardMatLayerNum;
-        int LayerNode;
-        int Inodes;
 
         // Formats
         static constexpr std::string_view Format_702(" ConductionFiniteDifference Node,{},{:.8R},{},{},{}\n");
@@ -1325,7 +1320,7 @@ namespace HeatBalFiniteDiffManager {
                       "Name (or Face), Inward Material Name (or Face)");
             }
 
-            for (ThisNum = 1; ThisNum <= state.dataHeatBal->TotConstructs; ++ThisNum) {
+            for (int ThisNum = 1; ThisNum <= state.dataHeatBal->TotConstructs; ++ThisNum) {
                 auto &constructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD(ThisNum);
 
                 if (state.dataConstruction->Construct(ThisNum).TypeIsWindow) continue;
@@ -1343,7 +1338,7 @@ namespace HeatBalFiniteDiffManager {
                       int(constructFD.TotNodes + 1),
                       constructFD.DeltaTime / Constant::SecInHour);
 
-                for (Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
+                for (int Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
                     static constexpr std::string_view Format_701(" Material CondFD Summary,{},{:.4R},{},{:.8R},{:.8R},{:.8R}\n");
                     print(state.files.eio,
                           Format_701,
@@ -1356,11 +1351,11 @@ namespace HeatBalFiniteDiffManager {
                 }
 
                 // now list each CondFD Node with its X distance from outside face in m along with other identifiers
-                Inodes = 0;
+                int Inodes = 0;
 
-                for (Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
-                    OutwardMatLayerNum = Layer - 1;
-                    for (LayerNode = 1; LayerNode <= constructFD.NodeNumPoint(Layer); ++LayerNode) {
+                for (int Layer = 1; Layer <= state.dataConstruction->Construct(ThisNum).TotLayers; ++Layer) {
+                    int OutwardMatLayerNum = Layer - 1;
+                    for (int LayerNode = 1; LayerNode <= constructFD.NodeNumPoint(Layer); ++LayerNode) {
                         ++Inodes;
                         if (Inodes == 1) {
                             print(state.files.eio,
@@ -1395,7 +1390,7 @@ namespace HeatBalFiniteDiffManager {
                     }
                 }
 
-                Layer = state.dataConstruction->Construct(ThisNum).TotLayers;
+                int Layer = state.dataConstruction->Construct(ThisNum).TotLayers;
                 ++Inodes;
                 print(state.files.eio,
                       Format_702,
