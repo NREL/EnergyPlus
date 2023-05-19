@@ -311,17 +311,13 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     std::string cCurrentModuleObject;
 
     Array1D_bool RepVarSet;
-    bool IsNotOK;
 
     std::string StringOut;
     std::string NameThisObject;
-    bool ControlFlag;
     Array1D<Real64> TotInfilVentFlow;
     Array1D<Real64> TotMixingFlow;
     Array1D<Real64> ZoneMixingNum;
     int ConnectionNumber;
-    int AlphaNum;
-    int Zone2Num;
     int ZoneNumA;
     int ZoneNumB;
 
@@ -489,7 +485,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        IsNotOK = false;
+        bool IsNotOK = false;
         state.dataHeatBal->ZoneAirBalance(Loop).Name = cAlphaArgs(1);
         state.dataHeatBal->ZoneAirBalance(Loop).ZoneName = cAlphaArgs(2);
         state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
@@ -576,7 +572,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
 
         // Check whether this zone is also controleld by hybrid ventilation object with ventilation control option or not
-        ControlFlag = GetHybridVentilationControlStatus(state, state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr);
+        bool ControlFlag = GetHybridVentilationControlStatus(state, state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr);
         if (ControlFlag && state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Quadrature) {
             state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
             ShowWarningError(
@@ -3822,7 +3818,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
             NameThisObject = cAlphaArgs(1);
 
-            AlphaNum = 2;
+            int AlphaNum = 2;
             int Zone1Num = UtilityRoutines::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
             if (Zone1Num == 0) {
                 ShowSevereError(state,
@@ -3836,7 +3832,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             }
 
             ++AlphaNum; // 3
-            Zone2Num = UtilityRoutines::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
+            int Zone2Num = UtilityRoutines::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
             if (Zone2Num == 0) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", invalid (not found) {}=\"{}\".",
@@ -3859,7 +3855,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             } else if (Zone1Num < Zone2Num) { // zone 1 will come first in soln loop, id zone 2 as mate zone
                 ZoneNumA = Zone1Num;
                 ZoneNumB = Zone2Num;
-            } else if (Zone2Num < Zone1Num) { // zone 2 will come first in soln loop, id zone 1 as mate zone
+            } else { // zone 2 will come first in soln loop, id zone 1 as mate zone
                 ZoneNumA = Zone2Num;
                 ZoneNumB = Zone1Num;
             }
