@@ -177,6 +177,10 @@ The new columns would be:
 - Occupied operation (cycling, continuous, off)
 - Unoccupied operation (cycling, continuous, off)
 - Locked out during central heating (yes, no, N/A)
+- Is autosized
+- Motor efficiency
+- Motor heat to zone fraction
+- Motor loss zone name
 
 ### Add New EnergyPlus Tabular Reports ###
 
