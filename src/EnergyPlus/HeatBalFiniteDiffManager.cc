@@ -1131,7 +1131,6 @@ namespace HeatBalFiniteDiffManager {
         Real64 MaxDelTemp(0.0);
 
         auto &ConstructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD;
-        auto &SurfaceFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD;
 
         int const ConstrNum(state.dataSurface->Surface(Surf).Construction);
 
@@ -1144,7 +1143,7 @@ namespace HeatBalFiniteDiffManager {
         int const Delt(ConstructFD(ConstrNum).DeltaTime); //   (seconds)
 
         // Aliases
-        auto &surfaceFD(SurfaceFD(Surf));
+        auto &surfaceFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf);
         auto const &T(surfaceFD.T);
         auto &TT(surfaceFD.TT);
         auto const &Rhov(surfaceFD.Rhov);
@@ -1228,23 +1227,23 @@ namespace HeatBalFiniteDiffManager {
                 // to either liquid or solid), the temperature at which it changes its direction is saved
                 // in the variable PhaseChangeTemperatureReverse, and this variable will hold the value of the temperature until
                 // the next reverse in the process takes place.
-                if ((SurfaceFD(Surf).PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING &&
-                     SurfaceFD(Surf).PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION)) {
-                    SurfaceFD(Surf).PhaseChangeTemperatureReverse(I) = SurfaceFD(Surf).TDT(I);
-                } else if ((SurfaceFD(Surf).PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
-                            SurfaceFD(Surf).PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING)) {
-                    SurfaceFD(Surf).PhaseChangeTemperatureReverse(I) = SurfaceFD(Surf).TDT(I);
-                } else if ((SurfaceFD(Surf).PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING &&
-                            SurfaceFD(Surf).PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION)) {
-                    SurfaceFD(Surf).PhaseChangeTemperatureReverse(I) = SurfaceFD(Surf).TDT(I);
-                } else if ((SurfaceFD(Surf).PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
-                            SurfaceFD(Surf).PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING)) {
-                    SurfaceFD(Surf).PhaseChangeTemperatureReverse(I) = SurfaceFD(Surf).TDT(I);
+                if ((surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING &&
+                     surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION)) {
+                    surfaceFD.PhaseChangeTemperatureReverse(I) = surfaceFD.TDT(I);
+                } else if ((surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
+                            surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING)) {
+                    surfaceFD.PhaseChangeTemperatureReverse(I) = surfaceFD.TDT(I);
+                } else if ((surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING &&
+                            surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION)) {
+                    surfaceFD.PhaseChangeTemperatureReverse(I) = surfaceFD.TDT(I);
+                } else if ((surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
+                            surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING)) {
+                    surfaceFD.PhaseChangeTemperatureReverse(I) = surfaceFD.TDT(I);
                 }
             }
 
-            SurfaceFD(Surf).PhaseChangeStateOldOld = SurfaceFD(Surf).PhaseChangeStateOld;
-            SurfaceFD(Surf).PhaseChangeStateOld = SurfaceFD(Surf).PhaseChangeState;
+            surfaceFD.PhaseChangeStateOldOld = surfaceFD.PhaseChangeStateOld;
+            surfaceFD.PhaseChangeStateOld = surfaceFD.PhaseChangeState;
 
         } // Time Loop  //PT solving time steps
 
