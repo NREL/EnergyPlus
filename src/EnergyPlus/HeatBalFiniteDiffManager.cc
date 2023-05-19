@@ -153,8 +153,6 @@ namespace HeatBalFiniteDiffManager {
         Array1D<Real64> MaterialProps(40);  // Temporary array to transfer material properties
         bool ErrorsFound(false);            // If errors detected in input
         int Loop;
-        int NumAlphas;
-        int NumNumbers;
         int propNum;
         int pcMat;
         int vcMat;
@@ -165,6 +163,8 @@ namespace HeatBalFiniteDiffManager {
         cCurrentModuleObject = "HeatBalanceSettings:ConductionFiniteDifference";
 
         if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject) > 0) {
+            int NumAlphas;
+            int NumNumbers;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      1,
