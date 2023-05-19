@@ -4866,17 +4866,12 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Loop; // local loop index
-    int J;    // local index for second zone in refrig door pair
-
-    int ZoneNum;              // zone counter
     Real64 ZoneMixingFlowSum; // sum of zone mixing flows for a zone
-    int NumOfMixingObjects;   // number of mixing objects for a receiving zone
 
     // Select type of airflow calculation
     if (state.dataHeatBal->AirFlowFlag) { // Simplified airflow calculation
         // Process the scheduled Mixing for air heat balance
-        for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
             state.dataHeatBal->Mixing(Loop).DesiredAirFlowRate =
                 state.dataHeatBal->Mixing(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->Mixing(Loop).SchedPtr);
             if (state.dataHeatBal->Mixing(Loop).EMSSimpleMixingOn)
@@ -4887,14 +4882,14 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
         // if zone air mass flow balance enforced calculate the fraction of
         // contribution of each mixing object to a zone mixed flow rate, BAN Feb 2014
         if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
-            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 ZoneMixingFlowSum = 0.0;
-                NumOfMixingObjects = state.dataHeatBal->MassConservation(ZoneNum).NumReceivingZonesMixingObject;
-                for (Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
+                int NumOfMixingObjects = state.dataHeatBal->MassConservation(ZoneNum).NumReceivingZonesMixingObject;
+                for (int Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
                     ZoneMixingFlowSum = ZoneMixingFlowSum + state.dataHeatBal->Mixing(Loop).DesignLevel;
                 }
                 if (ZoneMixingFlowSum > 0.0) {
-                    for (Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
+                    for (int Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
                         state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) =
                             state.dataHeatBal->Mixing(Loop).DesignLevel / ZoneMixingFlowSum;
                     }
@@ -4903,7 +4898,7 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
         }
 
         // Process the scheduled CrossMixing for air heat balance
-        for (Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
             state.dataHeatBal->CrossMixing(Loop).DesiredAirFlowRate =
                 state.dataHeatBal->CrossMixing(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->CrossMixing(Loop).SchedPtr);
             if (state.dataHeatBal->CrossMixing(Loop).EMSSimpleMixingOn)
@@ -4920,7 +4915,7 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
                  ++NZ) { // Can't have %ZonePtr==NumOfZones because lesser zone # of pair placed in ZonePtr in input
                 if (!state.dataHeatBal->RefDoorMixing(NZ).RefDoorMixFlag) continue;
                 if (state.dataHeatBal->RefDoorMixing(NZ).ZonePtr == NZ) {
-                    for (J = 1; J <= state.dataHeatBal->RefDoorMixing(NZ).NumRefDoorConnections; ++J) {
+                    for (int J = 1; J <= state.dataHeatBal->RefDoorMixing(NZ).NumRefDoorConnections; ++J) {
                         state.dataHeatBal->RefDoorMixing(NZ).VolRefDoorFlowRate(J) = 0.0;
                         if (state.dataHeatBal->RefDoorMixing(NZ).EMSRefDoorMixingOn(J))
                             state.dataHeatBal->RefDoorMixing(NZ).VolRefDoorFlowRate(J) = state.dataHeatBal->RefDoorMixing(NZ).EMSRefDoorFlowRate(J);
@@ -5003,8 +4998,7 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
                     } else {
                         thisMRTFraction = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
                     }
-                    znAirRpt.ThermOperativeTemp =
-                        (1.0 - thisMRTFraction) * thisZoneHB.ZTAV + thisMRTFraction * state.dataHeatBal->ZoneMRT(ZoneLoop);
+                    znAirRpt.ThermOperativeTemp = (1.0 - thisMRTFraction) * thisZoneHB.ZTAV + thisMRTFraction * state.dataHeatBal->ZoneMRT(ZoneLoop);
                 }
             }
         }
