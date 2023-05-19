@@ -390,8 +390,8 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
     state->dataGlobal->DoingSizing = true;
 
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -712,8 +712,8 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
     state->dataGlobal->DoingSizing = true;
 
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -1056,8 +1056,8 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
     state->dataGlobal->DoingSizing = true;
 
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -1426,8 +1426,8 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
     state->dataGlobal->DoingSizing = true;
 
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -1782,8 +1782,8 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
     state->dataGlobal->DoingSizing = true;
 
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -2131,8 +2131,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
     state->dataGlobal->DoingSizing = true;
 
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -2861,8 +2861,8 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
     state->dataGlobal->DoingSizing = true;
 
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -3290,8 +3290,8 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     state->dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
     state->dataGlobal->DoingSizing = true;
 
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
@@ -3647,8 +3647,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanCyclingFanMode)
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
     state->dataGlobal->DoingSizing = true;
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
     // heating mode tests
     state->dataFanCoilUnits->CoolingLoad = false;
     state->dataFanCoilUnits->HeatingLoad = true;
@@ -4014,8 +4014,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElecHeatCoilMultiSpeedFanContFanMode)
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
     state->dataGlobal->DoingSizing = true;
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
     // heating mode tests
     state->dataFanCoilUnits->CoolingLoad = false;
     state->dataFanCoilUnits->HeatingLoad = true;
@@ -4381,8 +4381,8 @@ TEST_F(EnergyPlusFixture, FanCoil_CalcFanCoilElecHeatCoilPLRResidual)
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
     state->dataGlobal->DoingSizing = true;
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
     // heating mode tests
     state->dataFanCoilUnits->CoolingLoad = false;
     state->dataFanCoilUnits->HeatingLoad = true;
@@ -4686,8 +4686,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ElectricHeatingCoilASHRAE90VariableFan)
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
     state->dataGlobal->DoingSizing = true;
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
     // heating mode tests
     state->dataFanCoilUnits->CoolingLoad = false;
     state->dataFanCoilUnits->HeatingLoad = true;

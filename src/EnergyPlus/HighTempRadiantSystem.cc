@@ -297,7 +297,6 @@ namespace HighTempRadiantSystem {
             state.dataHighTempRadSys->HighTempRadSysNumericFields(Item).FieldNames.allocate(NumNumbers);
             state.dataHighTempRadSys->HighTempRadSysNumericFields(Item).FieldNames = "";
             state.dataHighTempRadSys->HighTempRadSysNumericFields(Item).FieldNames = state.dataIPShortCut->cNumericFieldNames;
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             // General user input data
             state.dataHighTempRadSys->HighTempRadSys(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
 
