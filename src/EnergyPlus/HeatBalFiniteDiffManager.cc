@@ -1139,19 +1139,6 @@ namespace HeatBalFiniteDiffManager {
 
         // Aliases
         auto &surfaceFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf);
-        auto const &T(surfaceFD.T);
-        auto &TT(surfaceFD.TT);
-        auto const &Rhov(surfaceFD.Rhov);
-        auto &RhoT(surfaceFD.RhoT);
-        auto const &TD(surfaceFD.TD);
-        auto &TDT(surfaceFD.TDT);
-        auto &TDTLast(surfaceFD.TDTLast);
-        auto &TDreport(surfaceFD.TDreport);
-        auto &RH(surfaceFD.RH);
-        auto &EnthOld(surfaceFD.EnthOld);
-        auto &EnthNew(surfaceFD.EnthNew);
-        auto &EnthLast(surfaceFD.EnthLast);
-        auto &MaxNodeDelTemp(surfaceFD.MaxNodeDelTemp);
 
         Real64 HMovInsul = 0;
         if (state.dataSurface->AnyMovableInsulation) HMovInsul = state.dataHeatBalSurf->SurfMovInsulHExt(Surf);
@@ -1160,8 +1147,8 @@ namespace HeatBalFiniteDiffManager {
 
             int GSiter;                                                                       // iteration counter for implicit repeat calculation
             for (GSiter = 1; GSiter <= state.dataHeatBalFiniteDiffMgr->MaxGSiter; ++GSiter) { //  Iterate implicit equations
-                TDTLast = TDT;                                                                // Save last iteration's TDT (New temperature) values
-                EnthLast = EnthNew;                                                           // Last iterations new enthalpy value
+                surfaceFD.TDTLast = surfaceFD.TDT;                                            // Save last iteration's TDT (New temperature) values
+                surfaceFD.EnthLast = surfaceFD.EnthNew;                                       // Last iterations new enthalpy value
 
                 // Original loop version
                 int i(1);                                    //  Node counter
@@ -1169,23 +1156,79 @@ namespace HeatBalFiniteDiffManager {
 
                     // For the exterior surface node with a convective boundary condition
                     if ((i == 1) && (Lay == 1)) {
-                        ExteriorBCEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew, TotNodes, HMovInsul);
+                        ExteriorBCEqns(state,
+                                       Delt,
+                                       i,
+                                       Lay,
+                                       Surf,
+                                       surfaceFD.T,
+                                       surfaceFD.TT,
+                                       surfaceFD.Rhov,
+                                       surfaceFD.RhoT,
+                                       surfaceFD.RH,
+                                       surfaceFD.TD,
+                                       surfaceFD.TDT,
+                                       surfaceFD.EnthOld,
+                                       surfaceFD.EnthNew,
+                                       TotNodes,
+                                       HMovInsul);
                     }
 
                     // For the Layer Interior nodes.  Arrive here after exterior surface node or interface node
                     if (TotNodes != 1) {
                         for (int ctr = 2, ctr_end = constructFD.NodeNumPoint(Lay); ctr <= ctr_end; ++ctr) {
                             ++i;
-                            InteriorNodeEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew);
+                            InteriorNodeEqns(state,
+                                             Delt,
+                                             i,
+                                             Lay,
+                                             Surf,
+                                             surfaceFD.T,
+                                             surfaceFD.TT,
+                                             surfaceFD.Rhov,
+                                             surfaceFD.RhoT,
+                                             surfaceFD.RH,
+                                             surfaceFD.TD,
+                                             surfaceFD.TDT,
+                                             surfaceFD.EnthOld,
+                                             surfaceFD.EnthNew);
                         }
                     }
 
                     if ((Lay < TotLayers) && (TotNodes != 1)) { // Interface equations for 2 capacitive materials
                         ++i;
-                        IntInterfaceNodeEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew, GSiter);
+                        IntInterfaceNodeEqns(state,
+                                             Delt,
+                                             i,
+                                             Lay,
+                                             Surf,
+                                             surfaceFD.T,
+                                             surfaceFD.TT,
+                                             surfaceFD.Rhov,
+                                             surfaceFD.RhoT,
+                                             surfaceFD.RH,
+                                             surfaceFD.TD,
+                                             surfaceFD.TDT,
+                                             surfaceFD.EnthOld,
+                                             surfaceFD.EnthNew,
+                                             GSiter);
                     } else if (Lay == TotLayers) { // For the Interior surface node with a convective boundary condition
                         ++i;
-                        InteriorBCEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew, TDreport);
+                        InteriorBCEqns(state,
+                                       Delt,
+                                       i,
+                                       Lay,
+                                       Surf,
+                                       surfaceFD.T,
+                                       surfaceFD.TT,
+                                       surfaceFD.Rhov,
+                                       surfaceFD.RhoT,
+                                       surfaceFD.RH,
+                                       surfaceFD.TD,
+                                       surfaceFD.TDT,
+                                       surfaceFD.EnthOld,
+                                       surfaceFD.EnthNew,
+                                       surfaceFD.TDreport);
                     }
 
                 } // layer loop
@@ -1194,17 +1237,17 @@ namespace HeatBalFiniteDiffManager {
                 // to obtain the actual temperature that is going to be used for next iteration. This would mostly happen with PCM
                 // Tuned Function call to eliminate array temporaries and multiple relaxation passes
                 if (GSiter > 15) {
-                    relax_array(TDT, TDTLast, 0.9875);
+                    relax_array(surfaceFD.TDT, surfaceFD.TDTLast, 0.9875);
                 } else if (GSiter > 10) {
-                    relax_array(TDT, TDTLast, 0.875);
+                    relax_array(surfaceFD.TDT, surfaceFD.TDTLast, 0.875);
                 } else if (GSiter > 5) {
-                    relax_array(TDT, TDTLast, 0.5);
+                    relax_array(surfaceFD.TDT, surfaceFD.TDTLast, 0.5);
                 }
 
                 // the following could blow up when all the node temps sum to less than 1.0.  seems poorly formulated for temperature in C.
                 // PT delete one zero and decrease number of minimum iterations, from 3 (which actually requires 4 iterations) to 2.
 
-                if ((GSiter > 2) && (std::abs(sum_array_diff(TDT, TDTLast) / sum(TDT)) < 0.00001)) break;
+                if ((GSiter > 2) && (std::abs(sum_array_diff(surfaceFD.TDT, surfaceFD.TDTLast) / sum(surfaceFD.TDT)) < 0.00001)) break;
 
             } // End of Gauss Seidell iteration loop
 
@@ -1212,8 +1255,8 @@ namespace HeatBalFiniteDiffManager {
             if (state.dataHeatBal->CondFDRelaxFactor != 1.0) {
                 // Apply Relaxation factor for stability, use current (TDT) and previous (TDreport) temperature values
                 //   to obtain the actual temperature that is going to be exported/use
-                relax_array(TDT, TDreport, 1.0 - state.dataHeatBal->CondFDRelaxFactor);
-                EnthOld = EnthNew;
+                relax_array(surfaceFD.TDT, surfaceFD.TDreport, 1.0 - state.dataHeatBal->CondFDRelaxFactor);
+                surfaceFD.EnthOld = surfaceFD.EnthNew;
             }
 
             for (int I = 1; I <= (TotNodes + 1); I++) {
@@ -1221,17 +1264,14 @@ namespace HeatBalFiniteDiffManager {
                 // to either liquid or solid), the temperature at which it changes its direction is saved
                 // in the variable PhaseChangeTemperatureReverse, and this variable will hold the value of the temperature until
                 // the next reverse in the process takes place.
-                if ((surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING &&
-                     surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION)) {
-                    surfaceFD.PhaseChangeTemperatureReverse(I) = surfaceFD.TDT(I);
-                } else if ((surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
-                            surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING)) {
-                    surfaceFD.PhaseChangeTemperatureReverse(I) = surfaceFD.TDT(I);
-                } else if ((surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING &&
-                            surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION)) {
-                    surfaceFD.PhaseChangeTemperatureReverse(I) = surfaceFD.TDT(I);
-                } else if ((surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
-                            surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING)) {
+                if (((surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING &&
+                      surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION) ||
+                     (surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
+                      surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::FREEZING)) ||
+                    ((surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING &&
+                      surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION) ||
+                     (surfaceFD.PhaseChangeStateOld(I) == HysteresisPhaseChange::PhaseChangeStates::TRANSITION &&
+                      surfaceFD.PhaseChangeState(I) == HysteresisPhaseChange::PhaseChangeStates::MELTING))) {
                     surfaceFD.PhaseChangeTemperatureReverse(I) = surfaceFD.TDT(I);
                 }
             }
@@ -1241,8 +1281,8 @@ namespace HeatBalFiniteDiffManager {
 
         } // Time Loop  //PT solving time steps
 
-        TempSurfOutTmp = TDT(1);
-        SurfTempInTmp = TDT(TotNodes + 1);
+        TempSurfOutTmp = surfaceFD.TDT(1);
+        SurfTempInTmp = surfaceFD.TDT(TotNodes + 1);
         state.dataMstBal->RhoVaporSurfIn(Surf) = 0.0;
 
         // For ground surfaces or when raining, outside face inner half-node heat capacity was unknown and set to -1 in ExteriorBCEqns
@@ -1255,11 +1295,11 @@ namespace HeatBalFiniteDiffManager {
         // Determine largest change in node temps
         MaxDelTemp = 0.0;
         for (int NodeNum = 1; NodeNum <= TotNodes + 1; ++NodeNum) { // need to consider all nodes
-            MaxDelTemp = max(std::abs(TDT(NodeNum) - TDreport(NodeNum)), MaxDelTemp);
+            MaxDelTemp = max(std::abs(surfaceFD.TDT(NodeNum) - surfaceFD.TDreport(NodeNum)), MaxDelTemp);
         }
-        MaxNodeDelTemp = MaxDelTemp;
-        TDreport = TDT;
-        EnthOld = EnthNew;
+        surfaceFD.MaxNodeDelTemp = MaxDelTemp;
+        surfaceFD.TDreport = surfaceFD.TDT;
+        surfaceFD.EnthOld = surfaceFD.EnthNew;
     }
 
     void ReportFiniteDiffInits(EnergyPlusData &state)
