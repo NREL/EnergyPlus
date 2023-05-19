@@ -5,6 +5,7 @@ Extend Spaces to Sizing and HVAC
 
  - Original April 26, 2023
  - Revised May 5, 2023 - and now for something somewhat different
+ - Revised May 19, 2023 - add conf call and email comments, add design
 
 ## Table of Contents ##
 
@@ -25,6 +26,8 @@ Extend Spaces to Sizing and HVAC
 [Engineering Reference](#engineering-reference)
 
 [Example File and Transition Changes](#example-file-and-transition-changes)
+
+[Design](#design)
 
 ## Justification for New Feature ##
 
@@ -50,6 +53,18 @@ This NFP proposes additional optional capabilities:
 ## E-mail and Conference Call Conclusions ##
 
 Lots of useful comments and input from Rich R.
+
+Other conf call and email comments/questions:
+
+Q1: What about return air nodes from spaces?
+
+A1: The hope is that return air can be collected at the zone level, but implementation may require adding space return nodes.
+
+Q2: These Setpoint Not Met Time output variables seem important. Seems like a clear method for how the space level results get rolled up to the zone level will be needed, eg. average temperature for zone first and then compare to setpoint, or is zone unmet if any spaces are unmet.
+
+A2: Agreed, initial thought is that space hours not met will be reported separately, and zone hours not met would be based on the zone thermostat location.
+
+
 
 ## Overview ##
 
@@ -512,3 +527,57 @@ Summary paragraphs or sentences will be added to indicate that references to "Zo
 
 * The existing example file 5ZoneAirCooledWithSpaces will extended to add Space HVAC objects.
 
+## Design ##
+
+### Sizing ###
+
+When Space sizing is requested, the following arrays will be created for Spaces.
+
+```
+    Array2D<DataSizing::ZoneSizingData> ZoneSizing;               // Data for zone sizing (all data, all design)
+    EPVector<DataSizing::ZoneSizingData> FinalZoneSizing;         // Final data for zone sizing including effects
+    Array2D<DataSizing::ZoneSizingData> CalcZoneSizing;           // Data for zone sizing (all data)
+    EPVector<DataSizing::ZoneSizingData> CalcFinalZoneSizing;     // Final data for zone sizing (calculated only)
+```
+
+The main calculation flow for Zone sizing is:
+
+* `SizingManager::ManageSizing`
+    * Get sizing inputs (`GetOARequirements . . . GetPlantSizingInput`).
+    * Loop over sizing environments and days
+        ```
+          UpdateZoneSizing(state, Constant::CallIndicator::BeginDay);
+          Loop over hours and timesteps
+            ManageWeather(state);
+            UpdateSysSizing(state, Constant::CallIndicator::DuringDay);
+            ManageHeatBalance(state);
+          UpdateZoneSizing(state, Constant::CallIndicator::EndDay);
+        UpdateZoneSizing(state, Constant::CallIndicator::EndZoneSizingCalc);
+        ```
+        * Repeat (with a pulse) if zone component loads report is requested.
+ * `ZoneEquipmentManager::UpdateZoneSizing` (where all the work is done.)
+     * `case Constant::CallIndicator::BeginDay:`
+         * Do some initializations on `CalcZoneSizing`
+     * `case Constant::CallIndicator::DuringDay:`
+         * Called from `HVACManager`
+         * save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
+         * Works on `ZoneSizing` and `CalcZoneSizing`
+     * `case Constant::CallIndicator::EndDay:`
+         * Compute moving averages
+         * Save values at peak heating and cooling
+         * Works on `CalcZoneSizing` and `CalcFinalZoneSizing`
+     * `case Constant::CallIndicator::EndZoneSizingCalc:`
+         * Apply EMS overrides
+         * Output sizing results from `CalcFinalZoneSizing`
+         * Move sizing data into final sizing array according to sizing method
+         * Works on `CalcZoneSizing`, `CalcFinalZoneSizing`, `ZoneSizing`, and `FinalZoneSizing`
+         * Lots going on in here.
+     * Each case block has one or more zone loops
+         * Move the guts of each loop to a separate function
+         * Pass in the pertinent zone or space arrays as function parameters
+         * Add a section to collect space results to the zone level
+     * When doing Space sizing, which arrays are really needed?
+         * All four arrays will be needed for Space `SpaceSizing`, `CalcSpaceSizing`, `CalcFinalSpaceSizing`, and `FinalSpaceSizing`
+         * It's possible that only `FinalZoneSizing` is needed at the zone level. But will need to search the code to see if any of the other zone sizing arrays might be accessed elsewhere outside of the zone sizing calcs.
+         
+### HVAC ###
