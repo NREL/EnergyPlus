@@ -710,8 +710,7 @@ namespace HeatBalFiniteDiffManager {
                             if (thisMaterial->Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
                                 ShowContinueError(
                                     state, format("Material may be too thin to be modeled well, thickness = {:.5R} [m]", thisMaterial->Thickness));
-                                ShowContinueError(
-                                    state,
+                                ShowContinueError(state,
                                                   format("Material with this thermal diffusivity should have thickness > {:.5R} [m]",
                                                          DataHeatBalance::ThinMaterialLayerThreshold));
                             }
