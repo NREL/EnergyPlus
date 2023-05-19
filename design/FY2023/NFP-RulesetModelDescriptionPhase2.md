@@ -129,114 +129,11 @@ Most of these were used previously during the 2022 effort.
 
 ### Enhance Existing EnergyPlus Tabular Output Reports ###
 
-Report: Coil Sizing Details
-
-- Table: Coils
-- Rows: each row is a coil
+#### Equipment Summary - Heating Coils ####
 
 The current colums are:
-
-- Coil Type
-- Coil Location
-- HVAC Type
-- HVAC Name
-- Zone Name(s)
-- System Sizing Method Concurrence
-- System Sizing Method Capacity
-- System Sizing Method Air Flow
-- Autosized Coil Capacity?
-- Autosized Coil Airflow?
-- Autosized Coil Water Flow?
-- OA Pretreated prior to coil inlet?
-- Coil Final Gross Total Capacity [W]
-- Coil Final Gross Sensible Capacity [W]
-- Coil Final Reference Air Volume Flow Rate [m3/s]
-- Coil Final Reference Plant Fluid Volume Flow Rate [m3/s]
-- Coil U-value Times Area Value [W/K]
-- Terminal Unit Reheat Coil Multiplier
-- DX Coil Capacity Increase Ratio from Too Low Flow/Capacity Ratio
-- DX Coil Capacity Decrease Ratio from Too High Flow/Capacity Ratio
-- Moist Air Heat Capacity [J/kg-K]
-- Dry Air Heat Capacity [J/kg-K]
-- Standard Air Density Adjusted for Elevation [kg/m3]
-- Supply Fan Name for Coil
-- Supply Fan Type for Coil
-- Supply Fan Maximum Air Volume Flow Rate [m3/s]
-- Supply Fan Maximum Air Mass Flow Rate [kg/s]
-- Plant Name for Coil
-- Plant Fluid Specific Heat Capacity [J/kg-K]
-- Plant Fluid Density [kg/m3]
-- Plant Maximum Fluid Mass Flow Rate [kg/s]
-- Plant Design Fluid Return Temperature [C]
-- Plant Design Fluid Supply Temperature [C]
-- Plant Design Fluid Temperature Difference [deltaC]
-- Plant Design Capacity [W]
-- Coil Capacity Percentage of Plant Design Capacity [%]
-- Coil Fluid Flow Rate Percentage of Plant Design Flow Rate [%]
-- Design Day Name at Sensible Ideal Loads Peak
-- Date/Time at Sensible Ideal Loads Peak
-- Design Day Name at Total Ideal Loads Peak
-- Date/Time at Total Ideal Loads Peak
-- Design Day Name at Air Flow Ideal Loads Peak
-- Date/Time at Air Flow Ideal Loads Peak
-- Peak Load Type to Size On
-- Coil Total Capacity at Ideal Loads Peak [W]
-- Coil Sensible Capacity at Ideal Loads Peak [W]
-- Coil Off-Rating Capacity Modifier at Ideal Loads Peak [ ]
-- Coil Air Mass Flow Rate at Ideal Loads Peak [kg/s]
-- Coil Air Volume Flow Rate at Ideal Loads Peak [m3/s]
-- Coil Entering Air Drybulb at Ideal Loads Peak [C]
-- Coil Entering Air Wetbulb at Ideal Loads Peak [C]
-- Coil Entering Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]
-- Coil Entering Air Enthalpy at Ideal Loads Peak [J/KG-K]
-- Coil Leaving Air Drybulb at Ideal Loads Peak [C]
-- Coil Leaving Air Wetbulb at Ideal Loads Peak [C]
-- Coil Leaving Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]
-- Coil Leaving Air Enthalpy at Ideal Loads Peak [J/KG-K]
-- Coil Plant Fluid Mass Flow Rate at Ideal Loads Peak [kg/s]
-- Coil Entering Plant Fluid Temperature at Ideal Loads Peak [C]
-- Coil Leaving Plant Fluid Temperature at Ideal Loads Peak [C]
-- Coil Plant Fluid Temperature Difference at Ideal Loads Peak [deltaC]
-- Supply Fan Air Heat Gain at Ideal Loads Peak [W]
-- Coil and Fan Net Total Capacity at Ideal Loads Peak [W]
-- Outdoor Air Drybulb at Ideal Loads Peak [C]
-- Outdoor Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]
-- Outdoor Air Wetbulb at Ideal Loads Peak [C]
-- Outdoor Air Volume Flow Rate at Ideal Loads Peak [m3/s]
-- Outdoor Air Flow Percentage at Ideal Loads Peak [%]
-- System Return Air Drybulb at Ideal Loads Peak [C]
-- System Return Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]
-- Zone Air Drybulb at Ideal Loads Peak [C]
-- Zone Air Humidity Ratio at Ideal Loads Peak [kgWater/kgDryAir]
-- Zone Air Relative Humidity at Ideal Loads Peak [%]
-- Zone Sensible Heat Gain at Ideal Loads Peak [W]
-- Zone Latent Heat Gain at Ideal Loads Peak [W]
-- Coil Total Capacity at Rating Conditions [W]
-- Coil Sensible Capacity at Rating Conditions [W]
-- Coil Air Mass Flow Rate at Rating Conditions [kg/s]
-- Coil Entering Air Drybulb at Rating Conditions [C]
-- Coil Entering Air Wetbulb at Rating Conditions [C]
-- Coil Entering Air Humidity Ratio at Rating Conditions [kgWater/kgDryAir]
-- Coil Entering Air Enthalpy at Rating Conditions [J/KG-K]
-- Coil Leaving Air Drybulb at Rating Conditions [C]
-- Coil Leaving Air Wetbulb at Rating Conditions [C]
-- Coil Leaving Air Humidity Ratio at Rating Conditions [kgWater/kgDryAir]
-- Coil Leaving Air Enthalpy at Rating Conditions [J/KG-K]
-
-The new columns would be:
-
-- Airloop Name
-- Airloop Branch Name
-- Plant Loop Name
-- Plant Branch Name
-
-Report: Equipment Summary
-
-- Table: Heating Coils
-- Rows: each row is a heating coil
-
-The current colums are:
-- Type 	Design Coil Load [W]
+- Type
+- Design Coil Load [W]
 - Nominal Total Capacity [W]
 - Nominal Efficiency [W/W]
 
@@ -244,11 +141,9 @@ The new columns would be:
 - Used as Supplementary Heat
 - Airloop name
 - Airloop branch name
-- High shutoff temperature [C]
+- Suppplemental heat high shutoff temperature [C]
 
-Report: Equipment Summary
-- Table: DX Heating Coils
-- Rows: each row is a coil
+#### Equipment Summary - DX Heating Coils ####
 
 The current colums are:
 - DX Heating Coil Type
@@ -262,11 +157,83 @@ The new columns would be:
 - Airloop name
 - Airloop branch name
 
+#### Equipment Summary - Fans ####
+
+The current colums are:
+- Type
+- Total Efficiency [W/W]
+- Delta Pressure [pa]
+- Max Air Flow Rate [m3/s]
+- Rated Electricity Rate [W]
+- Rated Power Per Max Air Flow Rate [W-s/m3]
+- Motor Heat In Air Fraction
+- Fan Energy Index
+- End Use Subcategory
+- Design Day Name for Fan Sizing Peak
+- Date/Time for Fan Sizing Peak
+
+The new columns would be:
+- Purpose (supply, return, exhaust, relief)
+- Occupied operation (cycling, continuous, off)
+- Unoccupied operation (cycling, continuous, off)
+- Locked out during central heating (yes, no, N/A)
 
 ### Add New EnergyPlus Tabular Reports ###
 
+#### HVAC Topology ####
+
+Consists of tables for air and plant loops
+
+For each Plant loop and AirLoopHVAC a table is created that has:
+
+- Component Type (normal components including Connector:Splitter and Connector:Mixer)
+- Component Name
+- Loop Name
+- Plant side/Demand side
+- Order (2nd of 5 items on branch, items in parallel after split would have same number)
+- Branch Name
+- Split (either y/n or “split 3 of 5”)
+- node name in
+- node name out
+
+Probably also need table to outdoor air.
+
+Maybe include where controllers, setpoint managers, and other items that reference nodes.
+
+REVIEW BND FILE FOR WHAT ELSE IS REPORTED.
 
 
+#### Coil Connections ####
+
+New table under current Coil Sizing Details report called "Coil Connections". Each row would be a coil:
+
+- Coil Name
+- Coil Type*
+- Coil Location*
+- HVAC Type*
+- HVAC Name*
+- Zone Name(s)*
+- Supply Fan Name for Coil*
+- Supply Fan Type for Coil*
+- Plant Name for Coil*
+- Airloop Name
+- Airloop Branch Name
+- Location count on Airloop Branch
+- Plant Loop Name
+- Plant Branch Name
+- Location count on Plantloop Branch
+
+Some of these columns (shown with asterisks) are currently in the "Coils" table and could be removed from 
+that table since it is very wide already or they could be kept for compatibility.
+
+#### Controls ####
+
+New report that includes Setpoint Managers, Controllers, Availability Mangers and identifies the type, where they apply and sense
+and control parameters from input. Need: 
+
+- minimum and maximum setpoint temperatures
+- minimum turndown ratio
+- schedules
 
 
 
