@@ -1130,17 +1130,16 @@ namespace HeatBalFiniteDiffManager {
 
         Real64 MaxDelTemp(0.0);
 
-        auto &ConstructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD;
+        int const ConstrNum = state.dataSurface->Surface(Surf).Construction;
+        auto &constructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD(ConstrNum);
 
-        int const ConstrNum(state.dataSurface->Surface(Surf).Construction);
-
-        int const TotNodes(ConstructFD(ConstrNum).TotNodes);
-        int const TotLayers(state.dataConstruction->Construct(ConstrNum).TotLayers);
+        int const TotNodes = constructFD.TotNodes;
+        int const TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
 
         SurfTempInTmp = 0.0;
         TempSurfOutTmp = 0.0;
 
-        int const Delt(ConstructFD(ConstrNum).DeltaTime); //   (seconds)
+        int const Delt(constructFD.DeltaTime); //   (seconds)
 
         // Aliases
         auto &surfaceFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf);
@@ -1180,7 +1179,7 @@ namespace HeatBalFiniteDiffManager {
 
                     // For the Layer Interior nodes.  Arrive here after exterior surface node or interface node
                     if (TotNodes != 1) {
-                        for (int ctr = 2, ctr_end = ConstructFD(ConstrNum).NodeNumPoint(Lay); ctr <= ctr_end; ++ctr) {
+                        for (int ctr = 2, ctr_end = constructFD.NodeNumPoint(Lay); ctr <= ctr_end; ++ctr) {
                             ++i;
                             InteriorNodeEqns(state, Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew);
                         }
