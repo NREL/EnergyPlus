@@ -4867,7 +4867,6 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop; // local loop index
-    int NZ;   // local index for zone number
     int J;    // local index for second zone in refrig door pair
 
     int ZoneNum;              // zone counter
@@ -4878,7 +4877,6 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
     if (state.dataHeatBal->AirFlowFlag) { // Simplified airflow calculation
         // Process the scheduled Mixing for air heat balance
         for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
-            NZ = state.dataHeatBal->Mixing(Loop).ZonePtr;
             state.dataHeatBal->Mixing(Loop).DesiredAirFlowRate =
                 state.dataHeatBal->Mixing(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->Mixing(Loop).SchedPtr);
             if (state.dataHeatBal->Mixing(Loop).EMSSimpleMixingOn)
@@ -4906,7 +4904,6 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
 
         // Process the scheduled CrossMixing for air heat balance
         for (Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
-            NZ = state.dataHeatBal->CrossMixing(Loop).ZonePtr;
             state.dataHeatBal->CrossMixing(Loop).DesiredAirFlowRate =
                 state.dataHeatBal->CrossMixing(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->CrossMixing(Loop).SchedPtr);
             if (state.dataHeatBal->CrossMixing(Loop).EMSSimpleMixingOn)
@@ -4919,7 +4916,7 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
 
         // Process the scheduled Refrigeration Door mixing for air heat balance
         if (state.dataHeatBal->TotRefDoorMixing > 0) {
-            for (NZ = 1; NZ <= (state.dataGlobal->NumOfZones - 1);
+            for (int NZ = 1; NZ <= (state.dataGlobal->NumOfZones - 1);
                  ++NZ) { // Can't have %ZonePtr==NumOfZones because lesser zone # of pair placed in ZonePtr in input
                 if (!state.dataHeatBal->RefDoorMixing(NZ).RefDoorMixFlag) continue;
                 if (state.dataHeatBal->RefDoorMixing(NZ).ZonePtr == NZ) {
