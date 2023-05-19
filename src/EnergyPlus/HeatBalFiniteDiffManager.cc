@@ -2646,7 +2646,7 @@ namespace HeatBalFiniteDiffManager {
         updatedThermalConductivity = materialDefinition->phaseChange->getConductivity(temperatureUpdated);
     }
 
-    bool findAnySurfacesUsingConstructionAndCondFD(EnergyPlusData &state, int const constructionNum)
+    bool findAnySurfacesUsingConstructionAndCondFD(EnergyPlusData const &state, int const constructionNum)
     {
         for (auto const &thisSurface : state.dataSurface->Surface) {
             if (thisSurface.Construction == constructionNum) {
