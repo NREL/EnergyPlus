@@ -534,8 +534,6 @@ namespace HeatBalFiniteDiffManager {
         using DataHeatBalance::ThinMaterialLayerThreshold;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum;
-
         Real64 dxn; // Intermediate calculation of nodal spacing. This is the full dx. There is
         // a half dxn thick node at each surface. dxn is the "capacitor" spacing.
         int Ipts1; // Intermediate calculation for number of full thickness nodes per layer. There
@@ -903,7 +901,7 @@ namespace HeatBalFiniteDiffManager {
             }
         }
 
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
             if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
             if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CondFD) continue;
