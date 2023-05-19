@@ -561,7 +561,6 @@ namespace HeatBalFiniteDiffManager {
         Real64 Por;
         Real64 Cp;
         Real64 Dv;
-        bool ErrorsFound;
         Real64 DeltaTimestep;      // zone timestep in seconds, for local check of properties
         Real64 ThicknessThreshold; // min thickness consistent with other thermal properties, for local check
 
@@ -694,7 +693,6 @@ namespace HeatBalFiniteDiffManager {
                                            thisConstruct.Name));
                     if (thisConstruct.IsUsed) {
                         ShowContinueError(state, "...since this construction is used in a surface, the simulation is not allowed.");
-                        ErrorsFound = true;
                     } else {
                         ShowContinueError(state, "...if this construction were used in a surface, the simulation would be terminated.");
                     }
