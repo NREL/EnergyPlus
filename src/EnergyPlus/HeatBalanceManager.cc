@@ -1492,7 +1492,6 @@ namespace HeatBalanceManager {
         Array1D<Real64> SpecDataProps;   // Temporary array to transfer spectal data properties
         int Loop;
         int LamNum; // Wavelength number
-        int TotLam; // Total wavelengths
         Real64 Lam; // Wavelength (microns)
         Real64 Tau; // Transmittance, front reflectance, back reflectance
         Real64 RhoF;
@@ -1525,7 +1524,7 @@ namespace HeatBalanceManager {
 
             // Load the spectral data derived type from the input data.
             state.dataHeatBal->SpectralData(Loop).Name = SpecDataNames(1);
-            TotLam = SpecDataNumProp / 4;
+            int TotLam = SpecDataNumProp / 4;
             if (mod(SpecDataNumProp, 4) != 0) {
                 ShowWarningError(state, format("{}{}=\"{}\" invalid set.", RoutineName, state.dataHeatBalMgr->CurrentModuleObject, SpecDataNames(1)));
                 ShowContinueError(
@@ -2176,8 +2175,6 @@ namespace HeatBalanceManager {
         int Loop;
         int ListNum;
         int ZoneNum;
-        std::string ZoneName;
-        int GroupNum;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Zone";
         state.dataGlobal->NumOfZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -2288,7 +2285,7 @@ namespace HeatBalanceManager {
                     state.dataHeatBal->ZoneList(ListNum).Zone = 0;
 
                     for (ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(ListNum).NumOfZones; ++ZoneNum) {
-                        ZoneName = state.dataIPShortCut->cAlphaArgs(ZoneNum + 1);
+                        std::string ZoneName = state.dataIPShortCut->cAlphaArgs(ZoneNum + 1);
                         state.dataHeatBal->ZoneList(ListNum).MaxZoneNameLength =
                             max(state.dataHeatBal->ZoneList(ListNum).MaxZoneNameLength, len(ZoneName));
                         state.dataHeatBal->ZoneList(ListNum).Zone(ZoneNum) = UtilityRoutines::FindItemInList(ZoneName, state.dataHeatBal->Zone);
@@ -2329,7 +2326,7 @@ namespace HeatBalanceManager {
         if (state.dataHeatBal->NumOfZoneGroups > 0) {
             state.dataHeatBal->ZoneGroup.allocate(state.dataHeatBal->NumOfZoneGroups);
 
-            for (GroupNum = 1; GroupNum <= state.dataHeatBal->NumOfZoneGroups; ++GroupNum) {
+            for (int GroupNum = 1; GroupNum <= state.dataHeatBal->NumOfZoneGroups; ++GroupNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          GroupNum,
@@ -2524,11 +2521,7 @@ namespace HeatBalanceManager {
         constexpr const char *RoutineName("GetZoneLocalEnvData: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumAlpha;
-        int NumNumeric;
-
         int ZoneLoop;
-        int ZoneNum; // DO loop counter for zones
         int TotZoneEnv;
 
         //-----------------------------------------------------------------------
@@ -2539,6 +2532,8 @@ namespace HeatBalanceManager {
         TotZoneEnv = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotZoneEnv > 0) {
+            int NumAlpha;
+            int NumNumeric;
             int IOStat;
             // Check if IDD definition is correct
             state.dataGlobal->AnyLocalEnvironmentsInModel = true;
@@ -2564,7 +2559,7 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->ZoneLocalEnvironment(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // Assign zone number
-                ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+                int ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
                 if (ZoneNum == 0) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}, object. Illegal value for {} has been found.",
@@ -2965,8 +2960,6 @@ namespace HeatBalanceManager {
         using DaylightingDevices::InitDaylightingDevices;
         using OutAirNodeManager::SetOutAirNodes;
         using WindowEquivalentLayer::InitEquivalentLayerWindowCalculations;
-
-        int StormWinNum; // Number of StormWindow object
 
         if (state.dataGlobal->BeginSimFlag) {
             AllocateHeatBalArrays(state); // Allocate the Module Arrays
