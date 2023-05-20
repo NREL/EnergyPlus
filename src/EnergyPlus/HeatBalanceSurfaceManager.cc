@@ -2462,10 +2462,6 @@ void InitSolarHeatGains(EnergyPlusData &state)
     using SolarShading::SurfaceScheduledSolarInc;
     using SolarShading::WindowScheduledSolarAbs;
 
-    auto &AbsDiffWin = state.dataHeatBalSurfMgr->AbsDiffWin;
-    auto &AbsDiffWinGnd = state.dataHeatBalSurfMgr->AbsDiffWinGnd;
-    auto &AbsDiffWinSky = state.dataHeatBalSurfMgr->AbsDiffWinSky;
-
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         state.dataHeatBal->ZoneWinHeatGainRepEnergy(zoneNum) = 0.0;
         state.dataHeatBal->ZoneWinHeatLossRepEnergy(zoneNum) = 0.0;
@@ -3091,7 +3087,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             !state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                             int TotGlassLay = thisConstruct.TotGlassLayers; // Number of glass layers
                             for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
-                                AbsDiffWin(Lay) = thisConstruct.AbsDiff(Lay);
+                                state.dataHeatBalSurfMgr->AbsDiffWin(Lay) = thisConstruct.AbsDiff(Lay);
                             }
 
                             if (IS_SHADED(ShadeFlag)) { // Shaded window
@@ -3100,7 +3096,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
                                 if (ANY_SHADE_SCREEN(ShadeFlag)) { // Shade/screen on
                                     for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
-                                        AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNumSh).AbsDiff(Lay);
+                                        state.dataHeatBalSurfMgr->AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNumSh).AbsDiff(Lay);
                                     }
                                     state.dataSurface->SurfWinExtDiffAbsByShade(SurfNum) =
                                         state.dataConstruction->Construct(ConstrNumSh).AbsDiffShade * (SkySolarInc + GndSolarInc);
@@ -3110,17 +3106,17 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     Real64 AbsDiffBlind;
                                     if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                                         for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
-                                            AbsDiffWin(Lay) = General::InterpGeneral(
+                                            state.dataHeatBalSurfMgr->AbsDiffWin(Lay) = General::InterpGeneral(
                                                 state.dataConstruction->Construct(ConstrNumSh).BlAbsDiff(SurfWinSlatsAngIndex, Lay),
                                                 state.dataConstruction->Construct(ConstrNumSh)
                                                     .BlAbsDiff(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1), Lay),
                                                 SurfWinSlatsAngInterpFac);
-                                            AbsDiffWinGnd(Lay) = General::InterpGeneral(
+                                            state.dataHeatBalSurfMgr->AbsDiffWinGnd(Lay) = General::InterpGeneral(
                                                 state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffGnd(SurfWinSlatsAngIndex, Lay),
                                                 state.dataConstruction->Construct(ConstrNumSh)
                                                     .BlAbsDiffGnd(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1), Lay),
                                                 SurfWinSlatsAngInterpFac);
-                                            AbsDiffWinSky(Lay) = General::InterpGeneral(
+                                            state.dataHeatBalSurfMgr->AbsDiffWinSky(Lay) = General::InterpGeneral(
                                                 state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffSky(SurfWinSlatsAngIndex, Lay),
                                                 state.dataConstruction->Construct(ConstrNumSh)
                                                     .BlAbsDiffSky(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1), Lay),
@@ -3133,9 +3129,12 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                                                    SurfWinSlatsAngInterpFac);
                                     } else {
                                         for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
-                                            AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNumSh).BlAbsDiff(1, Lay);
-                                            AbsDiffWinGnd(Lay) = state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffGnd(1, Lay);
-                                            AbsDiffWinSky(Lay) = state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffSky(1, Lay);
+                                            state.dataHeatBalSurfMgr->AbsDiffWin(Lay) =
+                                                state.dataConstruction->Construct(ConstrNumSh).BlAbsDiff(1, Lay);
+                                            state.dataHeatBalSurfMgr->AbsDiffWinGnd(Lay) =
+                                                state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffGnd(1, Lay);
+                                            state.dataHeatBalSurfMgr->AbsDiffWinSky(Lay) =
+                                                state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffSky(1, Lay);
                                         }
                                         AbsDiffBlind = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBlind(1);
                                     }
@@ -3176,8 +3175,10 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 if (ShadeFlag == WinShadingType::SwitchableGlazing) {                      // Switchable glazing
                                     Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum); // Switching factor for switchable glazing
                                     for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
-                                        AbsDiffWin(Lay) =
-                                            InterpSw(SwitchFac, AbsDiffWin(Lay), state.dataConstruction->Construct(ConstrNumSh).AbsDiff(Lay));
+                                        state.dataHeatBalSurfMgr->AbsDiffWin(Lay) =
+                                            InterpSw(SwitchFac,
+                                                     state.dataHeatBalSurfMgr->AbsDiffWin(Lay),
+                                                     state.dataConstruction->Construct(ConstrNumSh).AbsDiff(Lay));
                                     }
                                 }
 
@@ -3186,7 +3187,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
                             for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                 state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
-                                    AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc) + state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar;
+                                    state.dataHeatBalSurfMgr->AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc) +
+                                    state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar;
                                 // SurfWinA is from InteriorSolarDistribution
                                 if (ANY_BLIND(ShadeFlag)) {
                                     int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
@@ -3289,9 +3291,10 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 // (2) sky and ground reflected duffuse solar radiation absorbed by all layers
                                 // (3) diffuse short wave incident on the inside face of the fenestration.  The short wave internal sources
                                 //     include light, ...
-                                AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL(Lay);
+                                state.dataHeatBalSurfMgr->AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL(Lay);
                                 state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
-                                    state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar + AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc);
+                                    state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar +
+                                    state.dataHeatBalSurfMgr->AbsDiffWin(Lay) * (SkySolarInc + GndSolarInc);
 
                                 // Total solar absorbed in solid layer (W), for reporting
                                 state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay) =
@@ -3601,9 +3604,10 @@ void InitSolarHeatGains(EnergyPlusData &state)
             int const TotGlassLay = thisConstruct.TotGlassLayers; // Number of glass layers
             state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
             for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
-                AbsDiffWin(Lay) = thisConstruct.AbsDiff(Lay);
+                state.dataHeatBalSurfMgr->AbsDiffWin(Lay) = thisConstruct.AbsDiff(Lay);
                 state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
-                    AbsDiffWin(Lay) * (state.dataSurface->SurfSkySolarInc(SurfNum) + state.dataSurface->SurfGndSolarInc(SurfNum)) +
+                    state.dataHeatBalSurfMgr->AbsDiffWin(Lay) *
+                        (state.dataSurface->SurfSkySolarInc(SurfNum) + state.dataSurface->SurfGndSolarInc(SurfNum)) +
                     state.dataSurface->SurfWinA(SurfNum, Lay) * currBeamSolar(SurfNum);
                 state.dataHeatBal->SurfWinQRadSWwinAbsLayer(SurfNum, Lay) =
                     state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) * Surface(SurfNum).Area;
@@ -5668,14 +5672,6 @@ void CalcThermalResilience(EnergyPlusData &state)
 void ReportThermalResilience(EnergyPlusData &state)
 {
 
-    int HINoBins = 5;                     // Heat Index range - number of bins
-    int HumidexNoBins = 5;                // Humidex range - number of bins
-    int SETNoBins = 5;                    // SET report column numbers
-    int ColdHourOfSafetyNoBins = 5;       // Cold Stress Hour of Safety number of columns
-    int HeatHourOfSafetyNoBins = 5;       // Heat Stress Hour of Safety number of columns
-    int UnmetDegreeHourNoBins = 6;        // Unmet Degree Hour number of columns
-    int DiscomfortWtExceedHourNoBins = 4; // Unmet Degree Hour number of columns
-
     Array1D_bool reportPeriodFlags;
     if (state.dataWeatherManager->TotReportPers > 0) {
         reportPeriodFlags.dimension(state.dataWeatherManager->TotThermalReportPers, false);
@@ -5692,6 +5688,14 @@ void ReportThermalResilience(EnergyPlusData &state)
     }
 
     if (state.dataHeatBalSurfMgr->reportThermalResilienceFirstTime) {
+        int constexpr HINoBins = 5;                     // Heat Index range - number of bins
+        int constexpr HumidexNoBins = 5;                // Humidex range - number of bins
+        int constexpr SETNoBins = 5;                    // SET report column numbers
+        int constexpr ColdHourOfSafetyNoBins = 5;       // Cold Stress Hour of Safety number of columns
+        int constexpr HeatHourOfSafetyNoBins = 5;       // Heat Stress Hour of Safety number of columns
+        int constexpr UnmetDegreeHourNoBins = 6;        // Unmet Degree Hour number of columns
+        int constexpr DiscomfortWtExceedHourNoBins = 4; // Unmet Degree Hour number of columns
+
         if (state.dataHeatBal->TotPeople == 0) state.dataHeatBalSurfMgr->hasPierceSET = false;
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             if (!state.dataHeatBal->People(iPeople).Pierce) {
@@ -6240,8 +6244,8 @@ void ReportThermalResilience(EnergyPlusData &state)
 
 void ReportCO2Resilience(EnergyPlusData &state)
 {
-    int NoBins = 3;
     if (state.dataHeatBalSurfMgr->reportCO2ResilienceFirstTime) {
+        int NoBins = 3;
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
                 state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
@@ -6331,8 +6335,8 @@ void ReportCO2Resilience(EnergyPlusData &state)
 
 void ReportVisualResilience(EnergyPlusData &state)
 {
-    int NoBins = 4;
     if (state.dataHeatBalSurfMgr->reportVisualResilienceFirstTime) {
+        int NoBins = 4;
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
                 state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
