@@ -2999,7 +2999,6 @@ namespace HeatBalanceManager {
             state.dataHeatBalMgr->LoadZone = -9999.0;
             state.dataHeatBalMgr->TempZonePrevDay = 1000.0;
             state.dataHeatBalMgr->LoadZonePrevDay = -9999.0;
-            state.dataHeatBalMgr->TempZoneSecPrevDay = 1000.0;
             state.dataHeatBalMgr->TempZoneSecPrevDay = -9999.0;
             state.dataHeatBalMgr->WarmupTempDiff = 0.0;
             state.dataHeatBalMgr->WarmupLoadDiff = 0.0;
@@ -3034,7 +3033,7 @@ namespace HeatBalanceManager {
             }
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                     int const firstSurfWin = thisSpace.WindowSurfaceFirst;
                     int const lastSurfWin = thisSpace.WindowSurfaceLast;
                     for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
@@ -3163,7 +3162,7 @@ namespace HeatBalanceManager {
         if (state.dataGlobal->BeginSimFlag) {
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
                 for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                    auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                    auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                     int const firstSurfWin = thisSpace.WindowSurfaceFirst;
                     int const lastSurfWin = thisSpace.WindowSurfaceLast;
                     for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
@@ -3365,8 +3364,8 @@ namespace HeatBalanceManager {
 
         // Record Maxs & Mins for individual zone
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
-            auto &thisZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum);
+            auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+            auto const &thisZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum);
             if (thisZoneHB.ZTAV > state.dataHeatBalMgr->MaxTempZone(ZoneNum)) {
                 state.dataHeatBalMgr->MaxTempZone(ZoneNum) = thisZoneHB.ZTAV;
             }
@@ -5385,9 +5384,6 @@ namespace HeatBalanceManager {
         int ConstrNum;
         int ScheduleNum;
         int i;
-        int NumOfScheduledLayers;
-        bool NumOfLayersMatch;
-        int iZone;
 
         //-----------------------------------------------------------------------
         //                SurfaceProperty:SolarIncidentInside
@@ -5561,8 +5557,8 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->FenLayAbsSSG(Loop).ConstrPtr = ConstrNum;
-                    NumOfScheduledLayers = NumAlpha - 3;
-                    NumOfLayersMatch = false;
+                    int NumOfScheduledLayers = NumAlpha - 3;
+                    bool NumOfLayersMatch = false;
                     // Check if number of layers in construction matches number of layers in schedule surface gains object
                     if (NumOfScheduledLayers == thisConstruct.TotSolidLayers) {
                         NumOfLayersMatch = true;
@@ -5616,7 +5612,7 @@ namespace HeatBalanceManager {
         // Check if scheduled surface gains are assigined to each surface in every zone.  If not then warning message to user will be
         // issued
         if ((state.dataSurface->TotSurfIncSolSSG > 0) || (state.dataSurface->TotFenLayAbsSSG > 0)) {
-            for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+            for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 CheckScheduledSurfaceGains(state, iZone);
             }
         }
@@ -5668,7 +5664,7 @@ namespace HeatBalanceManager {
 
         bool firstZoneSurface = true;
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-            auto &thisSpace = state.dataHeatBal->space(spaceNum);
+            auto const &thisSpace = state.dataHeatBal->space(spaceNum);
             for (int iSurf = thisSpace.HTSurfaceFirst; iSurf <= thisSpace.HTSurfaceLast; ++iSurf) {
                 int iConst = state.dataSurface->Surface(iSurf).Construction;
                 if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
@@ -5695,17 +5691,14 @@ namespace HeatBalanceManager {
             }
         }
         if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
-            // zone is nor scheduled nor unscheduled
+            // zone is not scheduled nor unscheduled
             ShowWarningError(state,
                              format("Zone {} does not have all surfaces scheduled with surface gains.", state.dataHeatBal->Zone(ZoneNum).Name));
             ShowContinueError(state,
                               "If at least one surface in the zone is scheduled with surface gains, then all other surfaces within the same zone "
                               "should be scheduled as well.");
-        }
-
-        if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                auto const &thisSpace = state.dataHeatBal->space(spaceNum);
                 for (int iSurf = thisSpace.HTSurfaceFirst; iSurf <= thisSpace.HTSurfaceLast; ++iSurf) {
                     int iConst = state.dataSurface->Surface(iSurf).Construction;
                     if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
@@ -5766,7 +5759,6 @@ namespace HeatBalanceManager {
         int iTC(0);
         int iMat(0);
         int NumNewConst(0);
-        int iTCG(0);
 
         NumNewConst = 0;
         for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
@@ -5774,7 +5766,7 @@ namespace HeatBalanceManager {
                 auto const *thisMaterial =
                     dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer));
                 assert(thisMaterial != nullptr);
-                iTCG = thisMaterial->TCParent;
+                int iTCG = thisMaterial->TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
                 iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
                 for (iTC = 1; iTC <= iMat; ++iTC) {
@@ -5798,7 +5790,7 @@ namespace HeatBalanceManager {
                 auto const *thisMaterial =
                     dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer));
                 assert(thisMaterial != nullptr);
-                iTCG = thisMaterial->TCParent;
+                int iTCG = thisMaterial->TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
                 iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
                 for (iTC = 1; iTC <= iMat; ++iTC) {
@@ -6591,7 +6583,6 @@ namespace HeatBalanceManager {
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int TotalArgs;  // Number of fields for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
-        int iMatGlass;  // number of glass layers
         int NumRows;    // temporary size of matrix
         int NumCols;    // temporary size of matrix
         int NBasis;     // temporary number of elements in basis
@@ -6808,8 +6799,6 @@ namespace HeatBalanceManager {
             }
             ++ConstrNum;
             auto &thisConstruct = state.dataConstruction->Construct(ConstrNum);
-            // Glass layer counter
-            iMatGlass = 0;
             // Simon TODO: This is to be confirmed.  If this is just initial value, then we might want to make better guess
             state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) = 0.1;
             // Simon TODO: If I do not put this, then it is considered that surface is NOT window
