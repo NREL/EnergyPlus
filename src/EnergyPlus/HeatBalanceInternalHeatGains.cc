@@ -119,8 +119,6 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     // devices are internal gains like people, lights, electric equipment
     // and HVAC components with skin loss models like thermal tanks, and power conditioning.
 
-    using namespace DataHeatBalance;
-
     int constexpr DeviceAllocInc(100);
 
     bool FoundDuplicate = false;
