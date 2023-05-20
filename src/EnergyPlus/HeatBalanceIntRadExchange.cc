@@ -86,7 +86,6 @@ namespace HeatBalanceIntRadExchange {
     //                       exchange between surfaces, depends on inside surface emissivities,
     //                       which, for a window, depends on whether or not an interior
     //                       shade or blind is in place.
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // Part of the heat balance modularization/re-engineering.  Purpose of this
@@ -100,8 +99,6 @@ namespace HeatBalanceIntRadExchange {
     // ASHRAE Loads Toolkit "Script F" routines by Curt Pedersen
     // Hottel, H.C., and A.F. Sarofim. "Radiative Transfer" (mainly chapter 3),
     //  McGraw-Hill, Inc., New York, 1967.
-
-    // OTHER NOTES: none
 
     // Using/Aliasing
     using namespace DataHeatBalance;
@@ -454,8 +451,6 @@ namespace HeatBalanceIntRadExchange {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   September 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Initializes the various parameters for Hottel's ScriptF method for
@@ -464,8 +459,6 @@ namespace HeatBalanceIntRadExchange {
         // Using/Aliasing
 
         using General::ScanForReports;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool NoUserInputF; // Logical flag signifying no input F's for zone
@@ -1086,12 +1079,9 @@ namespace HeatBalanceIntRadExchange {
         //       AUTHOR         Curt Pedersen
         //       DATE WRITTEN   September 2005
         //       MODIFIED       Linda Lawrie;September 2010
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This routine gets the user view factor info.
-
-        // Using/Aliasing
 
         // Argument array dimensioning
         F.dim(N, N);
@@ -1295,8 +1285,6 @@ namespace HeatBalanceIntRadExchange {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine gets the user view factor info for an enclosure which could be a zone or a group of zones
 
-        // Using/Aliasing
-
         // Argument array dimensioning
         F.dim(N, N);
         EP_SIZE_CHECK(SPtr, N);
@@ -1397,12 +1385,6 @@ namespace HeatBalanceIntRadExchange {
         //  ceilings are "seen" by other surfaces. Floors are seen by all other surfaces, but
         //  not by other floors.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         EP_SIZE_CHECK(A, N);
         EP_SIZE_CHECK(Azimuth, N);
@@ -1410,21 +1392,11 @@ namespace HeatBalanceIntRadExchange {
         F.dim(N, N);
         EP_SIZE_CHECK(SPtr, N);
 
-        // Locals
-        // SUBROUTINE ARGUMENTS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr SameAngleLimit(10.0); // If the difference in the azimuth angles are above this value (degrees),
         // then the surfaces are assumed to be facing different directions.
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         int i; // DO loop counters for surfaces in the zone
         int j;
         Array1D<Real64> ZoneArea; // Sum of the area of all zone surfaces seen
@@ -1516,7 +1488,6 @@ namespace HeatBalanceIntRadExchange {
         //                      surface larger than sum of all others (nonenclosure)
         //                      by using a Fii view factor for that surface. Process is
         //                      now much more robust and stable.
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine fixes approximate view factors and enforces reciprocity
@@ -1532,39 +1503,19 @@ namespace HeatBalanceIntRadExchange {
         // completeness is within a preselected small deviation from 1.0
         // The routine also checks the number of surfaces and if N<=3, just enforces reciprocity.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
         // Argument array dimensioning
         EP_SIZE_CHECK(A, N);
         F.dim(N, N);
-
-        // Locals
-        // SUBROUTINE ARGUMENTS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr PrimaryConvergence(0.001);
         Real64 constexpr DifferenceConvergence(0.00001);
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 LargestArea;
         Real64 ConvrgNew;
-        Real64 ConvrgOld;
-        Real64 Accelerator;            // RowCoefficient multipler to accelerate convergence
         Real64 CheckConvergeTolerance; // check value for actual warning
 
         bool Converged;
-        int i;
-        int j;
-        bool severeErrorPresent;
         // OriginalCheckValue is the first pass at a completeness check.  Even if this is zero,
         // there is no guarantee that reciprocity is satisfied.  As a result, the rest of this
         // routine is needed to correct any issues even if the user defined view factors
@@ -1574,10 +1525,10 @@ namespace HeatBalanceIntRadExchange {
         //  Allocate and zero arrays
         Array2D<Real64> FixedAF(F); // store for largest area check
 
-        Accelerator = 1.0;
-        ConvrgOld = 10.0;
-        LargestArea = maxval(A);
-        severeErrorPresent = false;
+        Real64 Accelerator = 1.0; // RowCoefficient multipler to accelerate convergence
+        Real64 ConvrgOld = 10.0;
+        Real64 LargestArea = maxval(A);
+        bool severeErrorPresent = false;
         // Check for Strange Geometry
         // When one surface has an area that exceeds the sum of all other surface areas in a zone,
         // essentially the situation is a non-complete enclosure.  As a result, the view factors
@@ -1591,7 +1542,7 @@ namespace HeatBalanceIntRadExchange {
         // this correction.  The use of 0.99 is simply to provide some reasonable boundary numerically
         // and does not have some derived theoretical basis.
         if (LargestArea > 0.99 * (sum(A) - LargestArea) && (N > 3)) {
-            for (i = 1; i <= N; ++i) {
+            for (int i = 1; i <= N; ++i) {
                 if (LargestArea != A(i)) continue;
                 state.dataHeatBalIntRadExchg->LargestSurf = i;
                 break;
@@ -1602,8 +1553,8 @@ namespace HeatBalanceIntRadExchange {
 
         //  Set up AF matrix.
         Array2D<Real64> AF(N, N); // = (AREA * DIRECT VIEW FACTOR) MATRIX
-        for (i = 1; i <= N; ++i) {
-            for (j = 1; j <= N; ++j) {
+        for (int i = 1; i <= N; ++i) {
+            for (int j = 1; j <= N; ++j) {
                 AF(j, i) = FixedAF(j, i) * A(i);
             }
         }
@@ -1620,8 +1571,8 @@ namespace HeatBalanceIntRadExchange {
         //  Check for physically unreasonable enclosures.
 
         if (N <= 3) {
-            for (i = 1; i <= N; ++i) {
-                for (j = 1; j <= N; ++j) {
+            for (int i = 1; i <= N; ++i) {
+                for (int j = 1; j <= N; ++j) {
                     FixedF(j, i) = FixedAF(j, i) / A(i);
                 }
             }
@@ -1647,8 +1598,8 @@ namespace HeatBalanceIntRadExchange {
                 Real64 MaxFixedFRowSum;
                 sumFixedF.allocate(N);
                 sumFixedF = 0.0;
-                for (i = 1; i <= N; ++i) {
-                    for (j = 1; j <= N; ++j) {
+                for (int i = 1; i <= N; ++i) {
+                    for (int j = 1; j <= N; ++j) {
                         sumFixedF(i) += FixedF(i, j);
                     }
                     if (i == 1) {
@@ -1679,7 +1630,7 @@ namespace HeatBalanceIntRadExchange {
         Converged = false;
         while (!Converged) {
             ++NumIterations;
-            for (i = 1; i <= N; ++i) {
+            for (int i = 1; i <= N; ++i) {
                 // Determine row coefficients which will enforce closure.
                 Real64 const sum_FixedAF_i(sum(FixedAF(_, i)));
                 if (std::abs(sum_FixedAF_i) > 1.0e-10) {
@@ -1694,8 +1645,8 @@ namespace HeatBalanceIntRadExchange {
             FixedAF = 0.5 * (FixedAF + transpose(FixedAF));
 
             //  Form FixedF matrix
-            for (i = 1; i <= N; ++i) {
-                for (j = 1; j <= N; ++j) {
+            for (int i = 1; i <= N; ++i) {
+                for (int j = 1; j <= N; ++j) {
                     FixedF(j, i) = FixedAF(j, i) / A(i);
                     if (std::abs(FixedF(j, i)) < 1.e-10) {
                         FixedF(j, i) = 0.0;
@@ -1714,8 +1665,8 @@ namespace HeatBalanceIntRadExchange {
                 FixedAF = 0.5 * (FixedAF + transpose(FixedAF));
 
                 //  Form FixedF matrix
-                for (i = 1; i <= N; ++i) {
-                    for (j = 1; j <= N; ++j) {
+                for (int i = 1; i <= N; ++i) {
+                    for (int j = 1; j <= N; ++j) {
                         FixedF(j, i) = FixedAF(j, i) / A(i);
                     }
                 }
@@ -1811,28 +1762,15 @@ namespace HeatBalanceIntRadExchange {
         // Determines Hottel's ScriptF coefficients which account for the total
         // grey interchange between surfaces in an enclosure.
 
-        // METHODOLOGY EMPLOYED:
-        // See reference
-
         // REFERENCES:
         // Hottel, H. C. and A. F. Sarofim, Radiative Transfer, Ch 3, McGraw Hill, 1967.
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
         // SUBROUTINE ARGUMENTS:
         // --Must satisfy reciprocity and completeness:
         //  A(i)*F(i,j)=A(j)*F(j,i); F(i,i)=0.; SUM(F(i,j)=1.0, j=1,N)
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr MaxEmissLimit(0.99999); // Limit the emissivity internally/avoid a divide by zero error
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // Validate argument array dimensions
         assert(N >= 0); // Do we need to allow for N==0?
@@ -1841,8 +1779,6 @@ namespace HeatBalanceIntRadExchange {
         assert((F.l2() == 1) && (F.u2() == N));
         assert((EMISS.l() == 1) && (EMISS.u() == N));
         assert(equal_dimensions(F, ScriptF));
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 #ifdef EP_Count_Calls
         ++state.dataTimingsData->NumCalcScriptF_Calls;

@@ -125,13 +125,10 @@ namespace HeatBalanceManager {
     //       MODIFIED       Dec 2006 DJS of PSU for ecoroof
     //       Added          Dec 2008 TH for thermochromic windows:
     //                       new subroutine CreateTCConstructions called by GetHeatBalanceInput
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // To encapsulate the data and algorithms required to
     // manage the heat balance simulation on the building.
-
-    // METHODOLOGY EMPLOYED:
 
     // REFERENCES:
     // The heat balance method is outlined in the "Tarp Algorithms Manual"
@@ -140,8 +137,6 @@ namespace HeatBalanceManager {
     // OTHER NOTES:
     // This module was created from IBLAST subroutines
 
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
     using namespace DataComplexFenestration;
     using namespace DataEnvironment;
@@ -163,7 +158,6 @@ namespace HeatBalanceManager {
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   January 1997
         //       MODIFIED       February 1998 Richard Liesen
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine manages the heat balance method of calculating
@@ -182,21 +176,6 @@ namespace HeatBalanceManager {
         using namespace HeatBalanceSurfaceManager;
         using EMSManager::ManageEMS;
         using EMSManager::UpdateEMSTrendVariables;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // Get the heat balance input at the beginning of the simulation only
         if (state.dataHeatBalMgr->ManageHeatBalanceGetInputFlag) {
@@ -281,33 +260,13 @@ namespace HeatBalanceManager {
         //       DATE WRITTEN   September 1997
         //       MODIFIED       February 1998 Richard Liesen
         //                      November 1998 FW
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is the main driver for initializations within the
         // heat balance.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using InternalHeatGains::ManageInternalHeatGains;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
@@ -380,13 +339,9 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Counts or details unused constructions.
-
-        // Using/Aliasing
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr NumConstrObjects(6);
@@ -399,18 +354,15 @@ namespace HeatBalanceManager {
                                             "EnergyManagementSystem:ConstructionIndexVariable"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Unused;
-        int Loop;
         int NumAlphas;
         int NumNumbers;
         int Status;
         int CNum;
-        int ONum;
 
         // Needs to account for Pipe:HeatTransfer/indoor, etc constructions.
-        for (ONum = 1; ONum <= NumConstrObjects; ++ONum) {
+        for (int ONum = 1; ONum <= NumConstrObjects; ++ONum) {
             int NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ConstrObjects(ONum));
-            for (Loop = 1; Loop <= NumObjects; ++Loop) {
+            for (int Loop = 1; Loop <= NumObjects; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          ConstrObjects(ONum),
                                                                          Loop,
@@ -435,9 +387,9 @@ namespace HeatBalanceManager {
                 }
             }
         }
-        Unused = state.dataHeatBal->TotConstructs - std::count_if(state.dataConstruction->Construct.begin(),
-                                                                  state.dataConstruction->Construct.end(),
-                                                                  [](Construction::ConstructionProps const &e) { return e.IsUsed; });
+        int Unused = state.dataHeatBal->TotConstructs - std::count_if(state.dataConstruction->Construct.begin(),
+                                                                      state.dataConstruction->Construct.end(),
+                                                                      [](Construction::ConstructionProps const &e) { return e.IsUsed; });
         if (Unused > 0) {
             if (!state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, format("CheckUsedConstructions: There are {} nominally unused constructions in input.", Unused));
@@ -445,7 +397,7 @@ namespace HeatBalanceManager {
             } else {
                 ShowWarningError(state, format("CheckUsedConstructions: There are {} nominally unused constructions in input.", Unused));
                 ShowContinueError(state, "Each Unused construction is shown.");
-                for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
+                for (int Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
                     if (state.dataConstruction->Construct(Loop).IsUsed) continue;
                     ShowMessage(state, format("Construction={}", state.dataConstruction->Construct(Loop).Name));
                 }
@@ -459,8 +411,6 @@ namespace HeatBalanceManager {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   July 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // If an input file presents with surfaces but no zones, there are certain objects
@@ -501,8 +451,6 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   October 2014
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine sets parameters that need to be established before any heat balance inputs are read
@@ -552,15 +500,10 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the project control data before the rest of the building data (such as
         // materials) is obtained.
-
-        // METHODOLOGY EMPLOYED:
-        // na
 
         // REFERENCES:
         // This routine gets the following objects:
@@ -576,17 +519,8 @@ namespace HeatBalanceManager {
         // Using/Aliasing
         auto &HVACSystemRootFinding = state.dataRootFinder->HVACSystemRootFinding;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr const char *RoutineName("GetProjectControlData: ");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string AlphaName(4);
@@ -594,13 +528,12 @@ namespace HeatBalanceManager {
         int NumAlpha;
         int NumNumber;
         int IOStat;
-        int NumObjects;
         std::string::size_type TMP;
 
         // Assign the values to the building data
 
         state.dataHeatBalMgr->CurrentModuleObject = "Building";
-        NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        int NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
 
         if (NumObjects > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -1385,16 +1318,11 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Reads the input data for the SITE ATMOSPHERIC VARIATION object.
 
-        // Using/Aliasing
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumObjects;
         Array1D_string AlphArray(1); // Character string data
         Array1D<Real64> NumArray(3); // Numeric data
 
@@ -1402,7 +1330,7 @@ namespace HeatBalanceManager {
         constexpr const char *Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}\n");
 
         state.dataHeatBalMgr->CurrentModuleObject = "Site:HeightVariation";
-        NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+        int NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
 
         if (NumObjects == 1) {
             int NumAlphas; // Number of elements in the alpha array
@@ -1451,35 +1379,15 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   May 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Gets spectral data (transmittance, front reflectance, and back
         // reflectance at normal incidence vs. wavelength) for glass
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr const char *RoutineName("GetWindowGlassSpectralData: ");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         int IOStat;                      // IO Status when calling get input subroutine
         Array1D_string SpecDataNames(1); // Spectral data alpha names
         int SpecDataNumAlpha;            // Number of spectral data alpha names being passed
@@ -1621,7 +1529,6 @@ namespace HeatBalanceManager {
         //       DATE WRITTEN   September 1997
         //       MODIFIED       January 2003, FCW: accommodate between-glass shading device
         //                      July 2009, TH: added constructions defined with F and C factors
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This file reads the input through the input processor for Constructions.
@@ -1631,26 +1538,17 @@ namespace HeatBalanceManager {
         // from the input file--all other portions of the Construct derived
         // type are set during the initializations.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataStringGlobals;
 
         // If UniqueConstructionNames size, then input has already been gotten
         if (state.dataHeatBalMgr->UniqueConstructNames.size()) return;
 
-        int ConstrNum;                                                           // Counter to keep track of the construction number
-        int Layer;                                                               // loop index for each of the construction layers
         int ConstructNumAlpha;                                                   // Number of construction alpha names being passed
         int DummyNumProp;                                                        // dummy variable for properties being passed
         int IOStat;                                                              // IO Status when calling get input subroutine
         Array1D_string ConstructAlphas({0, Construction::MaxLayersInConstruct}); // Construction Alpha names defined
         Array1D<Real64> DummyProps(5);                                           // Temporary array to transfer construction properties
-        int Loop;
         int TotRegConstructs; // Number of "regular" constructions (no embedded sources or sinks and
 
         int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
@@ -1721,10 +1619,10 @@ namespace HeatBalanceManager {
             e.setArraysBasedOnMaxSolidWinLayers(state);
         }
 
-        ConstrNum = 0;
+        int ConstrNum = 0;
 
         state.dataHeatBalMgr->CurrentModuleObject = "Construction";
-        for (Loop = 1; Loop <= TotRegConstructs; ++Loop) { // Loop through all constructs in the input...
+        for (int Loop = 1; Loop <= TotRegConstructs; ++Loop) { // Loop through all constructs in the input...
 
             // Get the object names for each construction from the input processor
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -1761,7 +1659,7 @@ namespace HeatBalanceManager {
 
             // Loop through all of the layers of the construct to match the material names.
             // The loop index is the number minus 1
-            for (Layer = 1; Layer <= ConstructNumAlpha - 1; ++Layer) {
+            for (int Layer = 1; Layer <= ConstructNumAlpha - 1; ++Layer) {
 
                 // Find the material in the list of materials
 
@@ -1934,7 +1832,7 @@ namespace HeatBalanceManager {
 
         ConstrNum = 0;
         state.dataHeatBalMgr->CurrentModuleObject = "Construction:WindowEquivalentLayer";
-        for (Loop = 1; Loop <= state.dataWindowEquivLayer->TotWinEquivLayerConstructs;
+        for (int Loop = 1; Loop <= state.dataWindowEquivLayer->TotWinEquivLayerConstructs;
              ++Loop) { // Loop through all constructs with Window EquivalentLayer ...
 
             // Get the object names for each construction from the input processor
@@ -1975,7 +1873,7 @@ namespace HeatBalanceManager {
 
             // Loop through all of the layers of the construct to match the material names.
             // The loop index is the number minus 1
-            for (Layer = 1; Layer <= ConstructNumAlpha - 1; ++Layer) {
+            for (int Layer = 1; Layer <= ConstructNumAlpha - 1; ++Layer) {
 
                 // Find the material in the list of materials
                 state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) =
@@ -2028,8 +1926,8 @@ namespace HeatBalanceManager {
         ConstrNum = 0;
 
         state.dataHeatBalMgr->CurrentModuleObject = "Construction:WindowDataFile";
-        for (Loop = 1; Loop <= TotWindow5Constructs; ++Loop) { // Loop through all Window5 constructions. These constructions come
-                                                               // from the Window5 data file and can be referenced only by windows
+        for (int Loop = 1; Loop <= TotWindow5Constructs; ++Loop) { // Loop through all Window5 constructions. These constructions come
+                                                                   // from the Window5 data file and can be referenced only by windows
 
             // Get the object names for each construction from the input processor
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -2087,7 +1985,7 @@ namespace HeatBalanceManager {
         WConstructNames.deallocate();
 
         // set some (default) properties of the Construction Derived Type
-        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
+        for (int ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
 
             auto &thisConstruct = state.dataConstruction->Construct(ConstrNum);
             // For air boundaries, skip TypeIsAirBoundary
@@ -2113,7 +2011,6 @@ namespace HeatBalanceManager {
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   November 1997
         //       MODIFIED       October 1998, FW; May 1999 FW; Oct 2004 LKL
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This routine calls other routines to get the Zone, and Surface data
@@ -2136,7 +2033,6 @@ namespace HeatBalanceManager {
         //       MODIFIED       PGE: Added ZONE LIST and ZONE GROUP objects, Nov 2003
         //                      RJH: Added init of DElight member of ZoneDaylight object, Jan 2004
         //                      JG: Added Part of Total Floor Area field March 2006
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the zone data for each zone in the input file.
@@ -2147,28 +2043,13 @@ namespace HeatBalanceManager {
         // REFERENCES:
         // IDD Definition for Zone object
 
-        // Using/Aliasing
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr const char *RoutineName("GetZoneData: ");
-        //  INTEGER, PARAMETER :: MaxZonesInList = 100 ! This is to allow DIMENSIONing below
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
         int NumNumbers;
         int IOStatus;
-        int ZoneLoop;
         std::string::size_type TMP;
-        int Loop;
-        int ListNum;
         int ZoneNum;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Zone";
@@ -2179,9 +2060,9 @@ namespace HeatBalanceManager {
         // always allocate as the data structure is needed in output variable Zone Heat Index, Zone Humidity Index
         state.dataHeatBal->Resilience.allocate(state.dataGlobal->NumOfZones);
 
-        ZoneLoop = 0;
+        int ZoneLoop = 0;
 
-        for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
 
             state.dataIPShortCut->rNumericArgs = 0.0; // Zero out just in case
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -2226,7 +2107,7 @@ namespace HeatBalanceManager {
 
         } // Loop
 
-        for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
             // Check to see if "nominally" controlled -- Zone Name appears in Zone Equip Configuration
             // relies on zone name being the "name" of the Zone Controlled Equip Configuration
             if (state.dataInputProcessing->inputProcessor->getObjectItemNum(
@@ -2245,7 +2126,7 @@ namespace HeatBalanceManager {
 
             state.dataHeatBal->ZoneList.allocate(state.dataHeatBal->NumOfZoneLists);
 
-            for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
+            for (int ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          ListNum,
@@ -2296,7 +2177,7 @@ namespace HeatBalanceManager {
                         }
 
                         // Check for duplicate zones
-                        for (Loop = 1; Loop <= ZoneNum - 1; ++Loop) {
+                        for (int Loop = 1; Loop <= ZoneNum - 1; ++Loop) {
                             if (state.dataHeatBal->ZoneList(ListNum).Zone(ZoneNum) == state.dataHeatBal->ZoneList(ListNum).Zone(Loop)) {
                                 ShowSevereError(state,
                                                 format("{}{}=\"{}\":  {} {} appears more than once in list.",
@@ -2341,7 +2222,7 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->ZoneGroup(GroupNum).Multiplier = state.dataIPShortCut->rNumericArgs(1);
 
                 // Zone list
-                ListNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
+                int ListNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
                 state.dataHeatBal->ZoneGroup(GroupNum).ZoneList = ListNum;
 
                 if (ListNum == 0) {
@@ -2355,7 +2236,7 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     // Check to make sure list is not in use by another ZONE GROUP
-                    for (Loop = 1; Loop <= GroupNum - 1; ++Loop) {
+                    for (int Loop = 1; Loop <= GroupNum - 1; ++Loop) {
                         if (state.dataHeatBal->ZoneGroup(GroupNum).ZoneList == state.dataHeatBal->ZoneGroup(Loop).ZoneList) {
                             ShowSevereError(state,
                                             format("{}{}=\"{}\":  {} already used by {} named {}.",
@@ -2370,7 +2251,7 @@ namespace HeatBalanceManager {
                     } // Loop
 
                     // Set group multiplier for each zone in the list
-                    for (Loop = 1; Loop <= state.dataHeatBal->ZoneList(ListNum).NumOfZones; ++Loop) {
+                    for (int Loop = 1; Loop <= state.dataHeatBal->ZoneList(ListNum).NumOfZones; ++Loop) {
                         ZoneNum = state.dataHeatBal->ZoneList(ListNum).Zone(Loop);
 
                         if (ZoneNum > 0) {
@@ -2501,8 +2382,6 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         X LUO
         //       DATE WRITTEN   July 2017
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // load input data for Outdoor Air Node for zones
@@ -2512,16 +2391,12 @@ namespace HeatBalanceManager {
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneLoop;
-        int TotZoneEnv;
-
         //-----------------------------------------------------------------------
         //               ZoneProperty:LocalEnvironment
         //-----------------------------------------------------------------------
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ZoneProperty:LocalEnvironment";
-        TotZoneEnv = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int TotZoneEnv = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotZoneEnv > 0) {
             int NumAlpha;
@@ -2597,7 +2472,7 @@ namespace HeatBalanceManager {
             }
         }
         // Link zone properties to zone object
-        for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
+        for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
             for (int Loop = 1; Loop <= TotZoneEnv; ++Loop) {
                 if (state.dataHeatBal->ZoneLocalEnvironment(Loop).ZonePtr == ZoneLoop) {
                     if (state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
@@ -2932,8 +2807,6 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   April 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is the main driver for initializations within the
@@ -2943,9 +2816,6 @@ namespace HeatBalanceManager {
         // Uses the status flags to trigger initialization events.  Some of the files
         //  have been moved to other heat balance managers.  More of these initializations
         //  will have to continue to be re-structured.
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using namespace WindowManager;
@@ -3341,13 +3211,8 @@ namespace HeatBalanceManager {
         // This subroutine is the main driver for record keeping within the
         // heat balance.
 
-        // Using/Aliasing
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNum;
-
         // Record Maxs & Mins for individual zone
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
             auto const &thisZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum);
             if (thisZoneHB.ZTAV > state.dataHeatBalMgr->MaxTempZone(ZoneNum)) {
@@ -3425,22 +3290,9 @@ namespace HeatBalanceManager {
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   April 1997
         //       MODIFIED       June 2011, Daeho Kang for individual zone comparison
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine checks warmup convergence values.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr MinLoad(100.0); // Minimum loads for convergence check
@@ -3599,32 +3451,6 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // na
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AverageZoneTemp;
@@ -3716,8 +3542,6 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   July 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is the main driver for reporting within the heat
@@ -3725,9 +3549,6 @@ namespace HeatBalanceManager {
 
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger record keeping events.
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using EconomicTariff::UpdateUtilityBills; // added for computing annual utility costs
@@ -3818,18 +3639,13 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         X Luo
         //       DATE WRITTEN   August 2017
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Open and set up headers for a external shading fraction export file.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum;
-
         state.files.shade.ensure_open(state, "OpenOutputFiles", state.files.outputControl.extshd);
         print(state.files.shade, "Surface Name,");
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             print(state.files.shade, "{},", state.dataSurface->Surface(SurfNum).Name);
         }
         print(state.files.shade, "\n");
@@ -3841,14 +3657,12 @@ namespace HeatBalanceManager {
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   May 2000
         //       MODIFIED       April 2002 (FCW): get window reveal data
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Gets input data for window frame and/or divider and/or window
         // inside/outside reveal.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         int IOStat;                            // IO Status when calling get input subroutine
         Array1D_string FrameDividerAlphas(3);  // Frame/Divider Alpha names
         int FrameDividerNum;                   // Counter to keep track of the frame/divider number
@@ -4015,7 +3829,6 @@ namespace HeatBalanceManager {
         //                        in gas data line.
         //                      Feb 2007, LKL: Add more checks on Window5DataFile
         //                      Jan 2008, LKL: Change Edge/Cond ratio check.
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Searches the WINDOW5 data file for a window with the name "DesiredConstructionName,"
@@ -4916,8 +4729,6 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Jan 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Sets the storm window flag for each window, which is:
@@ -4970,39 +4781,20 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Tianzhen Hong
         //       DATE WRITTEN   July 2009
-        //       MODIFIED
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine goes through each construction defined with Ffactor or Cfactor method,
         // and creates a construction (concrete + insulation) used in the heat transfer calculation.
         // This subroutine only gets called once in the GetConstructionData subroutine
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataStringGlobals;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
 
         // ASHRAE Handbook Fundamental 2005
         // Thermal resistance of the inside air film, m2.K/W. Average of 0.14 (heat flow up) and 0.11 (heat flow down)
         Real64 constexpr Rfilm_in(0.125);
         // Thermal resistance of the outside air film used in calculating the Ffactor, m2.K/W. 0.17/5.678
         Real64 constexpr Rfilm_out(0.03);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ConstructNumAlpha;             // Number of construction alpha names being passed
@@ -5328,8 +5120,6 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   June 2013
-        //       MODIFIED
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Loads scheduled surface gains for solar incident on interior side of the surfaces and absorbed solar energy in
@@ -5590,43 +5380,21 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2013
-        //       MODIFIED
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Check if all surfaces within zone are scheduled with surface gains. If not all surfaces within zone are scheduled,
         // warning message will be issued and program will continue to execute.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using SolarShading::SurfaceScheduledSolarInc;
         using SolarShading::WindowScheduledSolarAbs;
         using namespace DataSurfaces;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SchedPtr;         // scheduled surface gains pointer
-        bool ZoneUnscheduled; // true if all surfaces in the zone are unscheduled
-        bool ZoneScheduled;   // true if all surfaces in the zone are scheduled
+        int SchedPtr; // scheduled surface gains pointer
 
-        ZoneUnscheduled = false;
-        ZoneScheduled = false;
+        bool ZoneUnscheduled = false; // true if all surfaces in the zone are unscheduled
+        bool ZoneScheduled = false;   // true if all surfaces in the zone are scheduled
 
         bool firstZoneSurface = true;
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
@@ -5687,8 +5455,6 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Tianzhen Hong
         //       DATE WRITTEN   January 2009
-        //       MODIFIED
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine goes through each TC master construction and creates a complete series
@@ -5696,46 +5462,19 @@ namespace HeatBalanceManager {
         // This subroutine only gets called once in the GetHeatBalanceInput subroutine
         //  after materials, constructions and building geometry data are read.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Using/Aliasing
         using namespace DataStringGlobals;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        int Loop;
-        int iTC(0);
-        int iMat(0);
-        int NumNewConst(0);
-
-        NumNewConst = 0;
-        for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
+        int NumNewConst = 0;
+        for (int Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
             if (state.dataConstruction->Construct(Loop).TCFlag == 1) {
                 auto const *thisMaterial =
                     dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer));
                 assert(thisMaterial != nullptr);
                 int iTCG = thisMaterial->TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
-                iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
-                for (iTC = 1; iTC <= iMat; ++iTC) {
+                int iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
+                for (int iTC = 1; iTC <= iMat; ++iTC) {
                     ++NumNewConst;
                 }
             }
@@ -5751,15 +5490,15 @@ namespace HeatBalanceManager {
         state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs + NumNewConst) = 1.0;
 
         NumNewConst = state.dataHeatBal->TotConstructs;
-        for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
             if (state.dataConstruction->Construct(Loop).TCFlag == 1) {
                 auto const *thisMaterial =
                     dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer));
                 assert(thisMaterial != nullptr);
                 int iTCG = thisMaterial->TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
-                iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
-                for (iTC = 1; iTC <= iMat; ++iTC) {
+                int iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
+                for (int iTC = 1; iTC <= iMat; ++iTC) {
                     ++NumNewConst;
                     state.dataConstruction->Construct(NumNewConst) = state.dataConstruction->Construct(Loop); // copy data
                     state.dataConstruction->Construct(NumNewConst).Name =
@@ -5784,8 +5523,6 @@ namespace HeatBalanceManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   January 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Convert simple window performance indices into all the properties needed to
@@ -5796,21 +5533,6 @@ namespace HeatBalanceManager {
 
         // REFERENCES:
         // draft paper by Arasteh, Kohler, and Griffith
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Riw(0.0);            // thermal resistance of interior film coefficient under winter conditions (m2-K/W)
@@ -5982,7 +5704,6 @@ namespace HeatBalanceManager {
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   March 2012
         //       MODIFIED       May 2013 (Simon Vidanovic)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // get input for complex fenestration materials
@@ -5990,31 +5711,22 @@ namespace HeatBalanceManager {
         // METHODOLOGY EMPLOYED:
         // usual GetInput processing.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // Locals
         // SUBROUTINE PARAMETER DEFINITIONS
         constexpr const char *RoutineName("SetupComplexFenestrationMaterialInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string MaterialNames(5);   // Number of Material Alpha names defined
         Array1D<Real64> MaterialProps(27); // Temporary array to transfer material properties
-        int Loop;
-        int NumAlphas;  // Number of Alphas for each GetObjectItem call
-        int NumNumbers; // Number of Numbers for each GetObjectItem call
-        int IOStatus;   // Used in GetObjectItem
+        int NumAlphas;                     // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                    // Number of Numbers for each GetObjectItem call
+        int IOStatus;                      // Used in GetObjectItem
 
         // Reading WindowGap:SupportPillar
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "WindowGap:SupportPillar";
         state.dataHeatBal->W7SupportPillars = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataHeatBal->SupportPillar.allocate(state.dataHeatBal->W7SupportPillars);
-        for (Loop = 1; Loop <= state.dataHeatBal->W7SupportPillars; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->W7SupportPillars; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
@@ -6065,7 +5777,7 @@ namespace HeatBalanceManager {
         cCurrentModuleObject = "WindowGap:DeflectionState";
         state.dataHeatBal->W7DeflectionStates = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataHeatBal->DeflectionState.allocate(state.dataHeatBal->W7DeflectionStates);
-        for (Loop = 1; Loop <= state.dataHeatBal->W7DeflectionStates; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->W7DeflectionStates; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
@@ -6101,7 +5813,7 @@ namespace HeatBalanceManager {
         cCurrentModuleObject = "WindowMaterial:Gap";
         state.dataHeatBal->W7MaterialGaps = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         // ALLOCATE(DeflectionState(W7DeflectionStates))
-        for (Loop = 1; Loop <= state.dataHeatBal->W7MaterialGaps; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->W7MaterialGaps; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
@@ -6191,7 +5903,7 @@ namespace HeatBalanceManager {
                 state.dataMaterial->TotComplexShades); // Allocate the array Size to the number of complex shades
         }
 
-        for (Loop = 1; Loop <= state.dataMaterial->TotComplexShades; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataMaterial->TotComplexShades; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
@@ -6275,12 +5987,6 @@ namespace HeatBalanceManager {
             state.dataMaterial->ComplexShade(Loop).SlatAngle = state.dataIPShortCut->rNumericArgs(14);
             state.dataMaterial->ComplexShade(Loop).SlatConductivity = state.dataIPShortCut->rNumericArgs(15);
             state.dataMaterial->ComplexShade(Loop).SlatCurve = state.dataIPShortCut->rNumericArgs(16);
-
-            // IF (dataMaterial.Material(MaterNum)%Conductivity > 0.0) THEN
-            //  NominalR(MaterNum)=dataMaterial.Material(MaterNum)%Thickness/dataMaterial.Material(MaterNum)%Conductivity
-            // ELSE
-            //  NominalR(MaterNum)=1.0
-            // ENDIF
 
             if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) {
                 ErrorsFound = true;
@@ -6525,7 +6231,6 @@ namespace HeatBalanceManager {
         //       DATE WRITTEN   June 2010
         //       MODIFIED       January 2012 (Simon Vidanovic)
         //       MODIFIED       May 2012 (Simon Vidanovic)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // get input for complex fenestration construction
@@ -6543,8 +6248,6 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // The following moved to DataBSDFWindow module:
         // INTEGER :: TotComplexFenStates   ! Number of complex fenestration construction definitions
-        int I;          // do loop index
-        int Loop;       // do loop counter
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int TotalArgs;  // Number of fields for each GetObjectItem call
@@ -6552,7 +6255,6 @@ namespace HeatBalanceManager {
         int NumRows;    // temporary size of matrix
         int NumCols;    // temporary size of matrix
         int NBasis;     // temporary number of elements in basis
-        int Layer;      // loop counter for material layers
         int AlphaIndex;
         int ThermalModelNum;     // number of thermal model parameters object
         int NumOfTotalLayers;    // total number of layers in the construction
@@ -6576,7 +6278,7 @@ namespace HeatBalanceManager {
         state.dataBSDFWindow->TotThermalModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataMaterial->WindowThermalModel.allocate(state.dataBSDFWindow->TotThermalModels);
 
-        for (Loop = 1; Loop <= state.dataBSDFWindow->TotThermalModels; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataBSDFWindow->TotThermalModels; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      Loop,
@@ -6742,7 +6444,7 @@ namespace HeatBalanceManager {
         if (!allocated(locNumericArgs)) locNumericArgs.allocate(NumNumbers);
 
         state.dataBSDFWindow->FirstBSDF = ConstrNum + 1; // Location of first BSDF construction input (They will be consecutive)
-        for (Loop = 1; Loop <= state.dataBSDFWindow->TotComplexFenStates; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataBSDFWindow->TotComplexFenStates; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      locCurrentModuleObject,
                                                                      Loop,
@@ -7064,7 +6766,7 @@ namespace HeatBalanceManager {
                 }
 
                 // ALLOCATE(Construct(ConstrNum)%BSDFInput%Layer(NumOfOpticalLayers))
-                for (Layer = 1; Layer <= thisConstruct.TotLayers; ++Layer) {
+                for (int Layer = 1; Layer <= thisConstruct.TotLayers; ++Layer) {
                     AlphaIndex = 9 + (Layer * 3) - 2;
                     currentOpticalLayer = int(Layer / 2) + 1;
                     // Material info is contained in the thermal construct
@@ -7226,7 +6928,7 @@ namespace HeatBalanceManager {
                     Get2DMatrix(state, thisConstruct.BSDFInput.SolFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
 
                     thisConstruct.BSDFInput.SolFrtTrans = 0.0;
-                    for (I = 1; I <= NBasis; ++I) {
+                    for (int I = 1; I <= NBasis; ++I) {
                         thisConstruct.BSDFInput.SolFrtTrans(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
                     }
                 }
@@ -7273,7 +6975,7 @@ namespace HeatBalanceManager {
                 } else {
                     Get2DMatrix(state, thisConstruct.BSDFInput.SolBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     thisConstruct.BSDFInput.SolBkRefl = 0.0;
-                    for (I = 1; I <= NBasis; ++I) {
+                    for (int I = 1; I <= NBasis; ++I) {
                         thisConstruct.BSDFInput.SolBkRefl(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
                     }
                 }
@@ -7320,7 +7022,7 @@ namespace HeatBalanceManager {
                 } else {
                     Get2DMatrix(state, thisConstruct.BSDFInput.VisFrtTransIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     thisConstruct.BSDFInput.VisFrtTrans = 0.0;
-                    for (I = 1; I <= NBasis; ++I) {
+                    for (int I = 1; I <= NBasis; ++I) {
                         thisConstruct.BSDFInput.VisFrtTrans(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
                     }
                 }
@@ -7367,7 +7069,7 @@ namespace HeatBalanceManager {
                 } else {
                     Get2DMatrix(state, thisConstruct.BSDFInput.VisBkReflIndex, state.dataBSDFWindow->BSDFTempMtrx);
                     thisConstruct.BSDFInput.VisBkRefl = 0.0;
-                    for (I = 1; I <= NBasis; ++I) {
+                    for (int I = 1; I <= NBasis; ++I) {
                         thisConstruct.BSDFInput.VisBkRefl(I, I) = state.dataBSDFWindow->BSDFTempMtrx(I, 1);
                     }
                 }
@@ -7383,7 +7085,7 @@ namespace HeatBalanceManager {
                 // ENDIF
 
                 // ALLOCATE(Construct(ConstrNum)%BSDFInput%Layer(NumOfOpticalLayers))
-                for (Layer = 1; Layer <= thisConstruct.TotLayers; ++Layer) {
+                for (int Layer = 1; Layer <= thisConstruct.TotLayers; ++Layer) {
 
                     if (mod(Layer, 2) != 0) {
                         thisConstruct.BSDFInput.Layer(currentOpticalLayer).MaterialIndex = thisConstruct.LayerPoint(Layer);
