@@ -1748,7 +1748,6 @@ namespace HeatBalanceIntRadExchange {
                             state,
                             format("FixViewFactors: View factors convergence has failed and will lead to heat balance errors in zone=\"{}\".",
                                    enclName));
-                        severeErrorPresent = true;
                     }
                     ShowWarningError(
                         state,
@@ -2022,9 +2021,9 @@ namespace HeatBalanceIntRadExchange {
             for (int i = l; i < k; ++i, ++ik) { // Eliminate kth column entries from I in rows above k
                 Real64 const Aik(A[ik]);
                 int ji(A.index(l, i)); // [ ji ] == ( j, i )
-                int jk(A.index(l, k)); // [ jk ] == ( k, j )
-                for (int j = l; j <= u; ++j, ji += n, jk += n) {
-                    I[ji] -= Aik * I[jk];
+                int jm(A.index(l, k)); // [ jm ] == ( k, j )
+                for (int j = l; j <= u; ++j, ji += n, jm += n) {
+                    I[ji] -= Aik * I[jm];
                 }
             }
         }
@@ -2044,10 +2043,10 @@ namespace HeatBalanceIntRadExchange {
 
         constexpr int maxIt = 100;
         constexpr double tol = 0.0001;
-        double fChange, fLast;
+        double fLast;
         double sumAFNew = sumAF;
         for (unsigned i = 0; i < maxIt; i++) {
-            fChange = 0.;
+            double fChange = 0.;
             bool errorsFound(false);
             sumAF = sumAFNew;
             sumAFNew = 0.0;
@@ -2077,10 +2076,10 @@ namespace HeatBalanceIntRadExchange {
         return;
     }
 
-    void CalcFp(int const N,            // Number of surfaces
-                Array1D<Real64> &EMISS, // VECTOR OF SURFACE EMISSIVITIES
-                Array1D<Real64> &FMRT,  // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
-                Array1D<Real64> &Fp     // VECTOR OF OPPENHEIM RESISTANCE VALUES
+    void CalcFp(int const N,                  // Number of surfaces
+                Array1D<Real64> const &EMISS, // VECTOR OF SURFACE EMISSIVITIES
+                Array1D<Real64> const &FMRT,  // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+                Array1D<Real64> &Fp           // VECTOR OF OPPENHEIM RESISTANCE VALUES
     )
     {
         for (int iS = 0; iS < N; iS++) {
