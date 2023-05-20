@@ -6226,10 +6226,6 @@ void ReportThermalResilience(EnergyPlusData &state)
                         }
                     }
 
-                    Real64 Temperature = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTAV;
-                    Real64 CoolingSetpoint = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum);
-                    Real64 HeatingSetpoint = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum);
-
                     if ((CoolingSetpoint > 0) && (Temperature > CoolingSetpoint)) {
                         state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
                             (Temperature - CoolingSetpoint) * state.dataGlobal->TimeStepZone;
@@ -8172,11 +8168,11 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                             // Exterior shade in place
                             int const ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                             if (ConstrNumSh != 0) {
-                                auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(
+                                auto const *thisMaterial2 = dynamic_cast<Material::MaterialChild *>(
                                     state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1)));
-                                assert(thisMaterial != nullptr);
-                                RoughSurf = thisMaterial->Roughness;
-                                EmisOut = thisMaterial->AbsorpThermal;
+                                assert(thisMaterial2 != nullptr);
+                                RoughSurf = thisMaterial2->Roughness;
+                                EmisOut = thisMaterial2->AbsorpThermal;
                             }
                         }
 
@@ -8870,11 +8866,11 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                     // Exterior shade in place
                                     int const ConstrNumSh = Surface(surfNum).activeShadedConstruction;
                                     if (ConstrNumSh != 0) {
-                                        auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(
+                                        auto const *thisMaterial2 = dynamic_cast<Material::MaterialChild *>(
                                             state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1)));
-                                        assert(thisMaterial != nullptr);
-                                        RoughSurf = thisMaterial->Roughness;
-                                        EmisOut = thisMaterial->AbsorpThermal;
+                                        assert(thisMaterial2 != nullptr);
+                                        RoughSurf = thisMaterial2->Roughness;
+                                        EmisOut = thisMaterial2->AbsorpThermal;
                                     }
                                 }
 
@@ -9666,8 +9662,7 @@ void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state)
                 state.dataViewFactor->EnclRadInfo(enclosureNum).radThermAbsMult;
         }
         for (int jSurf = 1; jSurf <= state.dataSurface->TotSurfaces; ++jSurf) {
-            auto &surface = state.dataSurface->Surface(jSurf);
-
+            auto const&surface = state.dataSurface->Surface(jSurf);
             if (!surface.HeatTransSurf || surface.Zone == 0) continue; // Skip non-heat transfer surfaces
             if (surface.Class == SurfaceClass::TDD_Dome) continue;     // Skip tubular daylighting device domes
             state.dataOutRptTab->ITABSFseq(state.dataSize->CurOverallSimDay, TimeStepInDay, jSurf) = state.dataHeatBalSurf->SurfAbsThermalInt(jSurf);
