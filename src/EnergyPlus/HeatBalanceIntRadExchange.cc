@@ -2118,12 +2118,7 @@ namespace HeatBalanceIntRadExchange {
 
         // Check if the surface and equipment are in the same zone
         int const surfZoneNum = state.dataSurface->Surface(surfNum).Zone;
-        if (RadSysZoneNum == 0) {
-            // This should never happen - but it does in some simple unit tests that are designed to throw errors
-            ShowSevereError(state,
-                            format("{}Somehow the radiant system zone number is zero for{} = {}", routineName, cCurrentModuleObject, RadSysName));
-            ErrorsFound = true;
-        } else if (surfZoneNum == 0) {
+        if (surfZoneNum == 0) {
             // This should never happen
             ShowSevereError(state,
                             format("{}Somehow  the surface zone number is zero for{} = {} and Surface = {}",
