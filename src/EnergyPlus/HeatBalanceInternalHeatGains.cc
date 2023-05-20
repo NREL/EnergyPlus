@@ -124,13 +124,11 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     int constexpr DeviceAllocInc(100);
 
     int IntGainsNum;
-    bool FoundIntGainsType;
     bool FoundDuplicate;
     std::string UpperCaseObjectName;
 
     // Object Data
 
-    FoundIntGainsType = false;
     FoundDuplicate = false;
     UpperCaseObjectName = UtilityRoutines::MakeUPPERCase(cComponentName);
 
@@ -138,7 +136,6 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     for (IntGainsNum = 1; IntGainsNum <= thisIntGain.numberOfDevices; ++IntGainsNum) {
         if ((thisIntGain.device(IntGainsNum).CompObjectType == DataHeatBalance::IntGainTypeNamesUC[static_cast<int>(IntGainCompType)]) &&
             (thisIntGain.device(IntGainsNum).CompType == IntGainCompType)) {
-            FoundIntGainsType = true;
             if (thisIntGain.device(IntGainsNum).CompObjectName == UpperCaseObjectName) {
                 FoundDuplicate = true;
                 break;
