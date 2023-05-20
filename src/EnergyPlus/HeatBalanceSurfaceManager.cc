@@ -2146,10 +2146,6 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
     // REFERENCES:
     // (I)BLAST legacy routine INITTH
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int SurfNum; // DO loop counter for surfaces
-    int OSCMnum; // DO loop counter for Other side conditions modeled (OSCM)
-
     // First do the "bulk" initializations of arrays sized to NumOfZones
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         state.dataHeatBal->ZoneMRT(zoneNum) = DataHeatBalance::ZoneInitialTemp; // module level array
@@ -2300,7 +2296,7 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
 
     // Perform other initializations that depend on the surface characteristics
     for (int CTFTermNum = 1; CTFTermNum <= state.dataHeatBal->MaxCTFTerms + 1; ++CTFTermNum) {
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             auto &surface = state.dataSurface->Surface(SurfNum);
             if (!surface.HeatTransSurf) continue; // Skip non-heat transfer surfaces
             // Reset outside boundary conditions if necessary
@@ -2318,8 +2314,8 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             state.dataHeatBalSurf->SurfInsideFluxHist(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
         }
     }
-    for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        auto &surface = state.dataSurface->Surface(SurfNum);
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        auto const &surface = state.dataSurface->Surface(SurfNum);
         if (!surface.HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
         if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
@@ -2334,7 +2330,7 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
     }
     if (!state.dataHeatBal->SimpleCTFOnly || state.dataGlobal->AnyEnergyManagementSystemInModel) {
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             auto &surface = state.dataSurface->Surface(SurfNum);
             if (!surface.HeatTransSurf) continue;
             if ((surface.ExtBoundCond == ExternalEnvironment) || (surface.ExtBoundCond == OtherSideCondModeledExt)) {
@@ -2358,11 +2354,12 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
     }
 
     if (state.dataSurface->TotOSCM >= 1) {
-        for (OSCMnum = 1; OSCMnum <= state.dataSurface->TotOSCM; ++OSCMnum) {
-            state.dataSurface->OSCM(OSCMnum).TConv = 20.0;
-            state.dataSurface->OSCM(OSCMnum).HConv = 4.0;
-            state.dataSurface->OSCM(OSCMnum).TRad = 20.0;
-            state.dataSurface->OSCM(OSCMnum).HRad = 4.0;
+        for (int OSCMnum = 1; OSCMnum <= state.dataSurface->TotOSCM; ++OSCMnum) {
+            auto &thisOSC = state.dataSurface->OSCM(OSCMnum);
+            thisOSC.TConv = 20.0;
+            thisOSC.HConv = 4.0;
+            thisOSC.TRad = 20.0;
+            thisOSC.HRad = 4.0;
         }
     }
 }
@@ -3024,7 +3021,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                  state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(OutShelfSurf)) *
                 state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectSol;
 
-            Real64 GndReflSolarRad = state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier;
+            GndReflSolarRad = state.dataEnvrn->GndSolarRad * SurfIncSolarMultiplier;
             if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl) {
                 GndReflSolarRad = state.dataSurface->Surface(SurfNum).GndReflSolarRad;
             }
@@ -3642,10 +3639,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                     firstSurf = thisSpace.WindowSurfaceFirst;
                     lastSurf = thisSpace.WindowSurfaceLast;
                     for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-                        auto &surface = state.dataSurface->Surface(surfNum);
+                        auto const &surface = state.dataSurface->Surface(surfNum);
                         if (surface.ExtSolar && surface.ConstituentSurfaceNums.size() > 1) {
-                            auto const &surface = state.dataSurface->Surface(surfNum);
-
                             // Absorbed in glazing
                             int totalGlassLayers =
                                 state.dataConstruction->Construct(state.dataSurface->SurfActiveConstruction(surfNum)).TotGlassLayers;
@@ -5925,11 +5920,6 @@ void ReportThermalResilience(EnergyPlusData &state)
                         }
                     }
 
-                    Real64 VeryHotPMVThresh = 3.0;
-                    Real64 WarmPMVThresh = 0.7;
-                    Real64 CoolPMVThresh = -0.7;
-                    Real64 VeryColdPMVThresh = -3.0;
-                    Real64 PMV = state.dataThermalComforts->ThermalComfortData(iPeople).FangerPMV;
                     if (PMV < VeryColdPMVThresh) {
                         state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod(ZoneNum, ReportPeriodIdx)[0] +=
                             (VeryColdPMVThresh - PMV) * NumOcc * state.dataGlobal->TimeStepZone;
@@ -9662,7 +9652,7 @@ void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state)
                 state.dataViewFactor->EnclRadInfo(enclosureNum).radThermAbsMult;
         }
         for (int jSurf = 1; jSurf <= state.dataSurface->TotSurfaces; ++jSurf) {
-            auto const&surface = state.dataSurface->Surface(jSurf);
+            auto const &surface = state.dataSurface->Surface(jSurf);
             if (!surface.HeatTransSurf || surface.Zone == 0) continue; // Skip non-heat transfer surfaces
             if (surface.Class == SurfaceClass::TDD_Dome) continue;     // Skip tubular daylighting device domes
             state.dataOutRptTab->ITABSFseq(state.dataSize->CurOverallSimDay, TimeStepInDay, jSurf) = state.dataHeatBalSurf->SurfAbsThermalInt(jSurf);
