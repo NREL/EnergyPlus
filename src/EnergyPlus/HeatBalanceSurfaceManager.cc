@@ -280,10 +280,6 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     // Bulk Initialization for Temperatures & WindSpeed
     // using the zone, modify the zone  Dry/Wet BulbTemps
 
-    //  DO ZoneNum = 1, NumOfZones
-    //    Zone(ZoneNum)%WindSpeed = WindSpeedAt(Zone(ZoneNum)%Centroid%z)
-    //  END DO
-
     // Initialize surface outdoor environmental variables
     // Bulk Initialization for Temperatures & WindSpeed
     // using the surface centroids, modify the surface Dry/Wet BulbTemps
@@ -292,9 +288,6 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     DataSurfaces::SetSurfaceWindSpeedAt(state);
     DataSurfaces::SetSurfaceWindDirAt(state);
-    //  DO SurfNum = 1, TotSurfaces
-    //    IF (Surface(SurfNum)%ExtWind) Surface(SurfNum)%WindSpeed = WindSpeedAt(Surface(SurfNum)%Centroid%z)
-    //  END DO
     if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSurface->Surface(SurfNum).SurfLinkedOutAirNode > 0) {
@@ -370,7 +363,6 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     }
 
     // There are no daily initializations done in this portion of the surface heat balance
-
     // There are no hourly initializations done in this portion of the surface heat balance
 
     GetGroundSurfacesReflectanceAverage(state);
@@ -2128,7 +2120,6 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         George Walton
     //       DATE WRITTEN   March 1978
-    //       MODIFIED       na
     //       RE-ENGINEERED  Feb98 (RKS)
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -4439,8 +4430,6 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         Legacy Code
-    //       DATE WRITTEN
     //       MODIFIED       Jun 2007 - Lawrie - Speed enhancements.
     //       RE-ENGINEERED  Winkelmann, Lawrie
 
@@ -4562,33 +4551,12 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   April 2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // initialize material and construction surface properties if being overriden by EMS
 
     // METHODOLOGY EMPLOYED:
     // update solar, thermal and visible absorptance values when actuated by EMS
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int MaterNum;        // do loop counter over materials
@@ -4663,8 +4631,6 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   Jan 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // change construction on surface if overriden by EMS
@@ -4913,8 +4879,6 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, ObjexxFC
         UpdateNonRepresentativeSurfaceResults(state, ZoneToResimulate);
     }
 
-    // Set normalized properties used for reporting
-
     // Opaque or window surfaces (Skip TDD:DOME objects. Inside temp is handled by TDD:DIFFUSER.)
     for (int zoneNum = firstZone; zoneNum <= lastZone; ++zoneNum) {
         for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
@@ -5109,8 +5073,6 @@ void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   December 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // If a radiant system is present and was on for part of the time step,
@@ -5156,7 +5118,6 @@ void UpdateThermalHistories(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Russ Taylor
     //       DATE WRITTEN   June 1990
-    //       MODIFIED       na
     //       RE-ENGINEERED  Mar98 (RKS)
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -5513,14 +5474,10 @@ void CalculateZoneMRT(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   November 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the current zone MRT for thermal comfort and radiation
     // calculation purposes.
-
-    Real64 SumAET; // Intermediate calculational variable (area*emissivity*T) sum
 
     if (state.dataHeatBalSurfMgr->CalculateZoneMRTfirstTime) {
         state.dataHeatBalSurfMgr->SurfaceAE.allocate(state.dataSurface->TotSurfaces);
@@ -5540,7 +5497,7 @@ void CalculateZoneMRT(EnergyPlusData &state,
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (present(ZoneToResimulate) && (ZoneNum != ZoneToResimulate)) continue;
-        SumAET = 0.0;
+        Real64 SumAET = 0.0;
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             auto const &thisSpace = state.dataHeatBal->space(spaceNum);
             for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
@@ -9252,13 +9209,6 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     // (I)BLAST legacy routine HBOUT
     // 1989 ASHRAE Handbook of Fundamentals (Figure 1 on p. 22.4, convection correlations)
 
-    // Using/Aliasing
-    using namespace DataEnvironment;
-    using namespace DataHeatBalance;
-    using namespace DataHeatBalSurface;
-    using namespace DataSurfaces;
-    using namespace Psychrometrics;
-
     // Determine whether or not movable insulation is present
     bool MovInsulPresent = (HMovInsul > 0.0); // .TRUE. if movable insulation is currently present for surface
     bool QuickConductionSurf;                 // .TRUE. if the cross CTF term is relatively large
@@ -9269,7 +9219,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     // requires the inside heat balance to be accounted for in the heat balance
     // while a "slow" surface can used the last time step's value for inside
     // surface temperature.
-    auto &Surface = state.dataSurface->Surface;
+    auto &surface = state.dataSurface->Surface(SurfNum);
     auto const &construct = state.dataConstruction->Construct(ConstrNum);
     if (construct.CTFCross[0] > 0.01) {
         QuickConductionSurf = true;
@@ -9281,8 +9231,8 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     Real64 TSky = state.dataEnvrn->SkyTemp;
     Real64 TGround = state.dataEnvrn->OutDryBulbTemp;
 
-    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+    if (surface.SurfHasSurroundingSurfProperty) {
+        int SrdSurfsNum = surface.SurfSurroundingSurfacesNum;
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
             TSky = ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum);
         }
@@ -9290,8 +9240,8 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
             TGround = ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum);
         }
     }
-    if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp) {
-        TGround = state.dataSurface->GroundSurfsProperty(state.dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex).SurfsTempAvg;
+    if (surface.UseSurfPropertyGndSurfTemp) {
+        TGround = state.dataSurface->GroundSurfsProperty(surface.SurfPropertyGndSurfIndex).SurfsTempAvg;
     }
 
     // Now, calculate the outside surface temperature using the proper heat balance equation.
@@ -9302,12 +9252,12 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
 
     // Outside heat balance case: Tubular daylighting device
     Real64 &TH11(state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum));
-    if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome) {
+    if (surface.Class == DataSurfaces::SurfaceClass::TDD_Dome) {
 
         // Lookup up the TDD:DIFFUSER object
         int PipeNum = state.dataSurface->SurfWinTDDPipeNum(SurfNum);
         int SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
-        int ZoneNum2 = Surface(SurfNum2).Zone;
+        int ZoneNum2 = state.dataSurface->Surface(SurfNum2).Zone;
         Real64 Ueff = 1.0 / state.dataDaylightingDevicesData->TDDPipe(PipeNum).Reff; // 1 / effective R value between TDD:DOME and TDD:DIFFUSER
         F1 = Ueff / (Ueff + state.dataHeatBalSurf->SurfHConvInt(SurfNum2));
 
@@ -9333,7 +9283,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         // Outside heat balance case: No movable insulation, slow conduction
     } else if ((!MovInsulPresent) && (!QuickConductionSurf)) {
         // Add LWR from surrounding surfaces
-        if (Surface(SurfNum).OSCMPtr == 0) {
+        if (surface.OSCMPtr == 0) {
             if (construct.SourceSinkPresent) {
                 TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) +
                         state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
@@ -9358,9 +9308,9 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         } else { //( Surface(SurfNum)%OSCMPtr > 0 ) THEN
             // local copies of variables for clarity in radiation terms
             // TODO: - int OSCMPtr; // "Pointer" to OSCM data structure (other side conditions from a model)
-            Real64 RadTemp = state.dataSurface->OSCM(Surface(SurfNum).OSCMPtr)
-                                 .TRad; // local value for Effective radiation temperature for OtherSideConditions model
-            Real64 HRad = state.dataSurface->OSCM(Surface(SurfNum).OSCMPtr).HRad; // local value for effective (linearized) radiation coefficient
+            Real64 RadTemp =
+                state.dataSurface->OSCM(surface.OSCMPtr).TRad; // local value for Effective radiation temperature for OtherSideConditions model
+            Real64 HRad = state.dataSurface->OSCM(surface.OSCMPtr).HRad; // local value for effective (linearized) radiation coefficient
 
             // patterned after "No movable insulation, slow conduction," but with new radiation terms and no sun,
             if (construct.SourceSinkPresent) {
@@ -9378,7 +9328,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         }
         // Outside heat balance case: No movable insulation, quick conduction
     } else if ((!MovInsulPresent) && (QuickConductionSurf)) {
-        if (Surface(SurfNum).OSCMPtr == 0) {
+        if (surface.OSCMPtr == 0) {
             if (construct.SourceSinkPresent) {
                 TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) +
                         state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +
@@ -9410,8 +9360,8 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
             // Outside Heat Balance case: Other Side Conditions Model
         } else { //( Surface(SurfNum)%OSCMPtr > 0 ) THEN
             // local copies of variables for clarity in radiation terms
-            Real64 RadTemp = state.dataSurface->OSCM(Surface(SurfNum).OSCMPtr).TRad;
-            Real64 HRad = state.dataSurface->OSCM(Surface(SurfNum).OSCMPtr).HRad;
+            Real64 RadTemp = state.dataSurface->OSCM(surface.OSCMPtr).TRad;
+            Real64 HRad = state.dataSurface->OSCM(surface.OSCMPtr).HRad;
             // patterned after "No movable insulation, quick conduction," but with new radiation terms and no sun,
             if (construct.SourceSinkPresent) {
                 TH11 = (-state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) + state.dataHeatBalSurf->SurfHcExt(SurfNum) * TempExt +
@@ -9477,8 +9427,8 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     QRadLWOutSrdSurfsRep = 0;
     // Report LWR from surrounding surfaces for current exterior surf temp
     // Current exterior surf temp would be used for the next step LWR calculation.
-    if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
+    if (surface.SurfHasSurroundingSurfProperty) {
+        int SrdSurfsNum = surface.SurfSurroundingSurfacesNum;
         for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
             Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
             Real64 SrdSurfTempAbs = ScheduleManager::GetCurrentScheduleValue(
@@ -9533,8 +9483,6 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B Griffith
     //       DATE WRITTEN   January 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // manages calculating the temperatures of baffle and air cavity for
@@ -9543,48 +9491,28 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
     // METHODOLOGY EMPLOYED:
     // derived from CalcPassiveTranspiredCollector
 
-    // Using/Aliasing
-    using ConvectionCoefficients::InitExteriorConvectionCoeff;
-    using Psychrometrics::PsyCpAirFnW;
-    using Psychrometrics::PsyRhoAirFnPbTdbW;
-    using Psychrometrics::PsyWFnTdbTwbPb;
-
     // local working variables
-    Real64 AspRat; // Aspect Ratio of gap
-    Real64 TmpTscoll;
-    Real64 TmpTaPlen;
-    Real64 RhoAir;
-    Real64 holeArea;
     Real64 HrPlen;
     Real64 HcPlen;
     Real64 Isc;
     Real64 MdotVent;
     Real64 VdotWind;
     Real64 VdotThermal;
-    int CavNum; // do loop counter
-    int iter;   // do loop counter
-    int thisOSCM;
-    Real64 TempExt;
-    Real64 OutHumRatExt;
 
-    CavNum = state.dataSurface->SurfExtCavNum(SurfNum);
-
-    TempExt = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
-
-    OutHumRatExt = PsyWFnTdbTwbPb(
+    int CavNum = state.dataSurface->SurfExtCavNum(SurfNum);
+    Real64 TempExt = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+    Real64 OutHumRatExt = Psychrometrics::PsyWFnTdbTwbPb(
         state, state.dataSurface->SurfOutDryBulbTemp(SurfNum), state.dataSurface->SurfOutWetBulbTemp(SurfNum), state.dataEnvrn->OutBaroPress);
-
-    RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, OutHumRatExt);
-
-    holeArea = state.dataHeatBal->ExtVentedCavity(CavNum).ActualArea * state.dataHeatBal->ExtVentedCavity(CavNum).Porosity;
-
-    AspRat = state.dataHeatBal->ExtVentedCavity(CavNum).HdeltaNPL * 2.0 / state.dataHeatBal->ExtVentedCavity(CavNum).PlenGapThick;
-    TmpTscoll = state.dataHeatBal->ExtVentedCavity(CavNum).TbaffleLast;
-    TmpTaPlen = state.dataHeatBal->ExtVentedCavity(CavNum).TairLast;
+    Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, OutHumRatExt);
+    Real64 holeArea = state.dataHeatBal->ExtVentedCavity(CavNum).ActualArea * state.dataHeatBal->ExtVentedCavity(CavNum).Porosity;
+    // Aspect Ratio of gap
+    Real64 AspRat = state.dataHeatBal->ExtVentedCavity(CavNum).HdeltaNPL * 2.0 / state.dataHeatBal->ExtVentedCavity(CavNum).PlenGapThick;
+    Real64 TmpTscoll = state.dataHeatBal->ExtVentedCavity(CavNum).TbaffleLast;
+    Real64 TmpTaPlen = state.dataHeatBal->ExtVentedCavity(CavNum).TairLast;
 
     // all the work is done in this routine located in GeneralRoutines.cc
 
-    for (iter = 1; iter <= 3; ++iter) { // this is a sequential solution approach.
+    for (int iter = 1; iter <= 3; ++iter) { // this is a sequential solution approach.
 
         CalcPassiveExteriorBaffleGap(state,
                                      state.dataHeatBal->ExtVentedCavity(CavNum).SurfPtrs,
@@ -9627,7 +9555,7 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
     state.dataHeatBal->ExtVentedCavity(CavNum).TbaffleLast = state.dataHeatBal->ExtVentedCavity(CavNum).Tbaffle;
 
     // update the OtherSideConditionsModel coefficients.
-    thisOSCM = state.dataHeatBal->ExtVentedCavity(CavNum).OSCMPtr;
+    int thisOSCM = state.dataHeatBal->ExtVentedCavity(CavNum).OSCMPtr;
 
     state.dataSurface->OSCM(thisOSCM).TConv = state.dataHeatBal->ExtVentedCavity(CavNum).TAirCav;
     state.dataSurface->OSCM(thisOSCM).HConv = state.dataHeatBal->ExtVentedCavity(CavNum).HcPlen;
@@ -9784,11 +9712,6 @@ void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
     //  ground surfaces viewed by a building exterior surface
     //  ground surfaces temperature weighed using view factors
 
-    // local vars
-    Real64 GndSurfaceTemp;
-    Real64 GndSurfViewFactor;
-    Real64 GndSurfaceTempSum;
-
     if (!state.dataGlobal->AnyLocalEnvironmentsInModel) {
         return;
     }
@@ -9800,9 +9723,9 @@ void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
             state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp = false;
             continue;
         }
-        GndSurfaceTemp = 0.0;
-        GndSurfViewFactor = 0.0;
-        GndSurfaceTempSum = 0.0;
+        Real64 GndSurfaceTemp = 0.0;
+        Real64 GndSurfViewFactor = 0.0;
+        Real64 GndSurfaceTempSum = 0.0;
         for (int gSurfNum = 1; gSurfNum <= GndSurfsProperty.NumGndSurfs; gSurfNum++) {
             GndSurfViewFactor = GndSurfsProperty.GndSurfs(gSurfNum).ViewFactor;
             if (GndSurfViewFactor == 0.0) continue;
@@ -9825,10 +9748,6 @@ void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state)
     //  ground reflectance viewed by a building exterior surface
     //  ground surfaces reflectance weighed using view factors
 
-    // local vars
-    Real64 GndSurfRefl;
-    Real64 GndSurfsReflSum;
-
     if (!state.dataGlobal->AnyLocalEnvironmentsInModel) {
         return;
     }
@@ -9840,8 +9759,8 @@ void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state)
             state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfRefl = false;
             continue;
         }
-        GndSurfRefl = 0.0;
-        GndSurfsReflSum = 0.0;
+        Real64 GndSurfRefl = 0.0;
+        Real64 GndSurfsReflSum = 0.0;
         for (int gSurfNum = 1; gSurfNum <= GndSurfsProperty.NumGndSurfs; gSurfNum++) {
             if (GndSurfsProperty.GndSurfs(gSurfNum).ReflSchPtr == 0) continue;
             GndSurfRefl = ScheduleManager::GetCurrentScheduleValue(state, GndSurfsProperty.GndSurfs(gSurfNum).ReflSchPtr);
