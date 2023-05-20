@@ -143,9 +143,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 // This module was created from IBLAST subroutines
 
 // Use statements for access to subroutines in other modules
-using namespace ScheduleManager;
-using namespace SolarShading;
-using namespace WindowManager;
 using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
 using namespace MultiLayerOptics;
@@ -888,12 +885,13 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     Real64 shgcAssembly = 0.0;
                     Real64 vtAssembly = 0.0;
 
-                    GetWindowAssemblyNfrcForReport(
+                    WindowManager::GetWindowAssemblyNfrcForReport(
                         state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight, vision, uValueAssembly, shgcAssembly, vtAssembly);
                     if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                         state.dataHeatBal->NominalU(Surface(iSurf).Construction) =
-                            GetIGUUValueForNFRCReport(state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight);
-                        SHGCSummer = GetSHGCValueForNFRCReporting(state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight);
+                            WindowManager::GetIGUUValueForNFRCReport(state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight);
+                        SHGCSummer =
+                            WindowManager::GetSHGCValueForNFRCReporting(state, iSurf, Surface(iSurf).Construction, windowWidth, windowHeight);
                     }
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemUfact, surfName, uValueAssembly, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemSHGC, surfName, shgcAssembly, 3);
@@ -958,8 +956,8 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                             NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
 
                         const int stateConstrNum = Surface(iSurf).shadedConstructionList[i];
-                        const Real64 stateUValue = GetIGUUValueForNFRCReport(state, iSurf, stateConstrNum, windowWidth, windowHeight);
-                        const Real64 stateSHGC = GetSHGCValueForNFRCReporting(state, iSurf, stateConstrNum, windowWidth, windowHeight);
+                        const Real64 stateUValue = WindowManager::GetIGUUValueForNFRCReport(state, iSurf, stateConstrNum, windowWidth, windowHeight);
+                        const Real64 stateSHGC = WindowManager::GetSHGCValueForNFRCReporting(state, iSurf, stateConstrNum, windowWidth, windowHeight);
                         std::string const &constructionName = state.dataConstruction->Construct(stateConstrNum).Name;
 
                         PreDefTableEntry(state,
@@ -978,7 +976,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         Real64 stateAssemblySHGC{0.0};
                         Real64 stateAssemblyVT{0.0};
 
-                        GetWindowAssemblyNfrcForReport(
+                        WindowManager::GetWindowAssemblyNfrcForReport(
                             state, iSurf, stateConstrNum, windowWidth, windowHeight, vision, stateAssemblyUValue, stateAssemblySHGC, stateAssemblyVT);
 
                         std::string_view NFRCname = NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
@@ -2369,7 +2367,7 @@ void EvalOutsideMovableInsulation(EnergyPlusData &state)
 {
     // This subroutine determines whether or not outside movable insulation on opaque surfaces is present at the current time.
     for (int SurfNum : state.dataHeatBalSurf->SurfMovInsulIndexList) {
-        Real64 MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->SurfSchedMovInsulExt(SurfNum));
+        Real64 MovInsulSchedVal = ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurfSchedMovInsulExt(SurfNum));
         if (MovInsulSchedVal <= 0) { // Movable insulation not present at current time
             state.dataHeatBalSurf->SurfMovInsulExtPresent(SurfNum) = false;
             int ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
@@ -2401,7 +2399,7 @@ void EvalInsideMovableInsulation(EnergyPlusData &state)
 {
     // This subroutine determines whether or not inside movable insulation is present at the current time.
     for (int SurfNum : state.dataHeatBalSurf->SurfMovInsulIndexList) {
-        Real64 MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->SurfSchedMovInsulInt(SurfNum));
+        Real64 MovInsulSchedVal = ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurfSchedMovInsulInt(SurfNum));
         if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
             state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) = false;
             int ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
@@ -2782,14 +2780,14 @@ void InitSolarHeatGains(EnergyPlusData &state)
             }
         }
 
-        CalcWindowProfileAngles(state);
+        SolarShading::CalcWindowProfileAngles(state);
 
-        if (state.dataHeatBal->CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface(state);
+        if (state.dataHeatBal->CalcWindowRevealReflection) SolarShading::CalcBeamSolarOnWinRevealSurface(state);
 
         if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() && state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
-            CalcAbsorbedOnExteriorOpaqueSurfaces(state);
+            SolarShading::CalcAbsorbedOnExteriorOpaqueSurfaces(state);
             if (state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
-                CalcInteriorSolarDistributionWCESimple(state);
+                SolarShading::CalcInteriorSolarDistributionWCESimple(state);
             }
         } else {
             CalcInteriorSolarDistribution(state);
@@ -3177,9 +3175,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum); // Switching factor for switchable glazing
                                     for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                         state.dataHeatBalSurfMgr->AbsDiffWin(Lay) =
-                                            InterpSw(SwitchFac,
-                                                     state.dataHeatBalSurfMgr->AbsDiffWin(Lay),
-                                                     state.dataConstruction->Construct(ConstrNumSh).AbsDiff(Lay));
+                                            WindowManager::InterpSw(SwitchFac,
+                                                                    state.dataHeatBalSurfMgr->AbsDiffWin(Lay),
+                                                                    state.dataConstruction->Construct(ConstrNumSh).AbsDiff(Lay));
                                     }
                                 }
 
@@ -3256,7 +3254,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             for (int Lay = 1; Lay <= TotSolidLay; ++Lay) {
                                 if (SurfSolAbs != 0) {
                                     state.dataSurface->SurfWinA(SurfNum, Lay) =
-                                        GetCurrentScheduleValue(state, state.dataSurface->FenLayAbsSSG(SurfSolAbs).SchedPtrs(Lay));
+                                        ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->FenLayAbsSSG(SurfSolAbs).SchedPtrs(Lay));
                                     // ABWin(Lay) = SurfWinA(SurfNum,Lay)
                                     state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) = state.dataSurface->SurfWinA(SurfNum, Lay);
                                 } else {
@@ -3313,12 +3311,13 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(state.dataSurface->SurfWinTDDPipeNum(SurfNum)).Dome;
                             }
 
-                            std::pair<Real64, Real64> incomingAngle = getSunWCEAngles(state, SurfNum2, BSDFDirection::Incoming);
+                            std::pair<Real64, Real64> incomingAngle = WindowManager::getSunWCEAngles(state, SurfNum2, BSDFDirection::Incoming);
                             Real64 Theta = incomingAngle.first;
                             Real64 Phi = incomingAngle.second;
 
                             std::shared_ptr<CMultiLayerScattered> aLayer =
-                                CWindowConstructionsSimplified::instance(state).getEquivalentLayer(state, WavelengthRange::Solar, ConstrNum);
+                                WindowManager::CWindowConstructionsSimplified::instance(state).getEquivalentLayer(
+                                    state, WavelengthRange::Solar, ConstrNum);
 
                             size_t totLayers = aLayer->getNumOfLayers();
                             for (size_t Lay = 1; Lay <= totLayers; ++Lay) {
@@ -3404,9 +3403,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                             Real64 SwitchFac = state.dataSurface->SurfWinSwitchingFactor(SurfNum);
                                             int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                                             Real64 TransGlSh = POLYF(CosInc, state.dataConstruction->Construct(ConstrNumSh).TransSolBeamCoef);
-                                            TransGl = InterpSw(SwitchFac, TransGl, TransGlSh);
+                                            TransGl = WindowManager::InterpSw(SwitchFac, TransGl, TransGlSh);
                                             Real64 TransDiffGlSh = state.dataConstruction->Construct(ConstrNumSh).TransDiff;
-                                            TransDiffGl = InterpSw(SwitchFac, TransDiffGl, TransDiffGlSh);
+                                            TransDiffGl = WindowManager::InterpSw(SwitchFac, TransDiffGl, TransDiffGlSh);
                                         }
                                         // Beam solar on inside of frame
                                         FrIncSolarIn = (BeamFrHorFaceInc + BeamFrVertFaceInc) * FrProjIn * TransGl;
@@ -3455,9 +3454,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                         Real64 TransGlSh = thisMaterialSh->Trans;
                                         Real64 ReflGlSh = thisMaterialSh->ReflectSolBeamFront;
                                         Real64 AbsGlSh = 1.0 - TransGlSh - ReflGlSh;
-                                        TransGl = InterpSw(SwitchFac, TransGl, TransGlSh);
-                                        ReflGl = InterpSw(SwitchFac, ReflGl, ReflGlSh);
-                                        AbsGl = InterpSw(SwitchFac, AbsGl, AbsGlSh);
+                                        TransGl = WindowManager::InterpSw(SwitchFac, TransGl, TransGlSh);
+                                        ReflGl = WindowManager::InterpSw(SwitchFac, ReflGl, ReflGlSh);
+                                        AbsGl = WindowManager::InterpSw(SwitchFac, AbsGl, AbsGlSh);
                                     }
                                     Real64 DividerRefl = 1.0 - DividerAbs; // Window divider solar reflectance
                                     DividerAbs = AbsGl + TransGl * (DividerAbs + DividerRefl * AbsGl) / (1.0 - DividerRefl * ReflGl);
@@ -3496,10 +3495,10 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                             int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                                             Real64 TransGlSh = POLYF(CosInc, state.dataConstruction->Construct(ConstrNumSh).TransSolBeamCoef);
                                             // Outer glass solar trans, refl, absorptance if switched
-                                            TransGl = InterpSw(SwitchFac, TransGl, TransGlSh);
+                                            TransGl = WindowManager::InterpSw(SwitchFac, TransGl, TransGlSh);
                                             Real64 TransDiffGlSh = state.dataConstruction->Construct(ConstrNumSh).TransDiff;
                                             // Diffuse solar transmittance, switched construction
-                                            TransDiffGl = InterpSw(SwitchFac, TransDiffGl, TransDiffGlSh);
+                                            TransDiffGl = WindowManager::InterpSw(SwitchFac, TransDiffGl, TransDiffGlSh);
                                         }
                                         // Beam plus diffuse solar on inside of divider
                                         // BeamDivHorFaceIncIn - Beam solar on divider's horizontal inside projection faces (W/m2)
@@ -3955,9 +3954,9 @@ void InitIntSolarDistribution(EnergyPlusData &state)
 
                             state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) +=
                                 state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) *
-                                InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
-                                         thisConstruct.AbsDiffBack(IGlass),
-                                         state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(IGlass));
+                                WindowManager::InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
+                                                        thisConstruct.AbsDiffBack(IGlass),
+                                                        state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(IGlass));
                         }
 
                     } // End of shading flag check
@@ -5751,8 +5750,9 @@ void ReportThermalResilience(EnergyPlusData &state)
         }
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
-            state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
-                                                                GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
+            state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc =
+                state.dataHeatBal->People(iPeople).NumberOfPeople *
+                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
             state.dataHeatBal->Resilience(ZoneNum).ZonePierceSETLastStep = state.dataHeatBal->Resilience(ZoneNum).ZonePierceSET;
             if (state.dataHeatBal->People(iPeople).Pierce) {
                 state.dataHeatBal->Resilience(ZoneNum).ZonePierceSET = state.dataThermalComforts->ThermalComfortData(iPeople).PierceSET;
@@ -6270,8 +6270,9 @@ void ReportCO2Resilience(EnergyPlusData &state)
     if (Constant::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
-            state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
-                                                                GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
+            state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc =
+                state.dataHeatBal->People(iPeople).NumberOfPeople *
+                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
         }
 
         Array1D_bool reportPeriodFlags;
@@ -6361,8 +6362,9 @@ void ReportVisualResilience(EnergyPlusData &state)
     if (Constant::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
         for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             int ZoneNum = state.dataHeatBal->People(iPeople).ZonePtr;
-            state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc = state.dataHeatBal->People(iPeople).NumberOfPeople *
-                                                                GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
+            state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc =
+                state.dataHeatBal->People(iPeople).NumberOfPeople *
+                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
         }
         // Accumulate across daylighting controls first
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -8233,7 +8235,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
                     // Following call determines inside surface temperature of glazing, and of
                     // frame and/or divider, if present
-                    CalcWindowHeatBalance(
+                    WindowManager::CalcWindowHeatBalance(
                         state, SurfNum, state.dataHeatBalSurf->SurfHcExt(SurfNum), state.dataHeatBalSurf->SurfTempInTmp(SurfNum), TH11);
 
                     state.dataHeatBalSurf->SurfTempIn(SurfNum) = state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
@@ -8934,7 +8936,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
                             // Following call determines inside surface temperature of glazing, and of
                             // frame and/or divider, if present
-                            CalcWindowHeatBalance(
+                            WindowManager::CalcWindowHeatBalance(
                                 state, surfNum, state.dataHeatBalSurf->SurfHcExt(surfNum), state.dataHeatBalSurf->SurfTempInTmp(surfNum), TH11);
 
                             state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTempInTmp(surfNum);
@@ -9296,10 +9298,10 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
         int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
-            TSky = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum);
+            TSky = ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum);
         }
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum != 0) {
-            TGround = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum);
+            TGround = ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum);
         }
     }
     if (state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp) {
@@ -9493,9 +9495,9 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
         int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
         for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
             Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-            Real64 SrdSurfTempAbs =
-                GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                Constant::KelvinConv;
+            Real64 SrdSurfTempAbs = ScheduleManager::GetCurrentScheduleValue(
+                                        state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
+                                    Constant::KelvinConv;
             QRadLWOutSrdSurfsRep +=
                 Constant::StefanBoltzmann *
                 dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
@@ -9678,7 +9680,7 @@ Real64 GetSurfIncidentSolarMultiplier(EnergyPlusData &state, int SurfNum)
 {
     if (state.dataSurface->Surface(SurfNum).hasIncSolMultiplier) {
         if (state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr > 0) {
-            return GetCurrentScheduleValue(state, state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr) *
+            return ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurfIncSolMultiplier(SurfNum).SchedPtr) *
                    state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler;
         } else {
             return state.dataSurface->SurfIncSolMultiplier(SurfNum).Scaler;
