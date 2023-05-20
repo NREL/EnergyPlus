@@ -2527,12 +2527,9 @@ namespace HeatBalanceManager {
         int NumAlpha;
         int NumNumeric;
 
-        int Loop;
         int ZoneLoop;
         int ZoneNum; // DO loop counter for zones
         int TotZoneEnv;
-        int IOStat;
-        int NodeNum;
 
         //-----------------------------------------------------------------------
         //               ZoneProperty:LocalEnvironment
@@ -2542,6 +2539,7 @@ namespace HeatBalanceManager {
         TotZoneEnv = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (TotZoneEnv > 0) {
+            int IOStat;
             // Check if IDD definition is correct
             state.dataGlobal->AnyLocalEnvironmentsInModel = true;
 
@@ -2549,7 +2547,7 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->ZoneLocalEnvironment.allocate(TotZoneEnv);
             }
 
-            for (Loop = 1; Loop <= TotZoneEnv; ++Loop) {
+            for (int Loop = 1; Loop <= TotZoneEnv; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          cCurrentModuleObject,
                                                                          Loop,
@@ -2584,15 +2582,15 @@ namespace HeatBalanceManager {
                 }
 
                 // Assign outdoor air node number;
-                NodeNum = GetOnlySingleNode(state,
-                                            state.dataIPShortCut->cAlphaArgs(3),
-                                            ErrorsFound,
-                                            DataLoopNode::ConnectionObjectType::ZonePropertyLocalEnvironment,
-                                            state.dataIPShortCut->cAlphaArgs(1),
-                                            DataLoopNode::NodeFluidType::Air,
-                                            DataLoopNode::ConnectionType::Inlet,
-                                            NodeInputManager::CompFluidStream::Primary,
-                                            ObjectIsParent);
+                int NodeNum = GetOnlySingleNode(state,
+                                                state.dataIPShortCut->cAlphaArgs(3),
+                                                ErrorsFound,
+                                                DataLoopNode::ConnectionObjectType::ZonePropertyLocalEnvironment,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Air,
+                                                DataLoopNode::ConnectionType::Inlet,
+                                                NodeInputManager::CompFluidStream::Primary,
+                                                ObjectIsParent);
                 if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}, object. Illegal value for {} has been found.",
@@ -2612,7 +2610,7 @@ namespace HeatBalanceManager {
         }
         // Link zone properties to zone object
         for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
-            for (Loop = 1; Loop <= TotZoneEnv; ++Loop) {
+            for (int Loop = 1; Loop <= TotZoneEnv; ++Loop) {
                 if (state.dataHeatBal->ZoneLocalEnvironment(Loop).ZonePtr == ZoneLoop) {
                     if (state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
                         state.dataHeatBal->Zone(ZoneLoop).LinkedOutAirNode = state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr;
@@ -3025,7 +3023,7 @@ namespace HeatBalanceManager {
                 state.dataHeatBalMgr->ChangeSet = false;
             } else if (!state.dataHeatBalMgr->ChangeSet) {
                 state.dataHeatBal->StormWinChangeThisDay = false;
-                for (StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
+                for (int StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
                     int SurfNum = state.dataSurface->StormWindow(StormWinNum).BaseWindowNum;
                     state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum) = state.dataSurface->SurfWinStormWinFlag(SurfNum);
                 }
@@ -3462,26 +3460,16 @@ namespace HeatBalanceManager {
         Real64 constexpr MinLoad(100.0); // Minimum loads for convergence check
         // To avoid big percentage difference in low load situations
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNum;
-        bool ConvergenceChecksFailed;
-
         // Convergence criteria for warmup days:
         // Perform another warmup day unless both the % change in loads and
         // absolute change in zone temp min & max are less than their criteria.
 
-        ConvergenceChecksFailed = false;
-
         if (state.dataGlobal->NumOfZones <= 0) { // if there are no zones, immediate convergence
             state.dataGlobal->WarmupFlag = false;
         } else {
-            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            bool ConvergenceChecksFailed = false;
+
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
                 state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxTempValue =
                     std::abs(state.dataHeatBalMgr->MaxTempPrevDay(ZoneNum) - state.dataHeatBalMgr->MaxTempZone(ZoneNum));
@@ -3653,12 +3641,10 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNum;
         Real64 AverageZoneTemp;
         Real64 AverageZoneLoad;
         Real64 StdDevZoneTemp;
         Real64 StdDevZoneLoad;
-        std::string EnvHeader;
 
         if (!state.dataGlobal->WarmupFlag) { // Report out average/std dev
             // Write Warmup Convervence Information to the initialization output file
@@ -3675,13 +3661,14 @@ namespace HeatBalanceManager {
             state.dataHeatBalMgr->TempZoneRptStdDev = 0.0;
             state.dataHeatBalMgr->LoadZoneRptStdDev = 0.0;
 
+            std::string EnvHeader;
             if (state.dataEnvrn->RunPeriodEnvironment) {
                 EnvHeader = "RunPeriod:";
             } else {
                 EnvHeader = "SizingPeriod:";
             }
 
-            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 AverageZoneTemp = sum(state.dataHeatBalMgr->TempZoneRpt(ZoneNum, {1, state.dataHeatBalMgr->CountWarmupDayPoints})) /
                                   double(state.dataHeatBalMgr->CountWarmupDayPoints);
                 for (int Num = 1; Num <= state.dataHeatBalMgr->CountWarmupDayPoints; ++Num) {
@@ -4964,14 +4951,13 @@ namespace HeatBalanceManager {
         // Using/Aliasing
         using General::BetweenDates;
 
-        int StormWinNum;  // Number of storm window object
         int StormWinFlag; // Storm window flag; this routine sets the following values:
         //   0: if the storm window is off this time step
         //   1: if the storm window is on this time step
 
         state.dataHeatBal->StormWinChangeThisDay = false;
 
-        for (StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
+        for (int StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
             int SurfNum = state.dataSurface->StormWindow(StormWinNum).BaseWindowNum;
             state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum) = state.dataSurface->SurfWinStormWinFlag(SurfNum);
             int DateOff = state.dataSurface->StormWindow(StormWinNum).DateOff - 1;
@@ -5038,7 +5024,6 @@ namespace HeatBalanceManager {
         int IOStat;                        // IO Status when calling get input subroutine
         Array1D_string ConstructAlphas(1); // Construction Alpha names defined
         Array1D<Real64> DummyProps(4);     // Temporary array to transfer construction properties
-        int Loop;
 
         int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
         int TotCfactorConstructs; // Number of underground wall constructions defined with C factors
@@ -5076,7 +5061,7 @@ namespace HeatBalanceManager {
         state.dataHeatBalMgr->CurrentModuleObject = "Construction:FfactorGroundFloor";
 
         // Loop through all constructs defined with Ffactor method
-        for (Loop = 1; Loop <= TotFfactorConstructs; ++Loop) {
+        for (int Loop = 1; Loop <= TotFfactorConstructs; ++Loop) {
 
             // Get the object names for each construction from the input processor
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -5182,7 +5167,7 @@ namespace HeatBalanceManager {
         // Then create underground wall constructions defined with C factor method if any
         state.dataHeatBalMgr->CurrentModuleObject = "Construction:CfactorUndergroundWall";
 
-        for (Loop = 1; Loop <= TotCfactorConstructs; ++Loop) { // Loop through all constructs defined with Ffactor method
+        for (int Loop = 1; Loop <= TotCfactorConstructs; ++Loop) { // Loop through all constructs defined with Ffactor method
 
             // Get the object names for each construction from the input processor
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
