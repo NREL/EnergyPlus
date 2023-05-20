@@ -5126,14 +5126,6 @@ void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state)
     // radiant algorithm module.  Finally, using this source value, redo
     // the inside and outside heat balances.
 
-    using CoolingPanelSimple::UpdateCoolingPanelSourceValAvg;
-    using ElectricBaseboardRadiator::UpdateBBElecRadSourceValAvg;
-    using HighTempRadiantSystem::UpdateHTRadSourceValAvg;
-    using HWBaseboardRadiator::UpdateBBRadSourceValAvg;
-    using LowTempRadiantSystem::UpdateRadSysSourceValAvg;
-    using SteamBaseboardRadiator::UpdateBBSteamRadSourceValAvg;
-    using SwimmingPool::UpdatePoolSourceValAvg;
-
     bool LowTempRadSysOn;     // .TRUE. if a low temperature radiant system is running
     bool HighTempRadSysOn;    // .TRUE. if a high temperature radiant system is running
     bool HWBaseboardSysOn;    // .TRUE. if a water baseboard heater is running
@@ -5142,13 +5134,13 @@ void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state)
     bool CoolingPanelSysOn;   // true if a simple cooling panel is running
     bool SwimmingPoolOn;      // true if a pool is present (running)
 
-    UpdateRadSysSourceValAvg(state, LowTempRadSysOn);
-    UpdateHTRadSourceValAvg(state, HighTempRadSysOn);
-    UpdateBBRadSourceValAvg(state, HWBaseboardSysOn);
-    UpdateBBSteamRadSourceValAvg(state, SteamBaseboardSysOn);
-    UpdateBBElecRadSourceValAvg(state, ElecBaseboardSysOn);
-    UpdateCoolingPanelSourceValAvg(state, CoolingPanelSysOn);
-    UpdatePoolSourceValAvg(state, SwimmingPoolOn);
+    LowTempRadiantSystem::UpdateRadSysSourceValAvg(state, LowTempRadSysOn);
+    HighTempRadiantSystem::UpdateHTRadSourceValAvg(state, HighTempRadSysOn);
+    HWBaseboardRadiator::UpdateBBRadSourceValAvg(state, HWBaseboardSysOn);
+    SteamBaseboardRadiator::UpdateBBSteamRadSourceValAvg(state, SteamBaseboardSysOn);
+    ElectricBaseboardRadiator::UpdateBBElecRadSourceValAvg(state, ElecBaseboardSysOn);
+    CoolingPanelSimple::UpdateCoolingPanelSourceValAvg(state, CoolingPanelSysOn);
+    SwimmingPool::UpdatePoolSourceValAvg(state, SwimmingPoolOn);
 
     if (LowTempRadSysOn || HighTempRadSysOn || HWBaseboardSysOn || SteamBaseboardSysOn || ElecBaseboardSysOn || CoolingPanelSysOn || SwimmingPoolOn) {
         // Solve the zone heat balance 'Detailed' solution
@@ -6465,8 +6457,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine puts the reporting part of the HBSurface Module in one area.
 
-    using SolarShading::ReportSurfaceShading;
-    ReportSurfaceShading(state);
+    SolarShading::ReportSurfaceShading(state);
 
     if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
         ReportNonRepresentativeSurfaceResults(state);
