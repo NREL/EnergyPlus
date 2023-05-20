@@ -100,12 +100,6 @@ namespace HeatBalanceIntRadExchange {
     // Hottel, H.C., and A.F. Sarofim. "Radiative Transfer" (mainly chapter 3),
     //  McGraw-Hill, Inc., New York, 1967.
 
-    // Using/Aliasing
-    using namespace DataHeatBalance;
-    using namespace DataSurfaces;
-    using namespace DataSystemVariables;
-    using namespace DataViewFactorInformation;
-
     void CalcInteriorRadExchange(EnergyPlusData &state,
                                  Array1S<Real64> const SurfaceTemp,              // Current surface temperatures
                                  int const SurfIterations,                       // Number of iterations in calling subroutine
@@ -135,9 +129,6 @@ namespace HeatBalanceIntRadExchange {
 
         // Types
         typedef Array1D<Real64>::size_type size_type;
-
-        // Using/Aliasing
-        using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
 
         bool IntShadeOrBlindStatusChanged; // True if status of interior shade or blind on at least
         // one window in a zone has changed from previous time step
@@ -230,11 +221,11 @@ namespace HeatBalanceIntRadExchange {
                         if (IntShadeOrBlindStatusChanged || IntMovInsulChanged)
                             break; // Need only check if one window's status or one movable insulation status has changed
                         if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) {
-                            WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
-                            WinShadingType ShadeFlagPrev = state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum);
+                            DataSurfaces::WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
+                            DataSurfaces::WinShadingType ShadeFlagPrev = state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum);
                             if (ShadeFlagPrev != ShadeFlag && (ANY_INTERIOR_SHADE_BLIND(ShadeFlagPrev) || ANY_INTERIOR_SHADE_BLIND(ShadeFlag)))
                                 IntShadeOrBlindStatusChanged = true;
-                            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::EQL &&
+                            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::WindowModel::EQL &&
                                 state.dataWindowEquivLayer
                                     ->CFS(state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).EQLConsPtr)
                                     .ISControlled) {
@@ -256,9 +247,9 @@ namespace HeatBalanceIntRadExchange {
                             ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                             zone_info.Emissivity(ZoneSurfNum) = state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                         }
-                        if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::EQL &&
+                        if (state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::WindowModel::EQL &&
                             state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).ISControlled) {
-                            zone_info.Emissivity(ZoneSurfNum) = EQLWindowInsideEffectiveEmiss(state, ConstrNum);
+                            zone_info.Emissivity(ZoneSurfNum) = WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss(state, ConstrNum);
                         }
                     }
 
@@ -285,14 +276,14 @@ namespace HeatBalanceIntRadExchange {
                 auto const &construct = state.dataConstruction->Construct(ConstrNum);
                 if (construct.WindowTypeEQL) {
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
-                    SurfaceEmiss[ZoneSurfNum] = EQLWindowInsideEffectiveEmiss(state, ConstrNum);
-                } else if (construct.WindowTypeBSDF && state.dataSurface->SurfWinShadingFlag(SurfNum) == WinShadingType::IntShade) {
+                    SurfaceEmiss[ZoneSurfNum] = WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss(state, ConstrNum);
+                } else if (construct.WindowTypeBSDF && state.dataSurface->SurfWinShadingFlag(SurfNum) == DataSurfaces::WinShadingType::IntShade) {
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
                 } else if (construct.WindowTypeBSDF) {
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
-                } else if (construct.TypeIsWindow && state.dataSurface->SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) {
+                } else if (construct.TypeIsWindow && state.dataSurface->SurfWinOriginalClass(SurfNum) != DataSurfaces::SurfaceClass::TDD_Diffuser) {
                     if (SurfIterations == 0 && NOT_SHADED(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
@@ -456,10 +447,6 @@ namespace HeatBalanceIntRadExchange {
         // Initializes the various parameters for Hottel's ScriptF method for
         // the grey interchange between surfaces in an enclosure.
 
-        // Using/Aliasing
-
-        using General::ScanForReports;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool NoUserInputF; // Logical flag signifying no input F's for zone
         bool ErrorsFound(false);
@@ -474,7 +461,7 @@ namespace HeatBalanceIntRadExchange {
 
         auto &ViewFactorReport = state.dataHeatBalIntRadExchg->ViewFactorReport;
 
-        ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
+        General::ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
 
         if (ViewFactorReport) { // Print heading
             print(state.files.eio, "{}\n", "! <Surface View Factor and Grey Interchange Information>");
@@ -1406,17 +1393,17 @@ namespace HeatBalanceIntRadExchange {
         for (i = 1; i <= N; ++i) {
             for (j = 1; j <= N; ++j) {
                 //  No surface sees itself and no floor sees another floor
-                if (i == j || (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor &&
-                               state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor))
+                if (i == j || (state.dataSurface->Surface(SPtr(j)).Class == DataSurfaces::SurfaceClass::Floor &&
+                               state.dataSurface->Surface(SPtr(i)).Class == DataSurfaces::SurfaceClass::Floor))
                     continue;
                 // All surface types see internal mass
                 // All surface types see floors
                 // Floors always see ceilings/roofs
                 // All other surfaces whose tilt or facing angle differences are greater than 10 degrees see each other
-                if ((state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::IntMass) ||
-                    (state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::IntMass) ||
-                    (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor) ||
-                    (state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor) ||
+                if ((state.dataSurface->Surface(SPtr(j)).Class == DataSurfaces::SurfaceClass::IntMass) ||
+                    (state.dataSurface->Surface(SPtr(i)).Class == DataSurfaces::SurfaceClass::IntMass) ||
+                    (state.dataSurface->Surface(SPtr(j)).Class == DataSurfaces::SurfaceClass::Floor) ||
+                    (state.dataSurface->Surface(SPtr(i)).Class == DataSurfaces::SurfaceClass::Floor) ||
                     (std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit && std::abs(Azimuth(i) - Azimuth(j)) < 360.0 - SameAngleLimit) ||
                     (std::abs(Tilt(i) - Tilt(j)) > SameAngleLimit)) {
                     ZoneArea(i) += A(j);
@@ -1443,17 +1430,17 @@ namespace HeatBalanceIntRadExchange {
         for (i = 1; i <= N; ++i) {
             for (j = 1; j <= N; ++j) {
                 //  No surface sees itself and no floor sees another floor
-                if (i == j || (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor &&
-                               state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor))
+                if (i == j || (state.dataSurface->Surface(SPtr(j)).Class == DataSurfaces::SurfaceClass::Floor &&
+                               state.dataSurface->Surface(SPtr(i)).Class == DataSurfaces::SurfaceClass::Floor))
                     continue;
                 // All surface types see internal mass
                 // All surface types see floors
                 // Floors always see ceilings/roofs
                 // All other surfaces whose tilt or facing angle differences are greater than 10 degrees see each other
-                if ((state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::IntMass) ||
-                    (state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::IntMass) ||
-                    (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor) ||
-                    (state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor) ||
+                if ((state.dataSurface->Surface(SPtr(j)).Class == DataSurfaces::SurfaceClass::IntMass) ||
+                    (state.dataSurface->Surface(SPtr(i)).Class == DataSurfaces::SurfaceClass::IntMass) ||
+                    (state.dataSurface->Surface(SPtr(j)).Class == DataSurfaces::SurfaceClass::Floor) ||
+                    (state.dataSurface->Surface(SPtr(i)).Class == DataSurfaces::SurfaceClass::Floor) ||
                     (std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit && std::abs(Azimuth(i) - Azimuth(j)) < 360.0 - SameAngleLimit) ||
                     (std::abs(Tilt(i) - Tilt(j)) > SameAngleLimit)) {
                     // avoid a divide by zero if there are no other surfaces in the zone that can be seen
@@ -1737,7 +1724,7 @@ namespace HeatBalanceIntRadExchange {
     bool DoesZoneHaveInternalMass(EnergyPlusData &state, int const numZoneSurfaces, const Array1D_int &surfPointer)
     {
         for (int i = 1; i <= numZoneSurfaces; ++i) {
-            if (state.dataSurface->Surface(surfPointer(i)).Class == SurfaceClass::IntMass) return true;
+            if (state.dataSurface->Surface(surfPointer(i)).Class == DataSurfaces::SurfaceClass::IntMass) return true;
         }
         return false;
     }
