@@ -3659,17 +3659,15 @@ namespace HeatBalanceManager {
         Real64 StdDevZoneTemp;
         Real64 StdDevZoneLoad;
         std::string EnvHeader;
-        int Num; // loop control
-
-        // Formats
-        constexpr const char *Format_730("! <Warmup Convergence Information>,Zone Name,Environment Type/Name,Average Warmup Temperature Difference "
-                                         "{{deltaC}},Std Dev Warmup Temperature Difference {{deltaC}},Max Temperature Pass/Fail Convergence,Min "
-                                         "Temperature Pass/Fail Convergence,Average Warmup Load Difference {{W}},Std Dev Warmup Load Difference "
-                                         "{{W}},Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence\n");
 
         if (!state.dataGlobal->WarmupFlag) { // Report out average/std dev
             // Write Warmup Convervence Information to the initialization output file
             if (state.dataHeatBalMgr->ReportWarmupConvergenceFirstWarmupWrite && state.dataGlobal->NumOfZones > 0) {
+                constexpr const char *Format_730(
+                    "! <Warmup Convergence Information>,Zone Name,Environment Type/Name,Average Warmup Temperature Difference "
+                    "{{deltaC}},Std Dev Warmup Temperature Difference {{deltaC}},Max Temperature Pass/Fail Convergence,Min "
+                    "Temperature Pass/Fail Convergence,Average Warmup Load Difference {{W}},Std Dev Warmup Load Difference "
+                    "{{W}},Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence\n");
                 print(state.files.eio, Format_730);
                 state.dataHeatBalMgr->ReportWarmupConvergenceFirstWarmupWrite = false;
             }
@@ -3686,7 +3684,7 @@ namespace HeatBalanceManager {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 AverageZoneTemp = sum(state.dataHeatBalMgr->TempZoneRpt(ZoneNum, {1, state.dataHeatBalMgr->CountWarmupDayPoints})) /
                                   double(state.dataHeatBalMgr->CountWarmupDayPoints);
-                for (Num = 1; Num <= state.dataHeatBalMgr->CountWarmupDayPoints; ++Num) {
+                for (int Num = 1; Num <= state.dataHeatBalMgr->CountWarmupDayPoints; ++Num) {
                     if (state.dataHeatBalMgr->MaxLoadZoneRpt(ZoneNum, Num) > 1.e-4) {
                         state.dataHeatBalMgr->LoadZoneRpt(ZoneNum, Num) /= state.dataHeatBalMgr->MaxLoadZoneRpt(ZoneNum, Num);
                     } else {
@@ -3697,7 +3695,7 @@ namespace HeatBalanceManager {
                                   double(state.dataHeatBalMgr->CountWarmupDayPoints);
                 StdDevZoneTemp = 0.0;
                 StdDevZoneLoad = 0.0;
-                for (Num = 1; Num <= state.dataHeatBalMgr->CountWarmupDayPoints; ++Num) {
+                for (int Num = 1; Num <= state.dataHeatBalMgr->CountWarmupDayPoints; ++Num) {
                     state.dataHeatBalMgr->TempZoneRptStdDev(Num) = pow_2(state.dataHeatBalMgr->TempZoneRpt(ZoneNum, Num) - AverageZoneTemp);
                     state.dataHeatBalMgr->LoadZoneRptStdDev(Num) = pow_2(state.dataHeatBalMgr->LoadZoneRpt(ZoneNum, Num) - AverageZoneLoad);
                 }
@@ -4966,19 +4964,17 @@ namespace HeatBalanceManager {
         // Using/Aliasing
         using General::BetweenDates;
 
-        int SurfNum;      // Surface number
         int StormWinNum;  // Number of storm window object
         int StormWinFlag; // Storm window flag; this routine sets the following values:
         //   0: if the storm window is off this time step
         //   1: if the storm window is on this time step
-        int DateOff; // Date Off for calculation
 
         state.dataHeatBal->StormWinChangeThisDay = false;
 
         for (StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
-            SurfNum = state.dataSurface->StormWindow(StormWinNum).BaseWindowNum;
+            int SurfNum = state.dataSurface->StormWindow(StormWinNum).BaseWindowNum;
             state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum) = state.dataSurface->SurfWinStormWinFlag(SurfNum);
-            DateOff = state.dataSurface->StormWindow(StormWinNum).DateOff - 1;
+            int DateOff = state.dataSurface->StormWindow(StormWinNum).DateOff - 1;
             // Note: Dateon = Dateoff is not allowed and will have produced an error in getinput.
             if (DateOff == 0) DateOff = 366;
             if (BetweenDates(state.dataEnvrn->DayOfYear_Schedule, state.dataSurface->StormWindow(StormWinNum).DateOn, DateOff)) {
@@ -5383,7 +5379,6 @@ namespace HeatBalanceManager {
         int SurfNum;
         int ConstrNum;
         int ScheduleNum;
-        int i;
 
         //-----------------------------------------------------------------------
         //                SurfaceProperty:SolarIncidentInside
@@ -5587,7 +5582,7 @@ namespace HeatBalanceManager {
 
                     state.dataSurface->FenLayAbsSSG(Loop).NumOfSched = NumOfScheduledLayers;
 
-                    for (i = 1; i <= NumOfScheduledLayers; ++i) {
+                    for (int i = 1; i <= NumOfScheduledLayers; ++i) {
                         ScheduleNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(i + 3));
                         if (ScheduleNum == 0) {
                             ShowSevereError(state,
