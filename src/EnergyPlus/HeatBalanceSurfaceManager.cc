@@ -142,23 +142,12 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 // OTHER NOTES:
 // This module was created from IBLAST subroutines
 
-// Use statements for access to subroutines in other modules
-using namespace FenestrationCommon;
-using namespace SingleLayerOptics;
-using namespace MultiLayerOptics;
-
-// These are now external subroutines
-// PUBLIC  CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
-// PUBLIC  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
-
 void ManageSurfaceHeatBalance(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   January 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine manages the heat surface balance method of calculating
@@ -3311,17 +3300,19 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(state.dataSurface->SurfWinTDDPipeNum(SurfNum)).Dome;
                             }
 
-                            std::pair<Real64, Real64> incomingAngle = WindowManager::getSunWCEAngles(state, SurfNum2, BSDFDirection::Incoming);
+                            std::pair<Real64, Real64> incomingAngle =
+                                WindowManager::getSunWCEAngles(state, SurfNum2, SingleLayerOptics::BSDFDirection::Incoming);
                             Real64 Theta = incomingAngle.first;
                             Real64 Phi = incomingAngle.second;
 
-                            std::shared_ptr<CMultiLayerScattered> aLayer =
+                            std::shared_ptr<MultiLayerOptics::CMultiLayerScattered> aLayer =
                                 WindowManager::CWindowConstructionsSimplified::instance(state).getEquivalentLayer(
-                                    state, WavelengthRange::Solar, ConstrNum);
+                                    state, FenestrationCommon::WavelengthRange::Solar, ConstrNum);
 
                             size_t totLayers = aLayer->getNumOfLayers();
                             for (size_t Lay = 1; Lay <= totLayers; ++Lay) {
-                                Real64 AbWinDiff = aLayer->getAbsorptanceLayer(Lay, Side::Front, ScatteringSimple::Diffuse, Theta, Phi);
+                                Real64 AbWinDiff = aLayer->getAbsorptanceLayer(
+                                    Lay, FenestrationCommon::Side::Front, FenestrationCommon::ScatteringSimple::Diffuse, Theta, Phi);
 
                                 state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =
                                     AbWinDiff * (SkySolarInc + GndSolarInc) + state.dataSurface->SurfWinA(SurfNum, Lay) * BeamSolar;
