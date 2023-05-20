@@ -311,7 +311,6 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
-        bool ValidSimulationWithNoZones;
 
         GetProjectControlData(state, ErrorsFound);
 
@@ -351,7 +350,7 @@ namespace HeatBalanceManager {
         CreateTCConstructions(state, ErrorsFound);
 
         if (state.dataSurface->TotSurfaces > 0 && state.dataGlobal->NumOfZones == 0) {
-            ValidSimulationWithNoZones = CheckValidSimulationObjects(state);
+            bool ValidSimulationWithNoZones = CheckValidSimulationObjects(state);
             if (!ValidSimulationWithNoZones) {
                 ShowSevereError(state, "GetHeatBalanceInput: There are surfaces in input but no zones found.  Invalid simulation.");
                 ErrorsFound = true;
@@ -402,19 +401,15 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Unused;
         int Loop;
-        int NumObjects;
         int NumAlphas;
         int NumNumbers;
         int Status;
         int CNum;
         int ONum;
-        bool InErrFlag; // Preserve (no current use) the input status of ErrorsFound
-
-        InErrFlag = ErrorsFound;
 
         // Needs to account for Pipe:HeatTransfer/indoor, etc constructions.
         for (ONum = 1; ONum <= NumConstrObjects; ++ONum) {
-            NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ConstrObjects(ONum));
+            int NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ConstrObjects(ONum));
             for (Loop = 1; Loop <= NumObjects; ++Loop) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          ConstrObjects(ONum),
@@ -1400,9 +1395,6 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumObjects;
-        int NumAlphas;               // Number of elements in the alpha array
-        int NumNums;                 // Number of elements in the numeric array
-        int IOStat;                  // IO Status when calling get input subroutine
         Array1D_string AlphArray(1); // Character string data
         Array1D<Real64> NumArray(3); // Numeric data
 
@@ -1413,6 +1405,9 @@ namespace HeatBalanceManager {
         NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
 
         if (NumObjects == 1) {
+            int NumAlphas; // Number of elements in the alpha array
+            int NumNums;   // Number of elements in the numeric array
+            int IOStat;    // IO Status when calling get input subroutine
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      state.dataHeatBalMgr->CurrentModuleObject,
                                                                      1,
@@ -2517,9 +2512,6 @@ namespace HeatBalanceManager {
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr const char *RoutineName("GetZoneLocalEnvData: ");
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneLoop;
         int TotZoneEnv;
@@ -2535,6 +2527,7 @@ namespace HeatBalanceManager {
             int NumAlpha;
             int NumNumeric;
             int IOStat;
+            constexpr const char *RoutineName("GetZoneLocalEnvData: ");
             // Check if IDD definition is correct
             state.dataGlobal->AnyLocalEnvironmentsInModel = true;
 
@@ -2619,9 +2612,9 @@ namespace HeatBalanceManager {
                          std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
                          Array1D_string const &cAlphaArgs,
-                         int &NumAlphas,
+                         int const &NumAlphas,
                          Array1D<Real64> const &rNumericArgs,
-                         int &NumNumbers,
+                         int const &NumNumbers,
                          [[maybe_unused]] Array1D_bool const &lNumericFieldBlanks, // Unused
                          Array1D_bool const &lAlphaFieldBlanks,
                          Array1D_string const &cAlphaFieldNames,
