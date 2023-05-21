@@ -1509,10 +1509,8 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
 
     DisplayString(state, "Setting up Surface Reporting Variables");
     // Setup surface report variables CurrentModuleObject='Opaque Surfaces'
-    for (int loop = 1; loop <= state.dataSurface->TotSurfaces; ++loop) {
+    for (int loop : state.dataSurface->AllHTSurfaceList) {
         auto &surface = state.dataSurface->Surface(loop);
-
-        if (!surface.HeatTransSurf) continue;
         SetupOutputVariable(state,
                             "Surface Inside Face Temperature",
                             OutputProcessor::Unit::C,
@@ -2096,15 +2094,14 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Average,
                                 surface.Name);
         }
+        SetupOutputVariable(state,
+                            "Site Total Surface Heat Emission to Air",
+                            OutputProcessor::Unit::J,
+                            state.dataHeatBalSurf->SumSurfaceHeatEmission,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "Environment");
     }
-
-    SetupOutputVariable(state,
-                        "Site Total Surface Heat Emission to Air",
-                        OutputProcessor::Unit::J,
-                        state.dataHeatBalSurf->SumSurfaceHeatEmission,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
-                        "Environment");
 }
 
 void InitThermalAndFluxHistories(EnergyPlusData &state)
@@ -2280,9 +2277,8 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
 
     // Perform other initializations that depend on the surface characteristics
     for (int CTFTermNum = 1; CTFTermNum <= state.dataHeatBal->MaxCTFTerms + 1; ++CTFTermNum) {
-        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        for (int SurfNum : state.dataSurface->AllHTSurfaceList) {
             auto &surface = state.dataSurface->Surface(SurfNum);
-            if (!surface.HeatTransSurf) continue; // Skip non-heat transfer surfaces
             // Reset outside boundary conditions if necessary
             if ((surface.ExtBoundCond == DataSurfaces::ExternalEnvironment) || (surface.ExtBoundCond == DataSurfaces::OtherSideCondModeledExt)) {
                 state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
@@ -2298,15 +2294,6 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             state.dataHeatBalSurf->SurfInsideFluxHist(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
         }
     }
-    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        auto const &surface = state.dataSurface->Surface(SurfNum);
-        if (!surface.HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
-        if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
-            state.dataHeatBal->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TbaffleLast = 20.0;
-            state.dataHeatBal->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TairLast = 20.0;
-        }
-    }
     // Initialize Kiva convection algorithms
     for (int SurfNum : state.dataSurface->AllHTKivaSurfaceList) {
         state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
@@ -2314,9 +2301,8 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(0.0);
     }
     if (!state.dataHeatBal->SimpleCTFOnly || state.dataGlobal->AnyEnergyManagementSystemInModel) {
-        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        for (int SurfNum : state.dataSurface->AllHTSurfaceList) {
             auto &surface = state.dataSurface->Surface(SurfNum);
-            if (!surface.HeatTransSurf) continue;
             if ((surface.ExtBoundCond == DataSurfaces::ExternalEnvironment) || (surface.ExtBoundCond == DataSurfaces::OtherSideCondModeledExt)) {
                 for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
                     state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
@@ -2333,6 +2319,10 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             for (int CTFTermNum = 2; CTFTermNum <= state.dataConstruction->Construct(surface.Construction).NumCTFTerms + 1; ++CTFTermNum) {
                 state.dataHeatBalSurf->SurfOutsideFluxHistMaster(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
                 state.dataHeatBalSurf->SurfInsideFluxHistMaster(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
+            }
+            if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
+                state.dataHeatBal->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TbaffleLast = 20.0;
+                state.dataHeatBal->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TairLast = 20.0;
             }
         }
     }
@@ -3748,10 +3738,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
     // Beam and diffuse solar on inside surfaces from interior windows (for reporting)
 
     if (state.dataEnvrn->SunIsUp) {
-        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        for (int SurfNum : state.dataSurface->AllHTSurfaceList) {
             auto const &surface = state.dataSurface->Surface(SurfNum);
-
-            if (!surface.HeatTransSurf) continue;
             //!!! Following may need to be removed or changed when shelves are considered in adjacent reflection calculations
             if (surface.Class == DataSurfaces::SurfaceClass::Shading) continue;
             int const enclosureNum = surface.SolarEnclIndex;
@@ -3761,10 +3749,6 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 state.dataHeatBal->SurfIntBmIncInsSurfIntensRep(SurfNum) * (surface.Area + state.dataSurface->SurfWinDividerArea(SurfNum));
             state.dataHeatBal->SurfIntBmIncInsSurfAmountRepEnergy(SurfNum) =
                 state.dataHeatBal->SurfIntBmIncInsSurfAmountRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-            //      IntDifIncInsSurfIntensRep(SurfNum) = ZoneDifSolFrIntWinsRep(ZoneNum)/Zone(ZoneNum)%TotalSurfArea
-            //      IntDifIncInsSurfAmountRep(SurfNum) = IntDifIncInsSurfIntensRep(SurfNum) *  &
-            //                                             (Surface(SurfNum)%Area + SurfaceWindow(SurfNum)%DividerArea)
-            //      IntDifIncInsSurfAmountRepEnergy(SurfNum) = IntDifIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec
         }
     }
 
