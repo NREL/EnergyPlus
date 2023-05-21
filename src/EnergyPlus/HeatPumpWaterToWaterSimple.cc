@@ -709,9 +709,6 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
 
     // Using/Aliasing
     Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    using FluidProperties::GetDensityGlycol;
-    using PlantUtilities::InitComponentNodes;
-    using PlantUtilities::SetComponentFlowRate;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("InitGshp");
@@ -761,36 +758,36 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
         this->MustRun = true;
 
         if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
-            rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                   Constant::HWInitConvTemp,
-                                   state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
-                                   RoutineName);
+            rho = FluidProperties::GetDensityGlycol(state,
+                                                    state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
+                                                    Constant::HWInitConvTemp,
+                                                    state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
+                                                    RoutineName);
             this->LoadSideDesignMassFlow = this->RatedLoadVolFlowHeat * rho;
-            rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                   Constant::CWInitConvTemp,
-                                   state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
-                                   RoutineName);
+            rho = FluidProperties::GetDensityGlycol(state,
+                                                    state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
+                                                    Constant::CWInitConvTemp,
+                                                    state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
+                                                    RoutineName);
             this->SourceSideDesignMassFlow = this->RatedSourceVolFlowHeat * rho;
         } else if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFCooling) {
-            rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                   Constant::CWInitConvTemp,
-                                   state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
-                                   RoutineName);
+            rho = FluidProperties::GetDensityGlycol(state,
+                                                    state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
+                                                    Constant::CWInitConvTemp,
+                                                    state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
+                                                    RoutineName);
             this->LoadSideDesignMassFlow = this->RatedLoadVolFlowCool * rho;
-            rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                   Constant::HWInitConvTemp,
-                                   state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
-                                   RoutineName);
+            rho = FluidProperties::GetDensityGlycol(state,
+                                                    state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
+                                                    Constant::HWInitConvTemp,
+                                                    state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
+                                                    RoutineName);
             this->SourceSideDesignMassFlow = this->RatedSourceVolFlowCool * rho;
         }
 
-        InitComponentNodes(state, 0.0, this->LoadSideDesignMassFlow, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->LoadSideDesignMassFlow, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum);
 
-        InitComponentNodes(state, 0.0, this->SourceSideDesignMassFlow, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->SourceSideDesignMassFlow, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum);
 
         if (state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue)
             state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint = 0.0;
@@ -818,8 +815,9 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
         this->reportLoadSideMassFlowRate = 0.0;
         this->reportSourceSideMassFlowRate = 0.0;
 
-        SetComponentFlowRate(state, this->reportLoadSideMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
-        SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(
+            state, this->reportLoadSideMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
+        PlantUtilities::SetComponentFlowRate(
             state, this->reportSourceSideMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(state,
                                                     this->LoadPlantLoc,
@@ -833,8 +831,9 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
         this->reportLoadSideMassFlowRate = this->LoadSideDesignMassFlow;
         this->reportSourceSideMassFlowRate = this->SourceSideDesignMassFlow;
         // now check against and request in plant
-        SetComponentFlowRate(state, this->reportLoadSideMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
-        SetComponentFlowRate(
+        PlantUtilities::SetComponentFlowRate(
+            state, this->reportLoadSideMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
+        PlantUtilities::SetComponentFlowRate(
             state, this->reportSourceSideMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
         // if there's no flowin one, turn the entire "heat pump off"
         if (this->reportLoadSideMassFlowRate <= 0.0 || this->reportSourceSideMassFlowRate <= 0.0) {
@@ -843,9 +842,9 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
             this->reportSourceSideMassFlowRate = 0.0;
             this->MustRun = false;
 
-            SetComponentFlowRate(
+            PlantUtilities::SetComponentFlowRate(
                 state, this->reportLoadSideMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
-            SetComponentFlowRate(
+            PlantUtilities::SetComponentFlowRate(
                 state, this->reportSourceSideMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
             PlantUtilities::PullCompInterconnectTrigger(state,
                                                         this->LoadPlantLoc,
@@ -1605,7 +1604,6 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
     // Using/Aliasing
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     using Curve::CurveValue;
-    using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1655,17 +1653,17 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
         return;
     }
 
-    rhoLoadSide = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                   LoadSideInletTemp,
-                                   state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
-                                   RoutineName);
+    rhoLoadSide = FluidProperties::GetDensityGlycol(state,
+                                                    state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
+                                                    LoadSideInletTemp,
+                                                    state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
+                                                    RoutineName);
 
-    rhoSourceSide = GetDensityGlycol(state,
-                                     state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                     SourceSideInletTemp,
-                                     state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
-                                     RoutineName);
+    rhoSourceSide = FluidProperties::GetDensityGlycol(state,
+                                                      state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
+                                                      SourceSideInletTemp,
+                                                      state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
+                                                      RoutineName);
 
     func1 = ((LoadSideInletTemp + CelsiustoKelvin) / Tref);
     func2 = ((SourceSideInletTemp + CelsiustoKelvin) / Tref);
@@ -1774,7 +1772,6 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
     // Using/Aliasing
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     using Curve::CurveValue;
-    using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1822,17 +1819,17 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
     if (!this->MustRun) {
         return;
     }
-    rhoLoadSide = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                   LoadSideInletTemp,
-                                   state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
-                                   RoutineName);
+    rhoLoadSide = FluidProperties::GetDensityGlycol(state,
+                                                    state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
+                                                    LoadSideInletTemp,
+                                                    state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
+                                                    RoutineName);
 
-    rhoSourceSide = GetDensityGlycol(state,
-                                     state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                     SourceSideInletTemp,
-                                     state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
-                                     RoutineName);
+    rhoSourceSide = FluidProperties::GetDensityGlycol(state,
+                                                      state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
+                                                      SourceSideInletTemp,
+                                                      state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
+                                                      RoutineName);
 
     func1 = ((LoadSideInletTemp + CelsiustoKelvin) / Tref);
     func2 = ((SourceSideInletTemp + CelsiustoKelvin) / Tref);
