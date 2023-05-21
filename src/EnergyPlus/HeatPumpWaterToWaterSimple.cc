@@ -1603,8 +1603,6 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
 
     // Using/Aliasing
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    using Curve::CurveValue;
-    using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr CelsiustoKelvin(Constant::KelvinConv); // Conversion from Celsius to Kelvin
@@ -1670,9 +1668,9 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
     func3 = (LoadSideMassFlowRate / (LoadSideVolFlowRateRated * rhoLoadSide));
     func4 = (SourceSideMassFlowRate / (SourceSideVolFlowRateRated * rhoSourceSide));
 
-    QLoad = CoolCapRated * CurveValue(state, this->CoolCapCurveIndex, func1, func2, func3, func4);
+    QLoad = CoolCapRated * Curve::CurveValue(state, this->CoolCapCurveIndex, func1, func2, func3, func4);
 
-    Power = CoolPowerRated * CurveValue(state, this->CoolPowCurveIndex, func1, func2, func3, func4);
+    Power = CoolPowerRated * Curve::CurveValue(state, this->CoolPowCurveIndex, func1, func2, func3, func4);
 
     if ((QLoad <= 0.0 || Power <= 0.0) && !state.dataGlobal->WarmupFlag) {
         if (QLoad <= 0.0) {
@@ -1728,17 +1726,17 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
         QSource *= PartLoadRatio;
     }
 
-    CpLoadSide = GetSpecificHeatGlycol(state,
-                                       state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                       LoadSideInletTemp,
-                                       state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
-                                       RoutineName);
+    CpLoadSide = FluidProperties::GetSpecificHeatGlycol(state,
+                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
+                                                        LoadSideInletTemp,
+                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
+                                                        RoutineName);
 
-    CpSourceSide = GetSpecificHeatGlycol(state,
-                                         state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                         SourceSideInletTemp,
-                                         state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
-                                         RoutineName);
+    CpSourceSide = FluidProperties::GetSpecificHeatGlycol(state,
+                                                          state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
+                                                          SourceSideInletTemp,
+                                                          state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
+                                                          RoutineName);
 
     LoadSideOutletTemp = LoadSideInletTemp - QLoad / (LoadSideMassFlowRate * CpLoadSide);
     SourceSideOutletTemp = SourceSideInletTemp + QSource / (SourceSideMassFlowRate * CpSourceSide);
@@ -1771,8 +1769,6 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
 
     // Using/Aliasing
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    using Curve::CurveValue;
-    using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const CelsiustoKelvin(Constant::KelvinConv); // Conversion from Celsius to Kelvin
@@ -1836,8 +1832,8 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
     func3 = (LoadSideMassFlowRate / (LoadSideVolFlowRateRated * rhoLoadSide));
     func4 = (SourceSideMassFlowRate / (SourceSideVolFlowRateRated * rhoSourceSide));
 
-    QLoad = HeatCapRated * CurveValue(state, this->HeatCapCurveIndex, func1, func2, func3, func4);
-    Power = HeatPowerRated * CurveValue(state, this->HeatPowCurveIndex, func1, func2, func3, func4);
+    QLoad = HeatCapRated * Curve::CurveValue(state, this->HeatCapCurveIndex, func1, func2, func3, func4);
+    Power = HeatPowerRated * Curve::CurveValue(state, this->HeatPowCurveIndex, func1, func2, func3, func4);
 
     if ((QLoad <= 0.0 || Power <= 0.0) && !state.dataGlobal->WarmupFlag) {
         if (QLoad <= 0.0) {
@@ -1893,17 +1889,17 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
         QSource *= PartLoadRatio;
     }
 
-    CpLoadSide = GetSpecificHeatGlycol(state,
-                                       state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
-                                       LoadSideInletTemp,
-                                       state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
-                                       RoutineName);
+    CpLoadSide = FluidProperties::GetSpecificHeatGlycol(state,
+                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
+                                                        LoadSideInletTemp,
+                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
+                                                        RoutineName);
 
-    CpSourceSide = GetSpecificHeatGlycol(state,
-                                         state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
-                                         SourceSideInletTemp,
-                                         state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
-                                         RoutineName);
+    CpSourceSide = FluidProperties::GetSpecificHeatGlycol(state,
+                                                          state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
+                                                          SourceSideInletTemp,
+                                                          state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
+                                                          RoutineName);
 
     LoadSideOutletTemp = LoadSideInletTemp + QLoad / (LoadSideMassFlowRate * CpLoadSide);
     SourceSideOutletTemp = SourceSideInletTemp - QSource / (SourceSideMassFlowRate * CpSourceSide);
