@@ -95,7 +95,7 @@ std::string const ModuleCompName("HeatPump:WaterToWater:ParameterEstimation:Cool
 std::string const ModuleCompNameUC("HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING");
 std::string const GSHPRefrigerant("R22"); // refrigerant name and index
 
-PlantComponent *GshpPeCoolingSpecs::factory(EnergyPlusData &state, const std::string &objectName)
+GshpPeCoolingSpecs *GshpPeCoolingSpecs::factory(EnergyPlusData &state, const std::string &objectName)
 {
     if (state.dataHPWaterToWaterClg->GetWWHPCoolingInput) {
         GetGshpInput(state);

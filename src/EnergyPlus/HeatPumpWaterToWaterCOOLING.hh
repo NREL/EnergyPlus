@@ -138,7 +138,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
         virtual ~GshpPeCoolingSpecs() = default;
 
-        static PlantComponent *factory(EnergyPlusData &state, const std::string &objectName);
+        static GshpPeCoolingSpecs *factory(EnergyPlusData &state, const std::string &objectName);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,

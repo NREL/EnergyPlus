@@ -109,7 +109,7 @@ std::string const HPEqFitHeatingUC("HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING");
 std::string const HPEqFitCooling("HeatPump:WatertoWater:EquationFit:Cooling");
 std::string const HPEqFitCoolingUC("HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING");
 
-PlantComponent *GshpSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType wwhp_type, std::string eir_wwhp_name)
+GshpSpecs *GshpSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType wwhp_type, std::string eir_wwhp_name)
 {
     if (state.dataHPWaterToWaterSimple->GetInputFlag) {
         GshpSpecs::GetWatertoWaterHPInput(state);
