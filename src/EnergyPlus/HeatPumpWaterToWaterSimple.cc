@@ -116,11 +116,11 @@ PlantComponent *GshpSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipm
         state.dataHPWaterToWaterSimple->GetInputFlag = false;
     }
 
-    for (auto &wwhp : state.dataHPWaterToWaterSimple->GSHP) {
-        if (wwhp.Name == eir_wwhp_name && wwhp.WWHPType == wwhp_type) {
-            return &wwhp;
-        }
-    }
+    auto thisObj =
+        std::find_if(state.dataHPWaterToWaterSimple->GSHP.begin(),
+                     state.dataHPWaterToWaterSimple->GSHP.end(),
+                     [&eir_wwhp_name, &wwhp_type](const GshpSpecs &myObj) { return (myObj.Name == eir_wwhp_name && myObj.WWHPType == wwhp_type); });
+    if (thisObj != state.dataHPWaterToWaterSimple->GSHP.end()) return thisObj;
 
     ShowFatalError(state, format("EquationFit_WWHP factory: Error getting inputs for wwhp named: {}", eir_wwhp_name));
     return nullptr;
@@ -739,20 +739,13 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("InitGshp");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int LoadSideInletNode;    // Load Side Inlet Node
-    int LoadSideOutletNode;   // Load Side Outlet Node
-    int SourceSideInletNode;  // Source Side Inlet Node
-    int SourceSideOutletNode; // Source Side Outlet Node
-
-    int LoopNum;
-    DataPlant::LoopSideLocation LoopSideNum;
-    Real64 rho; // local fluid density
+    int LoadSideInletNode;   // Load Side Inlet Node
+    int SourceSideInletNode; // Source Side Inlet Node
+    Real64 rho;              // local fluid density
 
     this->MustRun = true; // Reset MustRun flag to TRUE
     LoadSideInletNode = this->LoadSideInletNodeNum;
-    LoadSideOutletNode = this->LoadSideOutletNodeNum;
     SourceSideInletNode = this->SourceSideInletNodeNum;
-    SourceSideOutletNode = this->SourceSideOutletNodeNum;
 
     if (this->MyPlantScanFlag) {
         bool errFlag = false;
@@ -829,17 +822,6 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     }
     // Reset the environment flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->MyEnvrnFlag = true;
-
-    if (state.dataHPWaterToWaterSimple->PrevSimTime != state.dataHPWaterToWaterSimple->CurrentSimTime) {
-        state.dataHPWaterToWaterSimple->PrevSimTime = state.dataHPWaterToWaterSimple->CurrentSimTime;
-    }
-
-    // Calculate the simulation time
-    state.dataHPWaterToWaterSimple->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
-                                                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
-
-    LoopNum = this->LoadPlantLoc.loopNum;
-    LoopSideNum = this->LoadPlantLoc.loopSideNum;
 
     if (MyLoad > 0.0 && GSHPTypeNum == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
         this->MustRun = true;
@@ -925,7 +907,7 @@ void GshpSpecs::sizeCoolingWaterToWaterHP(EnergyPlusData &state)
     bool errorsFound(false);
     static constexpr std::string_view RoutineName("sizeCoolingWaterToWaterHP");
     Real64 tmpLoadSideVolFlowRate = this->RatedLoadVolFlowCool;
-    Real64 tmpSourceSideVolFlowRate = this->RatedSourceVolFlowCool;
+    Real64 tmpSourceSideVolFlowRate;
     Real64 tmpCoolingCap = this->RatedCapCool;
     Real64 tmpPowerDraw = this->RatedPowerCool;
 
@@ -1280,7 +1262,7 @@ void GshpSpecs::sizeHeatingWaterToWaterHP(EnergyPlusData &state)
     bool errorsFound(false);
     static constexpr std::string_view RoutineName("sizeHeatingWaterToWaterHP");
     Real64 tmpLoadSideVolFlowRate = this->RatedLoadVolFlowHeat;
-    Real64 tmpSourceSideVolFlowRate = this->RatedSourceVolFlowHeat;
+    Real64 tmpSourceSideVolFlowRate;
     Real64 tmpHeatingCap = this->RatedCapHeat;
     Real64 tmpPowerDraw = this->RatedPowerHeat;
 

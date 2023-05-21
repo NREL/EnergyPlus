@@ -170,8 +170,6 @@ struct HeatPumpWaterToWaterHEATINGData : BaseGlobalStruct
     int NumGSHPs = 0;
     bool GetWWHPHeatingInput = true;
     Array1D<HeatPumpWaterToWaterHEATING::GshpPeHeatingSpecs> GSHP;
-    Real64 CurrentSimTime = 0.0;
-    Real64 PrevSimTime = 0.0;
 
     void clear_state() override
     {
@@ -179,8 +177,6 @@ struct HeatPumpWaterToWaterHEATINGData : BaseGlobalStruct
         this->NumGSHPs = 0;
         this->GetWWHPHeatingInput = true;
         this->GSHP.deallocate();
-        this->CurrentSimTime = 0.0;
-        this->PrevSimTime = 0.0;
     }
 };
 

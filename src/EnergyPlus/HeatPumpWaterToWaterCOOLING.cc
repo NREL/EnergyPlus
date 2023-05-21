@@ -101,11 +101,10 @@ PlantComponent *GshpPeCoolingSpecs::factory(EnergyPlusData &state, const std::st
         GetGshpInput(state);
         state.dataHPWaterToWaterClg->GetWWHPCoolingInput = false;
     }
-    for (auto &wwhp : state.dataHPWaterToWaterClg->GSHP) {
-        if (wwhp.Name == objectName) {
-            return &wwhp;
-        }
-    }
+    auto thisObj = std::find_if(state.dataHPWaterToWaterClg->GSHP.begin(),
+                                state.dataHPWaterToWaterClg->GSHP.end(),
+                                [&objectName](const GshpPeCoolingSpecs &myObj) { return myObj.Name == objectName; });
+    if (thisObj != state.dataHPWaterToWaterClg->GSHP.end()) return thisObj;
     // If we didn't find it, fatal
     ShowFatalError(state, format("WWHPCoolingFactory: Error getting inputs for heat pump named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
@@ -593,21 +592,11 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     Real64 CompSuctionEnth;
     Real64 CompSuctionDensity;
     Real64 CompSuctionSatTemp;
-    std::string ErrString;
     Real64 DutyFactor;
     int IterationCount;
 
     Real64 CpSourceSide; // local temporary for fluid specific heat
     Real64 CpLoadSide;   // local temporary for fluid specific heat
-
-    if (state.dataHPWaterToWaterClg->PrevSimTime != state.dataHPWaterToWaterClg->CurrentSimTime) {
-        state.dataHPWaterToWaterClg->PrevSimTime = state.dataHPWaterToWaterClg->CurrentSimTime;
-    }
-
-    // CALCULATE THE SIMULATION TIME
-    state.dataHPWaterToWaterClg->CurrentSimTime = (state.dataGlobal->DayOfSim - 1) * 24 + state.dataGlobal->HourOfDay - 1 +
-                                                  (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
-                                                  state.dataHVACGlobal->SysTimeElapsed;
 
     if (MyLoad < 0.0) {
         this->MustRun = true;
