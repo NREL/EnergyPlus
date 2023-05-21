@@ -2094,14 +2094,14 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Average,
                                 surface.Name);
         }
-        SetupOutputVariable(state,
-                            "Site Total Surface Heat Emission to Air",
-                            OutputProcessor::Unit::J,
-                            state.dataHeatBalSurf->SumSurfaceHeatEmission,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
-                            "Environment");
     }
+    SetupOutputVariable(state,
+                        "Site Total Surface Heat Emission to Air",
+                        OutputProcessor::Unit::J,
+                        state.dataHeatBalSurf->SumSurfaceHeatEmission,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Environment");
 }
 
 void InitThermalAndFluxHistories(EnergyPlusData &state)
