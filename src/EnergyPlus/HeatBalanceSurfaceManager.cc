@@ -571,8 +571,6 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string surfName;
-    int curCons;
-    int zonePt;
     Real64 mult;
     Real64 curAzimuth;
     Real64 curTilt;
@@ -730,7 +728,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
     for (int iSurf : state.dataSurface->AllSurfaceListReportOrder) {
         auto &surface = state.dataSurface->Surface(iSurf);
-        zonePt = surface.Zone;
+        surfName = surface.Name;
         // only exterior surfaces including underground
         if ((surface.ExtBoundCond == DataSurfaces::ExternalEnvironment) || (surface.ExtBoundCond == DataSurfaces::Ground) ||
             (surface.ExtBoundCond == DataSurfaces::GroundFCfactorMethod) || (surface.ExtBoundCond == DataSurfaces::KivaFoundation)) {
@@ -739,15 +737,13 @@ void GatherForPredefinedReport(EnergyPlusData &state)
             case DataSurfaces::SurfaceClass::Wall:
             case DataSurfaces::SurfaceClass::Floor:
             case DataSurfaces::SurfaceClass::Roof: {
-                surfName = surface.Name;
-                curCons = surface.Construction;
-                OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchOpCons, surfName, state.dataConstruction->Construct(curCons).Name);
-                OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchOpRefl, surfName, 1 - state.dataConstruction->Construct(curCons).OutsideAbsorpSolar);
+                auto const &construct = state.dataConstruction->Construct(surface.Construction);
+                auto const &thisZone = state.dataHeatBal->Zone(surface.Zone);
+                mult = thisZone.Multiplier * thisZone.ListMultiplier;
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpCons, surfName, construct.Name);
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpRefl, surfName, 1 - construct.OutsideAbsorpSolar);
                 OutputReportPredefined::PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchOpUfactNoFilm, surfName, state.dataHeatBal->NominalU(surface.Construction), 3);
-                mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier;
                 OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOpGrArea, surfName, surface.GrossArea * mult);
                 computedNetArea(iSurf) += surface.GrossArea * mult;
                 curAzimuth = surface.Azimuth;
@@ -771,59 +767,45 @@ void GatherForPredefinedReport(EnergyPlusData &state)
             } break;
             case DataSurfaces::SurfaceClass::Window:
             case DataSurfaces::SurfaceClass::TDD_Dome: {
-                surfName = surface.Name;
-                curCons = surface.Construction;
-                OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchFenCons, surfName, state.dataConstruction->Construct(curCons).Name);
-                zonePt = surface.Zone;
+                auto &construct = state.dataConstruction->Construct(surface.Construction);
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenCons, surfName, construct.Name);
                 // if the construction report is requested the SummerSHGC is already calculated
-                if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
-                    SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
-                    TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
+                if (construct.SummerSHGC != 0) {
+                    SHGCSummer = construct.SummerSHGC;
+                    TransVisNorm = construct.VisTransNorm;
                 } else {
                     // must calculate Summer SHGC
-                    if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
-                        WindowManager::CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
-                        state.dataConstruction->Construct(curCons).SummerSHGC = SHGCSummer;
-                        state.dataConstruction->Construct(curCons).VisTransNorm = TransVisNorm;
-                        state.dataConstruction->Construct(curCons).SolTransNorm = TransSolNorm;
+                    if (!construct.WindowTypeEQL) {
+                        WindowManager::CalcNominalWindowCond(
+                            state, surface.Construction, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                        construct.SummerSHGC = SHGCSummer;
+                        construct.VisTransNorm = TransVisNorm;
+                        construct.SolTransNorm = TransSolNorm;
                     }
                 }
-                mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier * surface.Multiplier;
                 // include the frame area if present
                 windowArea = surface.GrossArea;
                 frameArea = 0.0;
                 dividerArea = 0.0;
                 frameDivNum = surface.FrameDivider;
                 if (frameDivNum != 0) {
-                    frameWidth = state.dataSurface->FrameDivider(frameDivNum).FrameWidth;
+                    auto const &frameDivider = state.dataSurface->FrameDivider(frameDivNum);
+                    frameWidth = frameDivider.FrameWidth;
                     frameArea = (surface.Height + 2.0 * frameWidth) * (surface.Width + 2.0 * frameWidth) - (surface.Height * surface.Width);
                     windowArea += frameArea;
-                    dividerArea =
-                        state.dataSurface->FrameDivider(frameDivNum).DividerWidth *
-                        (state.dataSurface->FrameDivider(frameDivNum).HorDividers * surface.Width +
-                         state.dataSurface->FrameDivider(frameDivNum).VertDividers * surface.Height -
-                         state.dataSurface->FrameDivider(frameDivNum).HorDividers * state.dataSurface->FrameDivider(frameDivNum).VertDividers *
-                             state.dataSurface->FrameDivider(frameDivNum).DividerWidth);
+                    dividerArea = frameDivider.DividerWidth * (frameDivider.HorDividers * surface.Width + frameDivider.VertDividers * surface.Height -
+                                                               frameDivider.HorDividers * frameDivider.VertDividers * frameDivider.DividerWidth);
+                    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenFrameDivName, surfName, frameDivider.Name);
                     OutputReportPredefined::PreDefTableEntry(
-                        state, state.dataOutRptPredefined->pdchFenFrameDivName, surfName, state.dataSurface->FrameDivider(frameDivNum).Name);
-                    OutputReportPredefined::PreDefTableEntry(state,
-                                                             state.dataOutRptPredefined->pdchFenFrameConductance,
-                                                             surfName,
-                                                             state.dataSurface->FrameDivider(frameDivNum).FrameConductance,
-                                                             3);
-                    OutputReportPredefined::PreDefTableEntry(state,
-                                                             state.dataOutRptPredefined->pdchFenDividerConductance,
-                                                             surfName,
-                                                             state.dataSurface->FrameDivider(frameDivNum).DividerConductance,
-                                                             3);
+                        state, state.dataOutRptPredefined->pdchFenFrameConductance, surfName, frameDivider.FrameConductance, 3);
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchFenDividerConductance, surfName, frameDivider.DividerConductance, 3);
 
                     // report the selected NRFC product type (specific sizes) and the NFRC rating for the assembly (glass + frame + divider)
-                    std::string_view NFRCname = NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
-                    const Real64 windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
-                    const Real64 windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
-                    const DataSurfaces::NfrcVisionType vision =
-                        NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                    std::string_view NFRCname = NfrcProductNames[static_cast<int>(frameDivider.NfrcProductType)];
+                    const Real64 windowWidth = NfrcWidth[static_cast<int>(frameDivider.NfrcProductType)];
+                    const Real64 windowHeight = NfrcHeight[static_cast<int>(frameDivider.NfrcProductType)];
+                    const DataSurfaces::NfrcVisionType vision = NfrcVision[static_cast<int>(frameDivider.NfrcProductType)];
 
                     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemNfrcType, surfName, NFRCname);
 
@@ -844,13 +826,13 @@ void GatherForPredefinedReport(EnergyPlusData &state)
 
                     // output EIO <FenestrationAssembly> for each unique combination of construction and frame/divider
                     if (state.dataGeneral->Constructions) {
-                        consAndFrame = std::make_pair(curCons, frameDivNum);
+                        consAndFrame = std::make_pair(surface.Construction, frameDivNum);
                         if (std::find(uniqConsFrame.begin(), uniqConsFrame.end(), consAndFrame) == uniqConsFrame.end()) {
                             uniqConsFrame.push_back(consAndFrame);
                             print(state.files.eio,
                                   FenestrationAssemblyFormat,
-                                  state.dataConstruction->Construct(curCons).Name,
-                                  state.dataSurface->FrameDivider(frameDivNum).Name,
+                                  construct.Name,
+                                  frameDivider.Name,
                                   NFRCname,
                                   uValueAssembly,
                                   shgcAssembly,
@@ -895,21 +877,19 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                 // Report table for every shading control state
                 const unsigned int totalStates = surface.windowShadingControlList.size();
                 if (frameDivNum != 0) {
+                    auto const &frameDivider = state.dataSurface->FrameDivider(frameDivNum);
                     for (unsigned int i = 0; i < totalStates; ++i) {
-                        const Real64 windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
-                        const Real64 windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
-                        const DataSurfaces::NfrcVisionType vision =
-                            NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        const Real64 windowWidth = NfrcWidth[static_cast<int>(frameDivider.NfrcProductType)];
+                        const Real64 windowHeight = NfrcHeight[static_cast<int>(frameDivider.NfrcProductType)];
+                        const DataSurfaces::NfrcVisionType vision = NfrcVision[static_cast<int>(frameDivider.NfrcProductType)];
 
                         const int stateConstrNum = surface.shadedConstructionList[i];
                         const Real64 stateUValue = WindowManager::GetIGUUValueForNFRCReport(state, iSurf, stateConstrNum, windowWidth, windowHeight);
                         const Real64 stateSHGC = WindowManager::GetSHGCValueForNFRCReporting(state, iSurf, stateConstrNum, windowWidth, windowHeight);
                         std::string const &constructionName = state.dataConstruction->Construct(stateConstrNum).Name;
 
-                        OutputReportPredefined::PreDefTableEntry(state,
-                                                                 state.dataOutRptPredefined->pdchFenShdFrameDiv,
-                                                                 constructionName,
-                                                                 state.dataSurface->FrameDivider(frameDivNum).Name);
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchFenShdFrameDiv, constructionName, frameDivider.Name);
                         OutputReportPredefined::PreDefTableEntry(
                             state, state.dataOutRptPredefined->pdchFenShdUfact, constructionName, stateUValue, 3);
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenShdSHGC, constructionName, stateSHGC, 3);
@@ -926,7 +906,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         WindowManager::GetWindowAssemblyNfrcForReport(
                             state, iSurf, stateConstrNum, windowWidth, windowHeight, vision, stateAssemblyUValue, stateAssemblySHGC, stateAssemblyVT);
 
-                        std::string_view NFRCname = NfrcProductNames[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        std::string_view NFRCname = NfrcProductNames[static_cast<int>(frameDivider.NfrcProductType)];
                         OutputReportPredefined::PreDefTableEntry(
                             state, state.dataOutRptPredefined->pdchFenShdAssemNfrcType, constructionName, NFRCname);
 
@@ -956,7 +936,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                       stateUValue,
                                       stateSHGC,
                                       state.dataConstruction->Construct(stateConstrNum).VisTransNorm,
-                                      state.dataSurface->FrameDivider(frameDivNum).Name,
+                                      frameDivider.Name,
                                       NFRCname,
                                       stateAssemblyUValue,
                                       stateAssemblySHGC,
@@ -1022,13 +1002,12 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                 }
             } break;
             case DataSurfaces::SurfaceClass::Door: {
-                surfName = surface.Name;
-                curCons = surface.Construction;
+                auto const &thisZone = state.dataHeatBal->Zone(surface.Zone);
+                mult = thisZone.Multiplier * thisZone.ListMultiplier;
                 OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchDrCons, surfName, state.dataConstruction->Construct(curCons).Name);
+                    state, state.dataOutRptPredefined->pdchDrCons, surfName, state.dataConstruction->Construct(surface.Construction).Name);
                 OutputReportPredefined::PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchDrUfactNoFilm, surfName, state.dataHeatBal->NominalU(surface.Construction), 3);
-                mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier;
                 OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrGrArea, surfName, surface.GrossArea * mult);
                 OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDrParent, surfName, surface.BaseSurfName);
                 computedNetArea(surface.BaseSurf) -= surface.GrossArea * mult;
@@ -1041,15 +1020,14 @@ void GatherForPredefinedReport(EnergyPlusData &state)
             isExterior = false;
             if ((surface.Class == DataSurfaces::SurfaceClass::Wall) || (surface.Class == DataSurfaces::SurfaceClass::Floor) ||
                 (surface.Class == DataSurfaces::SurfaceClass::Roof) || (surface.Class == DataSurfaces::SurfaceClass::IntMass)) {
-                surfName = surface.Name;
-                curCons = surface.Construction;
+                auto const &construct = state.dataConstruction->Construct(surface.Construction);
+                auto const &thisZone = state.dataHeatBal->Zone(surface.Zone);
+                mult = thisZone.Multiplier * thisZone.ListMultiplier;
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpCons, surfName, construct.Name);
                 OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchIntOpCons, surfName, state.dataConstruction->Construct(curCons).Name);
-                OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchIntOpRefl, surfName, 1 - state.dataConstruction->Construct(curCons).OutsideAbsorpSolar);
+                    state, state.dataOutRptPredefined->pdchIntOpRefl, surfName, 1 - construct.OutsideAbsorpSolar);
                 OutputReportPredefined::PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchIntOpUfactNoFilm, surfName, state.dataHeatBal->NominalU(surface.Construction), 3);
-                mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier;
                 OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpGrArea, surfName, surface.GrossArea * mult);
                 computedNetArea(iSurf) += surface.GrossArea * mult;
                 curAzimuth = surface.Azimuth;
@@ -1072,14 +1050,12 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                 }
                 // interior window report
             } else if ((surface.Class == DataSurfaces::SurfaceClass::Window) || (surface.Class == DataSurfaces::SurfaceClass::TDD_Dome)) {
+                auto const &construct = state.dataConstruction->Construct(surface.Construction);
+                auto const &thisZone = state.dataHeatBal->Zone(surface.Zone);
+                mult = thisZone.Multiplier * thisZone.ListMultiplier;
                 if (!has_prefix(surface.Name,
                                 "iz-")) { // don't count created interzone surfaces that are mirrors of other surfaces
-                    surfName = surface.Name;
-                    curCons = surface.Construction;
-                    OutputReportPredefined::PreDefTableEntry(
-                        state, state.dataOutRptPredefined->pdchIntFenCons, surfName, state.dataConstruction->Construct(curCons).Name);
-                    zonePt = surface.Zone;
-                    mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier * surface.Multiplier;
+                    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenCons, surfName, construct.Name);
                     // include the frame area if present
                     windowArea = surface.GrossArea;
                     if (surface.FrameDivider != 0) {
@@ -1093,16 +1069,17 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     computedNetArea(surface.BaseSurf) -= windowAreaWMult;
                     nomUfact = state.dataHeatBal->NominalU(surface.Construction);
                     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenUfact, surfName, nomUfact, 3);
-                    if (!state.dataConstruction->Construct(curCons).TypeIsAirBoundary) {
+                    if (!construct.TypeIsAirBoundary) {
                         // Solar properties not applicable for air boundary surfaces
                         // if the construction report is requested the SummerSHGC is already calculated
-                        if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
-                            SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;
-                            TransVisNorm = state.dataConstruction->Construct(curCons).VisTransNorm;
+                        if (construct.SummerSHGC != 0) {
+                            SHGCSummer = construct.SummerSHGC;
+                            TransVisNorm = construct.VisTransNorm;
                         } else {
                             // must calculate Summer SHGC
-                            if (!state.dataConstruction->Construct(curCons).WindowTypeEQL) {
-                                WindowManager::CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                            if (!construct.WindowTypeEQL) {
+                                WindowManager::CalcNominalWindowCond(
+                                    state, surface.Construction, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
                             }
                         }
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenSHGC, surfName, SHGCSummer, 3);
@@ -1117,13 +1094,12 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     intUfactArea += nomUfact * windowAreaWMult;
                 }
             } else if (surface.Class == DataSurfaces::SurfaceClass::Door) {
-                surfName = surface.Name;
-                curCons = surface.Construction;
-                OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchIntDrCons, surfName, state.dataConstruction->Construct(curCons).Name);
+                auto const &construct = state.dataConstruction->Construct(surface.Construction);
+                auto const &thisZone = state.dataHeatBal->Zone(surface.Zone);
+                mult = thisZone.Multiplier * thisZone.ListMultiplier;
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntDrCons, surfName, construct.Name);
                 OutputReportPredefined::PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchIntDrUfactNoFilm, surfName, state.dataHeatBal->NominalU(surface.Construction), 3);
-                mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier;
                 OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntDrGrArea, surfName, surface.GrossArea * mult);
                 OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntDrParent, surfName, surface.BaseSurfName);
                 computedNetArea(surface.BaseSurf) -= surface.GrossArea * mult;
@@ -1158,8 +1134,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     numExtSurfaces(int(DataSurfaces::SurfaceClass::Fin)) = totFins;
     // go through all the surfaces again and this time insert the net area results
     for (int iSurf : state.dataSurface->AllSurfaceListReportOrder) {
-        auto &surface = state.dataSurface->Surface(iSurf);
-        zonePt = surface.Zone;
+        auto const &surface = state.dataSurface->Surface(iSurf);
         DataSurfaces::SurfaceClass const SurfaceClass(surface.Class);
         // exterior surfaces including underground
         if ((surface.ExtBoundCond == DataSurfaces::ExternalEnvironment) || (surface.ExtBoundCond == DataSurfaces::Ground) ||
