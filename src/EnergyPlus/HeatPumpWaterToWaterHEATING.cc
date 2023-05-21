@@ -79,7 +79,6 @@ namespace EnergyPlus::HeatPumpWaterToWaterHEATING {
 //                      L Lawrie: V1.1.1 (5/20/2003) add meters and energy to several reporting variables
 //                      L Lawrie: V1.1.1 (5/20/2003) restructure modules to comply with standard templates
 //                      B. Griffith, Sept 2010, plant upgrades, generalize fluid properties
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // This module simulates a water to Water Heat Pump (Heating)
@@ -177,7 +176,6 @@ void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
 void GetGshpInput(EnergyPlusData &state)
 {
     //       SUBROUTINE INFORMATION:
-    //       AUTHOR:
     //       DATE WRITTEN:    April 1998
 
     // PURPOSE OF THIS SUBROUTINE:

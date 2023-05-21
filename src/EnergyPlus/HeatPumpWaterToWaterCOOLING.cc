@@ -78,7 +78,6 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
 //                      L Lawrie: V1.1.1 (5/20/2003) add meters and energy to several reporting variables
 //                      L Lawrie: V1.1.1 (5/20/2003) restructure modules to comply with standard templates
 //                      B Griffith, Sept 2010, plant upgrades, general fluid properties
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // This module simulates a water to Water Heat Pump (Cooling)
@@ -86,9 +85,6 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
 // METHODOLOGY EMPLOYED:
 // This simulation is based on a set of selected parameters,
 // Which are obtained using Parameter Estimation technique.
-
-// Using/Aliasing
-using namespace DataLoopNode;
 
 // MODULE PARAMETER DEFINITIONS
 std::string const ModuleCompName("HeatPump:WaterToWater:ParameterEstimation:Cooling");
@@ -176,7 +172,6 @@ void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
 void GetGshpInput(EnergyPlusData &state)
 {
     //       SUBROUTINE INFORMATION:
-    //       AUTHOR:
     //       DATE WRITTEN:    April 1998
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -186,13 +181,6 @@ void GetGshpInput(EnergyPlusData &state)
     // information from the input file, count the number of
     // GSHPs and begin to fill the
     // arrays associated with the typeGSHP.
-
-    // Using/Aliasing
-    using BranchNodeConnections::TestCompSet;
-    using FluidProperties::FindRefrigerant;
-    using NodeInputManager::GetOnlySingleNode;
-    using PlantUtilities::RegisterPlantCompDesignFlow;
-    using PlantUtilities::ScanPlantLoopsForObject;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int GSHPNum;                  // Gshp counter
@@ -315,7 +303,7 @@ void GetGshpInput(EnergyPlusData &state)
                               DataLoopNode::NodeFluidType::Water,
                               DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
-                              ObjectIsNotParent);
+                              DataLoopNode::ObjectIsNotParent);
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideOutletNodeNum =
             GetOnlySingleNode(state,
@@ -326,7 +314,7 @@ void GetGshpInput(EnergyPlusData &state)
                               DataLoopNode::NodeFluidType::Water,
                               DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
-                              ObjectIsNotParent);
+                              DataLoopNode::ObjectIsNotParent);
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideInletNodeNum =
             GetOnlySingleNode(state,
@@ -337,7 +325,7 @@ void GetGshpInput(EnergyPlusData &state)
                               DataLoopNode::NodeFluidType::Water,
                               DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Secondary,
-                              ObjectIsNotParent);
+                              DataLoopNode::ObjectIsNotParent);
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideOutletNodeNum =
             GetOnlySingleNode(state,
@@ -348,16 +336,16 @@ void GetGshpInput(EnergyPlusData &state)
                               DataLoopNode::NodeFluidType::Water,
                               DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Secondary,
-                              ObjectIsNotParent);
+                              DataLoopNode::ObjectIsNotParent);
 
         // Test node sets
-        TestCompSet(state, ModuleCompNameUC, AlphArray(1), AlphArray(2), AlphArray(3), "Condenser Water Nodes");
-        TestCompSet(state, ModuleCompNameUC, AlphArray(1), AlphArray(4), AlphArray(5), "Chilled Water Nodes");
+        BranchNodeConnections::TestCompSet(state, ModuleCompNameUC, AlphArray(1), AlphArray(2), AlphArray(3), "Condenser Water Nodes");
+        BranchNodeConnections::TestCompSet(state, ModuleCompNameUC, AlphArray(1), AlphArray(4), AlphArray(5), "Chilled Water Nodes");
 
         // save the design source side flow rate for use by plant loop sizing algorithms
-        RegisterPlantCompDesignFlow(state,
-                                    state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideInletNodeNum,
-                                    0.5 * state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state,
+                                                    state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideInletNodeNum,
+                                                    0.5 * state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideVolFlowRate);
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).QLoad = 0.0;
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).QSource = 0.0;
@@ -376,7 +364,7 @@ void GetGshpInput(EnergyPlusData &state)
         ShowFatalError(state, "Errors Found in getting Gshp input");
     }
 
-    state.dataHPWaterToWaterClg->GSHPRefrigIndex = FindRefrigerant(state, GSHPRefrigerant);
+    state.dataHPWaterToWaterClg->GSHPRefrigIndex = FluidProperties::FindRefrigerant(state, GSHPRefrigerant);
     if (state.dataHPWaterToWaterClg->GSHPRefrigIndex == 0) {
         ShowFatalError(state, format("Refrigerant for {} not found, should have been={}", ModuleCompName, GSHPRefrigerant));
         ShowFatalError(state, format("FluidProperties:* objects for {} must be included in the idf file.", GSHPRefrigerant));
@@ -486,9 +474,6 @@ void GshpPeCoolingSpecs::initialize(EnergyPlusData &state)
     //       AUTHOR:          Dan Fisher
     //       DATE WRITTEN:    July 2007
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // initialization
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("InitGshp");
 
@@ -550,7 +535,6 @@ void GshpPeCoolingSpecs::initialize(EnergyPlusData &state)
 void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
 {
     // SUBROUTINE INFORMATION:
-    //       AUTHOR
     //       DATE WRITTEN   Sept. 1998
     //       MODIFIED       April 1999
     //                      September 2002, SJR
