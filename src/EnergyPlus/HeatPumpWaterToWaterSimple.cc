@@ -78,7 +78,6 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
 //       AUTHOR         Kenneth Tang
 //       DATE WRITTEN   March 2005
 //       MODIFIED       Brent Griffith, plant upgrades, fluid properties
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // This module simulates a Water-to-Water Heat Pump Simple (Equation-Fit Model)
@@ -95,13 +94,6 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
 // Loop Heat Exchanger Models in the EnergyPlus Simulation Environment,
 // M.S. Thesis, Department of Mechanical and Aerospace Engineering,
 // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
-
-// OTHER NOTES: none
-
-// USE STATEMENTS:
-// Use statements for data only modules
-// Using/Aliasing
-using namespace DataLoopNode;
 
 // MODULE PARAMETER DEFINITIONS
 std::string const HPEqFitHeating("HeatPump:WatertoWater:EquationFit:Heating");
@@ -222,31 +214,19 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Kenneth Tang
     //       DATE WRITTEN   March 2005
-    //       MODIFIED
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtain input from IDF and store them in data structures
 
-    // Using/Aliasing
-    using BranchNodeConnections::TestCompSet;
-    using Curve::GetCurveIndex;
-    using NodeInputManager::GetOnlySingleNode;
-    using PlantUtilities::RegisterPlantCompDesignFlow;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int GSHPNum;     // GSHP number
-    int HPNum;       // Counter
-    int NumCoolCoil; // Number of Cooling Coils
-    int NumHeatCoil; // Number of Heating Coils
-    int NumAlphas;   // Number of elements in the alpha array
-    int NumNums;     // Number of elements in the numeric array
-    int IOStat;      // IO Status when calling get input subroutine
+    int NumAlphas; // Number of elements in the alpha array
+    int NumNums;   // Number of elements in the numeric array
+    int IOStat;    // IO Status when calling get input subroutine
 
-    bool ErrorsFound(false);
+    bool ErrorsFound = false;
 
-    NumCoolCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, HPEqFitCoolingUC);
-    NumHeatCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, HPEqFitHeatingUC);
+    int NumCoolCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, HPEqFitCoolingUC);
+    int NumHeatCoil = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, HPEqFitHeatingUC);
     state.dataHPWaterToWaterSimple->NumGSHPs = NumCoolCoil + NumHeatCoil;
 
     if (state.dataHPWaterToWaterSimple->NumGSHPs <= 0) {
@@ -260,9 +240,9 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
     }
 
     // Load data structure for cooling coil
-    for (HPNum = 1; HPNum <= NumCoolCoil; ++HPNum) {
+    for (int HPNum = 1; HPNum <= NumCoolCoil; ++HPNum) {
 
-        GSHPNum = HPNum;
+        int GSHPNum = HPNum;
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  HPEqFitCoolingUC,
@@ -294,8 +274,8 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedPowerCool == DataSizing::AutoSize) {
             state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedPowerCoolWasAutoSized = true;
         }
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
+        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
+        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex > 0) {
             ErrorsFound |= Curve::CheckCurveDims(state,
                                                  state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex,
@@ -353,7 +333,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                               DataLoopNode::NodeFluidType::Water,
                               DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
-                              ObjectIsNotParent);
+                              DataLoopNode::ObjectIsNotParent);
 
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).SourceSideOutletNodeNum =
             GetOnlySingleNode(state,
@@ -364,7 +344,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                               DataLoopNode::NodeFluidType::Water,
                               DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
-                              ObjectIsNotParent);
+                              DataLoopNode::ObjectIsNotParent);
 
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).LoadSideInletNodeNum =
             GetOnlySingleNode(state,
@@ -375,7 +355,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                               DataLoopNode::NodeFluidType::Water,
                               DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Secondary,
-                              ObjectIsNotParent);
+                              DataLoopNode::ObjectIsNotParent);
 
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).LoadSideOutletNodeNum =
             GetOnlySingleNode(state,
@@ -386,21 +366,21 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                               DataLoopNode::NodeFluidType::Water,
                               DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Secondary,
-                              ObjectIsNotParent);
+                              DataLoopNode::ObjectIsNotParent);
 
         // Test node sets
-        TestCompSet(state,
-                    HPEqFitCoolingUC,
-                    state.dataIPShortCut->cAlphaArgs(1),
-                    state.dataIPShortCut->cAlphaArgs(2),
-                    state.dataIPShortCut->cAlphaArgs(3),
-                    "Condenser Water Nodes");
-        TestCompSet(state,
-                    HPEqFitCoolingUC,
-                    state.dataIPShortCut->cAlphaArgs(1),
-                    state.dataIPShortCut->cAlphaArgs(4),
-                    state.dataIPShortCut->cAlphaArgs(5),
-                    "Chilled Water Nodes");
+        BranchNodeConnections::TestCompSet(state,
+                                           HPEqFitCoolingUC,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(2),
+                                           state.dataIPShortCut->cAlphaArgs(3),
+                                           "Condenser Water Nodes");
+        BranchNodeConnections::TestCompSet(state,
+                                           HPEqFitCoolingUC,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(4),
+                                           state.dataIPShortCut->cAlphaArgs(5),
+                                           "Chilled Water Nodes");
 
         if (NumAlphas > 7 && !state.dataIPShortCut->lAlphaFieldBlanks(8)) {
             state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName = state.dataIPShortCut->cAlphaArgs(8);
@@ -436,9 +416,9 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
     }
 
     // Load data structure for heating coil
-    for (HPNum = 1; HPNum <= NumHeatCoil; ++HPNum) {
+    for (int HPNum = 1; HPNum <= NumHeatCoil; ++HPNum) {
 
-        GSHPNum = NumCoolCoil + HPNum;
+        int GSHPNum = NumCoolCoil + HPNum;
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  HPEqFitHeatingUC,
@@ -471,8 +451,8 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
             state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedPowerHeatWasAutoSized = true;
         }
 
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
+        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
+        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex > 0) {
             ErrorsFound |= Curve::CheckCurveDims(state,
                                                  state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex,
@@ -529,7 +509,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                               DataLoopNode::NodeFluidType::Water,
                               DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
-                              ObjectIsNotParent);
+                              DataLoopNode::ObjectIsNotParent);
 
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).SourceSideOutletNodeNum =
             GetOnlySingleNode(state,
@@ -540,7 +520,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                               DataLoopNode::NodeFluidType::Water,
                               DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
-                              ObjectIsNotParent);
+                              DataLoopNode::ObjectIsNotParent);
 
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).LoadSideInletNodeNum =
             GetOnlySingleNode(state,
@@ -551,7 +531,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                               DataLoopNode::NodeFluidType::Water,
                               DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Secondary,
-                              ObjectIsNotParent);
+                              DataLoopNode::ObjectIsNotParent);
 
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).LoadSideOutletNodeNum =
             GetOnlySingleNode(state,
@@ -562,25 +542,25 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                               DataLoopNode::NodeFluidType::Water,
                               DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Secondary,
-                              ObjectIsNotParent);
+                              DataLoopNode::ObjectIsNotParent);
 
         if (NumAlphas > 7 && !state.dataIPShortCut->lAlphaFieldBlanks(8)) {
             state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName = state.dataIPShortCut->cAlphaArgs(8);
         }
 
         // Test node sets
-        TestCompSet(state,
-                    HPEqFitHeatingUC,
-                    state.dataIPShortCut->cAlphaArgs(1),
-                    state.dataIPShortCut->cAlphaArgs(2),
-                    state.dataIPShortCut->cAlphaArgs(3),
-                    "Condenser Water Nodes");
-        TestCompSet(state,
-                    HPEqFitHeatingUC,
-                    state.dataIPShortCut->cAlphaArgs(1),
-                    state.dataIPShortCut->cAlphaArgs(4),
-                    state.dataIPShortCut->cAlphaArgs(5),
-                    "Hot Water Nodes");
+        BranchNodeConnections::TestCompSet(state,
+                                           HPEqFitHeatingUC,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(2),
+                                           state.dataIPShortCut->cAlphaArgs(3),
+                                           "Condenser Water Nodes");
+        BranchNodeConnections::TestCompSet(state,
+                                           HPEqFitHeatingUC,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaArgs(4),
+                                           state.dataIPShortCut->cAlphaArgs(5),
+                                           "Hot Water Nodes");
 
         // CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Heating'
         SetupOutputVariable(state,
@@ -612,7 +592,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
     }
 
     // now process companion coils, if any
-    for (GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterSimple->NumGSHPs; ++GSHPNum) {
+    for (int GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterSimple->NumGSHPs; ++GSHPNum) {
         if (!state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName.empty()) {
             state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionIndex =
                 UtilityRoutines::FindItemInList(state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName, state.dataHPWaterToWaterSimple->GSHP);
@@ -632,7 +612,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         ShowFatalError(state, "Errors found in processing input for Water to Water Heat Pumps");
     }
 
-    for (GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterSimple->NumGSHPs; ++GSHPNum) {
+    for (int GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterSimple->NumGSHPs; ++GSHPNum) {
         // setup output variables
         SetupOutputVariable(state,
                             "Heat Pump Electricity Rate",
@@ -711,8 +691,6 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Kenneth Tang
     //       DATE WRITTEN   March 2005
-    //       MODIFIED
-    //       RE-ENGINEERED
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for initializations of the Water-to-Water HP Simple
@@ -814,7 +792,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
 
         InitComponentNodes(state, 0.0, this->SourceSideDesignMassFlow, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum);
 
-        if (state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint == SensedNodeFlagValue)
+        if (state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue)
             state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint = 0.0;
         state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp = state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint + 30;
 
