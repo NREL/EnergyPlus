@@ -321,7 +321,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound)
+    void CheckUsedConstructions(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:

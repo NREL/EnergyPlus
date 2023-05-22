@@ -1512,7 +1512,6 @@ namespace HeatBalanceIntRadExchange {
         //  Allocate and zero arrays
         Array2D<Real64> FixedAF(F); // store for largest area check
 
-        Real64 Accelerator = 1.0; // RowCoefficient multipler to accelerate convergence
         Real64 ConvrgOld = 10.0;
         Real64 LargestArea = maxval(A);
         bool severeErrorPresent = false;
