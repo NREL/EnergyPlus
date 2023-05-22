@@ -768,6 +768,8 @@ void GatherForPredefinedReport(EnergyPlusData &state)
             case DataSurfaces::SurfaceClass::Window:
             case DataSurfaces::SurfaceClass::TDD_Dome: {
                 auto &construct = state.dataConstruction->Construct(surface.Construction);
+                auto const &thisZone = state.dataHeatBal->Zone(surface.Zone);
+                mult = thisZone.Multiplier * thisZone.ListMultiplier * surface.Multiplier;
                 OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenCons, surfName, construct.Name);
                 // if the construction report is requested the SummerSHGC is already calculated
                 if (construct.SummerSHGC != 0) {
@@ -1052,7 +1054,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
             } else if ((surface.Class == DataSurfaces::SurfaceClass::Window) || (surface.Class == DataSurfaces::SurfaceClass::TDD_Dome)) {
                 auto const &construct = state.dataConstruction->Construct(surface.Construction);
                 auto const &thisZone = state.dataHeatBal->Zone(surface.Zone);
-                mult = thisZone.Multiplier * thisZone.ListMultiplier;
+                mult = thisZone.Multiplier * thisZone.ListMultiplier * surface.Multiplier;
                 if (!has_prefix(surface.Name,
                                 "iz-")) { // don't count created interzone surfaces that are mirrors of other surfaces
                     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenCons, surfName, construct.Name);
@@ -1484,8 +1486,9 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
 
     DisplayString(state, "Setting up Surface Reporting Variables");
     // Setup surface report variables CurrentModuleObject='Opaque Surfaces'
-    for (int loop : state.dataSurface->AllHTSurfaceList) {
+    for (int loop = 1; loop <= state.dataSurface->TotSurfaces; ++loop) {
         auto &surface = state.dataSurface->Surface(loop);
+        if (!surface.HeatTransSurf) continue;
         SetupOutputVariable(state,
                             "Surface Inside Face Temperature",
                             OutputProcessor::Unit::C,
@@ -2269,6 +2272,12 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             state.dataHeatBalSurf->SurfInsideFluxHist(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
         }
     }
+    for (int SurfNum : state.dataSurface->AllHTSurfaceList) {
+        if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
+            state.dataHeatBal->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TbaffleLast = 20.0;
+            state.dataHeatBal->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TairLast = 20.0;
+        }
+    }
     // Initialize Kiva convection algorithms
     for (int SurfNum : state.dataSurface->AllHTKivaSurfaceList) {
         state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(3.076);
@@ -2294,10 +2303,6 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             for (int CTFTermNum = 2; CTFTermNum <= state.dataConstruction->Construct(surface.Construction).NumCTFTerms + 1; ++CTFTermNum) {
                 state.dataHeatBalSurf->SurfOutsideFluxHistMaster(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
                 state.dataHeatBalSurf->SurfInsideFluxHistMaster(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
-            }
-            if (state.dataSurface->SurfExtCavityPresent(SurfNum)) {
-                state.dataHeatBal->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TbaffleLast = 20.0;
-                state.dataHeatBal->ExtVentedCavity(state.dataSurface->SurfExtCavNum(SurfNum)).TairLast = 20.0;
             }
         }
     }
