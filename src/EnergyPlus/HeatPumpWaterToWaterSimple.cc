@@ -707,9 +707,6 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     // M.S. Thesis, Department of Mechanical and Aerospace Engineering,
     // Oklahoma State University. (downloadable from http://www.hvac.okstate.edu/)
 
-    // Using/Aliasing
-    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("InitGshp");
 

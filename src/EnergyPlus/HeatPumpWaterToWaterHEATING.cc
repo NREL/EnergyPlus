@@ -528,8 +528,6 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     //                      September 2002, SJR
     //       RE-ENGINEERED  Mar2000
 
-    Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr Real64 gamma(1.114); // Expansion Coefficient
     constexpr Real64 HeatBalTol(0.0005);
