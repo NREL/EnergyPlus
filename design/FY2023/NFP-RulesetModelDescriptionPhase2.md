@@ -127,7 +127,52 @@ Tags added are:
 
 Most of these were used previously during the 2022 effort.
 
+In the future, to support the data groups:
+- FanOutputValidationPoint
+- BoilerOutputValidationPoint 
+- ChillerCapacityValidationPoint
+- ChillerPowerValidationPoint
+
+Additional input objects may be required so that the values are consistent with what is requested by 
+the code official/rating authority.
+
 ### Enhance Existing EnergyPlus Tabular Output Reports ###
+
+#### Equipment Summary - Central Plant ####
+
+The current colums are:
+- Type
+- Reference Capacity [W]
+- Reference Efficiency [W/W]
+- Rated Capacity [W]
+- Rated Efficiency [W/W]
+- IPLV in SI Units [W/W]
+- IPLV in IP Units [Btu/W-h]
+
+The new columns would be:
+- Plantloop name
+- Plantloop branch name
+- Minimum part load ratio 
+- Fuel type
+- Parasitic electric load
+- Rated entering condenser temperature
+- Rated leaving evaporator temperature
+- Reference entering condenser temperature
+- Reference leaving evaporator temperature
+- Design water flow rate
+- Chiller condenser design flow rate
+- Heat recovery Plantloop name
+- Heat recovery Plantloop branch name
+- Recovery Relative Capacity Fraction
+- Fluid type
+- Range
+- Approach
+- Design Fan Power
+- Desing inlet air wet-bulb temperature
+- Leaving water setpoint temperature
+
+We may also want to consider breaking up "Central Plant" table into separate tables for chillers, boilers, and heat 
+rejection since more columns are unique to just one of those.
 
 #### Equipment Summary - Heating Coils ####
 
@@ -141,6 +186,8 @@ The new columns would be:
 - Used as Supplementary Heat
 - Airloop name
 - Airloop branch name
+- Plantloop name
+- Plantloop branch name
 - Suppplemental heat high shutoff temperature [C]
 
 #### Equipment Summary - DX Heating Coils ####
@@ -181,6 +228,26 @@ The new columns would be:
 - Motor efficiency
 - Motor heat to zone fraction
 - Motor loss zone name
+- Airloop name
+- Airloop branch name
+
+#### Equipment Summary - Pumps ####
+
+The current colums are:
+Type
+- Control
+- Head [pa]
+- Water Flow [m3/s]
+- Electricity Rate [W]
+- Power Per Water Flow Rate [W-s/m3]
+- Motor Efficiency [W/W]
+- End Use Subcategory
+
+The new columns would be:
+- Is autosized
+- Plantloop name
+- Plantloop branch name
+
 
 ### Add New EnergyPlus Tabular Reports ###
 
@@ -232,12 +299,15 @@ that table since it is very wide already or they could be kept for compatibility
 
 #### Controls ####
 
-New report that includes Setpoint Managers, Controllers, Availability Mangers and identifies the type, where they apply and sense
-and control parameters from input. Need: 
+New report that includes Setpoint Managers, Controllers, Availability Managers, PlantEquipmentOperation and identifies 
+the type, where they apply and sense and control parameters from input. Need: 
 
 - minimum and maximum setpoint temperatures
 - minimum turndown ratio
 - schedules
+- load ranges
+
+This is probably a series of tables, one for each type, the report the pertinant information including what they apply to.
 
 
 
