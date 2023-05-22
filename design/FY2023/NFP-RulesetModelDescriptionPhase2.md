@@ -249,7 +249,7 @@ The new columns would be:
 - Plantloop branch name
 
 
-### Add New EnergyPlus Tabular Reports ###
+### Add New EnergyPlus Tabular Reports and Tables ###
 
 #### HVAC Topology ####
 
@@ -274,7 +274,7 @@ Maybe include where controllers, setpoint managers, and other items that referen
 REVIEW BND FILE FOR WHAT ELSE IS REPORTED.
 
 
-#### Coil Connections ####
+#### Coil Sizing Details - Coil Connections ####
 
 New table under current Coil Sizing Details report called "Coil Connections". Each row would be a coil:
 
@@ -306,8 +306,25 @@ the type, where they apply and sense and control parameters from input. Need:
 - minimum turndown ratio
 - schedules
 - load ranges
+- Setpoint at Outdoor Low Temperature
+- Outdoor Low Temperature
+- Setpoint at Outdoor High Temperature
+- Outdoor High Temperature
+   
 
 This is probably a series of tables, one for each type, the report the pertinant information including what they apply to.
+
+#### Equipment Summary - PlantLoop or CondenserLoop ####
+
+New report for PlantLoop objects. One row for each Plant or CondenserLoop
+
+- name
+- type (PlantLoop or CondenserLoop)
+- provides heating
+- provides cooling
+- Maximum Loop Flow Rate
+- Minimum Loop Flow Rate
+- Total pump power on loop
 
 
 
