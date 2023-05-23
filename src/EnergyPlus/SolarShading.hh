@@ -182,10 +182,10 @@ namespace SolarShading {
     );
 
     void MULTOL(EnergyPlusData &state,
-                int const NNN,   // argument
-                int const LOC0,  // Location in the homogeneous coordinate array
-                int const NRFIGS // Number of figures overlapped
-    );
+                int const NNN,    // argument
+                int const LOC0,   // Location in the homogeneous coordinate array
+                int const NRFIGS, // Number of figures overlapped
+                bool const calledFromSHDGSS = false);
 
     void ORDER(EnergyPlusData &state,
                int const NV3, // Number of vertices of figure NS3
@@ -195,8 +195,8 @@ namespace SolarShading {
     void DeterminePolygonOverlap(EnergyPlusData &state,
                                  int const NS1, // Number of the figure being overlapped
                                  int const NS2, // Number of the figure doing overlapping
-                                 int const NS3  // Location to place results of overlap
-    );
+                                 int const NS3, // Location to place results of overlap
+                                 bool const calledFromMULTOLfromSHDGSS = false);
 
     void CalcPerSolarBeam(EnergyPlusData &state,
                           Real64 const AvgEqOfTime,       // Average value of Equation of Time for period
