@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/SwimmingPool.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SwimmingPool;
@@ -353,4 +354,113 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     EXPECT_TRUE(state->dataSurface->SurfIsRadSurfOrVentSlabOrPool(poolReference.SurfacePtr));
     EXPECT_TRUE(state->dataSurface->SurfIsPool(poolReference.SurfacePtr));
     EXPECT_EQ(state->dataSurface->Surface(poolReference.SurfacePtr).Zone, poolReference.ZonePtr);
+}
+
+TEST_F(EnergyPlusFixture, SwimmingPool_MultiplePoolUpdatePoolSourceValAvgTest)
+{
+    // Test of UpdatePoolSourceValAvg for Multiple Swimming Pools (Fix for Defect #9797)
+    // The specification of multiple pools in single input file led to weird results and
+    // was traced back to improper assignment statements in UpdatePoolSourceValAvg.
+    
+    auto &PoolData = state->dataSwimmingPools;
+    auto &SurfData = state->dataSurface;
+    auto &HBFanData = state->dataHeatBalFanSys;
+
+    Real64 closeEnough = 0.00001;
+    PoolData->NumSwimmingPools = 2;
+    PoolData->Pool.allocate(PoolData->NumSwimmingPools);
+    auto &Pool1Data = state->dataSwimmingPools->Pool(1);
+    auto &Pool2Data = state->dataSwimmingPools->Pool(2);
+
+    SurfData->TotSurfaces = 2;
+    SurfData->Surface.allocate(SurfData->TotSurfaces);
+    for (int poolNum = 1; poolNum <= PoolData->NumSwimmingPools; ++poolNum) {
+        PoolData->Pool(poolNum).QPoolSrcAvg.allocate(SurfData->TotSurfaces);
+        PoolData->Pool(poolNum).HeatTransCoefsAvg.allocate(SurfData->TotSurfaces);
+    }
+    
+    Real64 noResult = -9999.0;
+    HBFanData->QPoolSurfNumerator.allocate(SurfData->TotSurfaces);
+    HBFanData->QPoolSurfNumerator = noResult;
+    HBFanData->PoolHeatTransCoefs.allocate(SurfData->TotSurfaces);
+    HBFanData->PoolHeatTransCoefs = noResult;
+    
+    for (int surfNum= 1; surfNum <= SurfData->TotSurfaces; ++surfNum) {
+        SurfData->Surface(surfNum).ExtBoundCond = 0;    // All connected to exterior
+    }
+
+    // Test 1: both pools off
+    Pool1Data.QPoolSrcAvg = 0.0;
+    Pool1Data.HeatTransCoefsAvg = 0.0;
+    Pool2Data.QPoolSrcAvg = 0.0;
+    Pool2Data.HeatTransCoefsAvg = 0.0;
+    
+    // Call subroutine
+    bool poolOnFlag = false;
+    UpdatePoolSourceValAvg(*state,poolOnFlag);
+    
+    // Test data transfer
+    EXPECT_FALSE(poolOnFlag);
+    EXPECT_NEAR(HBFanData->QPoolSurfNumerator(1),noResult,closeEnough);
+    EXPECT_NEAR(HBFanData->QPoolSurfNumerator(2),noResult,closeEnough);
+    EXPECT_NEAR(HBFanData->PoolHeatTransCoefs(1),noResult,closeEnough);
+    EXPECT_NEAR(HBFanData->PoolHeatTransCoefs(2),noResult,closeEnough);
+
+    // Test 2a: pool 1 on, pool 2 off
+    Pool1Data.QPoolSrcAvg(1) = 100.0;
+    Pool1Data.HeatTransCoefsAvg(1) = 10.0;
+    Pool2Data.QPoolSrcAvg(2) = 0.0;
+    Pool2Data.HeatTransCoefsAvg(2) = 0.0;
+    HBFanData->QPoolSurfNumerator = noResult;
+    HBFanData->PoolHeatTransCoefs = noResult;
+
+    // Call subroutine
+    poolOnFlag = false;
+    UpdatePoolSourceValAvg(*state,poolOnFlag);
+    
+    // Test data transfer
+    EXPECT_TRUE(poolOnFlag);
+    EXPECT_NEAR(HBFanData->QPoolSurfNumerator(1),Pool1Data.QPoolSrcAvg(1),closeEnough);
+    EXPECT_NEAR(HBFanData->QPoolSurfNumerator(2),noResult,closeEnough);
+    EXPECT_NEAR(HBFanData->PoolHeatTransCoefs(1),Pool1Data.HeatTransCoefsAvg(1),closeEnough);
+    EXPECT_NEAR(HBFanData->PoolHeatTransCoefs(2),noResult,closeEnough);
+
+    // Test 2b: pool 1 off, pool 2 on
+    Pool1Data.QPoolSrcAvg(1) = 0.0;
+    Pool1Data.HeatTransCoefsAvg(1) = 0.0;
+    Pool2Data.QPoolSrcAvg(2) = 200.0;
+    Pool2Data.HeatTransCoefsAvg(2) = 20.0;
+    HBFanData->QPoolSurfNumerator = noResult;
+    HBFanData->PoolHeatTransCoefs = noResult;
+
+    // Call subroutine
+    poolOnFlag = false;
+    UpdatePoolSourceValAvg(*state,poolOnFlag);
+    
+    // Test data transfer
+    EXPECT_TRUE(poolOnFlag);
+    EXPECT_NEAR(HBFanData->QPoolSurfNumerator(1),noResult,closeEnough);
+    EXPECT_NEAR(HBFanData->QPoolSurfNumerator(2),Pool2Data.QPoolSrcAvg(2),closeEnough);
+    EXPECT_NEAR(HBFanData->PoolHeatTransCoefs(1),noResult,closeEnough);
+    EXPECT_NEAR(HBFanData->PoolHeatTransCoefs(2),Pool2Data.HeatTransCoefsAvg(2),closeEnough);
+
+    // Test 3: both pools on
+    Pool1Data.QPoolSrcAvg(1) = 100.0;
+    Pool1Data.HeatTransCoefsAvg(1) = 10.0;
+    Pool2Data.QPoolSrcAvg(2) = 200.0;
+    Pool2Data.HeatTransCoefsAvg(2) = 20.0;
+    HBFanData->QPoolSurfNumerator = noResult;
+    HBFanData->PoolHeatTransCoefs = noResult;
+
+    // Call subroutine
+    poolOnFlag = false;
+    UpdatePoolSourceValAvg(*state,poolOnFlag);
+    
+    // Test data transfer
+    EXPECT_TRUE(poolOnFlag);
+    EXPECT_NEAR(HBFanData->QPoolSurfNumerator(1),Pool1Data.QPoolSrcAvg(1),closeEnough);
+    EXPECT_NEAR(HBFanData->QPoolSurfNumerator(2),Pool2Data.QPoolSrcAvg(2),closeEnough);
+    EXPECT_NEAR(HBFanData->PoolHeatTransCoefs(1),Pool1Data.HeatTransCoefsAvg(1),closeEnough);
+    EXPECT_NEAR(HBFanData->PoolHeatTransCoefs(2),Pool2Data.HeatTransCoefsAvg(2),closeEnough);
+
 }
