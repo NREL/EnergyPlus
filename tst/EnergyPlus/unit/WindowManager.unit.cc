@@ -286,15 +286,9 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
         // Use complementary angle for exterior natural convection calculations
         state->dataSurface->Surface(1).Tilt = 180 - tiltSave;
-<<<<<<< HEAD
-        state->dataSurface->Surface(1).CosTilt = cos(state->dataSurface->Surface(winNum).Tilt * DataGlobalConstants::Pi / 180);
-        state->dataSurface->Surface(1).SinTilt = sin(state->dataSurface->Surface(winNum).Tilt * DataGlobalConstants::Pi / 180);
-        Convect::CalcISO15099WindowIntConvCoeff(
-=======
         state->dataSurface->Surface(1).CosTilt = cos(state->dataSurface->Surface(winNum).Tilt * Constant::Pi / 180);
         state->dataSurface->Surface(1).SinTilt = sin(state->dataSurface->Surface(winNum).Tilt * Constant::Pi / 180);
-        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
->>>>>>> origin/develop
+        Convect::CalcISO15099WindowIntConvCoeff(
             *state,
             winNum,
             outSurfTemp,
@@ -303,15 +297,9 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
         // revert tilt for interior natural convection calculations
         state->dataSurface->Surface(1).Tilt = tiltSave;
-<<<<<<< HEAD
-        state->dataSurface->Surface(1).CosTilt = cos(tiltSave * DataGlobalConstants::Pi / 180);
-        state->dataSurface->Surface(1).SinTilt = sin(tiltSave * DataGlobalConstants::Pi / 180);
-        Convect::CalcISO15099WindowIntConvCoeff(
-=======
         state->dataSurface->Surface(1).CosTilt = cos(tiltSave * Constant::Pi / 180);
         state->dataSurface->Surface(1).SinTilt = sin(tiltSave * Constant::Pi / 180);
-        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
->>>>>>> origin/develop
+        Convect::CalcISO15099WindowIntConvCoeff(
             *state,
             winNum,
             inSurfTemp,

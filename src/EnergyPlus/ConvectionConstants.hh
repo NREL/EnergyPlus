@@ -91,10 +91,10 @@ enum class HcInt {
     AwbiHattonHeatedWall,
     BeausoleilMorrisonMixedAssistingWall,
     BeausoleilMorrisonMixedOppossingWall,
-    BeausoleilMorrisonMixedStableCeiling,
-    BeausoleilMorrisonMixedUnstableCeiling,
     BeausoleilMorrisonMixedStableFloor,
     BeausoleilMorrisonMixedUnstableFloor,
+    BeausoleilMorrisonMixedStableCeiling,
+    BeausoleilMorrisonMixedUnstableCeiling,
     FohannoPolidoriVerticalWall,
     KaradagChilledCeiling,
     ISO15099Windows,
@@ -124,8 +124,8 @@ constexpr std::array<std::string_view, static_cast<int>(HcInt::Num)> HcIntNamesU
     "FISHERPEDERSENCEILINGDIFFUSERCEILING", 
     "FISHERPEDERSENCEILINGDIFFUSERFLOOR", 
     "ALAMDARIHAMMONDSTABLEHORIZONTAL", 
-    "ALAMDARIHAMMONDUNSTABLEHORIZONTAL", 
     "ALAMDARIHAMMONDVERTICALWALL", 
+    "ALAMDARIHAMMONDUNSTABLEHORIZONTAL", 
     "KHALIFAEQ3WALLAWAYFROMHEAT", 
     "KHALIFAEQ4CEILINGAWAYFROMHEAT", 
     "KHALIFAEQ5WALLNEARHEAT", 
@@ -236,8 +236,8 @@ constexpr std::array<std::string_view, static_cast<int>(HcExt::Num)> HcExtNamesU
     "SCHEDULE",
     "SETBYZONE", 
     "SIMPLECOMBINED",
-    "ASHRAETARP",
     "TARP",
+    "TARPOUTSIDE",
     "MOWITT",
     "DOE-2",
     "BLAST",
@@ -414,99 +414,6 @@ enum class IntConvClass
     Num
 };
 
-
-#ifdef GET_OUT	
-	HcIn SimpleBuoyVertWallEqNum = HcIn::FohannoPolidoriVerticalWall; // InConvClass_A3_VertWalls
-        int SimpleBuoyVertWallUserCurveNum = 0;
-        HcIn SimpleBuoyStableHorizEqNum = HcIn::AlamdariHammondStableHorizontal; // InConvClass_A3_StableHoriz
-        int SimpleBuoyStableHorizUserCurveNum = 0;
-        HcIn SimpleBuoyUnstableHorizEqNum = HcIn::AlamdariHammondUnstableHorizontal; // InConvClass_A3_UnstableHoriz
-        int SimpleBuoyUnstableHorizUserCurveNum = 0;
-        HcIn SimpleBuoyStableTiltedEqNum = HcIn::WaltonStableHorizontalOrTilt; // InConvClass_A3_StableTilted
-        int SimpleBuoyStableTiltedUserCurveNum = 0;
-        HcIn SimpleBuoyUnstableTiltedEqNum = HcIn::WaltonUnstableHorizontalOrTilt; // InConvClass_A3_UnstableTilted
-        int SimpleBuoyUnstableTiltedUserCurveNum = 0;
-        HcIn SimpleBuoyWindowsEqNum = HcIn::ISO15099Windows; // InConvClass_A3_Windows
-        int SimpleBuoyWindowsUserCurveNum = 0;
-        HcIn FloorHeatCeilingCoolVertWallEqNum = HcIn::KhalifaEq3WallAwayFromHeat; // InConvClass_A1_VertWalls
-        int FloorHeatCeilingCoolVertWallUserCurveNum = 0;
-        HcIn FloorHeatCeilingCoolStableHorizEqNum = HcIn::AlamdariHammondStableHorizontal; // InConvClass_A1_StableHoriz
-        int FloorHeatCeilingCoolStableHorizUserCurveNum = 0;
-        HcIn FloorHeatCeilingCoolUnstableHorizEqNum = HcIn::KhalifaEq4CeilingAwayFromHeat; // InConvClass_A1_UnstableHoriz
-        int FloorHeatCeilingCoolUnstableHorizUserCurveNum = 0;
-        HcIn FloorHeatCeilingCoolHeatedFloorEqNum = HcIn::AwbiHattonHeatedFloor; // InConvClass_A1_HeatedFloor
-        int FloorHeatCeilingCoolHeatedFloorUserCurveNum = 0;
-        HcIn FloorHeatCeilingCoolChilledCeilingEqNum = HcIn::KaradagChilledCeiling; // InConvClass_A1_ChilledCeil
-        int FloorHeatCeilingCoolChilledCeilingUserCurveNum = 0;
-        HcIn FloorHeatCeilingCoolStableTiltedEqNum = HcIn::WaltonStableHorizontalOrTilt; // InConvClass_A1_StableTilted
-        int FloorHeatCeilingCoolStableTiltedUserCurveNum = 0;
-        HcIn FloorHeatCeilingCoolUnstableTiltedEqNum = HcIn::WaltonUnstableHorizontalOrTilt; // InConvClass_A1_UnstableTilted
-        int FloorHeatCeilingCoolUnstableTiltedUserCurveNum = 0;
-        HcIn FloorHeatCeilingCoolWindowsEqNum = HcIn::ISO15099Windows; // InConvClass_A1_Windows
-        int FloorHeatCeilingCoolWindowsUserCurveNum = 0;
-        HcIn WallPanelHeatVertWallEqNum = HcIn::KhalifaEq6NonHeatedWalls; // InConvClass_A2_VertWallsNonHeated
-        int WallPanelHeatVertWallUserCurveNum = 0;
-        HcIn WallPanelHeatHeatedWallEqNum = HcIn::AwbiHattonHeatedWall; // InConvClass_A2_HeatedVerticalWall
-        int WallPanelHeatHeatedWallUserCurveNum = 0;
-        HcIn WallPanelHeatStableHorizEqNum = HcIn::AlamdariHammondStableHorizontal; // InConvClass_A2_StableHoriz
-        int WallPanelHeatStableHorizUserCurveNum = 0;
-        HcIn WallPanelHeatUnstableHorizEqNum = HcIn::KhalifaEq7Ceiling; // InConvClass_A2_UnstableHoriz
-        int WallPanelHeatUnstableHorizUserCurveNum = 0;
-        HcIn WallPanelHeatStableTiltedEqNum = HcIn::WaltonStableHorizontalOrTilt; // InConvClass_A2_StableTilted
-        int WallPanelHeatStableTiltedUserCurveNum = 0;
-        HcIn WallPanelHeatUnstableTiltedEqNum = HcIn::WaltonUnstableHorizontalOrTilt; // InConvClass_A2_UnstableTilted
-        int WallPanelHeatUnstableTiltedUserCurveNum = 0;
-        HcIn WallPanelHeatWindowsEqNum = HcIn::ISO15099Windows; // InConvClass_A2_Windows
-        int WallPanelHeatWindowsUserCurveNum = 0;
-        HcIn ConvectiveHeatVertWallEqNum = HcIn::FohannoPolidoriVerticalWall; // B
-        int ConvectiveHeatVertWallUserCurveNum = 0;
-        HcIn ConvectiveHeatVertWallNearHeaterEqNum = HcIn::KhalifaEq5WallNearHeat; // B
-        int ConvectiveHeatVertWallNearHeaterUserCurveNum = 0;
-        HcIn ConvectiveHeatStableHorizEqNum = HcIn::AlamdariHammondStableHorizontal; // B
-        int ConvectiveHeatStableHorizUserCurveNum = 0;
-        HcIn ConvectiveHeatUnstableHorizEqNum = HcIn::KhalifaEq7Ceiling; // B
-        int ConvectiveHeatUnstableHorizUserCurveNum = 0;
-        HcIn ConvectiveHeatStableTiltedEqNum = HcIn::WaltonStableHorizontalOrTilt; // B
-        int ConvectiveHeatStableTiltedUserCurveNum = 0;
-        HcIn ConvectiveHeatUnstableTiltedEqNum = HcIn::WaltonUnstableHorizontalOrTilt; // B
-        int ConvectiveHeatUnstableTiltedUserCurveNum = 0;
-        HcIn ConvectiveHeatWindowsEqNum = HcIn::ISO15099Windows; // B
-        int ConvectiveHeatWindowsUserCurveNum = 0;
-        HcIn CentralAirWallEqNum = HcIn::GoldsteinNovoselacCeilingDiffuserWalls; // C
-        int CentralAirWallUserCurveNum = 0;
-        HcIn CentralAirCeilingEqNum = HcIn::FisherPedersenCeilDiffuserCeiling; // C
-        int CentralAirCeilingUserCurveNum = 0;
-        HcIn CentralAirFloorEqNum = HcIn::GoldsteinNovoselacCeilingDiffuserFloor; // C
-        int CentralAirFloorUserCurveNum = 0;
-        HcIn CentralAirWindowsEqNum = HcIn::GoldsteinNovoselacCeilingDiffuserWindow; // C
-        int CentralAirWindowsUserCurveNum = 0;
-        HcIn ZoneFanCircVertWallEqNum = HcIn::KhalifaEq3WallAwayFromHeat; // D
-        int ZoneFanCircVertWallUserCurveNum = 0;
-        HcIn ZoneFanCircStableHorizEqNum = HcIn::AlamdariHammondStableHorizontal; // D
-        int ZoneFanCircStableHorizUserCurveNum = 0;
-        HcIn ZoneFanCircUnstableHorizEqNum = HcIn::KhalifaEq4CeilingAwayFromHeat; // D
-        int ZoneFanCircUnstableHorizUserCurveNum = 0;
-        HcIn ZoneFanCircStableTiltedEqNum = HcIn::WaltonStableHorizontalOrTilt; // D
-        int ZoneFanCircStableTiltedUserCurveNum = 0;
-        HcIn ZoneFanCircUnstableTiltedEqNum = HcIn::WaltonUnstableHorizontalOrTilt; // D
-        int ZoneFanCircUnstableTiltedUserCurveNum = 0;
-        HcIn ZoneFanCircWindowsEqNum = HcIn::ISO15099Windows; // D
-        int ZoneFanCircWindowsUserCurveNum = 0;
-        HcIn MixedBuoyAssistingFlowWallEqNum = HcIn::BeausoleilMorrisonMixedAssistingWall; // E
-        int MixedBuoyAssistingFlowWallUserCurveNum = 0;
-        HcIn MixedBuoyOpposingFlowWallEqNum = HcIn::BeausoleilMorrisonMixedOppossingWall; // E
-        int MixedBuoyOpposingFlowWallUserCurveNum = 0;
-        HcIn MixedStableFloorEqNum = HcIn::BeausoleilMorrisonMixedStableFloor; // E
-        int MixedStableFloorUserCurveNum = 0;
-        HcIn MixedUnstableFloorEqNum = HcIn::BeausoleilMorrisonMixedUnstableFloor; // E
-        int MixedUnstableFloorUserCurveNum = 0;
-        HcIn MixedStableCeilingEqNum = HcIn::BeausoleilMorrisonMixedStableCeiling; // E
-        int MixedStableCeilingUserCurveNum = 0;
-        HcIn MixedUnstableCeilingEqNum = HcIn::BeausoleilMorrisonMixedUnstableCeiling; // E
-        int MixedUnstableCeilingUserCurveNum = 0;
-        HcIn MixedWindowsEqNum = HcIn::GoldsteinNovoselacCeilingDiffuserWindow; // E
-        int MixedWindowsUserCurveNum = 0;
-#endif // GET_OUT
 // Report values for "Surface Inside Face Convection Classification Index"
 // note that Invalid (-1) is also reported but not included here
 // where used, that should be handled with a static_cast<int>(InConvClass::Invalid)

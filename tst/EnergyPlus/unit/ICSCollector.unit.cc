@@ -123,7 +123,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataHeatBal->ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
     // allocate zone variable data
     state->dataHeatBal->Zone.allocate(ZoneNum);
-    state->dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo = Convect::HcInt_ASHRAESimple;
+    state->dataHeatBal->Zone(ZoneNum).ExtConvAlgo = Convect::HcExt::ASHRAESimple;
     // allocate surface temperature variable data
     state->dataHeatBalSurf->SurfOutsideTempHist.allocate(1);
     state->dataHeatBalSurf->SurfOutsideTempHist(1).allocate(NumOfSurf);
@@ -134,8 +134,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     // set user defined conv. coeff. calculation to false
     state->dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(NumOfSurf, 1.0);
-    state->dataSurface->SurfExtConvCoeffIndex.allocate(NumOfSurf);
-    state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = 0;
+    state->dataSurface->SurfExtConvCoeff.allocate(NumOfSurf);
+    state->dataSurface->SurfExtConvCoeff(SurfNum) = Convect::HcExt::SetByZone;
     state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(NumOfSurf);
     state->dataSurface->SurfEMSOverrideExtConvCoef(1) = false;
     auto &surface = state->dataSurface->Surface(SurfNum);

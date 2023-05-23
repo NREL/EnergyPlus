@@ -1351,7 +1351,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
     // This then interfaces with the Hanby model for near-pipe region
 
     // Using/Aliasing
-    using Convect::CalcASHRAESimpExtConvectCoeff;
+    using Convect::CalcASHRAESimpExtConvCoeff;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr NumSections(20);
@@ -1427,7 +1427,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                         Cp = this->SoilCp;
 
                         // ASHRAE simple convection coefficient model for external surfaces.
-                        this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, state.dataEnvrn->WindSpeed);
+                        this->OutdoorConvCoef = CalcASHRAESimpExtConvCoeff(TopRoughness, state.dataEnvrn->WindSpeed);
                         ConvCoef = this->OutdoorConvCoef;
 
                         // thermal radiation coefficient using surf temp from past time step

@@ -491,8 +491,10 @@ namespace DataSurfaces {
 
         // Special Properties
         HeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
-        int IntConvCoeff;                        // Interior Convection Coefficient Algorithm pointer (different data structure)
-        int ExtConvCoeff;                        // Exterior Convection Coefficient Algorithm pointer (different data structure)
+        Convect::HcInt intConvCoeff;             // Interior convection algorithm
+        int intConvUserCoeffNum;                 // Interior convection user coefficient index
+	Convect::HcExt extConvCoeff;             // Exterior convection algorithm
+        int extConvUserCoeffNum;                 // Exterior convection user coefficient index
         int OSCPtr;                              // Pointer to OSC data structure
         int OSCMPtr;                             // "Pointer" to OSCM data structure (other side conditions from a model)
 
@@ -541,8 +543,10 @@ namespace DataSurfaces {
                     hash<Real64>()(ViewFactorSky),
 
                     hash<HeatTransferModel>()(HeatTransferAlgorithm),
-                    hash<int>()(IntConvCoeff),
-                    hash<int>()(ExtConvCoeff),
+		    hash<Convect::HcInt>()(intConvCoeff),
+		    hash<Convect::HcExt>()(extConvCoeff),
+		    hash<int>()(intConvUserCoeffNum),
+		    hash<int>()(extConvUserCoeffNum),
                     hash<int>()(OSCPtr),
                     hash<int>()(OSCMPtr),
 
@@ -577,8 +581,9 @@ namespace DataSurfaces {
                     ExtEnclIndex == other.ExtEnclIndex && ExtSolar == other.ExtSolar && ExtWind == other.ExtWind &&
                     ViewFactorGround == other.ViewFactorGround && ViewFactorSky == other.ViewFactorSky &&
 
-                    HeatTransferAlgorithm == other.HeatTransferAlgorithm && IntConvCoeff == other.IntConvCoeff &&
-                    ExtConvCoeff == other.ExtConvCoeff && OSCPtr == other.OSCPtr && OSCMPtr == other.OSCMPtr &&
+                    HeatTransferAlgorithm == other.HeatTransferAlgorithm && intConvCoeff == other.intConvCoeff &&
+                    intConvUserCoeffNum == other.intConvUserCoeffNum && extConvUserCoeffNum == other.extConvUserCoeffNum &&
+		    extConvCoeff == other.extConvCoeff && OSCPtr == other.OSCPtr && OSCMPtr == other.OSCMPtr &&
 
                     FrameDivider == other.FrameDivider && SurfWinStormWinConstr == other.SurfWinStormWinConstr &&
 
@@ -1673,8 +1678,8 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::WindowShadingControlData> WindowShadingControl;
     EPVector<DataSurfaces::OSCData> OSC;
     EPVector<DataSurfaces::OSCMData> OSCM;
-    EPVector<DataSurfaces::ConvectionCoefficient> UserInConvectionCoefs;
-    EPVector<DataSurfaces::ConvectionCoefficient> UserOutConvectionCoefs;
+    EPVector<DataSurfaces::ConvectionCoefficient> UserIntConvCoeffs;
+    EPVector<DataSurfaces::ConvectionCoefficient> UserExtConvCoeffs;
     EPVector<DataSurfaces::ShadingVertexData> ShadeV;
     EPVector<DataSurfaces::SurfaceSolarIncident> SurfIncSolSSG;
     EPVector<DataSurfaces::SurfaceIncidentSolarMultiplier> SurfIncSolMultiplier;
@@ -2029,8 +2034,8 @@ struct SurfacesData : BaseGlobalStruct
         this->WindowShadingControl.deallocate();
         this->OSC.deallocate();
         this->OSCM.deallocate();
-        this->UserInConvectionCoefs.deallocate();
-        this->UserOutConvectionCoefs.deallocate();
+        this->UserIntConvCoeffs.deallocate();
+        this->UserExtConvCoeffs.deallocate();
         this->ShadeV.deallocate();
         this->SurfIncSolSSG.deallocate();
         this->SurfIncSolMultiplier.deallocate();
