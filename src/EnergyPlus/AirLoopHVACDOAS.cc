@@ -71,6 +71,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -382,6 +383,7 @@ namespace AirLoopHVACDOAS {
 
                 thisSplitter.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 thisSplitter.InletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("inlet_node_name").get<std::string>());
+                thisSplitter.InletNodeNum = UtilityRoutines::FindItemInList(thisSplitter.InletNodeName, state.dataLoopNodes->NodeID);
                 thisSplitter.m_AirLoopSplitter_Num = AirLoopSplitterNum - 1;
 
                 auto NodeNames = fields.find("nodes");
@@ -782,6 +784,38 @@ namespace AirLoopHVACDOAS {
 
                 thisDOAS.m_AirLoopDOASNum = AirLoopDOASNum - 1;
                 state.dataAirLoopHVACDOAS->airloopDOAS.push_back(thisDOAS);
+
+                // ensure the inlet node should be an outdoor air node
+                bool OAnodeFound = false;
+                for (int OutsideAirNodeNum = 1; OutsideAirNodeNum <= state.dataOutAirNodeMgr->NumOutsideAirNodes; ++OutsideAirNodeNum) {
+                    if (thisDOAS.m_InletNodeNum == state.dataOutAirNodeMgr->OutsideAirNodeList(OutsideAirNodeNum)) {
+                        OAnodeFound = true;
+                        break;
+                    }
+                }
+                if (!OAnodeFound) {
+                    ShowSevereError(state,
+                                    format("Inlet node ({}) is not one of OutdoorAir:Node in {} = {}",
+                                           state.dataLoopNodes->NodeID(thisDOAS.m_InletNodeNum),
+                                           CurrentModuleObject,
+                                           thisDOAS.Name));
+                    errorsFound = true;
+                }
+                // Ensure the outlet node is the splitter inlet node 
+                bool OutletnodeFound = false;
+                if (thisDOAS.m_OutletNodeNum == thisDOAS.m_CompPointerAirLoopSplitter->InletNodeNum) {
+                    OutletnodeFound = true;
+                }
+                if (!OutletnodeFound) {
+                    ShowSevereError(
+                        state,
+                        format("Outlet node is not the inlet node of AirLoopHVAC:Splitter in {} = {}", CurrentModuleObject, thisDOAS.Name));
+                    ShowContinueError(state,
+                                      format("The outlet node name is {}, and the inlet node name of AirLoopHVAC:Splitter is {}",
+                                             state.dataLoopNodes->NodeID(thisDOAS.m_OutletNodeNum),
+                                             state.dataLoopNodes->NodeID(thisDOAS.m_CompPointerAirLoopSplitter->InletNodeNum)));
+                    errorsFound = true;
+                }
             }
 
             // Check valid OA controller
