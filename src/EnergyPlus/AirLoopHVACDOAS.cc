@@ -801,15 +801,14 @@ namespace AirLoopHVACDOAS {
                                            thisDOAS.Name));
                     errorsFound = true;
                 }
-                // Ensure the outlet node is the splitter inlet node 
+                // Ensure the outlet node is the splitter inlet node
                 bool OutletnodeFound = false;
                 if (thisDOAS.m_OutletNodeNum == thisDOAS.m_CompPointerAirLoopSplitter->InletNodeNum) {
                     OutletnodeFound = true;
                 }
                 if (!OutletnodeFound) {
                     ShowSevereError(
-                        state,
-                        format("Outlet node is not the inlet node of AirLoopHVAC:Splitter in {} = {}", CurrentModuleObject, thisDOAS.Name));
+                        state, format("Outlet node is not the inlet node of AirLoopHVAC:Splitter in {} = {}", CurrentModuleObject, thisDOAS.Name));
                     ShowContinueError(state,
                                       format("The outlet node name is {}, and the inlet node name of AirLoopHVAC:Splitter is {}",
                                              state.dataLoopNodes->NodeID(thisDOAS.m_OutletNodeNum),
