@@ -188,7 +188,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // get input for heat exchanger model
 
-    static constexpr std::string_view RoutineName("GetFluidHeatExchangerInput: ");
+    std::string_view RoutineName("GetFluidHeatExchangerInput: ");
 
     bool ErrorsFound(false);
     int NumAlphas;        // Number of elements in the alpha array
@@ -546,6 +546,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
     }
 
     cCurrentModuleObject = "HeatExchanger:SteamToWater";
+    RoutineName = "GetSteamToWaterHeatExchangerInput: ";
     for (int SteamCompLoop = 1; SteamCompLoop <= state.dataPlantHXFluidToFluid->NumberOfSteamToWaterHXs; ++SteamCompLoop) {
         int CompLoop = SteamCompLoop + state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs;
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -844,7 +845,7 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        "Fluid Heat Exchanger Effectiveness",
+                        reportVarPrefix + "Heat Exchanger Effectiveness",
                         OutputProcessor::Unit::None,
                         this->Effectiveness,
                         OutputProcessor::SOVTimeStepType::System,
@@ -864,8 +865,8 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // Initialize heat exchanger model
 
-    static constexpr std::string_view RoutineNameNoColon("InitFluidHeatExchanger");
-    static constexpr std::string_view RoutineNameSTWNoColon("InitSteamToWaterHeatExchanger");
+    std::string_view RoutineNameNoColon("InitFluidHeatExchanger");
+
     Real64 rho;
 
     this->oneTimeInit(state); // plant setup
@@ -886,11 +887,12 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                this->DemandSideLoop.outletNodeNum);
 
         } else if (this->Type == DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg) {
+            RoutineNameNoColon = "InitFluidHeatExchanger";
             Real64 TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(state,
                                                                                 state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
                                                                                 DataEnvironment::StdPressureSeaLevel,
                                                                                 state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                                RoutineNameSTWNoColon);
+                                                                                RoutineNameNoColon);
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp = TempWaterAtmPress;
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Press = DataEnvironment::StdPressureSeaLevel;
             Real64 rhoSteam = FluidProperties::GetSatDensityRefrig(state,
@@ -898,14 +900,14 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                                    state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp,
                                                                    1.0,
                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                   RoutineNameSTWNoColon);
+                                                                   RoutineNameNoColon);
 
             Real64 StartEnthSteam = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                           state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
                                                                           state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp,
                                                                           1.0,
                                                                           state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                          RoutineNameSTWNoColon);
+                                                                          RoutineNameNoColon);
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Enthalpy = StartEnthSteam;
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Quality = 1.0;
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).HumRat = 0.0;
