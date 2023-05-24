@@ -326,6 +326,31 @@ New report for PlantLoop objects. One row for each Plant or CondenserLoop
 - Minimum Loop Flow Rate
 - Total pump power on loop
 
+#### Equipment Summary - AirTerminals ####
+
+New report for AirTerminals.
+- name
+- type of input object
+- Heat/Reheat Coil Object Type
+- Zone Name
+- Hot Water Plant Loop Name
+- Hot Water Plant Branch Name
+- Chilled Water Coil Object Type
+- Chilled Water Plant Loop Name
+- Chilled Water Plant Branch Name
+- Fan Object Type
+- Fan Name
+- Primary Air Flow Rate
+- Secondary Air Flow Rate
+- Minimum Flow
+- Minimum Flow Schedule Name
+- Maximum Flow During Reheat
+- Supply cooling setpoint
+- Supply heating setpoint
+- Temperature control
+- Heating capacity
+- Cooling capacity
+
 
 
 ## Testing/Validation/Data Sources ##
