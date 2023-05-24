@@ -887,13 +887,13 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                this->DemandSideLoop.outletNodeNum);
 
         } else if (this->Type == DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg) {
-            RoutineNameNoColon = "InitFluidHeatExchanger";
-            Real64 TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(state,
+            RoutineNameNoColon = "InitSteamToWaterHeatExchanger";
+            Real64 SatTemp = FluidProperties::GetSatTemperatureRefrig(state,
                                                                                 state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
                                                                                 DataEnvironment::StdPressureSeaLevel,
                                                                                 state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                                 RoutineNameNoColon);
-            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp = TempWaterAtmPress;
+            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp = SatTemp;
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Press = DataEnvironment::StdPressureSeaLevel;
             Real64 rhoSteam = FluidProperties::GetSatDensityRefrig(state,
                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
@@ -902,13 +902,13 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                                    state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                    RoutineNameNoColon);
 
-            Real64 StartEnthSteam = FluidProperties::GetSatEnthalpyRefrig(state,
+            Real64 InitSteamH = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                           state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
                                                                           state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp,
                                                                           1.0,
                                                                           state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                           RoutineNameNoColon);
-            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Enthalpy = StartEnthSteam;
+            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Enthalpy = InitSteamH;
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Quality = 1.0;
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).HumRat = 0.0;
 
@@ -920,8 +920,8 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                this->DemandSideLoop.inletNodeNum,
                                                this->DemandSideLoop.outletNodeNum);
 
-            this->DemandSideLoop.InletEnthalpy = StartEnthSteam;
-            this->DemandSideLoop.InletQuality = 1.0;
+            this->DemandSideLoop.InletEnthalpy = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Enthalpy;
+            this->DemandSideLoop.InletQuality = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Quality;
             this->DemandSideLoop.InletSteamPress = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Press;
         }
 
