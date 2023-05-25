@@ -7282,7 +7282,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
                         if (state.dataEnvrn->IsRain) { // Raining: since wind exposed, outside surface gets wet
 
-                            if (state.dataSurface->SurfExtConvUserCoeffNum(SurfNum) != 0) { // Reset SurfHcExt because of wetness
+                            if (state.dataSurface->SurfExtConvUserCoeffNum(SurfNum) == 0) { // Reset SurfHcExt because of wetness
                                 state.dataHeatBalSurf->SurfHConvExt(SurfNum) = 1000.0;
                             } else { // User set
                                 state.dataHeatBalSurf->SurfHConvExt(SurfNum) = Convect::SetExtConvCoeff(state, SurfNum);

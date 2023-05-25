@@ -1712,18 +1712,21 @@ void GetUserConvCoeffs(EnergyPlusData &state)
     SetupAdaptiveConvStaticMetaData(state);
 }
 
-void ApplyIntConvValue(EnergyPlusData &state, int SurfNum, [[maybe_unused]] HcInt model, int userNum)
+void ApplyIntConvValue(EnergyPlusData &state, int surfNum, HcInt convCoeff, int convUserCoeffNum)
 {
-    if (state.dataSurface->SurfIntConvUserCoeffNum(SurfNum) != 0) {
+    if (convUserCoeffNum == 0) {
+        state.dataSurface->SurfIntConvCoeff(surfNum) = convCoeff;
+    } else if (state.dataSurface->SurfIntConvUserCoeffNum(surfNum) == 0) {
+        state.dataSurface->SurfIntConvCoeff(surfNum) = convCoeff;
+        state.dataSurface->SurfIntConvUserCoeffNum(surfNum) = convUserCoeffNum;
+    } else {
         ShowWarningError(state,
                          format("User Supplied Convection Coefficients not overwriting already assigned value for (Inside) in Surface={}",
-                                state.dataSurface->Surface(SurfNum).Name));
-    } else {
-        state.dataSurface->SurfIntConvUserCoeffNum(SurfNum) = userNum;
-    }
+                                state.dataSurface->Surface(surfNum).Name));
+    } 
 }
 
-void ApplyIntConvValueMulti(EnergyPlusData &state, SurfaceFilter surfaceFilter, [[maybe_unused]] HcInt model, int userNum)
+void ApplyIntConvValueMulti(EnergyPlusData &state, SurfaceFilter surfaceFilter, HcInt convCoeff, int convUserCoeffNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1744,44 +1747,50 @@ void ApplyIntConvValueMulti(EnergyPlusData &state, SurfaceFilter surfaceFilter, 
 	return;
     }
 	
-    int SurfaceCountInside = 0;
-    for (int SurfNum : state.dataSurface->SurfaceFilterLists[static_cast<int>(surfaceFilter)]) {
-        if (state.dataSurface->SurfIntConvUserCoeffNum(SurfNum) != 0) {
-            if (state.dataGlobal->DisplayExtraWarnings) {
-                ShowWarningError(state,
-                                 format("User Supplied Convection Coefficients, Multiple Surface Assignments=\"{}\", not overwriting already "
-                                        "assigned value for (Inside) in Surface={}",
-                                        SurfaceFilterNamesUC[static_cast<int>(surfaceFilter)],
-                                        state.dataSurface->Surface(SurfNum).Name));
-            } else {
-                ++SurfaceCountInside;
-            }
+    int numWarnings = 0;
+    for (int surfNum : state.dataSurface->SurfaceFilterLists[static_cast<int>(surfaceFilter)]) {
+        if (convUserCoeffNum == 0) {
+            state.dataSurface->SurfIntConvCoeff(surfNum) = convCoeff;
+	} else if (state.dataSurface->SurfIntConvUserCoeffNum(surfNum) == 0) {
+            state.dataSurface->SurfIntConvCoeff(surfNum) = convCoeff;
+            state.dataSurface->SurfIntConvUserCoeffNum(surfNum) = convUserCoeffNum;
+	} else if (state.dataGlobal->DisplayExtraWarnings) {
+            ShowWarningError(state,
+                             format("User Supplied Convection Coefficients, Multiple Surface Assignments=\"{}\", not overwriting already "
+                                    "assigned value for (Inside) in Surface={}",
+                                    SurfaceFilterNamesUC[static_cast<int>(surfaceFilter)],
+                                    state.dataSurface->Surface(surfNum).Name));
         } else {
-            state.dataSurface->SurfIntConvUserCoeffNum(SurfNum) = userNum;
-        }
-    }
-    if (!state.dataGlobal->DisplayExtraWarnings && SurfaceCountInside > 0) {
+            ++numWarnings;
+	}
+    } // for (surfNum)
+    
+    if (!state.dataGlobal->DisplayExtraWarnings && numWarnings > 0) {
         ShowWarningError(state,
                          format("User Supplied Convection Coefficients, Multiple Surface Assignments=\"{}\", not overwriting already assigned "
                                 "values for {} Inside assignments.",
                                 SurfaceFilterNamesUC[static_cast<int>(surfaceFilter)],
-                                SurfaceCountInside));
+                                numWarnings));
     }
 }
 
-void ApplyExtConvValue(EnergyPlusData &state, int surfNum, [[maybe_unused]] HcExt model, int userNum)
+void ApplyExtConvValue(EnergyPlusData &state, int surfNum, HcExt convCoeff, int convUserCoeffNum)
 {
     if (state.dataSurface->Surface(surfNum).OSCPtr > 0) return;
-    if (state.dataSurface->SurfExtConvUserCoeffNum(surfNum) != 0) {
+
+    if (convUserCoeffNum == 0) {
+        state.dataSurface->SurfExtConvCoeff(surfNum) = convCoeff;
+    } else if (state.dataSurface->SurfExtConvUserCoeffNum(surfNum) == 0) {
+        state.dataSurface->SurfExtConvCoeff(surfNum) = convCoeff;
+        state.dataSurface->SurfExtConvUserCoeffNum(surfNum) = convUserCoeffNum;
+    } else {
         ShowWarningError(state,
                          format("User Supplied Convection Coefficients not overwriting already assigned value for (Outside) in Surface={}",
                                 state.dataSurface->Surface(surfNum).Name));
-    } else {
-        state.dataSurface->SurfExtConvUserCoeffNum(surfNum) = userNum;
     }
 }
 
-void ApplyExtConvValueMulti(EnergyPlusData &state, SurfaceFilter surfaceFilter, [[maybe_unused]] HcExt model, int userNum)
+void ApplyExtConvValueMulti(EnergyPlusData &state, SurfaceFilter surfaceFilter, HcExt convCoeff, int convUserCoeffNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1793,36 +1802,36 @@ void ApplyExtConvValueMulti(EnergyPlusData &state, SurfaceFilter surfaceFilter, 
     // one of the "regular" convection types and becomes a "negative" convection
     // type to that surface.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
     if (state.dataSurface->SurfaceFilterLists[static_cast<int>(surfaceFilter)].size() == 0) {
-	    return;
+        return;
     }
 
-    int SurfaceCountOutside = 0;
+    int numWarnings = 0;
     for (int surfNum : state.dataSurface->SurfaceFilterLists[static_cast<int>(surfaceFilter)]) {
         if (state.dataSurface->Surface(surfNum).OSCPtr > 0) continue;
-	if (state.dataSurface->SurfExtConvUserCoeffNum(surfNum) != 0) {
-            if (state.dataGlobal->DisplayExtraWarnings) {
-                ShowWarningError(state,
-                                 format("User Supplied Convection Coefficients, Multiple Surface Assignments=\"{}\", not overwriting already "
-                                        "assigned value for (Outside) in Surface={}",
-                                        SurfaceFilterNamesUC[static_cast<int>(surfaceFilter)],
-                                        state.dataSurface->Surface(surfNum).Name));
-            } else {
-                ++SurfaceCountOutside;
-            }
-        } else {
-            state.dataSurface->SurfExtConvUserCoeffNum(surfNum) = userNum;
-        }
-    }
 
-    if (!state.dataGlobal->DisplayExtraWarnings && SurfaceCountOutside > 0) {
+	if (convUserCoeffNum == 0) {
+            state.dataSurface->SurfExtConvCoeff(surfNum) = convCoeff;
+	} else if (state.dataSurface->SurfExtConvUserCoeffNum(surfNum) == 0) {
+	    state.dataSurface->SurfExtConvCoeff(surfNum) = convCoeff;
+            state.dataSurface->SurfExtConvUserCoeffNum(surfNum) = convUserCoeffNum;
+	} else if (state.dataGlobal->DisplayExtraWarnings) {
+            ShowWarningError(state,
+                             format("User Supplied Convection Coefficients, Multiple Surface Assignments=\"{}\", not overwriting already "
+                                    "assigned value for (Outside) in Surface={}",
+                                    SurfaceFilterNamesUC[static_cast<int>(surfaceFilter)],
+                                    state.dataSurface->Surface(surfNum).Name));
+        } else {
+            ++numWarnings;
+	}
+    } // for (surfNum)
+
+    if (!state.dataGlobal->DisplayExtraWarnings && numWarnings > 0) {
         ShowWarningError(state,
                          format("User Supplied Convection Coefficients, Multiple Surface Assignments=\"{}\", not overwriting already assigned "
                                 "values for {} Outside assignments.",
                                 SurfaceFilterNamesUC[static_cast<int>(surfaceFilter)],
-                                SurfaceCountOutside));
+                                numWarnings));
     }
 }
 	
